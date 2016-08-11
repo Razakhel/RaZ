@@ -1,2 +1,2 @@
 # RaZ
-2D game engine/computer vision library (undefined).
+3D engine, for self-learning purposes.
