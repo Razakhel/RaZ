@@ -163,11 +163,11 @@ int main() {
   glfwMakeContextCurrent(window); // Defining the created window as the current context
   glfwSetKeyCallback(window, key_callback); // Adds the key_callback function to the window
 
-  glewExperimental = GL_TRUE; // Setting GLEW to force modern OpenGL to be executed
+  /*glewExperimental = GL_TRUE; // Setting GLEW to force modern OpenGL to be executed
   if (glewInit() != GLEW_OK) {
     std::cout << "Failed to initialize GLEW." << std::endl;
     return -1;
-  }
+  }*/
 
   int width, height;
   glfwGetFramebufferSize(window, &width, &height); // Recovers the window's width & height in variables

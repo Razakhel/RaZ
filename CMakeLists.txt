@@ -24,8 +24,14 @@ endif ()
 #add_library(RaZ SHARED ${SOURCE_FILES})
 add_executable(RaZ ${SOURCE_FILES})
 
-find_package(GLEW REQUIRED)
+#find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-target_link_libraries(RaZ GLEW GL glfw)
+if (WIN32)
+    set(LIBS "opengl32 glfw3")
+else ()
+    set(LIBS "GL glfw")
+endif ()
+
+target_link_libraries(RaZ ${LIBS})
