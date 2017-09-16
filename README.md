@@ -1,2 +1,2 @@
 # RaZ
-3D engine, for self-learning purposes.
+Basic 3D engine, mainly for learning purposes.
