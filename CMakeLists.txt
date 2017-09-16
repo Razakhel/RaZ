@@ -19,11 +19,13 @@ set(
     main.cpp
 
     src/RaZ/Mesh/Mesh.cpp
+    src/RaZ/Mesh/Shape.cpp
     src/RaZ/Mesh/Shader.cpp
     src/RaZ/Utils/Window.cpp
 
     include/RaZ/RaZ.hpp
     include/RaZ/Mesh/Mesh.hpp
+    include/RaZ/Mesh/Shape.hpp
     include/RaZ/Mesh/Shader.hpp
     include/RaZ/Utils/Window.hpp
 )

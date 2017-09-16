@@ -20,9 +20,6 @@ void Shader::read(const std::string& fileName) {
 
   content = std::string(&bytes[0], fileSize);
 
-  /*std::ifstream shaderSource(fileName, std::ios::in);
-  content = dynamic_cast<const std::stringstream&>(std::stringstream() << shaderSource.rdbuf()).str();*/
-
   index = glCreateShader(type);
   glShaderSource(index, 1, reinterpret_cast<const GLchar* const*>(&content), nullptr);
   glCompileShader(index);
