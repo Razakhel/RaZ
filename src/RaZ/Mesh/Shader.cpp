@@ -31,14 +31,14 @@ void Shader::read(const std::string& fileName) {
     std::array<GLchar, 512> infoLog;
 
     glGetShaderInfoLog(index, infoLog.size(), nullptr, infoLog.data());
-    std::cerr << "Error: Vertex shader compilation failed." << '\n' << infoLog.data() << std::endl;
+    std::cerr << "Error: Vertex shader compilation failed.\n" << infoLog.data() << std::endl;
   }
 }
 
-ShaderProgram::ShaderProgram(const std::initializer_list<Shader>& shaderList) {
+ShaderProgram::ShaderProgram(std::initializer_list<Shader> shadersList) {
   index = glCreateProgram();
 
-  for (auto shaderIndex : shaderList)
+  for (auto shaderIndex : shadersList)
     glAttachShader(index, shaderIndex.getIndex());
 
   glLinkProgram(index);
@@ -50,7 +50,7 @@ ShaderProgram::ShaderProgram(const std::initializer_list<Shader>& shaderList) {
     std::array<GLchar, 512> infoLog;
 
     glGetProgramInfoLog(index, infoLog.size(), nullptr, infoLog.data());
-    std::cerr << "Error: Shader program link failed." << std::endl << infoLog.data() << std::endl;
+    std::cerr << "Error: Shader program link failed.\n" << infoLog.data() << std::endl;
   }
 }
 

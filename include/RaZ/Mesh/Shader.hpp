@@ -49,7 +49,7 @@ public:
 class ShaderProgram {
 public:
   ShaderProgram() = default;
-  ShaderProgram(const std::initializer_list<Shader>& shaderList);
+  ShaderProgram(std::initializer_list<Shader> shadersList);
 
   GLuint getIndex() { return index; }
 
