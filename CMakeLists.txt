@@ -9,14 +9,22 @@ elseif (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 endif ()
 
+find_package(OpenGL REQUIRED)
+
 include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
+
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+AUX_SOURCE_DIRECTORY(extern/glfw/src GLFW_SRC)
 
 set(
     SRC
 
     main.cpp
+
+    ${GLFW_SRC}
 
     src/RaZ/Mesh/Mesh.cpp
     src/RaZ/Mesh/Shape.cpp
@@ -30,34 +38,107 @@ set(
     include/RaZ/Utils/Window.hpp
 )
 
-# Disabling useless stuff from GLFW
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+# Defining preprocessor macros and selecting files to be removed
+if (UNIX)
+    add_definitions(
+        -D_GLFW_X11
+        -D_GLFW_HAS_XF86VM
 
-if (WIN32)
-    set(GLEW_ROOT "D:\\Librairies\\glew-2.0.0")
-    set(GLEW_INCLUDE_DIR "${GLEW_ROOT}\\include")
-    include_directories(${GLEW_INCLUDE_DIR})
-    set(GLEW_DIR "${GLEW_ROOT}\\bin\\Release\\x64")
-    set(GLEW_LIBRARY "${GLEW_ROOT}\\lib\\Release\\x64")
+        -fsanitize=undefined
+        -fsanitize=address
+        -fsanitize=leak
+    )
 
-    set(glfw3_ROOT "D:\\Program Files\\GLFW")
-    include_directories(${glfw3_ROOT}\\include)
-    set(glfw3_DIR "${glfw3_ROOT}\\lib\\cmake\\glfw3")
+    file(
+        GLOB
+        DISPOSABLE
+
+        extern/glfw/src/cocoa*
+        extern/glfw/src/win32*
+        extern/glfw/src/wl*
+        extern/glfw/src/wgl*
+        extern/glfw/src/mir*
+        extern/glfw/src/*.m
+    )
+
+    set(
+        LIBS
+
+        asan
+        ubsan
+    )
+
+    set(
+        DEPS
+
+        X11
+        Xrandr
+        Xcursor
+        Xinerama
+        Xxf86vm
+        pthread
+        dl
+    )
+elseif (WIN32)
+    add_definitions(-D_GLFW_WIN32)
+
+    file(
+        GLOB
+        DISPOSABLE
+
+        extern/glfw/src/cocoa*
+        extern/glfw/src/x11*
+        extern/glfw/src/wl*
+        extern/glfw/src/mir*
+        extern/glfw/src/glx*
+        extern/glfw/src/linux*
+        extern/glfw/src/posix*
+    )
+elseif (APPLE)
+    add_definitions(
+        -D_GLFW_COCOA
+        -D_GLFW_USE_CHDIR
+        -D_GLFW_USE_MENUBAR
+        -D_GLFW_USE_RETINA
+    )
+
+    file(
+        GLOB
+        DISPOSABLE
+
+        extern/glfw/src/win32*
+        extern/glfw/src/x11*
+        extern/glfw/src/wl*
+        extern/glfw/src/mir*
+        extern/glfw/src/glx*
+        extern/glfw/src/linux*
+    )
 endif ()
 
-#add_library(RaZ SHARED ${SRC})
-add_executable(RaZ ${SRC})
+# Adding recursively every file we want to compile
+file(
+    GLOB_RECURSE
+    SOURCE_FILES
+    ${SRC}
+)
 
-find_package(GLEW REQUIRED)
-find_package(glfw3 REQUIRED)
-find_package(OpenGL REQUIRED)
+# Removing unwanted platform-specific files
+list(
+    REMOVE_ITEM
+    SOURCE_FILES
+    ${DISPOSABLE}
+)
+
+#add_library(RaZ SHARED ${SOURCE_FILES})
+add_executable(RaZ ${SOURCE_FILES} main.cpp)
 
 if (WIN32)
-    set(LIBS "opengl32 glfw")
+    set(LIBS ${LIBS} opengl32)
 else ()
-    set(LIBS "-lGL -lglfw -lGLEW")
+    set(LIBS ${LIBS} -lasan -lubsan -lGL -lGLEW)
 endif ()
 
-target_link_libraries(RaZ ${LIBS})
+target_link_libraries(
+    RaZ ${LIBS}
+    ${DEPS}
+)

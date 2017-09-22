@@ -3,7 +3,7 @@
 #ifndef RAZ_WINDOW_HPP
 #define RAZ_WINDOW_HPP
 
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 
 namespace Raz {
 
