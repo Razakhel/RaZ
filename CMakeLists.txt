@@ -4,7 +4,7 @@ project(RaZ)
 set(CMAKE_CXX_STANDARD 14)
 
 if (CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-value")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-value -Wno-unused-parameter")
 elseif (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 endif ()
@@ -71,6 +71,7 @@ if (UNIX)
         DEPS
 
         X11
+        GL
         Xrandr
         Xcursor
         Xinerama
@@ -131,12 +132,6 @@ list(
 
 #add_library(RaZ SHARED ${SOURCE_FILES})
 add_executable(RaZ ${SOURCE_FILES} main.cpp)
-
-if (WIN32)
-    set(LIBS ${LIBS} opengl32)
-else ()
-    set(LIBS ${LIBS} -lasan -lubsan -lGL -lGLEW)
-endif ()
 
 target_link_libraries(
     RaZ ${LIBS}
