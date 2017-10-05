@@ -5,7 +5,8 @@
 
 #include <vector>
 #include <string>
-#include <GL/glew.h>
+
+#include "GL/glew.h"
 
 namespace Raz {
 

@@ -1,6 +1,6 @@
 #include <iostream>
-#include <GL/glew.h>
 
+#include "GL/glew.h"
 #include "RaZ/Utils/Window.hpp"
 
 namespace Raz {
@@ -12,7 +12,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
     glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-}
+} // namespace
 
 Window::Window(unsigned int width, unsigned int height, const std::string& name) {
   glfwInit();
@@ -23,7 +23,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
 
   window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
   if (!window) {
-    std::cerr << "Failed to create GLFW Window." << std::endl;
+    std::cerr << "Error: Failed to create GLFW Window." << std::endl;
     glfwTerminate();
   }
 

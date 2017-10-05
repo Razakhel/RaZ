@@ -9,7 +9,7 @@ namespace Raz {
 
 class Window {
 public:
-  Window(unsigned int width, unsigned int height, const std::string& name);
+  Window(unsigned int width, unsigned int height, const std::string& name = "");
 
   int shouldClose() { return glfwWindowShouldClose(window); }
 

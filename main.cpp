@@ -1,5 +1,4 @@
-#include <GL/glew.h>
-
+#include "GL/glew.h"
 #include "RaZ/RaZ.hpp"
 
 int main() {

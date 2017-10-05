@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <GL/glew.h>
 
+#include "GL/glew.h"
 #include "RaZ/Mesh/Shader.hpp"
 
 namespace Raz {
