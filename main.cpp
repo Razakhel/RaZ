@@ -9,7 +9,7 @@ int main() {
 
   Raz::ShaderProgram program({ vertShader, fragShader });
 
-  Raz::Mesh mesh("../meshes/queen.off");
+  Raz::Mesh mesh("../assets/queen.off");
 
   glBindVertexArray(mesh.getVao().getIndex());
 
