@@ -16,6 +16,8 @@ public:
 
   GLuint getIndex() const { return index; }
 
+  void bind() { glBindVertexArray(index); }
+
   ~VertexArray() { glDeleteVertexArrays(1, &index); }
 
 private:
@@ -29,6 +31,8 @@ public:
   GLuint getIndex() const { return index; }
   const std::vector<float>& getVertices() const { return vertices; }
   std::vector<float>& getVertices() { return vertices; }
+
+  void bind() { glBindBuffer(GL_ARRAY_BUFFER, index); }
 
   ~VertexBuffer() { glDeleteBuffers(1, &index); }
 
@@ -45,6 +49,8 @@ public:
   const std::vector<unsigned int>& getIndices() const { return indices; }
   std::vector<unsigned int>& getIndices() { return indices; }
 
+  void bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index); }
+
   ~ElementBuffer() { glDeleteBuffers(1, &index); }
 
 private:
@@ -57,6 +63,8 @@ public:
   Texture() { glGenTextures(1, &index); }
 
   GLuint getIndex() const { return index; }
+
+  void bind() { glBindTexture(GL_TEXTURE_2D, index); }
 
   ~Texture() { glDeleteTextures(1, &index); }
 

@@ -50,6 +50,8 @@ public:
   ShaderProgram() = default;
   ShaderProgram(std::initializer_list<Shader> shadersList);
 
+  void use() { glUseProgram(index); }
+
   GLuint getIndex() const { return index; }
 
 private:

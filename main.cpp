@@ -11,12 +11,12 @@ int main() {
 
   Raz::Mesh mesh("../assets/queen.off");
 
-  glBindVertexArray(mesh.getVao().getIndex());
+  mesh.getVao().bind();
 
-  glBindBuffer(GL_ARRAY_BUFFER, mesh.getVbo().getIndex());
+  mesh.getVbo().bind();
   glBufferData(GL_ARRAY_BUFFER, mesh.getVertexCount(), mesh.getVbo().getVertices().data(), GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.getEbo().getIndex());
+  mesh.getEbo().bind();
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.getEbo().getIndices().size(), mesh.getEbo().getIndices().data(), GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
@@ -31,8 +31,8 @@ int main() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(program.getIndex());
-    glBindVertexArray(mesh.getVao().getIndex());
+    program.use();
+    mesh.getVao().bind();
     glDrawElements(GL_TRIANGLES, mesh.getEbo().getIndices().size(), GL_UNSIGNED_INT, nullptr);
 
     window.swapBuffers();
