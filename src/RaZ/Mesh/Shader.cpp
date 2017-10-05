@@ -18,38 +18,38 @@ void Shader::read(const std::string& fileName) {
   std::vector<char> bytes(fileSize);
   shaderSource.read(&bytes[0], fileSize);
 
-  content = std::string(&bytes[0], fileSize);
+  m_content = std::string(&bytes[0], fileSize);
 
-  index = glCreateShader(type);
-  glShaderSource(index, 1, reinterpret_cast<const GLchar* const*>(&content), nullptr);
-  glCompileShader(index);
+  m_index = glCreateShader(m_type);
+  glShaderSource(m_index, 1, reinterpret_cast<const GLchar* const*>(&m_content), nullptr);
+  glCompileShader(m_index);
 
   GLint success;
-  glGetShaderiv(index, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(m_index, GL_COMPILE_STATUS, &success);
 
   if (!success) {
     std::array<GLchar, 512> infoLog;
 
-    glGetShaderInfoLog(index, infoLog.size(), nullptr, infoLog.data());
+    glGetShaderInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
     std::cerr << "Error: Vertex shader compilation failed.\n" << infoLog.data() << std::endl;
   }
 }
 
 ShaderProgram::ShaderProgram(std::initializer_list<Shader> shadersList) {
-  index = glCreateProgram();
+  m_index = glCreateProgram();
 
   for (auto shaderIndex : shadersList)
-    glAttachShader(index, shaderIndex.getIndex());
+    glAttachShader(m_index, shaderIndex.getIndex());
 
-  glLinkProgram(index);
+  glLinkProgram(m_index);
 
   GLint success;
-  glGetProgramiv(index, GL_LINK_STATUS, &success);
+  glGetProgramiv(m_index, GL_LINK_STATUS, &success);
 
   if (!success) {
     std::array<GLchar, 512> infoLog;
 
-    glGetProgramInfoLog(index, infoLog.size(), nullptr, infoLog.data());
+    glGetProgramInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
     std::cerr << "Error: Shader program link failed.\n" << infoLog.data() << std::endl;
   }
 }

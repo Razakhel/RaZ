@@ -17,20 +17,20 @@ namespace Raz {
 
 class Shader {
 public:
-  GLuint getIndex() const { return index; }
-  const std::string& getContent() const { return content; }
+  GLuint getIndex() const { return m_index; }
+  const std::string& getContent() const { return m_content; }
 
   void read(const std::string& fileName);
 
-  ~Shader() { glDeleteShader(index); }
+  ~Shader() { glDeleteShader(m_index); }
 
 protected:
-  Shader(ShaderType type) : type{ type } {}
+  Shader(ShaderType type) : m_type{ type } {}
 
-  GLuint index;
-  std::string content;
+  GLuint m_index;
+  std::string m_content;
 
-  ShaderType type;
+  ShaderType m_type;
 };
 
 class VertexShader : public Shader {
@@ -50,12 +50,12 @@ public:
   ShaderProgram() = default;
   ShaderProgram(std::initializer_list<Shader> shadersList);
 
-  void use() { glUseProgram(index); }
+  void use() const { glUseProgram(m_index); }
 
-  GLuint getIndex() const { return index; }
+  GLuint getIndex() const { return m_index; }
 
 private:
-  GLuint index;
+  GLuint m_index;
 };
 
 } // namespace Raz

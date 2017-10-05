@@ -12,82 +12,90 @@ namespace Raz {
 
 class VertexArray {
 public:
-  VertexArray() { glGenVertexArrays(1, &index); }
+  VertexArray() { glGenVertexArrays(1, &m_index); }
 
-  GLuint getIndex() const { return index; }
+  GLuint getIndex() const { return m_index; }
 
-  void bind() { glBindVertexArray(index); }
+  void bind() const { glBindVertexArray(m_index); }
 
-  ~VertexArray() { glDeleteVertexArrays(1, &index); }
+  ~VertexArray() { glDeleteVertexArrays(1, &m_index); }
 
 private:
-  GLuint index;
+  GLuint m_index;
 };
 
 class VertexBuffer {
 public:
-  VertexBuffer() { glGenBuffers(1, &index); }
+  VertexBuffer() { glGenBuffers(1, &m_index); }
 
-  GLuint getIndex() const { return index; }
-  const std::vector<float>& getVertices() const { return vertices; }
-  std::vector<float>& getVertices() { return vertices; }
+  GLuint getIndex() const { return m_index; }
+  const std::vector<float>& getVertices() const { return m_vertices; }
+  std::vector<float>& getVertices() { return m_vertices; }
 
-  void bind() { glBindBuffer(GL_ARRAY_BUFFER, index); }
+  void bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_index); }
 
-  ~VertexBuffer() { glDeleteBuffers(1, &index); }
+  ~VertexBuffer() { glDeleteBuffers(1, &m_index); }
 
 private:
-  GLuint index;
-  std::vector<float> vertices;
+  GLuint m_index;
+  std::vector<float> m_vertices;
 };
 
 class ElementBuffer {
 public:
-  ElementBuffer() { glGenBuffers(1, &index); }
+  ElementBuffer() { glGenBuffers(1, &m_index); }
 
-  GLuint getIndex() const { return index; }
-  const std::vector<unsigned int>& getIndices() const { return indices; }
-  std::vector<unsigned int>& getIndices() { return indices; }
+  GLuint getIndex() const { return m_index; }
+  const std::vector<unsigned int>& getIndices() const { return m_indices; }
+  std::vector<unsigned int>& getIndices() { return m_indices; }
 
-  void bind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index); }
+  void setIndices(const std::vector<unsigned int>& indices);
 
-  ~ElementBuffer() { glDeleteBuffers(1, &index); }
+  void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index); }
+
+  ~ElementBuffer() { glDeleteBuffers(1, &m_index); }
 
 private:
-  GLuint index;
-  std::vector<unsigned int> indices;
+  GLuint m_index;
+  std::vector<unsigned int> m_indices;
 };
 
 class Texture {
 public:
-  Texture() { glGenTextures(1, &index); }
+  Texture() { glGenTextures(1, &m_index); }
 
-  GLuint getIndex() const { return index; }
+  GLuint getIndex() const { return m_index; }
 
-  void bind() { glBindTexture(GL_TEXTURE_2D, index); }
+  void load(const std::string& fileName);
+  void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
 
-  ~Texture() { glDeleteTextures(1, &index); }
+  ~Texture() { glDeleteTextures(1, &m_index); }
 
 private:
-  GLuint index;
+  GLuint m_index;
 };
 
 class Mesh {
 public:
+  Mesh(const std::vector<float>& data, const std::vector<unsigned int>& indices) { load(data, indices); }
   Mesh(const std::string& fileName) { load(fileName); }
 
-  VertexArray& getVao() { return vao; }
-  VertexBuffer& getVbo() { return vbo; }
-  ElementBuffer& getEbo() { return ebo; }
-  std::size_t getVertexCount() const { return vbo.getVertices().size(); }
-  std::size_t getFaceCount() const { return ebo.getIndices().size(); }
+  const VertexArray& getVao() const { return m_vao; }
+  const VertexBuffer& getVbo() const { return m_vbo; }
+  const ElementBuffer& getEbo() const { return m_ebo; }
+  const Texture& getTexture() const { return m_texture; }
+  std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
+  std::size_t getFaceCount() const { return m_ebo.getIndices().size(); }
 
+  void load(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
   void load(const std::string& fileName);
+  void draw() const;
 
 private:
-  VertexArray vao;
-  VertexBuffer vbo;
-  ElementBuffer ebo;
+  VertexArray m_vao;
+  VertexBuffer m_vbo;
+  ElementBuffer m_ebo;
+  Texture m_texture;
 };
 
 } // namespace Raz

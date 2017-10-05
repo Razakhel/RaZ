@@ -5,15 +5,6 @@
 
 namespace Raz {
 
-namespace {
-
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode) {
-  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, GL_TRUE);
-}
-
-} // namespace
-
 Window::Window(unsigned int width, unsigned int height, const std::string& name) {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -21,14 +12,17 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-  window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
-  if (!window) {
+  m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+  if (!m_window) {
     std::cerr << "Error: Failed to create GLFW Window." << std::endl;
     glfwTerminate();
   }
 
-  glfwMakeContextCurrent(window);
-  glfwSetKeyCallback(window, keyCallback);
+  glfwMakeContextCurrent(m_window);
+  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int scancode, int action, int mode) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(window, GL_TRUE);
+  });
 
   glViewport(0, 0, width, height);
 

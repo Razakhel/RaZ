@@ -11,16 +11,16 @@ class Window {
 public:
   Window(unsigned int width, unsigned int height, const std::string& name = "");
 
-  int shouldClose() { return glfwWindowShouldClose(window); }
+  int shouldClose() { return glfwWindowShouldClose(m_window); }
 
   void pollEvents() { glfwPollEvents(); }
-  void swapBuffers() { glfwSwapBuffers(window); }
+  void swapBuffers() { glfwSwapBuffers(m_window); }
   void close() { glfwTerminate(); }
 
   ~Window() { close(); }
 
 private:
-  GLFWwindow* window;
+  GLFWwindow* m_window;
 };
 
 } // namespace Raz
