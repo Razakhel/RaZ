@@ -9,21 +9,20 @@ elseif (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 endif ()
 
-find_package(OpenGL REQUIRED)
-
 include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
-
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+AUX_SOURCE_DIRECTORY(extern/glew/src GLEW_SRC)
 AUX_SOURCE_DIRECTORY(extern/glfw/src GLFW_SRC)
 
 set(
     SRC
 
-    main.cpp
-
+    ${GLEW_SRC}
     ${GLFW_SRC}
 
     src/RaZ/Mesh/Mesh.cpp
@@ -44,9 +43,9 @@ if (UNIX)
         -D_GLFW_X11
         -D_GLFW_HAS_XF86VM
 
-        -fsanitize=undefined
-        -fsanitize=address
-        -fsanitize=leak
+        #-fsanitize=undefined
+        #-fsanitize=address
+        #-fsanitize=leak
     )
 
     file(
@@ -64,8 +63,8 @@ if (UNIX)
     set(
         LIBS
 
-        asan
-        ubsan
+        #asan
+        #ubsan
     )
 
     set(
@@ -93,6 +92,7 @@ elseif (WIN32)
         extern/glfw/src/glx*
         extern/glfw/src/linux*
         extern/glfw/src/posix*
+        extern/glfw/src/*.m
     )
 elseif (APPLE)
     add_definitions(
