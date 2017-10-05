@@ -14,7 +14,7 @@ class VertexArray {
 public:
   VertexArray() { glGenVertexArrays(1, &index); }
 
-  const GLuint& getIndex() const { return index; }
+  GLuint getIndex() const { return index; }
 
   ~VertexArray() { glDeleteVertexArrays(1, &index); }
 
@@ -26,7 +26,8 @@ class VertexBuffer {
 public:
   VertexBuffer() { glGenBuffers(1, &index); }
 
-  const GLuint& getIndex() const { return index; }
+  GLuint getIndex() const { return index; }
+  const std::vector<float>& getVertices() const { return vertices; }
   std::vector<float>& getVertices() { return vertices; }
 
   ~VertexBuffer() { glDeleteBuffers(1, &index); }
@@ -40,7 +41,8 @@ class ElementBuffer {
 public:
   ElementBuffer() { glGenBuffers(1, &index); }
 
-  const GLuint& getIndex() const { return index; }
+  GLuint getIndex() const { return index; }
+  const std::vector<unsigned int>& getIndices() const { return indices; }
   std::vector<unsigned int>& getIndices() { return indices; }
 
   ~ElementBuffer() { glDeleteBuffers(1, &index); }
@@ -50,6 +52,18 @@ private:
   std::vector<unsigned int> indices;
 };
 
+class Texture {
+public:
+  Texture() { glGenTextures(1, &index); }
+
+  GLuint getIndex() const { return index; }
+
+  ~Texture() { glDeleteTextures(1, &index); }
+
+private:
+  GLuint index;
+};
+
 class Mesh {
 public:
   Mesh(const std::string& fileName) { load(fileName); }
@@ -57,8 +71,8 @@ public:
   VertexArray& getVao() { return vao; }
   VertexBuffer& getVbo() { return vbo; }
   ElementBuffer& getEbo() { return ebo; }
-  std::size_t getVertexCount() { return vbo.getVertices().size(); }
-  std::size_t getFaceCount() { return ebo.getIndices().size(); }
+  std::size_t getVertexCount() const { return vbo.getVertices().size(); }
+  std::size_t getFaceCount() const { return ebo.getIndices().size(); }
 
   void load(const std::string& fileName);
 

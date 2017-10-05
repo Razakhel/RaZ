@@ -4,22 +4,21 @@
 #define RAZ_SHADER_HPP
 
 #include <string>
-#include <GL/gl.h>
 #include <initializer_list>
 
-enum ShaderType {
-  RAZ_SHADER_TYPE_VERTEX = GL_VERTEX_SHADER,
-  RAZ_SHADER_TYPE_FRAGMENT = GL_FRAGMENT_SHADER,
-  RAZ_SHADER_TYPE_COMPUTE = GL_COMPUTE_SHADER,
-  RAZ_SHADER_TYPE_GEOMETRY = GL_GEOMETRY_SHADER
-};
+#include "GL/gl.h"
+
+enum ShaderType { RAZ_SHADER_TYPE_VERTEX = GL_VERTEX_SHADER,
+                  RAZ_SHADER_TYPE_FRAGMENT = GL_FRAGMENT_SHADER,
+                  RAZ_SHADER_TYPE_COMPUTE = GL_COMPUTE_SHADER,
+                  RAZ_SHADER_TYPE_GEOMETRY = GL_GEOMETRY_SHADER };
 
 namespace Raz {
 
 class Shader {
 public:
-  GLuint getIndex() { return index; }
-  const std::string& getContent() { return content; }
+  GLuint getIndex() const { return index; }
+  const std::string& getContent() const { return content; }
 
   void read(const std::string& fileName);
 
@@ -51,7 +50,7 @@ public:
   ShaderProgram() = default;
   ShaderProgram(std::initializer_list<Shader> shadersList);
 
-  GLuint getIndex() { return index; }
+  GLuint getIndex() const { return index; }
 
 private:
   GLuint index;
