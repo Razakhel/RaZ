@@ -4,25 +4,21 @@
 int main() {
   Raz::Window window(800, 600, "Test");
 
-  Raz::VertexShader vertShader("../shaders/vert.glsl");
-  Raz::FragmentShader fragShader("../shaders/frag.glsl");
+  const Raz::VertexShader vertShader("../shaders/vert.glsl");
+  const Raz::FragmentShader fragShader("../shaders/frag.glsl");
 
-  Raz::ShaderProgram program({ vertShader, fragShader });
+  const Raz::ShaderProgram program({ vertShader, fragShader });
 
-  Raz::Mesh mesh("../assets/queen.off");
+  //Raz::Mesh mesh("../assets/meshes/queen.off");
 
-  mesh.getVao().bind();
+  const std::vector<float> vertices = { -1.f, -1.f, 0.f,
+                                         1.f, -1.f, 0.f,
+                                         1.f,  1.f, 0.f,
+                                        -1.f,  1.f, 0.f };
 
-  mesh.getVbo().bind();
-  glBufferData(GL_ARRAY_BUFFER, mesh.getVertexCount(), mesh.getVbo().getVertices().data(), GL_STATIC_DRAW);
-
-  mesh.getEbo().bind();
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.getEbo().getIndices().size(), mesh.getEbo().getIndices().data(), GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-  glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
+  const std::vector<unsigned int> indices = { 0, 1, 3,
+                                              1, 2, 3 };
+  const Raz::Mesh mesh(vertices, indices);
 
   // Uncommenting this call will display scene in wireframe
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -32,8 +28,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     program.use();
-    mesh.getVao().bind();
-    glDrawElements(GL_TRIANGLES, mesh.getEbo().getIndices().size(), GL_UNSIGNED_INT, nullptr);
+    mesh.draw();
 
     window.swapBuffers();
     window.pollEvents();
