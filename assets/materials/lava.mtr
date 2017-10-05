@@ -1,0 +1,108 @@
+//Author Ken 'kat' Beyer
+//info@quake3bits.com
+//www.quake3bits.com
+//
+//////////////////////////////////////////////
+//
+//Edit the file paths below where necessary and
+//don't forget to include either the individual
+//files or make reference to the checksum reference
+//in your maps addon.conf file
+//
+//////////////////////////////////////////////
+
+//This version is static and without glowmap
+//It's used for the underlying surface where won't be seen
+//Note : Bumpmap is auto loaded due to file names used
+
+
+//path to add to ASE models : include '//'
+//q4base/textures/katslumpylava/lava_no_move
+//--------------------		
+textures/katslumpylava/lava_no_move
+{
+	materialType rock
+	noimpact
+	qer_editorimage		textures/katslumpylava/lava.tga
+
+		bumpmap			textures/katslumpylava/lava_local.tga
+		diffusemap		textures/katslumpylava/lava.tga
+}
+
+//path to add to **LWO** models BLENDER 3D ONLY : do NOT include '//'
+//textures/k/lav_no		
+//--------------------
+textures/k/lav_no
+{
+	materialType rock
+	noimpact
+	qer_editorimage		textures/katslumpylava/lava.tga
+
+		bumpmap			textures/katslumpylava/lava_local.tga
+		diffusemap		textures/katslumpylava/lava.tga
+}
+
+////////////////
+
+//This version of the texture moves slowly
+//path to add to ASE models : include '//'
+//q4base/textures/katslumpylava/lava
+//----------------------	
+textures/katslumpylava/lava
+{
+	twoSided
+	noimpact
+	nonsolid
+	qer_editorimage		textures/katslumpylava/lava.tga
+	
+
+	{	
+		blend		bumpmap
+		map			textures/katslumpylava/lava_local.tga
+		scale 2, 2
+		translate	time * 0.01 , time * -0.001
+	}
+	{
+		blend	diffusemap
+		map		textures/katslumpylava/lava.tga
+		scale 2, 2
+		translate	time * 0.01 , time * -0.001
+	}
+	{
+		blend add
+		map textures/katslumpylava/lava_glow.tga
+		scale 2, 2
+		translate	time * 0.01 , time * -0.001
+	}
+}
+
+//path to add to **LWO** models BLENDER 3D ONLY : do NOT include '//'
+//textures/k/lav
+//-------------------
+textures/k/lav
+{
+	twoSided
+	noimpact
+	nonsolid
+	qer_editorimage		textures/katslumpylava/lava.tga
+	
+
+	{	
+		blend		bumpmap
+		map			textures/katslumpylava/lava_local.tga
+		scale 2, 2
+		translate	time * 0.01 , time * -0.001
+	}
+	{
+		blend	diffusemap
+		map		textures/katslumpylava/lava.tga
+		scale 2, 2
+		translate	time * 0.01 , time * -0.001
+	}
+	{
+		blend add
+		map textures/katslumpylava/lava_glow.tga
+		scale 2, 2
+		translate	time * 0.01 , time * -0.001
+	}
+}
