@@ -131,7 +131,7 @@ list(
 )
 
 #add_library(RaZ SHARED ${SOURCE_FILES})
-add_executable(RaZ ${SOURCE_FILES} main.cpp)
+add_executable(RaZ ${SOURCE_FILES} examples/main.cpp)
 
 target_link_libraries(
     RaZ ${LIBS}
