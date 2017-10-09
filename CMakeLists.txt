@@ -80,7 +80,11 @@ if (UNIX)
         dl
     )
 elseif (WIN32)
-    add_definitions(-D_GLFW_WIN32)
+    add_definitions(
+        -D_GLFW_WIN32
+        -DGLEW_BUILD
+        #-DGLEW_NO_GLU
+    )
 
     file(
         GLOB
@@ -94,6 +98,12 @@ elseif (WIN32)
         extern/glfw/src/linux*
         extern/glfw/src/posix*
         extern/glfw/src/*.m
+    )
+
+    set(
+        DEPS
+
+        opengl32
     )
 elseif (APPLE)
     add_definitions(
@@ -118,8 +128,9 @@ endif ()
 
 # Adding recursively every file we want to compile
 file(
-    GLOB_RECURSE
+    GLOB
     SOURCE_FILES
+
     ${SRC}
 )
 
@@ -127,6 +138,7 @@ file(
 list(
     REMOVE_ITEM
     SOURCE_FILES
+
     ${DISPOSABLE}
 )
 

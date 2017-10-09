@@ -9,7 +9,7 @@ int main() {
 
   const Raz::ShaderProgram program({ vertShader, fragShader });
 
-  //Raz::Mesh mesh("../assets/meshes/queen.off");
+  //const Raz::Mesh mesh("../assets/meshes/queen.off");
 
   const std::vector<float> vertices = { -1.f, -1.f, 0.f,
                                          1.f, -1.f, 0.f,
@@ -18,6 +18,7 @@ int main() {
 
   const std::vector<unsigned int> indices = { 0, 1, 3,
                                               1, 2, 3 };
+
   const Raz::Mesh mesh(vertices, indices);
 
   // Uncommenting this call will display scene in wireframe
