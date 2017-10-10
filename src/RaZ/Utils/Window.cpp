@@ -31,4 +31,18 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
     std::cerr << "Error: Failed to initialize GLEW." << std::endl;
 }
 
+bool Window::run() const {
+  if (glfwWindowShouldClose(m_window))
+    return false;
+
+  glfwSwapBuffers(m_window);
+
+  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glfwPollEvents();
+
+  return true;
+}
+
 } // namespace Raz

@@ -11,11 +11,8 @@ class Window {
 public:
   Window(unsigned int width, unsigned int height, const std::string& name = "");
 
-  int shouldClose() { return glfwWindowShouldClose(m_window); }
-
-  void pollEvents() { glfwPollEvents(); }
-  void swapBuffers() { glfwSwapBuffers(m_window); }
-  void close() { glfwTerminate(); }
+  bool run() const;
+  void close() const { glfwTerminate(); }
 
   ~Window() { close(); }
 

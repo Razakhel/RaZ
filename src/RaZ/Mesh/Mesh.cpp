@@ -64,7 +64,8 @@ void Mesh::load(const std::string& fileName) {
 void Mesh::draw() const {
   m_texture.bind();
   m_vao.bind();
-  glDrawElements(GL_TRIANGLES, m_ebo.getIndices().size(), GL_UNSIGNED_INT, nullptr);
+
+  glDrawElements(GL_TRIANGLES, getFaceCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 } // namespace Raz
