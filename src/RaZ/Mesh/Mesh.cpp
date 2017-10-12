@@ -77,12 +77,15 @@ void Mesh::load(const std::string& fileName) {
   if (file) {
     const std::string format = extractFileExt(fileName);
 
-    if (format == "off" || format == "OFF")
+    if (format == "off" || format == "OFF") {
       loadOff(file, m_vbo, m_ebo);
-    else if (format == "obj" || format == "OBJ")
+      load(m_vbo.getVertices(), m_ebo.getIndices());
+    } else if (format == "obj" || format == "OBJ") {
       loadObj(file);
-    else
+      load(m_vbo.getVertices(), m_ebo.getIndices());
+    } else {
       std::cerr << "Error: '" << format << "' format is not supported" << std::endl;
+    }
   } else {
     std::cerr << "Error: Couldn't open the file '" << fileName << "'" << std::endl;
   }
