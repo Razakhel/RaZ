@@ -1,9 +1,42 @@
 #include <vector>
 #include <fstream>
+#include <iostream>
 
 #include "RaZ/Mesh/Mesh.hpp"
 
 namespace Raz {
+
+namespace {
+
+const std::string extractFileExt(const std::string& fileName) {
+  return (fileName.substr(fileName.find_last_of('.') + 1));
+}
+
+void loadOff(std::ifstream& file, VertexBuffer& vbo, ElementBuffer& ebo) {
+  unsigned int vertexCount, faceCount;
+
+  file.ignore(3);
+  file >> vertexCount >> faceCount;
+  file.ignore(100, '\n');
+
+  vbo.getVertices().resize(vertexCount * 3);
+  ebo.getIndices().resize(faceCount * 3);
+
+  for (unsigned int vertexIndex = 0; vertexIndex < vertexCount * 3; vertexIndex += 3)
+    file >> vbo.getVertices()[vertexIndex] >> vbo.getVertices()[vertexIndex + 1] >> vbo.getVertices()[vertexIndex + 2];
+
+  for (unsigned int faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
+    file.ignore(2);
+    file >> ebo.getIndices()[faceIndex] >> ebo.getIndices()[faceIndex + 1] >> ebo.getIndices()[faceIndex + 2];
+  }
+}
+
+void loadObj(const std::ifstream& file) {
+  std::cerr << "Error: OBJ reading not yet implemented" << std::endl;
+  exit(EXIT_FAILURE);
+}
+
+} // namespace
 
 void ElementBuffer::setIndices(const std::vector<unsigned int>& indices) {
   m_indices.resize(indices.size());
@@ -39,30 +72,24 @@ void Mesh::load(const std::vector<float>& vertices, const std::vector<unsigned i
 }
 
 void Mesh::load(const std::string& fileName) {
-  std::ifstream fs{ fileName };
+  std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
-  if (fs) {
-    unsigned int vertexCount, faceCount;
+  if (file) {
+    const std::string format = extractFileExt(fileName);
 
-    fs.ignore(3);
-    fs >> vertexCount >> faceCount;
-    fs.ignore(100, '\n');
-
-    m_vbo.getVertices().resize(vertexCount * 3);
-    m_ebo.getIndices().resize(faceCount * 3);
-
-    for (unsigned int vertexIndex = 0; vertexIndex < vertexCount * 3; vertexIndex += 3)
-      fs >> m_vbo.getVertices()[vertexIndex] >> m_vbo.getVertices()[vertexIndex + 1] >> m_vbo.getVertices()[vertexIndex + 2];
-
-    for (unsigned int faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
-      fs.ignore(2);
-      fs >> m_ebo.getIndices()[faceIndex] >> m_ebo.getIndices()[faceIndex + 1] >> m_ebo.getIndices()[faceIndex + 2];
-    }
+    if (format == "off" || format == "OFF")
+      loadOff(file, m_vbo, m_ebo);
+    else if (format == "obj" || format == "OBJ")
+      loadObj(file);
+    else
+      std::cerr << "Error: '" << format << "' format is not supported" << std::endl;
+  } else {
+    std::cerr << "Error: Couldn't open the file '" << fileName << "'" << std::endl;
   }
 }
 
 void Mesh::draw() const {
-  m_texture.bind();
+  //m_texture.bind();
   m_vao.bind();
 
   glDrawElements(GL_TRIANGLES, getFaceCount(), GL_UNSIGNED_INT, nullptr);
