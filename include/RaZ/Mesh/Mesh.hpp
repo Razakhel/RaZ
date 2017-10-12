@@ -31,6 +31,10 @@ public:
   GLuint getIndex() const { return m_index; }
   const std::vector<float>& getVertices() const { return m_vertices; }
   std::vector<float>& getVertices() { return m_vertices; }
+  const std::vector<float>& getNormals() const { return m_normals; }
+  std::vector<float>& getNormals() { return m_normals; }
+  const std::vector<float>& getTexcoords() const { return m_texcoords; }
+  std::vector<float>& getTexcoords() { return m_texcoords; }
 
   void bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_index); }
 
@@ -39,6 +43,8 @@ public:
 private:
   GLuint m_index;
   std::vector<float> m_vertices;
+  std::vector<float> m_normals;
+  std::vector<float> m_texcoords;
 };
 
 class ElementBuffer {
