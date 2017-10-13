@@ -1,3 +1,4 @@
+#include <string>
 #include <vector>
 #include <fstream>
 #include <iostream>
@@ -31,9 +32,47 @@ void loadOff(std::ifstream& file, VertexBuffer& vbo, ElementBuffer& ebo) {
   }
 }
 
-void loadObj(const std::ifstream& file) {
-  std::cerr << "Error: OBJ reading not yet implemented" << std::endl;
-  exit(EXIT_FAILURE);
+void loadObj(std::ifstream& file, VertexBuffer& vbo, ElementBuffer& ebo) {
+  while (!file.eof()) {
+    std::string type;
+    file >> type;
+
+    if (type[0] == 'v') {
+      if (type[1] == 'n') { // Normals
+        vbo.getNormals().resize(vbo.getNormals().size() + 3);
+
+        file >> vbo.getNormals()[vbo.getNormals().size() - 3]
+             >> vbo.getNormals()[vbo.getNormals().size() - 2]
+             >> vbo.getNormals()[vbo.getNormals().size() - 1];
+      } else if (type[1] == 't') { // Texcoords
+        vbo.getTexcoords().resize(vbo.getTexcoords().size() + 2);
+
+        file >> vbo.getTexcoords()[vbo.getTexcoords().size() - 2]
+             >> vbo.getTexcoords()[vbo.getTexcoords().size() - 1];
+      } else { // Vertices
+        vbo.getVertices().resize(vbo.getVertices().size() + 3);
+
+        file >> vbo.getVertices()[vbo.getVertices().size() - 3]
+             >> vbo.getVertices()[vbo.getVertices().size() - 2]
+             >> vbo.getVertices()[vbo.getVertices().size() - 1];
+      }
+    } else if (type[0] == 'f') { // Faces
+      ebo.getIndices().resize(ebo.getIndices().size() + 3);
+
+      std::string vertIndices;
+
+      file >> vertIndices;
+      *(ebo.getIndices().end() - 3) = std::stoul(vertIndices.substr(vertIndices.find_first_of('/') - 1));
+
+      file >> vertIndices;
+      *(ebo.getIndices().end() - 2) = std::stoul(vertIndices.substr(vertIndices.find_first_of('/') - 1));
+
+      file >> vertIndices;
+      *(ebo.getIndices().end() - 1) = std::stoul(vertIndices.substr(vertIndices.find_first_of('/') - 1));
+    } else {
+      std::getline(file, type); // Skip the rest of the line
+    }
+  }
 }
 
 } // namespace
@@ -81,7 +120,7 @@ void Mesh::load(const std::string& fileName) {
       loadOff(file, m_vbo, m_ebo);
       load(m_vbo.getVertices(), m_ebo.getIndices());
     } else if (format == "obj" || format == "OBJ") {
-      loadObj(file);
+      loadObj(file, m_vbo, m_ebo);
       load(m_vbo.getVertices(), m_ebo.getIndices());
     } else {
       std::cerr << "Error: '" << format << "' format is not supported" << std::endl;

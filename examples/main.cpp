@@ -8,7 +8,7 @@ int main() {
 
   const Raz::ShaderProgram program({ vertShader, fragShader });
 
-  const Raz::Mesh mesh("../assets/meshes/queen.off");
+  const Raz::Mesh mesh("../assets/meshes/cube.obj");
 
   /*const std::vector<float> vertices = { -1.f, -1.f, 0.f,
                                          1.f, -1.f, 0.f,
