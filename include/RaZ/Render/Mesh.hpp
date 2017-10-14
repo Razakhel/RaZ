@@ -7,6 +7,7 @@
 #include <string>
 
 #include "GL/glew.h"
+#include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
@@ -52,10 +53,14 @@ public:
   ElementBuffer() { glGenBuffers(1, &m_index); }
 
   GLuint getIndex() const { return m_index; }
-  const std::vector<unsigned int>& getIndices() const { return m_indices; }
-  std::vector<unsigned int>& getIndices() { return m_indices; }
+  const std::vector<unsigned int>& getVerticesIndices() const { return m_verticesIndices; }
+  std::vector<unsigned int>& getVerticesIndices() { return m_verticesIndices; }
+  const std::vector<unsigned int>& getTexcoordsIndices() const { return m_texcoordsIndices; }
+  std::vector<unsigned int>& getTexcoordsIndices() { return m_texcoordsIndices; }
+  const std::vector<unsigned int>& getNormalsIndices() const { return m_normalsIndices; }
+  std::vector<unsigned int>& getNormalsIndices() { return m_normalsIndices; }
 
-  void setIndices(const std::vector<unsigned int>& indices);
+  void setVerticesIndices(const std::vector<unsigned int>& indices);
 
   void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index); }
 
@@ -63,22 +68,9 @@ public:
 
 private:
   GLuint m_index;
-  std::vector<unsigned int> m_indices;
-};
-
-class Texture {
-public:
-  Texture() { glGenTextures(1, &m_index); }
-
-  GLuint getIndex() const { return m_index; }
-
-  void load(const std::string& fileName);
-  void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
-
-  ~Texture() { glDeleteTextures(1, &m_index); }
-
-private:
-  GLuint m_index;
+  std::vector<unsigned int> m_verticesIndices;
+  std::vector<unsigned int> m_texcoordsIndices;
+  std::vector<unsigned int> m_normalsIndices;
 };
 
 class Mesh {
@@ -91,7 +83,7 @@ public:
   const ElementBuffer& getEbo() const { return m_ebo; }
   const Texture& getTexture() const { return m_texture; }
   std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
-  std::size_t getFaceCount() const { return m_ebo.getIndices().size(); }
+  std::size_t getFaceCount() const { return m_ebo.getVerticesIndices().size(); }
 
   void load(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
   void load(const std::string& fileName);

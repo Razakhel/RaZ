@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "GL/glew.h"
-#include "RaZ/Mesh/Shader.hpp"
+#include "RaZ/Render/Shader.hpp"
 
 namespace Raz {
 

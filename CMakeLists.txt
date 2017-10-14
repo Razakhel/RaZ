@@ -25,15 +25,17 @@ set(
     ${GLEW_SRC}
     ${GLFW_SRC}
 
-    src/RaZ/Mesh/Mesh.cpp
-    src/RaZ/Mesh/Shape.cpp
-    src/RaZ/Mesh/Shader.cpp
+    src/RaZ/Render/Mesh.cpp
+    src/RaZ/Render/Shape.cpp
+    src/RaZ/Render/Shader.cpp
+    src/RaZ/Render/Texture.cpp
     src/RaZ/Utils/Window.cpp
 
     include/RaZ/RaZ.hpp
-    include/RaZ/Mesh/Mesh.hpp
-    include/RaZ/Mesh/Shape.hpp
-    include/RaZ/Mesh/Shader.hpp
+    include/RaZ/Render/Mesh.hpp
+    include/RaZ/Render/Shape.hpp
+    include/RaZ/Render/Shader.hpp
+    include/RaZ/Render/Texture.hpp
     include/RaZ/Utils/Window.hpp
 )
 

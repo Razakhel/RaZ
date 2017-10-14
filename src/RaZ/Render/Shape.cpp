@@ -1,7 +1,7 @@
 #include <cassert>
 #include <initializer_list>
 
-#include "RaZ/Mesh/Shape.hpp"
+#include "RaZ/Render/Shape.hpp"
 
 namespace Raz {
 

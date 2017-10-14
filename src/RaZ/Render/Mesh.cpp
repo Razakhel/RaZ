@@ -1,10 +1,9 @@
 #include <array>
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-#include "RaZ/Mesh/Mesh.hpp"
+#include "RaZ/Render/Mesh.hpp"
 
 namespace Raz {
 
@@ -22,14 +21,14 @@ void loadOff(std::ifstream& file, VertexBuffer& vbo, ElementBuffer& ebo) {
   file.ignore(100, '\n');
 
   vbo.getVertices().resize(vertexCount * 3);
-  ebo.getIndices().resize(faceCount * 3);
+  ebo.getVerticesIndices().resize(faceCount * 3);
 
   for (unsigned int vertexIndex = 0; vertexIndex < vertexCount * 3; vertexIndex += 3)
     file >> vbo.getVertices()[vertexIndex] >> vbo.getVertices()[vertexIndex + 1] >> vbo.getVertices()[vertexIndex + 2];
 
   for (unsigned int faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
     file.ignore(2);
-    file >> ebo.getIndices()[faceIndex] >> ebo.getIndices()[faceIndex + 1] >> ebo.getIndices()[faceIndex + 2];
+    file >> ebo.getVerticesIndices()[faceIndex] >> ebo.getVerticesIndices()[faceIndex + 1] >> ebo.getVerticesIndices()[faceIndex + 2];
   }
 }
 
@@ -58,28 +57,41 @@ void loadObj(std::ifstream& file, VertexBuffer& vbo, ElementBuffer& ebo) {
              >> vbo.getVertices()[vbo.getVertices().size() - 1];
       }
     } else if (type[0] == 'f') { // Faces
-      ebo.getIndices().resize(ebo.getIndices().size() + 3);
+      ebo.getVerticesIndices().resize(ebo.getVerticesIndices().size() + 3);
+      ebo.getNormalsIndices().resize(ebo.getNormalsIndices().size() + 3);
+      ebo.getTexcoordsIndices().resize(ebo.getTexcoordsIndices().size() + 3);
 
+      const char delim = '/';
       std::string index;
       std::array<std::string, 3> vertIndices;
 
       file >> index;
       for (uint8_t i = 0; i < 3; ++i)
-        std::getline(std::stringstream(index), vertIndices[i], '/');
+        std::getline(std::stringstream(index), vertIndices[i], delim);
 
-      *(ebo.getIndices().end() - 3) = std::stoul(vertIndices[0]);
-
-      file >> index;
-      for (uint8_t i = 0; i < 3; ++i)
-        std::getline(std::stringstream(index), vertIndices[i], '/');
-
-      *(ebo.getIndices().end() - 2) = std::stoul(vertIndices[0]);
+      *(ebo.getVerticesIndices().end() - 3) = std::stoul(vertIndices[0]);
+      *(ebo.getTexcoordsIndices().end() - 3) = std::stoul(vertIndices[1]);
+      *(ebo.getNormalsIndices().end() - 3) = std::stoul(vertIndices[2]);
 
       file >> index;
       for (uint8_t i = 0; i < 3; ++i)
-        std::getline(std::stringstream(index), vertIndices[i], '/');
+        std::getline(std::stringstream(index), vertIndices[i], delim);
 
-      *(ebo.getIndices().end() - 1) = std::stoul(vertIndices[0]);
+      *(ebo.getVerticesIndices().end() - 2) = std::stoul(vertIndices[0]);
+      *(ebo.getTexcoordsIndices().end() - 2) = std::stoul(vertIndices[1]);
+      *(ebo.getNormalsIndices().end() - 2) = std::stoul(vertIndices[2]);
+
+      file >> index;
+      for (uint8_t i = 0; i < 3; ++i)
+        std::getline(std::stringstream(index), vertIndices[i], delim);
+
+      *(ebo.getVerticesIndices().end() - 1) = std::stoul(vertIndices[0]);
+      *(ebo.getTexcoordsIndices().end() - 1) = std::stoul(vertIndices[1]);
+      *(ebo.getNormalsIndices().end() - 1) = std::stoul(vertIndices[2]);
+    } else if (type[0] == 'm') { // Import MTL
+      //file >> type;
+    } else if (type[0] == 'u') { // Use MTL
+      //file >> type;
     } else {
       std::getline(file, type); // Skip the rest of the line
     }
@@ -88,17 +100,13 @@ void loadObj(std::ifstream& file, VertexBuffer& vbo, ElementBuffer& ebo) {
 
 } // namespace
 
-void ElementBuffer::setIndices(const std::vector<unsigned int>& indices) {
-  m_indices.resize(indices.size());
-  std::move(indices.begin(), indices.end(), m_indices.begin());
-}
-
-void Texture::load(const std::string& fileName) {
-
+void ElementBuffer::setVerticesIndices(const std::vector<unsigned int>& indices) {
+  m_verticesIndices.resize(indices.size());
+  std::move(indices.begin(), indices.end(), m_verticesIndices.begin());
 }
 
 void Mesh::load(const std::vector<float>& vertices, const std::vector<unsigned int>& indices) {
-  m_ebo.setIndices(indices);
+  m_ebo.setVerticesIndices(indices);
 
   m_vao.bind();
 
@@ -129,10 +137,10 @@ void Mesh::load(const std::string& fileName) {
 
     if (format == "off" || format == "OFF") {
       loadOff(file, m_vbo, m_ebo);
-      load(m_vbo.getVertices(), m_ebo.getIndices());
+      load(m_vbo.getVertices(), m_ebo.getVerticesIndices());
     } else if (format == "obj" || format == "OBJ") {
       loadObj(file, m_vbo, m_ebo);
-      load(m_vbo.getVertices(), m_ebo.getIndices());
+      load(m_vbo.getVertices(), m_ebo.getVerticesIndices());
     } else {
       std::cerr << "Error: '" << format << "' format is not supported" << std::endl;
     }
