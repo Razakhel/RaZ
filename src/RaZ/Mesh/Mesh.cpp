@@ -1,6 +1,7 @@
+#include <array>
 #include <string>
-#include <vector>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 
 #include "RaZ/Mesh/Mesh.hpp"
@@ -59,16 +60,26 @@ void loadObj(std::ifstream& file, VertexBuffer& vbo, ElementBuffer& ebo) {
     } else if (type[0] == 'f') { // Faces
       ebo.getIndices().resize(ebo.getIndices().size() + 3);
 
-      std::string vertIndices;
+      std::string index;
+      std::array<std::string, 3> vertIndices;
 
-      file >> vertIndices;
-      *(ebo.getIndices().end() - 3) = std::stoul(vertIndices.substr(vertIndices.find_first_of('/') - 1));
+      file >> index;
+      for (uint8_t i = 0; i < 3; ++i)
+        std::getline(std::stringstream(index), vertIndices[i], '/');
 
-      file >> vertIndices;
-      *(ebo.getIndices().end() - 2) = std::stoul(vertIndices.substr(vertIndices.find_first_of('/') - 1));
+      *(ebo.getIndices().end() - 3) = std::stoul(vertIndices[0]);
 
-      file >> vertIndices;
-      *(ebo.getIndices().end() - 1) = std::stoul(vertIndices.substr(vertIndices.find_first_of('/') - 1));
+      file >> index;
+      for (uint8_t i = 0; i < 3; ++i)
+        std::getline(std::stringstream(index), vertIndices[i], '/');
+
+      *(ebo.getIndices().end() - 2) = std::stoul(vertIndices[0]);
+
+      file >> index;
+      for (uint8_t i = 0; i < 3; ++i)
+        std::getline(std::stringstream(index), vertIndices[i], '/');
+
+      *(ebo.getIndices().end() - 1) = std::stoul(vertIndices[0]);
     } else {
       std::getline(file, type); // Skip the rest of the line
     }
