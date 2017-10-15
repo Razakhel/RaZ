@@ -21,7 +21,9 @@ void Shader::read(const std::string& fileName) {
   m_content = std::string(&bytes[0], fileSize);
 
   m_index = glCreateShader(m_type);
-  glShaderSource(m_index, 1, reinterpret_cast<const GLchar* const*>(&m_content), nullptr);
+  const char* data = m_content.c_str();
+  GLint length = m_content.size();
+  glShaderSource(m_index, 1, static_cast<const GLchar* const*>(&data), &length);
   glCompileShader(m_index);
 
   GLint success;
@@ -32,6 +34,7 @@ void Shader::read(const std::string& fileName) {
 
     glGetShaderInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
     std::cerr << "Error: Vertex shader compilation failed.\n" << infoLog.data() << std::endl;
+    std::cerr << m_content << std::endl;
   }
 }
 
