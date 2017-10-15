@@ -3,8 +3,9 @@
 #ifndef RAZ_MESH_HPP
 #define RAZ_MESH_HPP
 
-#include <vector>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "GL/glew.h"
 #include "RaZ/Render/Texture.hpp"
@@ -18,6 +19,7 @@ public:
   GLuint getIndex() const { return m_index; }
 
   void bind() const { glBindVertexArray(m_index); }
+  void unbind() const { glBindVertexArray(0); }
 
   ~VertexArray() { glDeleteVertexArrays(1, &m_index); }
 
@@ -38,6 +40,7 @@ public:
   std::vector<float>& getTexcoords() { return m_texcoords; }
 
   void bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_index); }
+  void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
   ~VertexBuffer() { glDeleteBuffers(1, &m_index); }
 
@@ -61,6 +64,7 @@ public:
   std::vector<unsigned int>& getNormalsIndices() { return m_normalsIndices; }
 
   void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index); }
+  void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
   ~ElementBuffer() { glDeleteBuffers(1, &m_index); }
 
@@ -95,6 +99,8 @@ private:
   ElementBuffer m_ebo;
   Texture m_texture;
 };
+
+using MeshPtr = std::unique_ptr<Mesh>;
 
 } // namespace Raz
 

@@ -11,16 +11,16 @@ class Scene {
 public:
   Scene() = default;
   Scene(const std::string& fileName) { import(fileName); }
-  Scene(std::initializer_list<Mesh> meshes) : m_meshes(meshes) {}
+  Scene(std::vector<MeshPtr>&& meshes) : m_meshes(std::move(meshes)) {}
 
-  const std::vector<Mesh>& getMeshes() const { return m_meshes; }
-  std::vector<Mesh>& getMeshes() { return m_meshes; }
+  const std::vector<MeshPtr>& getMeshes() const { return m_meshes; }
+  std::vector<MeshPtr>& getMeshes() { return m_meshes; }
 
   void import(const std::string& fileName);
   void render() const;
 
 private:
-  std::vector<Mesh> m_meshes;
+  std::vector<MeshPtr> m_meshes;
 };
 
 } // namespace Raz
