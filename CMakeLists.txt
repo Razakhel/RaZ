@@ -26,15 +26,17 @@ set(
     ${GLFW_SRC}
 
     src/RaZ/Render/Mesh.cpp
-    src/RaZ/Render/Shape.cpp
+    src/RaZ/Render/Scene.cpp
     src/RaZ/Render/Shader.cpp
+    src/RaZ/Render/Shape.cpp
     src/RaZ/Render/Texture.cpp
     src/RaZ/Utils/Window.cpp
 
     include/RaZ/RaZ.hpp
     include/RaZ/Render/Mesh.hpp
-    include/RaZ/Render/Shape.hpp
+    include/RaZ/Render/Scene.hpp
     include/RaZ/Render/Shader.hpp
+    include/RaZ/Render/Shape.hpp
     include/RaZ/Render/Texture.hpp
     include/RaZ/Utils/Window.hpp
 )

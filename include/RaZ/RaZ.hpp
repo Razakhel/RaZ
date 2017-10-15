@@ -6,8 +6,9 @@
 #define GLEW_STATIC
 
 #include "Render/Mesh.hpp"
-#include "Render/Shape.hpp"
+#include "Render/Scene.hpp"
 #include "Render/Shader.hpp"
+#include "Render/Shape.hpp"
 #include "Render/Texture.hpp"
 #include "Utils/Window.hpp"
 

@@ -60,8 +60,6 @@ public:
   const std::vector<unsigned int>& getNormalsIndices() const { return m_normalsIndices; }
   std::vector<unsigned int>& getNormalsIndices() { return m_normalsIndices; }
 
-  void setVerticesIndices(const std::vector<unsigned int>& indices);
-
   void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index); }
 
   ~ElementBuffer() { glDeleteBuffers(1, &m_index); }
@@ -75,18 +73,20 @@ private:
 
 class Mesh {
 public:
-  Mesh(const std::vector<float>& data, const std::vector<unsigned int>& indices) { load(data, indices); }
-  Mesh(const std::string& fileName) { load(fileName); }
+  Mesh() = default;
 
   const VertexArray& getVao() const { return m_vao; }
+  VertexArray& getVao() { return m_vao; }
   const VertexBuffer& getVbo() const { return m_vbo; }
+  VertexBuffer& getVbo() { return m_vbo; }
   const ElementBuffer& getEbo() const { return m_ebo; }
+  ElementBuffer& getEbo() { return m_ebo; }
   const Texture& getTexture() const { return m_texture; }
+  Texture& getTexture() { return m_texture; }
   std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
   std::size_t getFaceCount() const { return m_ebo.getVerticesIndices().size(); }
 
-  void load(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
-  void load(const std::string& fileName);
+  void load() const;
   void draw() const;
 
 private:
