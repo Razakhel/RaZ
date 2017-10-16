@@ -2,34 +2,25 @@
 
 namespace Raz {
 
-void VertexArray::bind() const {
-  glBindVertexArray(m_index);
-  m_ebo.bind();
-}
-
-void VertexArray::unbind() const {
-  glBindVertexArray(0);
-  m_ebo.unbind();
-}
-
 void Mesh::load() const {
+  m_vao.bind();
+  getEbo().bind();
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+               sizeof(getEbo().getVerticesIndices().front()) * getEbo().getVerticesIndices().size(),
+               getEbo().getVerticesIndices().data(),
+               GL_STATIC_DRAW);
+
   m_vbo.bind();
   glBufferData(GL_ARRAY_BUFFER,
                sizeof(m_vbo.getVertices().front()) * m_vbo.getVertices().size(),
                m_vbo.getVertices().data(),
                GL_STATIC_DRAW);
-  m_vbo.unbind();
-
-  m_vao.bind();
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               sizeof(getEbo().getVerticesIndices().front()) * getEbo().getVerticesIndices().size(),
-               m_vao.getEbo().getVerticesIndices().data(),
-               GL_STATIC_DRAW);
-
-  m_vbo.bind();
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
+
   m_vao.unbind();
+  getEbo().unbind();
+  m_vbo.unbind();
 
   /*glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
