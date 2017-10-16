@@ -2,6 +2,16 @@
 
 namespace Raz {
 
+void VertexArray::bind() const {
+  glBindVertexArray(m_index);
+  m_ebo.bind();
+}
+
+void VertexArray::unbind() const {
+  glBindVertexArray(0);
+  m_ebo.unbind();
+}
+
 void Mesh::load() const {
   m_vbo.bind();
   glBufferData(GL_ARRAY_BUFFER,
@@ -10,14 +20,12 @@ void Mesh::load() const {
                GL_STATIC_DRAW);
   m_vbo.unbind();
 
-  m_ebo.bind();
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               sizeof(m_ebo.getVerticesIndices().front()) * m_ebo.getVerticesIndices().size(),
-               m_ebo.getVerticesIndices().data(),
-               GL_STATIC_DRAW);
-  m_ebo.unbind();
-
   m_vao.bind();
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+               sizeof(getEbo().getVerticesIndices().front()) * getEbo().getVerticesIndices().size(),
+               m_vao.getEbo().getVerticesIndices().data(),
+               GL_STATIC_DRAW);
+
   m_vbo.bind();
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
@@ -36,7 +44,6 @@ void Mesh::load() const {
 void Mesh::draw() const {
   //m_texture.bind();
   m_vao.bind();
-  m_ebo.bind();
 
   glDrawElements(GL_TRIANGLES, getFaceCount(), GL_UNSIGNED_INT, nullptr);
 }
