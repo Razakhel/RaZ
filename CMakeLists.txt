@@ -10,6 +10,7 @@ elseif (MSVC)
 endif ()
 
 include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
@@ -25,20 +26,15 @@ set(
     ${GLEW_SRC}
     ${GLFW_SRC}
 
-    src/RaZ/Render/Mesh.cpp
-    src/RaZ/Render/Scene.cpp
-    src/RaZ/Render/Shader.cpp
-    src/RaZ/Render/Shape.cpp
-    src/RaZ/Render/Texture.cpp
-    src/RaZ/Utils/Window.cpp
+    src/RaZ/Math/*.cpp
+    src/RaZ/Render/*.cpp
+    src/RaZ/Utils/*.cpp
 
     include/RaZ/RaZ.hpp
-    include/RaZ/Render/Mesh.hpp
-    include/RaZ/Render/Scene.hpp
-    include/RaZ/Render/Shader.hpp
-    include/RaZ/Render/Shape.hpp
-    include/RaZ/Render/Texture.hpp
-    include/RaZ/Utils/Window.hpp
+    include/RaZ/Math/*.hpp
+    include/RaZ/Math/*.inl
+    include/RaZ/Render/*.hpp
+    include/RaZ/Utils/*.hpp
 )
 
 # Defining preprocessor macros and selecting files to be removed

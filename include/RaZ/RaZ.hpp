@@ -5,6 +5,7 @@
 
 #define GLEW_STATIC
 
+#include "Math/Matrix.hpp"
 #include "Render/Mesh.hpp"
 #include "Render/Scene.hpp"
 #include "Render/Shader.hpp"
