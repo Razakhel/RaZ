@@ -38,9 +38,7 @@ void Shader::read(const std::string& fileName) {
   }
 }
 
-ShaderProgram::ShaderProgram(std::initializer_list<Shader> shadersList) {
-  m_index = glCreateProgram();
-
+void ShaderProgram::attachShaders(std::initializer_list<Shader> shadersList) {
   for (const auto& shaderIndex : shadersList)
     glAttachShader(m_index, shaderIndex.getIndex());
 

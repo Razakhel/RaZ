@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "GL/glew.h"
+#include "RaZ/Render/Shader.hpp"
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
@@ -93,10 +94,12 @@ public:
   std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
   std::size_t getFaceCount() const { return m_vao.getEbo().getVerticesIndices().size(); }
 
-  void load() const;
+  void load(const VertexShader& vertShader, const FragmentShader& fragShader);
   void draw() const;
+  void translate(float x, float y, float z);
 
 private:
+  ShaderProgram m_program;
   VertexArray m_vao;
   VertexBuffer m_vbo;
   Texture m_texture;

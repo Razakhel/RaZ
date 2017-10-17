@@ -14,31 +14,31 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
                                  GLsizei length,
                                  const GLchar* message,
                                  const void* userParam) {
-  std::cout << "OpenGL Debug - ";
+  std::cerr << "OpenGL Debug - ";
 
   switch (source) {
     case GL_DEBUG_SOURCE_API:
-      std::cout << "Source:OpenGL\t";
+      std::cerr << "Source:OpenGL\t";
       break;
 
     case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-      std::cout << "Source:Windows\t";
+      std::cerr << "Source:Windows\t";
       break;
 
     case GL_DEBUG_SOURCE_SHADER_COMPILER:
-      std::cout << "Source:Shader compiler\t";
+      std::cerr << "Source:Shader compiler\t";
       break;
 
     case GL_DEBUG_SOURCE_THIRD_PARTY:
-      std::cout << "Source:Third party\t";
+      std::cerr << "Source:Third party\t";
       break;
 
     case GL_DEBUG_SOURCE_APPLICATION:
-      std::cout << "Source:Application\t";
+      std::cerr << "Source:Application\t";
       break;
 
     case GL_DEBUG_SOURCE_OTHER:
-      std::cout << "Source:Other\t";
+      std::cerr << "Source:Other\t";
       break;
 
     default:
@@ -47,27 +47,27 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
 
   switch (type) {
     case GL_DEBUG_TYPE_ERROR:
-      std::cout << "Type:Error\t";
+      std::cerr << "Type:Error\t";
       break;
 
     case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-      std::cout << "Type:Deprecated behavior\t";
+      std::cerr << "Type:Deprecated behavior\t";
       break;
 
     case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-      std::cout << "Type:Undefined behavior\t";
+      std::cerr << "Type:Undefined behavior\t";
       break;
 
     case GL_DEBUG_TYPE_PORTABILITY:
-      std::cout << "Type:Portability\t";
+      std::cerr << "Type:Portability\t";
       break;
 
     case GL_DEBUG_TYPE_PERFORMANCE:
-      std::cout << "Type:Performance\t";
+      std::cerr << "Type:Performance\t";
       break;
 
     case GL_DEBUG_TYPE_OTHER:
-      std::cout << "Type:Other\t";
+      std::cerr << "Type:Other\t";
       break;
 
     default:
@@ -78,22 +78,22 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
 
   switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:
-      std::cout << "Severity:High\t";
+      std::cerr << "Severity:High\t";
       break;
 
     case GL_DEBUG_SEVERITY_MEDIUM:
-      std::cout << "Severity:Medium\t";
+      std::cerr << "Severity:Medium\t";
       break;
 
     case GL_DEBUG_SEVERITY_LOW:
-      std::cout << "Severity:Low\t";
+      std::cerr << "Severity:Low\t";
       break;
 
     default:
       break;
   }
 
-  std::cout << "Message:" << message << std::endl;
+  std::cerr << "Message:" << message << std::endl;
 }
 
 } // namespace

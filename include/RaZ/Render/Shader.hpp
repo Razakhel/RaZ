@@ -47,11 +47,12 @@ public:
 
 class ShaderProgram {
 public:
-  ShaderProgram() = default;
-  ShaderProgram(std::initializer_list<Shader> shadersList);
+  ShaderProgram() : m_index{ glCreateProgram() } {}
+  ShaderProgram(std::initializer_list<Shader> shadersList) : ShaderProgram() { attachShaders(shadersList); }
 
   GLuint getIndex() const { return m_index; }
 
+  void attachShaders(std::initializer_list<Shader> shadersList);
   void use() const { glUseProgram(m_index); }
 
 private:

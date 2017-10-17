@@ -10,13 +10,15 @@ namespace Raz {
 class Scene {
 public:
   Scene() = default;
-  Scene(const std::string& fileName) { import(fileName); }
+  Scene(const std::string& fileName,
+        const VertexShader& vertShader,
+        const FragmentShader& fragShader) { import(fileName, vertShader, fragShader); }
   Scene(std::vector<MeshPtr>&& meshes) : m_meshes(std::move(meshes)) {}
 
   const std::vector<MeshPtr>& getMeshes() const { return m_meshes; }
   std::vector<MeshPtr>& getMeshes() { return m_meshes; }
 
-  void import(const std::string& fileName);
+  void import(const std::string& fileName, const VertexShader& vertShader, const FragmentShader& fragShader);
   void render() const;
 
 private:

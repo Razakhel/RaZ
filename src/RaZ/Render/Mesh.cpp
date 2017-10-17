@@ -1,8 +1,11 @@
+#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Render/Mesh.hpp"
 
 namespace Raz {
 
-void Mesh::load() const {
+void Mesh::load(const VertexShader& vertShader, const FragmentShader& fragShader) {
+  m_program.attachShaders({ vertShader, fragShader });
+
   m_vao.bind();
   getEbo().bind();
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -33,10 +36,22 @@ void Mesh::load() const {
 }
 
 void Mesh::draw() const {
+  m_program.use();
+
   //m_texture.bind();
   m_vao.bind();
 
   glDrawElements(GL_TRIANGLES, getFaceCount(), GL_UNSIGNED_INT, nullptr);
+}
+
+void Mesh::translate(float x, float y, float z) {
+  const Mat4f mat({{ 1.f, 0.f, 0.f,   x },
+                   { 0.f, 1.f, 0.f,   y },
+                   { 0.f, 0.f, 1.f,   z },
+                   { 0.f, 0.f, 0.f, 1.f }});
+
+  const GLint location = glGetUniformLocation(m_program.getIndex(), "uniTransform");
+  glUniformMatrix4fv(location, 1, GL_TRUE, mat.getData().data());
 }
 
 } // namespace Raz

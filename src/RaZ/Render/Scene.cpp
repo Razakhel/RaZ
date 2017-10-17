@@ -111,7 +111,7 @@ MeshPtr importObj(std::ifstream& file) {
 
 } // namespace
 
-void Scene::import(const std::string& fileName) {
+void Scene::import(const std::string& fileName, const VertexShader& vertShader, const FragmentShader& fragShader) {
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
@@ -119,13 +119,13 @@ void Scene::import(const std::string& fileName) {
 
     if (format == "off" || format == "OFF") {
       m_meshes.emplace_back(importOff(file));
-      m_meshes.back()->load();
     } else if (format == "obj" || format == "OBJ") {
       m_meshes.emplace_back(importObj(file));
-      m_meshes.back()->load();
     } else {
       std::cerr << "Error: '" << format << "' format is not supported" << std::endl;
     }
+
+    m_meshes.back()->load(vertShader, fragShader);
   } else {
     std::cerr << "Error: Couldn't open the file '" << fileName << "'" << std::endl;
   }
