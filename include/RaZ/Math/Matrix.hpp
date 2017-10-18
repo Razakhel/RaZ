@@ -10,14 +10,13 @@ namespace Raz {
 template <typename T, unsigned int W, unsigned int H>
 class Matrix {
 public:
-  Matrix() = default;
+  Matrix();
   Matrix(std::initializer_list<std::initializer_list<T>> list);
-  template <typename TI, unsigned int WI, unsigned int HI> Matrix(const Matrix<TI, WI, HI>& mat);
 
   std::size_t getWidth() const { return W; }
   std::size_t getHeight() const { return H; }
-  const std::array<T, W * H>& getData() const { return data; }
-  std::array<T, W * H>& getData() { return data; }
+  const std::array<T, W * H>& getData() const { return m_data; }
+  std::array<T, W * H>& getData() { return m_data; }
 
   Matrix operator+(Matrix mat);
   Matrix operator+(float val);
@@ -35,13 +34,12 @@ public:
   Matrix& operator*=(float val);
   Matrix& operator/=(const Matrix& mat);
   Matrix& operator/=(float val);
-  template <typename TI, unsigned int WI, unsigned int HI> Matrix operator=(const Matrix<TI, WI, HI>& mat) { return Matrix<T, W, H>(mat); }
-  T& operator()(unsigned int widthIndex, unsigned int heightIndex) { return data[heightIndex * W + widthIndex]; }
-  const T& operator[](unsigned int index) const { return data[index]; }
-  T& operator[](unsigned int index) { return data[index]; }
+  T& operator()(unsigned int widthIndex, unsigned int heightIndex) { return m_data[heightIndex * W + widthIndex]; }
+  const T& operator[](unsigned int index) const { return m_data[index]; }
+  T& operator[](unsigned int index) { return m_data[index]; }
 
 private:
-  std::array<T, W * H> data;
+  std::array<T, W * H> m_data;
 };
 
 using Mat3f = Matrix<float, 3, 3>;
