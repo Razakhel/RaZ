@@ -8,8 +8,6 @@
 #include <vector>
 
 #include "GL/glew.h"
-#include "RaZ/Render/Shader.hpp"
-#include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
@@ -82,6 +80,7 @@ private:
 class Mesh {
 public:
   Mesh() = default;
+  Mesh(const std::string& fileName) { import(fileName); }
 
   const VertexArray& getVao() const { return m_vao; }
   VertexArray& getVao() { return m_vao; }
@@ -89,23 +88,19 @@ public:
   VertexBuffer& getVbo() { return m_vbo; }
   const ElementBuffer& getEbo() const { return m_vao.getEbo(); }
   ElementBuffer& getEbo() { return m_vao.getEbo(); }
-  const Texture& getTexture() const { return m_texture; }
-  Texture& getTexture() { return m_texture; }
   std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
   std::size_t getFaceCount() const { return m_vao.getEbo().getVerticesIndices().size(); }
 
-  void load(const VertexShader& vertShader, const FragmentShader& fragShader);
+  void import(const std::string& fileName);
+  void load();
   void draw() const;
-  void translate(float x, float y, float z);
 
 private:
-  ShaderProgram m_program;
   VertexArray m_vao;
   VertexBuffer m_vbo;
-  Texture m_texture;
 };
 
-using MeshPtr = std::unique_ptr<Mesh>;
+using MeshPtr = std::shared_ptr<Mesh>;
 
 } // namespace Raz
 
