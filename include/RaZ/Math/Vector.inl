@@ -10,14 +10,14 @@ Vector<T, Size>::Vector(std::initializer_list<T> list) {
   auto element = list.begin();
 
   for (std::size_t i = 0; i < list.size(); ++i, ++element)
-    data[i] = *element;
+    m_data[i] = *element;
 }
 
 template <typename T, unsigned int Size>
 T Vector<T, Size>::dot(const Vector<T, Size>& vec) const {
   float res = 0.f;
-  for (std::size_t i = 0; i < data.size(); ++i)
-    res += data[i] * vec.getData()[i];
+  for (std::size_t i = 0; i < m_data.size(); ++i)
+    res += m_data[i] * vec.getData()[i];
   return res;
 }
 
@@ -27,9 +27,9 @@ Vector<T, Size> Vector<T, Size>::cross(const Vector<T, Size>& vec) const {
 
   Vector<T, Size> res;
 
-  res[0] = data[1] * vec.getData()[2] - data[2] * vec.getData()[1];
-  res[1] = -(data[0] * vec.getData()[2] - data[2] * vec.getData()[0]);
-  res[2] = data[0] * vec.getData()[1] - data[1] * vec.getData()[0];
+  res[0] = m_data[1] * vec.getData()[2] - m_data[2] * vec.getData()[1];
+  res[1] = -(m_data[0] * vec.getData()[2] - m_data[2] * vec.getData()[0]);
+  res[2] = m_data[0] * vec.getData()[1] - m_data[1] * vec.getData()[0];
 
   return res;
 }
@@ -96,56 +96,56 @@ Vector<T, Size> Vector<T, Size>::operator/(float val) {
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator+=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < data.size(); ++i)
-    data[i] += vec.getData()[i];
+  for (std::size_t i = 0; i < m_data.size(); ++i)
+    m_data[i] += vec.getData()[i];
   return *this;
 }
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator+=(float val) {
-  for (T& it : data)
+  for (T& it : m_data)
     it += val;
   return *this;
 }
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator-=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < data.size(); ++i)
-    data[i] -= vec.getData()[i];
+  for (std::size_t i = 0; i < m_data.size(); ++i)
+    m_data[i] -= vec.getData()[i];
   return *this;
 }
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator-=(float val) {
-  for (T& it : data)
+  for (T& it : m_data)
     it -= val;
   return *this;
 }
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator*=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < data.size(); ++i)
-    data[i] *= vec.getData()[i];
+  for (std::size_t i = 0; i < m_data.size(); ++i)
+    m_data[i] *= vec.getData()[i];
   return *this;
 }
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator*=(float val) {
-  for (T& it : data)
+  for (T& it : m_data)
     it *= val;
   return *this;
 }
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator/=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < data.size(); ++i)
-    data[i] /= vec.getData()[i];
+  for (std::size_t i = 0; i < m_data.size(); ++i)
+    m_data[i] /= vec.getData()[i];
   return *this;
 }
 
 template <typename T, unsigned int Size>
 Vector<T, Size>& Vector<T, Size>::operator/=(float val) {
-  for (T& it : data)
+  for (T& it : m_data)
     it /= val;
   return *this;
 }

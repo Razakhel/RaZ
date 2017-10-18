@@ -14,8 +14,8 @@ public:
   Vector() = default;
   Vector(std::initializer_list<T> list);
 
-  const std::array<T, Size>& getData() const { return data; }
-  std::array<T, Size>& getData() { return data; }
+  const std::array<T, Size>& getData() const { return m_data; }
+  std::array<T, Size>& getData() { return m_data; }
 
   T dot(const Vector& vec) const;
   Vector cross(const Vector& vec) const;
@@ -37,11 +37,11 @@ public:
   Vector& operator*=(float val);
   Vector& operator/=(const Vector& vec);
   Vector& operator/=(float val);
-  const T& operator[](std::size_t index) const { return data[index]; }
-  T& operator[](std::size_t index) { return data[index]; }
+  const T& operator[](std::size_t index) const { return m_data[index]; }
+  T& operator[](std::size_t index) { return m_data[index]; }
 
 private:
-  std::array<T, Size> data;
+  std::array<T, Size> m_data;
 };
 
 using Vec3f = Vector<float, 3>;
