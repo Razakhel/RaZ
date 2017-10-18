@@ -3,26 +3,23 @@
 #ifndef RAZ_SCENE_HPP
 #define RAZ_SCENE_HPP
 
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/Model.hpp"
 
 namespace Raz {
 
 class Scene {
 public:
   Scene() = default;
-  Scene(const std::string& fileName,
-        const VertexShader& vertShader,
-        const FragmentShader& fragShader) { import(fileName, vertShader, fragShader); }
-  Scene(std::vector<MeshPtr>&& meshes) : m_meshes(std::move(meshes)) {}
+  Scene(std::vector<ModelPtr>&& models) : m_models(std::move(models)) {}
 
-  const std::vector<MeshPtr>& getMeshes() const { return m_meshes; }
-  std::vector<MeshPtr>& getMeshes() { return m_meshes; }
+  const std::vector<ModelPtr>& getModels() const { return m_models; }
+  std::vector<ModelPtr>& getModels() { return m_models; }
 
-  void import(const std::string& fileName, const VertexShader& vertShader, const FragmentShader& fragShader);
+  void addModel(ModelPtr model) { m_models.push_back(std::move(model)); }
   void render() const;
 
 private:
-  std::vector<MeshPtr> m_meshes;
+  std::vector<ModelPtr> m_models;
 };
 
 } // namespace Raz
