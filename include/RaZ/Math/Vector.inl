@@ -150,4 +150,18 @@ Vector<T, Size>& Vector<T, Size>::operator/=(float val) {
   return *this;
 }
 
+template <typename T, unsigned int Size>
+Vector<T, Size>& Vector<T, Size>::operator=(const Vector<T, Size>& vec) {
+  for (std::size_t i = 0; i < m_data.size(); ++i)
+    m_data[i] = vec.getData()[i];
+  return *this;
+}
+
+template <typename T, unsigned int Size>
+Vector<T, Size>& Vector<T, Size>::operator=(float val) {
+  for (T& it : m_data)
+    it = val;
+  return *this;
+}
+
 } // namespace Raz

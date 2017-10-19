@@ -37,6 +37,8 @@ public:
   Vector& operator*=(float val);
   Vector& operator/=(const Vector& vec);
   Vector& operator/=(float val);
+  Vector& operator=(const Vector& vec);
+  Vector& operator=(float val);
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }
 
