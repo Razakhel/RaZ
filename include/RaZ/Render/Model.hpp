@@ -25,10 +25,13 @@ public:
 
   void draw() const;
   void translate(float x, float y, float z);
+  void rotate(float angle, float x, float y, float z);
 
 private:
+  void updatePosition() const;
+
   Material m_material;
-  Mat4f m_position;
+  Mat4f m_position = Mat4f::identity();
   MeshPtr m_mesh;
 };
 

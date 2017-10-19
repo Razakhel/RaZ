@@ -37,7 +37,6 @@ Vector<T, Size> Vector<T, Size>::cross(const Vector<T, Size>& vec) const {
 template <typename T, unsigned int Size>
 Vector<T, Size> Vector<T, Size>::normalize() const {
   Vector<T, Size> res = *this;
-
   res /= std::sqrt(dot(*this));
   return res;
 }

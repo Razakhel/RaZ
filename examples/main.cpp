@@ -9,7 +9,7 @@ int main() {
   const Raz::FragmentShader fragShader("../shaders/frag.glsl");
   const Raz::Material defaultMaterial(vertShader, fragShader);
 
-  const Raz::MeshPtr cube = std::make_shared<Raz::Mesh>("../assets/meshes/cube.obj");
+  const Raz::MeshPtr cube = std::make_shared<Raz::Mesh>("../assets/meshes/queen.off");
   Raz::ModelPtr cubeModel = std::make_unique<Raz::Model>(cube);
   cubeModel->setMaterial(defaultMaterial);
 
@@ -19,7 +19,8 @@ int main() {
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (window.run()) {
-    scene.getModels().front()->translate(0.0005f, 0.0005f, 0.f);
+    scene.getModels().front()->translate(0.005f, 0.005f, 0.f);
+    scene.getModels().front()->rotate(5.f, 0.f, 1.f, 0.f);
 
     scene.render();
   }
