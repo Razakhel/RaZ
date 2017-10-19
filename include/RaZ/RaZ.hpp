@@ -6,6 +6,7 @@
 #define GLEW_STATIC
 
 #include "Math/Matrix.hpp"
+#include "Math/Quaternion.hpp"
 #include "Math/Vector.hpp"
 #include "Render/Material.hpp"
 #include "Render/Mesh.hpp"
