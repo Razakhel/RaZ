@@ -37,26 +37,32 @@ private:
 
 class VertexBuffer {
 public:
-  VertexBuffer() { glGenBuffers(1, &m_index); }
+  VertexBuffer();
 
-  GLuint getIndex() const { return m_index; }
+  GLuint getVerticesIndex() const { return m_verticesIndex; }
+  GLuint getTexcoordsIndex() const { return m_texcoordsIndex; }
+  GLuint getNormalsIndex() const { return m_normalsIndex; }
   const std::vector<float>& getVertices() const { return m_vertices; }
   std::vector<float>& getVertices() { return m_vertices; }
-  const std::vector<float>& getNormals() const { return m_normals; }
-  std::vector<float>& getNormals() { return m_normals; }
   const std::vector<float>& getTexcoords() const { return m_texcoords; }
   std::vector<float>& getTexcoords() { return m_texcoords; }
+  const std::vector<float>& getNormals() const { return m_normals; }
+  std::vector<float>& getNormals() { return m_normals; }
 
-  void bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_index); }
+  void bindVertices() const { glBindBuffer(GL_ARRAY_BUFFER, m_verticesIndex); }
+  void bindTexcoords() const { glBindBuffer(GL_ARRAY_BUFFER, m_texcoordsIndex); }
+  void bindNormals() const { glBindBuffer(GL_ARRAY_BUFFER, m_normalsIndex); }
   void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
 
-  ~VertexBuffer() { glDeleteBuffers(1, &m_index); }
+  ~VertexBuffer();
 
 private:
-  GLuint m_index;
+  GLuint m_verticesIndex;
+  GLuint m_texcoordsIndex;
+  GLuint m_normalsIndex;
   std::vector<float> m_vertices;
-  std::vector<float> m_normals;
   std::vector<float> m_texcoords;
+  std::vector<float> m_normals;
 };
 
 class VertexArray {
@@ -96,6 +102,9 @@ public:
   void draw() const;
 
 private:
+  void importOff(std::ifstream& file);
+  void importObj(std::ifstream& file);
+
   VertexArray m_vao;
   VertexBuffer m_vbo;
 };

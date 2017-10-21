@@ -13,56 +13,70 @@ const std::string extractFileExt(const std::string& fileName) {
   return (fileName.substr(fileName.find_last_of('.') + 1));
 }
 
-void importOff(std::ifstream& file, Mesh& mesh) {
+} // namespace
+
+VertexBuffer::VertexBuffer() {
+  glGenBuffers(1, &m_verticesIndex);
+  glGenBuffers(1, &m_texcoordsIndex);
+  glGenBuffers(1, &m_normalsIndex);
+}
+
+VertexBuffer::~VertexBuffer() {
+  glDeleteBuffers(1, &m_verticesIndex);
+  glDeleteBuffers(1, &m_texcoordsIndex);
+  glDeleteBuffers(1, &m_normalsIndex);
+}
+
+void Mesh::importOff(std::ifstream& file) {
   unsigned int vertexCount, faceCount;
   file.ignore(3);
   file >> vertexCount >> faceCount;
   file.ignore(100, '\n');
 
-  mesh.getVbo().getVertices().resize(vertexCount * 3);
-  mesh.getEbo().getVerticesIndices().resize(faceCount * 3);
+  m_vbo.getVertices().resize(vertexCount * 3);
+  getEbo().getVerticesIndices().resize(faceCount * 3);
 
   for (unsigned int vertexIndex = 0; vertexIndex < vertexCount * 3; vertexIndex += 3)
-    file >> mesh.getVbo().getVertices()[vertexIndex]
-         >> mesh.getVbo().getVertices()[vertexIndex + 1]
-         >> mesh.getVbo().getVertices()[vertexIndex + 2];
+    file >> m_vbo.getVertices()[vertexIndex]
+         >> m_vbo.getVertices()[vertexIndex + 1]
+         >> m_vbo.getVertices()[vertexIndex + 2];
 
   for (unsigned int faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
     file.ignore(2);
-    file >> mesh.getEbo().getVerticesIndices()[faceIndex]
-         >> mesh.getEbo().getVerticesIndices()[faceIndex + 1]
-         >> mesh.getEbo().getVerticesIndices()[faceIndex + 2];
+    file >> getEbo().getVerticesIndices()[faceIndex]
+         >> getEbo().getVerticesIndices()[faceIndex + 1]
+         >> getEbo().getVerticesIndices()[faceIndex + 2];
   }
 }
 
-void importObj(std::ifstream& file, Mesh& mesh) {
+void Mesh::importObj(std::ifstream& file) {
   while (!file.eof()) {
     std::string type;
     file >> type;
 
     if (type[0] == 'v') {
       if (type[1] == 'n') { // Normals
-        mesh.getVbo().getNormals().resize(mesh.getVbo().getNormals().size() + 3);
+        m_vbo.getNormals().resize(m_vbo.getNormals().size() + 3);
 
-        file >> mesh.getVbo().getNormals()[mesh.getVbo().getNormals().size() - 3]
-             >> mesh.getVbo().getNormals()[mesh.getVbo().getNormals().size() - 2]
-             >> mesh.getVbo().getNormals()[mesh.getVbo().getNormals().size() - 1];
+        file >> m_vbo.getNormals()[m_vbo.getNormals().size() - 3]
+             >> m_vbo.getNormals()[m_vbo.getNormals().size() - 2]
+             >> m_vbo.getNormals()[m_vbo.getNormals().size() - 1];
       } else if (type[1] == 't') { // Texcoords
-        mesh.getVbo().getTexcoords().resize(mesh.getVbo().getTexcoords().size() + 2);
+        m_vbo.getTexcoords().resize(m_vbo.getTexcoords().size() + 2);
 
-        file >> mesh.getVbo().getTexcoords()[mesh.getVbo().getTexcoords().size() - 2]
-             >> mesh.getVbo().getTexcoords()[mesh.getVbo().getTexcoords().size() - 1];
+        file >> m_vbo.getTexcoords()[m_vbo.getTexcoords().size() - 2]
+             >> m_vbo.getTexcoords()[m_vbo.getTexcoords().size() - 1];
       } else { // Vertices
-        mesh.getVbo().getVertices().resize(mesh.getVbo().getVertices().size() + 3);
+        m_vbo.getVertices().resize(m_vbo.getVertices().size() + 3);
 
-        file >> mesh.getVbo().getVertices()[mesh.getVbo().getVertices().size() - 3]
-             >> mesh.getVbo().getVertices()[mesh.getVbo().getVertices().size() - 2]
-             >> mesh.getVbo().getVertices()[mesh.getVbo().getVertices().size() - 1];
+        file >> m_vbo.getVertices()[m_vbo.getVertices().size() - 3]
+             >> m_vbo.getVertices()[m_vbo.getVertices().size() - 2]
+             >> m_vbo.getVertices()[m_vbo.getVertices().size() - 1];
       }
     } else if (type[0] == 'f') { // Faces
-      mesh.getEbo().getVerticesIndices().resize(mesh.getEbo().getVerticesIndices().size() + 3);
-      mesh.getEbo().getNormalsIndices().resize(mesh.getEbo().getNormalsIndices().size() + 3);
-      mesh.getEbo().getTexcoordsIndices().resize(mesh.getEbo().getTexcoordsIndices().size() + 3);
+      getEbo().getVerticesIndices().resize(getEbo().getVerticesIndices().size() + 3);
+      getEbo().getNormalsIndices().resize(getEbo().getNormalsIndices().size() + 3);
+      getEbo().getTexcoordsIndices().resize(getEbo().getTexcoordsIndices().size() + 3);
 
       for (uint8_t facePartIndex = 3; facePartIndex > 0; --facePartIndex) {
         std::array<std::string, 3> vertIndices;
@@ -77,9 +91,9 @@ void importObj(std::ifstream& file, Mesh& mesh) {
           indices.erase(0, delimPos + 1);
         }
 
-        *(mesh.getEbo().getVerticesIndices().end() - facePartIndex) = std::stoul(vertIndices[0]);
-        *(mesh.getEbo().getTexcoordsIndices().end() - facePartIndex) = std::stoul(vertIndices[1]);
-        *(mesh.getEbo().getNormalsIndices().end() - facePartIndex) = std::stoul(vertIndices[2]);
+        *(getEbo().getVerticesIndices().end() - facePartIndex) = std::stoul(vertIndices[0]);
+        *(getEbo().getTexcoordsIndices().end() - facePartIndex) = std::stoul(vertIndices[1]);
+        *(getEbo().getNormalsIndices().end() - facePartIndex) = std::stoul(vertIndices[2]);
       }
     } else if (type[0] == 'm') { // Import MTL
       //file >> type;
@@ -91,8 +105,6 @@ void importObj(std::ifstream& file, Mesh& mesh) {
   }
 }
 
-} // namespace
-
 void Mesh::import(const std::string& fileName) {
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
@@ -100,9 +112,9 @@ void Mesh::import(const std::string& fileName) {
     const std::string format = extractFileExt(fileName);
 
     if (format == "off" || format == "OFF") {
-      importOff(file, *this);
+      importOff(file);
     } else if (format == "obj" || format == "OBJ") {
-      importObj(file, *this);
+      importObj(file);
     } else {
       std::cerr << "Error: '" << format << "' format is not supported" << std::endl;
     }
@@ -115,13 +127,15 @@ void Mesh::import(const std::string& fileName) {
 
 void Mesh::load() {
   m_vao.bind();
+
   getEbo().bind();
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                sizeof(getEbo().getVerticesIndices().front()) * getEbo().getVerticesIndices().size(),
                getEbo().getVerticesIndices().data(),
                GL_STATIC_DRAW);
+  getEbo().unbind();
 
-  m_vbo.bind();
+  m_vbo.bindVertices();
   glBufferData(GL_ARRAY_BUFFER,
                sizeof(m_vbo.getVertices().front()) * m_vbo.getVertices().size(),
                m_vbo.getVertices().data(),
@@ -129,18 +143,24 @@ void Mesh::load() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
   glEnableVertexAttribArray(0);
 
-  m_vao.unbind();
-  getEbo().unbind();
-  m_vbo.unbind();
-
-  /*glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+  m_vbo.bindTexcoords();
+  glBufferData(GL_ARRAY_BUFFER,
+               sizeof(m_vbo.getTexcoords().front()) * m_vbo.getTexcoords().size(),
+               m_vbo.getTexcoords().data(),
+               GL_STATIC_DRAW);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
   glEnableVertexAttribArray(1);
 
-  texture.bind();
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  m_vbo.bindNormals();
+  glBufferData(GL_ARRAY_BUFFER,
+               sizeof(m_vbo.getNormals().front()) * m_vbo.getNormals().size(),
+               m_vbo.getNormals().data(),
+               GL_STATIC_DRAW);
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+  glEnableVertexAttribArray(2);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), , 0, GL_RGB, GL_UNSIGNED_BYTE, img.getData().data());*/
+  m_vbo.unbind();
+  m_vao.unbind();
 }
 
 void Mesh::draw() const {

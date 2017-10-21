@@ -2,6 +2,7 @@
 
 layout (location = 0) in vec3 vertPosition;
 layout (location = 1) in vec2 vertTexcoords;
+layout (location = 2) in vec3 vertNormals;
 
 uniform mat4 uniTransform;
 

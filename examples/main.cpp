@@ -12,30 +12,21 @@ int main() {
   const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/default.png");
   defaultMaterial.setTexture(defaultTexture);
 
-  const Raz::MeshPtr cubeMesh = std::make_shared<Raz::Mesh>("../assets/meshes/cube.obj");
-  //const Raz::MeshPtr queenMesh = std::make_shared<Raz::Mesh>("../assets/meshes/queen.off");
-  Raz::ModelPtr cubeModel = std::make_unique<Raz::Model>(cubeMesh);
-  //Raz::ModelPtr queenModel = std::make_unique<Raz::Model>(queenMesh);
-  cubeModel->setMaterial(defaultMaterial);
-  //queenModel->setMaterial(defaultMaterial);
+  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/cube.obj");
+  Raz::ModelPtr model = std::make_unique<Raz::Model>(mesh);
+  model->setMaterial(defaultMaterial);
 
-  auto cube = cubeModel.get();
-  //auto queen = queenModel.get();
+  auto cube = model.get();
 
-  scene.addModel(std::move(cubeModel));
-  //scene.addModel(std::move(queenModel));
+  scene.addModel(std::move(model));
 
   // Uncommenting this call will display scene in wireframe
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   while (window.run()) {
     //cube->translate(0.02f, 0.f, 0.f);
-    cube->rotate(5.f, 0.01f, 0.01f, 0.01f);
+    cube->rotate(10.f, 0.01f, 0.01f, 0.01f);
     //cube->scale(1.0025f, 1.0025f, 1.0025f);
-
-    //queen->translate(0.02f, 0.f, 0.f);
-    //queen->rotate(5.f, 0.f, 0.5f, 0.f);
-    //queen->scale(1.0025f, 1.0025f, 1.0025f);
 
     scene.render();
   }
