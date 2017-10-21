@@ -15,12 +15,14 @@ public:
 
   const ShaderProgram& getShaderProgram() const { return m_shaderProgram; }
   ShaderProgram& getShaderProgram() { return m_shaderProgram; }
-  const Texture& getTexture() const { return m_texture; }
-  Texture& getTexture() { return m_texture; }
+  const TexturePtr getTexture() const { return m_texture; }
+  TexturePtr getTexture() { return m_texture; }
+
+  void setTexture(TexturePtr texture) { m_texture = std::move(texture); }
 
 private:
   ShaderProgram m_shaderProgram;
-  Texture m_texture;
+  TexturePtr m_texture;
 };
 
 } // namespace Raz

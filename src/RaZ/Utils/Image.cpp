@@ -51,16 +51,13 @@ void Image::readPng(std::ifstream& file) {
 
   const uint32_t width = png_get_image_width(pngReadStruct, pngInfoStruct);
   const uint32_t height = png_get_image_height(pngReadStruct, pngInfoStruct);
-  uint8_t bitDepth = png_get_bit_depth(pngReadStruct, pngInfoStruct);
   uint8_t channels = png_get_channels(pngReadStruct, pngInfoStruct);
   const uint8_t colorType = png_get_color_type(pngReadStruct, pngInfoStruct);
 
   switch (colorType) {
     case PNG_COLOR_TYPE_GRAY:
-      if (bitDepth < 8)
+      if (png_get_bit_depth(pngReadStruct, pngInfoStruct) < 8)
         png_set_expand_gray_1_2_4_to_8(pngReadStruct);
-
-      bitDepth = 8;
       break;
 
     case PNG_COLOR_TYPE_PALETTE:

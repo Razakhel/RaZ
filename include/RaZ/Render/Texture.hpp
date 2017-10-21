@@ -3,6 +3,7 @@
 #ifndef RAZ_TEXTURE_HPP
 #define RAZ_TEXTURE_HPP
 
+#include <memory>
 #include <string>
 
 #include "GL/glew.h"
@@ -13,6 +14,7 @@ namespace Raz {
 class Texture {
 public:
   Texture() { glGenTextures(1, &m_index); }
+  Texture(const std::string& fileName) : Texture() { load(fileName); }
 
   GLuint getIndex() const { return m_index; }
 
@@ -25,6 +27,8 @@ private:
   GLuint m_index;
   Image m_image;
 };
+
+using TexturePtr = std::shared_ptr<Texture>;
 
 } // namespace Raz
 

@@ -18,8 +18,8 @@ public:
   Material& getMaterial() { return m_material; }
   const Mat4f& getPosition() const { return m_position; }
   Mat4f& getPosition() { return m_position; }
-  const MeshPtr& getMesh() const { return m_mesh; }
-  MeshPtr& getMesh() { return m_mesh; }
+  const MeshPtr getMesh() const { return m_mesh; }
+  MeshPtr getMesh() { return m_mesh; }
 
   void setMaterial(const Material& material) { m_material = material; }
 
