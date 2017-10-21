@@ -64,33 +64,23 @@ void importObj(std::ifstream& file, Mesh& mesh) {
       mesh.getEbo().getNormalsIndices().resize(mesh.getEbo().getNormalsIndices().size() + 3);
       mesh.getEbo().getTexcoordsIndices().resize(mesh.getEbo().getTexcoordsIndices().size() + 3);
 
-      const char delim = '/';
-      std::string index;
-      std::array<std::string, 3> vertIndices;
+      for (uint8_t facePartIndex = 3; facePartIndex > 0; --facePartIndex) {
+        std::array<std::string, 3> vertIndices;
+        const char delim = '/';
+        std::string indices;
 
-      file >> index;
-      for (uint8_t i = 0; i < 3; ++i)
-        std::getline(std::stringstream(index), vertIndices[i], delim);
+        file >> indices;
+        for (uint8_t i = 0; i < 3; ++i) {
+          const unsigned long delimPos = indices.find(delim);
 
-      *(mesh.getEbo().getVerticesIndices().end() - 3) = std::stoul(vertIndices[0]);
-      *(mesh.getEbo().getTexcoordsIndices().end() - 3) = std::stoul(vertIndices[1]);
-      *(mesh.getEbo().getNormalsIndices().end() - 3) = std::stoul(vertIndices[2]);
+          vertIndices[i] = indices.substr(0, delimPos);
+          indices.erase(0, delimPos + 1);
+        }
 
-      file >> index;
-      for (uint8_t i = 0; i < 3; ++i)
-        std::getline(std::stringstream(index), vertIndices[i], delim);
-
-      *(mesh.getEbo().getVerticesIndices().end() - 2) = std::stoul(vertIndices[0]);
-      *(mesh.getEbo().getTexcoordsIndices().end() - 2) = std::stoul(vertIndices[1]);
-      *(mesh.getEbo().getNormalsIndices().end() - 2) = std::stoul(vertIndices[2]);
-
-      file >> index;
-      for (uint8_t i = 0; i < 3; ++i)
-        std::getline(std::stringstream(index), vertIndices[i], delim);
-
-      *(mesh.getEbo().getVerticesIndices().end() - 1) = std::stoul(vertIndices[0]);
-      *(mesh.getEbo().getTexcoordsIndices().end() - 1) = std::stoul(vertIndices[1]);
-      *(mesh.getEbo().getNormalsIndices().end() - 1) = std::stoul(vertIndices[2]);
+        *(mesh.getEbo().getVerticesIndices().end() - facePartIndex) = std::stoul(vertIndices[0]);
+        *(mesh.getEbo().getTexcoordsIndices().end() - facePartIndex) = std::stoul(vertIndices[1]);
+        *(mesh.getEbo().getNormalsIndices().end() - facePartIndex) = std::stoul(vertIndices[2]);
+      }
     } else if (type[0] == 'm') { // Import MTL
       //file >> type;
     } else if (type[0] == 'u') { // Use MTL
@@ -136,7 +126,7 @@ void Mesh::load() {
                sizeof(m_vbo.getVertices().front()) * m_vbo.getVertices().size(),
                m_vbo.getVertices().data(),
                GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
   glEnableVertexAttribArray(0);
 
   m_vao.unbind();
