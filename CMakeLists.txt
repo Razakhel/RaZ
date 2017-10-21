@@ -11,18 +11,21 @@ endif ()
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/extern
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/png
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+AUX_SOURCE_DIRECTORY(extern/png PNG_SRC)
 AUX_SOURCE_DIRECTORY(extern/glew/src GLEW_SRC)
 AUX_SOURCE_DIRECTORY(extern/glfw/src GLFW_SRC)
 
 set(
     SRC
 
+    ${PNG_SRC}
     ${GLEW_SRC}
     ${GLFW_SRC}
 
