@@ -49,8 +49,8 @@ void Image::readPng(std::ifstream& file) {
 
   png_read_info(pngReadStruct, pngInfoStruct);
 
-  const uint32_t width = png_get_image_width(pngReadStruct, pngInfoStruct);
-  const uint32_t height = png_get_image_height(pngReadStruct, pngInfoStruct);
+  m_width = png_get_image_width(pngReadStruct, pngInfoStruct);
+  m_height = png_get_image_height(pngReadStruct, pngInfoStruct);
   uint8_t channels = png_get_channels(pngReadStruct, pngInfoStruct);
   const uint8_t colorType = png_get_color_type(pngReadStruct, pngInfoStruct);
 
@@ -79,13 +79,13 @@ void Image::readPng(std::ifstream& file) {
 
   png_read_update_info(pngReadStruct, pngInfoStruct);
 
-  m_data.resize(width * height * channels);
+  m_data.resize(m_width * m_height * channels);
 
-  std::vector<png_bytep> rowPtrs(height);
+  std::vector<png_bytep> rowPtrs(m_height);
 
   // Mapping row's elements to data's
-  for (unsigned int i = 0; i < height; ++i)
-    rowPtrs[i] = &m_data[width * channels * i];
+  for (unsigned int i = 0; i < m_height; ++i)
+    rowPtrs[i] = &m_data[m_width * channels * i];
 
   png_read_image(pngReadStruct, rowPtrs.data());
   png_read_end(pngReadStruct, pngInfoStruct);

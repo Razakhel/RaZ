@@ -17,8 +17,9 @@ public:
   Texture(const std::string& fileName) : Texture() { load(fileName); }
 
   GLuint getIndex() const { return m_index; }
+  const Image& getImage() const { return m_image; }
 
-  void load(const std::string& fileName) { m_image.read(fileName); }
+  void load(const std::string& fileName);
   void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
 
   ~Texture() { glDeleteTextures(1, &m_index); }
