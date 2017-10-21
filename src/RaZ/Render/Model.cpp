@@ -26,6 +26,14 @@ void Model::rotate(float angle, float x, float y, float z) {
   updatePosition();
 }
 
+void Model::scale(float x, float y, float z) {
+  m_position[0] *= x;
+  m_position[5] *= y;
+  m_position[10] *= z;
+
+  updatePosition();
+}
+
 void Model::updatePosition() const {
   const GLint location = glGetUniformLocation(m_material.getShaderProgram().getIndex(), "uniTransform");
   glUniformMatrix4fv(location, 1, GL_TRUE, m_position.getData().data());

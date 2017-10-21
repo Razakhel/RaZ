@@ -29,8 +29,9 @@ int main() {
     //cube->translate(0.04f, 0.002f, 0.f);
     //cube->rotate(5.f, 0.f, 1.f, 0.f);
 
-    queen->translate(0.04f, 0.002f, 0.f);
-    queen->rotate(5.f, 0.f, 1.f, 0.f);
+    //queen->translate(0.02f, 0.f, 0.f);
+    queen->rotate(5.f, 0.f, 0.5f, 0.f);
+    queen->scale(1.0025f, 1.0025f, 1.0025f);
 
     scene.render();
   }
