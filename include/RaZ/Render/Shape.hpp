@@ -12,22 +12,22 @@ class Triangle {
 public:
   Triangle(std::initializer_list<float> vertices);
 
-  const std::array<float, 9>& getVertices() const { return vertices; }
-  std::array<float, 9>& getVertices() { return vertices; }
+  const std::array<float, 9>& getVertices() const { return m_vertices; }
+  std::array<float, 9>& getVertices() { return m_vertices; }
 
 private:
-  std::array<float, 9> vertices;
+  std::array<float, 9> m_vertices;
 };
 
-class Rectangle {
+class Plane {
 public:
-  Rectangle(std::initializer_list<float> vertices);
+  Plane(std::initializer_list<float> vertices);
 
-  const std::array<float, 18>& getVertices() const { return vertices; }
-  std::array<float, 18>& getVertices() { return vertices; }
+  const std::array<float, 18>& getVertices() const { return m_vertices; }
+  std::array<float, 18>& getVertices() { return m_vertices; }
 
 private:
-  std::array<float, 18> vertices;
+  std::array<float, 18> m_vertices;
 };
 
 } // namespace Raz
