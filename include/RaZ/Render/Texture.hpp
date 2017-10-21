@@ -6,6 +6,7 @@
 #include <string>
 
 #include "GL/glew.h"
+#include "RaZ/Utils/Image.hpp"
 
 namespace Raz {
 
@@ -15,13 +16,14 @@ public:
 
   GLuint getIndex() const { return m_index; }
 
-  void load(const std::string& fileName);
+  void load(const std::string& fileName) { m_image.read(fileName); }
   void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
 
   ~Texture() { glDeleteTextures(1, &m_index); }
 
 private:
   GLuint m_index;
+  Image m_image;
 };
 
 } // namespace Raz

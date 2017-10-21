@@ -15,6 +15,7 @@
 #include "Render/Shader.hpp"
 #include "Render/Shape.hpp"
 #include "Render/Texture.hpp"
+#include "Utils/Image.hpp"
 #include "Utils/Window.hpp"
 
 #endif // RAZ_RAZ_HPP
