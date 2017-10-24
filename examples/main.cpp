@@ -9,7 +9,7 @@ int main() {
   const Raz::FragmentShader fragShader("../shaders/frag.glsl");
 
   Raz::Material defaultMaterial(vertShader, fragShader);
-  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/default.png");
+  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/lena.png");
   defaultMaterial.setTexture(defaultTexture);
 
   const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/cube.obj");
