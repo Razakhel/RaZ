@@ -46,6 +46,7 @@ private:
   std::array<T, Size> m_data;
 };
 
+using Vec2f = Vector<float, 2>;
 using Vec3f = Vector<float, 3>;
 using Vec4f = Vector<float, 4>;
 
