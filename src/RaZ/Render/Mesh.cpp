@@ -1,6 +1,8 @@
+#include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Render/Mesh.hpp"
@@ -38,28 +40,35 @@ void Mesh::importOff(std::ifstream& file) {
 }
 
 void Mesh::importObj(std::ifstream& file) {
+  std::vector<float> vertices;
+  std::vector<float> texcoords;
+  std::vector<float> normals;
+
+  std::vector<std::size_t> texcoordsIndices;
+  std::vector<std::size_t> normalsIndices;
+
   while (!file.eof()) {
     std::string type;
     file >> type;
 
     if (type[0] == 'v') {
       if (type[1] == 'n') { // Normals
-        m_vbo.getNormals().resize(m_vbo.getNormals().size() + 3);
+        normals.resize(normals.size() + 3);
 
-        file >> m_vbo.getNormals()[m_vbo.getNormals().size() - 3]
-             >> m_vbo.getNormals()[m_vbo.getNormals().size() - 2]
-             >> m_vbo.getNormals()[m_vbo.getNormals().size() - 1];
+        file >> normals[normals.size() - 3]
+             >> normals[normals.size() - 2]
+             >> normals[normals.size() - 1];
       } else if (type[1] == 't') { // Texcoords
-        m_vbo.getTexcoords().resize(m_vbo.getTexcoords().size() + 2);
+        texcoords.resize(texcoords.size() + 2);
 
-        file >> m_vbo.getTexcoords()[m_vbo.getTexcoords().size() - 2]
-             >> m_vbo.getTexcoords()[m_vbo.getTexcoords().size() - 1];
+        file >> texcoords[texcoords.size() - 2]
+             >> texcoords[texcoords.size() - 1];
       } else { // Vertices
-        m_vbo.getVertices().resize(m_vbo.getVertices().size() + 3);
+        vertices.resize(vertices.size() + 3);
 
-        file >> m_vbo.getVertices()[m_vbo.getVertices().size() - 3]
-             >> m_vbo.getVertices()[m_vbo.getVertices().size() - 2]
-             >> m_vbo.getVertices()[m_vbo.getVertices().size() - 1];
+        file >> vertices[vertices.size() - 3]
+             >> vertices[vertices.size() - 2]
+             >> vertices[vertices.size() - 1];
       }
     } else if (type[0] == 'f') { // Faces
       std::string indices;
@@ -67,51 +76,66 @@ void Mesh::importObj(std::ifstream& file) {
 
       const unsigned int nbVertices = std::count(indices.cbegin(), indices.cend(), ' ');
       const unsigned int nbIndices = std::count(indices.cbegin(), indices.cend(), '/') / nbVertices + 1;
-      const std::size_t baseIndex = getEbo().getIndices().size();
 
       std::stringstream indicesStream(indices);
-      std::vector<std::string> partIndices(nbIndices);
-
-      const char delim = '/';
+      std::array<std::string, 3> partIndices;
       std::string vertex;
 
-      indicesStream >> vertex;
-
-      for (std::size_t partIndex = 0; partIndex < nbIndices; ++partIndex) {
-        const std::size_t delimPos = vertex.find(delim);
-
-        partIndices[partIndex] = vertex.substr(0, delimPos);
-        vertex.erase(0, delimPos + 1);
-      }
-
-      getEbo().getIndices().resize(getEbo().getIndices().size() + (nbIndices - (!partIndices[1].empty() ? 0 : 1)) * nbVertices);
-
-      for (std::size_t partIndex = 0; partIndex < nbIndices; ++partIndex)
-        getEbo().getIndices()[baseIndex + partIndex * nbVertices] = std::stoul(partIndices[partIndex]);
-
-      for (std::size_t vertIndex = 1; vertIndex < nbVertices; ++vertIndex) {
+      for (std::size_t vertIndex = 0; vertIndex < nbVertices; ++vertIndex) {
         indicesStream >> vertex;
 
-        for (std::size_t partIndex = 0; partIndex < nbIndices; ++partIndex) {
+        for (std::size_t partIndex = 0; partIndex < 3; ++partIndex) {
+          const char delim = '/';
           const std::size_t delimPos = vertex.find(delim);
 
-          getEbo().getIndices()[baseIndex + (partIndex * nbVertices + vertIndex)] = std::stoul(vertex.substr(0, delimPos));
+          partIndices[partIndex] = vertex.substr(0, delimPos);
           vertex.erase(0, delimPos + 1);
         }
+
+        getEbo().getIndices().push_back(std::stoul(partIndices[0]));
+
+        if (nbIndices > 1) {
+          if (!partIndices[1].empty())
+            texcoordsIndices.push_back(std::stoul(partIndices[1]));
+
+          if (nbIndices > 2)
+            normalsIndices.push_back(std::stoul(partIndices[2]));
+        }
       }
-    } else if (type[0] == 'm') { // Import MTL
-      //file >> type;
-    } else if (type[0] == 'u') { // Use MTL
-      //file >> type;
-    } else if (type[0] == 'o') { // Create/use object
-      //file >> type;
-    } else if (type[0] == 'g') { // Create/use group
-      //file >> type;
-    } else if (type[0] == 's') { // Enable/disable smooth shading
-      //file >> type;
+    } else if (type[0] == 'm') {
+      // Import MTL
+    } else if (type[0] == 'u') {
+      // Use MTL
+    } else if (type[0] == 'o') {
+      // Create/use object
+    } else if (type[0] == 'g') {
+      // Create/use group
+    } else if (type[0] == 's') {
+      // Enable/disable smooth shading
     } else {
       std::getline(file, type); // Skip the rest of the line
     }
+  }
+
+  for (std::size_t vertIndex = 0, partIndex = 0; partIndex < getEbo().getIndices().size(); vertIndex += 8, ++partIndex) {
+    const std::size_t finalVertIndex = (getEbo().getIndices()[partIndex] - 1) * 3;
+    const std::size_t finalTexcoordsIndex = (texcoordsIndices[partIndex] - 1) * 2;
+    const std::size_t finalNormalsIndex = (normalsIndices[partIndex] - 1) * 3;
+    std::array<float, 8> values;
+
+    values[0] = vertices[finalVertIndex];
+    values[1] = vertices[finalVertIndex + 1];
+    values[2] = vertices[finalVertIndex + 2];
+
+    values[3] = texcoords[finalTexcoordsIndex];
+    values[4] = texcoords[finalTexcoordsIndex + 1];
+
+    values[5] = normals[finalNormalsIndex];
+    values[6] = normals[finalNormalsIndex + 1];
+    values[7] = normals[finalNormalsIndex + 2];
+
+    if (std::search(m_vbo.getVertices().cbegin(), m_vbo.getVertices().cend(), values.cbegin(), values.cend()) == m_vbo.getVertices().cend())
+      m_vbo.getVertices().insert(m_vbo.getVertices().cend(), values.begin(), values.end());
   }
 }
 
@@ -149,21 +173,23 @@ void Mesh::load() {
                sizeof(m_vbo.getVertices().front()) * m_vbo.getVertices().size(),
                m_vbo.getVertices().data(),
                GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+  glVertexAttribPointer(0, 3,
+                        GL_FLOAT, GL_FALSE,
+                        8 * sizeof(m_vbo.getVertices().front()),
+                        nullptr);
   glEnableVertexAttribArray(0);
 
-  glBufferData(GL_ARRAY_BUFFER,
-               sizeof(m_vbo.getTexcoords().front()) * m_vbo.getTexcoords().size(),
-               m_vbo.getTexcoords().data(),
-               GL_STATIC_DRAW);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<void*>(3 * sizeof(m_vbo.getTexcoords().front())));
+  glVertexAttribPointer(1, 2,
+                        GL_FLOAT, GL_FALSE,
+                        8 * sizeof(m_vbo.getVertices().front()),
+                        reinterpret_cast<void*>(3 * sizeof(m_vbo.getVertices().front())));
   glEnableVertexAttribArray(1);
 
-  glBufferData(GL_ARRAY_BUFFER,
-               sizeof(m_vbo.getNormals().front()) * m_vbo.getNormals().size(),
-               m_vbo.getNormals().data(),
-               GL_STATIC_DRAW);
-  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<void*>(5 * sizeof(m_vbo.getTexcoords().front())));
+  glVertexAttribPointer(2, 3,
+                        GL_FLOAT, GL_FALSE,
+                        8 * sizeof(m_vbo.getVertices().front()),
+                        reinterpret_cast<void*>(5 * sizeof(m_vbo.getVertices().front())));
   glEnableVertexAttribArray(2);
 
   m_vbo.unbind();

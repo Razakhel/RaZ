@@ -22,10 +22,11 @@ int main() {
 
   // Uncommenting this call will display scene in wireframe
   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  //glEnable(GL_CULL_FACE);
 
   while (window.run()) {
     //cube->translate(0.02f, 0.f, 0.f);
-    cube->rotate(10.f, 0.01f, 0.01f, 0.01f);
+    cube->rotate(15.f, 0.01f, 0.01f, 0.01f);
     //cube->scale(1.0025f, 1.0025f, 1.0025f);
 
     scene.render();
