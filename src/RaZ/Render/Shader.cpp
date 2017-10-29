@@ -12,6 +12,9 @@ namespace Raz {
 void Shader::read(const std::string& fileName) {
   std::ifstream shaderSource(fileName, std::ios::in | std::ios::binary | std::ios::ate);
 
+  if (!shaderSource)
+    std::cerr << "Error: Couldn't open the file '" << fileName << "'" << std::endl;
+
   std::ifstream::pos_type fileSize = shaderSource.tellg();
   shaderSource.seekg(0, std::ios::beg);
 
