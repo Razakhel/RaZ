@@ -74,7 +74,7 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
       break;
   }
 
-  std::cout << "ID:" << id << "\t";
+  std::cout << "ID: " << id << "\t";
 
   switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:
@@ -93,7 +93,7 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
       break;
   }
 
-  std::cerr << "Message:" << message << std::endl;
+  std::cerr << "Message: " << message << std::endl;
 }
 
 } // namespace
