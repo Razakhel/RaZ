@@ -1,5 +1,4 @@
 #include <array>
-#include <cassert>
 #include <fstream>
 #include <iostream>
 
@@ -26,42 +25,44 @@ bool validatePng(std::istream& file) {
 } // namespace
 
 void Image::readJpeg(std::ifstream& file) {
-  assert(("Error: JPEG reading not yet implemented"));
+  throw std::runtime_error("Error: JPEG reading not yet implemented");
 }
 
 void Image::readPng(std::ifstream& file) {
-  const bool valid = file.good() && validatePng(file);
-  assert(("Error: Not a valid PNG", valid));
+  if (!validatePng(file))
+    throw std::runtime_error("Error: Not a valid PNG");
 
-  png_structp pngReadStruct = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
-  assert(("Error: Couldn't initialize PNG read struct", pngReadStruct));
+  png_structp readStruct = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+  if (!readStruct)
+    throw std::runtime_error("Error: Couldn't initialize PNG read struct");
 
-  png_infop pngInfoStruct = png_create_info_struct(pngReadStruct);
-  assert(("Error: Couldn't initialize PNG info struct", pngInfoStruct));
+  png_infop infoStruct = png_create_info_struct(readStruct);
+  if (!infoStruct)
+    throw std::runtime_error("Error: Couldn't initialize PNG info struct");
 
-  png_set_read_fn(pngReadStruct, &file, [] (png_structp pngReadPtr, png_bytep data, png_size_t length) {
+  png_set_read_fn(readStruct, &file, [] (png_structp pngReadPtr, png_bytep data, png_size_t length) {
     png_voidp inPtr = png_get_io_ptr(pngReadPtr);
     static_cast<std::istream*>(inPtr)->read(reinterpret_cast<char*>(data), length);
   });
 
   // Setting the amount signature bytes we've already read
-  png_set_sig_bytes(pngReadStruct, PNG_HEADER_SIZE);
+  png_set_sig_bytes(readStruct, PNG_HEADER_SIZE);
 
-  png_read_info(pngReadStruct, pngInfoStruct);
+  png_read_info(readStruct, infoStruct);
 
-  m_width = png_get_image_width(pngReadStruct, pngInfoStruct);
-  m_height = png_get_image_height(pngReadStruct, pngInfoStruct);
-  uint8_t channels = png_get_channels(pngReadStruct, pngInfoStruct);
-  const uint8_t colorType = png_get_color_type(pngReadStruct, pngInfoStruct);
+  m_width = png_get_image_width(readStruct, infoStruct);
+  m_height = png_get_image_height(readStruct, infoStruct);
+  uint8_t channels = png_get_channels(readStruct, infoStruct);
+  const uint8_t colorType = png_get_color_type(readStruct, infoStruct);
 
   switch (colorType) {
     case PNG_COLOR_TYPE_GRAY:
-      if (png_get_bit_depth(pngReadStruct, pngInfoStruct) < 8)
-        png_set_expand_gray_1_2_4_to_8(pngReadStruct);
+      if (png_get_bit_depth(readStruct, infoStruct) < 8)
+        png_set_expand_gray_1_2_4_to_8(readStruct);
       break;
 
     case PNG_COLOR_TYPE_PALETTE:
-      png_set_palette_to_rgb(pngReadStruct);
+      png_set_palette_to_rgb(readStruct);
       channels = 3;
       break;
 
@@ -69,15 +70,15 @@ void Image::readPng(std::ifstream& file) {
       break;
   }
 
-  png_set_scale_16(pngReadStruct);
+  png_set_scale_16(readStruct);
 
   // Adding full alpha channel to the image if it possesses transparency
-  if (png_get_valid(pngReadStruct, pngInfoStruct, static_cast<png_uint_32>(PNG_INFO_tRNS))) {
-    png_set_tRNS_to_alpha(pngReadStruct);
+  if (png_get_valid(readStruct, infoStruct, static_cast<png_uint_32>(PNG_INFO_tRNS))) {
+    png_set_tRNS_to_alpha(readStruct);
     ++channels;
   }
 
-  png_read_update_info(pngReadStruct, pngInfoStruct);
+  png_read_update_info(readStruct, infoStruct);
 
   m_data.resize(m_width * m_height * channels);
 
@@ -87,21 +88,21 @@ void Image::readPng(std::ifstream& file) {
   for (unsigned int i = 0; i < m_height; ++i)
     rowPtrs[i] = &m_data[m_width * channels * i];
 
-  png_read_image(pngReadStruct, rowPtrs.data());
-  png_read_end(pngReadStruct, pngInfoStruct);
-  png_destroy_read_struct(&pngReadStruct, nullptr, &pngInfoStruct);
+  png_read_image(readStruct, rowPtrs.data());
+  png_read_end(readStruct, infoStruct);
+  png_destroy_read_struct(&readStruct, nullptr, &infoStruct);
 }
 
 void Image::readTga(std::ifstream& file) {
-  assert(("Error: TGA reading not yet implemented"));
+  throw std::runtime_error("Error: TGA reading not yet implemented");
 }
 
 void Image::readBmp(std::ifstream& file) {
-  assert(("Error: BMP reading not yet implemented"));
+  throw std::runtime_error("Error: BMP reading not yet implemented");
 }
 
 void Image::readBpg(std::ifstream& file) {
-  assert(("Error: BPG reading not yet implemented"));
+  throw std::runtime_error("Error: BPG reading not yet implemented");
 }
 
 void Image::read(const std::string& fileName) {
@@ -121,9 +122,9 @@ void Image::read(const std::string& fileName) {
     else if (format == "bpg" || format == "BPG")
       readBpg(file);
     else
-      std::cerr << "Error: '" << format << "' format is not supported" << std::endl;
+      throw std::runtime_error("Error: '" + format + "' format is not supported");
   } else {
-    std::cerr << "Error: Couldn't open the file '" << fileName << "'" << std::endl;
+    throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
   }
 }
 

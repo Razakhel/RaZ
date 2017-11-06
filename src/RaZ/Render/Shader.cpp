@@ -13,9 +13,9 @@ void Shader::read(const std::string& fileName) {
   std::ifstream shaderSource(fileName, std::ios::in | std::ios::binary | std::ios::ate);
 
   if (!shaderSource)
-    std::cerr << "Error: Couldn't open the file '" << fileName << "'" << std::endl;
+    throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
 
-  std::ifstream::pos_type fileSize = shaderSource.tellg();
+  const std::ifstream::pos_type fileSize = shaderSource.tellg();
   shaderSource.seekg(0, std::ios::beg);
 
   std::vector<char> bytes(fileSize);
