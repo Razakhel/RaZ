@@ -208,6 +208,7 @@ void Mesh::load() {
 
 void Mesh::draw() const {
   m_vao.bind();
+  getEbo().bind();
   glDrawElements(GL_TRIANGLES, getIndexCount() * 2, GL_UNSIGNED_INT, nullptr);
 }
 

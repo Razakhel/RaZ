@@ -16,8 +16,8 @@ public:
 
   std::size_t getWidth() const { return m_width; }
   std::size_t getHeight() const { return m_height; }
-  const std::vector<uint8_t> getData() const { return m_data; }
-  std::vector<uint8_t> getData() { return m_data; }
+  const std::vector<uint8_t>& getData() const { return m_data; }
+  std::vector<uint8_t>& getData() { return m_data; }
 
   void read(const std::string& fileName);
 

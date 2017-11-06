@@ -21,7 +21,7 @@ public:
   std::vector<std::size_t>& getIndices() { return m_indices; }
 
   void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index); }
-  void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+  void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
 
   ~ElementBuffer() { glDeleteBuffers(1, &m_index); }
 

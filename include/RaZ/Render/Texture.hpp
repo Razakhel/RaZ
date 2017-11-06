@@ -21,6 +21,7 @@ public:
 
   void load(const std::string& fileName);
   void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
+  void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
   ~Texture() { glDeleteTextures(1, &m_index); }
 

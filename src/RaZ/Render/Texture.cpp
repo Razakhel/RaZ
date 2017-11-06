@@ -21,6 +21,7 @@ void Texture::load(const std::string& fileName) {
                GL_UNSIGNED_BYTE,
                m_image.getData().data());
   glGenerateMipmap(GL_TEXTURE_2D);
+  unbind();
 }
 
 } // namespace Raz
