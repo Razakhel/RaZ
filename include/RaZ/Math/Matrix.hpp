@@ -7,7 +7,7 @@
 
 namespace Raz {
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 class Matrix {
 public:
   Matrix() = default;
@@ -36,7 +36,7 @@ public:
   Matrix& operator%=(float val);
   Matrix& operator/=(const Matrix& mat);
   Matrix& operator/=(float val);
-  template <unsigned int WI, unsigned int HI> Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat);
+  template <std::size_t WI, std::size_t HI> Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat);
   T& operator()(std::size_t widthIndex, std::size_t heightIndex) { return m_data[heightIndex * W + widthIndex]; }
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }

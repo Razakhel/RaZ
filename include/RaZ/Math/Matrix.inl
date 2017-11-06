@@ -2,7 +2,7 @@
 
 namespace Raz {
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
   auto row = list.begin();
 
@@ -14,7 +14,7 @@ Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
   }
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::identity() {
   static_assert(("Error: Matrix must be a square one.", W == H));
 
@@ -30,116 +30,116 @@ Matrix<T, W, H> Matrix<T, W, H>::identity() {
   return res;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator+(Matrix mat) {
   mat += *this;
   return mat;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator+(float val) {
   Matrix<T, W, H> res = *this;
   res += val;
   return res;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator-(Matrix mat) {
   mat -= *this;
   return mat;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator-(float val) {
   Matrix<T, W, H> res = *this;
   res -= val;
   return res;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator%(Matrix mat) {
   mat %= *this;
   return mat;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator%(float val) {
   Matrix<T, W, H> res = *this;
   res %= val;
   return res;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator/(Matrix mat) {
   mat /= *this;
   return mat;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator/(float val) {
   Matrix<T, W, H> res = *this;
   res /= val;
   return res;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& mat) {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] += mat.getData()[i];
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator+=(float val) {
   for (T& it : m_data)
     it += val;
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator-=(const Matrix<T, W, H>& mat) {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] -= mat.getData()[i];
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator-=(float val) {
   for (T& it : m_data)
     it -= val;
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix<T, W, H>& mat) {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] *= mat.getData()[i];
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator%=(float val) {
   for (T& it : m_data)
     it *= val;
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] /= mat.getData()[i];
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator/=(float val) {
   for (T& it : m_data)
     it /= val;
   return *this;
 }
 
-template <typename T, unsigned int W, unsigned int H>
-template <unsigned int WI, unsigned int HI>
+template <typename T, std::size_t W, std::size_t H>
+template <std::size_t WI, std::size_t HI>
 Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) {
   static_assert(("Error: Input matrix's width must be equal to current matrix's height.", W == HI));
 

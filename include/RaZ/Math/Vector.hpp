@@ -8,12 +8,13 @@
 
 namespace Raz {
 
-template <typename T, unsigned int Size>
+template <typename T, std::size_t Size>
 class Vector {
 public:
   Vector() = default;
   Vector(std::initializer_list<T> list);
 
+  std::size_t getSize() const { return Size; }
   const std::array<T, Size>& getData() const { return m_data; }
   std::array<T, Size>& getData() { return m_data; }
 

@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 
 #include "RaZ/RaZ.hpp"
@@ -21,8 +22,8 @@ int main() {
   const auto endTime = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
-      << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
-      << " seconds." << std::endl;
+            << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
+            << " seconds." << std::endl;
 
   Raz::ModelPtr model = std::make_unique<Raz::Model>(mesh);
   model->setMaterial(defaultMaterial);
