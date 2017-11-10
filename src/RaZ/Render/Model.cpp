@@ -1,4 +1,6 @@
-#include <cmath>
+#ifdef _WIN32
+#define _USE_MATH_DEFINES
+#endif
 
 #include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Render/Model.hpp"
@@ -7,8 +9,9 @@ namespace Raz {
 
 void Model::draw() const {
   m_material.getShaderProgram().use();
-
   m_material.getTexture()->bind();
+
+  updatePosition();
   m_mesh->draw();
 }
 
@@ -21,8 +24,7 @@ void Model::translate(float x, float y, float z) {
 }
 
 void Model::rotate(float angle, float x, float y, float z) {
-  const Quaternion<float> quaternion(angle * M_PI / 180, x, y, z);
-
+  const Quaternion<float> quaternion(angle * static_cast<float>(M_PI) / 180.f, x, y, z);
   m_position = m_position * quaternion.computeMatrix();
 
   updatePosition();
