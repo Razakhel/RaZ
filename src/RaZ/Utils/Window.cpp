@@ -125,6 +125,12 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
 
   glDebugMessageCallback(&callbackDebugLog, nullptr);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+  // Uncommenting this call will display scene in wireframe
+  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+  glEnable(GL_CULL_FACE);
+  glEnable(GL_DEPTH_TEST);
 }
 
 bool Window::run() const {
@@ -135,6 +141,7 @@ bool Window::run() const {
 
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_DEPTH_BUFFER_BIT);
 
   glfwPollEvents();
 
