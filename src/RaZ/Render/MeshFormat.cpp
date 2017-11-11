@@ -1,11 +1,9 @@
 #include <map>
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <algorithm>
 
-#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Render/Mesh.hpp"
 
 namespace Raz {
@@ -19,7 +17,7 @@ const std::string extractFileExt(const std::string& fileName) {
 } // namespace
 
 void Mesh::importOff(std::ifstream& file) {
-  unsigned int vertexCount, faceCount;
+  std::size_t vertexCount, faceCount;
   file.ignore(3);
   file >> vertexCount >> faceCount;
   file.ignore(100, '\n');
@@ -27,12 +25,12 @@ void Mesh::importOff(std::ifstream& file) {
   m_vbo.getVertices().resize(vertexCount * 3);
   getEbo().getIndices().resize(faceCount * 3);
 
-  for (unsigned int vertexIndex = 0; vertexIndex < vertexCount * 3; vertexIndex += 3)
+  for (std::size_t vertexIndex = 0; vertexIndex < vertexCount * 3; vertexIndex += 3)
     file >> m_vbo.getVertices()[vertexIndex]
          >> m_vbo.getVertices()[vertexIndex + 1]
          >> m_vbo.getVertices()[vertexIndex + 2];
 
-  for (unsigned int faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
+  for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
     file.ignore(2);
     file >> getEbo().getIndices()[faceIndex]
          >> getEbo().getIndices()[faceIndex + 1]
@@ -45,11 +43,11 @@ void Mesh::importObj(std::ifstream& file) {
   std::vector<float> texcoords;
   std::vector<float> normals;
 
-  std::vector<std::size_t> verticesIndices;
+  std::vector<std::size_t> posIndices;
   std::vector<std::size_t> texcoordsIndices;
   std::vector<std::size_t> normalsIndices;
 
-  std::map<std::array<float, 8>, std::size_t> indicesMap;
+  std::map<std::vector<float>, std::size_t> indicesMap;
 
   while (!file.eof()) {
     std::string type;
@@ -62,11 +60,15 @@ void Mesh::importObj(std::ifstream& file) {
         file >> normals[normals.size() - 3]
              >> normals[normals.size() - 2]
              >> normals[normals.size() - 1];
+
+        m_hasNormals = true;
       } else if (type[1] == 't') { // Texcoords
         texcoords.resize(texcoords.size() + 2);
 
         file >> texcoords[texcoords.size() - 2]
              >> texcoords[texcoords.size() - 1];
+
+        m_hasTexcoords = true;
       } else { // Vertices
         vertices.resize(vertices.size() + 3);
 
@@ -79,16 +81,16 @@ void Mesh::importObj(std::ifstream& file) {
       std::getline(file, indices);
 
       const uint8_t nbVertices = std::count(indices.cbegin(), indices.cend(), ' ');
-      const uint8_t nbIndices = std::count(indices.cbegin(), indices.cend(), '/') / nbVertices + 1;
+      const uint8_t nbParts = 1 + m_hasTexcoords + m_hasNormals;
 
       std::stringstream indicesStream(indices);
-      std::array<std::string, 3> partIndices;
+      std::vector<std::string> partIndices(nbParts);
       std::string vertex;
 
       for (std::size_t vertIndex = 0; vertIndex < nbVertices; ++vertIndex) {
         indicesStream >> vertex;
 
-        for (std::size_t partIndex = 0; partIndex < 3; ++partIndex) {
+        for (std::size_t partIndex = 0; partIndex < nbParts; ++partIndex) {
           const char delim = '/';
           const std::size_t delimPos = vertex.find(delim);
 
@@ -96,15 +98,13 @@ void Mesh::importObj(std::ifstream& file) {
           vertex.erase(0, delimPos + 1);
         }
 
-        verticesIndices.push_back(std::stoul(partIndices[0]));
+        posIndices.push_back(std::stoul(partIndices[0]));
 
-        if (nbIndices > 1) {
-          if (!partIndices[1].empty())
-            texcoordsIndices.push_back(std::stoul(partIndices[1]));
+        if (m_hasTexcoords)
+          texcoordsIndices.push_back(std::stoul(partIndices[1]));
 
-          if (nbIndices > 2)
-            normalsIndices.push_back(std::stoul(partIndices[2]));
-        }
+        if (m_hasNormals)
+          normalsIndices.push_back(std::stoul(partIndices[2]));
       }
     } else if (type[0] == 'm') {
       // Import MTL
@@ -121,35 +121,44 @@ void Mesh::importObj(std::ifstream& file) {
     }
   }
 
-  for (std::size_t vertIndex = 0, partIndex = 0; partIndex < verticesIndices.size(); vertIndex += 8, ++partIndex) {
-    const std::size_t finalVertIndex = (verticesIndices[partIndex] - 1) * 3;
-    const std::size_t finalTexcoordsIndex = (texcoordsIndices[partIndex] - 1) * 2;
-    const std::size_t finalNormalsIndex = (normalsIndices[partIndex] - 1) * 3;
-    std::array<float, 8> values;
+  const uint8_t nbFeatures = 3 + m_hasTexcoords * 2 + m_hasNormals * 3;
+
+  for (std::size_t vertIndex = 0, partIndex = 0; partIndex < posIndices.size(); vertIndex += nbFeatures, ++partIndex) {
+    const std::size_t finalVertIndex = (posIndices[partIndex] - 1) * 3;
+    std::vector<float> values(nbFeatures);
 
     values[0] = vertices[finalVertIndex];
     values[1] = vertices[finalVertIndex + 1];
     values[2] = vertices[finalVertIndex + 2];
 
-    values[3] = texcoords[finalTexcoordsIndex];
-    values[4] = texcoords[finalTexcoordsIndex + 1];
+    if (m_hasTexcoords) {
+      const std::size_t finalTexcoordsIndex = (texcoordsIndices[partIndex] - 1) * 2;
 
-    values[5] = normals[finalNormalsIndex];
-    values[6] = normals[finalNormalsIndex + 1];
-    values[7] = normals[finalNormalsIndex + 2];
+      values[3] = texcoords[finalTexcoordsIndex];
+      values[4] = texcoords[finalTexcoordsIndex + 1];
+    }
+
+    if (m_hasNormals) {
+      const std::size_t finalNormalsIndex = (normalsIndices[partIndex] - 1) * 3;
+      const uint8_t texcoordsStride = m_hasTexcoords * 2;
+
+      values[3 + texcoordsStride] = normals[finalNormalsIndex];
+      values[4 + texcoordsStride] = normals[finalNormalsIndex + 1];
+      values[5 + texcoordsStride] = normals[finalNormalsIndex + 2];
+    }
 
     const auto indexIter = indicesMap.find(values);
     if (indexIter != indicesMap.cend()) {
-      getEbo().getIndices().push_back(indexIter->second);
+      getEbo().getIndices().push_back(indexIter->second - 1);
     } else {
       indicesMap.emplace(values, indicesMap.size() + 1);
       m_vbo.getVertices().insert(m_vbo.getVertices().cend(), values.begin(), values.end());
-      getEbo().getIndices().push_back(indicesMap.size());
+      getEbo().getIndices().push_back(indicesMap.size() - 1);
     }
   }
 }
 
-void Mesh::import(const std::string& fileName) {
+void Mesh::importFromFile(const std::string& fileName) {
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
@@ -160,56 +169,12 @@ void Mesh::import(const std::string& fileName) {
     else if (format == "obj" || format == "OBJ")
       importObj(file);
     else
-      std::cerr << "Error: '" << format << "' format is not supported" << std::endl;
+      throw std::runtime_error("Error: '" + format + "' format is not supported");
 
     load();
   } else {
-    std::cerr << "Error: Couldn't open the file '" << fileName << "'" << std::endl;
+    throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
   }
-}
-
-void Mesh::load() {
-  m_vao.bind();
-
-  getEbo().bind();
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               sizeof(getEbo().getIndices().front()) * getEbo().getIndices().size(),
-               getEbo().getIndices().data(),
-               GL_STATIC_DRAW);
-  getEbo().unbind();
-
-  m_vbo.bind();
-  glBufferData(GL_ARRAY_BUFFER,
-               sizeof(m_vbo.getVertices().front()) * m_vbo.getVertices().size(),
-               m_vbo.getVertices().data(),
-               GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3,
-                        GL_FLOAT, GL_FALSE,
-                        8 * sizeof(m_vbo.getVertices().front()),
-                        nullptr);
-  glEnableVertexAttribArray(0);
-
-  glVertexAttribPointer(1, 2,
-                        GL_FLOAT, GL_FALSE,
-                        8 * sizeof(m_vbo.getVertices().front()),
-                        reinterpret_cast<void*>(3 * sizeof(m_vbo.getVertices().front())));
-  glEnableVertexAttribArray(1);
-
-  glVertexAttribPointer(2, 3,
-                        GL_FLOAT, GL_FALSE,
-                        8 * sizeof(m_vbo.getVertices().front()),
-                        reinterpret_cast<void*>(5 * sizeof(m_vbo.getVertices().front())));
-  glEnableVertexAttribArray(2);
-
-  m_vbo.unbind();
-  m_vao.unbind();
-}
-
-void Mesh::draw() const {
-  m_vao.bind();
-  getEbo().bind();
-  glDrawElements(GL_TRIANGLES, getIndexCount() * 2, GL_UNSIGNED_INT, nullptr);
 }
 
 } // namespace Raz
