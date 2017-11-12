@@ -47,7 +47,7 @@ void Mesh::importObj(std::ifstream& file) {
   std::vector<std::size_t> texcoordsIndices;
   std::vector<std::size_t> normalsIndices;
 
-  std::map<std::vector<float>, std::size_t> indicesMap;
+  std::map<std::vector<float>, unsigned int> indicesMap;
 
   while (!file.eof()) {
     std::string type;
@@ -82,9 +82,10 @@ void Mesh::importObj(std::ifstream& file) {
 
       const uint8_t nbVertices = std::count(indices.cbegin(), indices.cend(), ' ');
       const uint8_t nbParts = 1 + m_hasTexcoords + m_hasNormals;
+      const bool quadFaces = (nbVertices == 4);
 
       std::stringstream indicesStream(indices);
-      std::vector<std::string> partIndices(nbParts);
+      std::vector<std::size_t> partIndices(nbParts * nbVertices);
       std::string vertex;
 
       for (std::size_t vertIndex = 0; vertIndex < nbVertices; ++vertIndex) {
@@ -94,17 +95,47 @@ void Mesh::importObj(std::ifstream& file) {
           const char delim = '/';
           const std::size_t delimPos = vertex.find(delim);
 
-          partIndices[partIndex] = vertex.substr(0, delimPos);
+          partIndices[partIndex * nbParts + vertIndex + (partIndex * quadFaces)] = std::stoul(vertex.substr(0, delimPos));
           vertex.erase(0, delimPos + 1);
         }
+      }
 
-        posIndices.push_back(std::stoul(partIndices[0]));
+      uint8_t texcoordsStride = nbVertices * m_hasTexcoords;
 
-        if (m_hasTexcoords)
-          texcoordsIndices.push_back(std::stoul(partIndices[1]));
+      if (quadFaces) {
+        posIndices.push_back(partIndices[2]);
+        posIndices.push_back(partIndices[0]);
+        posIndices.push_back(partIndices[3]);
 
-        if (m_hasNormals)
-          normalsIndices.push_back(std::stoul(partIndices[2]));
+        if (m_hasTexcoords) {
+          texcoordsIndices.push_back(partIndices[6]);
+          texcoordsIndices.push_back(partIndices[4]);
+          texcoordsIndices.push_back(partIndices[7]);
+        }
+
+        if (m_hasNormals) {
+          normalsIndices.push_back(partIndices[6 + texcoordsStride]);
+          normalsIndices.push_back(partIndices[4 + texcoordsStride]);
+          normalsIndices.push_back(partIndices[7 + texcoordsStride]);
+        }
+      }
+
+      posIndices.push_back(partIndices[1]);
+      posIndices.push_back(partIndices[0]);
+      posIndices.push_back(partIndices[2]);
+
+      if (m_hasTexcoords) {
+        texcoordsIndices.push_back(partIndices[4 + quadFaces]);
+        texcoordsIndices.push_back(partIndices[3 + quadFaces]);
+        texcoordsIndices.push_back(partIndices[5 + quadFaces]);
+      }
+
+      if (m_hasNormals) {
+        texcoordsStride += quadFaces;
+
+        normalsIndices.push_back(partIndices[4 + texcoordsStride]);
+        normalsIndices.push_back(partIndices[3 + texcoordsStride]);
+        normalsIndices.push_back(partIndices[5 + texcoordsStride]);
       }
     } else if (type[0] == 'm') {
       // Import MTL

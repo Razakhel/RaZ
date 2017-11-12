@@ -17,7 +17,7 @@ int main() {
 
   const auto startTime = std::chrono::system_clock::now();
 
-  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/cube.obj");
+  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/bigguy.obj");
 
   const auto endTime = std::chrono::system_clock::now();
 
@@ -28,14 +28,15 @@ int main() {
   Raz::ModelPtr model = std::make_unique<Raz::Model>(mesh);
   model->setMaterial(defaultMaterial);
 
-  auto cube = model.get();
+  const auto modelPtr = model.get();
+  modelPtr->scale(0.05f, 0.05f, 0.05f);
 
   scene.addModel(std::move(model));
 
   while (window.run()) {
-    //cube->translate(0.02f, 0.f, 0.f);
-    cube->rotate(15.f, 0.01f, 0.01f, 0.01f);
-    //cube->scale(1.0025f, 1.0025f, 1.0025f);
+    //modelPtr->translate(0.02f, 0.f, 0.f);
+    modelPtr->rotate(25.f, 0.01f, 0.01f, 0.01f);
+    //modelPtr->scale(1.0025f, 1.0025f, 1.0025f);
 
     scene.render();
   }
