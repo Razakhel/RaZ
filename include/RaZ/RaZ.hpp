@@ -8,6 +8,7 @@
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
 #include "Math/Vector.hpp"
+#include "Render/GraphicObjects.hpp"
 #include "Render/Material.hpp"
 #include "Render/Mesh.hpp"
 #include "Render/Model.hpp"

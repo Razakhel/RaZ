@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 
-#include "GL/glew.h"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/GraphicObjects.hpp"
 
