@@ -4,7 +4,7 @@
 #include "RaZ/RaZ.hpp"
 
 int main() {
-  const Raz::Window window(800, 600, "Test");
+  Raz::Window window(800, 600, "Test");
 
   Raz::Scene scene;
 
@@ -17,7 +17,7 @@ int main() {
 
   const auto startTime = std::chrono::system_clock::now();
 
-  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/bigguy.obj");
+  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/car.obj");
 
   const auto endTime = std::chrono::system_clock::now();
 
@@ -29,17 +29,21 @@ int main() {
   model->setMaterial(defaultMaterial);
 
   const auto modelPtr = model.get();
-  modelPtr->scale(0.05f, 0.05f, 0.05f);
+  modelPtr->scale(0.0025f);
+
+  window.addKeyCallback(GLFW_KEY_W, [&modelPtr] () { modelPtr->translate(0.f, 0.1f, 0.f); });
+  window.addKeyCallback(GLFW_KEY_S, [&modelPtr] () { modelPtr->translate(0.f, -0.1f, 0.f); });
+  window.addKeyCallback(GLFW_KEY_A, [&modelPtr] () { modelPtr->translate(-0.1f, 0.f, 0.f); });
+  window.addKeyCallback(GLFW_KEY_D, [&modelPtr] () { modelPtr->translate(0.1f, 0.f, 0.f); });
+  window.addKeyCallback(GLFW_KEY_RIGHT, [&modelPtr] () { modelPtr->rotate(15.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(GLFW_KEY_LEFT, [&modelPtr] () { modelPtr->rotate(-15.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(GLFW_KEY_UP, [&modelPtr] () { modelPtr->rotate(15.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(GLFW_KEY_DOWN, [&modelPtr] () { modelPtr->rotate(-15.f, 1.f, 0.f, 0.f); });
 
   scene.addModel(std::move(model));
 
-  while (window.run()) {
-    //modelPtr->translate(0.02f, 0.f, 0.f);
-    modelPtr->rotate(25.f, 0.01f, 0.01f, 0.01f);
-    //modelPtr->scale(1.0025f, 1.0025f, 1.0025f);
-
+  while (window.run())
     scene.render();
-  }
 
   return EXIT_SUCCESS;
 }

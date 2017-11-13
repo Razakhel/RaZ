@@ -17,80 +17,32 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
   std::cerr << "OpenGL Debug - ";
 
   switch (source) {
-    case GL_DEBUG_SOURCE_API:
-      std::cerr << "Source:OpenGL\t";
-      break;
-
-    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-      std::cerr << "Source:Windows\t";
-      break;
-
-    case GL_DEBUG_SOURCE_SHADER_COMPILER:
-      std::cerr << "Source:Shader compiler\t";
-      break;
-
-    case GL_DEBUG_SOURCE_THIRD_PARTY:
-      std::cerr << "Source:Third party\t";
-      break;
-
-    case GL_DEBUG_SOURCE_APPLICATION:
-      std::cerr << "Source:Application\t";
-      break;
-
-    case GL_DEBUG_SOURCE_OTHER:
-      std::cerr << "Source:Other\t";
-      break;
-
-    default:
-      break;
+    case GL_DEBUG_SOURCE_API: std::cerr << "Source: OpenGL\t"; break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM: std::cerr << "Source: Windows\t"; break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cerr << "Source: Shader compiler\t"; break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY: std::cerr << "Source: Third party\t"; break;
+    case GL_DEBUG_SOURCE_APPLICATION: std::cerr << "Source: Application\t"; break;
+    case GL_DEBUG_SOURCE_OTHER: std::cerr << "Source: Other\t"; break;
+    default: break;
   }
 
   switch (type) {
-    case GL_DEBUG_TYPE_ERROR:
-      std::cerr << "Type:Error\t";
-      break;
-
-    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-      std::cerr << "Type:Deprecated behavior\t";
-      break;
-
-    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-      std::cerr << "Type:Undefined behavior\t";
-      break;
-
-    case GL_DEBUG_TYPE_PORTABILITY:
-      std::cerr << "Type:Portability\t";
-      break;
-
-    case GL_DEBUG_TYPE_PERFORMANCE:
-      std::cerr << "Type:Performance\t";
-      break;
-
-    case GL_DEBUG_TYPE_OTHER:
-      std::cerr << "Type:Other\t";
-      break;
-
-    default:
-      break;
+    case GL_DEBUG_TYPE_ERROR: std::cerr << "Type: Error\t"; break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cerr << "Type: Deprecated behavior\t"; break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: std::cerr << "Type: Undefined behavior\t"; break;
+    case GL_DEBUG_TYPE_PORTABILITY: std::cerr << "Type: Portability\t"; break;
+    case GL_DEBUG_TYPE_PERFORMANCE: std::cerr << "Type: Performance\t"; break;
+    case GL_DEBUG_TYPE_OTHER: std::cerr << "Type: Other\t"; break;
+    default: break;
   }
 
   std::cout << "ID: " << id << "\t";
 
   switch (severity) {
-    case GL_DEBUG_SEVERITY_HIGH:
-      std::cerr << "Severity:High\t";
-      break;
-
-    case GL_DEBUG_SEVERITY_MEDIUM:
-      std::cerr << "Severity:Medium\t";
-      break;
-
-    case GL_DEBUG_SEVERITY_LOW:
-      std::cerr << "Severity:Low\t";
-      break;
-
-    default:
-      break;
+    case GL_DEBUG_SEVERITY_HIGH: std::cerr << "Severity: High\t"; break;
+    case GL_DEBUG_SEVERITY_MEDIUM: std::cerr << "Severity: Medium\t"; break;
+    case GL_DEBUG_SEVERITY_LOW: std::cerr << "Severity: Low\t"; break;
+    default: break;
   }
 
   std::cerr << "Message: " << message << std::endl;
@@ -112,10 +64,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
   }
 
   glfwMakeContextCurrent(m_window);
-  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int scancode, int action, int mode) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GL_TRUE);
-  });
+  updateKeyCallback();
 
   glViewport(0, 0, width, height);
 
@@ -131,6 +80,27 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
 
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
+}
+
+void Window::addKeyCallback(int key, std::function<void()> func) {
+  m_keyCallbacks.emplace_back(key, func);
+  glfwSetWindowUserPointer(m_window, &m_keyCallbacks);
+
+  updateKeyCallback();
+}
+
+void Window::updateKeyCallback() {
+  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int scancode, int action, int mode) {
+    const CallbacksList& callbackList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
+
+    for (const auto& callback : callbackList) {
+      if (key == callback.first && (action == GLFW_PRESS || action == GLFW_REPEAT))
+        callback.second();
+    }
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(window, GL_TRUE);
+  });
 }
 
 bool Window::run() const {
