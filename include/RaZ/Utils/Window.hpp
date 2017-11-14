@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "GLFW/glfw3.h"
+#include "RaZ/Utils/Keyboard.hpp"
 
 namespace Raz {
 
@@ -16,8 +17,8 @@ class Window {
 public:
   Window(unsigned int width, unsigned int height, const std::string& name = "");
 
-  void addKeyCallback(int key, std::function<void()> func);
-  void updateKeyCallback();
+  void addKeyCallback(Keyboard::Key key, std::function<void()> func);
+  void updateKeyCallback() const;
   bool run() const;
   void close() const { glfwTerminate(); }
 

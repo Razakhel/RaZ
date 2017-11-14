@@ -12,7 +12,7 @@ int main() {
   const Raz::FragmentShader fragShader("../shaders/frag.glsl");
 
   Raz::Material defaultMaterial(vertShader, fragShader);
-  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/lena.png");
+  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/default.png");
   defaultMaterial.setTexture(defaultTexture);
 
   const auto startTime = std::chrono::system_clock::now();
@@ -31,14 +31,14 @@ int main() {
   const auto modelPtr = model.get();
   modelPtr->scale(0.0025f);
 
-  window.addKeyCallback(GLFW_KEY_W, [&modelPtr] () { modelPtr->translate(0.f, 0.1f, 0.f); });
-  window.addKeyCallback(GLFW_KEY_S, [&modelPtr] () { modelPtr->translate(0.f, -0.1f, 0.f); });
-  window.addKeyCallback(GLFW_KEY_A, [&modelPtr] () { modelPtr->translate(-0.1f, 0.f, 0.f); });
-  window.addKeyCallback(GLFW_KEY_D, [&modelPtr] () { modelPtr->translate(0.1f, 0.f, 0.f); });
-  window.addKeyCallback(GLFW_KEY_RIGHT, [&modelPtr] () { modelPtr->rotate(15.f, 0.f, 1.f, 0.f); });
-  window.addKeyCallback(GLFW_KEY_LEFT, [&modelPtr] () { modelPtr->rotate(-15.f, 0.f, 1.f, 0.f); });
-  window.addKeyCallback(GLFW_KEY_UP, [&modelPtr] () { modelPtr->rotate(15.f, 1.f, 0.f, 0.f); });
-  window.addKeyCallback(GLFW_KEY_DOWN, [&modelPtr] () { modelPtr->rotate(-15.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::W, [&modelPtr] () { modelPtr->translate(0.f, 0.1f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::S, [&modelPtr] () { modelPtr->translate(0.f, -0.1f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::A, [&modelPtr] () { modelPtr->translate(-0.1f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::D, [&modelPtr] () { modelPtr->translate(0.1f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(15.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-15.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::UP, [&modelPtr] () { modelPtr->rotate(15.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] () { modelPtr->rotate(-15.f, 1.f, 0.f, 0.f); });
 
   scene.addModel(std::move(model));
 

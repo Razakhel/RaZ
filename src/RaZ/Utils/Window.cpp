@@ -82,14 +82,14 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
   glEnable(GL_DEPTH_TEST);
 }
 
-void Window::addKeyCallback(int key, std::function<void()> func) {
+void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
   m_keyCallbacks.emplace_back(key, func);
   glfwSetWindowUserPointer(m_window, &m_keyCallbacks);
 
   updateKeyCallback();
 }
 
-void Window::updateKeyCallback() {
+void Window::updateKeyCallback() const {
   glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int scancode, int action, int mode) {
     const CallbacksList& callbackList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
 
