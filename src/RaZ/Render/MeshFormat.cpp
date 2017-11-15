@@ -159,27 +159,30 @@ void Mesh::importObj(std::ifstream& file) {
   const uint8_t nbFeatures = 3 + m_hasTexcoords * 2 + m_hasNormals * 3;
 
   for (std::size_t vertIndex = 0, partIndex = 0; partIndex < posIndices.size(); vertIndex += nbFeatures, ++partIndex) {
-    const std::size_t finalVertIndex = (posIndices[partIndex] - 1) * 3;
+    const int64_t tempPosIndex = posIndices[partIndex] - 1;
+    const std::size_t finalPosIndex = (tempPosIndex < 0 ? tempPosIndex + (vertices.size() / 3) + 1 : tempPosIndex) * 3;
     std::vector<float> values(nbFeatures);
 
-    values[0] = vertices[finalVertIndex];
-    values[1] = vertices[finalVertIndex + 1];
-    values[2] = vertices[finalVertIndex + 2];
+    values[0] = vertices[finalPosIndex];
+    values[1] = vertices[finalPosIndex + 1];
+    values[2] = vertices[finalPosIndex + 2];
 
     if (m_hasTexcoords) {
-      const std::size_t finalTexcoordsIndex = (texcoordsIndices[partIndex] - 1) * 2;
+      const int64_t tempTexIndex = texcoordsIndices[partIndex] - 1;
+      const std::size_t finalTexIndex = (tempTexIndex < 0 ? tempTexIndex + (texcoords.size() / 2) + 1 : tempTexIndex) * 2;
 
-      values[3] = texcoords[finalTexcoordsIndex];
-      values[4] = texcoords[finalTexcoordsIndex + 1];
+      values[3] = texcoords[finalTexIndex];
+      values[4] = texcoords[finalTexIndex + 1];
     }
 
     if (m_hasNormals) {
-      const std::size_t finalNormalsIndex = (normalsIndices[partIndex] - 1) * 3;
+      const int64_t tempNormIndex = normalsIndices[partIndex] - 1;
+      const std::size_t finalNormIndex = (tempNormIndex < 0 ? tempNormIndex + (normals.size() / 3) + 1 : tempNormIndex) * 3;
       const uint8_t texcoordsStride = m_hasTexcoords * 2;
 
-      values[3 + texcoordsStride] = normals[finalNormalsIndex];
-      values[4 + texcoordsStride] = normals[finalNormalsIndex + 1];
-      values[5 + texcoordsStride] = normals[finalNormalsIndex + 2];
+      values[3 + texcoordsStride] = normals[finalNormIndex];
+      values[4 + texcoordsStride] = normals[finalNormIndex + 1];
+      values[5 + texcoordsStride] = normals[finalNormIndex + 2];
     }
 
     const auto indexIter = indicesMap.find(values);
