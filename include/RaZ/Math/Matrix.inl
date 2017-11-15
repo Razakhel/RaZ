@@ -20,12 +20,8 @@ Matrix<T, W, H> Matrix<T, W, H>::identity() {
 
   Matrix<T, W, H> res;
 
-  for (unsigned int heightIndex = 0; heightIndex < H; ++heightIndex) {
-    for (unsigned int widthIndex = 0; widthIndex < W; ++widthIndex) {
-      if (heightIndex == widthIndex)
-        res[heightIndex * W + widthIndex] = 1.f;
-    }
-  }
+  for (std::size_t diagIndex = 0; diagIndex < W; ++diagIndex)
+    res[diagIndex * W + diagIndex] = 1.f;
 
   return res;
 }

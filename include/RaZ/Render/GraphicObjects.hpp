@@ -53,8 +53,8 @@ public:
   const ElementBuffer& getEbo() const { return m_ebo; }
   ElementBuffer& getEbo() { return m_ebo; }
 
-  void bind() const { glBindVertexArray(m_index); }
-  void unbind() const { glBindVertexArray(0); }
+  void bind() const { glBindVertexArray(m_index); m_ebo.bind(); }
+  void unbind() const { glBindVertexArray(0); m_ebo.unbind(); }
 
   ~VertexArray() { glDeleteVertexArrays(1, &m_index); }
 

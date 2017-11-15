@@ -5,12 +5,10 @@ namespace Raz {
 void Mesh::load() {
   m_vao.bind();
 
-  getEbo().bind();
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                sizeof(getEbo().getIndices().front()) * getEbo().getIndices().size(),
                getEbo().getIndices().data(),
                GL_STATIC_DRAW);
-  getEbo().unbind();
 
   m_vbo.bind();
   glBufferData(GL_ARRAY_BUFFER,
@@ -48,7 +46,6 @@ void Mesh::load() {
 
 void Mesh::draw() const {
   m_vao.bind();
-  getEbo().bind();
   glDrawElements(GL_TRIANGLES, getIndexCount(), GL_UNSIGNED_INT, nullptr);
 }
 

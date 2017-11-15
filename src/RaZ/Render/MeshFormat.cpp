@@ -43,9 +43,9 @@ void Mesh::importObj(std::ifstream& file) {
   std::vector<float> texcoords;
   std::vector<float> normals;
 
-  std::vector<std::size_t> posIndices;
-  std::vector<std::size_t> texcoordsIndices;
-  std::vector<std::size_t> normalsIndices;
+  std::vector<int64_t> posIndices;
+  std::vector<int64_t> texcoordsIndices;
+  std::vector<int64_t> normalsIndices;
 
   std::map<std::vector<float>, unsigned int> indicesMap;
 
@@ -85,7 +85,7 @@ void Mesh::importObj(std::ifstream& file) {
       const bool quadFaces = (nbVertices == 4);
 
       std::stringstream indicesStream(indices);
-      std::vector<std::size_t> partIndices(nbParts * nbVertices);
+      std::vector<int64_t> partIndices(nbParts * nbVertices);
       std::string vertex;
 
       for (std::size_t vertIndex = 0; vertIndex < nbVertices; ++vertIndex) {
@@ -94,8 +94,12 @@ void Mesh::importObj(std::ifstream& file) {
         for (std::size_t partIndex = 0; partIndex < nbParts; ++partIndex) {
           const char delim = '/';
           const std::size_t delimPos = vertex.find(delim);
+          const std::string part = vertex.substr(0, delimPos);
 
-          partIndices[partIndex * nbParts + vertIndex + (partIndex * quadFaces)] = std::stoul(vertex.substr(0, delimPos));
+          if (!part.empty())
+            partIndices[partIndex * nbParts + vertIndex + (partIndex * quadFaces)] = std::stol(part);
+          else
+            --partIndex;
           vertex.erase(0, delimPos + 1);
         }
       }
