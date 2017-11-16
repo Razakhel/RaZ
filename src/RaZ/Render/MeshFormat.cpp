@@ -119,9 +119,9 @@ void Mesh::importObj(std::ifstream& file) {
       posIndices.push_back(partIndices[0]);
       posIndices.push_back(partIndices[2]);
 
-      texcoordsIndices.push_back(partIndices[4 + quadStride]);
-      texcoordsIndices.push_back(partIndices[3 + quadStride]);
-      texcoordsIndices.push_back(partIndices[5 + quadStride]);
+      texcoordsIndices.push_back(partIndices[4 + quadFaces]);
+      texcoordsIndices.push_back(partIndices[3 + quadFaces]);
+      texcoordsIndices.push_back(partIndices[5 + quadFaces]);
 
       normalsIndices.push_back(partIndices[7 + quadStride]);
       normalsIndices.push_back(partIndices[6 + quadStride]);
