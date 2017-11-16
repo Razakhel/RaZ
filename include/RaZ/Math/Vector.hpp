@@ -21,6 +21,7 @@ public:
   T dot(const Vector& vec) const;
   Vector cross(const Vector& vec) const;
   Vector normalize() const;
+  std::size_t hash(std::size_t seed) const;
 
   Vector operator+(Vector vec);
   Vector operator+(float val);
@@ -47,9 +48,21 @@ private:
   std::array<T, Size> m_data;
 };
 
+using Vec2b = Vector<uint8_t, 2>;
+using Vec3b = Vector<uint8_t, 3>;
+using Vec4b = Vector<uint8_t, 4>;
+
+using Vec2i = Vector<int, 2>;
+using Vec3i = Vector<int, 3>;
+using Vec4i = Vector<int, 4>;
+
 using Vec2f = Vector<float, 2>;
 using Vec3f = Vector<float, 3>;
 using Vec4f = Vector<float, 4>;
+
+using Vec2d = Vector<double, 2>;
+using Vec3d = Vector<double, 3>;
+using Vec4d = Vector<double, 4>;
 
 } // namespace Raz
 
