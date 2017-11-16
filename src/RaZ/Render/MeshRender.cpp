@@ -16,7 +16,7 @@ void Mesh::load() {
                m_vbo.getVertices().data(),
                GL_STATIC_DRAW);
 
-  const uint8_t stride = (3 + m_hasTexcoords * 2 + m_hasNormals * 3) * sizeof(m_vbo.getVertices().front());
+  const uint8_t stride = sizeof(m_vbo.getVertices().front());
 
   glVertexAttribPointer(0, 3,
                         GL_FLOAT, GL_FALSE,
@@ -24,21 +24,17 @@ void Mesh::load() {
                         nullptr);
   glEnableVertexAttribArray(0);
 
-  if (m_hasTexcoords) {
-    glVertexAttribPointer(1, 2,
-                          GL_FLOAT, GL_FALSE,
-                          stride,
-                          reinterpret_cast<void*>(3 * sizeof(m_vbo.getVertices().front())));
-    glEnableVertexAttribArray(1);
-  }
+  glVertexAttribPointer(1, 2,
+                        GL_FLOAT, GL_FALSE,
+                        stride,
+                        reinterpret_cast<void*>(3 * sizeof(m_vbo.getVertices().front().positions.getData().front())));
+  glEnableVertexAttribArray(1);
 
-  if (m_hasNormals) {
-    glVertexAttribPointer(2, 3,
-                          GL_FLOAT, GL_FALSE,
-                          stride,
-                          reinterpret_cast<void*>((3 + m_hasTexcoords * 2) * sizeof(m_vbo.getVertices().front())));
-    glEnableVertexAttribArray(2);
-  }
+  glVertexAttribPointer(2, 3,
+                        GL_FLOAT, GL_FALSE,
+                        stride,
+                        reinterpret_cast<void*>(5 * sizeof(m_vbo.getVertices().front().normals.getData().front())));
+  glEnableVertexAttribArray(2);
 
   m_vbo.unbind();
   m_vao.unbind();

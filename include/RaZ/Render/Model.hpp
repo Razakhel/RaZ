@@ -16,8 +16,8 @@ public:
 
   const Material& getMaterial() const { return m_material; }
   Material& getMaterial() { return m_material; }
-  const Mat4f& getPosition() const { return m_position; }
-  Mat4f& getPosition() { return m_position; }
+  const Mat4f& getPosition() const { return m_transform; }
+  Mat4f& getPosition() { return m_transform; }
   const MeshPtr getMesh() const { return m_mesh; }
   MeshPtr getMesh() { return m_mesh; }
 
@@ -30,10 +30,10 @@ public:
   void scale(float val) { scale(val, val, val); }
 
 private:
-  void updatePosition() const;
+  void updateTransform() const;
 
   Material m_material;
-  Mat4f m_position = Mat4f::identity();
+  Mat4f m_transform = Mat4f::identity();
   MeshPtr m_mesh;
 };
 

@@ -35,8 +35,6 @@ private:
 
   VertexArray m_vao;
   VertexBuffer m_vbo;
-  bool m_hasTexcoords = false;
-  bool m_hasNormals = false;
 };
 
 using MeshPtr = std::shared_ptr<Mesh>;
