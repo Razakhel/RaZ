@@ -12,12 +12,12 @@ int main() {
   const Raz::FragmentShader fragShader("../shaders/frag.glsl");
 
   Raz::Material defaultMaterial(vertShader, fragShader);
-  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/default.png");
+  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/lena.png");
   defaultMaterial.setTexture(defaultTexture);
 
   const auto startTime = std::chrono::system_clock::now();
 
-  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/car.obj");
+  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/bigguy.obj");
 
   const auto endTime = std::chrono::system_clock::now();
 
@@ -29,7 +29,7 @@ int main() {
   model->setMaterial(defaultMaterial);
 
   const auto modelPtr = model.get();
-  modelPtr->scale(0.0025f);
+  modelPtr->scale(0.05f);
 
   window.addKeyCallback(Raz::Keyboard::W, [&modelPtr] () { modelPtr->translate(0.f, 0.1f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::S, [&modelPtr] () { modelPtr->translate(0.f, -0.1f, 0.f); });
@@ -41,6 +41,10 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] () { modelPtr->rotate(-15.f, 1.f, 0.f, 0.f); });
 
   scene.addModel(std::move(model));
+
+  scene.addLight(Raz::DirectionalLight(Raz::Vec4f({ 0.f, 1.f, 0.f, 0.f }),
+                                       Raz::Vec3f({ 0.f, 1.f, 0.f}),
+                                       Raz::Vec3f({ 1.f, 1.f, 1.f })));
 
   while (window.run())
     scene.render();

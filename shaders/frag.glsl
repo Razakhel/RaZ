@@ -3,7 +3,8 @@
 uniform sampler2D uniTexture;
 
 in vec2 fragTexcoords;
+in float fragLightHitAngle;
 
 void main() {
-  gl_FragColor = texture(uniTexture, fragTexcoords);
+  gl_FragColor = fragLightHitAngle * texture(uniTexture, fragTexcoords);
 }
