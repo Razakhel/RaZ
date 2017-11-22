@@ -25,7 +25,7 @@ void Shader::read(const std::string& fileName) {
 
   m_index = glCreateShader(m_type);
   const char* data = m_content.c_str();
-  GLint length = m_content.size();
+  const GLint length = m_content.size();
   glShaderSource(m_index, 1, static_cast<const GLchar* const*>(&data), &length);
   glCompileShader(m_index);
 
@@ -33,7 +33,7 @@ void Shader::read(const std::string& fileName) {
   glGetShaderiv(m_index, GL_COMPILE_STATUS, &success);
 
   if (!success) {
-    std::array<GLchar, 512> infoLog;
+    std::array<GLchar, 512> infoLog {};
 
     glGetShaderInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
     std::cerr << "Error: Vertex shader compilation failed.\n" << infoLog.data() << std::endl;
@@ -51,7 +51,7 @@ void ShaderProgram::attachShaders(const VertexShader& vertShader, const Fragment
   glGetProgramiv(m_index, GL_LINK_STATUS, &success);
 
   if (!success) {
-    std::array<GLchar, 512> infoLog;
+    std::array<GLchar, 512> infoLog {};
 
     glGetProgramInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
     std::cerr << "Error: Shader program link failed.\n" << infoLog.data() << std::endl;

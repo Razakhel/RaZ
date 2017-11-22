@@ -39,15 +39,13 @@ void Mesh::importOff(std::ifstream& file) {
 }
 
 void Mesh::importObj(std::ifstream& file) {
-  std::vector<float> vertices;
-  std::vector<float> texcoords;
-  std::vector<float> normals;
+  std::vector<Vec3f> positions;
+  std::vector<Vec2f> texcoords;
+  std::vector<Vec3f> normals;
 
   std::vector<int64_t> posIndices;
   std::vector<int64_t> texcoordsIndices;
   std::vector<int64_t> normalsIndices;
-
-  std::map<Vertex, unsigned int, Vertex> indicesMap;
 
   while (!file.eof()) {
     std::string type;
@@ -55,29 +53,36 @@ void Mesh::importObj(std::ifstream& file) {
 
     if (type[0] == 'v') {
       if (type[1] == 'n') { // Normals
-        normals.resize(normals.size() + 3);
+        Vec3f normalsTriplet {};
 
-        file >> normals[normals.size() - 3]
-             >> normals[normals.size() - 2]
-             >> normals[normals.size() - 1];
+        file >> normalsTriplet[0]
+             >> normalsTriplet[1]
+             >> normalsTriplet[2];
+
+        normals.push_back(normalsTriplet);
       } else if (type[1] == 't') { // Texcoords
-        texcoords.resize(texcoords.size() + 2);
+        Vec2f texcoordsTriplet {};
 
-        file >> texcoords[texcoords.size() - 2]
-             >> texcoords[texcoords.size() - 1];
+        file >> texcoordsTriplet[0]
+             >> texcoordsTriplet[1];
+
+        texcoords.push_back(texcoordsTriplet);
       } else { // Vertices
-        vertices.resize(vertices.size() + 3);
+        Vec3f positionTriplet {};
 
-        file >> vertices[vertices.size() - 3]
-             >> vertices[vertices.size() - 2]
-             >> vertices[vertices.size() - 1];
+        file >> positionTriplet[0]
+             >> positionTriplet[1]
+             >> positionTriplet[2];
+
+        positions.push_back(positionTriplet);
       }
     } else if (type[0] == 'f') { // Faces
       std::string indices;
       std::getline(file, indices);
 
+      const char delim = '/';
       const uint8_t nbVertices = std::count(indices.cbegin(), indices.cend(), ' ');
-      const uint8_t nbParts = std::count(indices.cbegin(), indices.cend(), '/') / nbVertices + 1;
+      const uint8_t nbParts = std::count(indices.cbegin(), indices.cend(), delim) / nbVertices + 1;
       const bool quadFaces = (nbVertices == 4);
 
       std::stringstream indicesStream(indices);
@@ -87,15 +92,15 @@ void Mesh::importObj(std::ifstream& file) {
       for (std::size_t vertIndex = 0; vertIndex < nbVertices; ++vertIndex) {
         indicesStream >> vertex;
 
-        for (std::size_t partIndex = 0; partIndex < nbParts; ++partIndex) {
-          const char delim = '/';
-          const std::size_t delimPos = vertex.find(delim);
-          const std::string part = vertex.substr(0, delimPos);
+        std::stringstream vertParts(vertex);
+        std::string part;
+        uint8_t partIndex = 0;
 
+        while (std::getline(vertParts, part, delim)) {
           if (!part.empty())
             partIndices[partIndex * nbParts + vertIndex + (partIndex * quadFaces)] = std::stol(part);
 
-          vertex.erase(0, delimPos + 1);
+          ++partIndex;
         }
       }
 
@@ -113,8 +118,6 @@ void Mesh::importObj(std::ifstream& file) {
         normalsIndices.push_back(partIndices[11]);
       }
 
-      const uint8_t quadStride = quadFaces * 2;
-
       posIndices.push_back(partIndices[1]);
       posIndices.push_back(partIndices[0]);
       posIndices.push_back(partIndices[2]);
@@ -122,6 +125,8 @@ void Mesh::importObj(std::ifstream& file) {
       texcoordsIndices.push_back(partIndices[4 + quadFaces]);
       texcoordsIndices.push_back(partIndices[3 + quadFaces]);
       texcoordsIndices.push_back(partIndices[5 + quadFaces]);
+
+      const uint8_t quadStride = quadFaces * 2;
 
       normalsIndices.push_back(partIndices[7 + quadStride]);
       normalsIndices.push_back(partIndices[6 + quadStride]);
@@ -141,39 +146,44 @@ void Mesh::importObj(std::ifstream& file) {
     }
   }
 
-  for (std::size_t vertIndex = 0, partIndex = 0; partIndex < posIndices.size(); vertIndex += 8, ++partIndex) {
-    const int64_t tempPosIndex = posIndices[partIndex] - 1;
-    const std::size_t finalPosIndex = (tempPosIndex < 0 ? tempPosIndex + (vertices.size() / 3) + 1 : tempPosIndex) * 3;
-    Vertex vert {};
+  std::map<std::array<std::size_t, 3>, unsigned int> indicesMap;
 
-    vert.positions[0] = vertices[finalPosIndex];
-    vert.positions[1] = vertices[finalPosIndex + 1];
-    vert.positions[2] = vertices[finalPosIndex + 2];
+  for (std::size_t partIndex = 0; partIndex < posIndices.size(); ++partIndex) {
+    const int64_t tempPosIndex = posIndices[partIndex];
+    const std::size_t posIndex = (tempPosIndex < 0 ? tempPosIndex + positions.size() : tempPosIndex - 1ul);
 
-    if (!texcoords.empty()) {
-      const int64_t tempTexIndex = texcoordsIndices[partIndex] - 1;
-      const std::size_t finalTexIndex = (tempTexIndex < 0 ? tempTexIndex + (texcoords.size() / 2) + 1 : tempTexIndex) * 2;
+    const int64_t tempTexIndex = texcoordsIndices[partIndex];
+    const std::size_t texIndex = (tempTexIndex < 0 ? tempTexIndex + texcoords.size() : tempTexIndex - 1ul);
 
-      vert.texcoords[0] = texcoords[finalTexIndex];
-      vert.texcoords[1] = texcoords[finalTexIndex + 1];
-    }
+    const int64_t tempNormIndex = normalsIndices[partIndex];
+    const std::size_t normIndex = (tempNormIndex < 0 ? tempNormIndex + normals.size() : tempNormIndex - 1ul);
 
-    if (!normals.empty()) {
-      const int64_t tempNormIndex = normalsIndices[partIndex] - 1;
-      const std::size_t finalNormIndex = (tempNormIndex < 0 ? tempNormIndex + (normals.size() / 3) + 1 : tempNormIndex) * 3;
+    const std::array<std::size_t, 3> vertIndices = { posIndex, texIndex, normIndex };
 
-      vert.normals[0] = normals[finalNormIndex];
-      vert.normals[1] = normals[finalNormIndex + 1];
-      vert.normals[2] = normals[finalNormIndex + 2];
-    }
-
-    const auto indexIter = indicesMap.find(vert);
+    const auto indexIter = indicesMap.find(vertIndices);
     if (indexIter != indicesMap.cend()) {
-      getEbo().getIndices().push_back(indexIter->second - 1);
+      getEbo().getIndices().push_back(indexIter->second);
     } else {
-      indicesMap.emplace(vert, indicesMap.size() + 1);
+      Vertex vert {};
+
+      vert.positions[0] = positions[posIndex][0];
+      vert.positions[1] = positions[posIndex][1];
+      vert.positions[2] = positions[posIndex][2];
+
+      if (!texcoords.empty()) {
+        vert.texcoords[0] = texcoords[texIndex][0];
+        vert.texcoords[1] = texcoords[texIndex][1];
+      }
+
+      if (!normals.empty()) {
+        vert.normals[0] = normals[normIndex][0];
+        vert.normals[1] = normals[normIndex][1];
+        vert.normals[2] = normals[normIndex][2];
+      }
+
+      getEbo().getIndices().push_back(indicesMap.size());
+      indicesMap.emplace(vertIndices, indicesMap.size());
       m_vbo.getVertices().push_back(vert);
-      getEbo().getIndices().push_back(indicesMap.size() - 1);
     }
   }
 }

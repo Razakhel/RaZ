@@ -16,7 +16,7 @@ const std::string extractFileExt(const std::string& fileName) {
 }
 
 bool validatePng(std::istream& file) {
-  std::array<png_byte, PNG_HEADER_SIZE> header;
+  std::array<png_byte, PNG_HEADER_SIZE> header {};
   file.read(reinterpret_cast<char*>(header.data()), PNG_HEADER_SIZE);
 
   return (png_sig_cmp(header.data(), 0, PNG_HEADER_SIZE) == 0);
