@@ -23,13 +23,13 @@ void Scene::updateLights() const {
     const std::string angleLocation = locationBase + "angle";
 
     const GLint uniPositionLocation = glGetUniformLocation(programIndex, posLocation.c_str());
-    glUniform4fv(uniPositionLocation, 1, m_lights[lightIndex].getPosition().getData().data());
+    glUniform4fv(uniPositionLocation, 1, m_lights[lightIndex].getPosition().getDataPtr());
 
     const GLint uniDirectionLocation = glGetUniformLocation(programIndex, dirLocation.c_str());
-    glUniform3fv(uniDirectionLocation, 1, m_lights[lightIndex].getDirection().getData().data());
+    glUniform3fv(uniDirectionLocation, 1, m_lights[lightIndex].getDirection().getDataPtr());
 
     const GLint uniColorLocation = glGetUniformLocation(programIndex, colorLocation.c_str());
-    glUniform3fv(uniColorLocation, 1, m_lights[lightIndex].getColor().getData().data());
+    glUniform3fv(uniColorLocation, 1, m_lights[lightIndex].getColor().getDataPtr());
 
     const GLint uniAngleLocation = glGetUniformLocation(programIndex, angleLocation.c_str());
     glUniform1f(uniAngleLocation, m_lights[lightIndex].getAngle());

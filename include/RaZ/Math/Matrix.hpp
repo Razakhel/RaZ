@@ -17,6 +17,8 @@ public:
   std::size_t getHeight() const { return H; }
   const std::array<T, W * H>& getData() const { return m_data; }
   std::array<T, W * H>& getData() { return m_data; }
+  const T* getDataPtr() const { return m_data.data(); }
+  T* getDataPtr() { return m_data.data(); }
 
   static Matrix identity();
 

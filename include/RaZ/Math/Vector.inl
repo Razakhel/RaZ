@@ -16,8 +16,8 @@ Vector<T, Size>::Vector(std::initializer_list<T> list) {
 template <typename T, std::size_t Size>
 T Vector<T, Size>::dot(const Vector<T, Size>& vec) const {
   float res = 0.f;
-  for (std::size_t i = 0; i < m_data.size(); ++i)
-    res += m_data[i] * vec.getData()[i];
+  for (std::size_t i = 0; i < Size; ++i)
+    res += m_data[i] * vec[i];
   return res;
 }
 
@@ -103,8 +103,8 @@ Vector<T, Size> Vector<T, Size>::operator/(float val) {
 
 template <typename T, std::size_t Size>
 Vector<T, Size>& Vector<T, Size>::operator+=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < m_data.size(); ++i)
-    m_data[i] += vec.getData()[i];
+  for (std::size_t i = 0; i < Size; ++i)
+    m_data[i] += vec[i];
   return *this;
 }
 
@@ -117,8 +117,8 @@ Vector<T, Size>& Vector<T, Size>::operator+=(float val) {
 
 template <typename T, std::size_t Size>
 Vector<T, Size>& Vector<T, Size>::operator-=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < m_data.size(); ++i)
-    m_data[i] -= vec.getData()[i];
+  for (std::size_t i = 0; i < Size; ++i)
+    m_data[i] -= vec[i];
   return *this;
 }
 
@@ -131,8 +131,8 @@ Vector<T, Size>& Vector<T, Size>::operator-=(float val) {
 
 template <typename T, std::size_t Size>
 Vector<T, Size>& Vector<T, Size>::operator*=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < m_data.size(); ++i)
-    m_data[i] *= vec.getData()[i];
+  for (std::size_t i = 0; i < Size; ++i)
+    m_data[i] *= vec[i];
   return *this;
 }
 
@@ -145,8 +145,8 @@ Vector<T, Size>& Vector<T, Size>::operator*=(float val) {
 
 template <typename T, std::size_t Size>
 Vector<T, Size>& Vector<T, Size>::operator/=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < m_data.size(); ++i)
-    m_data[i] /= vec.getData()[i];
+  for (std::size_t i = 0; i < Size; ++i)
+    m_data[i] /= vec[i];
   return *this;
 }
 
@@ -159,8 +159,8 @@ Vector<T, Size>& Vector<T, Size>::operator/=(float val) {
 
 template <typename T, std::size_t Size>
 Vector<T, Size>& Vector<T, Size>::operator=(const Vector<T, Size>& vec) {
-  for (std::size_t i = 0; i < m_data.size(); ++i)
-    m_data[i] = vec.getData()[i];
+  for (std::size_t i = 0; i < Size; ++i)
+    m_data[i] = vec[i];
   return *this;
 }
 

@@ -14,7 +14,10 @@ struct Vertex {
   Vec2f texcoords;
   Vec3f normals;
 
-  std::size_t operator()(const Vertex&, const Vertex&) { return normals.hash(texcoords.hash(positions.hash(0))); }
+  std::size_t operator()(const Vertex&) const { return normals.hash(texcoords.hash(positions.hash(0))); }
+  bool operator==(const Vertex& vert) const { return (positions == vert.positions)
+                                                  && (texcoords == vert.texcoords)
+                                                  && (normals == vert.normals); }
 };
 
 class ElementBuffer {
