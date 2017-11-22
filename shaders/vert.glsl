@@ -24,6 +24,10 @@ void main() {
   gl_Position = uniTransform * vec4(vertPosition.xyz, 1.0);
   fragTexcoords = vertTexcoords;
 
-  for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex)
-    fragLightHitAngle /*+*/= clamp(dot(vertNormals, uniLight[lightIndex].direction), 0, 1);
+  if (uniLightCount > 0u) {
+    for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex)
+      fragLightHitAngle /*+*/= clamp(dot(vertNormals, uniLight[lightIndex].direction), 0, 1);
+  } else {
+    fragLightHitAngle = 1;
+  }
 }
