@@ -41,7 +41,7 @@ void Shader::read(const std::string& fileName) {
   }
 }
 
-void ShaderProgram::attachShaders(const VertexShader& vertShader, const FragmentShader& fragShader) {
+void ShaderProgram::attachShaders(const VertexShader& vertShader, const FragmentShader& fragShader) const {
   glAttachShader(m_index, vertShader.getIndex());
   glAttachShader(m_index, fragShader.getIndex());
 

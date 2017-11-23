@@ -12,6 +12,7 @@ template <typename T, std::size_t Size>
 class Vector {
 public:
   Vector() = default;
+  Vector(T val);
   Vector(std::initializer_list<T> list);
 
   std::size_t getSize() const { return Size; }
