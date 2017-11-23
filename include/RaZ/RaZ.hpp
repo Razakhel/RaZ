@@ -7,6 +7,7 @@
 
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
+#include "Math/Transform.hpp"
 #include "Math/Vector.hpp"
 #include "Render/GraphicObjects.hpp"
 #include "Render/Light.hpp"

@@ -18,8 +18,8 @@ public:
   Mat4f computeMatrix() const;
 
 private:
-  T m_real;
-  Vector<T, 3> m_complexes;
+  T m_real {};
+  Vector<T, 3> m_complexes {};
 };
 
 } // namespace Raz

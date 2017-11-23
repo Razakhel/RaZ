@@ -4,7 +4,7 @@
 #include "RaZ/RaZ.hpp"
 
 int main() {
-  Raz::Window window(800, 600, "Test");
+  Raz::Window window(800, 600, "RaZ");
 
   Raz::Scene scene;
 
@@ -31,19 +31,19 @@ int main() {
   const auto modelPtr = model.get();
   modelPtr->scale(0.05f);
 
-  window.addKeyCallback(Raz::Keyboard::W, [&modelPtr] () { modelPtr->translate(0.f, 0.1f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::S, [&modelPtr] () { modelPtr->translate(0.f, -0.1f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::A, [&modelPtr] () { modelPtr->translate(-0.1f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::D, [&modelPtr] () { modelPtr->translate(0.1f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(15.f, 0.f, 1.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-15.f, 0.f, 1.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::UP, [&modelPtr] () { modelPtr->rotate(15.f, 1.f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] () { modelPtr->rotate(-15.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::W, [&modelPtr] () { modelPtr->translate(0.f, 0.05f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::S, [&modelPtr] () { modelPtr->translate(0.f, -0.05f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::A, [&modelPtr] () { modelPtr->translate(-0.05f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::D, [&modelPtr] () { modelPtr->translate(0.05f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(10.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::UP, [&modelPtr] () { modelPtr->rotate(10.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] () { modelPtr->rotate(-10.f, 1.f, 0.f, 0.f); });
 
   scene.addModel(std::move(model));
 
   scene.addLight(Raz::DirectionalLight(Raz::Vec4f({ 0.f, 1.f, 0.f, 0.f }),
-                                       Raz::Vec3f({ 0.f, 1.f, 0.f}),
+                                       Raz::Vec3f({ 0.f, 1.f, 0.f }),
                                        Raz::Vec3f({ 1.f, 1.f, 1.f })));
 
   while (window.run())

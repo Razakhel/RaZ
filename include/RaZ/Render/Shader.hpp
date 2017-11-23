@@ -35,14 +35,18 @@ protected:
 
 class VertexShader : public Shader {
 public:
-  VertexShader() : Shader(RAZ_SHADER_TYPE_VERTEX) {}
   VertexShader(const std::string& fileName) : VertexShader() { read(fileName); }
+
+private:
+  VertexShader() : Shader(RAZ_SHADER_TYPE_VERTEX) {}
 };
 
 class FragmentShader : public Shader {
 public:
-  FragmentShader() : Shader(RAZ_SHADER_TYPE_FRAGMENT) {}
   FragmentShader(const std::string& fileName) : FragmentShader() { read(fileName); }
+
+private:
+  FragmentShader() : Shader(RAZ_SHADER_TYPE_FRAGMENT) {}
 };
 
 class ShaderProgram {
@@ -53,7 +57,7 @@ public:
 
   GLuint getIndex() const { return m_index; }
 
-  void attachShaders(const VertexShader& vertShader, const FragmentShader& fragShader);
+  void attachShaders(const VertexShader& vertShader, const FragmentShader& fragShader) const;
   void use() const { glUseProgram(m_index); }
 
 private:

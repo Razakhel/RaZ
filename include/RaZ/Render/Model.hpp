@@ -5,6 +5,7 @@
 
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Material.hpp"
 
 namespace Raz {
@@ -16,24 +17,24 @@ public:
 
   const Material& getMaterial() const { return m_material; }
   Material& getMaterial() { return m_material; }
-  const Mat4f& getPosition() const { return m_transform; }
-  Mat4f& getPosition() { return m_transform; }
+  const Transform& getTransform() const { return m_transform; }
+  Transform& getTransform() { return m_transform; }
   const MeshPtr getMesh() const { return m_mesh; }
   MeshPtr getMesh() { return m_mesh; }
 
   void setMaterial(const Material& material) { m_material = material; }
 
   void draw() const;
-  void translate(float x, float y, float z);
-  void rotate(float angle, float x, float y, float z);
-  void scale(float x, float y, float z);
-  void scale(float val) { scale(val, val, val); }
+  void translate(float x, float y, float z) { m_transform.translate(x, y, z); }
+  void rotate(float angle, float x, float y, float z) { m_transform.rotate(angle, x, y, z); }
+  void scale(float x, float y, float z) { m_transform.scale(x, y, z); }
+  void scale(float val) { m_transform.scale(val, val, val); }
 
 private:
   void updateTransform() const;
 
   Material m_material;
-  Mat4f m_transform = Mat4f::identity();
+  Transform m_transform;
   MeshPtr m_mesh;
 };
 
