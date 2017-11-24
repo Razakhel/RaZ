@@ -27,52 +27,52 @@ Matrix<T, W, H> Matrix<T, W, H>::identity() {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator+(Matrix mat) {
+Matrix<T, W, H> Matrix<T, W, H>::operator+(Matrix mat) const {
   mat += *this;
   return mat;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator+(float val) {
+Matrix<T, W, H> Matrix<T, W, H>::operator+(float val) const {
   Matrix<T, W, H> res = *this;
   res += val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator-(Matrix mat) {
+Matrix<T, W, H> Matrix<T, W, H>::operator-(Matrix mat) const {
   mat -= *this;
   return mat;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator-(float val) {
+Matrix<T, W, H> Matrix<T, W, H>::operator-(float val) const {
   Matrix<T, W, H> res = *this;
   res -= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator%(Matrix mat) {
+Matrix<T, W, H> Matrix<T, W, H>::operator%(Matrix mat) const {
   mat %= *this;
   return mat;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator%(float val) {
+Matrix<T, W, H> Matrix<T, W, H>::operator%(float val) const {
   Matrix<T, W, H> res = *this;
   res %= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator/(Matrix mat) {
+Matrix<T, W, H> Matrix<T, W, H>::operator/(Matrix mat) const {
   mat /= *this;
   return mat;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator/(float val) {
+Matrix<T, W, H> Matrix<T, W, H>::operator/(float val) const {
   Matrix<T, W, H> res = *this;
   res /= val;
   return res;

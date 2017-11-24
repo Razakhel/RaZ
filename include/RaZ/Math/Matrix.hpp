@@ -22,14 +22,14 @@ public:
 
   static Matrix identity();
 
-  Matrix operator+(Matrix mat);
-  Matrix operator+(float val);
-  Matrix operator-(Matrix mat);
-  Matrix operator-(float val);
-  Matrix operator%(Matrix mat);
-  Matrix operator%(float val);
-  Matrix operator/(Matrix mat);
-  Matrix operator/(float val);
+  Matrix operator+(Matrix mat) const;
+  Matrix operator+(float val) const;
+  Matrix operator-(Matrix mat) const;
+  Matrix operator-(float val) const;
+  Matrix operator%(Matrix mat) const;
+  Matrix operator%(float val) const;
+  Matrix operator/(Matrix mat) const;
+  Matrix operator/(float val) const;
   Matrix& operator+=(const Matrix& mat);
   Matrix& operator+=(float val);
   Matrix& operator-=(const Matrix& mat);

@@ -12,7 +12,7 @@ template <typename T, std::size_t Size>
 class Vector {
 public:
   Vector() = default;
-  Vector(T val);
+  explicit Vector(T val);
   Vector(std::initializer_list<T> list);
 
   std::size_t getSize() const { return Size; }
@@ -26,14 +26,14 @@ public:
   Vector normalize() const;
   std::size_t hash(std::size_t seed) const;
 
-  Vector operator+(Vector vec);
-  Vector operator+(float val);
-  Vector operator-(Vector vec);
-  Vector operator-(float val);
-  Vector operator*(Vector vec);
-  Vector operator*(float val);
-  Vector operator/(Vector vec);
-  Vector operator/(float val);
+  Vector operator+(Vector vec) const;
+  Vector operator+(float val) const;
+  Vector operator-(Vector vec) const;
+  Vector operator-(float val) const;
+  Vector operator*(Vector vec) const;
+  Vector operator*(float val) const;
+  Vector operator/(Vector vec) const;
+  Vector operator/(float val) const;
   Vector& operator+=(const Vector& vec);
   Vector& operator+=(float val);
   Vector& operator-=(const Vector& vec);
