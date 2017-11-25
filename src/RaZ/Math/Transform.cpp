@@ -21,11 +21,10 @@ void Transform::scale(float x, float y, float z) {
 }
 
 Mat4f Transform::computeTransformMatrix() const {
-  Mat4f transform = Mat4f::identity();
-
-  transform[0] = m_scale[0];
-  transform[5] = m_scale[1];
-  transform[10] = m_scale[2];
+  Mat4f transform({{ m_scale[0],        0.f,        0.f, 0.f },
+                   {        0.f, m_scale[1],        0.f, 0.f },
+                   {        0.f,        0.f, m_scale[2], 0.f },
+                   {        0.f,        0.f,        0.f, 1.f }});
 
   transform = transform * m_rotation;
 

@@ -9,6 +9,7 @@
 #include "Math/Quaternion.hpp"
 #include "Math/Transform.hpp"
 #include "Math/Vector.hpp"
+#include "Render/Camera.hpp"
 #include "Render/GraphicObjects.hpp"
 #include "Render/Light.hpp"
 #include "Render/Material.hpp"
