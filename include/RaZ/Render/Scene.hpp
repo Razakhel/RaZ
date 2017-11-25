@@ -11,7 +11,7 @@ namespace Raz {
 class Scene {
 public:
   Scene() = default;
-  Scene(std::vector<ModelPtr>&& models) : m_models(std::move(models)) {}
+  explicit Scene(std::vector<ModelPtr>&& models) : m_models(std::move(models)) {}
 
   const std::vector<ModelPtr>& getModels() const { return m_models; }
   std::vector<ModelPtr>& getModels() { return m_models; }

@@ -14,7 +14,7 @@ namespace Raz {
 class Texture {
 public:
   Texture() { glGenTextures(1, &m_index); }
-  Texture(const std::string& fileName) : Texture() { load(fileName); }
+  explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
   GLuint getIndex() const { return m_index; }
   const Image& getImage() const { return m_image; }
@@ -26,7 +26,7 @@ public:
   ~Texture() { glDeleteTextures(1, &m_index); }
 
 private:
-  GLuint m_index;
+  GLuint m_index {};
   Image m_image;
 };
 

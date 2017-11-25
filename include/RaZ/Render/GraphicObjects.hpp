@@ -34,7 +34,7 @@ public:
   ~ElementBuffer() { glDeleteBuffers(1, &m_index); }
 
 private:
-  GLuint m_index;
+  GLuint m_index {};
   std::vector<unsigned int> m_indices;
 };
 
@@ -52,7 +52,7 @@ public:
   ~VertexBuffer() { glDeleteBuffers(1, &m_index); }
 
 private:
-  GLuint m_index;
+  GLuint m_index {};
   std::vector<Vertex> m_vertices;
 };
 
@@ -70,7 +70,7 @@ public:
   ~VertexArray() { glDeleteVertexArrays(1, &m_index); }
 
 private:
-  GLuint m_index;
+  GLuint m_index {};
   ElementBuffer m_ebo;
 };
 

@@ -25,9 +25,9 @@ public:
   ~Shader() { glDeleteShader(m_index); }
 
 protected:
-  Shader(ShaderType type) : m_type{ type } {}
+  explicit Shader(ShaderType type) : m_type{ type } {}
 
-  GLuint m_index;
+  GLuint m_index {};
   std::string m_content;
 
   ShaderType m_type;
@@ -35,7 +35,7 @@ protected:
 
 class VertexShader : public Shader {
 public:
-  VertexShader(const std::string& fileName) : VertexShader() { read(fileName); }
+  explicit VertexShader(const std::string& fileName) : VertexShader() { read(fileName); }
 
 private:
   VertexShader() : Shader(RAZ_SHADER_TYPE_VERTEX) {}
@@ -43,7 +43,7 @@ private:
 
 class FragmentShader : public Shader {
 public:
-  FragmentShader(const std::string& fileName) : FragmentShader() { read(fileName); }
+  explicit FragmentShader(const std::string& fileName) : FragmentShader() { read(fileName); }
 
 private:
   FragmentShader() : Shader(RAZ_SHADER_TYPE_FRAGMENT) {}

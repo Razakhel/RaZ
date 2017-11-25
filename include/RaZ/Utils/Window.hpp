@@ -17,6 +17,9 @@ class Window {
 public:
   Window(unsigned int width, unsigned int height, const std::string& name = "");
 
+  unsigned int getWidth() const { return m_width; }
+  unsigned int getHeight() const { return m_height; }
+
   void addKeyCallback(Keyboard::Key key, std::function<void()> func);
   void updateKeyCallback() const;
   bool run() const;
@@ -25,6 +28,8 @@ public:
   ~Window() { close(); }
 
 private:
+  unsigned int m_width;
+  unsigned int m_height;
   CallbacksList m_keyCallbacks;
   GLFWwindow* m_window;
 };

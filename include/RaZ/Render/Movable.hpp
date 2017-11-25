@@ -7,6 +7,9 @@ namespace Raz {
 
 class Movable {
 public:
+  const Vec3f& getPosition() const { return m_transform.getPosition(); }
+  const Mat4f& getRotation() const { return m_transform.getRotation(); }
+  const Vec3f& getScale() const { return m_transform.getScale(); }
   const Transform& getTransform() const { return m_transform; }
   Transform& getTransform() { return m_transform; }
 

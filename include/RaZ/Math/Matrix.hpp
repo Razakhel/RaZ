@@ -11,6 +11,7 @@ template <typename T, std::size_t W, std::size_t H>
 class Matrix {
 public:
   Matrix() = default;
+  Matrix(const Matrix&) = default;
   Matrix(std::initializer_list<std::initializer_list<T>> list);
 
   std::size_t getWidth() const { return W; }
