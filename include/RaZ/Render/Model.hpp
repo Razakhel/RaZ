@@ -26,8 +26,6 @@ public:
   void draw() const;
 
 private:
-  void updateTransform() const;
-
   Material m_material;
   MeshPtr m_mesh;
 };

@@ -15,13 +15,13 @@ struct Light {
 
 uniform uint uniLightCount;
 uniform Light uniLight[MAX_LIGHT_COUNT];
-uniform mat4 uniTransform;
+uniform mat4 uniMvpMatrix;
 
 out vec2 fragTexcoords;
 out float fragLightHitAngle;
 
 void main() {
-  gl_Position = uniTransform * vec4(vertPosition.xyz, 1.0);
+  gl_Position = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
   fragTexcoords = vertTexcoords;
 
   if (uniLightCount > 0u) {
