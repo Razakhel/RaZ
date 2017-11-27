@@ -21,6 +21,7 @@ public:
   Vec3f& getScale() { return m_scale; }
 
   void translate(float x, float y, float z);
+  template <typename T, std::size_t Size> void translate(const Vector<T, Size>& values) { translate(values[0], values[1], values[2]); }
   void rotate(float angle, float x, float y, float z);
   void scale(float x, float y, float z);
   Mat4f computeTransformMatrix() const;

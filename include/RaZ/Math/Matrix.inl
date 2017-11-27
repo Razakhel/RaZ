@@ -79,6 +79,24 @@ Matrix<T, W, H> Matrix<T, W, H>::operator/(float val) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
+template <std::size_t WI, std::size_t HI>
+Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const {
+  static_assert(("Error: Input matrix's width must be equal to current matrix's height.", W == HI));
+
+  Matrix<T, H, WI> res;
+
+  for (std::size_t currHeightIndex = 0; currHeightIndex < H; ++currHeightIndex) {
+    for (std::size_t inHeightIndex = 0; inHeightIndex < HI; ++inHeightIndex) {
+      for (std::size_t currWidthIndex = 0; currWidthIndex < W; ++currWidthIndex)
+        res.getData()[inHeightIndex * WI + currWidthIndex] += m_data[currHeightIndex * W + currWidthIndex]
+                                                              * mat[inHeightIndex * WI + currHeightIndex];
+    }
+  }
+
+  return res;
+}
+
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& mat) {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] += mat.getData()[i];
@@ -132,24 +150,6 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator/=(float val) {
   for (T& it : m_data)
     it /= val;
   return *this;
-}
-
-template <typename T, std::size_t W, std::size_t H>
-template <std::size_t WI, std::size_t HI>
-Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) {
-  static_assert(("Error: Input matrix's width must be equal to current matrix's height.", W == HI));
-
-  Matrix<T, H, WI> res;
-
-  for (std::size_t currHeightIndex = 0; currHeightIndex < H; ++currHeightIndex) {
-    for (std::size_t inHeightIndex = 0; inHeightIndex < HI; ++inHeightIndex) {
-      for (std::size_t currWidthIndex = 0; currWidthIndex < W; ++currWidthIndex)
-        res.getData()[inHeightIndex * WI + currWidthIndex] += m_data[currHeightIndex * W + currWidthIndex]
-                                                              * mat.getData()[inHeightIndex * WI + currHeightIndex];
-    }
-  }
-
-  return res;
 }
 
 } // namespace Raz

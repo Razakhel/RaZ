@@ -6,6 +6,8 @@
 #include <array>
 #include <initializer_list>
 
+#include "RaZ/Math/Matrix.hpp"
+
 namespace Raz {
 
 template <typename T, std::size_t Size>
@@ -13,6 +15,7 @@ class Vector {
 public:
   Vector() = default;
   Vector(const Vector&) = default;
+  Vector(const Vector<T, Size - 1>& vec, T val);
   explicit Vector(T val);
   Vector(std::initializer_list<T> list);
 
@@ -27,6 +30,7 @@ public:
   Vector normalize() const;
   std::size_t hash(std::size_t seed) const;
 
+  Vector operator-() const { return (*this * -1); }
   Vector operator+(Vector vec) const;
   Vector operator+(float val) const;
   Vector operator-(Vector vec) const;
@@ -35,6 +39,7 @@ public:
   Vector operator*(float val) const;
   Vector operator/(Vector vec) const;
   Vector operator/(float val) const;
+  template <std::size_t H> Vector operator*(const Matrix<T, Size, H>& mat) const;
   Vector& operator+=(const Vector& vec);
   Vector& operator+=(float val);
   Vector& operator-=(const Vector& vec);
@@ -43,8 +48,6 @@ public:
   Vector& operator*=(float val);
   Vector& operator/=(const Vector& vec);
   Vector& operator/=(float val);
-  Vector& operator=(const Vector& vec);
-  Vector& operator=(float val);
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }
   std::size_t operator()(const Vector& vec) const { return hash(0); }

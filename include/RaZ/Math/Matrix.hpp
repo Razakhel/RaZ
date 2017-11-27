@@ -31,6 +31,8 @@ public:
   Matrix operator%(float val) const;
   Matrix operator/(Matrix mat) const;
   Matrix operator/(float val) const;
+  //template <std::size_t Size> Vector<T, Size> operator*(const Vector<T, Size>& vec) const;
+  template <std::size_t WI, std::size_t HI> Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat) const;
   Matrix& operator+=(const Matrix& mat);
   Matrix& operator+=(float val);
   Matrix& operator-=(const Matrix& mat);
@@ -39,7 +41,6 @@ public:
   Matrix& operator%=(float val);
   Matrix& operator/=(const Matrix& mat);
   Matrix& operator/=(float val);
-  template <std::size_t WI, std::size_t HI> Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat);
   T& operator()(std::size_t widthIndex, std::size_t heightIndex) { return m_data[heightIndex * W + widthIndex]; }
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }
