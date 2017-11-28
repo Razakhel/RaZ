@@ -54,9 +54,9 @@ int main() {
   const GLint uniMvpLocation = glGetUniformLocation(modelPtr->getMaterial().getShaderProgram().getIndex(), "uniMvpMatrix");
 
   while (window.run()) {
-    const Raz::Mat4f mvpMat = camera.computePerspectiveMatrix()                   // Projection
-                            * camera.lookAt(modelPtr->getPosition())              // View
-                            * modelPtr->getTransform().computeTransformMatrix();  // Model
+    const Raz::Mat4f mvpMat = camera.computePerspectiveMatrix()       // Projection
+                            * camera.lookAt(modelPtr->getPosition())  // View
+                            * modelPtr->computeTransformMatrix();     // Model
 
     glUniformMatrix4fv(uniMvpLocation, 1, GL_TRUE, mvpMat.getDataPtr());
 

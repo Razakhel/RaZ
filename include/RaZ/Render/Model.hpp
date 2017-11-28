@@ -6,12 +6,11 @@
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Render/Movable.hpp"
 #include "RaZ/Render/Material.hpp"
 
 namespace Raz {
 
-class Model : public Movable {
+class Model : public Transform {
 public:
   Model() = default;
   explicit Model(MeshPtr mesh) : m_mesh{ std::move(mesh) } {}

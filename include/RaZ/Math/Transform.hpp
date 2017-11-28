@@ -10,7 +10,7 @@ namespace Raz {
 
 class Transform {
 public:
-  Transform(const Vec3f& position = Vec3f(0.f), const Mat4f& rotation = Mat4f::identity(), const Vec3f& scale = Vec3f(1.f))
+  explicit Transform(const Vec3f& position = Vec3f(0.f), const Mat4f& rotation = Mat4f::identity(), const Vec3f& scale = Vec3f(1.f))
     : m_position{ position }, m_rotation{ rotation }, m_scale{ scale } {}
 
   const Vec3f& getPosition() const { return m_position; }
@@ -24,9 +24,10 @@ public:
   template <typename T, std::size_t Size> void translate(const Vector<T, Size>& values) { translate(values[0], values[1], values[2]); }
   void rotate(float angle, float x, float y, float z);
   void scale(float x, float y, float z);
+  void scale(float val) { scale(val, val, val); }
   Mat4f computeTransformMatrix() const;
 
-private:
+protected:
   Vec3f m_position;
   Mat4f m_rotation;
   Vec3f m_scale;

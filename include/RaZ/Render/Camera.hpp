@@ -6,11 +6,10 @@
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Math/Transform.hpp"
-#include "RaZ/Render/Movable.hpp"
 
 namespace Raz {
 
-class Camera : public Movable {
+class Camera : public Transform {
 public:
   Camera(unsigned int frameWidth,
          unsigned int frameHeight,
@@ -21,9 +20,7 @@ public:
     : m_frameRatio{ static_cast<float>(frameWidth) / frameHeight },
       m_fieldOfView{ fieldOfViewDegrees * static_cast<float>(M_PI / 180) },
       m_nearPlane{ nearPlane },
-      m_farPlane{ farPlane } { m_transform.getPosition() = position; }
-
-  Mat4f getViewMatrix() const { return m_transform.computeTransformMatrix(); }
+      m_farPlane{ farPlane } { m_position = position; }
 
   Mat4f lookAt(const Vec3f& target = Vec3f(0.f), const Vec3f& orientation = Vec3f({ 0.f, 1.f, 0.f })) const;
   Mat4f computePerspectiveMatrix() const;
