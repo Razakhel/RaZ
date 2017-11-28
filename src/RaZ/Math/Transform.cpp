@@ -28,9 +28,9 @@ Mat4f Transform::computeTransformMatrix() const {
 
   transform = transform * m_rotation;
 
-  transform[3] = m_position[0];
-  transform[7] = m_position[1];
-  transform[11] = m_position[2];
+  transform[12] = m_position[0];
+  transform[13] = m_position[1];
+  transform[14] = m_position[2];
 
   return transform;
 }

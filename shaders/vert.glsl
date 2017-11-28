@@ -21,7 +21,7 @@ out vec2 fragTexcoords;
 out float fragLightHitAngle;
 
 void main() {
-  gl_Position = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
+  gl_Position = vec4(vertPosition.xyz, 1.0) * uniMvpMatrix;
   fragTexcoords = vertTexcoords;
 
   if (uniLightCount > 0u) {

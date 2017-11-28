@@ -29,14 +29,17 @@ int main() {
   model->setMaterial(defaultMaterial);
 
   const auto modelPtr = model.get();
-  modelPtr->scale(0.05f);
+  modelPtr->scale(0.075f);
 
-  Raz::Camera camera(window.getWidth(), window.getHeight(), 45.f, -0.5f, 100.f, Raz::Vec3f({ 0.f, 0.f, -3.f }));
+  Raz::Camera camera(window.getWidth(), window.getHeight(), 45.f, 0.1f, 100.f, Raz::Vec3f({ 0.f, 0.f, -3.f }));
 
   window.addKeyCallback(Raz::Keyboard::W, [&camera] () { camera.translate(0.f, 0.5f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::S, [&camera] () { camera.translate(0.f, -0.5f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::A, [&camera] () { camera.translate(-0.5f, 0.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::D, [&camera] () { camera.translate(0.5f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::Q, [&modelPtr] () { modelPtr->translate(-0.5f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::E, [&modelPtr] () { modelPtr->translate(0.5f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::F, [&camera, &modelPtr] () { camera.lookAt(modelPtr->getPosition()); });
   window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(10.f, 0.f, 1.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::UP, [&modelPtr] () { modelPtr->rotate(10.f, 1.f, 0.f, 0.f); });
@@ -51,11 +54,11 @@ int main() {
   const GLint uniMvpLocation = glGetUniformLocation(modelPtr->getMaterial().getShaderProgram().getIndex(), "uniMvpMatrix");
 
   while (window.run()) {
-    const Raz::Mat4f mvpMat = camera.computeProjectionMatrix()
-        * camera.lookAt(modelPtr->getPosition())
-        * modelPtr->getTransform().computeTransformMatrix();
+    const Raz::Mat4f mvpMat = camera.computePerspectiveMatrix()                   // Projection
+                            * camera.lookAt(modelPtr->getPosition())              // View
+                            * modelPtr->getTransform().computeTransformMatrix();  // Model
 
-    glUniformMatrix4fv(uniMvpLocation, 1, GL_FALSE, mvpMat.getDataPtr());
+    glUniformMatrix4fv(uniMvpLocation, 1, GL_TRUE, mvpMat.getDataPtr());
 
     scene.render();
   }
