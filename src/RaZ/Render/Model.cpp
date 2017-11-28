@@ -5,7 +5,9 @@ namespace Raz {
 
 void Model::draw() const {
   m_material.getShaderProgram().use();
-  m_material.getTexture()->bind();
+
+  if (m_material.getTexture())
+    m_material.getTexture()->bind();
 
   m_mesh->draw();
 }

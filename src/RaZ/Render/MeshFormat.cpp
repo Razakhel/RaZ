@@ -105,32 +105,32 @@ void Mesh::importObj(std::ifstream& file) {
       }
 
       if (quadFaces) {
-        posIndices.push_back(partIndices[2]);
-        posIndices.push_back(partIndices[0]);
-        posIndices.push_back(partIndices[3]);
+        posIndices.emplace_back(partIndices[2]);
+        posIndices.emplace_back(partIndices[0]);
+        posIndices.emplace_back(partIndices[3]);
 
-        texcoordsIndices.push_back(partIndices[6]);
-        texcoordsIndices.push_back(partIndices[4]);
-        texcoordsIndices.push_back(partIndices[7]);
+        texcoordsIndices.emplace_back(partIndices[6]);
+        texcoordsIndices.emplace_back(partIndices[4]);
+        texcoordsIndices.emplace_back(partIndices[7]);
 
-        normalsIndices.push_back(partIndices[10]);
-        normalsIndices.push_back(partIndices[8]);
-        normalsIndices.push_back(partIndices[11]);
+        normalsIndices.emplace_back(partIndices[10]);
+        normalsIndices.emplace_back(partIndices[8]);
+        normalsIndices.emplace_back(partIndices[11]);
       }
 
-      posIndices.push_back(partIndices[1]);
-      posIndices.push_back(partIndices[0]);
-      posIndices.push_back(partIndices[2]);
+      posIndices.emplace_back(partIndices[1]);
+      posIndices.emplace_back(partIndices[0]);
+      posIndices.emplace_back(partIndices[2]);
 
-      texcoordsIndices.push_back(partIndices[4 + quadFaces]);
-      texcoordsIndices.push_back(partIndices[3 + quadFaces]);
-      texcoordsIndices.push_back(partIndices[5 + quadFaces]);
+      texcoordsIndices.emplace_back(partIndices[4 + quadFaces]);
+      texcoordsIndices.emplace_back(partIndices[3 + quadFaces]);
+      texcoordsIndices.emplace_back(partIndices[5 + quadFaces]);
 
       const uint8_t quadStride = quadFaces * 2;
 
-      normalsIndices.push_back(partIndices[7 + quadStride]);
-      normalsIndices.push_back(partIndices[6 + quadStride]);
-      normalsIndices.push_back(partIndices[8 + quadStride]);
+      normalsIndices.emplace_back(partIndices[7 + quadStride]);
+      normalsIndices.emplace_back(partIndices[6 + quadStride]);
+      normalsIndices.emplace_back(partIndices[8 + quadStride]);
     } else if (type[0] == 'm') {
       // Import MTL
     } else if (type[0] == 'u') {
@@ -162,7 +162,7 @@ void Mesh::importObj(std::ifstream& file) {
 
     const auto indexIter = indicesMap.find(vertIndices);
     if (indexIter != indicesMap.cend()) {
-      getEbo().getIndices().push_back(indexIter->second);
+      getEbo().getIndices().emplace_back(indexIter->second);
     } else {
       Vertex vert {};
 
@@ -181,7 +181,7 @@ void Mesh::importObj(std::ifstream& file) {
         vert.normals[2] = normals[normIndex][2];
       }
 
-      getEbo().getIndices().push_back(indicesMap.size());
+      getEbo().getIndices().emplace_back(indicesMap.size());
       indicesMap.emplace(vertIndices, indicesMap.size());
       m_vbo.getVertices().push_back(vert);
     }

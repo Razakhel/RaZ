@@ -21,18 +21,17 @@ void Transform::scale(float x, float y, float z) {
 }
 
 Mat4f Transform::computeTransformMatrix() const {
-  Mat4f transform({{ m_scale[0],        0.f,        0.f, 0.f },
-                   {        0.f, m_scale[1],        0.f, 0.f },
-                   {        0.f,        0.f, m_scale[2], 0.f },
-                   {        0.f,        0.f,        0.f, 1.f }});
+  const Mat4f scale({{ m_scale[0],        0.f,        0.f, 0.f },
+                     {        0.f, m_scale[1],        0.f, 0.f },
+                     {        0.f,        0.f, m_scale[2], 0.f },
+                     {        0.f,        0.f,        0.f, 1.f }});
 
-  transform = transform * m_rotation;
+  const Mat4f translation({{           1.f,           0.f,           0.f, 0.f },
+                           {           0.f,           1.f,           0.f, 0.f },
+                           {           0.f,           0.f,           1.f, 0.f },
+                           { m_position[0], m_position[1], m_position[2], 1.f }});
 
-  transform[12] = m_position[0];
-  transform[13] = m_position[1];
-  transform[14] = m_position[2];
-
-  return transform;
+  return translation * m_rotation * scale;
 }
 
 } // namespace Raz
