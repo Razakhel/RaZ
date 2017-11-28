@@ -94,7 +94,7 @@ void Window::updateKeyCallback() const {
     const CallbacksList& callbackList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
 
     for (const auto& callback : callbackList) {
-      if (key == callback.first && (action == GLFW_PRESS || action == GLFW_REPEAT))
+      if (key == callback.first && action != GLFW_RELEASE)
         callback.second();
     }
 

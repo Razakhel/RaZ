@@ -22,8 +22,8 @@ public:
       m_nearPlane{ nearPlane },
       m_farPlane{ farPlane } { m_position = position; }
 
-  Mat4f lookAt(const Vec3f& target = Vec3f(0.f), const Vec3f& orientation = Vec3f({ 0.f, 1.f, 0.f })) const;
   Mat4f computePerspectiveMatrix() const;
+  Mat4f lookAt(const Vec3f& target = Vec3f(0.f), const Vec3f& orientation = Vec3f({ 0.f, 1.f, 0.f })) const;
 
 private:
   float m_frameRatio;

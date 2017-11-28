@@ -16,7 +16,7 @@ void Scene::updateLights() const {
   glUniform1ui(uniLightCountLocation, m_lights.size());
 
   for (std::size_t lightIndex = 0; lightIndex < m_lights.size(); ++lightIndex) {
-    const std::string locationBase = "uniLight[" + std::to_string(lightIndex) + "].";
+    const std::string locationBase = "uniLights[" + std::to_string(lightIndex) + "].";
     const std::string posLocation = locationBase + "position";
     const std::string dirLocation = locationBase + "direction";
     const std::string colorLocation = locationBase + "color";

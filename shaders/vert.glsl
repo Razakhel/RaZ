@@ -14,7 +14,7 @@ struct Light {
 };
 
 uniform uint uniLightCount;
-uniform Light uniLight[MAX_LIGHT_COUNT];
+uniform Light uniLights[MAX_LIGHT_COUNT];
 uniform mat4 uniMvpMatrix;
 
 out vec2 fragTexcoords;
@@ -26,7 +26,7 @@ void main() {
 
   if (uniLightCount > 0u) {
     for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex)
-      fragLightHitAngle /*+*/= clamp(dot(vertNormals, uniLight[lightIndex].direction), 0, 1);
+      fragLightHitAngle /*+*/= clamp(dot(vertNormals, uniLights[lightIndex].direction), 0, 1);
   } else {
     fragLightHitAngle = 1;
   }

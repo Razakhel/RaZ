@@ -16,9 +16,9 @@ Mat4f Quaternion<>::computeMatrix() const {
   const float yw = 2 * m_complexes[1] * m_real;
   const float zw = 2 * m_complexes[2] * m_real;
 
-  return Mat4f({{ 1 - yy - zz,     xy - zw,     xz + yw, 0.f },
-                {     xy + zw, 1 - xx - zz,     yz - xw, 0.f },
-                {     xz - yw,     yz + xw, 1 - xx - yy, 0.f },
+  return Mat4f({{ 1 - yy - zz,     xy + zw,     xz - yw, 0.f },
+                {     xy - zw, 1 - xx - zz,     yz + xw, 0.f },
+                {     xz + yw,     yz - xw, 1 - xx - yy, 0.f },
                 {         0.f,         0.f,         0.f, 1.f }});
 }
 
