@@ -21,7 +21,7 @@ public:
 
   void setCamera(CameraPtr camera) { m_camera = std::move(camera); }
   void addModel(ModelPtr model) { m_models.push_back(std::move(model)); }
-  void addLight(const Light& light) { m_lights.push_back(light); updateLights(); }
+  void addLight(LightPtr light) { m_lights.push_back(std::move(light)); }
   void render() const;
 
 private:
@@ -30,7 +30,7 @@ private:
   ShaderProgram m_shaderProgram;
   CameraPtr m_camera;
   std::vector<ModelPtr> m_models;
-  std::vector<Light> m_lights;
+  std::vector<LightPtr> m_lights;
 };
 
 } // namespace Raz

@@ -15,6 +15,8 @@ void Scene::render() const {
 
     model->draw();
   }
+
+  updateLights();
 }
 
 void Scene::updateLights() const {
@@ -32,16 +34,16 @@ void Scene::updateLights() const {
     const std::string angleLocation = locationBase + "angle";
 
     const GLint uniPositionLocation = glGetUniformLocation(programIndex, posLocation.c_str());
-    glUniform4fv(uniPositionLocation, 1, m_lights[lightIndex].getPosition().getDataPtr());
+    glUniform4fv(uniPositionLocation, 1, m_lights[lightIndex]->getHomogeneousPosition().getDataPtr());
 
     const GLint uniDirectionLocation = glGetUniformLocation(programIndex, dirLocation.c_str());
-    glUniform3fv(uniDirectionLocation, 1, m_lights[lightIndex].getDirection().getDataPtr());
+    glUniform3fv(uniDirectionLocation, 1, m_lights[lightIndex]->getDirection().getDataPtr());
 
     const GLint uniColorLocation = glGetUniformLocation(programIndex, colorLocation.c_str());
-    glUniform3fv(uniColorLocation, 1, m_lights[lightIndex].getColor().getDataPtr());
+    glUniform3fv(uniColorLocation, 1, m_lights[lightIndex]->getColor().getDataPtr());
 
     const GLint uniAngleLocation = glGetUniformLocation(programIndex, angleLocation.c_str());
-    glUniform1f(uniAngleLocation, m_lights[lightIndex].getAngle());
+    glUniform1f(uniAngleLocation, m_lights[lightIndex]->getAngle());
   }
 }
 
