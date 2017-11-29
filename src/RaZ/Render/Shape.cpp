@@ -5,22 +5,22 @@
 
 namespace Raz {
 
-Triangle::Triangle(std::initializer_list<float> verticesList) {
-  assert(("Error: Too many/few parameters to describe a triangle.", verticesList.size() == m_vertices.size()));
+Triangle::Triangle(const Vec3f& vert1, const Vec3f& vert2, const Vec3f& vert3) {
+  m_vertices = { vert1, vert2, vert3 };
 
-  auto vertex = verticesList.begin();
+  // Process texcoords
 
-  for (std::size_t vertIndex = 0; vertex != verticesList.end(); ++vertex, ++vertIndex)
-    m_vertices[vertIndex] = *vertex;
+  // Process normals
+
 }
 
-Plane::Plane(std::initializer_list<float> verticesList) {
-  assert(("Error: Too many/few parameters to describe a rectangle.", verticesList.size() == m_vertices.size()));
+Plane::Plane(const Vec3f& topLeft, const Vec3f& topRight, const Vec3f& bottomRight, const Vec3f& bottomLeft) {
+  m_vertices = { topLeft, topRight, bottomRight, bottomLeft };
 
-  auto vertex = verticesList.begin();
+  // Process texcoords
 
-  for (std::size_t vertIndex = 0; vertex != verticesList.end(); ++vertex, ++vertIndex)
-    m_vertices[vertIndex] = *vertex;
+  // Process normals
+
 }
 
 } // namespace Raz
