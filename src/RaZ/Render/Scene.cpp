@@ -3,14 +3,23 @@
 namespace Raz {
 
 void Scene::render() const {
-  for (const auto& model : m_models)
+  m_shaderProgram.use();
+  const GLint uniMvpLocation = glGetUniformLocation(m_shaderProgram.getIndex(), "uniMvpMatrix");
+
+  for (const auto& model : m_models) {
+    const Raz::Mat4f mvpMat = m_camera->computePerspectiveMatrix()    // Projection
+                            * m_camera->lookAt(model->getPosition())  // View
+                            * model->computeTransformMatrix();        // Model
+
+    glUniformMatrix4fv(uniMvpLocation, 1, GL_FALSE, mvpMat.getDataPtr());
+
     model->draw();
+  }
 }
 
 void Scene::updateLights() const {
-  // TODO: Temporary workaround, remove ASAP
-  m_models.front()->getMaterial().getShaderProgram().use();
-  const GLuint programIndex = m_models.front()->getMaterial().getShaderProgram().getIndex();
+  m_shaderProgram.use();
+  const GLuint programIndex = m_shaderProgram.getIndex();
 
   const GLint uniLightCountLocation = glGetUniformLocation(programIndex, "uniLightCount");
   glUniform1ui(uniLightCountLocation, m_lights.size());

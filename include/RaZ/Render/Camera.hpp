@@ -3,6 +3,8 @@
 #ifndef RAZ_CAMERA_HPP
 #define RAZ_CAMERA_HPP
 
+#include <memory>
+
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Math/Transform.hpp"
@@ -31,6 +33,8 @@ private:
   float m_nearPlane;
   float m_farPlane;
 };
+
+using CameraPtr = std::unique_ptr<Camera>;
 
 } // namespace Raz
 
