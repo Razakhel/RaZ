@@ -11,19 +11,29 @@ int main() {
 
   Raz::Scene scene(vertShader, fragShader);
 
+  Raz::Material floorMaterial;
+  const Raz::TexturePtr floorTexture = std::make_shared<Raz::Texture>("../assets/textures/brick_wall.png");
+  floorMaterial.setTexture(floorTexture);
   Raz::Material defaultMaterial;
-  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/lena.png");
+  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/lava.png");
   defaultMaterial.setTexture(defaultTexture);
 
   const auto startTime = std::chrono::system_clock::now();
 
   const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/bigguy.obj");
+  const Raz::MeshPtr floor = std::make_shared<Raz::Mesh>(Raz::Vec3f({ -10.f, -0.5f, 10.f }),    // Top left
+                                                         Raz::Vec3f({ 10.f, -0.5f, 10.f }),     // Top right
+                                                         Raz::Vec3f({ 10.f, -0.5f, -10.f }),    // Bottom right
+                                                         Raz::Vec3f({ -10.f, -0.5f, -10.f }));  // Bottom left
 
   const auto endTime = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
             << " seconds." << std::endl;
+
+  Raz::ModelPtr floorModel = std::make_unique<Raz::Model>(floor);
+  floorModel->setMaterial(floorMaterial);
 
   Raz::ModelPtr model = std::make_unique<Raz::Model>(mesh);
   model->setMaterial(defaultMaterial);
@@ -52,6 +62,12 @@ int main() {
   const auto lightPtr = light.get();
   const auto cameraPtr = camera.get();
 
+  // Allow wireframe toggling
+  bool isWireframe = false;
+  window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] () {
+    glPolygonMode(GL_FRONT_AND_BACK, ((isWireframe = !isWireframe) ? GL_LINE : GL_FILL));
+  });
+
   // Camera controls
   window.addKeyCallback(Raz::Keyboard::W, [&cameraPtr] () { cameraPtr->translate(0.f, 0.5f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::S, [&cameraPtr] () { cameraPtr->translate(0.f, -0.5f, 0.f); });
@@ -60,14 +76,16 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::F, [&cameraPtr, &modelPtr] () { cameraPtr->lookAt(modelPtr->getPosition()); });
 
   // Mesh control
-  window.addKeyCallback(Raz::Keyboard::Q, [&modelPtr] () { modelPtr->translate(-0.5f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::E, [&modelPtr] () { modelPtr->translate(0.5f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::T, [&modelPtr] () { modelPtr->translate(0.f, 0.f, 0.5f); });
+  window.addKeyCallback(Raz::Keyboard::G, [&modelPtr] () { modelPtr->translate(0.f, 0.f, -0.5f); });
+  window.addKeyCallback(Raz::Keyboard::F, [&modelPtr] () { modelPtr->translate(-0.5f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::H, [&modelPtr] () { modelPtr->translate(0.5f, 0.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::X, [&modelPtr] () { modelPtr->scale(0.5f); });
   window.addKeyCallback(Raz::Keyboard::C, [&modelPtr] () { modelPtr->scale(2.f); });
-  window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(10.f, 0.f, 1.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::UP, [&modelPtr] () { modelPtr->rotate(10.f, 1.f, 0.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] () { modelPtr->rotate(-10.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(10.f, 0.f, 1.f, 0.f); });
 
   // Light control
   window.addKeyCallback(Raz::Keyboard::I, [&lightPtr] () { lightPtr->translate(0.f, 0.f, 0.5f); });
@@ -78,6 +96,7 @@ int main() {
   scene.addModel(std::move(model));
   scene.addModel(std::move(model2));
   scene.addModel(std::move(model3));
+  scene.addModel(std::move(floorModel));
   scene.addLight(std::move(light));
   scene.setCamera(std::move(camera));
 
