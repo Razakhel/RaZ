@@ -17,7 +17,6 @@
 #include "Render/Model.hpp"
 #include "Render/Scene.hpp"
 #include "Render/Shader.hpp"
-#include "Render/Shape.hpp"
 #include "Render/Texture.hpp"
 #include "Utils/Image.hpp"
 #include "Utils/Keyboard.hpp"

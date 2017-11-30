@@ -13,8 +13,9 @@ namespace Raz {
 
 class Mesh {
 public:
-  Mesh() = default;
   explicit Mesh(const std::string& fileName) { importFromFile(fileName); }
+  Mesh(const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3);
+  Mesh(const Vec3f& posTopLeft, const Vec3f& posTopRight, const Vec3f& posBottomRight, const Vec3f& posBottomLeft);
 
   const VertexArray& getVao() const { return m_vao; }
   VertexArray& getVao() { return m_vao; }
