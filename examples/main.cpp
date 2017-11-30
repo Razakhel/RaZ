@@ -29,8 +29,8 @@ int main() {
   model->setMaterial(defaultMaterial);
   model->scale(0.075f);
 
-  Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 3.f, 0.f }),  // Position
-                                                          Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color
+  Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
+                                                          Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)
 
   Raz::CameraPtr camera = std::make_unique<Raz::Camera>(window.getWidth(),
                                                         window.getHeight(),

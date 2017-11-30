@@ -12,6 +12,8 @@ struct Light {
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
 
+uniform mat4 uniViewProjMatrix;
+
 uniform sampler2D uniTexture;
 
 in MeshInfo {
@@ -30,7 +32,7 @@ void main() {
   vec3 specular = vec3(0.0);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
-    vec3 lightPos = uniLights[lightIndex].position.xyz;
+    vec3 lightPos = (uniViewProjMatrix * uniLights[lightIndex].position).xyz;
 
     // Diffuse
     vec3 lightDir;
