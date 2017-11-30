@@ -17,7 +17,7 @@ void main() {
 
   fragMeshInfo.vertPosition = pos.xyz;
   fragMeshInfo.vertTexcoords = vertTexcoords;
-  fragMeshInfo.vertNormals = vertNormals;
+  fragMeshInfo.vertNormals = mat3(uniMvpMatrix) * vertNormals;
 
   gl_Position = pos;
 }
