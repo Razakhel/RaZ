@@ -29,6 +29,16 @@ int main() {
   model->setMaterial(defaultMaterial);
   model->scale(0.075f);
 
+  Raz::ModelPtr model2 = std::make_unique<Raz::Model>(mesh);
+  model2->setMaterial(defaultMaterial);
+  model2->scale(0.075f);
+  model2->translate(-1.5f, 0.f, 0.f);
+
+  Raz::ModelPtr model3 = std::make_unique<Raz::Model>(mesh);
+  model3->setMaterial(defaultMaterial);
+  model3->scale(0.075f);
+  model3->translate(1.5f, 0.f, 0.f);
+
   Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
                                                           Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)
 
@@ -66,6 +76,8 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::L, [&lightPtr] () { lightPtr->translate(0.5f, 0.f, 0.f); });
 
   scene.addModel(std::move(model));
+  scene.addModel(std::move(model2));
+  scene.addModel(std::move(model3));
   scene.addLight(std::move(light));
   scene.setCamera(std::move(camera));
 
