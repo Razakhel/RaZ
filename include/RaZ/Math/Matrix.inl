@@ -3,6 +3,23 @@
 namespace Raz {
 
 template <typename T, std::size_t W, std::size_t H>
+Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) {
+  std::size_t widthStride = 0;
+
+  for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
+    std::size_t resIndex = heightIndex * W;
+
+    for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
+      const std::size_t finalIndex = resIndex + widthIndex;
+
+      m_data[finalIndex] = mat[finalIndex + widthStride];
+    }
+
+    ++widthStride;
+  }
+}
+
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
   auto row = list.begin();
 

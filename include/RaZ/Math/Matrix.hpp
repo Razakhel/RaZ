@@ -12,6 +12,7 @@ class Matrix {
 public:
   Matrix() = default;
   Matrix(const Matrix&) = default;
+  explicit Matrix(const Matrix<T, W + 1, H + 1>& mat);
   Matrix(std::initializer_list<std::initializer_list<T>> list);
 
   std::size_t getWidth() const { return W; }
