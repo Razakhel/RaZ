@@ -18,9 +18,9 @@ Mesh::Mesh(const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3) {
   vert3.texcoords = Vec2f({ 1.f, 1.f });
 
   // Computing normals
-  vert1.normals = (vert1.positions - vert2.positions).cross(vert1.positions - vert3.positions);
-  vert2.normals = (vert2.positions - vert3.positions).cross(vert2.positions - vert1.positions);
-  vert3.normals = (vert3.positions - vert1.positions).cross(vert3.positions - vert2.positions);
+  vert1.normals = (vert1.positions - vert2.positions).cross(vert1.positions - vert3.positions).normalize();
+  vert2.normals = (vert2.positions - vert3.positions).cross(vert2.positions - vert1.positions).normalize();
+  vert3.normals = (vert3.positions - vert1.positions).cross(vert3.positions - vert2.positions).normalize();
 
   m_vbo.getVertices().resize(3);
   m_vao.getEbo().getIndices().resize(3);

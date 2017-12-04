@@ -75,9 +75,6 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
   glDebugMessageCallback(&callbackDebugLog, nullptr);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-  // Uncommenting this call will display scene in wireframe
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
 }
