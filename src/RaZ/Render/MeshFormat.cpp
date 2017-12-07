@@ -48,11 +48,11 @@ void Mesh::importObj(std::ifstream& file) {
   std::vector<int64_t> normalsIndices;
 
   while (!file.eof()) {
-    std::string type;
-    file >> type;
+    std::string line;
+    file >> line;
 
-    if (type[0] == 'v') {
-      if (type[1] == 'n') { // Normals
+    if (line[0] == 'v') {
+      if (line[1] == 'n') { // Normals
         Vec3f normalsTriplet {};
 
         file >> normalsTriplet[0]
@@ -60,7 +60,7 @@ void Mesh::importObj(std::ifstream& file) {
              >> normalsTriplet[2];
 
         normals.push_back(normalsTriplet);
-      } else if (type[1] == 't') { // Texcoords
+      } else if (line[1] == 't') { // Texcoords
         Vec2f texcoordsTriplet {};
 
         file >> texcoordsTriplet[0]
@@ -76,16 +76,15 @@ void Mesh::importObj(std::ifstream& file) {
 
         positions.push_back(positionTriplet);
       }
-    } else if (type[0] == 'f') { // Faces
-      std::string indices;
-      std::getline(file, indices);
+    } else if (line[0] == 'f') { // Faces
+      std::getline(file, line);
 
       const char delim = '/';
-      const uint8_t nbVertices = std::count(indices.cbegin(), indices.cend(), ' ');
-      const uint8_t nbParts = std::count(indices.cbegin(), indices.cend(), delim) / nbVertices + 1;
+      const uint8_t nbVertices = std::count(line.cbegin(), line.cend(), ' ');
+      const uint8_t nbParts = std::count(line.cbegin(), line.cend(), delim) / nbVertices + 1;
       const bool quadFaces = (nbVertices == 4);
 
-      std::stringstream indicesStream(indices);
+      std::stringstream indicesStream(line);
       std::vector<int64_t> partIndices(nbParts * nbVertices);
       std::string vertex;
 
@@ -131,18 +130,18 @@ void Mesh::importObj(std::ifstream& file) {
       normalsIndices.emplace_back(partIndices[7 + quadStride]);
       normalsIndices.emplace_back(partIndices[6 + quadStride]);
       normalsIndices.emplace_back(partIndices[8 + quadStride]);
-    } else if (type[0] == 'm') {
+    //} else if (type[0] == 'm') {
       // Import MTL
-    } else if (type[0] == 'u') {
+    //} else if (type[0] == 'u') {
       // Use MTL
-    } else if (type[0] == 'o') {
+    //} else if (type[0] == 'o') {
       // Create/use object
-    } else if (type[0] == 'g') {
+    //} else if (type[0] == 'g') {
       // Create/use group
-    } else if (type[0] == 's') {
+    //} else if (type[0] == 's') {
       // Enable/disable smooth shading
     } else {
-      std::getline(file, type); // Skip the rest of the line
+      std::getline(file, line); // Skip the rest of the line
     }
   }
 

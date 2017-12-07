@@ -7,15 +7,15 @@ Mesh::Mesh(const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3) {
 
   Vertex vert1 {};
   vert1.positions = pos1;
-  vert1.texcoords = Vec2f({ 0.f, 1.f });
+  vert1.texcoords = Vec2f({ 0.f, 0.f });
 
   Vertex vert2 {};
   vert2.positions = pos2;
-  vert2.texcoords = Vec2f({ 0.5f, 0.f });
+  vert2.texcoords = Vec2f({ 0.5f, 1.f });
 
   Vertex vert3 {};
   vert3.positions = pos3;
-  vert3.texcoords = Vec2f({ 1.f, 1.f });
+  vert3.texcoords = Vec2f({ 1.f, 0.f });
 
   // Computing normals
   vert1.normals = (vert1.positions - vert2.positions).cross(vert1.positions - vert3.positions).normalize();
@@ -41,19 +41,19 @@ Mesh::Mesh(const Vec3f& posTopLeft, const Vec3f& posTopRight, const Vec3f& posBo
 
   Vertex topLeft {};
   topLeft.positions = posTopLeft;
-  topLeft.texcoords = Vec2f({ 0.f, 0.f });
+  topLeft.texcoords = Vec2f({ 0.f, 1.f });
 
   Vertex topRight {};
   topRight.positions = posTopRight;
-  topRight.texcoords = Vec2f({ 1.f, 0.f });
+  topRight.texcoords = Vec2f({ 1.f, 1.f });
 
   Vertex bottomRight {};
   bottomRight.positions = posBottomRight;
-  bottomRight.texcoords = Vec2f({ 1.f, 1.f });
+  bottomRight.texcoords = Vec2f({ 1.f, 0.f });
 
   Vertex bottomLeft {};
   bottomLeft.positions = posBottomLeft;
-  bottomLeft.texcoords = Vec2f({ 0.f, 1.f });
+  bottomLeft.texcoords = Vec2f({ 0.f, 0.f });
 
   // Computing normals
   topLeft.normals = (topLeft.positions - topRight.positions).cross(topLeft.positions - bottomLeft.positions).normalize();

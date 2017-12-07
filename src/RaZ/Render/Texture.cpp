@@ -2,6 +2,15 @@
 
 namespace Raz {
 
+Texture::Texture(unsigned int width, unsigned int height) : Texture() {
+  bind();
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  unbind();
+}
+
 void Texture::load(const std::string& fileName) {
   m_image.read(fileName);
 
@@ -9,9 +18,8 @@ void Texture::load(const std::string& fileName) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
   glTexImage2D(GL_TEXTURE_2D,
                0,
@@ -21,7 +29,7 @@ void Texture::load(const std::string& fileName) {
                0,
                GL_RGB,
                GL_UNSIGNED_BYTE,
-               m_image.getData().data());
+               m_image.getDataPtr());
   glGenerateMipmap(GL_TEXTURE_2D);
   unbind();
 }
