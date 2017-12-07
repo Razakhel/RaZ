@@ -5,6 +5,7 @@
 
 int main() {
   Raz::Window window(800, 600, "RaZ");
+  Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
 
   const Raz::VertexShader vertShader("../shaders/vert.glsl");
   const Raz::FragmentShader fragShader("../shaders/blinn-phong.glsl");
@@ -68,6 +69,10 @@ int main() {
     glPolygonMode(GL_FRONT_AND_BACK, ((isWireframe = !isWireframe) ? GL_LINE : GL_FILL));
   });
 
+  // Allow framebuffer toggling
+  bool renderFramebuffer = false;
+  window.addKeyCallback(Raz::Keyboard::B, [&renderFramebuffer] () { renderFramebuffer = !renderFramebuffer; });
+
   // Camera controls
   window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr] () { cameraPtr->translate(0.f, 0.5f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::V, [&cameraPtr] () { cameraPtr->translate(0.f, -0.5f, 0.f); });
@@ -115,7 +120,15 @@ int main() {
       lastTime = currentTime;
     }
 
+    if (renderFramebuffer)
+      framebuffer.bind();
+
     scene.render();
+
+    if (renderFramebuffer) {
+      framebuffer.unbind();
+      framebuffer.display();
+    }
   }
 
   return EXIT_SUCCESS;
