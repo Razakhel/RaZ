@@ -23,6 +23,7 @@ public:
   T* getDataPtr() { return m_data.data(); }
 
   static Matrix identity();
+  Matrix<T, H, W> transpose() const;
 
   Matrix operator+(Matrix mat) const;
   Matrix operator+(float val) const;

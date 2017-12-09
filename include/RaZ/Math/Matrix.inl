@@ -44,6 +44,18 @@ Matrix<T, W, H> Matrix<T, W, H>::identity() {
 }
 
 template <typename T, std::size_t W, std::size_t H>
+Matrix<T, H, W> Matrix<T, W, H>::transpose() const {
+  Matrix<T, H, W> res;
+
+  for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
+    for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex)
+      res[widthIndex * H + heightIndex] = m_data[heightIndex * W + widthIndex];
+  }
+
+  return res;
+}
+
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator+(Matrix mat) const {
   mat += *this;
   return mat;

@@ -24,9 +24,7 @@ in MeshInfo {
 
 void main() {
   vec3 norm = normalize(fragMeshInfo.vertNormals);
-
   vec3 color = texture(uniTexture, fragMeshInfo.vertTexcoords).rgb;
-
   vec3 ambient = color * 0.05;
   vec3 diffuse = vec3(0.0);
   vec3 specular = vec3(0.0);
