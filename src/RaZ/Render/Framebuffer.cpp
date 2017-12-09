@@ -5,23 +5,19 @@
 
 namespace Raz {
 
-Framebuffer::Framebuffer(unsigned int width, unsigned int height)
-  : m_program(VertexShader("../shaders/framebufferVert.glsl"),
-              FragmentShader("../shaders/framebufferFrag.glsl")) {
-  m_texture = std::make_shared<Texture>(width, height);
+Framebuffer::Framebuffer(unsigned int width, unsigned int height) : m_program(VertexShader("../shaders/framebufferVert.glsl"),
+                                                                              FragmentShader("../shaders/framebufferFrag.glsl")) {
+  m_colorBuffer = std::make_shared<Texture>(width, height);
+  m_depthBuffer = std::make_shared<Texture>(width, height, true);
   m_viewport = std::make_shared<Mesh>(Vec3f({ -1.f, 1.f, 0.f }),
                                       Vec3f({ 1.f, 1.f, 0.f }),
                                       Vec3f({ 1.f, -1.f, 0.f }),
                                       Vec3f({ -1.f, -1.f, 0.f }));
   glGenFramebuffers(1, &m_index);
-  glGenRenderbuffers(1, &m_rboIndex);
 
   bind();
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture->getIndex(), 0);
-
-  glBindRenderbuffer(GL_RENDERBUFFER, m_rboIndex);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rboIndex);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorBuffer->getIndex(), 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer->getIndex(), 0);
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
@@ -36,20 +32,14 @@ void Framebuffer::bind() const {
 
 void Framebuffer::unbind() const {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  m_texture->unbind();
 }
 
 void Framebuffer::display() const {
   glClear(GL_COLOR_BUFFER_BIT);
 
   m_program.use();
-  m_texture->bind();
+  m_colorBuffer->bind();
   m_viewport->draw();
-}
-
-Framebuffer::~Framebuffer() {
-  glDeleteFramebuffers(1, &m_index);
-  glDeleteRenderbuffers(1, &m_rboIndex);
 }
 
 } // namespace Raz
