@@ -13,7 +13,7 @@ namespace Raz {
 
 class Texture {
 public:
-  Texture(unsigned int width, unsigned int height);
+  Texture(unsigned int width, unsigned int height, bool isDepthTexture = false);
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
   GLuint getIndex() const { return m_index; }

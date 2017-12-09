@@ -16,6 +16,7 @@ public:
   Scene(const VertexShader& vertShader, const FragmentShader& fragShader, std::vector<ModelPtr>&& models)
     : m_shaderProgram(vertShader, fragShader), m_models(std::move(models)) {}
 
+  const ShaderProgram& getProgram() const { return m_shaderProgram; }
   const std::vector<ModelPtr>& getModels() const { return m_models; }
   std::vector<ModelPtr>& getModels() { return m_models; }
 
