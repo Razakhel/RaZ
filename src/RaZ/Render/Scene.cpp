@@ -4,17 +4,21 @@ namespace Raz {
 
 void Scene::render() const {
   m_shaderProgram.use();
+
+  const GLint uniProjectionLocation = glGetUniformLocation(m_shaderProgram.getIndex(), "uniProjectionMatrix");
   const GLint uniViewProjLocation = glGetUniformLocation(m_shaderProgram.getIndex(), "uniViewProjMatrix");
   const GLint uniMvpLocation = glGetUniformLocation(m_shaderProgram.getIndex(), "uniMvpMatrix");
 
-  const Mat4f viewProjMat = m_camera->computePerspectiveMatrix()                // Projection
-                          * m_camera->lookAt(m_models.front()->getPosition());  // View
+  const Mat4f projectionMat = m_camera->computePerspectiveMatrix();
+  const Mat4f viewProjMat = projectionMat * m_camera->lookAt(m_models.front()->getPosition());
+
+  glUniformMatrix4fv(uniProjectionLocation, 1, GL_FALSE, projectionMat.getDataPtr());
+  glUniformMatrix4fv(uniViewProjLocation, 1, GL_FALSE, viewProjMat.getDataPtr());
 
   for (const auto& model : m_models) {
     const Mat4f modelMat = model->computeTransformMatrix();
     const Mat4f mvpMat = viewProjMat * modelMat;
 
-    glUniformMatrix4fv(uniViewProjLocation, 1, GL_FALSE, viewProjMat.getDataPtr());
     glUniformMatrix4fv(uniMvpLocation, 1, GL_FALSE, mvpMat.getDataPtr());
 
     model->draw();
