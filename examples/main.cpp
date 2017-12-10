@@ -8,7 +8,7 @@ int main() {
   Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
 
   const Raz::VertexShader vertShader("../shaders/vert.glsl");
-  const Raz::FragmentShader fragShader("../shaders/blinn-phong.glsl");
+  const Raz::FragmentShader fragShader("../shaders/ssr.glsl");
 
   Raz::Scene scene(vertShader, fragShader);
 
@@ -70,8 +70,11 @@ int main() {
   });
 
   // Allow framebuffer toggling
-  bool renderFramebuffer = false;
-  window.addKeyCallback(Raz::Keyboard::B, [&renderFramebuffer] () { renderFramebuffer = !renderFramebuffer; });
+  bool renderFramebuffer = true;
+  window.addKeyCallback(Raz::Keyboard::B, [&renderFramebuffer] () {
+    renderFramebuffer = !renderFramebuffer;
+    std::cout << "Framebuffer " << (renderFramebuffer ? "ON" : "OFF") << std::endl;
+  });
 
   // Camera controls
   window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr] () { cameraPtr->translate(0.f, 0.5f, 0.f); });
@@ -106,6 +109,10 @@ int main() {
   scene.addLight(std::move(light));
   scene.setCamera(std::move(camera));
 
+  scene.getProgram().use();
+  glUniform1i(glGetUniformLocation(scene.getProgram().getIndex(), "uniDepthBuffer"), 1);
+  glUniform1i(glGetUniformLocation(scene.getProgram().getIndex(), "uniSceneColorBuffer"), 2);
+
   auto lastTime = std::chrono::system_clock::now();
   uint16_t nbFrames = 0;
 
@@ -120,14 +127,19 @@ int main() {
       lastTime = currentTime;
     }
 
-    if (renderFramebuffer)
+    if (renderFramebuffer) {
       framebuffer.bind();
 
-    scene.render();
+      glActiveTexture(GL_TEXTURE1);
+      framebuffer.getDepthBuffer()->bind();
+      glActiveTexture(GL_TEXTURE2);
+      framebuffer.getColorBuffer()->bind();
+      scene.render();
 
-    if (renderFramebuffer) {
       framebuffer.unbind();
       framebuffer.display();
+    } else {
+      scene.render();
     }
   }
 
