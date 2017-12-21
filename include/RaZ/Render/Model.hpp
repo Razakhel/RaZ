@@ -12,20 +12,18 @@ namespace Raz {
 
 class Model : public Transform {
 public:
-  Model() = default;
+  Model(const Vec3f& topLeftPos, const Vec3f& topRightPos,
+        const Vec3f& bottomRightPos, const Vec3f& bottomLeftPos,
+        const Material& material);
   explicit Model(MeshPtr mesh) : m_mesh{ std::move(mesh) } {}
 
-  const Material& getMaterial() const { return m_material; }
-  Material& getMaterial() { return m_material; }
   const MeshPtr getMesh() const { return m_mesh; }
-  MeshPtr getMesh() { return m_mesh; }
 
-  void setMaterial(const Material& material) { m_material = material; }
-
-  void draw() const;
+  std::unique_ptr<Model> clone() const { return std::make_unique<Model>(*this); }
+  void load() const { m_mesh->load(); }
+  void draw() const { m_mesh->draw(); }
 
 private:
-  Material m_material;
   MeshPtr m_mesh;
 };
 
