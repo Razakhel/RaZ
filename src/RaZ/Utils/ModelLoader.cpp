@@ -1,10 +1,9 @@
 #include <map>
 #include <fstream>
 #include <sstream>
-#include <iostream>
-#include <algorithm>
 
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/Model.hpp"
+#include "RaZ/Utils/ModelLoader.hpp"
 
 namespace Raz {
 
@@ -14,31 +13,11 @@ const std::string extractFileExt(const std::string& fileName) {
   return (fileName.substr(fileName.find_last_of('.') + 1));
 }
 
-} // namespace
+ModelPtr importObj(std::ifstream& file) {
+  MeshPtr mesh = std::make_shared<Mesh>();
+  SubmeshPtr currentSubmesh = std::make_unique<Submesh>();
+  Material material;
 
-void Mesh::importOff(std::ifstream& file) {
-  std::size_t vertexCount, faceCount;
-  file.ignore(3);
-  file >> vertexCount >> faceCount;
-  file.ignore(100, '\n');
-
-  m_vbo.getVertices().resize(vertexCount * 3);
-  getEbo().getIndices().resize(faceCount * 3);
-
-  for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
-    file >> m_vbo.getVertices()[vertexIndex].positions[0]
-         >> m_vbo.getVertices()[vertexIndex].positions[1]
-         >> m_vbo.getVertices()[vertexIndex].positions[2];
-
-  for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
-    file.ignore(2);
-    file >> getEbo().getIndices()[faceIndex]
-         >> getEbo().getIndices()[faceIndex + 1]
-         >> getEbo().getIndices()[faceIndex + 2];
-  }
-}
-
-void Mesh::importObj(std::ifstream& file) {
   std::vector<Vec3f> positions;
   std::vector<Vec2f> texcoords;
   std::vector<Vec3f> normals;
@@ -80,8 +59,8 @@ void Mesh::importObj(std::ifstream& file) {
       std::getline(file, line);
 
       const char delim = '/';
-      const uint8_t nbVertices = std::count(line.cbegin(), line.cend(), ' ');
-      const uint8_t nbParts = std::count(line.cbegin(), line.cend(), delim) / nbVertices + 1;
+      const auto nbVertices = static_cast<uint16_t>(std::count(line.cbegin(), line.cend(), ' '));
+      const auto nbParts = static_cast<uint8_t>(std::count(line.cbegin(), line.cend(), delim) / nbVertices + 1);
       const bool quadFaces = (nbVertices == 4);
 
       std::stringstream indicesStream(line);
@@ -125,20 +104,21 @@ void Mesh::importObj(std::ifstream& file) {
       texcoordsIndices.emplace_back(partIndices[3 + quadFaces]);
       texcoordsIndices.emplace_back(partIndices[5 + quadFaces]);
 
-      const uint8_t quadStride = quadFaces * 2;
+      const auto quadStride = static_cast<uint8_t>(quadFaces * 2);
 
       normalsIndices.emplace_back(partIndices[7 + quadStride]);
       normalsIndices.emplace_back(partIndices[6 + quadStride]);
       normalsIndices.emplace_back(partIndices[8 + quadStride]);
-    //} else if (type[0] == 'm') {
+    //} else if (line[0] == 'm') {
       // Import MTL
-    //} else if (type[0] == 'u') {
+    //} else if (line[0] == 'u') {
       // Use MTL
-    //} else if (type[0] == 'o') {
-      // Create/use object
-    //} else if (type[0] == 'g') {
+    } else if (line[0] == 'o') {
+      mesh->addSubmesh(std::move(currentSubmesh));
+      currentSubmesh = std::make_unique<Submesh>();
+    //} else if (line[0] == 'g') {
       // Create/use group
-    //} else if (type[0] == 's') {
+    //} else if (line[0] == 's') {
       // Enable/disable smooth shading
     } else {
       std::getline(file, line); // Skip the rest of the line
@@ -161,7 +141,7 @@ void Mesh::importObj(std::ifstream& file) {
 
     const auto indexIter = indicesMap.find(vertIndices);
     if (indexIter != indicesMap.cend()) {
-      getEbo().getIndices().emplace_back(indexIter->second);
+      currentSubmesh->getEbo().getIndices().emplace_back(indexIter->second);
     } else {
       Vertex vert {};
 
@@ -180,30 +160,65 @@ void Mesh::importObj(std::ifstream& file) {
         vert.normals[2] = normals[normIndex][2];
       }
 
-      getEbo().getIndices().emplace_back(indicesMap.size());
+      currentSubmesh->getEbo().getIndices().emplace_back(indicesMap.size());
       indicesMap.emplace(vertIndices, indicesMap.size());
-      m_vbo.getVertices().push_back(vert);
+      currentSubmesh->getVbo().getVertices().push_back(vert);
     }
   }
+
+  mesh->addSubmesh(std::move(currentSubmesh));
+  return std::make_unique<Model>(std::move(mesh));
 }
 
-void Mesh::importFromFile(const std::string& fileName) {
+ModelPtr importOff(std::ifstream& file) {
+  MeshPtr mesh = std::make_shared<Mesh>();
+  mesh->getSubmeshes().emplace_back(std::make_unique<Submesh>());
+
+  std::size_t vertexCount, faceCount;
+  file.ignore(3);
+  file >> vertexCount >> faceCount;
+  file.ignore(100, '\n');
+
+  mesh->getSubmeshes().front()->getVbo().getVertices().resize(vertexCount * 3);
+  mesh->getSubmeshes().front()->getEbo().getIndices().resize(faceCount * 3);
+
+  for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
+    file >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[0]
+         >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[1]
+         >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[2];
+
+  for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
+    file.ignore(2);
+    file >> mesh->getSubmeshes().front()->getEbo().getIndices()[faceIndex]
+         >> mesh->getSubmeshes().front()->getEbo().getIndices()[faceIndex + 1]
+         >> mesh->getSubmeshes().front()->getEbo().getIndices()[faceIndex + 2];
+  }
+
+  return std::make_unique<Model>(std::move(mesh));
+}
+
+} // namespace
+
+ModelPtr ModelLoader::importModel(const std::string& fileName) {
+  ModelPtr model;
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
     const std::string format = extractFileExt(fileName);
 
-    if (format == "off" || format == "OFF")
-      importOff(file);
-    else if (format == "obj" || format == "OBJ")
-      importObj(file);
+    if (format == "obj" || format == "OBJ")
+      model = std::move(importObj(file));
+    else if (format == "off" || format == "OFF")
+      model = std::move(importOff(file));
     else
       throw std::runtime_error("Error: '" + format + "' format is not supported");
 
-    load();
+    model->load();
   } else {
     throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
   }
+
+  return model;
 }
 
 } // namespace Raz
