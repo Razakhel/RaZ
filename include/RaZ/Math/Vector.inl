@@ -55,6 +55,16 @@ Vector<T, Size> Vector<T, Size>::normalize() const {
 }
 
 template <typename T, std::size_t Size>
+float Vector<T, Size>::computeLength() const {
+  float length = 0;
+
+  for (const auto& val : m_data)
+    length += val * val;
+
+  return std::sqrt(length);
+}
+
+template <typename T, std::size_t Size>
 std::size_t Vector<T, Size>::hash(std::size_t seed) const {
   for (const auto& elt : m_data)
     seed ^= std::hash<T>()(elt) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
