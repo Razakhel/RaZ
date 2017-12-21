@@ -12,42 +12,30 @@ int main() {
 
   Raz::Scene scene(vertShader, fragShader);
 
-  Raz::Material floorMaterial;
-  const Raz::TexturePtr floorTexture = std::make_shared<Raz::Texture>("../assets/textures/brick_wall.png");
-  floorMaterial.setTexture(floorTexture);
-  Raz::Material defaultMaterial;
-  const Raz::TexturePtr defaultTexture = std::make_shared<Raz::Texture>("../assets/textures/lava.png");
-  defaultMaterial.setTexture(defaultTexture);
+  const Raz::Material floorMaterial("../assets/textures/brick_wall.png");
+  const Raz::Material meshMaterial("../assets/textures/lava.png");
+
+  Raz::ModelPtr floorModel = std::make_unique<Raz::Model>(Raz::Vec3f({ -10.f, -0.5f, 10.f }),    // Top left
+                                                          Raz::Vec3f({ 10.f, -0.5f, 10.f }),     // Top right
+                                                          Raz::Vec3f({ 10.f, -0.5f, -10.f }),    // Bottom right
+                                                          Raz::Vec3f({ -10.f, -0.5f, -10.f }),   // Bottom left
+                                                          floorMaterial);
 
   const auto startTime = std::chrono::system_clock::now();
-
-  const Raz::MeshPtr floor = std::make_shared<Raz::Mesh>(Raz::Vec3f({ -10.f, -0.5f, 10.f }),    // Top left
-                                                         Raz::Vec3f({ 10.f, -0.5f, 10.f }),     // Top right
-                                                         Raz::Vec3f({ 10.f, -0.5f, -10.f }),    // Bottom right
-                                                         Raz::Vec3f({ -10.f, -0.5f, -10.f }));  // Bottom left
-  const Raz::MeshPtr mesh = std::make_shared<Raz::Mesh>("../assets/meshes/bigguy.obj");
-
+  Raz::ModelPtr model = Raz::ModelLoader::importModel("../assets/meshes/bigguy.obj");
   const auto endTime = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
             << " seconds." << std::endl;
 
-  Raz::ModelPtr floorModel = std::make_unique<Raz::Model>(floor);
-  floorModel->setMaterial(floorMaterial);
-
-  Raz::ModelPtr model = std::make_unique<Raz::Model>(mesh);
-  model->setMaterial(defaultMaterial);
+  model->getMesh()->addMaterial(meshMaterial);
   model->scale(0.075f);
 
-  Raz::ModelPtr model2 = std::make_unique<Raz::Model>(mesh);
-  model2->setMaterial(defaultMaterial);
-  model2->scale(0.075f);
+  Raz::ModelPtr model2 = model->clone();
   model2->translate(-1.5f, 0.f, 0.f);
 
-  Raz::ModelPtr model3 = std::make_unique<Raz::Model>(mesh);
-  model3->setMaterial(defaultMaterial);
-  model3->scale(0.075f);
+  Raz::ModelPtr model3 = model->clone();
   model3->translate(1.5f, 0.f, 0.f);
 
   Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
