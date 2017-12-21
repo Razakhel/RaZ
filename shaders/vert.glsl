@@ -2,14 +2,14 @@
 
 layout (location = 0) in vec3 vertPosition;
 layout (location = 1) in vec2 vertTexcoords;
-layout (location = 2) in vec3 vertNormals;
+layout (location = 2) in vec3 vertNormal;
 
 uniform mat4 uniMvpMatrix;
 
 out MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
-  vec3 vertNormals;
+  vec3 vertNormal;
 } fragMeshInfo;
 
 void main() {
@@ -17,7 +17,7 @@ void main() {
 
   fragMeshInfo.vertPosition = pos.xyz;
   fragMeshInfo.vertTexcoords = vertTexcoords;
-  fragMeshInfo.vertNormals = mat3(uniMvpMatrix) * vertNormals;
+  fragMeshInfo.vertNormal = mat3(uniMvpMatrix) * vertNormal;
 
   gl_Position = pos;
 }

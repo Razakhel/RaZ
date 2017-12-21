@@ -21,8 +21,8 @@ public:
   std::vector<ModelPtr>& getModels() { return m_models; }
 
   void setCamera(CameraPtr camera) { m_camera = std::move(camera); }
-  void addModel(ModelPtr model) { m_models.push_back(std::move(model)); }
-  void addLight(LightPtr light) { m_lights.push_back(std::move(light)); }
+  void addModel(ModelPtr model) { m_models.emplace_back(std::move(model)); }
+  void addLight(LightPtr light) { m_lights.emplace_back(std::move(light)); }
   void render() const;
 
 private:

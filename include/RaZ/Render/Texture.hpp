@@ -29,7 +29,7 @@ private:
   Texture() { glGenTextures(1, &m_index); }
 
   GLuint m_index {};
-  Image m_image;
+  Image m_image {};
 };
 
 using TexturePtr = std::shared_ptr<Texture>;

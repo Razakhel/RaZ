@@ -11,7 +11,7 @@ namespace Raz {
 
 class Image {
 public:
-  Image() = default;
+  Image() : m_data(3, 255) {}
   explicit Image(const std::string& fileName) { read(fileName); }
 
   std::size_t getWidth() const { return m_width; }

@@ -19,11 +19,11 @@ uniform sampler2D uniTexture;
 in MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
-  vec3 vertNormals;
+  vec3 vertNormal;
 } fragMeshInfo;
 
 void main() {
-  vec3 norm = normalize(fragMeshInfo.vertNormals);
+  vec3 norm = normalize(fragMeshInfo.vertNormal);
   vec3 color = texture(uniTexture, fragMeshInfo.vertTexcoords).rgb;
   vec3 ambient = color * 0.05;
   vec3 diffuse = vec3(0.0);

@@ -11,14 +11,13 @@ namespace Raz {
 class Material {
 public:
   Material() = default;
+  explicit Material(TexturePtr texture) : m_texture{ std::move(texture) } {}
+  explicit Material(const std::string& fileName) { m_texture = std::make_shared<Texture>(fileName); }
 
   const TexturePtr getTexture() const { return m_texture; }
-  TexturePtr getTexture() { return m_texture; }
-
-  void setTexture(TexturePtr texture) { m_texture = std::move(texture); }
 
 private:
-  TexturePtr m_texture;
+  TexturePtr m_texture {};
 };
 
 } // namespace Raz
