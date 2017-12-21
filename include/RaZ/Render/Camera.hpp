@@ -7,6 +7,7 @@
 
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Math/Constants.hpp"
 #include "RaZ/Math/Transform.hpp"
 
 namespace Raz {
@@ -20,7 +21,7 @@ public:
          float farPlane,
          const Vec3f& position = Vec3f(0.f))
     : m_frameRatio{ static_cast<float>(frameWidth) / frameHeight },
-      m_fieldOfView{ fieldOfViewDegrees * static_cast<float>(M_PI / 180) },
+      m_fieldOfView{ fieldOfViewDegrees * pi<float> / 180 },
       m_nearPlane{ nearPlane },
       m_farPlane{ farPlane } { m_position = position; }
 
