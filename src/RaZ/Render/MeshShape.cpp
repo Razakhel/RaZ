@@ -2,80 +2,84 @@
 
 namespace Raz {
 
-Mesh::Mesh(const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3) {
+Mesh::Mesh(const Vec3f& leftPos, const Vec3f& topPos, const Vec3f& rightPos) {
   // TODO: check if vertices are defined counterclockwise
 
-  Vertex vert1 {};
-  vert1.positions = pos1;
-  vert1.texcoords = Vec2f({ 0.f, 0.f });
+  Vertex left {};
+  left.positions = leftPos;
+  left.texcoords = Vec2f({ 0.f, 0.f });
 
-  Vertex vert2 {};
-  vert2.positions = pos2;
-  vert2.texcoords = Vec2f({ 0.5f, 1.f });
+  Vertex top {};
+  top.positions = topPos;
+  top.texcoords = Vec2f({ 0.5f, 1.f });
 
-  Vertex vert3 {};
-  vert3.positions = pos3;
-  vert3.texcoords = Vec2f({ 1.f, 0.f });
+  Vertex right {};
+  right.positions = rightPos;
+  right.texcoords = Vec2f({ 1.f, 0.f });
 
   // Computing normals
-  vert1.normals = (vert1.positions - vert2.positions).cross(vert1.positions - vert3.positions).normalize();
-  vert2.normals = (vert2.positions - vert3.positions).cross(vert2.positions - vert1.positions).normalize();
-  vert3.normals = (vert3.positions - vert1.positions).cross(vert3.positions - vert2.positions).normalize();
+  left.normals = (leftPos - topPos).cross(leftPos - rightPos).normalize();
+  top.normals = (topPos - rightPos).cross(topPos - leftPos).normalize();
+  right.normals = (rightPos - leftPos).cross(rightPos - topPos).normalize();
 
-  m_vbo.getVertices().resize(3);
-  m_vao.getEbo().getIndices().resize(3);
+  m_submeshes.emplace_back(std::make_unique<Submesh>());
 
-  m_vbo.getVertices()[0] = vert1;
-  m_vbo.getVertices()[1] = vert2;
-  m_vbo.getVertices()[2] = vert3;
+  m_submeshes.front()->getVbo().getVertices().resize(3);
+  m_submeshes.front()->getEbo().getIndices().resize(3);
 
-  m_vao.getEbo().getIndices()[0] = 1;
-  m_vao.getEbo().getIndices()[1] = 0;
-  m_vao.getEbo().getIndices()[2] = 2;
+  m_submeshes.front()->getVbo().getVertices()[0] = left;
+  m_submeshes.front()->getVbo().getVertices()[1] = top;
+  m_submeshes.front()->getVbo().getVertices()[2] = right;
+
+  m_submeshes.front()->getEbo().getIndices()[0] = 1;
+  m_submeshes.front()->getEbo().getIndices()[1] = 0;
+  m_submeshes.front()->getEbo().getIndices()[2] = 2;
 
   load();
 }
 
-Mesh::Mesh(const Vec3f& posTopLeft, const Vec3f& posTopRight, const Vec3f& posBottomRight, const Vec3f& posBottomLeft) {
+Mesh::Mesh(const Vec3f& topLeftPos, const Vec3f& topRightPos, const Vec3f& bottomRightPos, const Vec3f& bottomLeftPos) {
   // TODO: check if vertices are defined counterclockwise
 
   Vertex topLeft {};
-  topLeft.positions = posTopLeft;
+  topLeft.positions = topLeftPos;
   topLeft.texcoords = Vec2f({ 0.f, 1.f });
 
   Vertex topRight {};
-  topRight.positions = posTopRight;
+  topRight.positions = topRightPos;
   topRight.texcoords = Vec2f({ 1.f, 1.f });
 
   Vertex bottomRight {};
-  bottomRight.positions = posBottomRight;
+  bottomRight.positions = bottomRightPos;
   bottomRight.texcoords = Vec2f({ 1.f, 0.f });
 
   Vertex bottomLeft {};
-  bottomLeft.positions = posBottomLeft;
+  bottomLeft.positions = bottomLeftPos;
   bottomLeft.texcoords = Vec2f({ 0.f, 0.f });
 
   // Computing normals
-  topLeft.normals = (topLeft.positions - topRight.positions).cross(topLeft.positions - bottomLeft.positions).normalize();
-  topRight.normals = (topRight.positions - bottomRight.positions).cross(topRight.positions - topLeft.positions).normalize();
-  bottomRight.normals = (bottomRight.positions - bottomLeft.positions).cross(bottomRight.positions - topRight.positions).normalize();
-  bottomLeft.normals = (bottomLeft.positions - topLeft.positions).cross(bottomLeft.positions - bottomRight.positions).normalize();
+  topLeft.normals = (topLeftPos - topRightPos).cross(topLeftPos - bottomLeftPos).normalize();
+  topRight.normals = (topRightPos - bottomRightPos).cross(topRightPos - topLeftPos).normalize();
+  bottomRight.normals = (bottomRightPos - bottomLeftPos).cross(bottomRightPos - topRightPos).normalize();
+  bottomLeft.normals = (bottomLeftPos - topLeftPos).cross(bottomLeftPos - bottomRightPos).normalize();
 
-  m_vbo.getVertices().resize(4);
-  m_vao.getEbo().getIndices().resize(6);
+  m_submeshes.emplace_back(std::make_unique<Submesh>());
 
-  m_vbo.getVertices()[0] = topLeft;
-  m_vbo.getVertices()[1] = topRight;
-  m_vbo.getVertices()[2] = bottomRight;
-  m_vbo.getVertices()[3] = bottomLeft;
+  m_submeshes.front()->getVbo().getVertices().resize(4);
+  m_submeshes.front()->getEbo().getIndices().resize(6);
 
-  m_vao.getEbo().getIndices()[0] = 1;
-  m_vao.getEbo().getIndices()[1] = 0;
-  m_vao.getEbo().getIndices()[2] = 2;
+  m_submeshes.front()->getVbo().getVertices()[0] = topLeft;
+  m_submeshes.front()->getVbo().getVertices()[1] = bottomLeft;
+  m_submeshes.front()->getVbo().getVertices()[2] = bottomRight;
+  m_submeshes.front()->getVbo().getVertices()[3] = topRight;
 
-  m_vao.getEbo().getIndices()[3] = 2;
-  m_vao.getEbo().getIndices()[4] = 0;
-  m_vao.getEbo().getIndices()[5] = 3;
+  m_submeshes.front()->getEbo().getIndices()[0] = 0;
+  m_submeshes.front()->getEbo().getIndices()[1] = 1;
+  m_submeshes.front()->getEbo().getIndices()[2] = 2;
+
+  m_submeshes.front()->getEbo().getIndices()[3] = 0;
+  m_submeshes.front()->getEbo().getIndices()[4] = 2;
+  m_submeshes.front()->getEbo().getIndices()[5] = 3;
 
   load();
 }

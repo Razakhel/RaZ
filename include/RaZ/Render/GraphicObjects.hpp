@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "RaZ/Math/Vector.hpp"
 #include "glew/include/GL/glew.h"
 
 namespace Raz {
@@ -53,7 +54,7 @@ public:
 
 private:
   GLuint m_index {};
-  std::vector<Vertex> m_vertices;
+  std::vector<Vertex> m_vertices {};
 };
 
 class VertexArray {

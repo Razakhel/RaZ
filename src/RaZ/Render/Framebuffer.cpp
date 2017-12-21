@@ -13,6 +13,7 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height) : m_program(Ve
                                       Vec3f({ 1.f, 1.f, 0.f }),
                                       Vec3f({ 1.f, -1.f, 0.f }),
                                       Vec3f({ -1.f, -1.f, 0.f }));
+  m_viewport->addMaterial(Material(m_colorBuffer));
   glGenFramebuffers(1, &m_index);
 
   bind();
@@ -20,7 +21,7 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height) : m_program(Ve
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer->getIndex(), 0);
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    std::cerr << "Error: Framebuffer is not complete." << std::endl;
   unbind();
 }
 
