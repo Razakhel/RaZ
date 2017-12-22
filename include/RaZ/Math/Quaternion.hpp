@@ -10,8 +10,9 @@ namespace Raz {
 
 template <typename T = float>
 class Quaternion {
+  static_assert(("Error: Quaternion's type must be floating point.", std::is_floating_point<T>::value));
+
 public:
-  Quaternion() { static_assert(("Error: Quaternion's type must be floating point.", std::is_floating_point<T>::value)); }
   Quaternion(T angle, Vec3f axes);
   Quaternion(T angle, float axisX, float axisY, float axisZ) : Quaternion(angle, Vec3f({ axisX, axisY, axisZ })) {}
 

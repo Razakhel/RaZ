@@ -24,13 +24,14 @@ public:
 
   static Matrix identity();
   Matrix<T, H, W> transpose() const;
+  float computeDeterminant() const;
 
   Matrix operator+(Matrix mat) const;
   Matrix operator+(float val) const;
   Matrix operator-(Matrix mat) const;
   Matrix operator-(float val) const;
   Matrix operator%(Matrix mat) const;
-  Matrix operator%(float val) const;
+  Matrix operator*(float val) const;
   Matrix operator/(Matrix mat) const;
   Matrix operator/(float val) const;
   //template <std::size_t Size> Vector<T, Size> operator*(const Vector<T, Size>& vec) const;
@@ -40,7 +41,7 @@ public:
   Matrix& operator-=(const Matrix& mat);
   Matrix& operator-=(float val);
   Matrix& operator%=(const Matrix& mat);
-  Matrix& operator%=(float val);
+  Matrix& operator*=(float val);
   Matrix& operator/=(const Matrix& mat);
   Matrix& operator/=(float val);
   T& operator()(std::size_t widthIndex, std::size_t heightIndex) { return m_data[heightIndex * W + widthIndex]; }

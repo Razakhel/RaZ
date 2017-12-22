@@ -2,6 +2,55 @@
 
 namespace Raz {
 
+namespace {
+
+template <typename T>
+float computeMatrixDeterminant(const Matrix<T, 2, 2>& mat) {
+  return (mat.getData()[0] * mat.getData()[3]) - (mat.getData()[2] * mat.getData()[1]);
+}
+
+template <typename T>
+float computeMatrixDeterminant(const Matrix<T, 3, 3>& mat) {
+  const auto leftMatrix = Matrix<T, 2, 2>({{ mat.getData()[4], mat.getData()[5] },
+                                           { mat.getData()[7], mat.getData()[8] }});
+
+  const auto centerMatrix = Matrix<T, 2, 2>({{ mat.getData()[3], mat.getData()[5] },
+                                             { mat.getData()[6], mat.getData()[8] }});
+
+  const auto rightMatrix = Matrix<T, 2, 2>({{ mat.getData()[3], mat.getData()[4] },
+                                            { mat.getData()[6], mat.getData()[7] }});
+
+  return computeMatrixDeterminant(leftMatrix) * mat.getData()[0]
+       - computeMatrixDeterminant(centerMatrix) * mat.getData()[1]
+       + computeMatrixDeterminant(rightMatrix) * mat.getData()[2];
+}
+
+template <typename T>
+float computeMatrixDeterminant(const Matrix<T, 4, 4>& mat) {
+  const auto leftMatrix = Matrix<T, 3, 3>({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
+                                           {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
+                                           { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
+
+  const auto centerLeftMatrix = Matrix<T, 3, 3>({{  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
+                                                 {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
+                                                 { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
+
+  const auto centerRightMatrix = Matrix<T, 3, 3>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
+                                                  {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
+                                                  { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
+
+  const auto rightMatrix = Matrix<T, 3, 3>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
+                                            {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
+                                            { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+
+  return computeMatrixDeterminant(leftMatrix) * mat.getData()[0]
+       - computeMatrixDeterminant(centerLeftMatrix) * mat.getData()[1]
+       + computeMatrixDeterminant(centerRightMatrix) * mat.getData()[2]
+       - computeMatrixDeterminant(rightMatrix) * mat.getData()[3];
+}
+
+} // namespace
+
 template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) {
   std::size_t widthStride = 0;
@@ -56,6 +105,13 @@ Matrix<T, H, W> Matrix<T, W, H>::transpose() const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
+float Matrix<T, W, H>::computeDeterminant() const {
+  static_assert(("Error: Matrix must be a square one.", W == H));
+
+  return computeMatrixDeterminant(*this);
+}
+
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator+(Matrix mat) const {
   mat += *this;
   return mat;
@@ -88,9 +144,9 @@ Matrix<T, W, H> Matrix<T, W, H>::operator%(Matrix mat) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator%(float val) const {
+Matrix<T, W, H> Matrix<T, W, H>::operator*(float val) const {
   Matrix<T, W, H> res = *this;
-  res %= val;
+  res *= val;
   return res;
 }
 
@@ -118,7 +174,7 @@ Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const 
     for (std::size_t inHeightIndex = 0; inHeightIndex < HI; ++inHeightIndex) {
       for (std::size_t currWidthIndex = 0; currWidthIndex < W; ++currWidthIndex)
         res.getData()[inHeightIndex * WI + currWidthIndex] += m_data[currHeightIndex * W + currWidthIndex]
-                                                              * mat[inHeightIndex * WI + currHeightIndex];
+                                                            * mat[inHeightIndex * WI + currHeightIndex];
     }
   }
 
@@ -161,7 +217,7 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix<T, W, H>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator%=(float val) {
+Matrix<T, W, H>& Matrix<T, W, H>::operator*=(float val) {
   for (T& it : m_data)
     it *= val;
   return *this;

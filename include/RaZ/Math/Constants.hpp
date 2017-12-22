@@ -11,4 +11,3 @@ constexpr T pi = T(3.14159265358979323846L);
 } // namespace Raz
 
 #endif // RAZ_CONSTANTS_HPP
-
