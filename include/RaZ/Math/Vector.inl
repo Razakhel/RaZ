@@ -36,7 +36,7 @@ T Vector<T, Size>::dot(const Vector<T, Size>& vec) const {
 
 template <typename T, std::size_t Size>
 Vector<T, Size> Vector<T, Size>::cross(const Vector<T, Size>& vec) const {
-  static_assert(("Error: Both vectors must be 3 dimensional.", Size == 3));
+  static_assert(Size == 3, "Error: Both vectors must be 3 dimensional.");
 
   Vector<T, Size> res;
 

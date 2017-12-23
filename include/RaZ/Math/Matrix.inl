@@ -82,7 +82,7 @@ Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
 
 template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::identity() {
-  static_assert(("Error: Matrix must be a square one.", W == H));
+  static_assert(W == H, "Error: Matrix must be a square one.");
 
   Matrix<T, W, H> res;
 
@@ -106,7 +106,7 @@ Matrix<T, H, W> Matrix<T, W, H>::transpose() const {
 
 template <typename T, std::size_t W, std::size_t H>
 float Matrix<T, W, H>::computeDeterminant() const {
-  static_assert(("Error: Matrix must be a square one.", W == H));
+  static_assert(W == H, "Error: Matrix must be a square one.");
 
   return computeMatrixDeterminant(*this);
 }
@@ -166,7 +166,7 @@ Matrix<T, W, H> Matrix<T, W, H>::operator/(float val) const {
 template <typename T, std::size_t W, std::size_t H>
 template <std::size_t WI, std::size_t HI>
 Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const {
-  static_assert(("Error: Input matrix's width must be equal to current matrix's height.", W == HI));
+  static_assert(W == HI, "Error: Input matrix's width must be equal to current matrix's height.");
 
   Matrix<T, H, WI> res;
 
