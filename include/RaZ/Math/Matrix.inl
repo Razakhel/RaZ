@@ -5,20 +5,20 @@ namespace Raz {
 namespace {
 
 template <typename T>
-float computeMatrixDeterminant(const Matrix<T, 2, 2>& mat) {
+float computeMatrixDeterminant(const Mat2<T>& mat) {
   return (mat.getData()[0] * mat.getData()[3]) - (mat.getData()[2] * mat.getData()[1]);
 }
 
 template <typename T>
-float computeMatrixDeterminant(const Matrix<T, 3, 3>& mat) {
-  const auto leftMatrix = Matrix<T, 2, 2>({{ mat.getData()[4], mat.getData()[5] },
-                                           { mat.getData()[7], mat.getData()[8] }});
+float computeMatrixDeterminant(const Mat3<T>& mat) {
+  const auto leftMatrix = Mat2<T>({{ mat.getData()[4], mat.getData()[5] },
+                                   { mat.getData()[7], mat.getData()[8] }});
 
-  const auto centerMatrix = Matrix<T, 2, 2>({{ mat.getData()[3], mat.getData()[5] },
-                                             { mat.getData()[6], mat.getData()[8] }});
+  const auto centerMatrix = Mat2<T>({{ mat.getData()[3], mat.getData()[5] },
+                                     { mat.getData()[6], mat.getData()[8] }});
 
-  const auto rightMatrix = Matrix<T, 2, 2>({{ mat.getData()[3], mat.getData()[4] },
-                                            { mat.getData()[6], mat.getData()[7] }});
+  const auto rightMatrix = Mat2<T>({{ mat.getData()[3], mat.getData()[4] },
+                                    { mat.getData()[6], mat.getData()[7] }});
 
   return computeMatrixDeterminant(leftMatrix) * mat.getData()[0]
        - computeMatrixDeterminant(centerMatrix) * mat.getData()[1]
@@ -26,27 +26,65 @@ float computeMatrixDeterminant(const Matrix<T, 3, 3>& mat) {
 }
 
 template <typename T>
-float computeMatrixDeterminant(const Matrix<T, 4, 4>& mat) {
-  const auto leftMatrix = Matrix<T, 3, 3>({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
-                                           {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
-                                           { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
+float computeMatrixDeterminant(const Mat4<T>& mat) {
+  const auto leftMatrix = Mat3<T>({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
+                                   {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
+                                   { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
 
-  const auto centerLeftMatrix = Matrix<T, 3, 3>({{  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
-                                                 {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
-                                                 { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
+  const auto centerLeftMatrix = Mat3<T>({{  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
+                                         {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
+                                         { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
 
-  const auto centerRightMatrix = Matrix<T, 3, 3>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
-                                                  {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
-                                                  { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
+  const auto centerRightMatrix = Mat3<T>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
+                                          {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
+                                          { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
 
-  const auto rightMatrix = Matrix<T, 3, 3>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
-                                            {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
-                                            { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+  const auto rightMatrix = Mat3<T>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
+                                    {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
+                                    { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
 
   return computeMatrixDeterminant(leftMatrix) * mat.getData()[0]
        - computeMatrixDeterminant(centerLeftMatrix) * mat.getData()[1]
        + computeMatrixDeterminant(centerRightMatrix) * mat.getData()[2]
        - computeMatrixDeterminant(rightMatrix) * mat.getData()[3];
+}
+
+template <typename T>
+Mat2<T> computeMatrixInverse(const Mat2<T>& mat, float determinant) {
+  const Mat2<T> res({{  mat.getData()[3], -mat.getData()[1] },
+                     { -mat.getData()[2],  mat.getData()[0] }});
+
+  return res / determinant;
+}
+
+template <typename T>
+Mat3<T> computeMatrixInverse(const Mat3<T>& mat, float determinant) {
+  const Mat2<T> topLeft({{ mat.getData()[4], mat.getData()[5] },
+                         { mat.getData()[7], mat.getData()[8] }});
+  const Mat2<T> topCenter({{ mat.getData()[3], mat.getData()[5] },
+                           { mat.getData()[6], mat.getData()[8] }});
+  const Mat2<T> topRight({{ mat.getData()[3], mat.getData()[4] },
+                          { mat.getData()[6], mat.getData()[7] }});
+
+  const Mat2<T> midLeft({{ mat.getData()[1], mat.getData()[2] },
+                         { mat.getData()[7], mat.getData()[8] }});
+  const Mat2<T> midCenter({{ mat.getData()[0], mat.getData()[2] },
+                           { mat.getData()[6], mat.getData()[8] }});
+  const Mat2<T> midRight({{ mat.getData()[0], mat.getData()[1] },
+                          { mat.getData()[6], mat.getData()[7] }});
+
+  const Mat2<T> botLeft({{ mat.getData()[1], mat.getData()[2] },
+                         { mat.getData()[4], mat.getData()[5] }});
+  const Mat2<T> botCenter({{ mat.getData()[0], mat.getData()[2] },
+                           { mat.getData()[3], mat.getData()[5] }});
+  const Mat2<T> botRight({{ mat.getData()[0], mat.getData()[1] },
+                          { mat.getData()[3], mat.getData()[4] }});
+
+  const Mat3<T> res({{  topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant() },
+                     { -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant() },
+                     {  botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant() }});
+
+  return res.transpose() / determinant;
 }
 
 } // namespace
@@ -109,6 +147,19 @@ float Matrix<T, W, H>::computeDeterminant() const {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
   return computeMatrixDeterminant(*this);
+}
+
+template <typename T, std::size_t W, std::size_t H>
+Matrix<T, W, H> Matrix<T, W, H>::inverse() const {
+  static_assert(W == H, "Error: Matrix must be a square one.");
+
+  const float determinant = computeMatrixDeterminant(*this);
+  const float errorRange = 0.01f;
+
+  if (determinant > 1.f - errorRange && determinant < 1.f + errorRange)
+    return transpose();
+
+  return computeMatrixInverse(*this, determinant);
 }
 
 template <typename T, std::size_t W, std::size_t H>

@@ -25,6 +25,7 @@ public:
   static Matrix identity();
   Matrix<T, H, W> transpose() const;
   float computeDeterminant() const;
+  Matrix inverse() const;
 
   Matrix operator+(Matrix mat) const;
   Matrix operator+(float val) const;
@@ -52,8 +53,12 @@ private:
   std::array<T, W * H> m_data {};
 };
 
-using Mat3f = Matrix<float, 3, 3>;
-using Mat4f = Matrix<float, 4, 4>;
+template <typename T> using Mat2 = Matrix<T, 2, 2>;
+using Mat2f = Mat2<float>;
+template <typename T> using Mat3 = Matrix<T, 3, 3>;
+using Mat3f = Mat3<float>;
+template <typename T> using Mat4 = Matrix<T, 4, 4>;
+using Mat4f = Mat4<float>;
 
 } // namespace Raz
 
