@@ -80,11 +80,93 @@ Mat3<T> computeMatrixInverse(const Mat3<T>& mat, float determinant) {
   const Mat2<T> botRight({{ mat.getData()[0], mat.getData()[1] },
                           { mat.getData()[3], mat.getData()[4] }});
 
-  const Mat3<T> res({{  topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant() },
-                     { -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant() },
-                     {  botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant() }});
+  const Mat3<T> cofactors({{ topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant() },
+                          { -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant() },
+                          {  botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant() }});
 
-  return res.transpose() / determinant;
+  return cofactors.transpose() / determinant;
+}
+
+template <typename T>
+Mat4<T> computeMatrixInverse(const Mat4<T>& mat, float determinant) {
+  const Mat3<T> topLeft({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
+                         {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
+                         { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
+  const Mat3<T> topCenterLeft({{  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
+                               {  mat.getData()[8], mat.getData()[11], mat.getData()[11] },
+                               { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
+  const Mat3<T> topCenterRight({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
+                                {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
+                                { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
+  const Mat3<T> topRight({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
+                          {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
+                          { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+
+  const Mat3<T> midTopLeft({{  mat.getData()[1],  mat.getData()[2],  mat.getData()[3] },
+                            {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
+                            { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
+  const Mat3<T> midTopCenterLeft({{  mat.getData()[0],  mat.getData()[2],  mat.getData()[3] },
+                                  {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
+                                  { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
+  const Mat3<T> midTopCenterRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[3] },
+                                   {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
+                                   { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
+  const Mat3<T> midTopRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[2] },
+                             {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
+                             { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+
+  const Mat3<T> midBotLeft({{  mat.getData()[1],  mat.getData()[2],  mat.getData()[3] },
+                            {  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
+                            { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
+  const Mat3<T> midBotCenterLeft({{  mat.getData()[0],  mat.getData()[2],  mat.getData()[3] },
+                                  {  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
+                                  { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
+  const Mat3<T> midBotCenterRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[3] },
+                                   {  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
+                                   { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
+  const Mat3<T> midBotRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[2] },
+                             {  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
+                             { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+
+  const Mat3<T> botLeft({{ mat.getData()[1],  mat.getData()[2],  mat.getData()[3] },
+                         { mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
+                         { mat.getData()[9], mat.getData()[10], mat.getData()[11] }});
+  const Mat3<T> botCenterLeft({{ mat.getData()[0],  mat.getData()[2],  mat.getData()[3] },
+                               { mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
+                               { mat.getData()[8], mat.getData()[10], mat.getData()[11] }});
+  const Mat3<T> botCenterRight({{ mat.getData()[0], mat.getData()[1],  mat.getData()[3] },
+                                { mat.getData()[4], mat.getData()[5],  mat.getData()[7] },
+                                { mat.getData()[8], mat.getData()[9], mat.getData()[11] }});
+  const Mat3<T> botRight({{ mat.getData()[0], mat.getData()[1],  mat.getData()[2] },
+                          { mat.getData()[4], mat.getData()[5],  mat.getData()[6] },
+                          { mat.getData()[8], mat.getData()[9], mat.getData()[10] }});
+
+  const float topLeftDeterm = topLeft.computeDeterminant();
+  const float topCenterLeftDeterm = topCenterLeft.computeDeterminant();
+  const float topCenterRightDeterm = topCenterRight.computeDeterminant();
+  const float topRightDeterm = topRight.computeDeterminant();
+
+  const float midTopLeftDeterm = midTopLeft.computeDeterminant();
+  const float midTopCenterLeftDeterm = midTopCenterLeft.computeDeterminant();
+  const float midTopCenterRightDeterm = midTopCenterRight.computeDeterminant();
+  const float midTopRightDeterm = midTopRight.computeDeterminant();
+
+  const float midBotLeftDeterm = midBotLeft.computeDeterminant();
+  const float midBotCenterLeftDeterm = midBotCenterLeft.computeDeterminant();
+  const float midBotCenterRightDeterm = midBotCenterRight.computeDeterminant();
+  const float midBotRightDeterm = midBotRight.computeDeterminant();
+
+  const float botLeftDeterm = topLeft.computeDeterminant();
+  const float botCenterLeftDeterm = topLeft.computeDeterminant();
+  const float botCenterRightDeterm = topLeft.computeDeterminant();
+  const float botRightDeterm = topLeft.computeDeterminant();
+
+  const Mat4<T> cofactors({{     topLeftDeterm,    -topCenterLeftDeterm,     topCenterRightDeterm,    -topRightDeterm },
+                           { -midTopLeftDeterm,  midTopCenterLeftDeterm, -midTopCenterRightDeterm,  midTopRightDeterm },
+                           {  midBotLeftDeterm, -midBotCenterLeftDeterm,  midBotCenterRightDeterm, -midBotRightDeterm },
+                           {    -botLeftDeterm,     botCenterLeftDeterm,    -botCenterRightDeterm,     botRightDeterm }});
+
+  return cofactors.transpose() / determinant;
 }
 
 } // namespace
