@@ -93,7 +93,7 @@ Mat4<T> computeMatrixInverse(const Mat4<T>& mat, float determinant) {
                          {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
                          { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
   const Mat3<T> topCenterLeft({{  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
-                               {  mat.getData()[8], mat.getData()[11], mat.getData()[11] },
+                               {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
                                { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
   const Mat3<T> topCenterRight({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
                                 {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
@@ -156,10 +156,10 @@ Mat4<T> computeMatrixInverse(const Mat4<T>& mat, float determinant) {
   const float midBotCenterRightDeterm = midBotCenterRight.computeDeterminant();
   const float midBotRightDeterm = midBotRight.computeDeterminant();
 
-  const float botLeftDeterm = topLeft.computeDeterminant();
-  const float botCenterLeftDeterm = topLeft.computeDeterminant();
-  const float botCenterRightDeterm = topLeft.computeDeterminant();
-  const float botRightDeterm = topLeft.computeDeterminant();
+  const float botLeftDeterm = botLeft.computeDeterminant();
+  const float botCenterLeftDeterm = botCenterLeft.computeDeterminant();
+  const float botCenterRightDeterm = botCenterRight.computeDeterminant();
+  const float botRightDeterm = botRight.computeDeterminant();
 
   const Mat4<T> cofactors({{     topLeftDeterm,    -topCenterLeftDeterm,     topCenterRightDeterm,    -topRightDeterm },
                            { -midTopLeftDeterm,  midTopCenterLeftDeterm, -midTopCenterRightDeterm,  midTopRightDeterm },
