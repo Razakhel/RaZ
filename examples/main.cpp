@@ -8,35 +8,19 @@ int main() {
   Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
 
   const Raz::VertexShader vertShader("../shaders/vert.glsl");
-  const Raz::FragmentShader fragShader("../shaders/ssr.glsl");
+  const Raz::FragmentShader fragShader("../shaders/lambert.glsl");
 
   Raz::Scene scene(vertShader, fragShader);
 
-  const Raz::Material floorMaterial("../assets/textures/brick_wall.png");
-  const Raz::Material meshMaterial("../assets/textures/lava.png");
-
-  Raz::ModelPtr floorModel = std::make_unique<Raz::Model>(Raz::Vec3f({ -10.f, -0.5f, 10.f }),    // Top left
-                                                          Raz::Vec3f({ 10.f, -0.5f, 10.f }),     // Top right
-                                                          Raz::Vec3f({ 10.f, -0.5f, -10.f }),    // Bottom right
-                                                          Raz::Vec3f({ -10.f, -0.5f, -10.f }),   // Bottom left
-                                                          floorMaterial);
-
   const auto startTime = std::chrono::system_clock::now();
-  Raz::ModelPtr model = Raz::ModelLoader::importModel("../assets/meshes/bigguy.obj");
+  Raz::ModelPtr model = Raz::ModelLoader::importModel("../assets/meshes/crytek_sponza.obj");
   const auto endTime = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
             << " seconds." << std::endl;
 
-  model->getMesh()->addMaterial(meshMaterial);
   model->scale(0.075f);
-
-  Raz::ModelPtr model2 = model->clone();
-  model2->translate(-1.5f, 0.f, 0.f);
-
-  Raz::ModelPtr model3 = model->clone();
-  model3->translate(1.5f, 0.f, 0.f);
 
   Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
                                                           Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)
@@ -58,7 +42,7 @@ int main() {
   });
 
   // Allow framebuffer toggling
-  bool renderFramebuffer = true;
+  bool renderFramebuffer = false;
   window.addKeyCallback(Raz::Keyboard::B, [&renderFramebuffer] () {
     renderFramebuffer = !renderFramebuffer;
     std::cout << "Framebuffer " << (renderFramebuffer ? "ON" : "OFF") << std::endl;
@@ -72,7 +56,7 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::A, [&cameraPtr] () { cameraPtr->translate(-0.5f, 0.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::D, [&cameraPtr] () { cameraPtr->translate(0.5f, 0.f, 0.f); });
 
-  // Mesh control
+  // Mesh controls
   window.addKeyCallback(Raz::Keyboard::T, [&modelPtr] () { modelPtr->translate(0.f, 0.f, 0.5f); });
   window.addKeyCallback(Raz::Keyboard::G, [&modelPtr] () { modelPtr->translate(0.f, 0.f, -0.5f); });
   window.addKeyCallback(Raz::Keyboard::F, [&modelPtr] () { modelPtr->translate(-0.5f, 0.f, 0.f); });
@@ -84,16 +68,13 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(10.f, 0.f, 1.f, 0.f); });
 
-  // Light control
+  // Light controls
   window.addKeyCallback(Raz::Keyboard::I, [&lightPtr] () { lightPtr->translate(0.f, 0.f, 0.5f); });
   window.addKeyCallback(Raz::Keyboard::K, [&lightPtr] () { lightPtr->translate(0.f, 0.f, -0.5f); });
   window.addKeyCallback(Raz::Keyboard::J, [&lightPtr] () { lightPtr->translate(-0.5f, 0.f, 0.f); });
   window.addKeyCallback(Raz::Keyboard::L, [&lightPtr] () { lightPtr->translate(0.5f, 0.f, 0.f); });
 
   scene.addModel(std::move(model));
-  scene.addModel(std::move(model2));
-  scene.addModel(std::move(model3));
-  scene.addModel(std::move(floorModel));
   scene.addLight(std::move(light));
   scene.setCamera(std::move(camera));
 
