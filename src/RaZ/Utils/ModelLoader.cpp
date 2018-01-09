@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "RaZ/Render/Model.hpp"
+#include "RaZ/Utils/MtlLoader.hpp"
 #include "RaZ/Utils/ModelLoader.hpp"
 
 namespace Raz {
@@ -15,16 +16,15 @@ const std::string extractFileExt(const std::string& fileName) {
 
 ModelPtr importObj(std::ifstream& file) {
   MeshPtr mesh = std::make_shared<Mesh>();
-  SubmeshPtr currentSubmesh = std::make_unique<Submesh>();
-  Material material;
+  std::unordered_map<std::string, std::size_t> materialCorrespIndices;
 
   std::vector<Vec3f> positions;
   std::vector<Vec2f> texcoords;
   std::vector<Vec3f> normals;
 
-  std::vector<int64_t> posIndices;
-  std::vector<int64_t> texcoordsIndices;
-  std::vector<int64_t> normalsIndices;
+  std::vector<std::vector<int64_t>> posIndices(1);
+  std::vector<std::vector<int64_t>> texcoordsIndices(1);
+  std::vector<std::vector<int64_t>> normalsIndices(1);
 
   while (!file.eof()) {
     std::string line;
@@ -83,43 +83,53 @@ ModelPtr importObj(std::ifstream& file) {
       }
 
       if (quadFaces) {
-        posIndices.emplace_back(partIndices[2]);
-        posIndices.emplace_back(partIndices[0]);
-        posIndices.emplace_back(partIndices[3]);
+        posIndices.back().emplace_back(partIndices[2]);
+        posIndices.back().emplace_back(partIndices[0]);
+        posIndices.back().emplace_back(partIndices[3]);
 
-        texcoordsIndices.emplace_back(partIndices[6]);
-        texcoordsIndices.emplace_back(partIndices[4]);
-        texcoordsIndices.emplace_back(partIndices[7]);
+        texcoordsIndices.back().emplace_back(partIndices[6]);
+        texcoordsIndices.back().emplace_back(partIndices[4]);
+        texcoordsIndices.back().emplace_back(partIndices[7]);
 
-        normalsIndices.emplace_back(partIndices[10]);
-        normalsIndices.emplace_back(partIndices[8]);
-        normalsIndices.emplace_back(partIndices[11]);
+        normalsIndices.back().emplace_back(partIndices[10]);
+        normalsIndices.back().emplace_back(partIndices[8]);
+        normalsIndices.back().emplace_back(partIndices[11]);
       }
 
-      posIndices.emplace_back(partIndices[1]);
-      posIndices.emplace_back(partIndices[0]);
-      posIndices.emplace_back(partIndices[2]);
+      posIndices.back().emplace_back(partIndices[1]);
+      posIndices.back().emplace_back(partIndices[0]);
+      posIndices.back().emplace_back(partIndices[2]);
 
-      texcoordsIndices.emplace_back(partIndices[4 + quadFaces]);
-      texcoordsIndices.emplace_back(partIndices[3 + quadFaces]);
-      texcoordsIndices.emplace_back(partIndices[5 + quadFaces]);
+      texcoordsIndices.back().emplace_back(partIndices[4 + quadFaces]);
+      texcoordsIndices.back().emplace_back(partIndices[3 + quadFaces]);
+      texcoordsIndices.back().emplace_back(partIndices[5 + quadFaces]);
 
       const auto quadStride = static_cast<uint8_t>(quadFaces * 2);
 
-      normalsIndices.emplace_back(partIndices[7 + quadStride]);
-      normalsIndices.emplace_back(partIndices[6 + quadStride]);
-      normalsIndices.emplace_back(partIndices[8 + quadStride]);
-    //} else if (line[0] == 'm') {
-      // Import MTL
-    //} else if (line[0] == 'u') {
-      // Use MTL
-    } else if (line[0] == 'o') {
-      mesh->addSubmesh(std::move(currentSubmesh));
-      currentSubmesh = std::make_unique<Submesh>();
-    //} else if (line[0] == 'g') {
-      // Create/use group
-    //} else if (line[0] == 's') {
-      // Enable/disable smooth shading
+      normalsIndices.back().emplace_back(partIndices[7 + quadStride]);
+      normalsIndices.back().emplace_back(partIndices[6 + quadStride]);
+      normalsIndices.back().emplace_back(partIndices[8 + quadStride]);
+    } else if (line[0] == 'm') {
+      std::string materialName;
+      file >> materialName;
+
+      MtlLoader::importMtl(materialName, mesh->getMaterials(), materialCorrespIndices);
+    } else if (line[0] == 'u') {
+      std::string materialName;
+      file >> materialName;
+
+      mesh->getSubmeshes().back()->setMaterialIndex(materialCorrespIndices.find(materialName)->second);
+    } else if (line[0] == 'o' || line[0] == 'g') {
+      if (!posIndices.front().empty()) {
+        const std::size_t newSize = posIndices.size() + 1;
+        posIndices.resize(newSize);
+        texcoordsIndices.resize(newSize);
+        normalsIndices.resize(newSize);
+
+        mesh->addSubmesh(std::make_unique<Submesh>());
+      }
+
+      std::getline(file, line);
     } else {
       std::getline(file, line); // Skip the rest of the line
     }
@@ -127,46 +137,49 @@ ModelPtr importObj(std::ifstream& file) {
 
   std::map<std::array<std::size_t, 3>, unsigned int> indicesMap;
 
-  for (std::size_t partIndex = 0; partIndex < posIndices.size(); ++partIndex) {
-    const int64_t tempPosIndex = posIndices[partIndex];
-    const std::size_t posIndex = (tempPosIndex < 0 ? tempPosIndex + positions.size() : tempPosIndex - 1ul);
+  for (std::size_t submeshIndex = 0; submeshIndex < mesh->getSubmeshes().size(); ++submeshIndex) {
+    indicesMap.clear();
 
-    const int64_t tempTexIndex = texcoordsIndices[partIndex];
-    const std::size_t texIndex = (tempTexIndex < 0 ? tempTexIndex + texcoords.size() : tempTexIndex - 1ul);
+    for (std::size_t partIndex = 0; partIndex < posIndices[submeshIndex].size(); ++partIndex) {
+      const int64_t tempPosIndex = posIndices[submeshIndex][partIndex];
+      const std::size_t posIndex = (tempPosIndex < 0 ? tempPosIndex + positions.size() : tempPosIndex - 1ul);
 
-    const int64_t tempNormIndex = normalsIndices[partIndex];
-    const std::size_t normIndex = (tempNormIndex < 0 ? tempNormIndex + normals.size() : tempNormIndex - 1ul);
+      const int64_t tempTexIndex = texcoordsIndices[submeshIndex][partIndex];
+      const std::size_t texIndex = (tempTexIndex < 0 ? tempTexIndex + texcoords.size() : tempTexIndex - 1ul);
 
-    const std::array<std::size_t, 3> vertIndices = { posIndex, texIndex, normIndex };
+      const int64_t tempNormIndex = normalsIndices[submeshIndex][partIndex];
+      const std::size_t normIndex = (tempNormIndex < 0 ? tempNormIndex + normals.size() : tempNormIndex - 1ul);
 
-    const auto indexIter = indicesMap.find(vertIndices);
-    if (indexIter != indicesMap.cend()) {
-      currentSubmesh->getEbo().getIndices().emplace_back(indexIter->second);
-    } else {
-      Vertex vert {};
+      const std::array<std::size_t, 3> vertIndices = { posIndex, texIndex, normIndex };
 
-      vert.positions[0] = positions[posIndex][0];
-      vert.positions[1] = positions[posIndex][1];
-      vert.positions[2] = positions[posIndex][2];
+      const auto indexIter = indicesMap.find(vertIndices);
+      if (indexIter != indicesMap.cend()) {
+        mesh->getSubmeshes()[submeshIndex]->getEbo().getIndices().emplace_back(indexIter->second);
+      } else {
+        Vertex vert {};
 
-      if (!texcoords.empty()) {
-        vert.texcoords[0] = texcoords[texIndex][0];
-        vert.texcoords[1] = texcoords[texIndex][1];
+        vert.positions[0] = positions[posIndex][0];
+        vert.positions[1] = positions[posIndex][1];
+        vert.positions[2] = positions[posIndex][2];
+
+        if (!texcoords.empty()) {
+          vert.texcoords[0] = texcoords[texIndex][0];
+          vert.texcoords[1] = texcoords[texIndex][1];
+        }
+
+        if (!normals.empty()) {
+          vert.normals[0] = normals[normIndex][0];
+          vert.normals[1] = normals[normIndex][1];
+          vert.normals[2] = normals[normIndex][2];
+        }
+
+        mesh->getSubmeshes()[submeshIndex]->getEbo().getIndices().emplace_back(indicesMap.size());
+        indicesMap.emplace(vertIndices, indicesMap.size());
+        mesh->getSubmeshes()[submeshIndex]->getVbo().getVertices().push_back(vert);
       }
-
-      if (!normals.empty()) {
-        vert.normals[0] = normals[normIndex][0];
-        vert.normals[1] = normals[normIndex][1];
-        vert.normals[2] = normals[normIndex][2];
-      }
-
-      currentSubmesh->getEbo().getIndices().emplace_back(indicesMap.size());
-      indicesMap.emplace(vertIndices, indicesMap.size());
-      currentSubmesh->getVbo().getVertices().push_back(vert);
     }
   }
 
-  mesh->addSubmesh(std::move(currentSubmesh));
   return std::make_unique<Model>(std::move(mesh));
 }
 
