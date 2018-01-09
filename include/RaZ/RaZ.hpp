@@ -23,6 +23,7 @@
 #include "Utils/Image.hpp"
 #include "Utils/Keyboard.hpp"
 #include "Utils/ModelLoader.hpp"
+#include "Utils/MtlLoader.hpp"
 #include "Utils/Window.hpp"
 
 #endif // RAZ_RAZ_HPP
