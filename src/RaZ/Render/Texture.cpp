@@ -22,7 +22,7 @@ Texture::Texture(unsigned int width, unsigned int height, bool isDepthTexture) :
 }
 
 void Texture::load(const std::string& fileName) {
-  m_image.read(fileName);
+  m_image = std::make_unique<Image>(fileName);
 
   bind();
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -31,16 +31,24 @@ void Texture::load(const std::string& fileName) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
+  if (m_image->getColorspace() == GL_RED || m_image->getColorspace() == GL_RG) {
+    const std::array<GLint, 4> swizzle = { GL_RED, GL_RED, GL_RED, (m_image->getColorspace() == GL_RED ? GL_ONE : GL_GREEN) };
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle.data());
+  }
+
   glTexImage2D(GL_TEXTURE_2D,
                0,
-               GL_RGB,
-               m_image.getWidth(),
-               m_image.getHeight(),
+               m_image->getColorspace(),
+               m_image->getWidth(),
+               m_image->getHeight(),
                0,
-               GL_RGB,
+               m_image->getColorspace(),
                GL_UNSIGNED_BYTE,
-               m_image.getDataPtr());
+               m_image->getDataPtr());
+  glGenerateMipmap(GL_TEXTURE_2D);
   unbind();
+
+  m_image.reset();
 }
 
 } // namespace Raz

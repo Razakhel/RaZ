@@ -59,14 +59,27 @@ void Image::readPng(std::ifstream& file) {
     case PNG_COLOR_TYPE_GRAY:
       if (png_get_bit_depth(readStruct, infoStruct) < 8)
         png_set_expand_gray_1_2_4_to_8(readStruct);
+
+      m_colorspace = GL_RED;
+      break;
+
+    case PNG_COLOR_TYPE_GRAY_ALPHA:
+      m_colorspace = GL_RG;
       break;
 
     case PNG_COLOR_TYPE_PALETTE:
       png_set_palette_to_rgb(readStruct);
       channels = 3;
+      m_colorspace = GL_RGB;
       break;
 
+    case PNG_COLOR_TYPE_RGB:
     default:
+      m_colorspace = GL_RGB;
+      break;
+
+    case PNG_COLOR_TYPE_RGBA:
+      m_colorspace = GL_RGBA;
       break;
   }
 
@@ -75,6 +88,7 @@ void Image::readPng(std::ifstream& file) {
   // Adding full alpha channel to the image if it possesses transparency
   if (png_get_valid(readStruct, infoStruct, static_cast<png_uint_32>(PNG_INFO_tRNS))) {
     png_set_tRNS_to_alpha(readStruct);
+    m_colorspace = GL_RGBA;
     ++channels;
   }
 

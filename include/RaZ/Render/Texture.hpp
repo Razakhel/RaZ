@@ -13,11 +13,12 @@ namespace Raz {
 
 class Texture {
 public:
+  Texture() { glGenTextures(1, &m_index); }
   Texture(unsigned int width, unsigned int height, bool isDepthTexture = false);
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
   GLuint getIndex() const { return m_index; }
-  const Image& getImage() const { return m_image; }
+  const ImagePtr& getImage() const { return m_image; }
 
   void load(const std::string& fileName);
   void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
@@ -26,10 +27,8 @@ public:
   ~Texture() { glDeleteTextures(1, &m_index); }
 
 private:
-  Texture() { glGenTextures(1, &m_index); }
-
   GLuint m_index {};
-  Image m_image {};
+  ImagePtr m_image {};
 };
 
 using TexturePtr = std::shared_ptr<Texture>;

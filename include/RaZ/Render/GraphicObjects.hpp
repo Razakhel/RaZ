@@ -36,7 +36,7 @@ public:
 
 private:
   GLuint m_index {};
-  std::vector<unsigned int> m_indices;
+  std::vector<unsigned int> m_indices {};
 };
 
 class VertexBuffer {
@@ -72,7 +72,7 @@ public:
 
 private:
   GLuint m_index {};
-  ElementBuffer m_ebo;
+  ElementBuffer m_ebo {};
 };
 
 } // namespace Raz
