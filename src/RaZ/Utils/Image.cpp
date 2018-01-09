@@ -24,10 +24,6 @@ bool validatePng(std::istream& file) {
 
 } // namespace
 
-void Image::readJpeg(std::ifstream& file) {
-  throw std::runtime_error("Error: JPEG reading not yet implemented");
-}
-
 void Image::readPng(std::ifstream& file) {
   if (!validatePng(file))
     throw std::runtime_error("Error: Not a valid PNG");
@@ -107,36 +103,16 @@ void Image::readPng(std::ifstream& file) {
   png_destroy_read_struct(&readStruct, nullptr, &infoStruct);
 }
 
-void Image::readTga(std::ifstream& file) {
-  throw std::runtime_error("Error: TGA reading not yet implemented");
-}
-
-void Image::readBmp(std::ifstream& file) {
-  throw std::runtime_error("Error: BMP reading not yet implemented");
-}
-
-void Image::readBpg(std::ifstream& file) {
-  throw std::runtime_error("Error: BPG reading not yet implemented");
-}
-
 void Image::read(const std::string& fileName) {
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
     const std::string format = extractFileExt(fileName);
 
-    if (format == "jpg" || format == "jpeg" || format == "JPG" || format == "JPEG")
-      readJpeg(file);
-    else if (format == "png" || format == "PNG")
+    if (format == "png" || format == "PNG")
       readPng(file);
-    else if (format == "tga" || format == "TGA")
-      readTga(file);
-    else if (format == "bmp" || format == "BMP")
-      readBmp(file);
-    else if (format == "bpg" || format == "BPG")
-      readBpg(file);
     else
-      throw std::runtime_error("Error: '" + format + "' format is not supported");
+      std::cerr << "Warning: '" + format + "' format is not supported, image ignored";
   } else {
     throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
   }
