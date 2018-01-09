@@ -14,7 +14,7 @@ class Model : public Transform {
 public:
   Model(const Vec3f& topLeftPos, const Vec3f& topRightPos,
         const Vec3f& bottomRightPos, const Vec3f& bottomLeftPos,
-        const Material& material);
+        MaterialPtr material);
   explicit Model(MeshPtr mesh) : m_mesh{ std::move(mesh) } {}
 
   const MeshPtr getMesh() const { return m_mesh; }

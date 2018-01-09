@@ -10,7 +10,8 @@ void Mesh::load() const {
 void Mesh::draw() const {
   for (const auto& submesh : m_submeshes) {
     glActiveTexture(GL_TEXTURE0);
-    m_materials[submesh->getMaterialIndex()].getTexture()->bind();
+    m_materials[submesh->getMaterialIndex()]->getDiffuseMap()->bind();
+
     submesh->draw();
   }
 }

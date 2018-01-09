@@ -13,7 +13,7 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height) : m_program(Ve
                                       Vec3f({ 1.f, 1.f, 0.f }),
                                       Vec3f({ 1.f, -1.f, 0.f }),
                                       Vec3f({ -1.f, -1.f, 0.f }));
-  m_viewport->addMaterial(Material(m_colorBuffer));
+  m_viewport->addMaterial(std::make_unique<Material>(m_colorBuffer));
   glGenFramebuffers(1, &m_index);
 
   bind();

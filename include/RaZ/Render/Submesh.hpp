@@ -23,6 +23,8 @@ public:
   std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
   std::size_t getIndexCount() const { return getEbo().getIndices().size(); }
 
+  void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
+
   void load() const;
   void draw() const;
 
