@@ -1,0 +1,362 @@
+newmtl leaf
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_thorn_diff.png
+	map_Kd ../assets/textures/sponza_thorn_diff.png
+	map_d ../assets/textures/sponza_thorn_mask.png
+	map_bump ../assets/textures/sponza_thorn_bump.png
+
+newmtl vase_round
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/vase_round.png
+	map_Kd ../assets/textures/vase_round.png
+	map_bump ../assets/textures/vase_round_bump.png
+
+newmtl Material__57
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/vase_plant.png
+	map_Kd ../assets/textures/vase_plant.png
+	map_d ../assets/textures/vase_plant_mask.png
+
+newmtl Material__298
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/background.png
+	map_Kd ../assets/textures/background.png
+	map_bump ../assets/textures/background_bump.png
+
+
+newmtl bricks
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 1 1 1
+	Ks 0.01 0.01 0.01
+	Ke 0.0000 0.0000 0.0000
+	map_Ks ../assets/textures/spnza_bricks_a_spec.png
+	map_Ka ../assets/textures/spnza_bricks_a_diff.png
+	map_Kd ../assets/textures/spnza_bricks_a_diff.png
+	map_bump ../assets/textures/spnza_bricks_a_bump.png
+
+newmtl arch
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_arch_diff.png
+	map_Kd ../assets/textures/sponza_arch_diff.png
+
+newmtl ceiling
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_ceiling_a_diff.png
+	map_Kd ../assets/textures/sponza_ceiling_a_diff.png
+
+newmtl column_a
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_column_a_diff.png
+	map_Kd ../assets/textures/sponza_column_a_diff.png
+	map_bump ../assets/textures/sponza_column_a_bump.png
+
+newmtl floor
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_floor_a_diff.png
+	map_Kd ../assets/textures/sponza_floor_a_diff.png
+
+newmtl column_c
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_column_c_diff.png
+	map_Kd ../assets/textures/sponza_column_c_diff.png
+	map_bump ../assets/textures/sponza_column_c_bump.png
+
+newmtl details
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_details_diff.png
+	map_Kd ../assets/textures/sponza_details_diff.png
+
+newmtl column_b
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_column_b_diff.png
+	map_Kd ../assets/textures/sponza_column_b_diff.png
+	map_bump ../assets/textures/sponza_column_b_bump.png
+
+newmtl Material__47
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+
+newmtl flagpole
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_flagpole_diff.png
+	map_Kd ../assets/textures/sponza_flagpole_diff.png
+
+newmtl fabric_e
+	Ns 0.1000
+	Ni 1.000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_fabric_green_diff.png
+	map_Kd ../assets/textures/sponza_fabric_green_diff.png
+
+newmtl fabric_d
+	Ns 0.1000
+	Ni 1.000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_fabric_blue_diff.png
+	map_Kd ../assets/textures/sponza_fabric_blue_diff.png
+
+newmtl fabric_a
+	Ns 0.1000
+	Ni 1.000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_fabric_diff.png
+	map_Kd ../assets/textures/sponza_fabric_diff.png
+
+newmtl fabric_g
+	Ns 0.1000
+	Ni 1.0000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_curtain_blue_diff.png
+	map_Kd ../assets/textures/sponza_curtain_blue_diff.png
+
+newmtl fabric_c
+	Ns 0.1000
+	Ni 1.0000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_curtain_diff.png
+	map_Kd ../assets/textures/sponza_curtain_diff.png
+
+newmtl fabric_f
+	Ns 0.1000
+	Ni 1.0000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_curtain_green_diff.png
+	map_Kd ../assets/textures/sponza_curtain_green_diff.png
+
+newmtl chain
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0100 0.0100 0.0100
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/chain_texture.png
+	map_Kd ../assets/textures/chain_texture.png
+	map_d ../assets/textures/chain_texture_mask.png
+	map_bump ../assets/textures/chain_texture_bump.png
+
+newmtl vase_hanging
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/vase_hanging.png
+	map_Kd ../assets/textures/vase_hanging.png
+
+newmtl vase
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/vase_dif.png
+	map_Kd ../assets/textures/vase_dif.png
+	map_bump ../assets/textures/vase_bump.png
+
+newmtl Material__25
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/lion.png
+	map_Kd ../assets/textures/lion.png
+	map_bump ../assets/textures/lion_bump.png
+
+newmtl roof
+	Ns 10.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000
+	illum 2
+	Ka 0.5880 0.5880 0.5880
+	Kd 0.5880 0.5880 0.5880
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka ../assets/textures/sponza_roof_diff.png
+	map_Kd ../assets/textures/sponza_roof_diff.png
