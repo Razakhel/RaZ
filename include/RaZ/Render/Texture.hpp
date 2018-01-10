@@ -18,7 +18,6 @@ public:
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
   GLuint getIndex() const { return m_index; }
-  const ImagePtr& getImage() const { return m_image; }
 
   void load(const std::string& fileName);
   void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
@@ -28,7 +27,6 @@ public:
 
 private:
   GLuint m_index {};
-  ImagePtr m_image {};
 };
 
 using TexturePtr = std::shared_ptr<Texture>;

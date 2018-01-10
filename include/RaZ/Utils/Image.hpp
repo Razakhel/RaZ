@@ -36,8 +36,6 @@ private:
   std::vector<uint8_t> m_data;
 };
 
-using ImagePtr = std::unique_ptr<Image>;
-
 } // namespace Raz
 
 #endif // RAZ_IMAGE_HPP
