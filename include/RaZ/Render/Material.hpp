@@ -41,7 +41,7 @@ private:
   float m_transparency {};
 
   TexturePtr m_ambientMap {};
-  TexturePtr m_diffuseMap = std::make_shared<Texture>();
+  TexturePtr m_diffuseMap {};
   TexturePtr m_specularMap {};
   TexturePtr m_transparencyMap {};
   TexturePtr m_bumpMap {};

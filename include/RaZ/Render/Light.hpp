@@ -5,7 +5,6 @@
 
 #include <memory>
 
-#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Math/Transform.hpp"
 

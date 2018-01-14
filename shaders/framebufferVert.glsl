@@ -7,5 +7,6 @@ out vec2 fragTexcoords;
 
 void main() {
   fragTexcoords = vertTexcoords;
-  gl_Position = vec4(vertPosition.x, vertPosition.y, 0.0, 1.0);
+
+  gl_Position = vec4(vertPosition, 0.0, 1.0);
 }

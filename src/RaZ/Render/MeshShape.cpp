@@ -58,6 +58,7 @@ Mesh::Mesh(const Vec3f& topLeftPos, const Vec3f& topRightPos, const Vec3f& botto
   bottomLeft.texcoords = Vec2f({ 0.f, 0.f });
 
   // Computing normals
+  // TODO: normals should not be computed (or even exist) for simple display quads like a framebuffer
   topLeft.normals = (topLeftPos - topRightPos).cross(topLeftPos - bottomLeftPos).normalize();
   topRight.normals = (topRightPos - bottomRightPos).cross(topRightPos - topLeftPos).normalize();
   bottomRight.normals = (bottomRightPos - bottomLeftPos).cross(bottomRightPos - topRightPos).normalize();

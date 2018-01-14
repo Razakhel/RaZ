@@ -13,7 +13,7 @@ namespace Raz {
 
 class Image {
 public:
-  Image() : m_data(3, 255) {}
+  Image() = default;
   explicit Image(const std::string& fileName) { read(fileName); }
 
   std::size_t getWidth() const { return m_width; }
@@ -24,11 +24,7 @@ public:
 
 private:
   void read(const std::string& fileName);
-  void readJpeg(std::ifstream& fileName);
   void readPng(std::ifstream& fileName);
-  void readTga(std::ifstream& fileName);
-  void readBmp(std::ifstream& fileName);
-  void readBpg(std::ifstream& fileName);
 
   std::size_t m_width {};
   std::size_t m_height {};

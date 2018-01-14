@@ -29,8 +29,8 @@ public:
   void draw() const;
 
 private:
-  std::vector<SubmeshPtr> m_submeshes;
-  std::vector<MaterialPtr> m_materials;
+  std::vector<SubmeshPtr> m_submeshes {};
+  std::vector<MaterialPtr> m_materials {};
 };
 
 using MeshPtr = std::shared_ptr<Mesh>;
