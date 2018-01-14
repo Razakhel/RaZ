@@ -8,7 +8,7 @@ int main() {
   Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
 
   const Raz::VertexShader vertShader("../shaders/vert.glsl");
-  const Raz::FragmentShader fragShader("../shaders/lambert.glsl");
+  const Raz::FragmentShader fragShader("../shaders/blinn-phong.glsl");
 
   Raz::Scene scene(vertShader, fragShader);
 
@@ -29,7 +29,7 @@ int main() {
                                                         window.getHeight(),
                                                         45.f,                             // Field of view
                                                         0.1f, 100.f,                      // Near plane, far plane
-                                                        Raz::Vec3f({ 0.f, 0.f, -3.f }));  // Initial position
+                                                        Raz::Vec3f({ 5.f, 1.f, -5.f }));  // Initial position
 
   const auto modelPtr = model.get();
   const auto lightPtr = light.get();
@@ -42,7 +42,7 @@ int main() {
   });
 
   // Allow framebuffer toggling
-  bool renderFramebuffer = false;
+  bool renderFramebuffer = true;
   window.addKeyCallback(Raz::Keyboard::B, [&renderFramebuffer] () {
     renderFramebuffer = !renderFramebuffer;
     std::cout << "Framebuffer " << (renderFramebuffer ? "ON" : "OFF") << std::endl;
@@ -78,10 +78,6 @@ int main() {
   scene.addLight(std::move(light));
   scene.setCamera(std::move(camera));
 
-  scene.getProgram().use();
-  glUniform1i(glGetUniformLocation(scene.getProgram().getIndex(), "uniDepthBuffer"), 1);
-  glUniform1i(glGetUniformLocation(scene.getProgram().getIndex(), "uniSceneColorBuffer"), 2);
-
   auto lastTime = std::chrono::system_clock::now();
   uint16_t nbFrames = 0;
 
@@ -98,14 +94,9 @@ int main() {
 
     if (renderFramebuffer) {
       framebuffer.bind();
-
-      glActiveTexture(GL_TEXTURE1);
-      framebuffer.getDepthBuffer()->bind();
-      glActiveTexture(GL_TEXTURE2);
-      framebuffer.getColorBuffer()->bind();
       scene.render();
-
       framebuffer.unbind();
+
       framebuffer.display();
     } else {
       scene.render();
