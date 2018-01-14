@@ -12,12 +12,16 @@ out MeshInfo {
   vec3 vertNormal;
 } fragMeshInfo;
 
+out vec3 fragNormal;
+
 void main() {
   vec4 pos = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
 
   fragMeshInfo.vertPosition = pos.xyz;
   fragMeshInfo.vertTexcoords = vertTexcoords;
   fragMeshInfo.vertNormal = mat3(uniMvpMatrix) * vertNormal;
+
+  fragNormal = vertNormal;
 
   gl_Position = pos;
 }

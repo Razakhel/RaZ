@@ -21,8 +21,14 @@ in MeshInfo {
   vec2 vertTexcoords;
   vec3 vertNormal;
 } fragMeshInfo;
+in vec3 fragNormal;
+
+layout (location = 1) out vec3 bufferNormal;
+out vec4 fragColor;
 
 void main() {
+  bufferNormal = normalize(fragNormal);
+
   vec3 norm = normalize(fragMeshInfo.vertNormal);
   vec3 color = texture(uniTexture, fragMeshInfo.vertTexcoords).rgb;
   vec3 ambient = color * 0.05;
@@ -49,5 +55,5 @@ void main() {
     specular += uniLights[lightIndex].color * pow(max(dot(norm, halfDir), 0.0), 32.0);
   }
 
-  gl_FragColor = vec4(ambient + diffuse + specular, 1.0);
+  fragColor = vec4(ambient + diffuse + specular, 1.0);
 }

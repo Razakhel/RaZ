@@ -21,8 +21,14 @@ in MeshInfo {
   vec2 vertTexcoords;
   vec3 vertNormal;
 } fragMeshInfo;
+in vec3 fragNormal;
+
+layout (location = 1) out vec3 bufferNormal;
+out vec4 fragColor;
 
 void main() {
+  bufferNormal = normalize(fragNormal);
+
   vec3 norm = normalize(fragMeshInfo.vertNormal);
   float lightHitAngle = 0.0;
 
@@ -39,5 +45,5 @@ void main() {
     lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, norm), 0.0, 1.0));
   }
 
-  gl_FragColor = vec4(lightHitAngle * texture(uniTexture, fragMeshInfo.vertTexcoords).rgb, 1.0);
+  fragColor = vec4(lightHitAngle * texture(uniTexture, fragMeshInfo.vertTexcoords).rgb, 1.0);
 }
