@@ -4,10 +4,6 @@ uniform mat4 uniProjectionMatrix;
 uniform mat4 uniInvProjMatrix;
 uniform mat4 uniViewMatrix;
 uniform mat4 uniInvViewMatrix;
-uniform mat4 uniViewProjMatrix;
-uniform mat4 uniInvViewProjMatrix;
-uniform mat4 uniMvpMatrix;
-uniform mat4 uniInvMvpMatrix;
 
 uniform sampler2D uniSceneDepthBuffer;
 uniform sampler2D uniSceneColorBuffer;
@@ -22,7 +18,7 @@ const uint maxRaySteps = 30u;
 const uint maxBinaryRefinement = 5u;
 const float maxThreshold = 1000.0;
 
-vec3 hash(vec3 vec) {
+/*vec3 hash(vec3 vec) {
   vec = fract(vec * vec3(0.8));
   vec += dot(vec, vec.yxz + 19.19);
 
@@ -53,7 +49,7 @@ vec2 binaryRefinement(vec3 dir, vec3 hitCoords) {
   projCoords.xy = projCoords.xy * 0.5 + 0.5;
 
   return projCoords.xy;
-}
+}*/
 
 vec2 recoverHitCoords(vec3 dir, vec3 hitCoords) {
   vec4 projCoords;
@@ -63,7 +59,7 @@ vec2 recoverHitCoords(vec3 dir, vec3 hitCoords) {
   for (uint i = 0u; i < maxRaySteps; ++i) {
     hitCoords += dir;
 
-    projCoords = vec4(hitCoords, 1.0);
+    projCoords = uniProjectionMatrix * vec4(hitCoords, 1.0);
     projCoords.xy /= projCoords.w;
     projCoords.xy = projCoords.xy * 0.5 + 0.5;
 
@@ -74,8 +70,8 @@ vec2 recoverHitCoords(vec3 dir, vec3 hitCoords) {
 
     float depthDiff = hitCoords.z - depth;
 
-    if ((dir.z - depthDiff) < 1.2) {
-      if (depthDiff <= 0.0)
+    if (dir.z - depthDiff < 1.2) {
+      if (depthDiff >= 0.0)
         return projCoords.xy/*binaryRefinement(dir, hitCoords)*/;
     }
   }
@@ -84,18 +80,18 @@ vec2 recoverHitCoords(vec3 dir, vec3 hitCoords) {
 }
 
 void main() {
-  vec3 viewNormal = normalize((uniInvViewMatrix * texture(uniSceneNormalBuffer, fragTexcoords)).rgb);
+  vec3 viewNormal = (uniInvProjMatrix * texture(uniSceneNormalBuffer, fragTexcoords)).rgb;
 
   float depth = texture(uniSceneDepthBuffer, fragTexcoords).r;
-  vec3 projPos = vec3(fragTexcoords.x * 2.0 - 1.0, (1.0 - fragTexcoords.y) * 2.0 - 1.0, depth);
+  vec3 projPos = vec3(fragTexcoords.x, 1.0 - fragTexcoords.y, depth) * 2.0 - 1.0;
   vec4 viewPos = uniInvProjMatrix * vec4(projPos, 1.0);
   viewPos /= viewPos.w;
-  vec3 worldPos = (uniInvViewMatrix * viewPos).xyz;
+  //vec3 worldPos = (uniInvViewMatrix * viewPos).xyz;
 
-  vec3 jittering = mix(vec3(0.0), vec3(hash(worldPos)), 1.0);
+  //vec3 jittering = mix(vec3(0.0), vec3(hash(worldPos)), 1.0);
 
-  vec3 reflectDir = reflect(normalize(viewPos.xyz), viewNormal);
+  vec3 reflectDir = reflect(normalize(viewPos.xyz), normalize(viewNormal));
   vec3 reflectColor = texture(uniSceneColorBuffer, recoverHitCoords(reflectDir * max(0.1, -viewPos.z), viewPos.xyz)).rgb;
 
-  fragColor = vec4(/*reflectColor + */texture(uniSceneColorBuffer, fragTexcoords).rgb, 1.0);
+  fragColor = vec4(reflectColor + texture(uniSceneColorBuffer, fragTexcoords).rgb, 1.0);
 }
