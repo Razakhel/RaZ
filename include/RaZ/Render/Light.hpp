@@ -37,14 +37,14 @@ class PointLight : public Light {
 public:
   PointLight(const Vec3f& position, const Vec3f& color) : Light(position, color) {}
 
-  Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 0.f); }
+  Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 1.f); }
 };
 
 class DirectionalLight : public Light {
 public:
   DirectionalLight(const Vec3f& position, const Vec3f& direction, const Vec3f& color) : Light(position, direction, color) {}
 
-  Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 1.f); }
+  Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 0.f); }
 };
 
 class SpotLight : public Light {

@@ -23,8 +23,8 @@ in MeshInfo {
 } fragMeshInfo;
 in vec3 fragNormal;
 
+layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec3 bufferNormal;
-out vec4 fragColor;
 
 void main() {
   bufferNormal = normalize(fragNormal);
@@ -41,10 +41,10 @@ void main() {
     // Diffuse
     vec3 lightDir;
 
-    if (uniLights[lightIndex].position.w == 0.0) {
+    if (uniLights[lightIndex].position.w != 0.0) {
       lightDir = normalize(lightPos - fragMeshInfo.vertPosition);
     } else {
-      lightDir = uniLights[lightIndex].direction;
+      lightDir = normalize(-uniLights[lightIndex].direction);
     }
 
     diffuse += max(dot(lightDir, norm), 0.0) * color;
