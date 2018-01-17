@@ -18,6 +18,7 @@ public:
   const TexturePtr& getDepthBuffer() const { return m_depthBuffer; }
   const TexturePtr& getColorBuffer() const { return m_colorBuffer; }
   const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
+  const ShaderProgram& getProgram() const { return m_program; }
 
   void bind() const;
   void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
