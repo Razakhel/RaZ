@@ -27,9 +27,9 @@ int main() {
 
   Raz::CameraPtr camera = std::make_unique<Raz::Camera>(window.getWidth(),
                                                         window.getHeight(),
-                                                        45.f,                             // Field of view
-                                                        0.1f, 100.f,                      // Near plane, far plane
-                                                        Raz::Vec3f({ 5.f, 1.f, -5.f }));  // Initial position
+                                                        45.f,                              // Field of view
+                                                        0.1f, 100.f,                       // Near plane, far plane
+                                                        Raz::Vec3f({ 50.f, 1.f, -5.f }));  // Initial position
 
   const auto modelPtr = model.get();
   const auto lightPtr = light.get();
@@ -94,7 +94,7 @@ int main() {
 
     if (renderFramebuffer) {
       framebuffer.bind();
-      scene.render();
+      scene.render(&framebuffer);
       framebuffer.unbind();
 
       framebuffer.display();

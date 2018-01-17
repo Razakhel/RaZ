@@ -16,12 +16,13 @@ out vec3 fragNormal;
 
 void main() {
   vec4 pos = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
+  vec3 norm = mat3(uniMvpMatrix) * vertNormal;
 
   fragMeshInfo.vertPosition = pos.xyz;
   fragMeshInfo.vertTexcoords = vertTexcoords;
-  fragMeshInfo.vertNormal = mat3(uniMvpMatrix) * vertNormal;
+  fragMeshInfo.vertNormal = norm;
 
-  fragNormal = vertNormal;
+  fragNormal = norm;
 
   gl_Position = pos;
 }
