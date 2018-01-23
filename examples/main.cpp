@@ -5,6 +5,8 @@
 
 int main() {
   Raz::Window window(800, 600, "RaZ");
+  window.disableVerticalSync();
+
   Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
 
   const Raz::VertexShader vertShader("../shaders/vert.glsl");
@@ -42,7 +44,7 @@ int main() {
   });
 
   // Allow framebuffer toggling
-  bool renderFramebuffer = true;
+  bool renderFramebuffer = false;
   window.addKeyCallback(Raz::Keyboard::B, [&renderFramebuffer] () {
     renderFramebuffer = !renderFramebuffer;
     std::cout << "Framebuffer " << (renderFramebuffer ? "ON" : "OFF") << std::endl;
@@ -69,14 +71,27 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(10.f, 0.f, 1.f, 0.f); });
 
   // Light controls
-  window.addKeyCallback(Raz::Keyboard::I, [&lightPtr] () { lightPtr->translate(0.f, 0.f, 0.5f); });
-  window.addKeyCallback(Raz::Keyboard::K, [&lightPtr] () { lightPtr->translate(0.f, 0.f, -0.5f); });
-  window.addKeyCallback(Raz::Keyboard::J, [&lightPtr] () { lightPtr->translate(-0.5f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::L, [&lightPtr] () { lightPtr->translate(0.5f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::I, [&lightPtr, &scene] () { lightPtr->translate(0.f, 0.f, 0.5f); scene.updateLights(); });
+  window.addKeyCallback(Raz::Keyboard::K, [&lightPtr, &scene] () { lightPtr->translate(0.f, 0.f, -0.5f); scene.updateLights(); });
+  window.addKeyCallback(Raz::Keyboard::J, [&lightPtr, &scene] () { lightPtr->translate(-0.5f, 0.f, 0.f); scene.updateLights(); });
+  window.addKeyCallback(Raz::Keyboard::L, [&lightPtr, &scene] () { lightPtr->translate(0.5f, 0.f, 0.f); scene.updateLights(); });
 
   scene.addModel(std::move(model));
   scene.addLight(std::move(light));
-  scene.setCamera(std::move(camera));
+  scene.updateLights();
+  //scene.setCamera(std::move(camera));
+
+  const int uniProjectionLocation = framebuffer.getProgram().recoverUniformLocation("uniProjectionMatrix");
+  const int uniInvProjLocation = framebuffer.getProgram().recoverUniformLocation("uniInvProjMatrix");
+  const int uniViewLocation = framebuffer.getProgram().recoverUniformLocation("uniViewMatrix");
+  const int uniInvViewLocation = framebuffer.getProgram().recoverUniformLocation("uniInvViewMatrix");
+
+  const int uniViewProjLocation = scene.getProgram().recoverUniformLocation("uniViewProjMatrix");
+
+  framebuffer.getProgram().use();
+  framebuffer.getProgram().sendUniform("uniSceneDepthBuffer", 0);
+  framebuffer.getProgram().sendUniform("uniSceneColorBuffer", 1);
+  framebuffer.getProgram().sendUniform("uniSceneNormalBuffer", 2);
 
   auto lastTime = std::chrono::system_clock::now();
   uint16_t nbFrames = 0;
@@ -92,14 +107,34 @@ int main() {
       lastTime = currentTime;
     }
 
+    const Raz::Mat4f projectionMat = cameraPtr->computePerspectiveMatrix();
+    const Raz::Mat4f viewMat = cameraPtr->lookAt(modelPtr->getPosition());
+    const Raz::Mat4f viewProjMat = projectionMat * viewMat;
+
     if (renderFramebuffer) {
       framebuffer.bind();
-      scene.render(&framebuffer);
+
+      framebuffer.getProgram().sendUniform(uniProjectionLocation, projectionMat);
+      framebuffer.getProgram().sendUniform(uniInvProjLocation, projectionMat.inverse());
+      framebuffer.getProgram().sendUniform(uniViewLocation, viewMat);
+      framebuffer.getProgram().sendUniform(uniInvViewLocation, viewMat.inverse());
+
+      scene.render(viewProjMat);
       framebuffer.unbind();
 
+      glActiveTexture(GL_TEXTURE0);
+      framebuffer.getDepthBuffer()->bind();
+      glActiveTexture(GL_TEXTURE1);
+      framebuffer.getColorBuffer()->bind();
+      glActiveTexture(GL_TEXTURE2);
+      framebuffer.getNormalBuffer()->bind();
+
+      framebuffer.getProgram().use();
       framebuffer.display();
     } else {
-      scene.render();
+      scene.getProgram().sendUniform(uniViewProjLocation, viewProjMat);
+
+      scene.render(viewProjMat);
     }
   }
 
