@@ -6,7 +6,7 @@
 #include <string>
 #include <initializer_list>
 
-#include "GL/glew.h"
+#include "glew/include/GL/glew.h"
 
 enum ShaderType { RAZ_SHADER_TYPE_VERTEX = GL_VERTEX_SHADER,
                   RAZ_SHADER_TYPE_FRAGMENT = GL_FRAGMENT_SHADER,
@@ -47,21 +47,6 @@ public:
 
 private:
   FragmentShader() : Shader(RAZ_SHADER_TYPE_FRAGMENT) {}
-};
-
-class ShaderProgram {
-public:
-  ShaderProgram() : m_index{ glCreateProgram() } {}
-  ShaderProgram(const VertexShader& vertShader, const FragmentShader& fragShader)
-    : ShaderProgram() { attachShaders(vertShader, fragShader); }
-
-  GLuint getIndex() const { return m_index; }
-
-  void attachShaders(const VertexShader& vertShader, const FragmentShader& fragShader) const;
-  void use() const { glUseProgram(m_index); }
-
-private:
-  GLuint m_index;
 };
 
 } // namespace Raz

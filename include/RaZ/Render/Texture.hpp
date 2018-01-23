@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "GL/glew.h"
+#include "glew/include/GL/glew.h"
 #include "RaZ/Utils/Image.hpp"
 
 namespace Raz {
