@@ -1,6 +1,11 @@
 #include <iostream>
 
-#include "GL/glew.h"
+#include "glew/include/GL/glew.h"
+#if defined(_WIN32)
+#include "glew/include/GL/wglew.h"
+#elif defined(__gnu_linux__)
+#include "glew/include/GL/glxew.h"
+#endif
 #include "RaZ/Utils/Window.hpp"
 
 namespace Raz {
@@ -59,12 +64,12 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
 
   m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
   if (!m_window) {
-    std::cerr << "Error: Failed to create GLFW Window." << std::endl;
-    glfwTerminate();
+    close();
+    throw std::runtime_error("Error: Failed to create GLFW Window");
   }
 
   glfwMakeContextCurrent(m_window);
-  updateKeyCallback();
+  updateKeyCallbacks();
 
   glViewport(0, 0, width, height);
 
@@ -79,14 +84,30 @@ Window::Window(unsigned int width, unsigned int height, const std::string& name)
   glEnable(GL_DEPTH_TEST);
 }
 
+void Window::enableVerticalSync(bool value) {
+#if defined(_WIN32)
+  if (wglGetExtensionsStringEXT())
+    wglSwapIntervalEXT(value);
+  else
+    std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
+#elif defined(__gnu_linux__)
+  if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
+    glXSwapIntervalEXT(glXGetCurrentDisplay(), glXGetCurrentDrawable(), value);
+    glXSwapIntervalMESA(static_cast<unsigned int>(value));
+  } else {
+    std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
+  }
+#endif
+}
+
 void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
   m_keyCallbacks.emplace_back(key, func);
   glfwSetWindowUserPointer(m_window, &m_keyCallbacks);
 
-  updateKeyCallback();
+  updateKeyCallbacks();
 }
 
-void Window::updateKeyCallback() const {
+void Window::updateKeyCallbacks() const {
   glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int scancode, int action, int mode) {
     const CallbacksList& callbackList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
 

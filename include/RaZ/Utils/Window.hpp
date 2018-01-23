@@ -6,7 +6,7 @@
 #include <vector>
 #include <functional>
 
-#include "GLFW/glfw3.h"
+#include "glfw/include/GLFW/glfw3.h"
 #include "RaZ/Utils/Keyboard.hpp"
 
 namespace Raz {
@@ -20,8 +20,10 @@ public:
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
 
+  void enableVerticalSync(bool value = true);
+  void disableVerticalSync() { enableVerticalSync(false); }
   void addKeyCallback(Keyboard::Key key, std::function<void()> func);
-  void updateKeyCallback() const;
+  void updateKeyCallbacks() const;
   bool run() const;
   void close() const { glfwTerminate(); }
 
