@@ -15,12 +15,6 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height) : m_program(Ve
                                       Vec3f({ -1.f, -1.f, 0.f }));
   glGenFramebuffers(1, &m_index);
 
-  m_program.use();
-
-  glUniform1i(glGetUniformLocation(m_program.getIndex(), "uniSceneDepthBuffer"), 0);
-  glUniform1i(glGetUniformLocation(m_program.getIndex(), "uniSceneColorBuffer"), 1);
-  glUniform1i(glGetUniformLocation(m_program.getIndex(), "uniSceneNormalBuffer"), 2);
-
   const std::array<GLenum, 2> colorBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
   bind();
@@ -43,15 +37,6 @@ void Framebuffer::bind() const {
 
 void Framebuffer::display() const {
   glClear(GL_COLOR_BUFFER_BIT);
-
-  m_program.use();
-
-  glActiveTexture(GL_TEXTURE0);
-  m_depthBuffer->bind();
-  glActiveTexture(GL_TEXTURE1);
-  m_colorBuffer->bind();
-  glActiveTexture(GL_TEXTURE2);
-  m_normalBuffer->bind();
 
   m_viewport->draw();
 }

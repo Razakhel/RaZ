@@ -3,10 +3,10 @@
 #ifndef RAZ_FRAMEBUFFER_HPP
 #define RAZ_FRAMEBUFFER_HPP
 
-#include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Render/Shader.hpp"
-#include "RaZ/Render/Texture.hpp"
 #include "glew/include/GL/glew.h"
+#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
@@ -14,7 +14,6 @@ class Framebuffer {
 public:
   Framebuffer(unsigned int width, unsigned int height);
 
-  GLuint getIndex() const { return m_index; }
   const TexturePtr& getDepthBuffer() const { return m_depthBuffer; }
   const TexturePtr& getColorBuffer() const { return m_colorBuffer; }
   const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
