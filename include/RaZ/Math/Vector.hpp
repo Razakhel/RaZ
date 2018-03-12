@@ -32,13 +32,13 @@ public:
   std::size_t hash(std::size_t seed) const;
 
   Vector operator-() const { return (*this * -1); }
-  Vector operator+(Vector vec) const;
+  Vector operator+(const Vector& vec) const;
   Vector operator+(float val) const;
-  Vector operator-(Vector vec) const;
+  Vector operator-(const Vector& vec) const;
   Vector operator-(float val) const;
-  Vector operator*(Vector vec) const;
+  Vector operator*(const Vector& vec) const;
   Vector operator*(float val) const;
-  Vector operator/(Vector vec) const;
+  Vector operator/(const Vector& vec) const;
   Vector operator/(float val) const;
   template <std::size_t H> Vector operator*(const Matrix<T, Size, H>& mat) const;
   Vector& operator+=(const Vector& vec);

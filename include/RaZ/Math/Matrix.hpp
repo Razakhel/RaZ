@@ -27,13 +27,13 @@ public:
   float computeDeterminant() const;
   Matrix inverse() const;
 
-  Matrix operator+(Matrix mat) const;
+  Matrix operator+(const Matrix& mat) const;
   Matrix operator+(float val) const;
-  Matrix operator-(Matrix mat) const;
+  Matrix operator-(const Matrix& mat) const;
   Matrix operator-(float val) const;
-  Matrix operator%(Matrix mat) const;
+  Matrix operator%(const Matrix& mat) const;
   Matrix operator*(float val) const;
-  Matrix operator/(Matrix mat) const;
+  Matrix operator/(const Matrix& mat) const;
   Matrix operator/(float val) const;
   //template <std::size_t Size> Vector<T, Size> operator*(const Vector<T, Size>& vec) const;
   template <std::size_t WI, std::size_t HI> Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat) const;

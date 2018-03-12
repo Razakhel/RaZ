@@ -245,9 +245,10 @@ Matrix<T, W, H> Matrix<T, W, H>::inverse() const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator+(Matrix mat) const {
-  mat += *this;
-  return mat;
+Matrix<T, W, H> Matrix<T, W, H>::operator+(const Matrix& mat) const {
+  Matrix<T, W, H> res = *this;
+  res += mat;
+  return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
@@ -258,9 +259,10 @@ Matrix<T, W, H> Matrix<T, W, H>::operator+(float val) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator-(Matrix mat) const {
-  mat -= *this;
-  return mat;
+Matrix<T, W, H> Matrix<T, W, H>::operator-(const Matrix& mat) const {
+  Matrix<T, W, H> res = *this;
+  res -= mat;
+  return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
@@ -271,9 +273,10 @@ Matrix<T, W, H> Matrix<T, W, H>::operator-(float val) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator%(Matrix mat) const {
-  mat %= *this;
-  return mat;
+Matrix<T, W, H> Matrix<T, W, H>::operator%(const Matrix& mat) const {
+  Matrix<T, W, H> res = *this;
+  res %= mat;
+  return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
@@ -284,9 +287,10 @@ Matrix<T, W, H> Matrix<T, W, H>::operator*(float val) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator/(Matrix mat) const {
-  mat /= *this;
-  return mat;
+Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const {
+  Matrix<T, W, H> res = *this;
+  res /= mat;
+  return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
@@ -301,7 +305,7 @@ template <std::size_t WI, std::size_t HI>
 Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const {
   static_assert(W == HI, "Error: Input matrix's width must be equal to current matrix's height.");
 
-  Matrix<T, H, WI> res;
+  Matrix<T, H, WI> res {};
 
   for (std::size_t currHeightIndex = 0; currHeightIndex < H; ++currHeightIndex) {
     for (std::size_t inHeightIndex = 0; inHeightIndex < HI; ++inHeightIndex) {
