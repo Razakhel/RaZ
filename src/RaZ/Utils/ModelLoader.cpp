@@ -154,7 +154,7 @@ ModelPtr importObj(std::ifstream& file) {
 
       const auto indexIter = indicesMap.find(vertIndices);
       if (indexIter != indicesMap.cend()) {
-        mesh->getSubmeshes()[submeshIndex]->getEbo().getIndices().emplace_back(indexIter->second);
+        mesh->getSubmeshes().front()->getIndices().emplace_back(indexIter->second);
       } else {
         Vertex vert {};
 
@@ -173,7 +173,7 @@ ModelPtr importObj(std::ifstream& file) {
           vert.normals[2] = normals[normIndex][2];
         }
 
-        mesh->getSubmeshes()[submeshIndex]->getEbo().getIndices().emplace_back(indicesMap.size());
+        mesh->getSubmeshes().front()->getIndices().emplace_back(indicesMap.size());
         indicesMap.emplace(vertIndices, indicesMap.size());
         mesh->getSubmeshes()[submeshIndex]->getVbo().getVertices().push_back(vert);
       }
@@ -193,18 +193,32 @@ ModelPtr importOff(std::ifstream& file) {
   file.ignore(100, '\n');
 
   mesh->getSubmeshes().front()->getVbo().getVertices().resize(vertexCount * 3);
-  mesh->getSubmeshes().front()->getEbo().getIndices().resize(faceCount * 3);
 
   for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
     file >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[0]
          >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[1]
          >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[2];
 
-  for (std::size_t faceIndex = 0; faceIndex < faceCount * 3; faceIndex += 3) {
-    file.ignore(2);
-    file >> mesh->getSubmeshes().front()->getEbo().getIndices()[faceIndex]
-         >> mesh->getSubmeshes().front()->getEbo().getIndices()[faceIndex + 1]
-         >> mesh->getSubmeshes().front()->getEbo().getIndices()[faceIndex + 2];
+  for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex) {
+    uint16_t partCount {};
+    file >> partCount;
+
+    mesh->getSubmeshes().front()->getIndices().reserve(mesh->getSubmeshes().front()->getIndices().size() + partCount);
+
+    std::vector<std::size_t> indices(partCount);
+    file >> indices[0] >> indices[1] >> indices[2];
+
+    mesh->getSubmeshes().front()->getIndices().emplace_back(indices[0]);
+    mesh->getSubmeshes().front()->getIndices().emplace_back(indices[1]);
+    mesh->getSubmeshes().front()->getIndices().emplace_back(indices[2]);
+
+    for (uint16_t partIndex = 3; partIndex < partCount; ++partIndex) {
+      file >> indices[partIndex];
+
+      mesh->getSubmeshes().front()->getIndices().emplace_back(indices[0]);
+      mesh->getSubmeshes().front()->getIndices().emplace_back(indices[partIndex - 1]);
+      mesh->getSubmeshes().front()->getIndices().emplace_back(indices[partIndex]);
+    }
   }
 
   return std::make_unique<Model>(std::move(mesh));

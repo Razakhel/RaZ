@@ -19,6 +19,8 @@ public:
   VertexBuffer& getVbo() { return m_vbo; }
   const ElementBuffer& getEbo() const { return m_vao.getEbo(); }
   ElementBuffer& getEbo() { return m_vao.getEbo(); }
+  const std::vector<unsigned int>& getIndices() const { return m_vao.getEbo().getIndices(); }
+  std::vector<unsigned int>& getIndices() { return m_vao.getEbo().getIndices(); }
   std::size_t getMaterialIndex() const { return m_materialIndex; }
   std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
   std::size_t getIndexCount() const { return getEbo().getIndices().size(); }
