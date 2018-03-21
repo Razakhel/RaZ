@@ -154,7 +154,7 @@ ModelPtr importObj(std::ifstream& file) {
 
       const auto indexIter = indicesMap.find(vertIndices);
       if (indexIter != indicesMap.cend()) {
-        mesh->getSubmeshes().front()->getIndices().emplace_back(indexIter->second);
+        mesh->getSubmeshes()[submeshIndex]->getIndices().emplace_back(indexIter->second);
       } else {
         Vertex vert {};
 
@@ -173,9 +173,9 @@ ModelPtr importObj(std::ifstream& file) {
           vert.normals[2] = normals[normIndex][2];
         }
 
-        mesh->getSubmeshes().front()->getIndices().emplace_back(indicesMap.size());
+        mesh->getSubmeshes()[submeshIndex]->getIndices().emplace_back(indicesMap.size());
         indicesMap.emplace(vertIndices, indicesMap.size());
-        mesh->getSubmeshes()[submeshIndex]->getVbo().getVertices().push_back(vert);
+        mesh->getSubmeshes()[submeshIndex]->getVertices().push_back(vert);
       }
     }
   }
@@ -192,12 +192,12 @@ ModelPtr importOff(std::ifstream& file) {
   file >> vertexCount >> faceCount;
   file.ignore(100, '\n');
 
-  mesh->getSubmeshes().front()->getVbo().getVertices().resize(vertexCount * 3);
+  mesh->getSubmeshes().front()->getVertices().resize(vertexCount * 3);
 
   for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
-    file >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[0]
-         >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[1]
-         >> mesh->getSubmeshes().front()->getVbo().getVertices()[vertexIndex].positions[2];
+    file >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].positions[0]
+         >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].positions[1]
+         >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].positions[2];
 
   for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex) {
     uint16_t partCount {};
