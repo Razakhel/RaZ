@@ -1,0 +1,15 @@
+newmtl 08_-_Default
+  Ns 19.607843
+  Ka 1.000000 1.000000 1.000000
+  Kd 0.470588 0.470588 0.470588
+  Ks 0.000000 0.000000 0.000000
+  Ke 0.000000 0.000000 0.000000
+  Ni 1.000000
+  d 1.000000
+  Pm 1.000000
+  Pr 1.000000
+  illum 1
+  map_Kd ../assets/textures/cerberus_albedo.png
+  norm ../assets/textures/cerberus_normal.png
+  map_Pm ../assets/textures/cerberus_metallic.png
+  map_Pr ../assets/textures/cerberus_roughness.png
