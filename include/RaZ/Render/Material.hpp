@@ -5,15 +5,24 @@
 
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
+#include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
 class Material {
 public:
-  Material() = default;
-  explicit Material(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
-  explicit Material(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
+  virtual void initTextures(const ShaderProgram& program) const = 0;
+  virtual void bindAttributes(const ShaderProgram& program) const = 0;
+};
+
+using MaterialPtr = std::unique_ptr<Material>;
+
+class MaterialStandard : public Material {
+public:
+  MaterialStandard() = default;
+  explicit MaterialStandard(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
+  explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
 
   const TexturePtr getAmbientMap() const { return m_ambientMap; }
   const TexturePtr getDiffuseMap() const { return m_diffuseMap; }
@@ -33,6 +42,9 @@ public:
   void loadTransparencyMap(const std::string& fileName) { m_transparencyMap = std::make_shared<Texture>(fileName); }
   void loadBumpMap(const std::string& fileName) { m_bumpMap = std::make_shared<Texture>(fileName); }
 
+  void initTextures(const ShaderProgram& program) const override;
+  void bindAttributes(const ShaderProgram& program) const override;
+
 private:
   Vec3f m_ambient {};
   Vec3f m_diffuse {};
@@ -40,14 +52,44 @@ private:
   Vec3f m_emissive {};
   float m_transparency {};
 
-  TexturePtr m_ambientMap {};
-  TexturePtr m_diffuseMap {};
-  TexturePtr m_specularMap {};
-  TexturePtr m_transparencyMap {};
-  TexturePtr m_bumpMap {};
+  TexturePtr m_ambientMap = std::make_shared<Texture>(1);
+  TexturePtr m_diffuseMap = std::make_shared<Texture>(1);
+  TexturePtr m_specularMap = std::make_shared<Texture>(1);
+  TexturePtr m_transparencyMap = std::make_shared<Texture>(1);
+  TexturePtr m_bumpMap = std::make_shared<Texture>(1);
 };
 
-using MaterialPtr = std::unique_ptr<Material>;
+class MaterialCookTorrance : public Material {
+public:
+  MaterialCookTorrance() = default;
+  explicit MaterialCookTorrance(TexturePtr albedoMap) : m_albedoMap{ std::move(albedoMap) } {}
+  explicit MaterialCookTorrance(const std::string& fileName) { m_albedoMap = std::make_shared<Texture>(fileName); }
+
+  const TexturePtr getAlbedoMap() const { return m_albedoMap; }
+  const TexturePtr getMetallicMap() const { return m_metallicMap; }
+  const TexturePtr getNormalMap() const { return m_normalMap; }
+  const TexturePtr getRoughnessMap() const { return m_roughnessMap; }
+  const TexturePtr getAmbientOcclusionMap() const { return m_ambientOcclusionMap; }
+
+  void loadAlbedoMap(const std::string& fileName) { m_albedoMap = std::make_shared<Texture>(fileName); }
+  void loadNormalMap(const std::string& fileName) { m_normalMap = std::make_shared<Texture>(fileName); }
+  void loadMetallicMap(const std::string& fileName) { m_metallicMap = std::make_shared<Texture>(fileName); }
+  void loadRoughnessMap(const std::string& fileName) { m_roughnessMap = std::make_shared<Texture>(fileName); }
+  void loadAmbientOcclusionMap(const std::string& fileName) { m_ambientOcclusionMap = std::make_shared<Texture>(fileName); }
+
+  void initTextures(const ShaderProgram& program) const override;
+  void bindAttributes(const ShaderProgram& program) const override;
+
+private:
+  float m_metallicFactor {};
+  float m_roughnessFactor {};
+
+  TexturePtr m_albedoMap = std::make_shared<Texture>(1);
+  TexturePtr m_normalMap = std::make_shared<Texture>(1);
+  TexturePtr m_metallicMap = std::make_shared<Texture>(1);
+  TexturePtr m_roughnessMap = std::make_shared<Texture>(1);
+  TexturePtr m_ambientOcclusionMap = std::make_shared<Texture>(1);
+};
 
 } // namespace Raz
 
