@@ -27,6 +27,7 @@ public:
 
   T dot(const Vector& vec) const;
   Vector cross(const Vector& vec) const;
+  Vector reflect(const Vector& normal) const { return (*this - normal * dot(normal) * 2); }
   Vector normalize() const;
   float computeLength() const;
   std::size_t hash(std::size_t seed) const;

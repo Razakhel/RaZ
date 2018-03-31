@@ -1,0 +1,10 @@
+newmtl initialShadingGroup
+illum 4
+Kd 0.50 0.50 0.50
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+map_Kd ../assets/textures/cerberus_albedo.png
+norm ../assets/textures/cerberus_normal.png
+map_Pm ../assets/textures/cerberus_metallic.png
+map_Pr ../assets/textures/cerberus_roughness.png
