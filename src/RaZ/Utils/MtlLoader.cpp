@@ -11,6 +11,12 @@ void importMtl(const std::string& fileName,
                std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
+  auto standardMaterial = std::make_unique<MaterialStandard>();
+  auto cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
+
+  bool isStandardMaterial = false;
+  bool isCookTorranceMaterial = false;
+
   if (file) {
     while (!file.eof()) {
       std::string line;
@@ -26,41 +32,78 @@ void importMtl(const std::string& fileName,
         const float blue = std::stof(thirdValue);
 
         if (line[1] == 'a') {
-          materials.back()->assignAmbient(red, green, blue);
+          standardMaterial->assignAmbient(red, green, blue);
         } else if (line[1] == 'd') {
-          materials.back()->assignDiffuse(red, green, blue);
+          standardMaterial->assignDiffuse(red, green, blue);
         } else if (line[1] == 's') {
-          materials.back()->assignSpecular(red, green, blue);
+          standardMaterial->assignSpecular(red, green, blue);
         } else if (line[1] == 'e') {
-          materials.back()->assignEmissive(red, green, blue);
+          standardMaterial->assignEmissive(red, green, blue);
         }
+
+        isStandardMaterial = true;
       } else if (line[0] == 'm') { // Import texture
         if (line[4] == 'K') {
           if (line[5] == 'a') {
-            materials.back()->loadAmbientMap(nextValue);
+            standardMaterial->loadAmbientMap(nextValue);
+            isStandardMaterial = true;
           } else if (line[5] == 'd') {
-            materials.back()->loadDiffuseMap(nextValue);
+            standardMaterial->loadDiffuseMap(nextValue);
+            cookTorranceMaterial->loadAlbedoMap(nextValue);
           } else if (line[5] == 's') {
-            materials.back()->loadSpecularMap(nextValue);
+            standardMaterial->loadSpecularMap(nextValue);
+            isStandardMaterial = true;
+          }
+        }  else if (line[4] == 'P') {
+          if (line[5] == 'm') {
+            cookTorranceMaterial->loadMetallicMap(nextValue);
+            isCookTorranceMaterial = true;
+          } else if (line[5] == 'r') {
+            cookTorranceMaterial->loadRoughnessMap(nextValue);
+            isCookTorranceMaterial = true;
           }
         } else if (line[4] == 'd') {
-          materials.back()->loadTransparencyMap(nextValue);
+          standardMaterial->loadTransparencyMap(nextValue);
+          isStandardMaterial = true;
         } else if (line[4] == 'b') {
-          materials.back()->loadBumpMap(nextValue);
+          standardMaterial->loadBumpMap(nextValue);
+          isStandardMaterial = true;
         }
       } else if (line[0] == 'T') {
         if (line[1] == 'r') { // Assign transparency
-          materials.back()->setTransparency(std::stof(nextValue));
+          standardMaterial->setTransparency(std::stof(nextValue));
+          isStandardMaterial = true;
         }/* else if (line[1] == 'f') { // Assign transmission filter
 
+          isStandardMaterial = true;
         }*/
       } else if (line[0] == 'd') { // Assign transparency
-        materials.back()->setTransparency(std::stof(nextValue));
+        standardMaterial->setTransparency(std::stof(nextValue));
+        isStandardMaterial = true;
       } else if (line[0] == 'b') { // Import bump map
-        materials.back()->loadBumpMap(nextValue);
-      } else if (line[0] == 'n') { // Create new material
-        materials.emplace_back(std::make_unique<Material>());
-        materialCorrespIndices.insert({ nextValue, materialCorrespIndices.size() });
+        standardMaterial->loadBumpMap(nextValue);
+        isStandardMaterial = true;
+      } else if (line[0] == 'n') {
+        if (line[1] == 'o') { // Import normal map
+          cookTorranceMaterial->loadNormalMap(nextValue);
+          isCookTorranceMaterial = true;
+        } else if (line[1] == 'e') { // Create new material
+          materialCorrespIndices.insert({ nextValue, materialCorrespIndices.size() });
+
+          if (!isStandardMaterial && !isCookTorranceMaterial)
+            continue;
+
+          if (isCookTorranceMaterial) {
+            materials.emplace_back(std::move(cookTorranceMaterial));
+            cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
+          } else {
+            materials.emplace_back(std::move(standardMaterial));
+            standardMaterial = std::make_unique<MaterialStandard>();
+          }
+
+          isStandardMaterial = false;
+          isCookTorranceMaterial = false;
+        }
       } else {
         std::getline(file, line); // Skip the rest of the line
       }
@@ -68,6 +111,11 @@ void importMtl(const std::string& fileName,
   } else {
     throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
   }
+
+  if (isCookTorranceMaterial)
+    materials.emplace_back(std::move(cookTorranceMaterial));
+  else
+    materials.emplace_back(std::move(standardMaterial));
 }
 
 } // namespace MtlLoader
