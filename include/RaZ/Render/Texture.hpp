@@ -11,9 +11,14 @@
 
 namespace Raz {
 
+class Texture;
+
+using TexturePtr = std::shared_ptr<Texture>;
+
 class Texture {
 public:
   Texture() { glGenTextures(1, &m_index); }
+  explicit Texture(uint8_t value);
   Texture(unsigned int width, unsigned int height, bool isDepthTexture = false);
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
@@ -28,8 +33,6 @@ public:
 private:
   GLuint m_index {};
 };
-
-using TexturePtr = std::shared_ptr<Texture>;
 
 } // namespace Raz
 

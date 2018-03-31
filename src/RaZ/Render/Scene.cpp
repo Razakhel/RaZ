@@ -2,13 +2,21 @@
 
 namespace Raz {
 
+void Scene::load() const {
+  for (const auto& model : m_models)
+    model->load(m_program);
+}
+
 void Scene::render(const Mat4f& viewProjMat) const {
   m_program.use();
 
   for (const auto& model : m_models) {
-    m_program.sendUniform("uniMvpMatrix", viewProjMat * model->computeTransformMatrix());
+    const auto modelMat = model->computeTransformMatrix();
 
-    model->draw();
+    m_program.sendUniform("uniModelMatrix", modelMat);
+    m_program.sendUniform("uniMvpMatrix", viewProjMat * modelMat);
+
+    model->draw(m_program);
   }
 }
 

@@ -2,6 +2,14 @@
 
 namespace Raz {
 
+Texture::Texture(uint8_t value) : Texture() {
+  const std::array<uint8_t, 3> pixel = { value, value, value };
+
+  bind();
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel.data());
+  unbind();
+}
+
 Texture::Texture(unsigned int width, unsigned int height, bool isDepthTexture) : Texture() {
   bind();
 
