@@ -34,8 +34,6 @@ Mesh::Mesh(const Vec3f& leftPos, const Vec3f& topPos, const Vec3f& rightPos) {
   m_submeshes.front()->getEbo().getIndices()[0] = 1;
   m_submeshes.front()->getEbo().getIndices()[1] = 0;
   m_submeshes.front()->getEbo().getIndices()[2] = 2;
-
-  load();
 }
 
 Mesh::Mesh(const Vec3f& topLeftPos, const Vec3f& topRightPos, const Vec3f& bottomRightPos, const Vec3f& bottomLeftPos) {
@@ -81,8 +79,6 @@ Mesh::Mesh(const Vec3f& topLeftPos, const Vec3f& topRightPos, const Vec3f& botto
   m_submeshes.front()->getEbo().getIndices()[3] = 0;
   m_submeshes.front()->getEbo().getIndices()[4] = 2;
   m_submeshes.front()->getEbo().getIndices()[5] = 3;
-
-  load();
 }
 
 } // namespace Raz

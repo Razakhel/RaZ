@@ -24,6 +24,7 @@ public:
   //void setCamera(CameraPtr camera) { m_camera = std::move(camera); }
   void addModel(ModelPtr model) { m_models.emplace_back(std::move(model)); }
   void addLight(LightPtr light) { m_lights.emplace_back(std::move(light)); }
+  void load() const;
   void render(const Mat4f& viewProjMat) const;
   void updateLights() const;
 

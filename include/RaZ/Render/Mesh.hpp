@@ -25,8 +25,8 @@ public:
 
   void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
-  void load() const;
-  void draw() const;
+  void load(const ShaderProgram& program) const;
+  void draw(const ShaderProgram& program) const;
 
 private:
   std::vector<SubmeshPtr> m_submeshes {};

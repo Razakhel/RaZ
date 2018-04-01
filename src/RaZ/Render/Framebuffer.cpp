@@ -27,6 +27,8 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height) : m_program(Ve
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     std::cerr << "Error: Framebuffer is not complete." << std::endl;
   unbind();
+
+  m_viewport->load(m_program);
 }
 
 void Framebuffer::bind() const {
@@ -38,7 +40,7 @@ void Framebuffer::bind() const {
 void Framebuffer::display() const {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  m_viewport->draw();
+  m_viewport->draw(m_program);
 }
 
 } // namespace Raz

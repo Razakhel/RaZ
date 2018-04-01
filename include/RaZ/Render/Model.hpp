@@ -20,8 +20,8 @@ public:
   const MeshPtr getMesh() const { return m_mesh; }
 
   std::unique_ptr<Model> clone() const { return std::make_unique<Model>(*this); }
-  void load() const { m_mesh->load(); }
-  void draw() const { m_mesh->draw(); }
+  void load(const ShaderProgram& program) const { m_mesh->load(program); }
+  void draw(const ShaderProgram& program) const { m_mesh->draw(program); }
 
 private:
   MeshPtr m_mesh;

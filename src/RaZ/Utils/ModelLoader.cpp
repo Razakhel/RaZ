@@ -239,8 +239,6 @@ ModelPtr ModelLoader::importModel(const std::string& fileName) {
       model = std::move(importOff(file));
     else
       throw std::runtime_error("Error: '" + format + "' format is not supported");
-
-    model->load();
   } else {
     throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
   }
