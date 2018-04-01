@@ -14,7 +14,19 @@ uniform Light uniLights[MAX_LIGHT_COUNT];
 
 uniform mat4 uniViewProjMatrix;
 
-uniform sampler2D uniTexture;
+uniform struct Material {
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+  vec3 emissive;
+  float transparency;
+
+  sampler2D ambientMap;
+  sampler2D diffuseMap;
+  sampler2D specularMap;
+  sampler2D transparencyMap;
+  sampler2D bumpMap;
+} uniMaterial;
 
 in MeshInfo {
   vec3 vertPosition;
@@ -45,5 +57,5 @@ void main() {
     lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, norm), 0.0, 1.0));
   }
 
-  fragColor = vec4(lightHitAngle * texture(uniTexture, fragMeshInfo.vertTexcoords).rgb, 1.0);
+  fragColor = vec4(lightHitAngle * texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb, 1.0);
 }

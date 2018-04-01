@@ -14,7 +14,19 @@ uniform Light uniLights[MAX_LIGHT_COUNT];
 
 uniform mat4 uniViewProjMatrix;
 
-uniform sampler2D uniTexture;
+uniform struct Material {
+  vec3 ambient;
+  vec3 diffuse;
+  vec3 specular;
+  vec3 emissive;
+  float transparency;
+
+  sampler2D ambientMap;
+  sampler2D diffuseMap;
+  sampler2D specularMap;
+  sampler2D transparencyMap;
+  sampler2D bumpMap;
+} uniMaterial;
 
 in MeshInfo {
   vec3 vertPosition;
@@ -30,7 +42,7 @@ void main() {
   bufferNormal = normalize(fragNormal);
 
   vec3 norm = normalize(fragMeshInfo.vertNormal);
-  vec3 color = texture(uniTexture, fragMeshInfo.vertTexcoords).rgb;
+  vec3 color = texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb;
   vec3 ambient = color * 0.05;
   vec3 diffuse = vec3(0.0);
   vec3 specular = vec3(0.0);
