@@ -5,24 +5,24 @@
 
 int main() {
   Raz::Window window(800, 600, "RaZ");
-  window.disableVerticalSync();
+  //window.disableVerticalSync();
 
   Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
 
   const Raz::VertexShader vertShader("../shaders/vert.glsl");
-  const Raz::FragmentShader fragShader("../shaders/blinn-phong.glsl");
+  const Raz::FragmentShader fragShader("../shaders/cook-torrance.glsl");
 
   Raz::Scene scene(vertShader, fragShader);
 
   const auto startTime = std::chrono::system_clock::now();
-  Raz::ModelPtr model = Raz::ModelLoader::importModel("../assets/meshes/crytek_sponza.obj");
+  Raz::ModelPtr model = Raz::ModelLoader::importModel("../assets/meshes/ball.obj");
   const auto endTime = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
             << " seconds." << std::endl;
 
-  model->scale(0.075f);
+  model->scale(2.f);
 
   Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
                                                           Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)
@@ -31,7 +31,7 @@ int main() {
                                                         window.getHeight(),
                                                         45.f,                              // Field of view
                                                         0.1f, 100.f,                       // Near plane, far plane
-                                                        Raz::Vec3f({ 50.f, 1.f, -5.f }));  // Initial position
+                                                        Raz::Vec3f({ 0.f, 0.f, -5.f }));  // Initial position
 
   const auto modelPtr = model.get();
   const auto lightPtr = light.get();
@@ -80,18 +80,20 @@ int main() {
   scene.addLight(std::move(light));
   scene.updateLights();
   //scene.setCamera(std::move(camera));
+  scene.load();
 
-  const int uniProjectionLocation = framebuffer.getProgram().recoverUniformLocation("uniProjectionMatrix");
-  const int uniInvProjLocation = framebuffer.getProgram().recoverUniformLocation("uniInvProjMatrix");
-  const int uniViewLocation = framebuffer.getProgram().recoverUniformLocation("uniViewMatrix");
-  const int uniInvViewLocation = framebuffer.getProgram().recoverUniformLocation("uniInvViewMatrix");
-
-  const int uniViewProjLocation = scene.getProgram().recoverUniformLocation("uniViewProjMatrix");
+  const auto uniProjectionLocation = framebuffer.getProgram().recoverUniformLocation("uniProjectionMatrix");
+  const auto uniInvProjLocation = framebuffer.getProgram().recoverUniformLocation("uniInvProjMatrix");
+  const auto uniViewLocation = framebuffer.getProgram().recoverUniformLocation("uniViewMatrix");
+  const auto uniInvViewLocation = framebuffer.getProgram().recoverUniformLocation("uniInvViewMatrix");
 
   framebuffer.getProgram().use();
   framebuffer.getProgram().sendUniform("uniSceneDepthBuffer", 0);
   framebuffer.getProgram().sendUniform("uniSceneColorBuffer", 1);
   framebuffer.getProgram().sendUniform("uniSceneNormalBuffer", 2);
+
+  const auto uniCameraPosLocation = scene.getProgram().recoverUniformLocation("uniCameraPos");
+  const auto uniViewProjLocation = scene.getProgram().recoverUniformLocation("uniViewProjMatrix");
 
   auto lastTime = std::chrono::system_clock::now();
   uint16_t nbFrames = 0;
@@ -132,6 +134,7 @@ int main() {
       framebuffer.getProgram().use();
       framebuffer.display();
     } else {
+      scene.getProgram().sendUniform(uniCameraPosLocation, camera->getPosition());
       scene.getProgram().sendUniform(uniViewProjLocation, viewProjMat);
 
       scene.render(viewProjMat);
