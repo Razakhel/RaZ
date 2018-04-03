@@ -15,7 +15,7 @@ using CallbacksList = std::vector<std::pair<int, std::function<void()>>>;
 
 class Window {
 public:
-  Window(unsigned int width, unsigned int height, const std::string& name = "");
+  Window(unsigned int width, unsigned int height, const std::string& name = "", uint8_t AASampleCount = 1);
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }

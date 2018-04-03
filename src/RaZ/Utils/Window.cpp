@@ -55,12 +55,14 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
 
 } // namespace
 
-Window::Window(unsigned int width, unsigned int height, const std::string& name) : m_width{ width }, m_height{ height } {
+Window::Window(unsigned int width, unsigned int height, const std::string& name, uint8_t AASampleCount) : m_width{ width },
+                                                                                                          m_height{ height } {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+  glfwWindowHint(GLFW_SAMPLES, AASampleCount);
 
   m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
   if (!m_window) {
