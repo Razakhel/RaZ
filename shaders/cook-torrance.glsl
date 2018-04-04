@@ -18,6 +18,7 @@ uniform vec3 uniCameraPos;
 uniform mat4 uniViewProjMatrix;
 
 uniform struct Material {
+  vec3 baseColor;
   float metallicFactor;
   float roughnessFactor;
 
@@ -72,8 +73,8 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
   float viewAngle  = max(dot(viewDir, normal), 0.0);
   float lightAngle = max(dot(lightDir, normal), 0.0);
 
-  float ggx1       = computeShlickGGX(viewAngle, roughness);
-  float ggx2       = computeShlickGGX(lightAngle, roughness);
+  float ggx1 = computeShlickGGX(viewAngle, roughness);
+  float ggx2 = computeShlickGGX(lightAngle, roughness);
 
   return ggx1 * ggx2;
 }
@@ -81,9 +82,10 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 void main() {
   bufferNormal = normalize(fragNormal);
 
-  vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)); // Gamma correction (sRGB presumed)
-  float metallic  = texture(uniMaterial.metallicMap, fragMeshInfo.vertTexcoords).r;
-  float roughness = texture(uniMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r;
+  // Gamma correction (sRGB presumed)
+  vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+  float metallic  = texture(uniMaterial.metallicMap, fragMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
+  float roughness = texture(uniMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
   float ambOcc    = texture(uniMaterial.ambientOcclusionMap, fragMeshInfo.vertTexcoords).r;
 
   vec3 normal  = normalize(fragMeshInfo.vertNormal);
