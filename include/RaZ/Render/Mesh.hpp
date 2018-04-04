@@ -7,8 +7,8 @@
 #include <string>
 
 #include "RaZ/Math/Vector.hpp"
-#include "RaZ/Render/Submesh.hpp"
 #include "RaZ/Render/Material.hpp"
+#include "RaZ/Render/Submesh.hpp"
 
 namespace Raz {
 
@@ -23,6 +23,7 @@ public:
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
 
+  void setMaterial(MaterialPreset material, float roughnessFactor);
   void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
   void load(const ShaderProgram& program) const;

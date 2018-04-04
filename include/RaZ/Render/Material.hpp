@@ -3,6 +3,8 @@
 #ifndef RAZ_MATERIAL_HPP
 #define RAZ_MATERIAL_HPP
 
+#include <unordered_map>
+
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
@@ -10,8 +12,15 @@
 
 namespace Raz {
 
+enum class MaterialPreset {
+  CHARCOAL, GRASS, SAND, ICE, SNOW,                                                   // Dielectric presets
+  IRON, SILVER, ALUMINIUM, GOLD, COPPER, CHROMIUM, NICKEL, TITANIUM, COBALT, PLATINUM // Metallic presets
+};
+
 class Material {
 public:
+  static std::unique_ptr<Material> recoverMaterial(MaterialPreset preset, float roughnessFactor);
+  virtual std::unique_ptr<Material> clone() const = 0;
   virtual void initTextures(const ShaderProgram& program) const = 0;
   virtual void bindAttributes(const ShaderProgram& program) const = 0;
 };
@@ -42,21 +51,22 @@ public:
   void loadTransparencyMap(const std::string& fileName) { m_transparencyMap = std::make_shared<Texture>(fileName); }
   void loadBumpMap(const std::string& fileName) { m_bumpMap = std::make_shared<Texture>(fileName); }
 
+  std::unique_ptr<Material> clone() const override { return std::make_unique<MaterialStandard>(*this); }
   void initTextures(const ShaderProgram& program) const override;
   void bindAttributes(const ShaderProgram& program) const override;
 
 private:
-  Vec3f m_ambient {};
-  Vec3f m_diffuse {};
-  Vec3f m_specular {};
-  Vec3f m_emissive {};
-  float m_transparency {};
+  Vec3f m_ambient = Vec3f(1.f);
+  Vec3f m_diffuse = Vec3f(1.f);
+  Vec3f m_specular = Vec3f(1.f);
+  Vec3f m_emissive = Vec3f(1.f);
+  float m_transparency = 1.f;
 
-  TexturePtr m_ambientMap = std::make_shared<Texture>(1);
-  TexturePtr m_diffuseMap = std::make_shared<Texture>(1);
-  TexturePtr m_specularMap = std::make_shared<Texture>(1);
-  TexturePtr m_transparencyMap = std::make_shared<Texture>(1);
-  TexturePtr m_bumpMap = std::make_shared<Texture>(1);
+  TexturePtr m_ambientMap = std::make_shared<Texture>(255);
+  TexturePtr m_diffuseMap = std::make_shared<Texture>(255);
+  TexturePtr m_specularMap = std::make_shared<Texture>(255);
+  TexturePtr m_transparencyMap = std::make_shared<Texture>(255);
+  TexturePtr m_bumpMap = std::make_shared<Texture>(255);
 };
 
 class MaterialCookTorrance : public Material {
@@ -64,6 +74,8 @@ public:
   MaterialCookTorrance() = default;
   explicit MaterialCookTorrance(TexturePtr albedoMap) : m_albedoMap{ std::move(albedoMap) } {}
   explicit MaterialCookTorrance(const std::string& fileName) { m_albedoMap = std::make_shared<Texture>(fileName); }
+  MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
+    : m_baseColor{ baseColor }, m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } {}
 
   const TexturePtr getAlbedoMap() const { return m_albedoMap; }
   const TexturePtr getMetallicMap() const { return m_metallicMap; }
@@ -77,18 +89,20 @@ public:
   void loadRoughnessMap(const std::string& fileName) { m_roughnessMap = std::make_shared<Texture>(fileName); }
   void loadAmbientOcclusionMap(const std::string& fileName) { m_ambientOcclusionMap = std::make_shared<Texture>(fileName); }
 
+  std::unique_ptr<Material> clone() const override { return std::make_unique<MaterialCookTorrance>(*this); }
   void initTextures(const ShaderProgram& program) const override;
   void bindAttributes(const ShaderProgram& program) const override;
 
 private:
-  float m_metallicFactor {};
-  float m_roughnessFactor {};
+  Vec3f m_baseColor = Vec3f(1.f);
+  float m_metallicFactor = 1.f;
+  float m_roughnessFactor = 1.f;
 
-  TexturePtr m_albedoMap = std::make_shared<Texture>(1);
-  TexturePtr m_normalMap = std::make_shared<Texture>(1);
-  TexturePtr m_metallicMap = std::make_shared<Texture>(1);
-  TexturePtr m_roughnessMap = std::make_shared<Texture>(1);
-  TexturePtr m_ambientOcclusionMap = std::make_shared<Texture>(1);
+  TexturePtr m_albedoMap = std::make_shared<Texture>(255);
+  TexturePtr m_normalMap = std::make_shared<Texture>(255);
+  TexturePtr m_metallicMap = std::make_shared<Texture>(255);
+  TexturePtr m_roughnessMap = std::make_shared<Texture>(255);
+  TexturePtr m_ambientOcclusionMap = std::make_shared<Texture>(255);
 };
 
 } // namespace Raz

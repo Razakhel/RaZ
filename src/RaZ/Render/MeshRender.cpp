@@ -2,6 +2,14 @@
 
 namespace Raz {
 
+void Mesh::setMaterial(MaterialPreset material, float roughnessFactor) {
+  m_materials.resize(1);
+  m_materials.front() = Material::recoverMaterial(material, roughnessFactor);
+
+  for (auto& submesh : m_submeshes)
+    submesh->setMaterialIndex(0);
+}
+
 void Mesh::load(const ShaderProgram& program) const {
   for (const auto& submesh : m_submeshes)
     submesh->load();
