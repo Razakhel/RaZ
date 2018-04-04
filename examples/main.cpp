@@ -22,8 +22,8 @@ int main() {
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
             << " seconds." << std::endl;
 
-  model->scale(2.f);
-  model->getMesh()->setMaterial(Raz::MaterialPreset::GOLD, 0.1f);
+  model->scale(3.f);
+  model->rotate(45.f, 0.f, 1.f, 0.f);
 
   /*Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
                                                           Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/

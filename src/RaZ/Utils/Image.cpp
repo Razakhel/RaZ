@@ -95,8 +95,8 @@ void Image::readPng(std::ifstream& file) {
   std::vector<png_bytep> rowPtrs(m_height);
 
   // Mapping row's elements to data's
-  for (unsigned int i = 0; i < m_height; ++i)
-    rowPtrs[i] = &m_data[m_width * channels * i];
+  for (std::size_t i = 0; i < m_height; ++i)
+    rowPtrs[m_height - i] = &m_data[m_width * channels * i];
 
   png_read_image(readStruct, rowPtrs.data());
   png_read_end(readStruct, infoStruct);
