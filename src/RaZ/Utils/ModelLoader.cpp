@@ -10,8 +10,23 @@ namespace Raz {
 
 namespace {
 
-const std::string extractFileExt(const std::string& fileName) {
+std::string extractFileExt(const std::string& fileName) {
   return (fileName.substr(fileName.find_last_of('.') + 1));
+}
+
+Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
+                     const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
+  const Vec3f firstEdge  = secondPos - firstPos;
+  const Vec3f secondEdge = thirdPos - firstPos;
+
+  const Vec2f firstUVDiff  = secondTexcoords - firstTexcoords;
+  const Vec2f secondUVDiff = thirdTexcoords - firstTexcoords;
+
+  const float inversionFactor = 1.f / (firstUVDiff[0] * secondUVDiff[1] - secondUVDiff[0] * firstUVDiff[1]);
+
+  const Vec3f tangent = (firstEdge * secondUVDiff[1] - secondEdge * firstUVDiff[1]) * inversionFactor;
+
+  return tangent;
 }
 
 ModelPtr importObj(std::ifstream& file) {
@@ -138,46 +153,94 @@ ModelPtr importObj(std::ifstream& file) {
   std::map<std::array<std::size_t, 3>, unsigned int> indicesMap;
 
   for (std::size_t submeshIndex = 0; submeshIndex < mesh->getSubmeshes().size(); ++submeshIndex) {
+    SubmeshPtr& submesh = mesh->getSubmeshes()[submeshIndex];
     indicesMap.clear();
 
     for (std::size_t partIndex = 0; partIndex < posIndices[submeshIndex].size(); ++partIndex) {
-      const int64_t tempPosIndex = posIndices[submeshIndex][partIndex];
-      const std::size_t posIndex = (tempPosIndex < 0 ? tempPosIndex + positions.size() : tempPosIndex - 1ul);
+      // Face (vertices indices triplets), containing position/texcoords/normals
+      // vertIndices[i][j] -> vertex i, feature j (j = 0 -> position, j = 1 -> texcoords, j = 2 -> normal)
+      std::array<std::array<std::size_t, 3>, 3> vertIndices {};
 
-      const int64_t tempTexIndex = texcoordsIndices[submeshIndex][partIndex];
-      const std::size_t texIndex = (tempTexIndex < 0 ? tempTexIndex + texcoords.size() : tempTexIndex - 1ul);
+      // First vertex informations
+      int64_t tempIndex = posIndices[submeshIndex][partIndex];
+      vertIndices[0][0] = (tempIndex < 0 ? tempIndex + positions.size() : tempIndex - 1ul);
 
-      const int64_t tempNormIndex = normalsIndices[submeshIndex][partIndex];
-      const std::size_t normIndex = (tempNormIndex < 0 ? tempNormIndex + normals.size() : tempNormIndex - 1ul);
+      tempIndex = texcoordsIndices[submeshIndex][partIndex];
+      vertIndices[0][1] = (tempIndex < 0 ? tempIndex + texcoords.size() : tempIndex - 1ul);
 
-      const std::array<std::size_t, 3> vertIndices = { posIndex, texIndex, normIndex };
+      tempIndex = normalsIndices[submeshIndex][partIndex];
+      vertIndices[0][2] = (tempIndex < 0 ? tempIndex + normals.size() : tempIndex - 1ul);
 
-      const auto indexIter = indicesMap.find(vertIndices);
-      if (indexIter != indicesMap.cend()) {
-        mesh->getSubmeshes()[submeshIndex]->getIndices().emplace_back(indexIter->second);
-      } else {
-        Vertex vert {};
+      ++partIndex;
 
-        vert.positions[0] = positions[posIndex][0];
-        vert.positions[1] = positions[posIndex][1];
-        vert.positions[2] = positions[posIndex][2];
+      // Second vertex informations
+      tempIndex = posIndices[submeshIndex][partIndex];
+      vertIndices[1][0] = (tempIndex < 0 ? tempIndex + positions.size() : tempIndex - 1ul);
 
-        if (!texcoords.empty()) {
-          vert.texcoords[0] = texcoords[texIndex][0];
-          vert.texcoords[1] = texcoords[texIndex][1];
+      tempIndex = texcoordsIndices[submeshIndex][partIndex];
+      vertIndices[1][1] = (tempIndex < 0 ? tempIndex + texcoords.size() : tempIndex - 1ul);
+
+      tempIndex = normalsIndices[submeshIndex][partIndex];
+      vertIndices[1][2] = (tempIndex < 0 ? tempIndex + normals.size() : tempIndex - 1ul);
+
+      ++partIndex;
+
+      // Third vertex informations
+      tempIndex = posIndices[submeshIndex][partIndex];
+      vertIndices[2][0] = (tempIndex < 0 ? tempIndex + positions.size() : tempIndex - 1ul);
+
+      tempIndex = texcoordsIndices[submeshIndex][partIndex];
+      vertIndices[2][1] = (tempIndex < 0 ? tempIndex + texcoords.size() : tempIndex - 1ul);
+
+      tempIndex = normalsIndices[submeshIndex][partIndex];
+      vertIndices[2][2] = (tempIndex < 0 ? tempIndex + normals.size() : tempIndex - 1ul);
+
+      const std::array<Vec3f, 3> facePositions = { positions[vertIndices[0][0]],
+                                                   positions[vertIndices[1][0]],
+                                                   positions[vertIndices[2][0]] };
+
+      Vec3f faceTangent {};
+      std::array<Vec2f, 3> faceTexcoords {};
+      if (!texcoords.empty()) {
+        faceTexcoords[0] = texcoords[vertIndices[0][1]];
+        faceTexcoords[1] = texcoords[vertIndices[1][1]];
+        faceTexcoords[2] = texcoords[vertIndices[2][1]];
+
+        faceTangent = computeTangent(facePositions[0], facePositions[1], facePositions[2],
+                                     faceTexcoords[0], faceTexcoords[1], faceTexcoords[2]);
+      }
+
+      std::array<Vec3f, 3> faceNormals {};
+      if (!normals.empty()) {
+        faceNormals[0] = normals[vertIndices[0][2]];
+        faceNormals[1] = normals[vertIndices[1][2]];
+        faceNormals[2] = normals[vertIndices[2][2]];
+      }
+
+      for (uint8_t vertPartIndex = 0; vertPartIndex < 3; ++vertPartIndex) {
+        const auto indexIter = indicesMap.find(vertIndices[vertPartIndex]);
+
+        if (indexIter != indicesMap.cend()) {
+          submesh->getVertices()[indexIter->second].tangent += faceTangent; // Adding current tangent to be averaged later
+          submesh->getIndices().emplace_back(indexIter->second);
+        } else {
+          Vertex vert {};
+
+          vert.position  = facePositions[vertPartIndex];
+          vert.texcoords = faceTexcoords[vertPartIndex];
+          vert.normal    = faceNormals[vertPartIndex];
+          vert.tangent   = faceTangent;
+
+          submesh->getIndices().emplace_back(indicesMap.size());
+          indicesMap.emplace(vertIndices[vertPartIndex], indicesMap.size());
+          submesh->getVertices().push_back(vert);
         }
-
-        if (!normals.empty()) {
-          vert.normals[0] = normals[normIndex][0];
-          vert.normals[1] = normals[normIndex][1];
-          vert.normals[2] = normals[normIndex][2];
-        }
-
-        mesh->getSubmeshes()[submeshIndex]->getIndices().emplace_back(indicesMap.size());
-        indicesMap.emplace(vertIndices, indicesMap.size());
-        mesh->getSubmeshes()[submeshIndex]->getVertices().push_back(vert);
       }
     }
+
+    // Normalizing tangents to become unit vectors & to be averaged after being accumulated
+    for (auto& vertex : submesh->getVertices())
+      vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
   }
 
   return std::make_unique<Model>(std::move(mesh));
@@ -195,9 +258,9 @@ ModelPtr importOff(std::ifstream& file) {
   mesh->getSubmeshes().front()->getVertices().resize(vertexCount * 3);
 
   for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
-    file >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].positions[0]
-         >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].positions[1]
-         >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].positions[2];
+    file >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].position[0]
+         >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].position[1]
+         >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].position[2];
 
   for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex) {
     uint16_t partCount {};
