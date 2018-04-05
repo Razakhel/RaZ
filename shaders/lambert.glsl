@@ -31,7 +31,7 @@ uniform struct Material {
 in MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
-  vec3 vertNormal;
+  mat3 vertTBNMatrix;
 } fragMeshInfo;
 in vec3 fragNormal;
 
@@ -41,7 +41,8 @@ layout (location = 1) out vec3 bufferNormal;
 void main() {
   bufferNormal = normalize(fragNormal);
 
-  vec3 norm = normalize(fragMeshInfo.vertNormal);
+  vec3 normal = fragMeshInfo.vertTBNMatrix[2];
+
   float lightHitAngle = 0.0;
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
@@ -54,7 +55,7 @@ void main() {
       lightDir = normalize(-uniLights[lightIndex].direction);
     }
 
-    lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, norm), 0.0, 1.0));
+    lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, normal), 0.0, 1.0));
   }
 
   fragColor = vec4(lightHitAngle * texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb, 1.0);

@@ -31,7 +31,7 @@ uniform struct Material {
 in MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
-  vec3 vertNormal;
+  mat3 vertTBNMatrix;
 } fragMeshInfo;
 in vec3 fragNormal;
 
@@ -41,10 +41,10 @@ layout (location = 1) out vec3 bufferNormal;
 void main() {
   bufferNormal = normalize(fragNormal);
 
-  vec3 norm = normalize(fragMeshInfo.vertNormal);
-  vec3 color = texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb;
-  vec3 ambient = color * 0.05;
-  vec3 diffuse = vec3(0.0);
+  vec3 normal   = fragMeshInfo.vertTBNMatrix[2];
+  vec3 color    = texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb;
+  vec3 ambient  = color * 0.05;
+  vec3 diffuse  = vec3(0.0);
   vec3 specular = vec3(0.0);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
@@ -59,12 +59,12 @@ void main() {
       lightDir = normalize(-uniLights[lightIndex].direction);
     }
 
-    diffuse += max(dot(lightDir, norm), 0.0) * color;
+    diffuse += max(dot(lightDir, normal), 0.0) * color;
 
     // Specular
     vec3 viewDir = normalize(-fragMeshInfo.vertPosition);
     vec3 halfDir = normalize(lightDir + viewDir);
-    specular += uniLights[lightIndex].color * pow(max(dot(norm, halfDir), 0.0), 32.0);
+    specular += uniLights[lightIndex].color * pow(max(dot(normal, halfDir), 0.0), 32.0);
   }
 
   fragColor = vec4(ambient + diffuse + specular, 1.0);
