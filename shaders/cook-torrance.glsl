@@ -32,7 +32,7 @@ uniform struct Material {
 in MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
-  vec3 vertNormal;
+  mat3 vertTBNMatrix;
 } fragMeshInfo;
 in vec3 fragNormal;
 
@@ -82,13 +82,16 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 void main() {
   bufferNormal = normalize(fragNormal);
 
-  // Gamma correction (sRGB presumed)
+  // Gamma correction for albedo (sRGB presumed)
   vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
   float metallic  = texture(uniMaterial.metallicMap, fragMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
   float roughness = texture(uniMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
   float ambOcc    = texture(uniMaterial.ambientOcclusionMap, fragMeshInfo.vertTexcoords).r;
 
-  vec3 normal  = normalize(fragMeshInfo.vertNormal);
+  vec3 normal  = texture(uniMaterial.normalMap, fragMeshInfo.vertTexcoords).rgb;
+  normal       = normalize(normal * 2.0 - 1.0);
+  normal       = normalize(fragMeshInfo.vertTBNMatrix * normal);
+
   vec3 viewDir = normalize(uniCameraPos - fragMeshInfo.vertPosition);
 
   // Base Fresnel (F)
