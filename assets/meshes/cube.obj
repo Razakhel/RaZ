@@ -1,4 +1,4 @@
-mtllib default.mtl
+mtllib ../assets/materials/test.mtl
 
 v -0.5 0.5 -0.5
 v -0.5 0.5 0.5

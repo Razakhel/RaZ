@@ -4,6 +4,7 @@
 #define RAZ_VECTOR_HPP
 
 #include <array>
+#include <cmath>
 #include <initializer_list>
 
 #include "RaZ/Math/Matrix.hpp"
@@ -29,7 +30,7 @@ public:
   Vector cross(const Vector& vec) const;
   Vector reflect(const Vector& normal) const { return (*this - normal * dot(normal) * 2); }
   Vector normalize() const;
-  float computeLength() const;
+  float computeLength() const { return std::sqrt(dot(*this)); }
   std::size_t hash(std::size_t seed) const;
 
   Vector operator-() const { return (*this * -1); }

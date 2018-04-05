@@ -1,4 +1,3 @@
-#include <cmath>
 #include <cassert>
 
 namespace Raz {
@@ -40,9 +39,9 @@ Vector<T, Size> Vector<T, Size>::cross(const Vector<T, Size>& vec) const {
 
   Vector<T, Size> res;
 
-  res[0] = m_data[1] * vec.getData()[2] - m_data[2] * vec.getData()[1];
+  res[0] =   m_data[1] * vec.getData()[2] - m_data[2] * vec.getData()[1];
   res[1] = -(m_data[0] * vec.getData()[2] - m_data[2] * vec.getData()[0]);
-  res[2] = m_data[0] * vec.getData()[1] - m_data[1] * vec.getData()[0];
+  res[2] =   m_data[0] * vec.getData()[1] - m_data[1] * vec.getData()[0];
 
   return res;
 }
@@ -50,18 +49,8 @@ Vector<T, Size> Vector<T, Size>::cross(const Vector<T, Size>& vec) const {
 template <typename T, std::size_t Size>
 Vector<T, Size> Vector<T, Size>::normalize() const {
   Vector<T, Size> res = *this;
-  res /= std::sqrt(dot(*this));
+  res /= computeLength();
   return res;
-}
-
-template <typename T, std::size_t Size>
-float Vector<T, Size>::computeLength() const {
-  float length = 0;
-
-  for (const auto& val : m_data)
-    length += val * val;
-
-  return std::sqrt(length);
 }
 
 template <typename T, std::size_t Size>

@@ -1,4 +1,4 @@
-mtllib ../assets/materials/ball.mtl
+mtllib ../assets/materials/test.mtl
 g default
 v 0.148778 -0.987688 -0.048341
 v 0.126558 -0.987688 -0.091950
@@ -1205,7 +1205,7 @@ vn -0.000000 -1.000000 -0.000000
 vn -0.000000 1.000000 0.000000
 s 1
 g pSphere1
-usemtl initialShadingGroup
+usemtl default
 f 1/1/1 2/2/2 21/22/3
 f 21/22/3 2/2/2 22/23/4
 f 2/2/2 3/3/5 22/23/4

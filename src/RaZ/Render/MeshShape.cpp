@@ -6,21 +6,21 @@ Mesh::Mesh(const Vec3f& leftPos, const Vec3f& topPos, const Vec3f& rightPos) {
   // TODO: check if vertices are defined counterclockwise
 
   Vertex left {};
-  left.positions = leftPos;
+  left.position  = leftPos;
   left.texcoords = Vec2f({ 0.f, 0.f });
 
   Vertex top {};
-  top.positions = topPos;
+  top.position  = topPos;
   top.texcoords = Vec2f({ 0.5f, 1.f });
 
   Vertex right {};
-  right.positions = rightPos;
+  right.position  = rightPos;
   right.texcoords = Vec2f({ 1.f, 0.f });
 
   // Computing normals
-  left.normals = (leftPos - topPos).cross(leftPos - rightPos).normalize();
-  top.normals = (topPos - rightPos).cross(topPos - leftPos).normalize();
-  right.normals = (rightPos - leftPos).cross(rightPos - topPos).normalize();
+  left.normal  = (leftPos - topPos).cross(leftPos - rightPos).normalize();
+  top.normal   = (topPos - rightPos).cross(topPos - leftPos).normalize();
+  right.normal = (rightPos - leftPos).cross(rightPos - topPos).normalize();
 
   m_submeshes.emplace_back(std::make_unique<Submesh>());
 
@@ -40,27 +40,27 @@ Mesh::Mesh(const Vec3f& topLeftPos, const Vec3f& topRightPos, const Vec3f& botto
   // TODO: check if vertices are defined counterclockwise
 
   Vertex topLeft {};
-  topLeft.positions = topLeftPos;
+  topLeft.position  = topLeftPos;
   topLeft.texcoords = Vec2f({ 0.f, 1.f });
 
   Vertex topRight {};
-  topRight.positions = topRightPos;
+  topRight.position  = topRightPos;
   topRight.texcoords = Vec2f({ 1.f, 1.f });
 
   Vertex bottomRight {};
-  bottomRight.positions = bottomRightPos;
+  bottomRight.position  = bottomRightPos;
   bottomRight.texcoords = Vec2f({ 1.f, 0.f });
 
   Vertex bottomLeft {};
-  bottomLeft.positions = bottomLeftPos;
+  bottomLeft.position  = bottomLeftPos;
   bottomLeft.texcoords = Vec2f({ 0.f, 0.f });
 
   // Computing normals
   // TODO: normals should not be computed (or even exist) for simple display quads like a framebuffer
-  topLeft.normals = (topLeftPos - topRightPos).cross(topLeftPos - bottomLeftPos).normalize();
-  topRight.normals = (topRightPos - bottomRightPos).cross(topRightPos - topLeftPos).normalize();
-  bottomRight.normals = (bottomRightPos - bottomLeftPos).cross(bottomRightPos - topRightPos).normalize();
-  bottomLeft.normals = (bottomLeftPos - topLeftPos).cross(bottomLeftPos - bottomRightPos).normalize();
+  topLeft.normal     = (topLeftPos - topRightPos).cross(topLeftPos - bottomLeftPos).normalize();
+  topRight.normal    = (topRightPos - bottomRightPos).cross(topRightPos - topLeftPos).normalize();
+  bottomRight.normal = (bottomRightPos - bottomLeftPos).cross(bottomRightPos - topRightPos).normalize();
+  bottomLeft.normal  = (bottomLeftPos - topLeftPos).cross(bottomLeftPos - bottomRightPos).normalize();
 
   m_submeshes.emplace_back(std::make_unique<Submesh>());
 

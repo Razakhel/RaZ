@@ -1,4 +1,4 @@
-newmtl initialShadingGroup
+newmtl default
 illum 4
 Kd 0.50 0.50 0.50
 Ka 0.00 0.00 0.00
@@ -6,8 +6,10 @@ Tf 1.00 1.00 1.00
 Ni 1.00
 #map_Kd ../assets/textures/copper-rock-alb.png
 map_Kd ../assets/textures/rustediron_albedo.png
+#map_Kd ../assets/textures/brickwall.png
 #norm ../assets/textures/copper-rock-normal.png
 norm ../assets/textures/rustediron_normal.png
+#norm ../assets/textures/brickwall_normal.png
 #map_Pm ../assets/textures/copper-rock-metal.png
 map_Pm ../assets/textures/rustediron_metallic.png
 #map_Pr ../assets/textures/copper-rock-rough.png
