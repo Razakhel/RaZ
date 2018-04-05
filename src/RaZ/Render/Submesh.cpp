@@ -6,17 +6,17 @@ void Submesh::load() const {
   m_vao.bind();
 
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               sizeof(getEbo().getIndices().front()) * getEbo().getIndices().size(),
-               getEbo().getIndices().data(),
+               sizeof(getIndices().front()) * getIndices().size(),
+               getIndices().data(),
                GL_STATIC_DRAW);
 
   m_vbo.bind();
   glBufferData(GL_ARRAY_BUFFER,
-               sizeof(m_vbo.getVertices().front()) * m_vbo.getVertices().size(),
-               m_vbo.getVertices().data(),
+               sizeof(getVertices().front()) * getVertices().size(),
+               getVertices().data(),
                GL_STATIC_DRAW);
 
-  const uint8_t stride = sizeof(m_vbo.getVertices().front());
+  const uint8_t stride = sizeof(getVertices().front());
 
   glVertexAttribPointer(0, 3,
                         GL_FLOAT, GL_FALSE,
@@ -27,14 +27,20 @@ void Submesh::load() const {
   glVertexAttribPointer(1, 2,
                         GL_FLOAT, GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(3 * sizeof(m_vbo.getVertices().front().positions.getData().front())));
+                        reinterpret_cast<void*>(3 * sizeof(getVertices().front().position.getData().front())));
   glEnableVertexAttribArray(1);
 
   glVertexAttribPointer(2, 3,
                         GL_FLOAT, GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(5 * sizeof(m_vbo.getVertices().front().normals.getData().front())));
+                        reinterpret_cast<void*>(5 * sizeof(getVertices().front().normal.getData().front())));
   glEnableVertexAttribArray(2);
+
+  glVertexAttribPointer(3, 3,
+                        GL_FLOAT, GL_FALSE,
+                        stride,
+                        reinterpret_cast<void*>(8 * sizeof(getVertices().front().tangent.getData().front())));
+  glEnableVertexAttribArray(3);
 
   m_vbo.unbind();
   m_vao.unbind();
