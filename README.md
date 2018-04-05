@@ -20,19 +20,21 @@ If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/w
 
 | Objectives | Implemented |
 | :--------: | :---------: |
-| Loading a mesh (OBJ/FBX/...) | **Yes** (OBJ) |
-| Loading textures (JPEG/PNG/TGA/BMP/BPG) | **Yes** (PNG) |
-| Base OpenGL classes | **Yes** |
-| Base scene classes (model, mesh, light, ...) | **Yes** |
+| Mesh loading (OBJ/FBX/...) | **Yes** (OBJ) |
+| Texture loading (JPEG/PNG/TGA/BMP/BPG) | **Yes** (PNG) |
 | Vector: operations, dot, cross, normalization, length/magnitude calculation | **Yes** |
 | Matrix: operations, transposition, determinant computation, inversion | **Yes** |
 | Camera &amp; transformations | **Yes** (rotation with quaternions) |
-| Lighting (light types &amp; algorithms) | **Yes** (Lambert &amp; Blinn-Phong available) |
-| Materials &amp; textures | **Yes** |
-| Handling submeshes while importing | **Yes** |
+| Lighting | **Yes** (point/directional lights) |
+| Materials &amp; textures | **Yes** (multi-textures functional) |
 | Deferred rendering | **Yes** (modularization in progress) |
-| Screen-Space Ambiant Occlusion (SSAO) | _In progress_ |
-| Screen-Space Reflections (SSR) | _In progress_ |
+| Screen-Space Ambiant Occlusion (SSAO) | _On standby_ |
+| Screen-Space Reflections (SSR) | _On standby_ |
+| Normal mapping | **Yes** |
+| PBR rendering | **Yes** (Cook-Torrance model) |
+| Image Based Lighting (IBL) | No |
+| Shadow mapping | No |
+| Bloom | No |
 
 ## In the future...
 
