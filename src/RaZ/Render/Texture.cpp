@@ -1,3 +1,5 @@
+#include <array>
+
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
