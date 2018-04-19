@@ -50,7 +50,7 @@ float computeNormalDistrib(vec3 normal, vec3 halfVec, float roughness) {
   float divider = (sqrHalfVecAngle * (frthRough - 1.0) + 1.0);
   divider       = PI * divider * divider;
 
-  return sqrRough / divider;
+  return frthRough / divider;
 }
 
 // Fresnel: Shlick
@@ -58,7 +58,7 @@ vec3 computeFresnel(float cosTheta, vec3 baseReflectivity) {
   return baseReflectivity + (1.0 - baseReflectivity) * pow(1.0 - cosTheta, 5.0);
 }
 
-// Shlick GGX for Geometry part
+// Shlick-Beckmann for Geometry part
 float computeShlickGGX(float viewAngle, float roughness) {
   float incrRough   = (roughness + 1.0);
   float roughFactor = (incrRough * incrRough) / 8.0;
@@ -101,15 +101,16 @@ void main() {
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
     vec3 fullLightDir;
+    float attenuation = 1.0;
 
     if (uniLights[lightIndex].position.w != 0.0) {
       fullLightDir = uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition;
+
+      float distance = length(fullLightDir);
+      attenuation /= (distance * distance);
     } else {
       fullLightDir = -uniLights[lightIndex].direction;
     }
-
-    float distance    = length(fullLightDir);
-    float attenuation = 1.0 / (distance * distance);
 
     vec3 lightDir = normalize(fullLightDir);
     vec3 halfDir  = normalize(viewDir + lightDir);
