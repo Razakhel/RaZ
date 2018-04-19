@@ -9,11 +9,11 @@
 
 namespace Raz {
 
-void Shader::read(const std::string& fileName) {
-  std::ifstream shaderSource(fileName, std::ios::in | std::ios::binary | std::ios::ate);
+void Shader::load() {
+  std::ifstream shaderSource(m_path, std::ios::in | std::ios::binary | std::ios::ate);
 
   if (!shaderSource)
-    throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
+    throw std::runtime_error("Error: Couldn't open the file '" + m_path + "'");
 
   const auto fileSize = static_cast<std::size_t>(shaderSource.tellg());
   shaderSource.seekg(0, std::ios::beg);
@@ -21,12 +21,14 @@ void Shader::read(const std::string& fileName) {
   std::vector<char> bytes(fileSize);
   shaderSource.read(&bytes[0], fileSize);
 
-  m_content = std::string(&bytes[0], fileSize);
+  std::string content = std::string(&bytes[0], fileSize);
 
-  m_index = glCreateShader(m_type);
-  const char* data = m_content.c_str();
-  const auto length = static_cast<GLint>(m_content.size());
+  const char* data = content.c_str();
+  const auto length = static_cast<GLint>(content.size());
   glShaderSource(m_index, 1, static_cast<const GLchar* const*>(&data), &length);
+}
+
+void Shader::compile() const {
   glCompileShader(m_index);
 
   GLint success;
@@ -37,8 +39,19 @@ void Shader::read(const std::string& fileName) {
 
     glGetShaderInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
     std::cerr << "Error: Vertex shader compilation failed.\n" << infoLog.data() << std::endl;
-    std::cerr << m_content << std::endl;
   }
+}
+
+VertexShader::VertexShader(const std::string& fileName) {
+  m_path = fileName;
+  create();
+  load();
+}
+
+FragmentShader::FragmentShader(const std::string& fileName) {
+  m_path = fileName;
+  create();
+  load();
 }
 
 } // namespace Raz
