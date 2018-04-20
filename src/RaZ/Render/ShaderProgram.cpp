@@ -7,10 +7,26 @@
 
 namespace Raz {
 
-void ShaderProgram::attachShaders(const VertexShader& vertShader, const FragmentShader& fragShader) const {
-  glAttachShader(m_index, vertShader.getIndex());
-  glAttachShader(m_index, fragShader.getIndex());
+ShaderProgram::ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader) : m_index{ glCreateProgram() },
+                                                                                         m_vertShader{ std::move(vertShader) },
+                                                                                         m_fragShader{ std::move(fragShader) } {
+  glAttachShader(m_index, m_vertShader->getIndex());
+  glAttachShader(m_index, m_fragShader->getIndex());
 
+  updateShaders();
+}
+
+void ShaderProgram::loadShaders() const {
+  m_vertShader->load();
+  m_fragShader->load();
+}
+
+void ShaderProgram::compileShaders() const {
+  m_vertShader->compile();
+  m_fragShader->compile();
+}
+
+void ShaderProgram::link() const {
   glLinkProgram(m_index);
 
   GLint success;
@@ -22,6 +38,12 @@ void ShaderProgram::attachShaders(const VertexShader& vertShader, const Fragment
     glGetProgramInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
     std::cerr << "Error: Shader program link failed.\n" << infoLog.data() << std::endl;
   }
+}
+
+void ShaderProgram::updateShaders() const {
+  loadShaders();
+  compileShaders();
+  link();
 }
 
 template <>
@@ -36,7 +58,7 @@ void ShaderProgram::sendUniform(GLint uniformIndex, unsigned int value) const {
 
 template <>
 void ShaderProgram::sendUniform(GLint uniformIndex, std::size_t value) const {
-  glUniform1ui(uniformIndex, static_cast<GLint>(value));
+  glUniform1ui(uniformIndex, static_cast<GLuint>(value));
 }
 
 template <>

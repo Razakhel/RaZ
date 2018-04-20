@@ -13,10 +13,9 @@ namespace Raz {
 
 class Scene {
 public:
-  Scene() = default;
-  Scene(const VertexShader& vertShader, const FragmentShader& fragShader) : m_program(vertShader, fragShader) {}
-  Scene(const VertexShader& vertShader, const FragmentShader& fragShader, std::vector<ModelPtr>&& models)
-    : m_program(vertShader, fragShader), m_models(std::move(models)) {}
+  Scene(VertexShaderPtr vertShader, FragmentShaderPtr fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
+  Scene(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, std::vector<ModelPtr>&& models)
+    : m_program(std::move(vertShader), std::move(fragShader)), m_models{ std::move(models) } {}
 
   const ShaderProgram& getProgram() const { return m_program; }
   const std::vector<ModelPtr>& getModels() const { return m_models; }

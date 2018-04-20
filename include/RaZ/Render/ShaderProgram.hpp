@@ -6,19 +6,19 @@
 #include <string>
 
 #include "glew/include/GL/glew.h"
+#include "RaZ/Math/Matrix.hpp"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
 
 namespace Raz {
 
 class ShaderProgram {
 public:
-  ShaderProgram() : m_index{ glCreateProgram() } {}
-  ShaderProgram(const VertexShader& vertShader, const FragmentShader& fragShader)
-    : ShaderProgram() { attachShaders(vertShader, fragShader); }
+  ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader);
 
   GLuint getIndex() const { return m_index; }
 
-  void attachShaders(const VertexShader& vertShader, const FragmentShader& fragShader) const;
+  void updateShaders() const;
   void use() const { glUseProgram(m_index); }
   GLint recoverUniformLocation(const std::string& uniformName) const { return glGetUniformLocation(m_index, uniformName.c_str()); }
   template <typename T> void sendUniform(GLint uniformIndex, T value) const;
@@ -29,7 +29,14 @@ public:
   }
 
 private:
+  void loadShaders() const;
+  void compileShaders() const;
+  void link() const;
+
   GLuint m_index;
+
+  VertexShaderPtr m_vertShader;
+  FragmentShaderPtr m_fragShader;
 };
 
 } // namespace Raz

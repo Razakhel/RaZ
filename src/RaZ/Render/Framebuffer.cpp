@@ -4,8 +4,10 @@
 
 namespace Raz {
 
-Framebuffer::Framebuffer(unsigned int width, unsigned int height) : m_program(VertexShader("../shaders/framebufferVert.glsl"),
-                                                                              FragmentShader("../shaders/ssr.glsl")) {
+Framebuffer::Framebuffer(unsigned int width, unsigned int height)
+  : m_program(std::make_unique<VertexShader>("../shaders/framebufferVert.glsl"),
+              std::make_unique<FragmentShader>("../shaders/ssr.glsl")) {
+
   m_depthBuffer = std::make_shared<Texture>(width, height, true);
   m_colorBuffer = std::make_shared<Texture>(width, height);
   m_normalBuffer = std::make_shared<Texture>(width, height);
