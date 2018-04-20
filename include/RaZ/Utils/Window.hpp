@@ -15,11 +15,12 @@ using CallbacksList = std::vector<std::pair<int, std::function<void()>>>;
 
 class Window {
 public:
-  Window(unsigned int width, unsigned int height, const std::string& name = "", uint8_t AASampleCount = 1);
+  Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t AASampleCount = 1);
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
 
+  void setTitle(const std::string& title) { glfwSetWindowTitle(m_window, title.c_str()); }
   void enableVerticalSync(bool value = true);
   void disableVerticalSync() { enableVerticalSync(false); }
   void addKeyCallback(Keyboard::Key key, std::function<void()> func);
