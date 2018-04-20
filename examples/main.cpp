@@ -9,14 +9,14 @@ int main() {
 
   Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
 
-  const Raz::VertexShader vertShader("../shaders/vert.glsl");
-  const Raz::FragmentShader fragShader("../shaders/cook-torrance.glsl");
+  Raz::VertexShaderPtr vertShader = std::make_unique<Raz::VertexShader>("../shaders/vert.glsl");
+  Raz::FragmentShaderPtr fragShader = std::make_unique<Raz::FragmentShader>("../shaders/cook-torrance.glsl");
 
-  Raz::Scene scene(vertShader, fragShader);
+  Raz::Scene scene(std::move(vertShader), std::move(fragShader));
 
   const auto startTime = std::chrono::system_clock::now();
-  Raz::ModelPtr model = Raz::ModelLoader::importModel("../assets/meshes/cerberus.obj");
-  const auto endTime = std::chrono::system_clock::now();
+  Raz::ModelPtr model  = Raz::ModelLoader::importModel("../assets/meshes/cerberus.obj");
+  const auto endTime   = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
@@ -27,18 +27,18 @@ int main() {
 
   /*Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
                                                           Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/
-  Raz::LightPtr light = std::make_unique<Raz::DirectionalLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),   // Position
-                                                                Raz::Vec3f({ -1.f, -1.f, 0.f }), // Direction
-                                                                Raz::Vec3f({ 1.f, 1.f, 1.f }));  // Color (R/G/B)
+  Raz::LightPtr light = std::make_unique<Raz::DirectionalLight>(Raz::Vec3f({  0.f,  1.f, 0.f }),  // Position
+                                                                Raz::Vec3f({ -1.f, -1.f, 0.f }),  // Direction
+                                                                Raz::Vec3f({  1.f,  1.f, 1.f })); // Color (R/G/B)
 
   Raz::CameraPtr camera = std::make_unique<Raz::Camera>(window.getWidth(),
                                                         window.getHeight(),
-                                                        45.f,                             // Field of view
-                                                        0.1f, 100.f,                      // Near plane, far plane
-                                                        Raz::Vec3f({ 0.f, 0.f, -5.f }));  // Initial position
+                                                        45.f,                            // Field of view
+                                                        0.1f, 100.f,                     // Near plane, far plane
+                                                        Raz::Vec3f({ 0.f, 0.f, -5.f })); // Initial position
 
-  const auto modelPtr = model.get();
-  const auto lightPtr = light.get();
+  const auto modelPtr  = model.get();
+  const auto lightPtr  = light.get();
   const auto cameraPtr = camera.get();
 
   // Allow wireframe toggling
@@ -55,30 +55,32 @@ int main() {
   });
 
   // Camera controls
-  window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr] () { cameraPtr->translate(0.f, 0.5f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::V, [&cameraPtr] () { cameraPtr->translate(0.f, -0.5f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::W, [&cameraPtr] () { cameraPtr->translate(0.f, 0.f, 0.5f); });
-  window.addKeyCallback(Raz::Keyboard::S, [&cameraPtr] () { cameraPtr->translate(0.f, 0.f, -0.5f); });
-  window.addKeyCallback(Raz::Keyboard::A, [&cameraPtr] () { cameraPtr->translate(-0.5f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::D, [&cameraPtr] () { cameraPtr->translate(0.5f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr] () { cameraPtr->translate( 0.f,  0.5f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::V,     [&cameraPtr] () { cameraPtr->translate( 0.f, -0.5f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::W,     [&cameraPtr] () { cameraPtr->translate( 0.f,  0.f,  0.5f); });
+  window.addKeyCallback(Raz::Keyboard::S,     [&cameraPtr] () { cameraPtr->translate( 0.f,  0.f, -0.5f); });
+  window.addKeyCallback(Raz::Keyboard::A,     [&cameraPtr] () { cameraPtr->translate(-0.5f, 0.f,  0.f); });
+  window.addKeyCallback(Raz::Keyboard::D,     [&cameraPtr] () { cameraPtr->translate( 0.5f, 0.f,  0.f); });
 
   // Mesh controls
-  window.addKeyCallback(Raz::Keyboard::T, [&modelPtr] () { modelPtr->translate(0.f, 0.f, 0.5f); });
-  window.addKeyCallback(Raz::Keyboard::G, [&modelPtr] () { modelPtr->translate(0.f, 0.f, -0.5f); });
-  window.addKeyCallback(Raz::Keyboard::F, [&modelPtr] () { modelPtr->translate(-0.5f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::H, [&modelPtr] () { modelPtr->translate(0.5f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::X, [&modelPtr] () { modelPtr->scale(0.5f); });
-  window.addKeyCallback(Raz::Keyboard::C, [&modelPtr] () { modelPtr->scale(2.f); });
-  window.addKeyCallback(Raz::Keyboard::UP, [&modelPtr] () { modelPtr->rotate(10.f, 1.f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] () { modelPtr->rotate(-10.f, 1.f, 0.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
-  window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate(10.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::T,     [&modelPtr] () { modelPtr->translate( 0.f,  0.f,  0.5f); });
+  window.addKeyCallback(Raz::Keyboard::G,     [&modelPtr] () { modelPtr->translate( 0.f,  0.f, -0.5f); });
+  window.addKeyCallback(Raz::Keyboard::F,     [&modelPtr] () { modelPtr->translate(-0.5f, 0.f,  0.f); });
+  window.addKeyCallback(Raz::Keyboard::H,     [&modelPtr] () { modelPtr->translate( 0.5f, 0.f,  0.f); });
+  window.addKeyCallback(Raz::Keyboard::X,     [&modelPtr] () { modelPtr->scale(0.5f); });
+  window.addKeyCallback(Raz::Keyboard::C,     [&modelPtr] () { modelPtr->scale(2.f); });
+  window.addKeyCallback(Raz::Keyboard::UP,    [&modelPtr] () { modelPtr->rotate( 10.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::DOWN,  [&modelPtr] () { modelPtr->rotate(-10.f, 1.f, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::LEFT,  [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate( 10.f, 0.f, 1.f, 0.f); });
 
   // Light controls
-  window.addKeyCallback(Raz::Keyboard::I, [&lightPtr, &scene] () { lightPtr->translate(0.f, 0.f, 0.5f); scene.updateLights(); });
-  window.addKeyCallback(Raz::Keyboard::K, [&lightPtr, &scene] () { lightPtr->translate(0.f, 0.f, -0.5f); scene.updateLights(); });
-  window.addKeyCallback(Raz::Keyboard::J, [&lightPtr, &scene] () { lightPtr->translate(-0.5f, 0.f, 0.f); scene.updateLights(); });
-  window.addKeyCallback(Raz::Keyboard::L, [&lightPtr, &scene] () { lightPtr->translate(0.5f, 0.f, 0.f); scene.updateLights(); });
+  window.addKeyCallback(Raz::Keyboard::I, [&lightPtr, &scene] () { lightPtr->translate( 0.f,  0.f,  0.5f); scene.updateLights(); });
+  window.addKeyCallback(Raz::Keyboard::K, [&lightPtr, &scene] () { lightPtr->translate( 0.f,  0.f, -0.5f); scene.updateLights(); });
+  window.addKeyCallback(Raz::Keyboard::J, [&lightPtr, &scene] () { lightPtr->translate(-0.5f, 0.f,  0.f);  scene.updateLights(); });
+  window.addKeyCallback(Raz::Keyboard::L, [&lightPtr, &scene] () { lightPtr->translate( 0.5f, 0.f,  0.f);  scene.updateLights(); });
+
+  window.addKeyCallback(Raz::Keyboard::F5, [&scene] () { scene.getProgram().updateShaders(); scene.load(); scene.updateLights(); });
 
   scene.addModel(std::move(model));
   scene.addLight(std::move(light));
@@ -87,9 +89,9 @@ int main() {
   scene.load();
 
   const auto uniProjectionLocation = framebuffer.getProgram().recoverUniformLocation("uniProjectionMatrix");
-  const auto uniInvProjLocation = framebuffer.getProgram().recoverUniformLocation("uniInvProjMatrix");
-  const auto uniViewLocation = framebuffer.getProgram().recoverUniformLocation("uniViewMatrix");
-  const auto uniInvViewLocation = framebuffer.getProgram().recoverUniformLocation("uniInvViewMatrix");
+  const auto uniInvProjLocation    = framebuffer.getProgram().recoverUniformLocation("uniInvProjMatrix");
+  const auto uniViewLocation       = framebuffer.getProgram().recoverUniformLocation("uniViewMatrix");
+  const auto uniInvViewLocation    = framebuffer.getProgram().recoverUniformLocation("uniInvViewMatrix");
 
   framebuffer.getProgram().use();
   framebuffer.getProgram().sendUniform("uniSceneDepthBuffer", 0);
@@ -97,7 +99,7 @@ int main() {
   framebuffer.getProgram().sendUniform("uniSceneNormalBuffer", 2);
 
   const auto uniCameraPosLocation = scene.getProgram().recoverUniformLocation("uniCameraPos");
-  const auto uniViewProjLocation = scene.getProgram().recoverUniformLocation("uniViewProjMatrix");
+  const auto uniViewProjLocation  = scene.getProgram().recoverUniformLocation("uniViewProjMatrix");
 
   auto lastTime = std::chrono::system_clock::now();
   uint16_t nbFrames = 0;
@@ -107,15 +109,15 @@ int main() {
     ++nbFrames;
 
     if (std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - lastTime).count() >= 1.f) {
-      std::cout << nbFrames << " FPS\r" << std::flush;
+      window.setTitle("RaZ - " + std::to_string(nbFrames) + " FPS");
 
       nbFrames = 0;
       lastTime = currentTime;
     }
 
     const Raz::Mat4f projectionMat = cameraPtr->computePerspectiveMatrix();
-    const Raz::Mat4f viewMat = cameraPtr->lookAt(modelPtr->getPosition());
-    const Raz::Mat4f viewProjMat = projectionMat * viewMat;
+    const Raz::Mat4f viewMat       = cameraPtr->lookAt(modelPtr->getPosition());
+    const Raz::Mat4f viewProjMat   = projectionMat * viewMat;
 
     if (renderFramebuffer) {
       framebuffer.bind();
