@@ -23,18 +23,20 @@ public:
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
 
-  void setMaterial(MaterialPreset material, float roughnessFactor);
+  static void drawQuad();
+
+  void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
-  void load(const ShaderProgram& program) const;
-  void draw(const ShaderProgram& program) const;
+  void load(const ShaderProgram* program = nullptr) const;
+  void draw(const ShaderProgram* program = nullptr) const;
 
 private:
   std::vector<SubmeshPtr> m_submeshes {};
   std::vector<MaterialPtr> m_materials {};
 };
 
-using MeshPtr = std::shared_ptr<Mesh>;
+using MeshPtr = std::unique_ptr<Mesh>;
 
 } // namespace Raz
 
