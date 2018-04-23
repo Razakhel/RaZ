@@ -32,13 +32,13 @@ void importMtl(const std::string& fileName,
         const float blue = std::stof(thirdValue);
 
         if (line[1] == 'a') {
-          standardMaterial->assignAmbient(red, green, blue);
+          standardMaterial->setAmbient(red, green, blue);
         } else if (line[1] == 'd') {
-          standardMaterial->assignDiffuse(red, green, blue);
+          standardMaterial->setDiffuse(red, green, blue);
         } else if (line[1] == 's') {
-          standardMaterial->assignSpecular(red, green, blue);
+          standardMaterial->setSpecular(red, green, blue);
         } else if (line[1] == 'e') {
-          standardMaterial->assignEmissive(red, green, blue);
+          standardMaterial->setEmissive(red, green, blue);
         }
 
         isStandardMaterial = true;

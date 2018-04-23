@@ -12,6 +12,7 @@ class Matrix {
 public:
   Matrix() = default;
   Matrix(const Matrix&) = default;
+  Matrix(Matrix&&) noexcept = default;
   explicit Matrix(const Matrix<T, W + 1, H + 1>& mat);
   Matrix(std::initializer_list<std::initializer_list<T>> list);
 
@@ -27,6 +28,7 @@ public:
   float computeDeterminant() const;
   Matrix inverse() const;
 
+  Matrix& operator=(const Matrix& mat) = default;
   Matrix operator+(const Matrix& mat) const;
   Matrix operator+(float val) const;
   Matrix operator-(const Matrix& mat) const;

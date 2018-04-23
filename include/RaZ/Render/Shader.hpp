@@ -15,13 +15,12 @@ class Shader {
 public:
   GLuint getIndex() const { return m_index; }
 
-  void load();
+  void load() const;
   void compile() const;
 
   ~Shader() { glDeleteShader(m_index); }
 
 protected:
-
   virtual void create() = 0;
 
   GLuint m_index {};

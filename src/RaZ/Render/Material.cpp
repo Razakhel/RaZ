@@ -25,7 +25,7 @@ const std::unordered_map<MaterialPreset, std::pair<Vec3f, float>> MATERIAL_PRESE
 
 }
 
-MaterialPtr Material::recoverMaterial(MaterialPreset preset, float roughnessFactor) {
+std::unique_ptr<MaterialCookTorrance> Material::recoverMaterial(MaterialPreset preset, float roughnessFactor) {
   const auto& materialParamsIter = MATERIAL_PRESET_PARAMS.find(preset);
 
   if (materialParamsIter == MATERIAL_PRESET_PARAMS.end())

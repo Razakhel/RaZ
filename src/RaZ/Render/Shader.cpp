@@ -9,7 +9,7 @@
 
 namespace Raz {
 
-void Shader::load() {
+void Shader::load() const {
   std::ifstream shaderSource(m_path, std::ios::in | std::ios::binary | std::ios::ate);
 
   if (!shaderSource)

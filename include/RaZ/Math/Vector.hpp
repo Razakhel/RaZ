@@ -16,6 +16,7 @@ class Vector {
 public:
   Vector() = default;
   Vector(const Vector&) = default;
+  Vector(Vector&&) noexcept = default;
   Vector(const Vector<T, Size - 1>& vec, T val);
   explicit Vector(T val);
   Vector(std::initializer_list<T> list);
@@ -33,6 +34,7 @@ public:
   float computeLength() const { return std::sqrt(dot(*this)); }
   std::size_t hash(std::size_t seed) const;
 
+  Vector& operator=(const Vector& vec) = default;
   Vector operator-() const { return (*this * -1); }
   Vector operator+(const Vector& vec) const;
   Vector operator+(float val) const;

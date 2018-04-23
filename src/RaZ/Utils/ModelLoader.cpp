@@ -30,7 +30,7 @@ Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f&
 }
 
 ModelPtr importObj(std::ifstream& file) {
-  MeshPtr mesh = std::make_shared<Mesh>();
+  MeshPtr mesh = std::make_unique<Mesh>();
   std::unordered_map<std::string, std::size_t> materialCorrespIndices;
 
   std::vector<Vec3f> positions;
@@ -247,7 +247,7 @@ ModelPtr importObj(std::ifstream& file) {
 }
 
 ModelPtr importOff(std::ifstream& file) {
-  MeshPtr mesh = std::make_shared<Mesh>();
+  MeshPtr mesh = std::make_unique<Mesh>();
   mesh->getSubmeshes().emplace_back(std::make_unique<Submesh>());
 
   std::size_t vertexCount, faceCount;

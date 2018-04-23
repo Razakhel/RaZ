@@ -9,7 +9,7 @@ namespace Raz {
 
 namespace ModelLoader {
 
-ModelPtr importModel(const std::string& file);
+ModelPtr importModel(const std::string& fileName);
 
 } // namespace ModelLoader
 
