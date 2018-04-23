@@ -4,17 +4,13 @@
 
 namespace Raz {
 
-Framebuffer::Framebuffer(unsigned int width, unsigned int height)
-  : m_program(std::make_unique<VertexShader>("../shaders/framebufferVert.glsl"),
-              std::make_unique<FragmentShader>("../shaders/ssr.glsl")) {
+Framebuffer::Framebuffer(unsigned int width, unsigned int height, const std::string& vertShaderPath, const std::string& fragShaderPath)
+  : m_program(std::make_unique<VertexShader>(vertShaderPath),
+              std::make_unique<FragmentShader>(fragShaderPath)) {
 
   m_depthBuffer = std::make_shared<Texture>(width, height, true);
   m_colorBuffer = std::make_shared<Texture>(width, height);
   m_normalBuffer = std::make_shared<Texture>(width, height);
-  m_viewport = std::make_shared<Mesh>(Vec3f({ -1.f, 1.f, 0.f }),
-                                      Vec3f({ 1.f, 1.f, 0.f }),
-                                      Vec3f({ 1.f, -1.f, 0.f }),
-                                      Vec3f({ -1.f, -1.f, 0.f }));
   glGenFramebuffers(1, &m_index);
 
   const std::array<GLenum, 2> colorBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
@@ -29,8 +25,6 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height)
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     std::cerr << "Error: Framebuffer is not complete." << std::endl;
   unbind();
-
-  m_viewport->load(m_program);
 }
 
 void Framebuffer::bind() const {
@@ -42,7 +36,14 @@ void Framebuffer::bind() const {
 void Framebuffer::display() const {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  m_viewport->draw(m_program);
+  glActiveTexture(GL_TEXTURE0);
+  m_depthBuffer->bind();
+  glActiveTexture(GL_TEXTURE1);
+  m_colorBuffer->bind();
+  glActiveTexture(GL_TEXTURE2);
+  m_normalBuffer->bind();
+
+  Mesh::drawQuad();
 }
 
 } // namespace Raz

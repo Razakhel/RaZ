@@ -12,7 +12,7 @@ namespace Raz {
 
 class Framebuffer {
 public:
-  Framebuffer(unsigned int width, unsigned int height);
+  Framebuffer(unsigned int width, unsigned int height, const std::string& vertShaderPath, const std::string& fragShaderPath);
 
   const TexturePtr& getDepthBuffer() const { return m_depthBuffer; }
   const TexturePtr& getColorBuffer() const { return m_colorBuffer; }
@@ -30,7 +30,6 @@ private:
   TexturePtr m_depthBuffer;
   TexturePtr m_colorBuffer;
   TexturePtr m_normalBuffer;
-  MeshPtr m_viewport;
   ShaderProgram m_program;
 };
 
