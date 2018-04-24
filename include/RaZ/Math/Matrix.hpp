@@ -14,6 +14,7 @@ public:
   Matrix(const Matrix&) = default;
   Matrix(Matrix&&) noexcept = default;
   explicit Matrix(const Matrix<T, W + 1, H + 1>& mat);
+  explicit Matrix(const Matrix<T, W - 1, H - 1>& mat);
   Matrix(std::initializer_list<std::initializer_list<T>> list);
 
   std::size_t getWidth() const { return W; }

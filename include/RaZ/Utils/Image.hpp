@@ -22,8 +22,9 @@ public:
   const std::vector<uint8_t>& getData() const { return m_data; }
   const uint8_t* getDataPtr() const { return m_data.data(); }
 
-private:
   void read(const std::string& fileName);
+
+private:
   void readPng(std::ifstream& fileName);
 
   std::size_t m_width {};

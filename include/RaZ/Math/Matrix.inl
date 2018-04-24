@@ -189,6 +189,25 @@ Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
+Matrix<T, W, H>::Matrix(const Matrix<T, W - 1, H - 1>& mat) {
+  std::size_t widthStride = 0;
+
+  for (std::size_t heightIndex = 0; heightIndex < H - 1; ++heightIndex) {
+    std::size_t resIndex = heightIndex * (W - 1);
+
+    for (std::size_t widthIndex = 0; widthIndex < W - 1; ++widthIndex) {
+      const std::size_t finalIndex = resIndex + widthIndex;
+
+      m_data[finalIndex + widthStride] = mat[finalIndex];
+    }
+
+    ++widthStride;
+  }
+
+  m_data.back() = 1;
+}
+
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
   auto row = list.begin();
 
