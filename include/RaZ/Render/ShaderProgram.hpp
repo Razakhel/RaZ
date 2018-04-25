@@ -14,10 +14,15 @@ namespace Raz {
 
 class ShaderProgram {
 public:
+  ShaderProgram() : m_index{ glCreateProgram() } {}
   ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader);
 
   GLuint getIndex() const { return m_index; }
 
+  void setVertexShader(VertexShaderPtr vertShader);
+  void setFragmentShader(FragmentShaderPtr fragShader);
+
+  void link() const;
   void updateShaders() const;
   void use() const { glUseProgram(m_index); }
   GLint recoverUniformLocation(const std::string& uniformName) const { return glGetUniformLocation(m_index, uniformName.c_str()); }
@@ -31,7 +36,6 @@ public:
 private:
   void loadShaders() const;
   void compileShaders() const;
-  void link() const;
 
   GLuint m_index;
 

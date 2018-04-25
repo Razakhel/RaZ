@@ -7,13 +7,24 @@
 
 namespace Raz {
 
-ShaderProgram::ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader) : m_index{ glCreateProgram() },
-                                                                                         m_vertShader{ std::move(vertShader) },
-                                                                                         m_fragShader{ std::move(fragShader) } {
-  glAttachShader(m_index, m_vertShader->getIndex());
-  glAttachShader(m_index, m_fragShader->getIndex());
+ShaderProgram::ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader) : ShaderProgram() {
+  glAttachShader(m_index, vertShader->getIndex());
+  glAttachShader(m_index, fragShader->getIndex());
+
+  m_vertShader = std::move(vertShader);
+  m_fragShader = std::move(fragShader);
 
   updateShaders();
+}
+
+void ShaderProgram::setVertexShader(Raz::VertexShaderPtr vertShader) {
+  glAttachShader(m_index, vertShader->getIndex());
+  m_vertShader = std::move(vertShader);
+}
+
+void ShaderProgram::setFragmentShader(Raz::FragmentShaderPtr fragShader) {
+  glAttachShader(m_index, fragShader->getIndex());
+  m_fragShader = std::move(fragShader);
 }
 
 void ShaderProgram::loadShaders() const {

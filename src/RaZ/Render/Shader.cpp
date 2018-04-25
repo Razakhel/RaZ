@@ -25,7 +25,7 @@ void Shader::load() const {
 
   const char* data = content.c_str();
   const auto length = static_cast<GLint>(content.size());
-  glShaderSource(m_index, 1, static_cast<const GLchar* const*>(&data), &length);
+  glShaderSource(m_index, 1, &data, &length);
 }
 
 void Shader::compile() const {
@@ -42,16 +42,40 @@ void Shader::compile() const {
   }
 }
 
-VertexShader::VertexShader(const std::string& fileName) {
+VertexShader::VertexShader(const std::string& fileName) : VertexShader() {
   m_path = fileName;
-  create();
   load();
 }
 
-FragmentShader::FragmentShader(const std::string& fileName) {
+VertexShaderPtr VertexShader::loadFromSource(const std::string& source) {
+  auto vertShader = std::make_unique<VertexShader>();
+
+  const char* data = source.c_str();
+  const auto length = static_cast<GLint>(source.size());
+
+  glShaderSource(vertShader->getIndex(), 1, &data, &length);
+
+  vertShader->compile();
+
+  return vertShader;
+}
+
+FragmentShader::FragmentShader(const std::string& fileName) : FragmentShader() {
   m_path = fileName;
-  create();
   load();
+}
+
+FragmentShaderPtr FragmentShader::loadFromSource(const std::string& source) {
+  auto fragShader = std::make_unique<FragmentShader>();
+
+  const char* data = source.c_str();
+  const auto length = static_cast<GLint>(source.size());
+
+  glShaderSource(fragShader->getIndex(), 1, &data, &length);
+
+  fragShader->compile();
+
+  return fragShader;
 }
 
 } // namespace Raz

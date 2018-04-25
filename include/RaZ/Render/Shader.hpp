@@ -21,28 +21,26 @@ public:
   ~Shader() { glDeleteShader(m_index); }
 
 protected:
-  virtual void create() = 0;
-
   GLuint m_index {};
   std::string m_path {};
 };
 
 class VertexShader : public Shader {
 public:
+  VertexShader() { m_index = glCreateShader(GL_VERTEX_SHADER); }
   explicit VertexShader(const std::string& fileName);
 
-private:
-  void create() override { m_index = glCreateShader(GL_VERTEX_SHADER); }
+  static std::unique_ptr<VertexShader> loadFromSource(const std::string& source);
 };
 
 using VertexShaderPtr = std::unique_ptr<VertexShader>;
 
 class FragmentShader : public Shader {
 public:
+  FragmentShader() { m_index = glCreateShader(GL_FRAGMENT_SHADER); }
   explicit FragmentShader(const std::string& fileName);
 
-private:
-  void create() override { m_index = glCreateShader(GL_FRAGMENT_SHADER); }
+  static std::unique_ptr<FragmentShader> loadFromSource(const std::string& source);
 };
 
 using FragmentShaderPtr = std::unique_ptr<FragmentShader>;
