@@ -24,7 +24,7 @@ bool validatePng(std::istream& file) {
 
 } // namespace
 
-void Image::readPng(std::ifstream& file) {
+void Image::readPng(std::ifstream& file, bool reverse) {
   if (!validatePng(file))
     throw std::runtime_error("Error: Not a valid PNG");
 
@@ -96,21 +96,21 @@ void Image::readPng(std::ifstream& file) {
 
   // Mapping row's elements to data's
   for (std::size_t i = 0; i < m_height; ++i)
-    rowPtrs[(m_height - 1) - i] = &m_data[m_width * channels * i];
+    rowPtrs[(reverse ? i : m_height - 1 - i)] = &m_data[m_width * channels * i];
 
   png_read_image(readStruct, rowPtrs.data());
   png_read_end(readStruct, infoStruct);
   png_destroy_read_struct(&readStruct, nullptr, &infoStruct);
 }
 
-void Image::read(const std::string& fileName) {
+void Image::read(const std::string& fileName, bool reverse) {
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
     const std::string format = extractFileExt(fileName);
 
     if (format == "png" || format == "PNG")
-      readPng(file);
+      readPng(file, reverse);
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored";
   } else {
