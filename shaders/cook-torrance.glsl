@@ -10,14 +10,7 @@ struct Light {
   float angle;
 };
 
-uniform uint uniLightCount;
-uniform Light uniLights[MAX_LIGHT_COUNT];
-
-uniform vec3 uniCameraPos;
-
-uniform mat4 uniViewProjMatrix;
-
-uniform struct Material {
+struct Material {
   vec3 baseColor;
   float metallicFactor;
   float roughnessFactor;
@@ -27,14 +20,22 @@ uniform struct Material {
   sampler2D metallicMap;
   sampler2D roughnessMap;
   sampler2D ambientOcclusionMap;
-} uniMaterial;
+};
 
 in MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;
 } fragMeshInfo;
-in vec3 fragNormal;
+
+uniform uint uniLightCount;
+uniform Light uniLights[MAX_LIGHT_COUNT];
+
+uniform vec3 uniCameraPos;
+
+uniform mat4 uniViewProjMatrix;
+
+uniform Material uniMaterial;
 
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec3 bufferNormal;
@@ -80,7 +81,7 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 }
 
 void main() {
-  bufferNormal = normalize(fragNormal);
+  bufferNormal = normalize(fragMeshInfo.vertTBNMatrix[2]);
 
   // Gamma correction for albedo (sRGB presumed)
   vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;

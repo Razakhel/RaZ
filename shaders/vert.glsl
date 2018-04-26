@@ -14,8 +14,6 @@ out MeshInfo {
   mat3 vertTBNMatrix;
 } fragMeshInfo;
 
-out vec3 fragNormal;
-
 void main() {
   vec4 pos = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
 
@@ -28,8 +26,6 @@ void main() {
   vec3 normal    = normalize(modelMat * vertNormal);
   vec3 bitangent = cross(normal, tangent);
   fragMeshInfo.vertTBNMatrix = mat3(tangent, bitangent, normal);
-
-  fragNormal = normal;
 
   gl_Position = pos;
 }

@@ -9,12 +9,7 @@ struct Light {
   float angle;
 };
 
-uniform uint uniLightCount;
-uniform Light uniLights[MAX_LIGHT_COUNT];
-
-uniform mat4 uniViewProjMatrix;
-
-uniform struct Material {
+struct Material {
   vec3 ambient;
   vec3 diffuse;
   vec3 specular;
@@ -26,20 +21,26 @@ uniform struct Material {
   sampler2D specularMap;
   sampler2D transparencyMap;
   sampler2D bumpMap;
-} uniMaterial;
+};
 
 in MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;
 } fragMeshInfo;
-in vec3 fragNormal;
+
+uniform uint uniLightCount;
+uniform Light uniLights[MAX_LIGHT_COUNT];
+
+uniform mat4 uniViewProjMatrix;
+
+uniform Material uniMaterial;
 
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec3 bufferNormal;
 
 void main() {
-  bufferNormal = normalize(fragNormal);
+  bufferNormal = normalize(fragMeshInfo.vertTBNMatrix[2]);
 
   vec3 normal = fragMeshInfo.vertTBNMatrix[2];
 
