@@ -15,15 +15,19 @@ namespace Raz {
 class Mesh {
 public:
   Mesh() { m_submeshes.emplace_back(std::make_unique<Submesh>()); }
-  Mesh(const Vec3f& leftPos, const Vec3f& topPos, const Vec3f& rightPos);
-  Mesh(const Vec3f& topLeftPos, const Vec3f& topRightPos, const Vec3f& bottomRightPos, const Vec3f& bottomLeftPos);
 
   const std::vector<SubmeshPtr>& getSubmeshes() const { return m_submeshes; }
   std::vector<SubmeshPtr>& getSubmeshes() { return m_submeshes; }
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
 
+  static std::unique_ptr<Mesh> createTriangle(const Vec3f& leftPos, const Vec3f& topPos, const Vec3f& rightPos);
+  static std::unique_ptr<Mesh> createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos,
+                                          const Vec3f& rightBottomPos, const Vec3f& leftBottomPos);
+  static std::unique_ptr<Mesh> createAABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos);
+
   static void drawQuad();
+  static void drawCube();
 
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }

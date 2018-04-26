@@ -3,12 +3,19 @@
 namespace Raz {
 
 void Mesh::drawQuad() {
-  static const MeshPtr quadMesh = std::make_unique<Mesh>(Vec3f({ -1.f,  1.f, 0.f }),
-                                                         Vec3f({  1.f,  1.f, 0.f }),
-                                                         Vec3f({  1.f, -1.f, 0.f }),
-                                                         Vec3f({ -1.f, -1.f, 0.f }));
+  static const MeshPtr quadMesh = Mesh::createQuad(Vec3f({ -1.f,  1.f, 0.f }),
+                                                   Vec3f({  1.f,  1.f, 0.f }),
+                                                   Vec3f({  1.f, -1.f, 0.f }),
+                                                   Vec3f({ -1.f, -1.f, 0.f }));
 
   quadMesh->draw();
+}
+
+void Mesh::drawCube() {
+  static const MeshPtr cubeMesh = Mesh::createAABB(Vec3f({  1.f,  1.f,  1.f }),
+                                                   Vec3f({ -1.f, -1.f, -1.f }));
+
+  cubeMesh->draw();
 }
 
 void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
