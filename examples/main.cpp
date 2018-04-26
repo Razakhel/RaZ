@@ -7,12 +7,16 @@ int main() {
   Raz::Window window(800, 600, "RaZ", 4);
   //window.disableVerticalSync();
 
-  Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight());
+  Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight(), "../shaders/framebufferVert.glsl", "../shaders/ssr.glsl");
 
-  Raz::VertexShaderPtr vertShader = std::make_unique<Raz::VertexShader>("../shaders/vert.glsl");
+  Raz::VertexShaderPtr vertShader   = std::make_unique<Raz::VertexShader>("../shaders/vert.glsl");
   Raz::FragmentShaderPtr fragShader = std::make_unique<Raz::FragmentShader>("../shaders/cook-torrance.glsl");
 
   Raz::Scene scene(std::move(vertShader), std::move(fragShader));
+
+  Raz::CubemapPtr cubemap = std::make_unique<Raz::Cubemap>("../assets/skyboxes/lake_right.png", "../assets/skyboxes/lake_left.png",
+                                                           "../assets/skyboxes/lake_top.png", "../assets/skyboxes/lake_bottom.png",
+                                                           "../assets/skyboxes/lake_front.png", "../assets/skyboxes/lake_back.png");
 
   const auto startTime = std::chrono::system_clock::now();
   Raz::ModelPtr model  = Raz::ModelLoader::importModel("../assets/meshes/cerberus.obj");
@@ -37,9 +41,10 @@ int main() {
                                                         0.1f, 100.f,                     // Near plane, far plane
                                                         Raz::Vec3f({ 0.f, 0.f, -5.f })); // Initial position
 
-  const auto modelPtr  = model.get();
-  const auto lightPtr  = light.get();
-  const auto cameraPtr = camera.get();
+  const auto cubemapPtr = cubemap.get();
+  const auto modelPtr   = model.get();
+  const auto lightPtr   = light.get();
+  const auto cameraPtr  = camera.get();
 
   // Allow wireframe toggling
   bool isWireframe = false;
@@ -82,21 +87,25 @@ int main() {
 
   window.addKeyCallback(Raz::Keyboard::F5, [&scene] () { scene.getProgram().updateShaders(); scene.load(); scene.updateLights(); });
 
+  scene.setCubemap(std::move(cubemap));
   scene.addModel(std::move(model));
   scene.addLight(std::move(light));
   scene.updateLights();
   //scene.setCamera(std::move(camera));
   scene.load();
 
-  const auto uniProjectionLocation = framebuffer.getProgram().recoverUniformLocation("uniProjectionMatrix");
-  const auto uniInvProjLocation    = framebuffer.getProgram().recoverUniformLocation("uniInvProjMatrix");
-  const auto uniViewLocation       = framebuffer.getProgram().recoverUniformLocation("uniViewMatrix");
-  const auto uniInvViewLocation    = framebuffer.getProgram().recoverUniformLocation("uniInvViewMatrix");
+  const auto uniFBOProjectionLocation = framebuffer.getProgram().recoverUniformLocation("uniProjectionMatrix");
+  const auto uniFBOInvProjLocation    = framebuffer.getProgram().recoverUniformLocation("uniInvProjMatrix");
+  const auto uniFBOViewLocation       = framebuffer.getProgram().recoverUniformLocation("uniViewMatrix");
+  const auto uniFBOInvViewLocation    = framebuffer.getProgram().recoverUniformLocation("uniInvViewMatrix");
 
   framebuffer.getProgram().use();
-  framebuffer.getProgram().sendUniform("uniSceneDepthBuffer", 0);
-  framebuffer.getProgram().sendUniform("uniSceneColorBuffer", 1);
+  framebuffer.getProgram().sendUniform("uniSceneDepthBuffer",  0);
+  framebuffer.getProgram().sendUniform("uniSceneColorBuffer",  1);
   framebuffer.getProgram().sendUniform("uniSceneNormalBuffer", 2);
+
+  const auto uniCubemapProjLocation = cubemapPtr->getProgram().recoverUniformLocation("uniProjectionMatrix");
+  const auto uniCubemapViewLocation = cubemapPtr->getProgram().recoverUniformLocation("uniViewMatrix");
 
   const auto uniCameraPosLocation = scene.getProgram().recoverUniformLocation("uniCameraPos");
   const auto uniViewProjLocation  = scene.getProgram().recoverUniformLocation("uniViewProjMatrix");
@@ -119,30 +128,28 @@ int main() {
     const Raz::Mat4f viewMat       = cameraPtr->lookAt(modelPtr->getPosition());
     const Raz::Mat4f viewProjMat   = projectionMat * viewMat;
 
+    scene.getProgram().use();
+    scene.getProgram().sendUniform(uniCameraPosLocation, camera->getPosition());
+    scene.getProgram().sendUniform(uniViewProjLocation, viewProjMat);
+
+    cubemapPtr->getProgram().use();
+    cubemapPtr->getProgram().sendUniform(uniCubemapProjLocation, projectionMat);
+    cubemapPtr->getProgram().sendUniform(uniCubemapViewLocation, Raz::Mat4f(Raz::Mat3f(viewMat)));
+
     if (renderFramebuffer) {
+      framebuffer.getProgram().use();
+      framebuffer.getProgram().sendUniform(uniFBOProjectionLocation, projectionMat);
+      framebuffer.getProgram().sendUniform(uniFBOInvProjLocation, projectionMat.inverse());
+      framebuffer.getProgram().sendUniform(uniFBOViewLocation, viewMat);
+      framebuffer.getProgram().sendUniform(uniFBOInvViewLocation, viewMat.inverse());
+
       framebuffer.bind();
-
-      framebuffer.getProgram().sendUniform(uniProjectionLocation, projectionMat);
-      framebuffer.getProgram().sendUniform(uniInvProjLocation, projectionMat.inverse());
-      framebuffer.getProgram().sendUniform(uniViewLocation, viewMat);
-      framebuffer.getProgram().sendUniform(uniInvViewLocation, viewMat.inverse());
-
       scene.render(viewProjMat);
       framebuffer.unbind();
-
-      glActiveTexture(GL_TEXTURE0);
-      framebuffer.getDepthBuffer()->bind();
-      glActiveTexture(GL_TEXTURE1);
-      framebuffer.getColorBuffer()->bind();
-      glActiveTexture(GL_TEXTURE2);
-      framebuffer.getNormalBuffer()->bind();
 
       framebuffer.getProgram().use();
       framebuffer.display();
     } else {
-      scene.getProgram().sendUniform(uniCameraPosLocation, camera->getPosition());
-      scene.getProgram().sendUniform(uniViewProjLocation, viewProjMat);
-
       scene.render(viewProjMat);
     }
   }
