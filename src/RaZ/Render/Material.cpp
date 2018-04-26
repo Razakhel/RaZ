@@ -66,19 +66,19 @@ void MaterialStandard::bindAttributes(const ShaderProgram& program) const {
   program.sendUniform(emissiveLocation, m_emissive);
   program.sendUniform(transparencyLocation, m_transparency);
 
-  glActiveTexture(GL_TEXTURE0);
+  Texture::activate(0);
   m_ambientMap->bind();
 
-  glActiveTexture(GL_TEXTURE1);
+  Texture::activate(1);
   m_diffuseMap->bind();
 
-   glActiveTexture(GL_TEXTURE2);
+  Texture::activate(2);
   m_specularMap->bind();
 
-   glActiveTexture(GL_TEXTURE3);
+  Texture::activate(3);
   m_transparencyMap->bind();
 
-   glActiveTexture(GL_TEXTURE4);
+  Texture::activate(4);
   m_bumpMap->bind();
 }
 
@@ -109,19 +109,19 @@ void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
   program.sendUniform(metallicFactorLocation,  m_metallicFactor);
   program.sendUniform(roughnessFactorLocation, m_roughnessFactor);
 
-  glActiveTexture(GL_TEXTURE0);
+  Texture::activate(0);
   m_albedoMap->bind();
 
-  glActiveTexture(GL_TEXTURE1);
+  Texture::activate(1);
   m_normalMap->bind();
 
-  glActiveTexture(GL_TEXTURE2);
+  Texture::activate(2);
   m_metallicMap->bind();
 
-  glActiveTexture(GL_TEXTURE3);
+  Texture::activate(3);
   m_roughnessMap->bind();
 
-  glActiveTexture(GL_TEXTURE4);
+  Texture::activate(4);
   m_ambientOcclusionMap->bind();
 }
 

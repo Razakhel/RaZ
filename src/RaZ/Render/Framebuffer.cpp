@@ -36,11 +36,11 @@ void Framebuffer::bind() const {
 void Framebuffer::display() const {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glActiveTexture(GL_TEXTURE0);
+  Texture::activate(0);
   m_depthBuffer->bind();
-  glActiveTexture(GL_TEXTURE1);
+  Texture::activate(1);
   m_colorBuffer->bind();
-  glActiveTexture(GL_TEXTURE2);
+  Texture::activate(2);
   m_normalBuffer->bind();
 
   Mesh::drawQuad();
