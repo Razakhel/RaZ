@@ -10,6 +10,7 @@
 #include "Math/Transform.hpp"
 #include "Math/Vector.hpp"
 #include "Render/Camera.hpp"
+#include "Render/Cubemap.hpp"
 #include "Render/Framebuffer.hpp"
 #include "Render/GraphicObjects.hpp"
 #include "Render/Light.hpp"

@@ -4,6 +4,7 @@
 #define RAZ_SCENE_HPP
 
 #include "RaZ/Render/Camera.hpp"
+#include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/Light.hpp"
 #include "RaZ/Render/Model.hpp"
@@ -21,6 +22,7 @@ public:
   const std::vector<ModelPtr>& getModels() const { return m_models; }
 
   //void setCamera(CameraPtr camera) { m_camera = std::move(camera); }
+  void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
   void addModel(ModelPtr model) { m_models.emplace_back(std::move(model)); }
   void addLight(LightPtr light) { m_lights.emplace_back(std::move(light)); }
   void load() const;
@@ -30,6 +32,7 @@ public:
 private:
   ShaderProgram m_program;
   //CameraPtr m_camera;
+  CubemapPtr m_cubemap;
   std::vector<ModelPtr> m_models;
   std::vector<LightPtr> m_lights;
 };

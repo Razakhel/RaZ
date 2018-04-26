@@ -18,6 +18,9 @@ void Scene::render(const Mat4f& viewProjMat) const {
 
     model->draw(m_program);
   }
+
+  if (m_cubemap)
+    m_cubemap->draw();
 }
 
 void Scene::updateLights() const {
