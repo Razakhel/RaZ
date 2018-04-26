@@ -55,6 +55,7 @@ void ShaderProgram::updateShaders() const {
   loadShaders();
   compileShaders();
   link();
+  use();
 }
 
 template <>
