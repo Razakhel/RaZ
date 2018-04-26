@@ -1,4 +1,5 @@
 #include <array>
+#include <unordered_map>
 
 #include "RaZ/Render/Texture.hpp"
 
@@ -29,6 +30,20 @@ Texture::Texture(unsigned int width, unsigned int height, bool isDepthTexture) :
   }
 
   unbind();
+}
+
+TexturePtr Texture::recoverTexture(TexturePreset texturePreset) {
+  static const std::unordered_map<TexturePreset, TexturePtr> texturePresets = {
+    { TexturePreset::BLACK, std::make_shared<Texture>(0) },
+    { TexturePreset::WHITE, std::make_shared<Texture>(255) }
+  };
+
+  const auto materialParamsIter = texturePresets.find(texturePreset);
+
+  if (materialParamsIter == texturePresets.end())
+    throw std::invalid_argument("Error: Couldn't find the given texture preset");
+
+  return materialParamsIter->second;
 }
 
 void Texture::load(const std::string& fileName) {

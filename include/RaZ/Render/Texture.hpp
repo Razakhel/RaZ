@@ -11,6 +11,9 @@
 
 namespace Raz {
 
+enum class TexturePreset { BLACK = 0,
+                           WHITE = 255 };
+
 class Texture;
 using TexturePtr = std::shared_ptr<Texture>;
 
@@ -23,6 +26,7 @@ public:
 
   GLuint getIndex() const { return m_index; }
 
+  static TexturePtr recoverTexture(TexturePreset texturePreset);
   static void activate(uint8_t index) { glActiveTexture(GL_TEXTURE0 + index); }
   void load(const std::string& fileName);
   void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
