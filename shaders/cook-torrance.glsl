@@ -33,8 +33,6 @@ uniform Light uniLights[MAX_LIGHT_COUNT];
 
 uniform vec3 uniCameraPos;
 
-uniform mat4 uniViewProjMatrix;
-
 uniform Material uniMaterial;
 
 layout (location = 0) out vec4 fragColor;
@@ -51,7 +49,7 @@ float computeNormalDistrib(vec3 normal, vec3 halfVec, float roughness) {
   float divider = (sqrHalfVecAngle * (frthRough - 1.0) + 1.0);
   divider       = PI * divider * divider;
 
-  return frthRough / divider;
+  return frthRough / max(divider, 0.001);
 }
 
 // Fresnel: Shlick

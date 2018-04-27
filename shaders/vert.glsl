@@ -15,17 +15,15 @@ out MeshInfo {
 } fragMeshInfo;
 
 void main() {
-  vec4 pos = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
-
-  fragMeshInfo.vertPosition = pos.xyz;
-  fragMeshInfo.vertTexcoords = vertTexcoords;
-
   mat3 modelMat = mat3(uniModelMatrix);
+
+  fragMeshInfo.vertPosition  = modelMat * vertPosition;
+  fragMeshInfo.vertTexcoords = vertTexcoords;
 
   vec3 tangent   = normalize(modelMat * vertTangent);
   vec3 normal    = normalize(modelMat * vertNormal);
   vec3 bitangent = cross(normal, tangent);
   fragMeshInfo.vertTBNMatrix = mat3(tangent, bitangent, normal);
 
-  gl_Position = pos;
+  gl_Position = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
 }
