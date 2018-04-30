@@ -7,34 +7,43 @@
 
 namespace Raz {
 
-ShaderProgram::ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader) : ShaderProgram() {
-  glAttachShader(m_index, vertShader->getIndex());
-  glAttachShader(m_index, fragShader->getIndex());
-
-  m_vertShader = std::move(vertShader);
-  m_fragShader = std::move(fragShader);
+ShaderProgram::ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader,
+                             GeometryShaderPtr geomShader) : ShaderProgram() {
+  setVertexShader(std::move(vertShader));
+  setFragmentShader(std::move(fragShader));
+  if (geomShader)
+    setGeometryShader(std::move(geomShader));
 
   updateShaders();
 }
 
-void ShaderProgram::setVertexShader(Raz::VertexShaderPtr vertShader) {
+void ShaderProgram::setVertexShader(VertexShaderPtr vertShader) {
   glAttachShader(m_index, vertShader->getIndex());
   m_vertShader = std::move(vertShader);
 }
 
-void ShaderProgram::setFragmentShader(Raz::FragmentShaderPtr fragShader) {
+void ShaderProgram::setFragmentShader(FragmentShaderPtr fragShader) {
   glAttachShader(m_index, fragShader->getIndex());
   m_fragShader = std::move(fragShader);
+}
+
+void ShaderProgram::setGeometryShader(GeometryShaderPtr geomShader) {
+  glAttachShader(m_index, geomShader->getIndex());
+  m_geomShader = std::move(geomShader);
 }
 
 void ShaderProgram::loadShaders() const {
   m_vertShader->load();
   m_fragShader->load();
+  if (m_geomShader)
+    m_fragShader->load();
 }
 
 void ShaderProgram::compileShaders() const {
   m_vertShader->compile();
   m_fragShader->compile();
+  if (m_geomShader)
+    m_geomShader->compile();
 }
 
 void ShaderProgram::link() const {

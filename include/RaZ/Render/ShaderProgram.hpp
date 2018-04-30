@@ -15,12 +15,13 @@ namespace Raz {
 class ShaderProgram {
 public:
   ShaderProgram() : m_index{ glCreateProgram() } {}
-  ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader);
+  ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, GeometryShaderPtr geomShader = nullptr);
 
   GLuint getIndex() const { return m_index; }
 
   void setVertexShader(VertexShaderPtr vertShader);
   void setFragmentShader(FragmentShaderPtr fragShader);
+  void setGeometryShader(GeometryShaderPtr geomShader);
 
   void link() const;
   void updateShaders() const;
@@ -39,8 +40,9 @@ private:
 
   GLuint m_index;
 
-  VertexShaderPtr m_vertShader;
-  FragmentShaderPtr m_fragShader;
+  VertexShaderPtr m_vertShader {};
+  FragmentShaderPtr m_fragShader {};
+  GeometryShaderPtr m_geomShader {};
 };
 
 } // namespace Raz

@@ -45,6 +45,16 @@ public:
 
 using FragmentShaderPtr = std::unique_ptr<FragmentShader>;
 
+class GeometryShader : public Shader {
+public:
+  GeometryShader() { m_index = glCreateShader(GL_GEOMETRY_SHADER); }
+  explicit GeometryShader(const std::string& fileName);
+
+  static std::unique_ptr<GeometryShader> loadFromSource(const std::string& source);
+};
+
+using GeometryShaderPtr = std::unique_ptr<GeometryShader>;
+
 } // namespace Raz
 
 #endif // RAZ_SHADER_HPP

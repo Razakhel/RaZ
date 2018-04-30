@@ -54,6 +54,8 @@ float computeNormalDistrib(vec3 normal, vec3 halfVec, float roughness) {
 
 // Fresnel: Shlick
 vec3 computeFresnel(float cosTheta, vec3 baseReflectivity) {
+  // Seemingly optimized version:
+  //    pow(2.0, (-5.55473 * cosTheta - 6.98316) * cosTheta)
   return baseReflectivity + (1.0 - baseReflectivity) * pow(1.0 - cosTheta, 5.0);
 }
 
