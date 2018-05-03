@@ -4,9 +4,9 @@ namespace Raz {
 
 Mat4f Camera::computePerspectiveMatrix() const {
   const float halfFovTangent = std::tan(m_fieldOfView / 2.f);
-  const float planeDist = m_farPlane - m_nearPlane;
-  const float planeMult = m_farPlane * m_nearPlane;
-  const float fovRatio = m_frameRatio * halfFovTangent;
+  const float planeDist      = m_farPlane - m_nearPlane;
+  const float planeMult      = m_farPlane * m_nearPlane;
+  const float fovRatio       = m_frameRatio * halfFovTangent;
 
   const Mat4f projMatrix({{ 1 / fovRatio,                0.f,                    0.f, 0.f },
                           {          0.f, 1 / halfFovTangent,                    0.f, 0.f },

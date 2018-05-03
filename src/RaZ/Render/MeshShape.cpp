@@ -2,34 +2,34 @@
 
 namespace Raz {
 
-MeshPtr Mesh::createTriangle(const Raz::Vec3f& leftPos, const Raz::Vec3f& topPos, const Raz::Vec3f& rightPos) {
+MeshPtr Mesh::createTriangle(const Raz::Vec3f& firstPos, const Raz::Vec3f& secondPos, const Raz::Vec3f& thirdPos) {
   MeshPtr triangle = std::make_unique<Mesh>();
 
   // TODO: check if vertices are defined counterclockwise
 
-  Vertex left {};
-  left.position  = leftPos;
-  left.texcoords = Vec2f({ 0.f, 0.f });
+  Vertex firstVert {};
+  firstVert.position  = firstPos;
+  firstVert.texcoords = Vec2f({ 0.f, 0.f });
 
-  Vertex top {};
-  top.position  = topPos;
-  top.texcoords = Vec2f({ 0.5f, 1.f });
+  Vertex secondVert {};
+  secondVert.position  = secondPos;
+  secondVert.texcoords = Vec2f({ 0.5f, 1.f });
 
-  Vertex right {};
-  right.position  = rightPos;
-  right.texcoords = Vec2f({ 1.f, 0.f });
+  Vertex thirdVert {};
+  thirdVert.position  = thirdPos;
+  thirdVert.texcoords = Vec2f({ 1.f, 0.f });
 
   // Computing normals
-  left.normal  = (leftPos - topPos).cross(leftPos - rightPos).normalize();
-  top.normal   = (topPos - rightPos).cross(topPos - leftPos).normalize();
-  right.normal = (rightPos - leftPos).cross(rightPos - topPos).normalize();
+  firstVert.normal  = (firstPos - secondPos).cross(firstPos - thirdPos).normalize();
+  secondVert.normal   = (secondPos - thirdPos).cross(secondPos - firstPos).normalize();
+  thirdVert.normal = (thirdPos - firstPos).cross(thirdPos - secondPos).normalize();
 
   triangle->getSubmeshes().front()->getVbo().getVertices().resize(3);
   triangle->getSubmeshes().front()->getEbo().getIndices().resize(3);
 
-  triangle->getSubmeshes().front()->getVbo().getVertices()[0] = left;
-  triangle->getSubmeshes().front()->getVbo().getVertices()[1] = top;
-  triangle->getSubmeshes().front()->getVbo().getVertices()[2] = right;
+  triangle->getSubmeshes().front()->getVbo().getVertices()[0] = firstVert;
+  triangle->getSubmeshes().front()->getVbo().getVertices()[1] = secondVert;
+  triangle->getSubmeshes().front()->getVbo().getVertices()[2] = thirdVert;
 
   triangle->getSubmeshes().front()->getEbo().getIndices()[0] = 1;
   triangle->getSubmeshes().front()->getEbo().getIndices()[1] = 0;

@@ -21,7 +21,7 @@ public:
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
 
-  static std::unique_ptr<Mesh> createTriangle(const Vec3f& leftPos, const Vec3f& topPos, const Vec3f& rightPos);
+  static std::unique_ptr<Mesh> createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos);
   static std::unique_ptr<Mesh> createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos,
                                           const Vec3f& rightBottomPos, const Vec3f& leftBottomPos);
   static std::unique_ptr<Mesh> createAABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos);
