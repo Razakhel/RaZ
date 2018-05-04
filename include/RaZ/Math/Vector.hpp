@@ -64,25 +64,29 @@ private:
   std::array<T, Size> m_data;
 };
 
-using Vec2b = Vector<uint8_t, 2>;
-using Vec3b = Vector<uint8_t, 3>;
-using Vec4b = Vector<uint8_t, 4>;
+template <typename T> using Vec2 = Vector<T, 2>;
+template <typename T> using Vec3 = Vector<T, 3>;
+template <typename T> using Vec4 = Vector<T, 4>;
 
-using Vec2i = Vector<int, 2>;
-using Vec3i = Vector<int, 3>;
-using Vec4i = Vector<int, 4>;
+using Vec2b = Vec2<uint8_t>;
+using Vec3b = Vec3<uint8_t>;
+using Vec4b = Vec4<uint8_t>;
 
-using Vec2ul = Vector<std::size_t, 2>;
-using Vec3ul = Vector<std::size_t, 3>;
-using Vec4ul = Vector<std::size_t, 4>;
+using Vec2i = Vec2<int>;
+using Vec3i = Vec3<int>;
+using Vec4i = Vec4<int>;
 
-using Vec2f = Vector<float, 2>;
-using Vec3f = Vector<float, 3>;
-using Vec4f = Vector<float, 4>;
+using Vec2ul = Vec2<unsigned long>;
+using Vec3ul = Vec3<unsigned long>;
+using Vec4ul = Vec4<unsigned long>;
 
-using Vec2d = Vector<double, 2>;
-using Vec3d = Vector<double, 3>;
-using Vec4d = Vector<double, 4>;
+using Vec2f = Vec2<float>;
+using Vec3f = Vec3<float>;
+using Vec4f = Vec4<float>;
+
+using Vec2d = Vec2<double>;
+using Vec3d = Vec3<double>;
+using Vec4d = Vec4<double>;
 
 } // namespace Raz
 

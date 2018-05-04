@@ -7,7 +7,6 @@ namespace Raz {
 Framebuffer::Framebuffer(unsigned int width, unsigned int height, const std::string& vertShaderPath, const std::string& fragShaderPath)
   : m_program(std::make_unique<VertexShader>(vertShaderPath),
               std::make_unique<FragmentShader>(fragShaderPath)) {
-
   m_depthBuffer = std::make_shared<Texture>(width, height, true);
   m_colorBuffer = std::make_shared<Texture>(width, height);
   m_normalBuffer = std::make_shared<Texture>(width, height);

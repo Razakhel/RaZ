@@ -57,11 +57,28 @@ private:
 };
 
 template <typename T> using Mat2 = Matrix<T, 2, 2>;
-using Mat2f = Mat2<float>;
 template <typename T> using Mat3 = Matrix<T, 3, 3>;
-using Mat3f = Mat3<float>;
 template <typename T> using Mat4 = Matrix<T, 4, 4>;
+
+using Mat2b = Mat2<uint8_t>;
+using Mat3b = Mat3<uint8_t>;
+using Mat4b = Mat4<uint8_t>;
+
+using Mat2i = Mat2<int>;
+using Mat3i = Mat3<int>;
+using Mat4i = Mat4<int>;
+
+using Mat2ul = Mat2<unsigned long>;
+using Mat3ul = Mat3<unsigned long>;
+using Mat4ul = Mat4<unsigned long>;
+
+using Mat2f = Mat2<float>;
+using Mat3f = Mat3<float>;
 using Mat4f = Mat4<float>;
+
+using Mat2d = Mat2<double>;
+using Mat3d = Mat3<double>;
+using Mat4d = Mat4<double>;
 
 } // namespace Raz
 
