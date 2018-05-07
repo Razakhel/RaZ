@@ -24,22 +24,25 @@ void Submesh::load() const {
                         nullptr);
   glEnableVertexAttribArray(0);
 
+  const std::size_t positionSize = sizeof(getVertices().front().position);
   glVertexAttribPointer(1, 2,
                         GL_FLOAT, GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(3 * sizeof(getVertices().front().position.getData().front())));
+                        reinterpret_cast<void*>(positionSize));
   glEnableVertexAttribArray(1);
 
+  const std::size_t texcoordsSize = sizeof(getVertices().front().texcoords);
   glVertexAttribPointer(2, 3,
                         GL_FLOAT, GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(5 * sizeof(getVertices().front().normal.getData().front())));
+                        reinterpret_cast<void*>(positionSize + texcoordsSize));
   glEnableVertexAttribArray(2);
 
+  const std::size_t normalSize = sizeof(getVertices().front().normal);
   glVertexAttribPointer(3, 3,
                         GL_FLOAT, GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(8 * sizeof(getVertices().front().tangent.getData().front())));
+                        reinterpret_cast<void*>(positionSize + texcoordsSize + normalSize));
   glEnableVertexAttribArray(3);
 
   m_vbo.unbind();
