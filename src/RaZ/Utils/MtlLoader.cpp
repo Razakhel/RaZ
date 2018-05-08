@@ -46,6 +46,7 @@ void importMtl(const std::string& fileName,
         if (line[4] == 'K') {
           if (line[5] == 'a') {
             standardMaterial->loadAmbientMap(nextValue);
+            cookTorranceMaterial->loadAmbientOcclusionMap(nextValue);
             isStandardMaterial = true;
           } else if (line[5] == 'd') {
             standardMaterial->loadDiffuseMap(nextValue);

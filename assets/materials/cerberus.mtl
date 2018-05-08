@@ -13,3 +13,4 @@ newmtl 08_-_Default
   norm ../assets/textures/cerberus_normal.png
   map_Pm ../assets/textures/cerberus_metallic.png
   map_Pr ../assets/textures/cerberus_roughness.png
+  map_Ka ../assets/textures/cerberus_ao.png
