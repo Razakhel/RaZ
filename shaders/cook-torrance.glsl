@@ -81,8 +81,6 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 }
 
 void main() {
-  bufferNormal = normalize(fragMeshInfo.vertTBNMatrix[2]);
-
   // Gamma correction for albedo (sRGB presumed)
   vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
   float metallic  = texture(uniMaterial.metallicMap, fragMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
@@ -145,4 +143,7 @@ void main() {
   color = pow(color, vec3(1.0 / 2.2));
 
   fragColor = vec4(color, 1.0);
+
+  // Sending fragment normal to next framebuffer(s), if any
+  bufferNormal = normal;
 }

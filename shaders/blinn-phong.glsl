@@ -40,8 +40,6 @@ layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec3 bufferNormal;
 
 void main() {
-  bufferNormal = normalize(fragMeshInfo.vertTBNMatrix[2]);
-
   vec3 normal   = fragMeshInfo.vertTBNMatrix[2];
   vec3 color    = texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb;
   vec3 ambient  = color * 0.05;
@@ -49,13 +47,11 @@ void main() {
   vec3 specular = vec3(0.0);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
-    vec3 lightPos = (uniViewProjMatrix * uniLights[lightIndex].position).xyz;
-
     // Diffuse
     vec3 lightDir;
 
     if (uniLights[lightIndex].position.w != 0.0) {
-      lightDir = normalize(lightPos - fragMeshInfo.vertPosition);
+      lightDir = normalize(uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition);
     } else {
       lightDir = normalize(-uniLights[lightIndex].direction);
     }
@@ -69,4 +65,7 @@ void main() {
   }
 
   fragColor = vec4(ambient + diffuse + specular, 1.0);
+
+  // Sending fragment normal to next framebuffer(s), if any
+  bufferNormal = normal;
 }
