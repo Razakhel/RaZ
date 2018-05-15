@@ -105,8 +105,8 @@ void main() {
     if (uniLights[lightIndex].position.w != 0.0) {
       fullLightDir = uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition;
 
-      float distance = length(fullLightDir);
-      attenuation /= (distance * distance);
+      float sqrDist = dot(fullLightDir, fullLightDir);
+      attenuation  /= sqrDist;
     } else {
       fullLightDir = -uniLights[lightIndex].direction;
     }
@@ -124,14 +124,15 @@ void main() {
     // Geometry (G)
     float geometry = computeGeometry(normal, viewDir, lightDir, roughness);
 
-    vec3 DFG      = normalDistrib * fresnel * geometry;
-    float divider = 4.0 * max(dot(viewDir, normal), 0.0) * max(dot(lightDir, normal), 0.0);
-    vec3 specular = DFG / max(divider, 0.001);
+    vec3 DFG         = normalDistrib * fresnel * geometry;
+    float lightAngle = max(dot(lightDir, normal), 0.0);
+    float divider    = 4.0 * max(dot(viewDir, normal), 0.0) * lightAngle;
+    vec3 specular    = DFG / max(divider, 0.001);
 
     vec3 diffuse = vec3(1.0) - fresnel;
     diffuse     *= 1.0 - metallic;
 
-    lightRadiance += (diffuse * albedo / PI + specular) * radiance * max(dot(lightDir, normal), 0.0);
+    lightRadiance += (diffuse * albedo / PI + specular) * radiance * lightAngle;
   }
 
   vec3 ambient = vec3(0.03) * albedo * ambOcc;

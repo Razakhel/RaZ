@@ -40,8 +40,6 @@ layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec3 bufferNormal;
 
 void main() {
-  bufferNormal = normalize(fragMeshInfo.vertTBNMatrix[2]);
-
   vec3 normal = fragMeshInfo.vertTBNMatrix[2];
 
   float lightHitAngle = 0.0;
@@ -60,4 +58,7 @@ void main() {
   }
 
   fragColor = vec4(lightHitAngle * texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb, 1.0);
+
+  // Sending fragment normal to next framebuffer(s), if any
+  bufferNormal = normal;
 }

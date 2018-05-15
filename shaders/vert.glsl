@@ -25,5 +25,5 @@ void main() {
   vec3 bitangent = cross(normal, tangent);
   fragMeshInfo.vertTBNMatrix = mat3(tangent, bitangent, normal);
 
-  gl_Position = uniMvpMatrix * vec4(vertPosition.xyz, 1.0);
+  gl_Position = uniMvpMatrix * vec4(vertPosition, 1.0);
 }

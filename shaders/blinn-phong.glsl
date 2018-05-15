@@ -48,20 +48,26 @@ void main() {
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
     // Diffuse
-    vec3 lightDir;
+    vec3 fullLightDir;
+    float attenuation = 1.0;
 
     if (uniLights[lightIndex].position.w != 0.0) {
-      lightDir = normalize(uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition);
+      fullLightDir = uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition;
+
+      float sqrDist = dot(fullLightDir, fullLightDir);
+      attenuation  /= sqrDist;
     } else {
-      lightDir = normalize(-uniLights[lightIndex].direction);
+      fullLightDir = -uniLights[lightIndex].direction;
     }
 
-    diffuse += max(dot(lightDir, normal), 0.0) * color;
+    vec3 lightDir = normalize(fullLightDir);
+
+    diffuse += max(dot(lightDir, normal), 0.0) * color * attenuation;
 
     // Specular
     vec3 viewDir = normalize(-fragMeshInfo.vertPosition);
     vec3 halfDir = normalize(lightDir + viewDir);
-    specular += uniLights[lightIndex].color * pow(max(dot(normal, halfDir), 0.0), 32.0);
+    specular += uniLights[lightIndex].color * pow(max(dot(normal, halfDir), 0.0), 32.0) * attenuation;
   }
 
   fragColor = vec4(ambient + diffuse + specular, 1.0);
