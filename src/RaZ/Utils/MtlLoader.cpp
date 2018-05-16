@@ -87,7 +87,6 @@ void importMtl(const std::string& fileName,
       } else if (line[0] == 'n') {
         if (line[1] == 'o') { // Import normal map
           cookTorranceMaterial->loadNormalMap(nextValue);
-          isCookTorranceMaterial = true;
         } else if (line[1] == 'e') { // Create new material
           materialCorrespIndices.insert({ nextValue, materialCorrespIndices.size() });
 
