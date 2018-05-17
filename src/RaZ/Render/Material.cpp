@@ -41,14 +41,16 @@ void MaterialStandard::initTextures(const ShaderProgram& program) const {
   const std::string ambientMapLocation      = locationBase + "ambientMap";
   const std::string diffuseMapLocation      = locationBase + "diffuseMap";
   const std::string specularMapLocation     = locationBase + "specularMap";
+  const std::string emissiveMapLocation     = locationBase + "emissiveMap";
   const std::string transparencyMapLocation = locationBase + "transparencyMap";
   const std::string bumpMapLocation         = locationBase + "bumpMap";
 
   program.sendUniform(ambientMapLocation,      0);
   program.sendUniform(diffuseMapLocation,      1);
   program.sendUniform(specularMapLocation,     2);
-  program.sendUniform(transparencyMapLocation, 3);
-  program.sendUniform(bumpMapLocation,         4);
+  program.sendUniform(emissiveMapLocation,     3);
+  program.sendUniform(transparencyMapLocation, 4);
+  program.sendUniform(bumpMapLocation,         5);
 }
 
 void MaterialStandard::bindAttributes(const ShaderProgram& program) const {
@@ -76,9 +78,12 @@ void MaterialStandard::bindAttributes(const ShaderProgram& program) const {
   m_specularMap->bind();
 
   Texture::activate(3);
-  m_transparencyMap->bind();
+  m_emissiveMap->bind();
 
   Texture::activate(4);
+  m_transparencyMap->bind();
+
+  Texture::activate(5);
   m_bumpMap->bind();
 }
 

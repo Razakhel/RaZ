@@ -19,6 +19,7 @@ struct Material {
   sampler2D ambientMap;
   sampler2D diffuseMap;
   sampler2D specularMap;
+  sampler2D emissiveMap;
   sampler2D transparencyMap;
   sampler2D bumpMap;
 };
@@ -73,7 +74,9 @@ void main() {
     specular    += uniLights[lightIndex].color * pow(max(dot(halfDir, normal), 0.0), 32.0) * specFactor * attenuation;
   }
 
-  fragColor = vec4(ambient + diffuse + specular, 1.0);
+  vec3 emissive = texture(uniMaterial.emissiveMap, fragMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
+
+  fragColor = vec4(ambient + diffuse + specular + emissive, 1.0);
 
   // Sending fragment normal to next framebuffer(s), if any
   bufferNormal = normal;

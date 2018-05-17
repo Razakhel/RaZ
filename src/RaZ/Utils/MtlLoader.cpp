@@ -54,6 +54,8 @@ void importMtl(const std::string& fileName,
           } else if (line[5] == 's') {
             standardMaterial->loadSpecularMap(nextValue);
             isStandardMaterial = true;
+          } else if (line[5] == 'e') {
+            standardMaterial->loadEmissiveMap(nextValue);
           }
         }  else if (line[4] == 'P') {
           if (line[5] == 'm') {

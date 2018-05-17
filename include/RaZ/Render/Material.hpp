@@ -38,6 +38,7 @@ public:
   const TexturePtr getAmbientMap() const { return m_ambientMap; }
   const TexturePtr getDiffuseMap() const { return m_diffuseMap; }
   const TexturePtr getSpecularMap() const { return m_specularMap; }
+  const TexturePtr getEmissiveMap() const { return m_emissiveMap; }
   const TexturePtr getTransparencyMap() const { return m_transparencyMap; }
   const TexturePtr getBumpMap() const { return m_bumpMap; }
 
@@ -53,13 +54,15 @@ public:
 
   void setAmbientMap(TexturePtr ambientMap) { m_ambientMap = std::move(ambientMap); }
   void setDiffuseMap(TexturePtr diffuseMap) { m_diffuseMap = std::move(diffuseMap); }
-  void setASpecularMap(TexturePtr specularMap) { m_specularMap = std::move(specularMap); }
+  void setSpecularMap(TexturePtr specularMap) { m_specularMap = std::move(specularMap); }
+  void setEmissiveMap(TexturePtr emissiveMap) { m_emissiveMap = std::move(emissiveMap); }
   void setTransparencyMap(TexturePtr transparencyMap) { m_transparencyMap = std::move(transparencyMap); }
   void setBumpMap(TexturePtr bumpMap) { m_bumpMap = std::move(bumpMap); }
 
   void loadAmbientMap(const std::string& fileName) { m_ambientMap = std::make_shared<Texture>(fileName); }
   void loadDiffuseMap(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
   void loadSpecularMap(const std::string& fileName) { m_specularMap = std::make_shared<Texture>(fileName); }
+  void loadEmissiveMap(const std::string& fileName) { m_emissiveMap = std::make_shared<Texture>(fileName); }
   void loadTransparencyMap(const std::string& fileName) { m_transparencyMap = std::make_shared<Texture>(fileName); }
   void loadBumpMap(const std::string& fileName) { m_bumpMap = std::make_shared<Texture>(fileName); }
 
@@ -77,6 +80,7 @@ private:
   TexturePtr m_ambientMap      = Texture::recoverTexture(TexturePreset::WHITE);
   TexturePtr m_diffuseMap      = Texture::recoverTexture(TexturePreset::WHITE);
   TexturePtr m_specularMap     = Texture::recoverTexture(TexturePreset::WHITE);
+  TexturePtr m_emissiveMap     = Texture::recoverTexture(TexturePreset::WHITE);
   TexturePtr m_transparencyMap = Texture::recoverTexture(TexturePreset::WHITE);
   TexturePtr m_bumpMap         = Texture::recoverTexture(TexturePreset::WHITE);
 };
