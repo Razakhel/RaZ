@@ -16,6 +16,14 @@ This library is available for Linux and Windows. It is also supposed to run on m
 
 If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/wiki)!
 
+### Gallery
+
+| Crytek Sponza | Hylian shield (PBR) |
+| :--------: | :---------: |
+| [![Crytek Sponza](https://i.imgur.com/Tr1nnjV.jpg)](https://i.imgur.com/Tr1nnjV.jpg) | [![Hyrule's shield](https://i.imgur.com/UZ90KKJ.jpg)](https://i.imgur.com/UZ90KKJ.jpg) |
+
+More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples).
+
 ## Features
 
 | Objectives | Implemented |
@@ -35,6 +43,8 @@ If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/w
 | Image Based Lighting (IBL) | No |
 | Shadow mapping | No |
 | Bloom | No |
+
+## 
 
 ## In the future...
 
