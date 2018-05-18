@@ -5,7 +5,7 @@
 
 int main() {
   Raz::Window window(800, 600, "RaZ", 4);
-  //window.disableVerticalSync();
+  window.disableVerticalSync();
 
   Raz::Framebuffer framebuffer(window.getWidth(), window.getHeight(), "../shaders/framebufferVert.glsl", "../shaders/ssr.glsl");
 
@@ -30,9 +30,11 @@ int main() {
   model->rotate(45.f, 0.f, 1.f, 0.f);
 
   /*Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
+                                                          10.f                            // Energy
                                                           Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/
   Raz::LightPtr light = std::make_unique<Raz::DirectionalLight>(Raz::Vec3f({  0.f,  1.f, 0.f }),  // Position
                                                                 Raz::Vec3f({ -1.f, -1.f, 0.f }),  // Direction
+                                                                1.f,
                                                                 Raz::Vec3f({  1.f,  1.f, 1.f })); // Color (R/G/B)
 
   Raz::CameraPtr camera = std::make_unique<Raz::Camera>(window.getWidth(),
