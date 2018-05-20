@@ -17,7 +17,7 @@ out MeshInfo {
 void main() {
   mat3 modelMat = mat3(uniModelMatrix);
 
-  fragMeshInfo.vertPosition  = modelMat * vertPosition;
+  fragMeshInfo.vertPosition  = (uniModelMatrix * vec4(vertPosition, 1.0)).xyz;
   fragMeshInfo.vertTexcoords = vertTexcoords;
 
   vec3 tangent   = normalize(modelMat * vertTangent);
