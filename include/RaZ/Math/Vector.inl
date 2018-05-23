@@ -26,7 +26,7 @@ Vector<T, Size>::Vector(std::initializer_list<T> list) {
 }
 
 template <typename T, std::size_t Size>
-T Vector<T, Size>::dot(const Vector<T, Size>& vec) const {
+T Vector<T, Size>::dot(const Vector& vec) const {
   float res = 0.f;
   for (std::size_t i = 0; i < Size; ++i)
     res += m_data[i] * vec[i];
@@ -34,7 +34,7 @@ T Vector<T, Size>::dot(const Vector<T, Size>& vec) const {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::cross(const Vector<T, Size>& vec) const {
+Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const {
   static_assert(Size == 3, "Error: Both vectors must be 3 dimensional.");
 
   Vector<T, Size> res;
@@ -120,18 +120,19 @@ Vector<T, Size> Vector<T, Size>::operator/(float val) const {
 template <typename T, std::size_t Size>
 template <std::size_t H>
 Vector<T, Size> Vector<T, Size>::operator*(const Matrix<T, Size, H>& mat) const {
-  Vector<T, Size> res;
+  // This multiplication is made assuming the vector to be horizontal
+  Vector<T, Size> res {};
 
-  for (std::size_t j = 0; j < Size; ++j) {
-    for (std::size_t i = 0; i < H; ++i)
-      res[j] = m_data[j] + mat[i * Size + j];
+  for (std::size_t widthIndex = 0; widthIndex < Size; ++widthIndex) {
+    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex)
+      res[widthIndex] += m_data[heightIndex] * mat[heightIndex * Size + widthIndex];
   }
 
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator+=(const Vector<T, Size>& vec) {
+Vector<T, Size>& Vector<T, Size>::operator+=(const Vector& vec) {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] += vec[i];
   return *this;
@@ -145,7 +146,7 @@ Vector<T, Size>& Vector<T, Size>::operator+=(float val) {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator-=(const Vector<T, Size>& vec) {
+Vector<T, Size>& Vector<T, Size>::operator-=(const Vector& vec) {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] -= vec[i];
   return *this;
@@ -159,7 +160,7 @@ Vector<T, Size>& Vector<T, Size>::operator-=(float val) {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator*=(const Vector<T, Size>& vec) {
+Vector<T, Size>& Vector<T, Size>::operator*=(const Vector& vec) {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] *= vec[i];
   return *this;
@@ -173,7 +174,7 @@ Vector<T, Size>& Vector<T, Size>::operator*=(float val) {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator/=(const Vector<T, Size>& vec) {
+Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] /= vec[i];
   return *this;

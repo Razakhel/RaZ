@@ -61,7 +61,7 @@ public:
                                                  && (m_data[2] == vec.getData()[2]); }
 
 private:
-  std::array<T, Size> m_data;
+  std::array<T, Size> m_data {};
 };
 
 template <typename T> using Vec2 = Vector<T, 2>;
