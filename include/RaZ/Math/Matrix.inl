@@ -141,25 +141,25 @@ Mat4<T> computeMatrixInverse(const Mat4<T>& mat, float determinant) {
                           { mat.getData()[4], mat.getData()[5],  mat.getData()[6] },
                           { mat.getData()[8], mat.getData()[9], mat.getData()[10] }});
 
-  const float topLeftDeterm = topLeft.computeDeterminant();
-  const float topCenterLeftDeterm = topCenterLeft.computeDeterminant();
+  const float topLeftDeterm        = topLeft.computeDeterminant();
+  const float topCenterLeftDeterm  = topCenterLeft.computeDeterminant();
   const float topCenterRightDeterm = topCenterRight.computeDeterminant();
-  const float topRightDeterm = topRight.computeDeterminant();
+  const float topRightDeterm       = topRight.computeDeterminant();
 
-  const float midTopLeftDeterm = midTopLeft.computeDeterminant();
-  const float midTopCenterLeftDeterm = midTopCenterLeft.computeDeterminant();
+  const float midTopLeftDeterm        = midTopLeft.computeDeterminant();
+  const float midTopCenterLeftDeterm  = midTopCenterLeft.computeDeterminant();
   const float midTopCenterRightDeterm = midTopCenterRight.computeDeterminant();
-  const float midTopRightDeterm = midTopRight.computeDeterminant();
+  const float midTopRightDeterm       = midTopRight.computeDeterminant();
 
-  const float midBotLeftDeterm = midBotLeft.computeDeterminant();
-  const float midBotCenterLeftDeterm = midBotCenterLeft.computeDeterminant();
+  const float midBotLeftDeterm        = midBotLeft.computeDeterminant();
+  const float midBotCenterLeftDeterm  = midBotCenterLeft.computeDeterminant();
   const float midBotCenterRightDeterm = midBotCenterRight.computeDeterminant();
-  const float midBotRightDeterm = midBotRight.computeDeterminant();
+  const float midBotRightDeterm       = midBotRight.computeDeterminant();
 
-  const float botLeftDeterm = botLeft.computeDeterminant();
-  const float botCenterLeftDeterm = botCenterLeft.computeDeterminant();
+  const float botLeftDeterm        = botLeft.computeDeterminant();
+  const float botCenterLeftDeterm  = botCenterLeft.computeDeterminant();
   const float botCenterRightDeterm = botCenterRight.computeDeterminant();
-  const float botRightDeterm = botRight.computeDeterminant();
+  const float botRightDeterm       = botRight.computeDeterminant();
 
   const Mat4<T> cofactors({{     topLeftDeterm,    -topCenterLeftDeterm,     topCenterRightDeterm,    -topRightDeterm },
                            { -midTopLeftDeterm,  midTopCenterLeftDeterm, -midTopCenterRightDeterm,  midTopRightDeterm },
@@ -316,6 +316,19 @@ template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator/(float val) const {
   Matrix<T, W, H> res = *this;
   res /= val;
+  return res;
+}
+
+template <typename T, std::size_t W, std::size_t H>
+Vector<T, H> Matrix<T, W, H>::operator*(const Vector<T, H>& vec) const {
+  // This multiplication is made assuming the vector to be vertical
+  Vector<T, H> res {};
+
+  for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
+    for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex)
+      res[heightIndex] += m_data[heightIndex * W + widthIndex] * vec[widthIndex];
+  }
+
   return res;
 }
 
