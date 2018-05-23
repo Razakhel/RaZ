@@ -7,6 +7,7 @@ struct Light {
   vec4 position;
   vec3 direction;
   vec3 color;
+  float energy;
   float angle;
 };
 
@@ -100,7 +101,7 @@ void main() {
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
     vec3 fullLightDir;
-    float attenuation = 1.0;
+    float attenuation = uniLights[lightIndex].energy;
 
     if (uniLights[lightIndex].position.w != 0.0) {
       fullLightDir = uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition;

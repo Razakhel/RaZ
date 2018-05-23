@@ -62,10 +62,10 @@ void MaterialStandard::bindAttributes(const ShaderProgram& program) const {
   const std::string emissiveLocation     = locationBase + "emissive";
   const std::string transparencyLocation = locationBase + "transparency";
 
-  program.sendUniform(ambientLocation, m_ambient);
-  program.sendUniform(diffuseLocation, m_diffuse);
-  program.sendUniform(specularLocation, m_specular);
-  program.sendUniform(emissiveLocation, m_emissive);
+  program.sendUniform(ambientLocation,      m_ambient);
+  program.sendUniform(diffuseLocation,      m_diffuse);
+  program.sendUniform(specularLocation,     m_specular);
+  program.sendUniform(emissiveLocation,     m_emissive);
   program.sendUniform(transparencyLocation, m_transparency);
 
   Texture::activate(0);
