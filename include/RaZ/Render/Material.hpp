@@ -21,6 +21,8 @@ class MaterialCookTorrance;
 
 class Material {
 public:
+  virtual ~Material() = default;
+
   static std::unique_ptr<MaterialCookTorrance> recoverMaterial(MaterialPreset preset, float roughnessFactor);
   virtual std::unique_ptr<Material> clone() const = 0;
   virtual void initTextures(const ShaderProgram& program) const = 0;

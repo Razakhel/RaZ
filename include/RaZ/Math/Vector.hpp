@@ -56,9 +56,7 @@ public:
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }
   std::size_t operator()(const Vector& vec) const { return hash(0); }
-  bool operator==(const Vector& vec) const { return (m_data[0] == vec.getData()[0])
-                                                 && (m_data[1] == vec.getData()[1])
-                                                 && (m_data[2] == vec.getData()[2]); }
+  bool operator==(const Vector& vec) const { return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin()); }
 
 private:
   std::array<T, Size> m_data {};

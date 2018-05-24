@@ -12,6 +12,8 @@ namespace Raz {
 
 class Light : public Transform {
 public:
+  virtual ~Light() = default;
+
   virtual Vec4f getHomogeneousPosition() const = 0;
   const Vec3f& getDirection() const { return m_direction; }
   Vec3f& getDirection() { return m_direction; }

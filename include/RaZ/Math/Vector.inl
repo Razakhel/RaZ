@@ -17,7 +17,7 @@ Vector<T, Size>::Vector(T val) {
 
 template <typename T, std::size_t Size>
 Vector<T, Size>::Vector(std::initializer_list<T> list) {
-  assert(("Error: Vector must not be created with less/more values than specified.", Size == list.size()));
+  assert("Error: Vector must not be created with less/more values than specified." && Size == list.size());
 
   auto element = list.begin();
 

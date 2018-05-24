@@ -82,7 +82,7 @@ void Image::readPng(std::ifstream& file, bool reverse) {
   png_set_scale_16(readStruct);
 
   // Adding full alpha channel to the image if it possesses transparency
-  if (png_get_valid(readStruct, infoStruct, static_cast<png_uint_32>(PNG_INFO_tRNS))) {
+  if (png_get_valid(readStruct, infoStruct, PNG_INFO_tRNS)) {
     png_set_tRNS_to_alpha(readStruct);
     m_colorspace = GL_RGBA;
     ++channels;
