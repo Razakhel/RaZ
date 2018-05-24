@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 
 namespace Raz {
 
@@ -209,9 +210,13 @@ Matrix<T, W, H>::Matrix(const Matrix<T, W - 1, H - 1>& mat) {
 
 template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
+  assert("Error: Matrix must not be created with less/more values than specified." && H == list.size());
+
   auto row = list.begin();
 
   for (std::size_t heightIndex = 0; heightIndex < list.size(); ++heightIndex, ++row) {
+    assert("Error: Matrix must not be created with less/more values than specified." && W == (list.begin() + heightIndex)->size());
+
     auto element = row->begin();
 
     for (std::size_t widthIndex = 0; widthIndex < list.begin()->size(); ++widthIndex, ++element)

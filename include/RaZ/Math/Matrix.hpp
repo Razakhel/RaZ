@@ -55,6 +55,7 @@ public:
   T& operator()(std::size_t widthIndex, std::size_t heightIndex) { return m_data[heightIndex * W + widthIndex]; }
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }
+  bool operator==(const Matrix& mat) const { return std::equal(m_data.cbegin(), m_data.cend(), mat.getData().cbegin()); }
 
 private:
   std::array<T, W * H> m_data {};
