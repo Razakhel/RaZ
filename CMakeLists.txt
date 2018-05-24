@@ -4,7 +4,48 @@ project(RaZ)
 set(CMAKE_CXX_STANDARD 14)
 
 if (CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-value -Wno-unused-parameter")
+    set(GCC_FLAGS "-pedantic -pedantic-errors \
+                   -Wall -Wextra \
+                   -Wcast-align -Wcast-qual \
+                   -Wdisabled-optimization \
+                   -Wfloat-equal \
+                   -Wformat-security -Wformat-signedness -Wformat=2 \
+                   -Wmissing-declarations -Wmissing-include-dirs \
+                   -Wnon-virtual-dtor \
+                   -Wold-style-cast \
+                   -Woverloaded-virtual \
+                   -Wpacked \
+                   -Wredundant-decls \
+                   -Wundef -Wuninitialized \
+                   -Wunused-macros \
+                   -Wvla \
+                   -Wconversion \
+                   -Wswitch-default -Wswitch-enum \
+                   -Wsuggest-attribute=noreturn \
+                   -Wzero-as-null-pointer-constant \
+                   -Wlogical-op \
+                   -Wvector-operation-performance \
+                   -Wdouble-promotion \
+                   -Wtrampolines \
+                   -Wuseless-cast \
+                   -Wconditionally-supported \
+                   -Wfloat-conversion \
+                   -Wopenmp-simd \
+                   -fsized-deallocation \
+                   -Warray-bounds=2 \
+                   -Wconditionally-supported \
+                   -Wnoexcept \
+                   -Wsized-deallocation \
+                   -Wstrict-null-sentinel \
+                   -Wsuggest-override \
+                   -Wduplicated-cond \
+                   -Wnull-dereference \
+                   -Waligned-new \
+                   -Walloc-zero -Walloca \
+                   -Wformat-overflow \
+                   -Wshadow=compatible-local")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
 elseif (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 endif ()
