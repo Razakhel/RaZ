@@ -3,6 +3,16 @@
 
 namespace Raz {
 
+Mat4f Transform::computeTranslationMatrix(bool inverseTranslation) const {
+  const Vec3f translation = (inverseTranslation ? -m_position : m_position);
+  const Mat4f translationMat({{            1.f,            0.f,            0.f, 0.f },
+                              {            0.f,            1.f,            0.f, 0.f },
+                              {            0.f,            0.f,            1.f, 0.f },
+                              { translation[0], translation[1], translation[2], 1.f }});
+
+  return translationMat;
+}
+
 void Transform::translate(float x, float y, float z) {
   m_position[0] += x;
   m_position[1] += y;
@@ -10,7 +20,7 @@ void Transform::translate(float x, float y, float z) {
 }
 
 void Transform::rotate(float angle, float x, float y, float z) {
-  const Quaternion<float> quaternion(angle, x, y, z);
+  const Quaternionf quaternion(angle, x, y, z);
   m_rotation = m_rotation * quaternion.computeMatrix();
 }
 
@@ -26,12 +36,7 @@ Mat4f Transform::computeTransformMatrix() const {
                      {        0.f,        0.f, m_scale[2], 0.f },
                      {        0.f,        0.f,        0.f, 1.f }});
 
-  const Mat4f translation({{           1.f,           0.f,           0.f, 0.f },
-                           {           0.f,           1.f,           0.f, 0.f },
-                           {           0.f,           0.f,           1.f, 0.f },
-                           { m_position[0], m_position[1], m_position[2], 1.f }});
-
-  return translation * m_rotation * scale;
+  return computeTranslationMatrix() * m_rotation * scale;
 }
 
 } // namespace Raz

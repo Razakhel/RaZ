@@ -20,6 +20,9 @@ public:
   const Vec3f& getScale() const { return m_scale; }
   Vec3f& getScale() { return m_scale; }
 
+  Mat4f computeTranslationMatrix(bool inverseTranslation = false) const;
+  void move(float x, float y, float z) { move(Vec3f({ x, y, z })); }
+  void move(const Vec3f& displacement) { translate(displacement * Mat3f(m_rotation)); }
   void translate(float x, float y, float z);
   template <typename T, std::size_t Size> void translate(const Vector<T, Size>& values) { translate(values[0], values[1], values[2]); }
   void rotate(float angle, float x, float y, float z);
@@ -31,6 +34,7 @@ protected:
   Vec3f m_position;
   Mat4f m_rotation;
   Vec3f m_scale;
+  Vec3f m_oldPosition;
 };
 
 } // namespace Raz
