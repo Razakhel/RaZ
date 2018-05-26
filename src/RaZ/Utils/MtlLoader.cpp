@@ -11,6 +11,8 @@ void importMtl(const std::string& fileName,
                std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
 
+  std::unordered_map<std::string, TexturePtr> loadedTextures;
+
   auto standardMaterial = std::make_unique<MaterialStandard>();
   auto cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
 
@@ -19,77 +21,86 @@ void importMtl(const std::string& fileName,
 
   if (file) {
     while (!file.eof()) {
-      std::string line;
+      std::string tag;
       std::string nextValue;
-      file >> line >> nextValue;
+      file >> tag >> nextValue;
 
-      if (line[0] == 'K') { // Assign properties
+      if (tag[0] == 'K') { // Assign properties
         std::string secondValue, thirdValue;
         file >> secondValue >> thirdValue;
 
-        const float red = std::stof(nextValue);
+        const float red   = std::stof(nextValue);
         const float green = std::stof(secondValue);
-        const float blue = std::stof(thirdValue);
+        const float blue  = std::stof(thirdValue);
 
-        if (line[1] == 'a') {
+        if (tag[1] == 'a') {                           // Ambient/ambient occlusion factor [Ka]
           standardMaterial->setAmbient(red, green, blue);
-        } else if (line[1] == 'd') {
+        } else if (tag[1] == 'd') {                    // Diffuse/albedo factor [Kd]
           standardMaterial->setDiffuse(red, green, blue);
-        } else if (line[1] == 's') {
+        } else if (tag[1] == 's') {                    // Specular factor [Ks]
           standardMaterial->setSpecular(red, green, blue);
-        } else if (line[1] == 'e') {
+        } else if (tag[1] == 'e') {                    // Emissive factor [Ke]
           standardMaterial->setEmissive(red, green, blue);
         }
 
         isStandardMaterial = true;
-      } else if (line[0] == 'm') { // Import texture
-        if (line[4] == 'K') {
-          if (line[5] == 'a') {
-            standardMaterial->loadAmbientMap(nextValue);
-            cookTorranceMaterial->loadAmbientOcclusionMap(nextValue);
+      } else if (tag[0] == 'm') {                      // Import texture
+        TexturePtr map;
+
+        const auto loadedTexturePos = loadedTextures.find(nextValue);
+        if (loadedTexturePos != loadedTextures.cend()) {
+          map = loadedTexturePos->second;
+        } else {
+          map = std::make_shared<Texture>(nextValue);
+          loadedTextures.insert({ nextValue, map });
+        }
+
+        if (tag[4] == 'K') {                           // Standard maps
+          if (tag[5] == 'a') {                         // Ambient/ambient occlusion map [map_Ka]
+            standardMaterial->setAmbientMap(map);
+            cookTorranceMaterial->setAmbientOcclusionMap(map);
+          } else if (tag[5] == 'd') {                  // Diffuse/albedo map [map_Kd]
+            standardMaterial->setDiffuseMap(map);
+            cookTorranceMaterial->setAlbedoMap(map);
+          } else if (tag[5] == 's') {                  // Specular map [map_Ks]
+            standardMaterial->setSpecularMap(map);
             isStandardMaterial = true;
-          } else if (line[5] == 'd') {
-            standardMaterial->loadDiffuseMap(nextValue);
-            cookTorranceMaterial->loadAlbedoMap(nextValue);
-          } else if (line[5] == 's') {
-            standardMaterial->loadSpecularMap(nextValue);
-            isStandardMaterial = true;
-          } else if (line[5] == 'e') {
-            standardMaterial->loadEmissiveMap(nextValue);
+          } else if (tag[5] == 'e') {                  // Emissive map [map_Ke]
+            standardMaterial->setEmissiveMap(map);
           }
-        }  else if (line[4] == 'P') {
-          if (line[5] == 'm') {
-            cookTorranceMaterial->loadMetallicMap(nextValue);
-            isCookTorranceMaterial = true;
-          } else if (line[5] == 'r') {
-            cookTorranceMaterial->loadRoughnessMap(nextValue);
-            isCookTorranceMaterial = true;
+        }  else if (tag[4] == 'P') {                   // PBR maps
+          if (tag[5] == 'm') {                         // Metallic map [map_Pm]
+            cookTorranceMaterial->setMetallicMap(map);
+          } else if (tag[5] == 'r') {                  // Roughness map [map_Pr]
+            cookTorranceMaterial->setRoughnessMap(map);
           }
-        } else if (line[4] == 'd') {
-          standardMaterial->loadTransparencyMap(nextValue);
+
+          isCookTorranceMaterial = true;
+        } else if (tag[4] == 'd') {                    // Transparency map [map_d]
+          standardMaterial->setTransparencyMap(map);
           isStandardMaterial = true;
-        } else if (line[4] == 'b') {
-          standardMaterial->loadBumpMap(nextValue);
+        } else if (tag[4] == 'b') {                    // Bump map [map_bump]
+          standardMaterial->setBumpMap(map);
           isStandardMaterial = true;
         }
-      } else if (line[0] == 'T') {
-        if (line[1] == 'r') { // Assign transparency
-          standardMaterial->setTransparency(std::stof(nextValue));
+      } else if (tag[0] == 'd') {                      // Transparency factor
+        standardMaterial->setTransparency(std::stof(nextValue));
+        isStandardMaterial = true;
+      } else if (tag[0] == 'T') {
+        if (tag[1] == 'r') {                           // Transparency factor (alias, 1 - d) [Tr]
+          standardMaterial->setTransparency(1.f - std::stof(nextValue));
           isStandardMaterial = true;
-        }/* else if (line[1] == 'f') { // Assign transmission filter
+        }/* else if (line[1] == 'f') {                 // Transmission filter [Tf]
 
           isStandardMaterial = true;
         }*/
-      } else if (line[0] == 'd') { // Assign transparency
-        standardMaterial->setTransparency(std::stof(nextValue));
-        isStandardMaterial = true;
-      } else if (line[0] == 'b') { // Import bump map
+      }  else if (tag[0] == 'b') {                     // Bump map (alias) [bump]
         standardMaterial->loadBumpMap(nextValue);
         isStandardMaterial = true;
-      } else if (line[0] == 'n') {
-        if (line[1] == 'o') { // Import normal map
+      } else if (tag[0] == 'n') {
+        if (tag[1] == 'o') {                           // Normal map [norm]
           cookTorranceMaterial->loadNormalMap(nextValue);
-        } else if (line[1] == 'e') { // Create new material
+        } else if (tag[1] == 'e') {                    // New material [newmtl]
           materialCorrespIndices.insert({ nextValue, materialCorrespIndices.size() });
 
           if (!isStandardMaterial && !isCookTorranceMaterial)
@@ -107,7 +118,7 @@ void importMtl(const std::string& fileName,
           isCookTorranceMaterial = false;
         }
       } else {
-        std::getline(file, line); // Skip the rest of the line
+        std::getline(file, tag); // Skip the rest of the line
       }
     }
   } else {

@@ -16,9 +16,9 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
                                  GLenum type,
                                  GLuint id,
                                  GLenum severity,
-                                 GLsizei/* length*/,
+                                 GLsizei /*length*/,
                                  const GLchar* message,
-                                 const void*/* userParam*/) {
+                                 const void* /*userParam*/) {
   std::cerr << "OpenGL Debug - ";
 
   switch (source) {
@@ -110,7 +110,7 @@ void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
 }
 
 void Window::updateKeyCallbacks() const {
-  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int/* scancode*/, int action, int/* mode*/) {
+  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
     const CallbacksList& callbackList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
 
     for (const auto& callback : callbackList) {
