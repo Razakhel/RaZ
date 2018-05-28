@@ -1,10 +1,10 @@
-#include <map>
 #include <fstream>
+#include <map>
 #include <sstream>
 
 #include "RaZ/Render/Model.hpp"
-#include "RaZ/Utils/MtlLoader.hpp"
 #include "RaZ/Utils/ModelLoader.hpp"
+#include "RaZ/Utils/MtlLoader.hpp"
 
 namespace Raz {
 

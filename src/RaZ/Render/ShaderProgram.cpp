@@ -7,16 +7,6 @@
 
 namespace Raz {
 
-ShaderProgram::ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader,
-                             GeometryShaderPtr geomShader) : ShaderProgram() {
-  setVertexShader(std::move(vertShader));
-  setFragmentShader(std::move(fragShader));
-  if (geomShader)
-    setGeometryShader(std::move(geomShader));
-
-  updateShaders();
-}
-
 void ShaderProgram::setVertexShader(VertexShaderPtr vertShader) {
   glAttachShader(m_index, vertShader->getIndex());
   m_vertShader = std::move(vertShader);
@@ -30,6 +20,15 @@ void ShaderProgram::setFragmentShader(FragmentShaderPtr fragShader) {
 void ShaderProgram::setGeometryShader(GeometryShaderPtr geomShader) {
   glAttachShader(m_index, geomShader->getIndex());
   m_geomShader = std::move(geomShader);
+}
+
+void ShaderProgram::setShaders(Raz::VertexShaderPtr vertShader, Raz::FragmentShaderPtr fragShader, Raz::GeometryShaderPtr geomShader) {
+  setVertexShader(std::move(vertShader));
+  setFragmentShader(std::move(fragShader));
+  if (geomShader)
+    setGeometryShader(std::move(geomShader));
+
+  updateShaders();
 }
 
 void ShaderProgram::loadShaders() const {
@@ -55,7 +54,7 @@ void ShaderProgram::link() const {
   if (!success) {
     std::array<GLchar, 512> infoLog {};
 
-    glGetProgramInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
+    glGetProgramInfoLog(m_index, static_cast<GLsizei>(infoLog.size()), nullptr, infoLog.data());
     std::cerr << "Error: Shader program link failed.\n" << infoLog.data() << std::endl;
   }
 }
