@@ -22,6 +22,7 @@
 #include "Render/ShaderProgram.hpp"
 #include "Render/Submesh.hpp"
 #include "Render/Texture.hpp"
+#include "Render/UniformBuffer.hpp"
 #include "Utils/Image.hpp"
 #include "Utils/Keyboard.hpp"
 #include "Utils/ModelLoader.hpp"

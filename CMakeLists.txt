@@ -78,6 +78,7 @@ set(
     include/RaZ/Math/*.hpp
     include/RaZ/Math/*.inl
     include/RaZ/Render/*.hpp
+    include/RaZ/Render/*.inl
     include/RaZ/Utils/*.hpp
 )
 
