@@ -23,7 +23,7 @@ const std::unordered_map<MaterialPreset, std::pair<Vec3f, float>> MATERIAL_PRESE
   { MaterialPreset::PLATINUM,  { Vec3f({ 0.672f, 0.637f, 0.585f }), 1.f } }
 };
 
-}
+} // namespace
 
 std::unique_ptr<MaterialCookTorrance> Material::recoverMaterial(MaterialPreset preset, float roughnessFactor) {
   const auto& materialParamsIter = MATERIAL_PRESET_PARAMS.find(preset);

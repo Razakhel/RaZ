@@ -74,9 +74,9 @@ using Vec2i = Vec2<int>;
 using Vec3i = Vec3<int>;
 using Vec4i = Vec4<int>;
 
-using Vec2ul = Vec2<unsigned long>;
-using Vec3ul = Vec3<unsigned long>;
-using Vec4ul = Vec4<unsigned long>;
+using Vec2ul = Vec2<uint32_t>;
+using Vec3ul = Vec3<uint32_t>;
+using Vec4ul = Vec4<uint32_t>;
 
 using Vec2f = Vec2<float>;
 using Vec3f = Vec3<float>;

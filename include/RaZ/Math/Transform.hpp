@@ -34,7 +34,6 @@ protected:
   Vec3f m_position;
   Mat4f m_rotation;
   Vec3f m_scale;
-  Vec3f m_oldPosition;
 };
 
 } // namespace Raz
