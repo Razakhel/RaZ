@@ -57,15 +57,15 @@ void Texture::load(const std::string& fileName) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   if (img.getColorspace() == GL_RED || img.getColorspace() == GL_RG) {
-    const std::array<GLint, 4> swizzle = { GL_RED, GL_RED, GL_RED, (img.getColorspace() == GL_RED ? GL_ONE : GL_GREEN) };
+    const std::array<int, 4> swizzle = { GL_RED, GL_RED, GL_RED, (img.getColorspace() == GL_RED ? GL_ONE : GL_GREEN) };
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle.data());
   }
 
   glTexImage2D(GL_TEXTURE_2D,
                0,
                img.getColorspace(),
-               static_cast<GLsizei>(img.getWidth()),
-               static_cast<GLsizei>(img.getHeight()),
+               static_cast<int>(img.getWidth()),
+               static_cast<int>(img.getHeight()),
                0,
                img.getColorspace(),
                GL_UNSIGNED_BYTE,

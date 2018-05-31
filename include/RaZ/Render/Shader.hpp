@@ -5,7 +5,6 @@
 
 #include <memory>
 #include <string>
-#include <initializer_list>
 
 #include "glew/include/GL/glew.h"
 
@@ -14,6 +13,7 @@ namespace Raz {
 class Shader {
 public:
   GLuint getIndex() const { return m_index; }
+  const std::string& getPath() const { return m_path; }
 
   void load() const;
   void compile() const;
@@ -28,7 +28,7 @@ protected:
 class VertexShader : public Shader {
 public:
   VertexShader() { m_index = glCreateShader(GL_VERTEX_SHADER); }
-  explicit VertexShader(const std::string& fileName);
+  explicit VertexShader(std::string fileName);
 
   static std::unique_ptr<VertexShader> loadFromSource(const std::string& source);
 };
@@ -38,7 +38,7 @@ using VertexShaderPtr = std::unique_ptr<VertexShader>;
 class FragmentShader : public Shader {
 public:
   FragmentShader() { m_index = glCreateShader(GL_FRAGMENT_SHADER); }
-  explicit FragmentShader(const std::string& fileName);
+  explicit FragmentShader(std::string fileName);
 
   static std::unique_ptr<FragmentShader> loadFromSource(const std::string& source);
 };
@@ -48,7 +48,7 @@ using FragmentShaderPtr = std::unique_ptr<FragmentShader>;
 class GeometryShader : public Shader {
 public:
   GeometryShader() { m_index = glCreateShader(GL_GEOMETRY_SHADER); }
-  explicit GeometryShader(const std::string& fileName);
+  explicit GeometryShader(std::string fileName);
 
   static std::unique_ptr<GeometryShader> loadFromSource(const std::string& source);
 };

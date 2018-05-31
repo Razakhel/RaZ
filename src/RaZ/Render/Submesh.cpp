@@ -51,7 +51,7 @@ void Submesh::load() const {
 
 void Submesh::draw() const {
   m_vao.bind();
-  glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(getIndexCount()), GL_UNSIGNED_INT, nullptr);
+  glDrawElements(GL_TRIANGLES, static_cast<int>(getIndexCount()), GL_UNSIGNED_INT, nullptr);
 }
 
 } // namespace Raz

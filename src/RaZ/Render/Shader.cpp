@@ -24,26 +24,26 @@ void Shader::load() const {
   std::string content = std::string(&bytes[0], fileSize);
 
   const char* data  = content.c_str();
-  const auto length = static_cast<GLint>(content.size());
+  const auto length = static_cast<int>(content.size());
   glShaderSource(m_index, 1, &data, &length);
 }
 
 void Shader::compile() const {
   glCompileShader(m_index);
 
-  GLint success;
+  int success;
   glGetShaderiv(m_index, GL_COMPILE_STATUS, &success);
 
   if (!success) {
-    std::array<GLchar, 512> infoLog {};
+    std::array<char, 512> infoLog {};
 
-    glGetShaderInfoLog(m_index, infoLog.size(), nullptr, infoLog.data());
+    glGetShaderInfoLog(m_index, static_cast<int>(infoLog.size()), nullptr, infoLog.data());
     std::cerr << "Error: Vertex shader compilation failed.\n" << infoLog.data() << std::endl;
   }
 }
 
-VertexShader::VertexShader(const std::string& fileName) : VertexShader() {
-  m_path = fileName;
+VertexShader::VertexShader(std::string fileName) : VertexShader() {
+  m_path = std::move(fileName);
   load();
 }
 
@@ -51,7 +51,7 @@ VertexShaderPtr VertexShader::loadFromSource(const std::string& source) {
   auto vertShader = std::make_unique<VertexShader>();
 
   const char* data  = source.c_str();
-  const auto length = static_cast<GLint>(source.size());
+  const auto length = static_cast<int>(source.size());
 
   glShaderSource(vertShader->getIndex(), 1, &data, &length);
 
@@ -60,8 +60,8 @@ VertexShaderPtr VertexShader::loadFromSource(const std::string& source) {
   return vertShader;
 }
 
-FragmentShader::FragmentShader(const std::string& fileName) : FragmentShader() {
-  m_path = fileName;
+FragmentShader::FragmentShader(std::string fileName) : FragmentShader() {
+  m_path = std::move(fileName);
   load();
 }
 
@@ -69,7 +69,7 @@ FragmentShaderPtr FragmentShader::loadFromSource(const std::string& source) {
   auto fragShader = std::make_unique<FragmentShader>();
 
   const char* data  = source.c_str();
-  const auto length = static_cast<GLint>(source.size());
+  const auto length = static_cast<int>(source.size());
 
   glShaderSource(fragShader->getIndex(), 1, &data, &length);
 
@@ -78,8 +78,8 @@ FragmentShaderPtr FragmentShader::loadFromSource(const std::string& source) {
   return fragShader;
 }
 
-GeometryShader::GeometryShader(const std::string& fileName) : GeometryShader() {
-  m_path = fileName;
+GeometryShader::GeometryShader(std::string fileName) : GeometryShader() {
+  m_path = std::move(fileName);
   load();
 }
 
@@ -87,7 +87,7 @@ GeometryShaderPtr GeometryShader::loadFromSource(const std::string& source) {
   auto fragShader = std::make_unique<GeometryShader>();
 
   const char* data  = source.c_str();
-  const auto length = static_cast<GLint>(source.size());
+  const auto length = static_cast<int>(source.size());
 
   glShaderSource(fragShader->getIndex(), 1, &data, &length);
 
