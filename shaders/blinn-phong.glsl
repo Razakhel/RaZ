@@ -43,7 +43,7 @@ layout (location = 1) out vec3 bufferNormal;
 
 void main() {
   vec3 normal     = fragMeshInfo.vertTBNMatrix[2];
-  vec3 color      = texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb;
+  vec3 color      = texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb * uniMaterial.diffuse;
   vec3 specFactor = texture(uniMaterial.specularMap, fragMeshInfo.vertTexcoords).r * uniMaterial.specular;
 
   vec3 ambient  = color * 0.05;
