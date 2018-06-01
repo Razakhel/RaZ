@@ -22,14 +22,20 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
   const auto& newMaterial = Material::recoverMaterial(materialPreset, roughnessFactor);
 
   for (auto& material : m_materials) {
-    auto* cookTorranceMaterial = dynamic_cast<MaterialCookTorrance*>(material.get());
+    if (material->getType() == MaterialType::MATERIAL_TYPE_COOK_TORRANCE) {
+      auto materialCT = dynamic_cast<MaterialCookTorrance*>(material.get());
 
-    if (cookTorranceMaterial) {
-      cookTorranceMaterial->setBaseColor(newMaterial->getBaseColor());
-      cookTorranceMaterial->setMetallicFactor(newMaterial->getMetallicFactor());
-      cookTorranceMaterial->setRoughnessFactor(roughnessFactor);
+      materialCT->setBaseColor(newMaterial->getBaseColor());
+      materialCT->setMetallicFactor(newMaterial->getMetallicFactor());
+      materialCT->setRoughnessFactor(roughnessFactor);
+      materialCT->setAlbedoMap(Texture::recoverTexture(TexturePreset::WHITE));
+    } else {
+      auto materialStd = dynamic_cast<MaterialStandard*>(material.get());
+      const float specular = newMaterial->getMetallicFactor() * (1.f - roughnessFactor);
 
-      cookTorranceMaterial->setAlbedoMap(Texture::recoverTexture(TexturePreset::WHITE));
+      materialStd->setDiffuse(newMaterial->getBaseColor());
+      materialStd->setSpecular(Vec3f(specular));
+      materialStd->setDiffuseMap(Texture::recoverTexture(TexturePreset::WHITE));
     }
   }
 }

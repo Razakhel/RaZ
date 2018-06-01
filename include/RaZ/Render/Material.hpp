@@ -12,6 +12,11 @@
 
 namespace Raz {
 
+enum class MaterialType {
+  MATERIAL_TYPE_STANDARD = 0,
+  MATERIAL_TYPE_COOK_TORRANCE
+};
+
 enum class MaterialPreset {
   CHARCOAL, GRASS, SAND, ICE, SNOW,                                                   // Dielectric presets
   IRON, SILVER, ALUMINIUM, GOLD, COPPER, CHROMIUM, NICKEL, TITANIUM, COBALT, PLATINUM // Metallic presets
@@ -22,6 +27,8 @@ class MaterialCookTorrance;
 class Material {
 public:
   virtual ~Material() = default;
+
+  virtual MaterialType getType() const = 0;
 
   static std::unique_ptr<MaterialCookTorrance> recoverMaterial(MaterialPreset preset, float roughnessFactor);
   virtual std::unique_ptr<Material> clone() const = 0;
@@ -37,6 +44,7 @@ public:
   explicit MaterialStandard(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
   explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
 
+  MaterialType getType() const override { return MaterialType::MATERIAL_TYPE_STANDARD; }
   const TexturePtr getAmbientMap() const { return m_ambientMap; }
   const TexturePtr getDiffuseMap() const { return m_diffuseMap; }
   const TexturePtr getSpecularMap() const { return m_specularMap; }
@@ -95,6 +103,7 @@ public:
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
     : m_baseColor{ baseColor }, m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } {}
 
+  MaterialType getType() const override { return MaterialType::MATERIAL_TYPE_COOK_TORRANCE; }
   const Vec3f& getBaseColor() const { return m_baseColor; }
   float getMetallicFactor() const { return m_metallicFactor; }
   float getRoughnessFactor() const { return m_roughnessFactor; }

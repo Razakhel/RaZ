@@ -14,10 +14,10 @@ namespace {
 
 void GLAPIENTRY callbackDebugLog(GLenum source,
                                  GLenum type,
-                                 GLuint id,
+                                 unsigned int id,
                                  GLenum severity,
-                                 GLsizei /*length*/,
-                                 const GLchar* message,
+                                 int /*length*/,
+                                 const char* message,
                                  const void* /*userParam*/) {
   std::cerr << "OpenGL Debug - ";
 
@@ -86,7 +86,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glEnable(GL_DEPTH_TEST);
 }
 
-void Window::enableVerticalSync(bool value) {
+void Window::enableVerticalSync(bool value) const {
 #if defined(_WIN32)
   if (wglGetExtensionsStringEXT())
     wglSwapIntervalEXT(value);
