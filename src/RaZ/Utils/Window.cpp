@@ -64,7 +64,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_SAMPLES, AASampleCount);
 
-  m_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+  m_window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
   if (!m_window) {
     close();
     throw std::runtime_error("Error: Failed to create GLFW Window");
@@ -73,7 +73,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glfwMakeContextCurrent(m_window);
   updateKeyCallbacks();
 
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, static_cast<int>(width), static_cast<int>(height));
 
   glewExperimental = GL_TRUE;
   if (glewInit() != GLEW_OK)

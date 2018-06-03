@@ -12,8 +12,8 @@ Cubemap::Cubemap() {
 
     layout (location = 0) in vec3 vertPosition;
 
-    uniform mat4 uniProjectionMatrix;
     uniform mat4 uniViewMatrix;
+    uniform mat4 uniProjectionMatrix;
 
     out vec3 fragTexcoords;
 
@@ -54,9 +54,9 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   Image img(rightTexturePath, true);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                0,
-               img.getColorspace(),
-               img.getWidth(),
-               img.getHeight(),
+               static_cast<int>(img.getColorspace()),
+               static_cast<int>(img.getWidth()),
+               static_cast<int>(img.getHeight()),
                0,
                img.getColorspace(),
                GL_UNSIGNED_BYTE,
@@ -65,9 +65,9 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   img.read(leftTexturePath, true);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
                0,
-               img.getColorspace(),
-               img.getWidth(),
-               img.getHeight(),
+               static_cast<int>(img.getColorspace()),
+               static_cast<int>(img.getWidth()),
+               static_cast<int>(img.getHeight()),
                0,
                img.getColorspace(),
                GL_UNSIGNED_BYTE,
@@ -76,9 +76,9 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   img.read(topTexturePath, true);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
                0,
-               img.getColorspace(),
-               img.getWidth(),
-               img.getHeight(),
+               static_cast<int>(img.getColorspace()),
+               static_cast<int>(img.getWidth()),
+               static_cast<int>(img.getHeight()),
                0,
                img.getColorspace(),
                GL_UNSIGNED_BYTE,
@@ -87,9 +87,9 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   img.read(bottomTexturePath, true);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
                0,
-               img.getColorspace(),
-               img.getWidth(),
-               img.getHeight(),
+               static_cast<int>(img.getColorspace()),
+               static_cast<int>(img.getWidth()),
+               static_cast<int>(img.getHeight()),
                0,
                img.getColorspace(),
                GL_UNSIGNED_BYTE,
@@ -98,9 +98,9 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   img.read(frontTexturePath, true);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                0,
-               img.getColorspace(),
-               img.getWidth(),
-               img.getHeight(),
+               static_cast<int>(img.getColorspace()),
+               static_cast<int>(img.getWidth()),
+               static_cast<int>(img.getHeight()),
                0,
                img.getColorspace(),
                GL_UNSIGNED_BYTE,
@@ -109,9 +109,9 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   img.read(backTexturePath, true);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
                0,
-               img.getColorspace(),
-               img.getWidth(),
-               img.getHeight(),
+               static_cast<int>(img.getColorspace()),
+               static_cast<int>(img.getWidth()),
+               static_cast<int>(img.getHeight()),
                0,
                img.getColorspace(),
                GL_UNSIGNED_BYTE,

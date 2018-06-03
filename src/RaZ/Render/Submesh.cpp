@@ -6,13 +6,13 @@ void Submesh::load() const {
   m_vao.bind();
 
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-               sizeof(getIndices().front()) * getIndices().size(),
+               static_cast<int64_t>(sizeof(getIndices().front()) * getIndices().size()),
                getIndices().data(),
                GL_STATIC_DRAW);
 
   m_vbo.bind();
   glBufferData(GL_ARRAY_BUFFER,
-               sizeof(getVertices().front()) * getVertices().size(),
+               static_cast<int64_t>(sizeof(getVertices().front()) * getVertices().size()),
                getVertices().data(),
                GL_STATIC_DRAW);
 

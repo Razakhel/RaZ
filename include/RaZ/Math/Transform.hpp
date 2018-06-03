@@ -13,8 +13,6 @@ public:
   explicit Transform(const Vec3f& position = Vec3f(0.f), const Mat4f& rotation = Mat4f::identity(), const Vec3f& scale = Vec3f(1.f))
     : m_position{ position }, m_rotation{ rotation }, m_scale{ scale } {}
 
-  virtual ~Transform() = default;
-
   const Vec3f& getPosition() const { return m_position; }
   Vec3f& getPosition() { return m_position; }
   const Mat4f& getRotation() const { return m_rotation; }
@@ -31,6 +29,8 @@ public:
   virtual void scale(float val) { scale(val, val, val); }
   Mat4f computeTranslationMatrix(bool inverseTranslation = false) const;
   Mat4f computeTransformMatrix() const;
+
+  virtual ~Transform() = default;
 
 protected:
   Vec3f m_position;

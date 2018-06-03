@@ -38,7 +38,7 @@ void Image::readPng(std::ifstream& file, bool reverse) {
 
   png_set_read_fn(readStruct, &file, [] (png_structp pngReadPtr, png_bytep data, png_size_t length) {
     png_voidp inPtr = png_get_io_ptr(pngReadPtr);
-    static_cast<std::istream*>(inPtr)->read(reinterpret_cast<char*>(data), length);
+    static_cast<std::istream*>(inPtr)->read(reinterpret_cast<char*>(data), static_cast<std::streamsize>(length));
   });
 
   // Setting the amount signature bytes we've already read

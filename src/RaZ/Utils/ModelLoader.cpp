@@ -297,9 +297,9 @@ ModelPtr ModelLoader::importModel(const std::string& fileName) {
     const std::string format = extractFileExt(fileName);
 
     if (format == "obj" || format == "OBJ")
-      model = std::move(importObj(file));
+      model = importObj(file);
     else if (format == "off" || format == "OFF")
-      model = std::move(importOff(file));
+      model = importOff(file);
     else
       throw std::runtime_error("Error: '" + format + "' format is not supported");
   } else {

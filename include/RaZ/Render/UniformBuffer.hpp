@@ -14,6 +14,7 @@ class UniformBuffer {
 public:
   UniformBuffer() { glGenBuffers(1, &m_index); }
   explicit UniformBuffer(unsigned int size, unsigned int bindingIndex);
+  UniformBuffer(const UniformBuffer&) = default;
 
   GLuint getIndex() const { return m_index; }
 

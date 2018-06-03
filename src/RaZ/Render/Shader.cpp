@@ -19,7 +19,7 @@ void Shader::load() const {
   shaderSource.seekg(0, std::ios::beg);
 
   std::vector<char> bytes(fileSize);
-  shaderSource.read(&bytes[0], fileSize);
+  shaderSource.read(&bytes[0], static_cast<std::streamsize>(fileSize));
 
   std::string content = std::string(&bytes[0], fileSize);
 

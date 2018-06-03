@@ -26,7 +26,7 @@ class MaterialCookTorrance;
 
 class Material {
 public:
-  virtual ~Material() = default;
+  Material(const Material&) = default;
 
   virtual MaterialType getType() const = 0;
 
@@ -34,6 +34,11 @@ public:
   virtual std::unique_ptr<Material> clone() const = 0;
   virtual void initTextures(const ShaderProgram& program) const = 0;
   virtual void bindAttributes(const ShaderProgram& program) const = 0;
+
+  virtual ~Material() = default;
+
+protected:
+  Material() = default;
 };
 
 using MaterialPtr = std::unique_ptr<Material>;

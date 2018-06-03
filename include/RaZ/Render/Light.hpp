@@ -12,8 +12,6 @@ namespace Raz {
 
 class Light : public Transform {
 public:
-  virtual ~Light() = default;
-
   virtual Vec4f getHomogeneousPosition() const = 0;
   const Vec3f& getDirection() const { return m_direction; }
   Vec3f& getDirection() { return m_direction; }
@@ -21,6 +19,8 @@ public:
   Vec3f& getColor() { return m_color; }
   float getEnergy() const { return m_energy; }
   float getAngle() const { return m_angle; }
+
+  virtual ~Light() = default;
 
 protected:
   Light(const Vec3f& position, float energy, const Vec3f& color) : m_energy{ energy }, m_color{ color } { m_position = position; }
