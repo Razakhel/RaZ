@@ -10,7 +10,7 @@ Vector<T, Size>::Vector(const Vector<T, Size - 1>& vec, T val) {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>::Vector(T val) {
+Vector<T, Size>::Vector(T val) noexcept {
   for (T& elt : m_data)
     elt = val;
 }
