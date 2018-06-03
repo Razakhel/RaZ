@@ -20,6 +20,7 @@ public:
     : m_program(std::move(vertShader), std::move(fragShader), std::move(geomShader)), m_models{ std::move(models) } {}
 
   const ShaderProgram& getProgram() const { return m_program; }
+  const CubemapPtr& getCubemap() const { return m_cubemap; }
   const std::vector<ModelPtr>& getModels() const { return m_models; }
 
   void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }

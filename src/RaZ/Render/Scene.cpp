@@ -26,8 +26,7 @@ void Scene::render(const CameraPtr& camera) const {
 
   if (m_cubemap) {
     m_cubemap->getProgram().use();
-    m_cubemap->getProgram().sendUniform("uniViewMatrix", Raz::Mat4f(Raz::Mat3f(viewMat)));
-    m_cubemap->getProgram().sendUniform("uniProjectionMatrix", projMat);
+    m_cubemap->sendViewProjectionMatrix(projMat * Mat4f(Mat3f(viewMat)));
 
     m_cubemap->draw();
   }

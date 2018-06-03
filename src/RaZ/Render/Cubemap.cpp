@@ -12,15 +12,16 @@ Cubemap::Cubemap() {
 
     layout (location = 0) in vec3 vertPosition;
 
-    uniform mat4 uniViewMatrix;
-    uniform mat4 uniProjectionMatrix;
+    layout (std140) uniform uboCubemapMatrix {
+      mat4 viewProjMat;
+    };
 
     out vec3 fragTexcoords;
 
     void main() {
       fragTexcoords = vertPosition;
 
-      vec4 pos = uniProjectionMatrix * uniViewMatrix * vec4(vertPosition, 1.0);
+      vec4 pos = viewProjMat * vec4(vertPosition, 1.0);
       gl_Position = pos.xyww;
     }
   )";
@@ -44,6 +45,9 @@ Cubemap::Cubemap() {
   m_program.link();
 
   m_program.sendUniform("uniSkybox", 0);
+
+  m_viewProjUbo.bindUniformBlock(m_program, "uboCubemapMatrix", 0);
+  m_viewProjUbo.bindBufferBase(0);
 }
 
 void Cubemap::load(const std::string& rightTexturePath, const std::string& leftTexturePath,

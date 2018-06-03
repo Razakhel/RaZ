@@ -8,6 +8,7 @@
 
 #include "glew/include/GL/glew.h"
 #include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Utils/Image.hpp"
 
 namespace Raz {
@@ -22,6 +23,8 @@ public:
 
   const ShaderProgram& getProgram() const { return m_program; }
 
+  void sendViewProjectionMatrix(const Mat4f& viewMat) const { m_viewProjUbo.sendData(viewMat, 0); }
+
   void load(const std::string& rightTexturePath, const std::string& leftTexturePath,
             const std::string& topTexturePath, const std::string& bottomTexturePath,
             const std::string& frontTexturePath, const std::string& backTexturePath);
@@ -32,6 +35,7 @@ public:
 private:
   GLuint m_index {};
   ShaderProgram m_program;
+  UniformBuffer m_viewProjUbo = UniformBuffer(sizeof(Mat4f), 0);
 };
 
 using CubemapPtr = std::unique_ptr<Cubemap>;
