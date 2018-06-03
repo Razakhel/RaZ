@@ -14,28 +14,30 @@ namespace Raz {
 
 class Scene {
 public:
-  Scene(VertexShaderPtr vertShader, FragmentShaderPtr fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
-  Scene(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, std::vector<ModelPtr>&& models)
-    : m_program(std::move(vertShader), std::move(fragShader)), m_models{ std::move(models) } {}
+  Scene(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, GeometryShaderPtr geomShader = nullptr)
+    : m_program(std::move(vertShader), std::move(fragShader), std::move(geomShader)) {}
+  Scene(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, std::vector<ModelPtr> models, GeometryShaderPtr geomShader = nullptr)
+    : m_program(std::move(vertShader), std::move(fragShader), std::move(geomShader)), m_models{ std::move(models) } {}
 
   const ShaderProgram& getProgram() const { return m_program; }
   const std::vector<ModelPtr>& getModels() const { return m_models; }
 
-  //void setCamera(CameraPtr camera) { m_camera = std::move(camera); }
   void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
+
   void addModel(ModelPtr model) { m_models.emplace_back(std::move(model)); }
   void addLight(LightPtr light) { m_lights.emplace_back(std::move(light)); }
   void load() const;
-  void render(const Mat4f& viewProjMat) const;
+  void render(const CameraPtr& camera) const;
   void updateLights() const;
 
 private:
-  ShaderProgram m_program;
-  //CameraPtr m_camera;
-  CubemapPtr m_cubemap;
-  std::vector<ModelPtr> m_models;
-  std::vector<LightPtr> m_lights;
+  ShaderProgram m_program {};
+  CubemapPtr m_cubemap {};
+  std::vector<ModelPtr> m_models {};
+  std::vector<LightPtr> m_lights {};
 };
+
+using ScenePtr = std::unique_ptr<Scene>;
 
 } // namespace Raz
 

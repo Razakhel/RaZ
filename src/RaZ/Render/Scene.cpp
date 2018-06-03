@@ -7,8 +7,13 @@ void Scene::load() const {
     model->load(m_program);
 }
 
-void Scene::render(const Mat4f& viewProjMat) const {
+void Scene::render(const CameraPtr& camera) const {
+  const Mat4f& viewMat    = camera->getViewMatrix();
+  const Mat4f& projMat    = camera->getProjectionMatrix();
+  const Mat4f viewProjMat = projMat * viewMat;
+
   m_program.use();
+  m_program.sendUniform("uniCameraPos", camera->getPosition());
 
   for (const auto& model : m_models) {
     const auto modelMat = model->computeTransformMatrix();
@@ -19,8 +24,13 @@ void Scene::render(const Mat4f& viewProjMat) const {
     model->draw(m_program);
   }
 
-  if (m_cubemap)
+  if (m_cubemap) {
+    m_cubemap->getProgram().use();
+    m_cubemap->getProgram().sendUniform("uniViewMatrix", Raz::Mat4f(Raz::Mat3f(viewMat)));
+    m_cubemap->getProgram().sendUniform("uniProjectionMatrix", projMat);
+
     m_cubemap->draw();
+  }
 }
 
 void Scene::updateLights() const {
