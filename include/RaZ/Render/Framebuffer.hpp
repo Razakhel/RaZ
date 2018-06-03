@@ -19,6 +19,7 @@ public:
   const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
   const ShaderProgram& getProgram() const { return m_program; }
 
+  void initBuffers() const;
   void bind() const;
   void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
   void display() const;
@@ -32,6 +33,8 @@ private:
   TexturePtr m_normalBuffer;
   ShaderProgram m_program;
 };
+
+using FramebufferPtr = std::unique_ptr<Framebuffer>;
 
 } // namespace Raz
 

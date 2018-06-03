@@ -21,9 +21,17 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height, const std::str
 
   glDrawBuffers(2, colorBuffers.data());
 
+  initBuffers();
+
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     std::cerr << "Error: Framebuffer is not complete." << std::endl;
   unbind();
+}
+
+void Framebuffer::initBuffers() const {
+  m_program.sendUniform("uniSceneBuffers.depth",  0);
+  m_program.sendUniform("uniSceneBuffers.color",  1);
+  m_program.sendUniform("uniSceneBuffers.normal", 2);
 }
 
 void Framebuffer::bind() const {
@@ -44,6 +52,7 @@ void Framebuffer::display() const {
   Texture::activate(2);
   m_normalBuffer->bind();
 
+  m_program.use();
   Mesh::drawQuad();
 }
 
