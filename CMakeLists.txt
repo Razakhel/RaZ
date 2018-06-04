@@ -46,9 +46,28 @@ if (CMAKE_COMPILER_IS_GNUCC)
                    -Wshadow=compatible-local")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(CLANG_FLAGS "-pedantic -pedantic-errors \
+                     -Weverything \
+                     -Wno-c++98-compat -Wno-c++98-compat-pedantic \
+                     -Wno-mismatched-tags \
+                     -Wno-padded \
+                     -Wno-shadow \
+                     -Wno-global-constructors \
+                     -Wno-weak-vtables \
+                     -Wno-exit-time-destructors \
+                     -Wno-covered-switch-default \
+                     -Wno-unused-template \
+                     -Wno-reserved-id-macro \
+                     -Wno-documentation -Wno-documentation-unknown-command")
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_FLAGS}")
 elseif (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 endif ()
+
+option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
+option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/extern
@@ -187,10 +206,17 @@ list(
     ${DISPOSABLE}
 )
 
-#add_library(RaZ SHARED ${SOURCE_FILES})
-add_executable(RaZ ${SOURCE_FILES} examples/main.cpp)
+if (${RAZ_BUILD_STATIC})
+    add_library(RaZ STATIC ${SOURCE_FILES})
+else ()
+    add_library(RaZ SHARED ${SOURCE_FILES})
+endif ()
 
 target_link_libraries(
     RaZ ${LIBS}
     ${DEPS}
 )
+
+if (${RAZ_BUILD_EXAMPLES})
+    add_subdirectory(examples)
+endif ()
