@@ -5,6 +5,8 @@ namespace Raz {
 void Scene::load() const {
   for (const auto& model : m_models)
     model->load(m_program);
+
+  updateLights();
 }
 
 void Scene::render(const CameraPtr& camera) const {

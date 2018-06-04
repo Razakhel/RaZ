@@ -15,8 +15,8 @@ namespace Raz {
 class Camera : public Transform {
 public:
   Camera(unsigned int frameWidth, unsigned int frameHeight,
-         float fieldOfViewDegrees,
-         float nearPlane, float farPlane,
+         float fieldOfViewDegrees = 45.f,
+         float nearPlane = 0.1f, float farPlane = 100.f,
          const Vec3f& position = Vec3f(0.f));
 
   const Mat4f& getViewMatrix() const { return m_viewMat; }

@@ -39,14 +39,14 @@ using LightPtr = std::unique_ptr<Light>;
 
 class PointLight : public Light {
 public:
-  PointLight(const Vec3f& position, float energy = 1.f, const Vec3f& color = Vec3f(1.f)) : Light(position, energy, color) {}
+  explicit PointLight(const Vec3f& position, float energy = 1.f, const Vec3f& color = Vec3f(1.f)) : Light(position, energy, color) {}
 
   Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 1.f); }
 };
 
 class DirectionalLight : public Light {
 public:
-  DirectionalLight(const Vec3f& position, const Vec3f& direction, float energy = 1.f, const Vec3f& color = Vec3f(1.f))
+  DirectionalLight(const Vec3f& direction, float energy = 1.f, const Vec3f& color = Vec3f(1.f), const Vec3f& position = Vec3f(0.f))
     : Light(position, direction, energy, color) {}
 
   Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 0.f); }
