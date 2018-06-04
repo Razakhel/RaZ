@@ -24,6 +24,7 @@
 #include "Render/Submesh.hpp"
 #include "Render/Texture.hpp"
 #include "Render/UniformBuffer.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
 #include "Utils/Image.hpp"
 #include "Utils/Keyboard.hpp"
 #include "Utils/ModelLoader.hpp"
