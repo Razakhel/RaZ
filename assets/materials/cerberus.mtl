@@ -9,8 +9,8 @@ newmtl 08_-_Default
   Pm 1.000000
   Pr 1.000000
   illum 1
-  map_Kd ../assets/textures/cerberus_albedo.png
-  norm ../assets/textures/cerberus_normal.png
-  map_Pm ../assets/textures/cerberus_metallic.png
-  map_Pr ../assets/textures/cerberus_roughness.png
-  map_Ka ../assets/textures/cerberus_ao.png
+  map_Kd ../textures/cerberus_albedo.png
+  norm ../textures/cerberus_normal.png
+  map_Pm ../textures/cerberus_metallic.png
+  map_Pr ../textures/cerberus_roughness.png
+  map_Ka ../textures/cerberus_ao.png

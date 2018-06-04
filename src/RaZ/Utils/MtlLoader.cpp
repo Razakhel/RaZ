@@ -1,17 +1,37 @@
 #include <fstream>
 
+#include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/MtlLoader.hpp"
 
 namespace Raz {
 
 namespace MtlLoader {
 
-void importMtl(const std::string& fileName,
+namespace {
+
+TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textureFileName) {
+  static std::unordered_map<std::string, TexturePtr> loadedTextures;
+
+  TexturePtr map {};
+  const auto loadedTexturePos = loadedTextures.find(textureFileName);
+
+  if (loadedTexturePos != loadedTextures.cend()) {
+    map = loadedTexturePos->second;
+  } else {
+    const auto texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
+    map = std::make_shared<Texture>(texturePath);
+    loadedTextures.emplace(textureFileName, map);
+  }
+
+  return map;
+}
+
+} // namespace
+
+void importMtl(const std::string& mtlFilePath,
                std::vector<MaterialPtr>& materials,
                std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
-  std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
-
-  std::unordered_map<std::string, TexturePtr> loadedTextures;
+  std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
   auto standardMaterial = std::make_unique<MaterialStandard>();
   auto cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
@@ -45,15 +65,7 @@ void importMtl(const std::string& fileName,
 
         isStandardMaterial = true;
       } else if (tag[0] == 'm') {                      // Import texture
-        TexturePtr map;
-
-        const auto loadedTexturePos = loadedTextures.find(nextValue);
-        if (loadedTexturePos != loadedTextures.cend()) {
-          map = loadedTexturePos->second;
-        } else {
-          map = std::make_shared<Texture>(nextValue);
-          loadedTextures.insert({ nextValue, map });
-        }
+        const TexturePtr& map = std::move(loadTexture(mtlFilePath, nextValue));
 
         if (tag[4] == 'K') {                           // Standard maps
           if (tag[5] == 'a') {                         // Ambient/ambient occlusion map [map_Ka]
@@ -95,24 +107,24 @@ void importMtl(const std::string& fileName,
           isStandardMaterial = true;
         }*/
       }  else if (tag[0] == 'b') {                     // Bump map (alias) [bump]
-        standardMaterial->loadBumpMap(nextValue);
+        standardMaterial->setBumpMap(std::move(loadTexture(mtlFilePath, nextValue)));
         isStandardMaterial = true;
       } else if (tag[0] == 'n') {
         if (tag[1] == 'o') {                           // Normal map [norm]
-          cookTorranceMaterial->loadNormalMap(nextValue);
+          cookTorranceMaterial->setNormalMap(std::move(loadTexture(mtlFilePath, nextValue)));
         } else if (tag[1] == 'e') {                    // New material [newmtl]
-          materialCorrespIndices.insert({ nextValue, materialCorrespIndices.size() });
+          materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
 
           if (!isStandardMaterial && !isCookTorranceMaterial)
             continue;
 
-          if (isCookTorranceMaterial) {
+          if (isCookTorranceMaterial)
             materials.emplace_back(std::move(cookTorranceMaterial));
-            cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
-          } else {
+          else
             materials.emplace_back(std::move(standardMaterial));
-            standardMaterial = std::make_unique<MaterialStandard>();
-          }
+
+          cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
+          standardMaterial = std::make_unique<MaterialStandard>();
 
           isStandardMaterial = false;
           isCookTorranceMaterial = false;
@@ -122,7 +134,7 @@ void importMtl(const std::string& fileName,
       }
     }
   } else {
-    throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
+    throw std::runtime_error("Error: Couldn't open the file '" + mtlFilePath + "'");
   }
 
   if (isCookTorranceMaterial)

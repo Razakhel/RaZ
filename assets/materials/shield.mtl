@@ -4,8 +4,8 @@ newmtl shield
   Ka 1.00 1.00 1.00
   Tf 1.00 1.00 1.00
   Ni 1.00
-  map_Kd ../assets/textures/shield_albedo.png
-  norm ../assets/textures/shield_normal.png
-  map_Pm ../assets/textures/shield_metallic.png
-  map_Pr ../assets/textures/shield_roughness.png
-  map_Ka ../assets/textures/shield_ao.png
+  map_Kd ../textures/shield_albedo.png
+  norm ../textures/shield_normal.png
+  map_Pm ../textures/shield_metallic.png
+  map_Pr ../textures/shield_roughness.png
+  map_Ka ../textures/shield_ao.png

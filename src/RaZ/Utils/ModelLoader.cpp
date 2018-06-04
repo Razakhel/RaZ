@@ -3,16 +3,13 @@
 #include <sstream>
 
 #include "RaZ/Render/Model.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/ModelLoader.hpp"
 #include "RaZ/Utils/MtlLoader.hpp"
 
 namespace Raz {
 
 namespace {
-
-std::string extractFileExt(const std::string& fileName) {
-  return (fileName.substr(fileName.find_last_of('.') + 1));
-}
 
 Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
                      const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
@@ -29,7 +26,7 @@ Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f&
   return tangent;
 }
 
-ModelPtr importObj(std::ifstream& file) {
+ModelPtr importObj(std::ifstream& file, const std::string& filePath) {
   MeshPtr mesh = std::make_unique<Mesh>();
   std::unordered_map<std::string, std::size_t> materialCorrespIndices;
 
@@ -125,15 +122,19 @@ ModelPtr importObj(std::ifstream& file) {
       normalsIndices.back().emplace_back(partIndices[6 + quadStride]);
       normalsIndices.back().emplace_back(partIndices[8 + quadStride]);
     } else if (line[0] == 'm') {
-      std::string materialName;
-      file >> materialName;
+      std::string mtlFileName;
+      file >> mtlFileName;
 
-      MtlLoader::importMtl(materialName, mesh->getMaterials(), materialCorrespIndices);
+      const auto mtlFilePath = FileUtils::extractPathToFile(filePath) + mtlFileName;
+
+      MtlLoader::importMtl(mtlFilePath, mesh->getMaterials(), materialCorrespIndices);
     } else if (line[0] == 'u') {
-      std::string materialName;
-      file >> materialName;
+      if (!materialCorrespIndices.empty()) {
+        std::string materialName;
+        file >> materialName;
 
-      mesh->getSubmeshes().back()->setMaterialIndex(materialCorrespIndices.find(materialName)->second);
+        mesh->getSubmeshes().back()->setMaterialIndex(materialCorrespIndices.find(materialName)->second);
+      }
     } else if (line[0] == 'o' || line[0] == 'g') {
       if (!posIndices.front().empty()) {
         const std::size_t newSize = posIndices.size() + 1;
@@ -289,21 +290,21 @@ ModelPtr importOff(std::ifstream& file) {
 
 } // namespace
 
-ModelPtr ModelLoader::importModel(const std::string& fileName) {
+ModelPtr ModelLoader::importModel(const std::string& filePath) {
   ModelPtr model;
-  std::ifstream file(fileName, std::ios_base::in | std::ios_base::binary);
+  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
-    const std::string format = extractFileExt(fileName);
+    const std::string format = FileUtils::extractFileExtension(filePath);
 
     if (format == "obj" || format == "OBJ")
-      model = importObj(file);
+      model = importObj(file, filePath);
     else if (format == "off" || format == "OFF")
       model = importOff(file);
     else
       throw std::runtime_error("Error: '" + format + "' format is not supported");
   } else {
-    throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
+    throw std::runtime_error("Error: Couldn't open the file '" + filePath + "'");
   }
 
   return model;

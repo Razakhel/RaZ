@@ -12,7 +12,7 @@ namespace Raz {
 
 namespace MtlLoader {
 
-void importMtl(const std::string& file,
+void importMtl(const std::string& mtlFilePath,
                std::vector<MaterialPtr>& materials,
                std::unordered_map<std::string, std::size_t>& materialCorrespIndices);
 
