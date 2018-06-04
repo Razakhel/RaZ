@@ -12,7 +12,9 @@ namespace Raz {
 
 class Application {
 public:
-  Application(WindowPtr window, ScenePtr scene, CameraPtr camera = nullptr);
+  Application(WindowPtr window, ScenePtr scene);
+  Application(WindowPtr window, ScenePtr scene, CameraPtr camera)
+    : Application(std::move(window), std::move(scene)) { m_camera = std::move(camera); }
 
   const WindowPtr& getWindow() const { return m_window; }
   const ScenePtr& getScene() const { return m_scene; }
@@ -34,7 +36,7 @@ public:
 private:
   WindowPtr m_window {};
   ScenePtr m_scene {};
-  CameraPtr m_camera = std::make_unique<Camera>(m_window->getWidth(), m_window->getHeight(), 45.f, 0.1f, 100.f);
+  CameraPtr m_camera = std::make_unique<Camera>(m_window->getWidth(), m_window->getHeight());
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);
 };
 
