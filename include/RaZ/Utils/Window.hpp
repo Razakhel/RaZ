@@ -22,6 +22,8 @@ public:
   unsigned int getHeight() const { return m_height; }
 
   void setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
+  void enableFaceCulling(bool value = true) const;
+  void disableFaceCulling() const { enableFaceCulling(false); }
   void enableVerticalSync(bool value = true) const;
   void disableVerticalSync() const { enableVerticalSync(false); }
   void addKeyCallback(Keyboard::Key key, std::function<void()> func);

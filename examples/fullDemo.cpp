@@ -65,6 +65,12 @@ int main() {
     glPolygonMode(GL_FRONT_AND_BACK, ((isWireframe = !isWireframe) ? GL_LINE : GL_FILL));
   });
 
+  // Allow face culling toggling
+  bool hasFaceCulling = true;
+  windowPtr->addKeyCallback(Raz::Keyboard::N, [&hasFaceCulling, &windowPtr] () {
+    windowPtr->enableFaceCulling((hasFaceCulling = !hasFaceCulling));
+  });
+
   // Camera controls
   windowPtr->addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr] () { cameraPtr->move( 0.f,  0.5f, 0.f); });
   windowPtr->addKeyCallback(Raz::Keyboard::V,     [&cameraPtr] () { cameraPtr->move( 0.f, -0.5f, 0.f); });

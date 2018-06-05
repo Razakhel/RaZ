@@ -64,6 +64,10 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_SAMPLES, AASampleCount);
 
+#if defined(__APPLE__) // Setting the OpenGL forward compatibility is required on macOS
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
   m_window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
   if (!m_window) {
     close();
@@ -71,7 +75,6 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   }
 
   glfwMakeContextCurrent(m_window);
-  updateKeyCallbacks();
 
   glViewport(0, 0, static_cast<int>(width), static_cast<int>(height));
 
@@ -79,11 +82,20 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   if (glewInit() != GLEW_OK)
     std::cerr << "Error: Failed to initialize GLEW." << std::endl;
 
+#if !defined(__APPLE__) // Setting the debug message callback provokes a crash on macOS
   glDebugMessageCallback(&callbackDebugLog, nullptr);
+#endif
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-  glEnable(GL_CULL_FACE);
+  enableFaceCulling();
   glEnable(GL_DEPTH_TEST);
+}
+
+void Window::enableFaceCulling(bool value) const {
+  if (value)
+    glEnable(GL_CULL_FACE);
+  else
+    glDisable(GL_CULL_FACE);
 }
 
 void Window::enableVerticalSync(bool value) const {
@@ -111,15 +123,15 @@ void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
 
 void Window::updateKeyCallbacks() const {
   glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
-    const CallbacksList& callbackList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
-
-    for (const auto& callback : callbackList) {
-      if (key == callback.first && action != GLFW_RELEASE)
-        callback.second();
-    }
+    const CallbacksList& callbacksList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, GL_TRUE);
+
+    for (const auto& callback : callbacksList) {
+      if (key == callback.first && action != GLFW_RELEASE)
+        callback.second();
+    }
   });
 }
 
