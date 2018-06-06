@@ -12,10 +12,12 @@ Application::Application(WindowPtr window, ScenePtr scene)
 bool Application::run() const {
   const bool windowRunning = m_window->run();
 
+  m_cameraUbo.bind();
   sendViewMatrix(m_camera->getViewMatrix());
-  sendInverseViewMatrix(m_camera->getViewMatrix().inverse());
+  sendInverseViewMatrix(m_camera->getInverseViewMatrix());
   sendProjectionMatrix(m_camera->getProjectionMatrix());
-  sendInverseProjectionMatrix(m_camera->getProjectionMatrix().inverse());
+  sendInverseProjectionMatrix(m_camera->getInverseProjectionMatrix());
+  //sendViewProjectionMatrix(m_camera->getProjectionMatrix() * m_camera->getViewMatrix());
   sendCameraPosition(m_camera->getPosition());
 
   m_scene->render(m_camera);

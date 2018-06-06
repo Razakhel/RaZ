@@ -9,29 +9,39 @@ Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
                                              m_fieldOfView{ fieldOfViewDegrees * PI<float> / 180 },
                                              m_nearPlane{ nearPlane }, m_farPlane{ farPlane } {
   m_position = position;
-  
+
   computeViewMatrix();
+  computeInverseViewMatrix();
   computePerspectiveMatrix();
+  computeInverseProjectionMatrix();
 }
 
 void Camera::move(const Raz::Vec3f& displacement) {
   Transform::move(displacement);
   computeViewMatrix();
+  computeInverseViewMatrix();
 }
 
 void Camera::translate(float x, float y, float z) {
   Transform::translate(x, y, z);
   computeViewMatrix();
+  computeInverseViewMatrix();
 }
 
 void Camera::rotate(float angle, float x, float y, float z) {
   Transform::rotate(angle, x, y, z);
   computeViewMatrix();
+  computeInverseViewMatrix();
 }
 
 const Mat4f& Camera::computeViewMatrix() {
   m_viewMat = m_rotation.inverse() * computeTranslationMatrix(true);
   return m_viewMat;
+}
+
+const Mat4f& Camera::computeInverseViewMatrix() {
+  m_invViewMat = m_viewMat.inverse();
+  return m_invViewMat;
 }
 
 const Mat4f& Camera::computeLookAt(const Vec3f& target, const Vec3f& orientation) {
@@ -45,6 +55,11 @@ const Mat4f& Camera::computeLookAt(const Vec3f& target, const Vec3f& orientation
                      { xAxis.dot(-m_position), yAxis.dot(-m_position), zAxis.dot(m_position), 1.f }});
 
   return m_viewMat;
+}
+
+const Mat4f& Camera::computeInverseProjectionMatrix() {
+  m_invProjMat = m_projMat.inverse();
+  return m_invProjMat;
 }
 
 const Mat4f& Camera::computePerspectiveMatrix() {
