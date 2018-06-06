@@ -26,12 +26,8 @@ void Scene::render(const CameraPtr& camera) const {
     model->draw(m_program);
   }
 
-  if (m_cubemap) {
-    m_cubemap->getProgram().use();
-    m_cubemap->sendViewProjectionMatrix(projMat * Mat4f(Mat3f(viewMat)));
-
-    m_cubemap->draw();
-  }
+  if (m_cubemap)
+    m_cubemap->draw(camera);
 }
 
 void Scene::updateLights() const {

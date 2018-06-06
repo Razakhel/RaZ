@@ -47,7 +47,7 @@ Cubemap::Cubemap() {
   m_program.sendUniform("uniSkybox", 0);
 
   m_viewProjUbo.bindUniformBlock(m_program, "uboCubemapMatrix", 0);
-  m_viewProjUbo.bindBufferBase(0);
+  m_viewProjUbo.bindBufferBase(1);
 }
 
 void Cubemap::load(const std::string& rightTexturePath, const std::string& leftTexturePath,
@@ -130,7 +130,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   unbind();
 }
 
-void Cubemap::draw() const {
+void Cubemap::draw(const CameraPtr& camera) const {
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_FRONT);
 
@@ -138,6 +138,9 @@ void Cubemap::draw() const {
 
   Texture::activate(0);
   bind();
+
+  m_viewProjUbo.bind();
+  sendViewProjectionMatrix(camera->getProjectionMatrix() * Mat4f(Mat3f(camera->getViewMatrix())));
 
   Mesh::drawCube();
 

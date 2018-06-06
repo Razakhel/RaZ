@@ -2,7 +2,7 @@ namespace Raz {
 
 template <typename T>
 void UniformBuffer::sendData(T data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, std::min(static_cast<std::size_t>(4), sizeof(data)), &data);
+  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
 }
 
 template <typename T, std::size_t Size>
