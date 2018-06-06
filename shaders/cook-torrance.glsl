@@ -145,7 +145,7 @@ void main() {
   // Gamma correction
   color = pow(color, vec3(1.0 / 2.2));
 
-  fragColor = vec4(color, 1.0);
+  fragColor = vec4(color, metallic);
 
   // Sending fragment normal to next framebuffer(s), if any
   bufferNormal = normal;

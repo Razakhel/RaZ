@@ -77,7 +77,7 @@ void main() {
 
   vec3 emissive = texture(uniMaterial.emissiveMap, fragMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
 
-  fragColor = vec4(ambient + diffuse + specular + emissive, 1.0);
+  fragColor = vec4(ambient + diffuse + specular + emissive, specFactor);
 
   // Sending fragment normal to next framebuffer(s), if any
   bufferNormal = normal;
