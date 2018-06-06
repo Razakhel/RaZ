@@ -81,9 +81,9 @@ Mat3<T> computeMatrixInverse(const Mat3<T>& mat, float determinant) {
   const Mat2<T> botRight({{ mat.getData()[0], mat.getData()[1] },
                           { mat.getData()[3], mat.getData()[4] }});
 
-  const Mat3<T> cofactors({{ topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant() },
-                          { -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant() },
-                          {  botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant() }});
+  const Mat3<T> cofactors({{  topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant() },
+                           { -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant() },
+                           {  botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant() }});
 
   return cofactors.transpose() / determinant;
 }
@@ -259,13 +259,7 @@ template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::inverse() const {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
-  const float determinant = computeMatrixDeterminant(*this);
-  const float errorRange = 0.01f;
-
-  if (determinant > 1.f - errorRange && determinant < 1.f + errorRange)
-    return transpose();
-
-  return computeMatrixInverse(*this, determinant);
+  return computeMatrixInverse(*this, computeMatrixDeterminant(*this));
 }
 
 template <typename T, std::size_t W, std::size_t H>
