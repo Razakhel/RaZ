@@ -21,7 +21,7 @@ class Texture {
 public:
   Texture() { glGenTextures(1, &m_index); }
   explicit Texture(uint8_t value);
-  Texture(unsigned int width, unsigned int height, bool isDepthTexture = false);
+  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
   GLuint getIndex() const { return m_index; }

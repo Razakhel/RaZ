@@ -62,7 +62,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                static_cast<int>(img.getWidth()),
                static_cast<int>(img.getHeight()),
                0,
-               img.getColorspace(),
+               static_cast<unsigned int>(img.getColorspace()),
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
@@ -73,7 +73,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                static_cast<int>(img.getWidth()),
                static_cast<int>(img.getHeight()),
                0,
-               img.getColorspace(),
+               static_cast<unsigned int>(img.getColorspace()),
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
@@ -84,7 +84,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                static_cast<int>(img.getWidth()),
                static_cast<int>(img.getHeight()),
                0,
-               img.getColorspace(),
+               static_cast<unsigned int>(img.getColorspace()),
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
@@ -95,7 +95,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                static_cast<int>(img.getWidth()),
                static_cast<int>(img.getHeight()),
                0,
-               img.getColorspace(),
+               static_cast<unsigned int>(img.getColorspace()),
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
@@ -106,7 +106,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                static_cast<int>(img.getWidth()),
                static_cast<int>(img.getHeight()),
                0,
-               img.getColorspace(),
+               static_cast<unsigned int>(img.getColorspace()),
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
@@ -117,7 +117,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                static_cast<int>(img.getWidth()),
                static_cast<int>(img.getHeight()),
                0,
-               img.getColorspace(),
+               static_cast<unsigned int>(img.getColorspace()),
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 

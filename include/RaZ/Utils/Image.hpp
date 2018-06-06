@@ -11,6 +11,12 @@
 
 namespace Raz {
 
+enum class ImageColorspace { GRAY = GL_RED,
+                             GRAY_ALPHA = GL_RG,
+                             RGB = GL_RGB,
+                             RGBA = GL_RGBA,
+                             DEPTH = GL_DEPTH_COMPONENT };
+
 class Image {
 public:
   Image() = default;
@@ -18,7 +24,7 @@ public:
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
-  GLenum getColorspace() const { return m_colorspace; }
+  ImageColorspace getColorspace() const { return m_colorspace; }
   const std::vector<uint8_t>& getData() const { return m_data; }
   const uint8_t* getDataPtr() const { return m_data.data(); }
 
@@ -29,7 +35,7 @@ private:
 
   unsigned int m_width {};
   unsigned int m_height {};
-  GLenum m_colorspace {};
+  ImageColorspace m_colorspace {};
   std::vector<uint8_t> m_data {};
 };
 

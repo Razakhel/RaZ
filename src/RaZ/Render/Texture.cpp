@@ -13,14 +13,22 @@ Texture::Texture(uint8_t value) : Texture() {
   unbind();
 }
 
-Texture::Texture(unsigned int width, unsigned int height, bool isDepthTexture) : Texture() {
+Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace) : Texture() {
   bind();
 
-  if (!isDepthTexture) {
+  if (colorspace != ImageColorspace::DEPTH) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, static_cast<int>(width), static_cast<int>(height), 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 static_cast<unsigned int>(colorspace),
+                 static_cast<int>(width),
+                 static_cast<int>(height),
+                 0,
+                 static_cast<unsigned int>(colorspace),
+                 GL_UNSIGNED_BYTE,
+                 nullptr);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -32,7 +40,7 @@ Texture::Texture(unsigned int width, unsigned int height, bool isDepthTexture) :
                  static_cast<int>(width),
                  static_cast<int>(height),
                  0,
-                 GL_DEPTH_COMPONENT,
+                 static_cast<unsigned int>(colorspace),
                  GL_FLOAT,
                  nullptr);
   }
@@ -64,8 +72,8 @@ void Texture::load(const std::string& fileName) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  if (img.getColorspace() == GL_RED || img.getColorspace() == GL_RG) {
-    const std::array<int, 4> swizzle = { GL_RED, GL_RED, GL_RED, (img.getColorspace() == GL_RED ? GL_ONE : GL_GREEN) };
+  if (img.getColorspace() == ImageColorspace::GRAY || img.getColorspace() == ImageColorspace::GRAY_ALPHA) {
+    const std::array<int, 4> swizzle = { GL_RED, GL_RED, GL_RED, (img.getColorspace() == ImageColorspace::GRAY ? GL_ONE : GL_GREEN) };
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle.data());
   }
 
@@ -75,7 +83,7 @@ void Texture::load(const std::string& fileName) {
                static_cast<int>(img.getWidth()),
                static_cast<int>(img.getHeight()),
                0,
-               img.getColorspace(),
+               static_cast<unsigned int>(img.getColorspace()),
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
   glGenerateMipmap(GL_TEXTURE_2D);

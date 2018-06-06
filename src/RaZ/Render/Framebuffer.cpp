@@ -7,9 +7,9 @@ namespace Raz {
 Framebuffer::Framebuffer(unsigned int width, unsigned int height, const std::string& vertShaderPath, const std::string& fragShaderPath)
   : m_program(std::make_unique<VertexShader>(vertShaderPath),
               std::make_unique<FragmentShader>(fragShaderPath)) {
-  m_depthBuffer  = std::make_shared<Texture>(width, height, true);
-  m_colorBuffer  = std::make_shared<Texture>(width, height);
-  m_normalBuffer = std::make_shared<Texture>(width, height);
+  m_depthBuffer  = std::make_shared<Texture>(width, height, ImageColorspace::DEPTH);
+  m_colorBuffer  = std::make_shared<Texture>(width, height, ImageColorspace::RGBA);
+  m_normalBuffer = std::make_shared<Texture>(width, height, ImageColorspace::RGB);
   glGenFramebuffers(1, &m_index);
 
   const std::array<GLenum, 2> colorBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };

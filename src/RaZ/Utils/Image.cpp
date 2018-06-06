@@ -56,26 +56,26 @@ void Image::readPng(std::ifstream& file, bool reverse) {
       if (png_get_bit_depth(readStruct, infoStruct) < 8)
         png_set_expand_gray_1_2_4_to_8(readStruct);
 
-      m_colorspace = GL_RED;
+      m_colorspace = ImageColorspace::GRAY;
       break;
 
     case PNG_COLOR_TYPE_GRAY_ALPHA:
-      m_colorspace = GL_RG;
+      m_colorspace = ImageColorspace::GRAY_ALPHA;
       break;
 
     case PNG_COLOR_TYPE_PALETTE:
       png_set_palette_to_rgb(readStruct);
       channels = 3;
-      m_colorspace = GL_RGB;
+      m_colorspace = ImageColorspace::RGB;
       break;
 
     case PNG_COLOR_TYPE_RGB:
     default:
-      m_colorspace = GL_RGB;
+      m_colorspace = ImageColorspace::RGB;
       break;
 
     case PNG_COLOR_TYPE_RGBA:
-      m_colorspace = GL_RGBA;
+      m_colorspace = ImageColorspace::RGBA;
       break;
   }
 
@@ -84,7 +84,7 @@ void Image::readPng(std::ifstream& file, bool reverse) {
   // Adding full alpha channel to the image if it possesses transparency
   if (png_get_valid(readStruct, infoStruct, PNG_INFO_tRNS)) {
     png_set_tRNS_to_alpha(readStruct);
-    m_colorspace = GL_RGBA;
+    m_colorspace = ImageColorspace::RGBA;
     ++channels;
   }
 
@@ -112,7 +112,7 @@ void Image::read(const std::string& fileName, bool reverse) {
     if (format == "png" || format == "PNG")
       readPng(file, reverse);
     else
-      std::cerr << "Warning: '" + format + "' format is not supported, image ignored";
+      std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
   } else {
     throw std::runtime_error("Error: Couldn't open the file '" + fileName + "'");
   }
