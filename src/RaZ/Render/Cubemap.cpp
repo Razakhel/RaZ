@@ -46,7 +46,7 @@ Cubemap::Cubemap() {
 
   m_program.sendUniform("uniSkybox", 0);
 
-  m_viewProjUbo.bindUniformBlock(m_program, "uboCubemapMatrix", 0);
+  m_viewProjUbo.bindUniformBlock(m_program, "uboCubemapMatrix", 1);
   m_viewProjUbo.bindBufferBase(1);
 }
 

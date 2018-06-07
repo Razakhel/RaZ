@@ -1,11 +1,5 @@
 #include <iostream>
 
-#include "glew/include/GL/glew.h"
-#if defined(_WIN32)
-#include "glew/include/GL/wglew.h"
-#elif defined(__gnu_linux__)
-#include "glew/include/GL/glxew.h"
-#endif
 #include "RaZ/Utils/Window.hpp"
 
 namespace Raz {
@@ -57,7 +51,13 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
 
 Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t AASampleCount) : m_width{ width },
                                                                                                            m_height{ height } {
-  glfwInit();
+  glfwSetErrorCallback([] (int error, const char* description) {
+    std::cerr << "GLFW error " << error << ": " << description << std::endl;
+  });
+
+  if (!glfwInit())
+    throw std::runtime_error("Error: Failed to initialize GLFW");
+
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
