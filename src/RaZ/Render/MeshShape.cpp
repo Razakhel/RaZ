@@ -2,7 +2,7 @@
 
 namespace Raz {
 
-MeshPtr Mesh::createTriangle(const Raz::Vec3f& firstPos, const Raz::Vec3f& secondPos, const Raz::Vec3f& thirdPos) {
+MeshPtr Mesh::createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos) {
   MeshPtr triangle = std::make_unique<Mesh>();
 
   // TODO: check if vertices are defined counterclockwise

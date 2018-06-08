@@ -92,6 +92,7 @@ option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
 AUX_SOURCE_DIRECTORY(extern/png PNG_SRC)
 AUX_SOURCE_DIRECTORY(extern/glew/src GLEW_SRC)
 AUX_SOURCE_DIRECTORY(extern/glfw/src GLFW_SRC)
+AUX_SOURCE_DIRECTORY(extern/imgui IMGUI_SRC)
 
 set(
     SRC
@@ -99,6 +100,7 @@ set(
     ${PNG_SRC}
     ${GLEW_SRC}
     ${GLFW_SRC}
+    ${IMGUI_SRC}
 
     src/RaZ/Math/*.cpp
     src/RaZ/Render/*.cpp

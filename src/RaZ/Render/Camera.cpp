@@ -5,9 +5,9 @@ namespace Raz {
 Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
                float fieldOfViewDegrees,
                float nearPlane, float farPlane,
-               const Raz::Vec3f& position) : m_frameRatio{ static_cast<float>(frameWidth) / static_cast<float>(frameHeight) },
-                                             m_fieldOfView{ fieldOfViewDegrees * PI<float> / 180 },
-                                             m_nearPlane{ nearPlane }, m_farPlane{ farPlane } {
+               const Vec3f& position) : m_frameRatio{ static_cast<float>(frameWidth) / static_cast<float>(frameHeight) },
+                                        m_fieldOfView{ fieldOfViewDegrees * PI<float> / 180 },
+                                        m_nearPlane{ nearPlane }, m_farPlane{ farPlane } {
   m_position = position;
 
   computeViewMatrix();
@@ -16,7 +16,7 @@ Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
   computeInverseProjectionMatrix();
 }
 
-void Camera::move(const Raz::Vec3f& displacement) {
+void Camera::move(const Vec3f& displacement) {
   Transform::move(displacement);
   computeViewMatrix();
   computeInverseViewMatrix();
