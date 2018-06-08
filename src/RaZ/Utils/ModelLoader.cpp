@@ -257,6 +257,7 @@ ModelPtr importOff(std::ifstream& file) {
   file.ignore(100, '\n');
 
   mesh->getSubmeshes().front()->getVertices().resize(vertexCount * 3);
+  mesh->getSubmeshes().front()->getIndices().reserve(faceCount * 3);
 
   for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
     file >> mesh->getSubmeshes().front()->getVertices()[vertexIndex].position[0]
@@ -266,8 +267,6 @@ ModelPtr importOff(std::ifstream& file) {
   for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex) {
     uint16_t partCount {};
     file >> partCount;
-
-    mesh->getSubmeshes().front()->getIndices().reserve(mesh->getSubmeshes().front()->getIndices().size() + partCount);
 
     std::vector<std::size_t> indices(partCount);
     file >> indices[0] >> indices[1] >> indices[2];
