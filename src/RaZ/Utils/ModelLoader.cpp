@@ -284,6 +284,8 @@ ModelPtr importOff(std::ifstream& file) {
     }
   }
 
+  mesh->getSubmeshes().front()->getIndices().shrink_to_fit();
+
   return std::make_unique<Model>(std::move(mesh));
 }
 

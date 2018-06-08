@@ -3,6 +3,26 @@ project(RaZ)
 
 set(CMAKE_CXX_STANDARD 14)
 
+# Disabling all compilers warnings for extern dependencies
+if (CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
+elseif (MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
+endif ()
+
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/png
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# Re-enabling most of the available warnings flags for RaZ
 if (CMAKE_COMPILER_IS_GNUCC)
     set(GCC_FLAGS "-pedantic -pedantic-errors \
                    -Wall -Wextra \
@@ -69,15 +89,6 @@ endif ()
 option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
 option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/png
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
 AUX_SOURCE_DIRECTORY(extern/png PNG_SRC)
 AUX_SOURCE_DIRECTORY(extern/glew/src GLEW_SRC)
 AUX_SOURCE_DIRECTORY(extern/glfw/src GLFW_SRC)
@@ -102,7 +113,26 @@ set(
 )
 
 # Defining preprocessor macros and selecting files to be removed
-if (UNIX)
+if (APPLE)
+    add_definitions(
+        -D_GLFW_COCOA
+        -D_GLFW_USE_CHDIR
+        -D_GLFW_USE_MENUBAR
+        -D_GLFW_USE_RETINA
+    )
+
+    file(
+        GLOB
+        DISPOSABLE
+
+        extern/glfw/src/win32*
+        extern/glfw/src/x11*
+        extern/glfw/src/wl*
+        extern/glfw/src/mir*
+        extern/glfw/src/glx*
+        extern/glfw/src/linux*
+    )
+elseif (UNIX)
     add_definitions(
         -D_GLFW_X11
         -D_GLFW_HAS_XF86VM
@@ -168,25 +198,6 @@ elseif (WIN32)
         DEPS
 
         opengl32
-    )
-elseif (APPLE)
-    add_definitions(
-        -D_GLFW_COCOA
-        -D_GLFW_USE_CHDIR
-        -D_GLFW_USE_MENUBAR
-        -D_GLFW_USE_RETINA
-    )
-
-    file(
-        GLOB
-        DISPOSABLE
-
-        extern/glfw/src/win32*
-        extern/glfw/src/x11*
-        extern/glfw/src/wl*
-        extern/glfw/src/mir*
-        extern/glfw/src/glx*
-        extern/glfw/src/linux*
     )
 endif ()
 
