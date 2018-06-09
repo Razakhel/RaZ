@@ -3,26 +3,6 @@ project(RaZ)
 
 set(CMAKE_CXX_STANDARD 14)
 
-# Disabling all compilers warnings for extern dependencies
-if (CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-everything")
-elseif (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
-endif ()
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/png
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-# Re-enabling most of the available warnings flags for RaZ
 if (CMAKE_COMPILER_IS_GNUCC)
     set(GCC_FLAGS "-pedantic -pedantic-errors \
                    -Wall -Wextra \
@@ -63,7 +43,18 @@ if (CMAKE_COMPILER_IS_GNUCC)
                    -Waligned-new \
                    -Walloc-zero -Walloca \
                    -Wformat-overflow \
-                   -Wshadow=compatible-local")
+                   -Wshadow=compatible-local \
+                   -Wno-format-security -Wno-format-nonliteral \
+                   -Wno-switch-default \
+                   \
+                   -Wno-old-style-cast \
+                   -Wno-zero-as-null-pointer-constant \
+                   -Wno-useless-cast \
+                   -Wno-float-equal \
+                   -Wno-conversion \
+                   -Wno-missing-declarations \
+                   -Wno-double-promotion \
+                   -Wno-cast-qual") # Disabling some warnings triggered a lot by ImGui...
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -88,6 +79,16 @@ endif ()
 
 option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
 option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
+
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/png
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 AUX_SOURCE_DIRECTORY(extern/png PNG_SRC)
 AUX_SOURCE_DIRECTORY(extern/glew/src GLEW_SRC)
