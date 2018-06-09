@@ -50,12 +50,12 @@ public:
   explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
 
   MaterialType getType() const override { return MaterialType::MATERIAL_TYPE_STANDARD; }
-  const TexturePtr getAmbientMap() const { return m_ambientMap; }
-  const TexturePtr getDiffuseMap() const { return m_diffuseMap; }
-  const TexturePtr getSpecularMap() const { return m_specularMap; }
-  const TexturePtr getEmissiveMap() const { return m_emissiveMap; }
-  const TexturePtr getTransparencyMap() const { return m_transparencyMap; }
-  const TexturePtr getBumpMap() const { return m_bumpMap; }
+  const TexturePtr& getAmbientMap() const { return m_ambientMap; }
+  const TexturePtr& getDiffuseMap() const { return m_diffuseMap; }
+  const TexturePtr& getSpecularMap() const { return m_specularMap; }
+  const TexturePtr& getEmissiveMap() const { return m_emissiveMap; }
+  const TexturePtr& getTransparencyMap() const { return m_transparencyMap; }
+  const TexturePtr& getBumpMap() const { return m_bumpMap; }
 
   void setDiffuse(float red, float green, float blue) { setDiffuse(Vec3f({ red, green, blue })); }
   void setDiffuse(const Vec3f& val) { m_diffuse = val; }
@@ -67,12 +67,12 @@ public:
   void setEmissive(const Vec3f& val) { m_emissive = val; }
   void setTransparency(float transparency) { m_transparency = transparency; }
 
-  void setAmbientMap(TexturePtr ambientMap) { m_ambientMap = std::move(ambientMap); }
-  void setDiffuseMap(TexturePtr diffuseMap) { m_diffuseMap = std::move(diffuseMap); }
-  void setSpecularMap(TexturePtr specularMap) { m_specularMap = std::move(specularMap); }
-  void setEmissiveMap(TexturePtr emissiveMap) { m_emissiveMap = std::move(emissiveMap); }
-  void setTransparencyMap(TexturePtr transparencyMap) { m_transparencyMap = std::move(transparencyMap); }
-  void setBumpMap(TexturePtr bumpMap) { m_bumpMap = std::move(bumpMap); }
+  void setAmbientMap(const TexturePtr& ambientMap) { m_ambientMap = ambientMap; }
+  void setDiffuseMap(const TexturePtr& diffuseMap) { m_diffuseMap = diffuseMap; }
+  void setSpecularMap(const TexturePtr& specularMap) { m_specularMap = specularMap; }
+  void setEmissiveMap(const TexturePtr& emissiveMap) { m_emissiveMap = emissiveMap; }
+  void setTransparencyMap(const TexturePtr& transparencyMap) { m_transparencyMap = transparencyMap; }
+  void setBumpMap(const TexturePtr& bumpMap) { m_bumpMap = bumpMap; }
 
   void loadAmbientMap(const std::string& fileName) { m_ambientMap = std::make_shared<Texture>(fileName); }
   void loadDiffuseMap(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
@@ -113,22 +113,22 @@ public:
   float getMetallicFactor() const { return m_metallicFactor; }
   float getRoughnessFactor() const { return m_roughnessFactor; }
 
-  const TexturePtr getAlbedoMap() const { return m_albedoMap; }
-  const TexturePtr getMetallicMap() const { return m_metallicMap; }
-  const TexturePtr getNormalMap() const { return m_normalMap; }
-  const TexturePtr getRoughnessMap() const { return m_roughnessMap; }
-  const TexturePtr getAmbientOcclusionMap() const { return m_ambientOcclusionMap; }
+  const TexturePtr& getAlbedoMap() const { return m_albedoMap; }
+  const TexturePtr& getMetallicMap() const { return m_metallicMap; }
+  const TexturePtr& getNormalMap() const { return m_normalMap; }
+  const TexturePtr& getRoughnessMap() const { return m_roughnessMap; }
+  const TexturePtr& getAmbientOcclusionMap() const { return m_ambientOcclusionMap; }
 
   void setBaseColor(float red, float green, float blue) { setBaseColor(Vec3f({ red, green, blue })); }
   void setBaseColor(const Vec3f& color) { m_baseColor = color; }
   void setMetallicFactor(float metallicFactor) { m_metallicFactor = metallicFactor; }
   void setRoughnessFactor(float roughnessFactor) { m_roughnessFactor = roughnessFactor; }
 
-  void setAlbedoMap(TexturePtr albedoMap) { m_albedoMap = std::move(albedoMap); }
-  void setNormalMap(TexturePtr normalMap) { m_normalMap = std::move(normalMap); }
-  void setMetallicMap(TexturePtr metallicMap) { m_metallicMap = std::move(metallicMap); }
-  void setRoughnessMap(TexturePtr roughnessMap) { m_roughnessMap = std::move(roughnessMap); }
-  void setAmbientOcclusionMap(TexturePtr ambientOcclusionMap) { m_ambientOcclusionMap = std::move(ambientOcclusionMap); }
+  void setAlbedoMap(const TexturePtr& albedoMap) { m_albedoMap = albedoMap; }
+  void setNormalMap(const TexturePtr& normalMap) { m_normalMap = normalMap; }
+  void setMetallicMap(const TexturePtr& metallicMap) { m_metallicMap = metallicMap; }
+  void setRoughnessMap(const TexturePtr& roughnessMap) { m_roughnessMap = roughnessMap; }
+  void setAmbientOcclusionMap(const TexturePtr& ambientOcclusionMap) { m_ambientOcclusionMap = ambientOcclusionMap; }
 
   void loadAlbedoMap(const std::string& fileName) { m_albedoMap = std::make_shared<Texture>(fileName); }
   void loadNormalMap(const std::string& fileName) { m_normalMap = std::make_shared<Texture>(fileName); }

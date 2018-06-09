@@ -65,7 +65,7 @@ void importMtl(const std::string& mtlFilePath,
 
         isStandardMaterial = true;
       } else if (tag[0] == 'm') {                      // Import texture
-        const TexturePtr& map = std::move(loadTexture(mtlFilePath, nextValue));
+        const TexturePtr& map = loadTexture(mtlFilePath, nextValue);
 
         if (tag[4] == 'K') {                           // Standard maps
           if (tag[5] == 'a') {                         // Ambient/ambient occlusion map [map_Ka]
