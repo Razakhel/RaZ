@@ -15,6 +15,7 @@
 #endif
 #include "glfw/include/GLFW/glfw3.h"
 #include "RaZ/Utils/Image.hpp"
+#include "RaZ/Utils/Overlay.hpp"
 #include "RaZ/Utils/Keyboard.hpp"
 
 namespace Raz {
@@ -35,10 +36,13 @@ public:
   void disableFaceCulling() const { enableFaceCulling(false); }
   void enableVerticalSync(bool value = true) const;
   void disableVerticalSync() const { enableVerticalSync(false); }
+  void enableOverlay() { m_overlay = std::make_unique<Overlay>(m_window); }
+  void disableOverlay() { m_overlay.reset(); }
+  void addOverlayElement(OverlayElementType type, const std::string& name, std::function<void()> action = nullptr);
   void addKeyCallback(Keyboard::Key key, std::function<void()> func);
   void updateKeyCallbacks() const;
   bool run() const;
-  void close() const { glfwTerminate(); }
+  void close();
 
   ~Window() { close(); }
 
@@ -47,6 +51,7 @@ private:
   unsigned int m_height {};
   KeyCallbacks m_keyCallbacks {};
   GLFWwindow* m_window {};
+  OverlayPtr m_overlay {};
 };
 
 using WindowPtr = std::unique_ptr<Window>;

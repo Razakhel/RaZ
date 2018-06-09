@@ -121,6 +121,10 @@ void Window::enableVerticalSync(bool value) const {
 #endif
 }
 
+void Window::addOverlayElement(OverlayElementType type, const std::string& name, std::function<void()> action) {
+  m_overlay->addElement(type, name, std::move(action));
+}
+
 void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
   m_keyCallbacks.emplace_back(key, func);
   glfwSetWindowUserPointer(m_window, &m_keyCallbacks);
@@ -146,14 +150,22 @@ bool Window::run() const {
   if (glfwWindowShouldClose(m_window))
     return false;
 
+  glfwPollEvents();
+
+  if (m_overlay)
+    m_overlay->render();
+
   glfwSwapBuffers(m_window);
 
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glfwPollEvents();
-
   return true;
+}
+
+void Window::close() {
+  disableOverlay();
+  glfwTerminate();
 }
 
 } // namespace Raz
