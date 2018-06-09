@@ -91,6 +91,13 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glEnable(GL_DEPTH_TEST);
 }
 
+void Window::setIcon(const Image& img) const {
+  const GLFWimage icon = { static_cast<int>(img.getWidth()),
+                           static_cast<int>(img.getHeight()),
+                           const_cast<unsigned char*>(img.getDataPtr()) };
+  glfwSetWindowIcon(m_window, 1, &icon);
+}
+
 void Window::enableFaceCulling(bool value) const {
   if (value)
     glEnable(GL_CULL_FACE);
@@ -123,7 +130,7 @@ void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
 
 void Window::updateKeyCallbacks() const {
   glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
-    const CallbacksList& callbacksList = *static_cast<CallbacksList*>(glfwGetWindowUserPointer(window));
+    const KeyCallbacks& callbacksList = *static_cast<KeyCallbacks*>(glfwGetWindowUserPointer(window));
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
       glfwSetWindowShouldClose(window, GL_TRUE);

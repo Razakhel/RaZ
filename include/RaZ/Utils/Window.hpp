@@ -14,11 +14,12 @@
 #include "glew/include/GL/glxew.h"
 #endif
 #include "glfw/include/GLFW/glfw3.h"
+#include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Keyboard.hpp"
 
 namespace Raz {
 
-using CallbacksList = std::vector<std::pair<int, std::function<void()>>>;
+using KeyCallbacks = std::vector<std::pair<int, std::function<void()>>>;
 
 class Window {
 public:
@@ -28,6 +29,8 @@ public:
   unsigned int getHeight() const { return m_height; }
 
   void setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
+  void setIcon(const Image& img) const;
+  void setIcon(const std::string& fileName) const { setIcon(Image(fileName, true)); }
   void enableFaceCulling(bool value = true) const;
   void disableFaceCulling() const { enableFaceCulling(false); }
   void enableVerticalSync(bool value = true) const;
@@ -42,7 +45,7 @@ public:
 private:
   unsigned int m_width {};
   unsigned int m_height {};
-  CallbacksList m_keyCallbacks {};
+  KeyCallbacks m_keyCallbacks {};
   GLFWwindow* m_window {};
 };
 
