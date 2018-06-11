@@ -4,8 +4,8 @@
 #include "RaZ/RaZ.hpp"
 
 int main() {
-  Raz::WindowPtr window = std::make_unique<Raz::Window>(800, 600, "RaZ", 4);
-  //window->disableVerticalSync();
+  Raz::WindowPtr window = std::make_unique<Raz::Window>(1280, 720, "RaZ", 4);
+  window->enableOverlay();
 
   Raz::VertexShaderPtr vertShader   = std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl");
   Raz::FragmentShaderPtr fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl");
@@ -114,6 +114,17 @@ int main() {
   });
 
   windowPtr->addKeyCallback(Raz::Keyboard::F5, [&app] () { app.updateShaders(); });
+
+  // Overlay features
+  windowPtr->addOverlayText("RaZ - Full demo");
+  windowPtr->addOverlayButton("Scale down mesh", [&modelPtr] () { modelPtr->scale(0.5f); });
+  windowPtr->addOverlayButton("Scale up mesh", [&modelPtr] () { modelPtr->scale(2.f); });
+  windowPtr->addOverlayCheckbox("Enable vertical sync",                                 // Text
+                                windowPtr->recoverVerticalSyncState(),                  // Initial state
+                                [&windowPtr] () { windowPtr->enableVerticalSync(); },   // Action if toggled on
+                                [&windowPtr] () { windowPtr->disableVerticalSync(); }); // Action if toggled off
+  windowPtr->addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  windowPtr->addOverlayFpsCounter("FPS: %.1f");
 
   auto lastTime = std::chrono::system_clock::now();
   uint16_t nbFrames = 0;
