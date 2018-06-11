@@ -43,13 +43,13 @@
 #include "imgui_impl_glfw.h"
 
 // GL3W/GLFW
-#include "glew/include/GL/glew.h"    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
-#include "glfw/glfw3.h"
+#include "../glew/include/GL/glew.h"    // This example is using gl3w to access OpenGL functions (because it is small). You may use glew/glad/glLoadGen/etc. whatever already works for you.
+#include "../glfw/include/GLFW/glfw3.h"
 #ifdef _WIN32
 #undef APIENTRY
 #define GLFW_EXPOSE_NATIVE_WIN32
 #define GLFW_EXPOSE_NATIVE_WGL
-#include <GLFW/glfw3native.h>
+#include "../glfw/include/GLFW/glfw3native.h"
 #endif
 
 // GLFW data
