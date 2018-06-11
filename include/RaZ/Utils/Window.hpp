@@ -34,11 +34,18 @@ public:
   void setIcon(const std::string& fileName) const { setIcon(Image(fileName, true)); }
   void enableFaceCulling(bool value = true) const;
   void disableFaceCulling() const { enableFaceCulling(false); }
+  bool recoverVerticalSyncState() const;
   void enableVerticalSync(bool value = true) const;
   void disableVerticalSync() const { enableVerticalSync(false); }
   void enableOverlay() { m_overlay = std::make_unique<Overlay>(m_window); }
   void disableOverlay() { m_overlay.reset(); }
-  void addOverlayElement(OverlayElementType type, const std::string& name, std::function<void()> action = nullptr);
+  void addOverlayElement(OverlayElementType type, const std::string& text,
+                         std::function<void()> actionOn = nullptr, std::function<void()> actionOff = nullptr);
+  void addOverlayText(const std::string& text);
+  void addOverlayButton(const std::string& text, std::function<void()> action);
+  void addOverlayCheckbox(const std::string& text, bool initVal, std::function<void()> actionOn, std::function<void()> actionOff);
+  void addOverlayFrameTime(const std::string& formattedText);
+  void addOverlayFpsCounter(const std::string& formattedText);
   void addKeyCallback(Keyboard::Key key, std::function<void()> func);
   void updateKeyCallbacks() const;
   bool run() const;

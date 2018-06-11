@@ -105,10 +105,27 @@ void Window::enableFaceCulling(bool value) const {
     glDisable(GL_CULL_FACE);
 }
 
+bool Window::recoverVerticalSyncState() const {
+#if defined(_WIN32)
+  if (wglGetExtensionsStringEXT())
+    return static_cast<bool>(wglGetSwapIntervalEXT());
+#elif defined(__gnu_linux__)
+  if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
+    unsigned int interval;
+    glXQueryDrawable(glXGetCurrentDisplay(), glXGetCurrentDrawable(), GLX_SWAP_INTERVAL_EXT, &interval);
+
+    return static_cast<bool>(interval);
+  }
+#endif
+
+  std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
+  return false;
+}
+
 void Window::enableVerticalSync(bool value) const {
 #if defined(_WIN32)
   if (wglGetExtensionsStringEXT())
-    wglSwapIntervalEXT(value);
+    wglSwapIntervalEXT(static_cast<int>(value));
   else
     std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
 #elif defined(__gnu_linux__)
@@ -121,8 +138,30 @@ void Window::enableVerticalSync(bool value) const {
 #endif
 }
 
-void Window::addOverlayElement(OverlayElementType type, const std::string& name, std::function<void()> action) {
-  m_overlay->addElement(type, name, std::move(action));
+void Window::addOverlayElement(OverlayElementType type, const std::string& text,
+                               std::function<void()> actionOn, std::function<void()> actionOff) {
+  m_overlay->addElement(type, text, std::move(actionOn), std::move(actionOff));
+}
+
+void Window::addOverlayText(const std::string& text) {
+  m_overlay->addText(text);
+}
+
+void Window::addOverlayButton(const std::string& text, std::function<void()> action) {
+  m_overlay->addButton(text, std::move(action));
+}
+
+void Window::addOverlayCheckbox(const std::string& text, bool initVal,
+                                std::function<void()> actionOn, std::function<void()> actionOff) {
+  m_overlay->addCheckbox(text, initVal, std::move(actionOn), std::move(actionOff));
+}
+
+void Window::addOverlayFrameTime(const std::string& formattedText) {
+  m_overlay->addFrameTime(formattedText);
+}
+
+void Window::addOverlayFpsCounter(const std::string& formattedText) {
+  m_overlay->addFpsCounter(formattedText);
 }
 
 void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
