@@ -63,7 +63,7 @@ TexturePtr Texture::recoverTexture(TexturePreset texturePreset) {
 }
 
 void Texture::load(const std::string& fileName) {
-  const Image img(fileName);
+  m_image = std::make_unique<Image>(fileName);
 
   bind();
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -72,20 +72,23 @@ void Texture::load(const std::string& fileName) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  if (img.getColorspace() == ImageColorspace::GRAY || img.getColorspace() == ImageColorspace::GRAY_ALPHA) {
-    const std::array<int, 4> swizzle = { GL_RED, GL_RED, GL_RED, (img.getColorspace() == ImageColorspace::GRAY ? GL_ONE : GL_GREEN) };
+  if (m_image->getColorspace() == ImageColorspace::GRAY || m_image->getColorspace() == ImageColorspace::GRAY_ALPHA) {
+    const std::array<int, 4> swizzle = { GL_RED,
+                                         GL_RED,
+                                         GL_RED,
+                                         (m_image->getColorspace() == ImageColorspace::GRAY ? GL_ONE : GL_GREEN) };
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle.data());
   }
 
   glTexImage2D(GL_TEXTURE_2D,
                0,
-               static_cast<int>(img.getColorspace()),
-               static_cast<int>(img.getWidth()),
-               static_cast<int>(img.getHeight()),
+               static_cast<int>(m_image->getColorspace()),
+               static_cast<int>(m_image->getWidth()),
+               static_cast<int>(m_image->getHeight()),
                0,
-               static_cast<unsigned int>(img.getColorspace()),
+               static_cast<unsigned int>(m_image->getColorspace()),
                GL_UNSIGNED_BYTE,
-               img.getDataPtr());
+               m_image->getDataPtr());
   glGenerateMipmap(GL_TEXTURE_2D);
   unbind();
 }

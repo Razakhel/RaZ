@@ -29,6 +29,7 @@ public:
   static TexturePtr recoverTexture(TexturePreset texturePreset);
   static void activate(uint8_t index) { glActiveTexture(GL_TEXTURE0 + index); }
   void load(const std::string& fileName);
+  void save(const std::string& fileName, bool reverse = false) const { m_image->save(fileName, reverse); }
   void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
   void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
 
@@ -36,6 +37,7 @@ public:
 
 private:
   GLuint m_index {};
+  ImagePtr m_image {};
 };
 
 } // namespace Raz

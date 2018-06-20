@@ -28,16 +28,22 @@ public:
   const std::vector<uint8_t>& getData() const { return m_data; }
   const uint8_t* getDataPtr() const { return m_data.data(); }
 
-  void read(const std::string& fileName, bool reverse = false);
+  void read(const std::string& filePath, bool reverse = false);
+  void save(const std::string& filePath, bool reverse = false) const;
 
 private:
-  void readPng(std::ifstream& fileName, bool reverse);
+  void readPng(std::ifstream& file, bool reverse);
+  void savePng(std::ofstream& file, bool reverse) const;
 
   unsigned int m_width {};
   unsigned int m_height {};
   ImageColorspace m_colorspace {};
+  uint8_t m_channelCount {};
+  uint8_t m_bitDepth {};
   std::vector<uint8_t> m_data {};
 };
+
+using ImagePtr = std::unique_ptr<Image>;
 
 } // namespace Raz
 
