@@ -50,6 +50,12 @@ public:
   explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
 
   MaterialType getType() const override { return MaterialType::MATERIAL_TYPE_STANDARD; }
+  const Vec3f& getAmbient() const { return m_ambient; }
+  const Vec3f& getDiffuse() const { return m_diffuse; }
+  const Vec3f& getSpecular() const { return m_specular; }
+  const Vec3f& getEmissive() const { return m_emissive; }
+  float getTransparency() const { return m_transparency; }
+
   const TexturePtr& getAmbientMap() const { return m_ambientMap; }
   const TexturePtr& getDiffuseMap() const { return m_diffuseMap; }
   const TexturePtr& getSpecularMap() const { return m_specularMap; }

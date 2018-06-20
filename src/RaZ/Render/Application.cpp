@@ -2,9 +2,7 @@
 
 namespace Raz {
 
-Application::Application(WindowPtr window, ScenePtr scene)
-  : m_window{ std::move(window) },
-    m_scene{ std::move(scene) } {
+Application::Application(WindowPtr window, ScenePtr scene) : m_window{ std::move(window) }, m_scene{ std::move(scene) } {
   m_cameraUbo.bindUniformBlock(m_scene->getProgram(), "uboCameraMatrices", 0);
   m_cameraUbo.bindBufferBase(0);
 }
