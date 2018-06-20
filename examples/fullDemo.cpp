@@ -4,7 +4,7 @@
 #include "RaZ/RaZ.hpp"
 
 int main() {
-  Raz::WindowPtr window = std::make_unique<Raz::Window>(1280, 720, "RaZ", 4);
+  Raz::WindowPtr window = std::make_unique<Raz::Window>(1280, 720, "RaZ - Full demo", 4);
   window->enableOverlay();
 
   Raz::VertexShaderPtr vertShader   = std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl");
@@ -20,7 +20,7 @@ int main() {
                                                            "../../assets/skyboxes/clouds_back.png");
 
   const auto startTime = std::chrono::system_clock::now();
-  Raz::ModelPtr model  = Raz::ModelLoader::importModel("../../assets/meshes/shield.obj");
+  Raz::ModelPtr model  = Raz::Model::import("../../assets/meshes/shield.obj");
   const auto endTime   = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "

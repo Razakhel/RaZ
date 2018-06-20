@@ -7,7 +7,7 @@ int main() {
                              std::make_unique<Raz::Scene>(std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl"),
                                                           std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl")));
 
-  app.getScene()->addModel(Raz::ModelLoader::importModel("../../assets/meshes/ball.obj"));
+  app.getScene()->addModel(Raz::Model::import("../../assets/meshes/ball.obj"));
   app.getScene()->addLight(std::make_unique<Raz::DirectionalLight>(Raz::Vec3f({ 0.f, 0.f, 1.f })));
   app.getScene()->load();
 
