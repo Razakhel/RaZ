@@ -2,6 +2,24 @@
 
 namespace Raz {
 
+std::size_t Mesh::recoverVertexCount() const {
+  std::size_t vertexCount = 0;
+
+  for (const auto& submesh : m_submeshes)
+    vertexCount += submesh->getVertexCount();
+
+  return vertexCount;
+}
+
+std::size_t Mesh::recoverTriangleCount() const {
+  std::size_t indexCount = 0;
+
+  for (const auto& submesh : m_submeshes)
+    indexCount += submesh->getIndexCount();
+
+  return indexCount / 3;
+}
+
 void Mesh::drawQuad() {
   static const MeshPtr quadMesh = Mesh::createQuad(Vec3f({ -1.f,  1.f, 0.f }),
                                                    Vec3f({  1.f,  1.f, 0.f }),

@@ -2,6 +2,24 @@
 
 namespace Raz {
 
+std::size_t Scene::recoverVertexCount() const {
+  std::size_t vertexCount = 0;
+
+  for (const auto& model : m_models)
+    vertexCount += model->getMesh()->recoverVertexCount();
+
+  return vertexCount;
+}
+
+std::size_t Scene::recoverTriangleCount() const {
+  std::size_t triangleCount = 0;
+
+  for (const auto& model : m_models)
+    triangleCount += model->getMesh()->recoverTriangleCount();
+
+  return triangleCount;
+}
+
 void Scene::load() const {
   for (const auto& model : m_models)
     model->load(m_program);

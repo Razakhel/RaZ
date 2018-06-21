@@ -22,6 +22,8 @@ public:
   const ShaderProgram& getProgram() const { return m_program; }
   const CubemapPtr& getCubemap() const { return m_cubemap; }
   const std::vector<ModelPtr>& getModels() const { return m_models; }
+  std::size_t recoverVertexCount() const;
+  std::size_t recoverTriangleCount() const;
 
   void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
 

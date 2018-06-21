@@ -20,6 +20,8 @@ public:
   std::vector<SubmeshPtr>& getSubmeshes() { return m_submeshes; }
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
+  std::size_t recoverVertexCount() const;
+  std::size_t recoverTriangleCount() const;
 
   static std::unique_ptr<Mesh> createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos);
   static std::unique_ptr<Mesh> createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos,

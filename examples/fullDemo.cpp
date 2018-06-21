@@ -117,12 +117,9 @@ int main() {
 
   // Overlay features
   windowPtr->addOverlayText("RaZ - Full demo");
-  windowPtr->addOverlayButton("Scale down mesh", [&modelPtr] () { modelPtr->scale(0.5f); });
-  windowPtr->addOverlayButton("Scale up mesh", [&modelPtr] () { modelPtr->scale(2.f); });
-  windowPtr->addOverlayCheckbox("Enable vertical sync",                                 // Text
-                                windowPtr->recoverVerticalSyncState(),                  // Initial state
-                                [&windowPtr] () { windowPtr->enableVerticalSync(); },   // Action if toggled on
-                                [&windowPtr] () { windowPtr->disableVerticalSync(); }); // Action if toggled off
+  windowPtr->addOverlayText("Scene's informations:");
+  windowPtr->addOverlayText(std::to_string(scenePtr->recoverVertexCount()) + " vertices, "
+                          + std::to_string(scenePtr->recoverTriangleCount()) + " triangles");
   windowPtr->addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
   windowPtr->addOverlayFpsCounter("FPS: %.1f");
 
