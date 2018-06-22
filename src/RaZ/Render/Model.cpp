@@ -25,4 +25,18 @@ ModelPtr Model::import(const std::string& filePath) {
   return model;
 }
 
+void Model::save(const std::string& filePath) const {
+  std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
+  const std::string format = FileUtils::extractFileExtension(filePath);
+
+  if (file) {
+    if (format == "obj" || format == "OBJ")
+      saveObj(file, filePath);
+    else
+      throw std::runtime_error("Error: '" + format + "' format is not supported");
+  } else {
+    throw std::runtime_error("Error: Unable to create a file as '" + filePath + "'; path to file must exist");
+  }
+}
+
 } // namespace Raz
