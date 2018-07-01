@@ -139,7 +139,7 @@ void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
 
   for (const auto& submesh : m_mesh->getSubmeshes()) {
     for (const auto& vertex : submesh->getVertices()) {
-      const std::array<float, 3> pos({ vertex.position[0], vertex.position[1], vertex.position[2] });
+      const std::array<float, 3> pos = { vertex.position[0], vertex.position[1], vertex.position[2] };
 
       if (posCorrespIndices.find(pos) == posCorrespIndices.cend()) {
         file << "v " << vertex.position[0] << ' '
@@ -148,7 +148,7 @@ void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
         posCorrespIndices.emplace(pos, posCorrespIndices.size() + 1);
       }
 
-      const std::array<float, 2> tex({ vertex.texcoords[0], vertex.texcoords[1] });
+      const std::array<float, 2> tex = { vertex.texcoords[0], vertex.texcoords[1] };
 
       if (texCorrespIndices.find(tex) == texCorrespIndices.cend()) {
         file << "vt " << vertex.texcoords[0] << ' '
@@ -156,7 +156,7 @@ void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
         texCorrespIndices.emplace(tex, texCorrespIndices.size() + 1);
       }
 
-      const std::array<float, 3> norm({ vertex.normal[0], vertex.normal[1], vertex.normal[2] });
+      const std::array<float, 3> norm = { vertex.normal[0], vertex.normal[1], vertex.normal[2] };
 
       if (normCorrespIndices.find(norm) == normCorrespIndices.cend()) {
         file << "vn " << vertex.normal[0] << ' '
@@ -183,9 +183,9 @@ void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
       // First vertex
       auto vertex = submesh->getVertices()[submesh->getIndices()[i + 1]];
 
-      std::array<float, 3> pos({ vertex.position[0], vertex.position[1], vertex.position[2] });
-      std::array<float, 2> tex({ vertex.texcoords[0], vertex.texcoords[1] });
-      std::array<float, 3> norm({ vertex.normal[0], vertex.normal[1], vertex.normal[2] });
+      std::array<float, 3> pos  = { vertex.position[0], vertex.position[1], vertex.position[2] };
+      std::array<float, 2> tex  = { vertex.texcoords[0], vertex.texcoords[1] };
+      std::array<float, 3> norm = { vertex.normal[0], vertex.normal[1], vertex.normal[2] };
 
       auto posIndex  = posCorrespIndices.find(pos)->second;
       auto texIndex  = texCorrespIndices.find(tex)->second;
@@ -196,9 +196,9 @@ void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
       // Second vertex
       vertex = submesh->getVertices()[submesh->getIndices()[i]];
 
-      pos  = std::array<float, 3>({ vertex.position[0], vertex.position[1], vertex.position[2] });
-      tex  = std::array<float, 2>({ vertex.texcoords[0], vertex.texcoords[1] });
-      norm = std::array<float, 3>({ vertex.normal[0], vertex.normal[1], vertex.normal[2] });
+      pos  = { vertex.position[0], vertex.position[1], vertex.position[2] };
+      tex  = { vertex.texcoords[0], vertex.texcoords[1] };
+      norm = { vertex.normal[0], vertex.normal[1], vertex.normal[2] };
 
       posIndex  = posCorrespIndices.find(pos)->second;
       texIndex  = texCorrespIndices.find(tex)->second;

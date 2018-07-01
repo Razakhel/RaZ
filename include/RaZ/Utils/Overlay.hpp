@@ -3,6 +3,7 @@
 #ifndef RAZ_OVERLAY_HPP
 #define RAZ_OVERLAY_HPP
 
+#include <array>
 #include <functional>
 #include <memory>
 #include <unordered_map>
