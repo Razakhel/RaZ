@@ -3,6 +3,10 @@ project(RaZ)
 
 set(CMAKE_CXX_STANDARD 14)
 
+if (NOT CMAKE_BUILD_TYPE) # Define build type to Release if not automatically set
+    set(CMAKE_BUILD_TYPE "Release")
+endif ()
+
 if (CMAKE_COMPILER_IS_GNUCC)
     set(GCC_FLAGS "-pedantic -pedantic-errors \
                    -Wall -Wextra \
@@ -74,7 +78,20 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_FLAGS}")
 elseif (MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    set(MSVC_FLAGS "/W4 \
+                    \
+                    /wd4100 \
+                    /wd4127 \
+                    /wd4131 \
+                    /wd4152 \
+                    /wd4204 \
+                    /wd4244 \
+                    /wd4245 \
+                    /wd4267 \
+                    /wd4456 \
+                    /wd4996") # Disabling warnings triggered by libpng, GLEW & GLFW
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_FLAGS}")
 endif ()
 
 option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
