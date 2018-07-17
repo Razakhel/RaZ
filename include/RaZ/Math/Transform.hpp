@@ -27,6 +27,7 @@ public:
   virtual void rotate(float angle, float x, float y, float z);
   virtual void scale(float x, float y, float z);
   virtual void scale(float val) { scale(val, val, val); }
+  virtual void scale(const Vec3f& values) { scale(values[0], values[1], values[2]); }
   Mat4f computeTranslationMatrix(bool inverseTranslation = false) const;
   Mat4f computeTransformMatrix() const;
 

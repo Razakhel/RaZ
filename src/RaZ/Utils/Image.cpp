@@ -176,7 +176,7 @@ void Image::read(const std::string& filePath, bool reverse) {
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
   } else {
-    throw std::runtime_error("Error: Couldn't open the file '" + filePath + "'");
+    std::cerr << "Error: Couldn't open the file '" + filePath + "'" << std::endl;
   }
 }
 
