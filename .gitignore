@@ -28,7 +28,8 @@
 *.out
 *.app
 
-# CLion folders
+# Build folders
+*build*/
+
+# CLion folder
 .idea/
-cmake-build-debug/
-cmake-build-release/
