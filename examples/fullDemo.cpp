@@ -62,7 +62,8 @@ int main() {
   // Allow wireframe toggling
   bool isWireframe = false;
   windowPtr->addKeyCallback(Raz::Keyboard::Z, [&isWireframe] () {
-    glPolygonMode(GL_FRONT_AND_BACK, ((isWireframe = !isWireframe) ? GL_LINE : GL_FILL));
+    isWireframe = !isWireframe;
+    glPolygonMode(GL_FRONT_AND_BACK, (isWireframe ? GL_LINE : GL_FILL));
   });
 
   // Allow face culling toggling
@@ -110,6 +111,13 @@ int main() {
   });
   windowPtr->addKeyCallback(Raz::Keyboard::L, [&lightPtr, &scenePtr] () {
     lightPtr->translate(0.5f, 0.f, 0.f);
+    scenePtr->updateLights();
+  });
+
+  windowPtr->addKeyCallback(Raz::Keyboard::NUM0, [&scenePtr, &cameraPtr] () {
+    scenePtr->addLight(std::make_unique<Raz::PointLight>(cameraPtr->getPosition(),
+                                                         10.f,
+                                                         Raz::Vec3f({ 1.f, 1.f, 1.f })));
     scenePtr->updateLights();
   });
 
