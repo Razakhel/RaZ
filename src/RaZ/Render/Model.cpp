@@ -16,6 +16,12 @@ ModelPtr Model::import(const std::string& filePath) {
       model = importObj(file, filePath);
     else if (format == "off" || format == "OFF")
       model = importOff(file);
+    else if (format == "fbx" || format == "FBX")
+#if defined(FBX_ENABLED)
+      model = importFbx(filePath);
+#else
+      throw std::runtime_error("Error: FBX SDK not found; check that you allowed its use when building RaZ");
+#endif
     else
       throw std::runtime_error("Error: '" + format + "' format is not supported");
   } else {

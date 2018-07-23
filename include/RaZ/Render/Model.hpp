@@ -28,6 +28,9 @@ public:
 private:
   static ModelPtr importObj(std::ifstream& file, const std::string& filePath);
   static ModelPtr importOff(std::ifstream& file);
+#if defined(_MSC_VER) || (defined(__GNUC__) && !defined(__MINGW32__)) // Enabling FBX for MSVC & GCC (no MinGW) only
+  static ModelPtr importFbx(const std::string& fileName);
+#endif
 
   void saveObj(std::ofstream& file, const std::string& filePath) const;
 
