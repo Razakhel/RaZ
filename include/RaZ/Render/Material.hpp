@@ -95,7 +95,7 @@ private:
   Vec3f m_ambient      = Vec3f(1.f);
   Vec3f m_diffuse      = Vec3f(1.f);
   Vec3f m_specular     = Vec3f(1.f);
-  Vec3f m_emissive     = Vec3f(1.f);
+  Vec3f m_emissive     = Vec3f(0.f);
   float m_transparency = 1.f;
 
   TexturePtr m_ambientMap      = Texture::recoverTexture(TexturePreset::WHITE);
