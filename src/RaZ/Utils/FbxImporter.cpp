@@ -106,7 +106,7 @@ ModelPtr Model::importFbx(const std::string& filePath) {
     if (meshMaterial) {
       if (meshMaterial->GetMappingMode() == FbxLayerElement::EMappingMode::eAllSame)
         // TODO: small hack to avoid segfaulting when mesh count > material count, but clearly wrong; find another way
-        submesh->setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount()));
+        submesh->setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
       else
         std::cerr << "Error: Materials can't be mapped by anything other than the whole submesh" << std::endl;
     }
