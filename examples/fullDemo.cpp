@@ -8,7 +8,29 @@ int main() {
   window->enableOverlay();
 
   Raz::VertexShaderPtr vertShader   = std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl");
-  Raz::FragmentShaderPtr fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl");
+  Raz::FragmentShaderPtr fragShader;
+
+  const auto startTime = std::chrono::system_clock::now();
+  // If FBX SDK linked, load an FBX mesh
+#if defined(FBX_ENABLED)
+  fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/blinn-phong.glsl");
+  Raz::ModelPtr model = Raz::Model::import("../../assets/meshes/shaderBall.fbx");
+
+  model->translate(0.f, -1.f, 0.f);
+  model->scale(0.01f);
+  model->rotate(180.f, 0.f, 1.f, 0.f);
+#else
+  fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl");
+  Raz::ModelPtr model = Raz::Model::import("../../assets/meshes/shield.obj");
+
+  model->scale(0.2f);
+  model->rotate(180.f, 0.f, 1.f, 0.f);
+#endif
+  const auto endTime   = std::chrono::system_clock::now();
+
+  std::cout << "Mesh loading duration: "
+            << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
+            << " seconds." << std::endl;
 
   Raz::ScenePtr scene = std::make_unique<Raz::Scene>(std::move(vertShader), std::move(fragShader));
 
@@ -18,17 +40,6 @@ int main() {
                                                            "../../assets/skyboxes/clouds_bottom.png",
                                                            "../../assets/skyboxes/clouds_front.png",
                                                            "../../assets/skyboxes/clouds_back.png");
-
-  const auto startTime = std::chrono::system_clock::now();
-  Raz::ModelPtr model  = Raz::Model::import("../../assets/meshes/shield.obj");
-  const auto endTime   = std::chrono::system_clock::now();
-
-  std::cout << "Mesh loading duration: "
-            << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
-            << " seconds." << std::endl;
-
-  model->scale(0.2f);
-  model->rotate(180.f, 0.f, 1.f, 0.f);
 
   /*Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
                                                           10.f,                           // Energy
