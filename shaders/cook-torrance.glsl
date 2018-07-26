@@ -62,13 +62,13 @@ vec3 computeFresnel(float cosTheta, vec3 baseReflectivity) {
 }
 
 // Shlick-Beckmann for Geometry part
-float computeShlickGGX(float viewAngle, float roughness) {
+float computeGeomShlickGGX(float angle, float roughness) {
   float incrRough   = (roughness + 1.0);
   float roughFactor = (incrRough * incrRough) / 8.0;
 
-  float denom = viewAngle * (1.0 - roughFactor) + roughFactor;
+  float denom = angle * (1.0 - roughFactor) + roughFactor;
 
-  return viewAngle / denom;
+  return angle / denom;
 }
 
 // Geometry: Smith's Shlick GGX
@@ -76,10 +76,10 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
   float viewAngle  = max(dot(viewDir, normal), 0.0);
   float lightAngle = max(dot(lightDir, normal), 0.0);
 
-  float ggx1 = computeShlickGGX(viewAngle, roughness);
-  float ggx2 = computeShlickGGX(lightAngle, roughness);
+  float viewGeom  = computeGeomShlickGGX(viewAngle, roughness);
+  float lightGeom = computeGeomShlickGGX(lightAngle, roughness);
 
-  return ggx1 * ggx2;
+  return viewGeom * lightGeom;
 }
 
 void main() {
@@ -89,9 +89,9 @@ void main() {
   float roughness = texture(uniMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
   float ambOcc    = texture(uniMaterial.ambientOcclusionMap, fragMeshInfo.vertTexcoords).r;
 
-  vec3 normal  = texture(uniMaterial.normalMap, fragMeshInfo.vertTexcoords).rgb;
-  normal       = normalize(normal * 2.0 - 1.0);
-  normal       = normalize(fragMeshInfo.vertTBNMatrix * normal);
+  vec3 normal = texture(uniMaterial.normalMap, fragMeshInfo.vertTexcoords).rgb;
+  normal      = normalize(normal * 2.0 - 1.0);
+  normal      = normalize(fragMeshInfo.vertTBNMatrix * normal);
 
   vec3 viewDir = normalize(uniCameraPos - fragMeshInfo.vertPosition);
 
