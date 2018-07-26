@@ -7,12 +7,13 @@
 #include <string>
 
 #include "glew/include/GL/glew.h"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
 
 namespace Raz {
 
-enum class TexturePreset { BLACK = 0,
-                           WHITE = 255 };
+enum class TexturePreset : uint8_t { BLACK = 0,
+                                     WHITE = 255 };
 
 class Texture;
 using TexturePtr = std::shared_ptr<Texture>;
@@ -20,7 +21,7 @@ using TexturePtr = std::shared_ptr<Texture>;
 class Texture {
 public:
   Texture() { glGenTextures(1, &m_index); }
-  explicit Texture(uint8_t value);
+  explicit Texture(uint8_t value) : Texture() { makePlainColored(Vec3b(value)); }
   Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
@@ -36,6 +37,8 @@ public:
   ~Texture() { glDeleteTextures(1, &m_index); }
 
 private:
+  void makePlainColored(const Vec3b& color) const;
+
   GLuint m_index {};
   ImagePtr m_image {};
 };
