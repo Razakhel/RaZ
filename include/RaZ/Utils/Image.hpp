@@ -11,10 +11,15 @@
 
 namespace Raz {
 
+enum class ImageDataType : uint8_t { BYTE = 0,
+                                     FLOAT };
+
 struct ImageData {
-  virtual bool isEmpty() const = 0;
   virtual void* getDataPtr() = 0;
   virtual const void* getDataPtr() const = 0;
+
+  virtual bool isEmpty() const = 0;
+  virtual ImageDataType getDataType() const = 0;
 
   virtual ~ImageData() = default;
 };
@@ -22,17 +27,21 @@ struct ImageData {
 using ImageDataPtr = std::unique_ptr<ImageData>;
 
 struct ImageDataB : public ImageData {
-  bool isEmpty() const override { return data.empty(); }
+  ImageDataType getDataType() const override { return ImageDataType::BYTE; }
   void* getDataPtr() override { return data.data(); }
   const void* getDataPtr() const override { return data.data(); }
+
+  bool isEmpty() const override { return data.empty(); }
 
   std::vector<uint8_t> data;
 };
 
 struct ImageDataF : public ImageData {
-  bool isEmpty() const override { return data.empty(); }
+  ImageDataType getDataType() const override { return ImageDataType::FLOAT; }
   void* getDataPtr() override { return data.data(); }
   const void* getDataPtr() const override { return data.data(); }
+
+  bool isEmpty() const override { return data.empty(); }
 
   std::vector<float> data;
 };
@@ -51,9 +60,10 @@ public:
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
   ImageColorspace getColorspace() const { return m_colorspace; }
-  bool isEmpty() const { return (!m_data || m_data->isEmpty()); }
+  ImageDataType getDataType() const { return m_data->getDataType(); }
   const void* getDataPtr() const { return m_data->getDataPtr(); }
 
+  bool isEmpty() const { return (!m_data || m_data->isEmpty()); }
   void read(const std::string& filePath, bool reverse = false);
   void save(const std::string& filePath, bool reverse = false) const;
 
