@@ -57,7 +57,7 @@ TexturePtr Texture::recoverTexture(TexturePreset texturePreset) {
 void Texture::load(const std::string& fileName) {
   m_image = std::make_unique<Image>(fileName);
 
-  if (!m_image->getData().empty()) {
+  if (!m_image->isEmpty()) {
     bind();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

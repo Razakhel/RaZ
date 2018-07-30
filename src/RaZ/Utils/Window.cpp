@@ -94,7 +94,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 void Window::setIcon(const Image& img) const {
   const GLFWimage icon = { static_cast<int>(img.getWidth()),
                            static_cast<int>(img.getHeight()),
-                           const_cast<unsigned char*>(img.getDataPtr()) };
+                           const_cast<unsigned char*>(static_cast<const uint8_t*>(img.getDataPtr())) };
   glfwSetWindowIcon(m_window, 1, &icon);
 }
 
