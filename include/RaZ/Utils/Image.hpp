@@ -11,6 +11,32 @@
 
 namespace Raz {
 
+struct ImageData {
+  virtual bool isEmpty() const = 0;
+  virtual void* getDataPtr() = 0;
+  virtual const void* getDataPtr() const = 0;
+
+  virtual ~ImageData() = default;
+};
+
+using ImageDataPtr = std::unique_ptr<ImageData>;
+
+struct ImageDataB : public ImageData {
+  bool isEmpty() const override { return data.empty(); }
+  void* getDataPtr() override { return data.data(); }
+  const void* getDataPtr() const override { return data.data(); }
+
+  std::vector<uint8_t> data;
+};
+
+struct ImageDataF : public ImageData {
+  bool isEmpty() const override { return data.empty(); }
+  void* getDataPtr() override { return data.data(); }
+  const void* getDataPtr() const override { return data.data(); }
+
+  std::vector<float> data;
+};
+
 enum class ImageColorspace { GRAY = GL_RED,
                              GRAY_ALPHA = GL_RG,
                              RGB = GL_RGB,
@@ -25,8 +51,8 @@ public:
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
   ImageColorspace getColorspace() const { return m_colorspace; }
-  const std::vector<uint8_t>& getData() const { return m_data; }
-  const uint8_t* getDataPtr() const { return m_data.data(); }
+  bool isEmpty() const { return (!m_data || m_data->isEmpty()); }
+  const void* getDataPtr() const { return m_data->getDataPtr(); }
 
   void read(const std::string& filePath, bool reverse = false);
   void save(const std::string& filePath, bool reverse = false) const;
@@ -40,7 +66,7 @@ private:
   ImageColorspace m_colorspace {};
   uint8_t m_channelCount {};
   uint8_t m_bitDepth {};
-  std::vector<uint8_t> m_data {};
+  ImageDataPtr m_data {};
 };
 
 using ImagePtr = std::unique_ptr<Image>;
