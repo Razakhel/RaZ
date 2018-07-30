@@ -3,6 +3,7 @@
 
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Image.hpp"
+#include "RaZ/Utils/StrUtils.hpp"
 
 namespace Raz {
 
@@ -10,9 +11,9 @@ void Image::read(const std::string& filePath, bool reverse) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
-    const std::string format = FileUtils::extractFileExtension(filePath);
+    const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 
-    if (format == "png" || format == "PNG")
+    if (format == "png")
       readPng(file, reverse);
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
@@ -25,9 +26,9 @@ void Image::save(const std::string& filePath, bool reverse) const {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
   if (file) {
-    const std::string format = FileUtils::extractFileExtension(filePath);
+    const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 
-    if (format == "png" || format == "PNG")
+    if (format == "png")
       savePng(file, reverse);
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;

@@ -2,6 +2,7 @@
 
 #include "RaZ/Render/Model.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
+#include "RaZ/Utils/StrUtils.hpp"
 
 namespace Raz {
 
@@ -10,13 +11,13 @@ ModelPtr Model::import(const std::string& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
-    const std::string format = FileUtils::extractFileExtension(filePath);
+    const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 
-    if (format == "obj" || format == "OBJ")
+    if (format == "obj")
       model = importObj(file, filePath);
-    else if (format == "off" || format == "OFF")
+    else if (format == "off")
       model = importOff(file);
-    else if (format == "fbx" || format == "FBX")
+    else if (format == "fbx")
 #if defined(FBX_ENABLED)
       model = importFbx(filePath);
 #else
@@ -33,10 +34,10 @@ ModelPtr Model::import(const std::string& filePath) {
 
 void Model::save(const std::string& filePath) const {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
-  const std::string format = FileUtils::extractFileExtension(filePath);
+  const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 
   if (file) {
-    if (format == "obj" || format == "OBJ")
+    if (format == "obj")
       saveObj(file, filePath);
     else
       throw std::runtime_error("Error: '" + format + "' format is not supported");
