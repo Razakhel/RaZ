@@ -4,6 +4,7 @@
 #define RAZ_STRUTILS_HPP
 
 #include <algorithm>
+#include <cctype>
 #include <string>
 
 namespace Raz {
@@ -20,12 +21,14 @@ inline std::string& toUppercase(std::string& text) {
   return text;
 }
 
-inline std::string& toLowercaseCopy(std::string text) {
-  return toLowercase(text);
+inline std::string toLowercaseCopy(std::string text) {
+  toLowercase(text);
+  return text;
 }
 
-inline std::string& toUppercaseCopy(std::string text) {
-  return toUppercase(text);
+inline std::string toUppercaseCopy(std::string text) {
+  toUppercase(text);
+  return text;
 }
 
 inline std::string& trimLeft(std::string& text) {
