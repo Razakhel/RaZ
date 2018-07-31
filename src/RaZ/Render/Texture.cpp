@@ -73,18 +73,44 @@ void Texture::load(const std::string& fileName) {
       glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle.data());
     }
 
+    // Default internal format is the own image's colorspace; modified if the image is a floating point one
+    auto colorFormat = static_cast<int>(m_image->getColorspace());
+
+    if (m_image->getDataType() == ImageDataType::FLOAT) {
+      switch (m_image->getColorspace()) {
+        case ImageColorspace::GRAY:
+          colorFormat = GL_R16F;
+          break;
+
+        case ImageColorspace::GRAY_ALPHA:
+          colorFormat = GL_RG16F;
+          break;
+
+        case ImageColorspace::RGB:
+          colorFormat = GL_RGB16F;
+          break;
+
+        case ImageColorspace::RGBA:
+          colorFormat = GL_RGBA16F;
+          break;
+
+        case ImageColorspace::DEPTH: // Unhandled here
+          break;
+      }
+    }
+
     glTexImage2D(GL_TEXTURE_2D,
                  0,
-                 static_cast<int>(m_image->getColorspace()),
+                 colorFormat,
                  static_cast<int>(m_image->getWidth()),
                  static_cast<int>(m_image->getHeight()),
                  0,
                  static_cast<unsigned int>(m_image->getColorspace()),
-                 GL_UNSIGNED_BYTE,
+                 (m_image->getDataType() == ImageDataType::FLOAT ? GL_FLOAT : GL_UNSIGNED_BYTE),
                  m_image->getDataPtr());
     glGenerateMipmap(GL_TEXTURE_2D);
     unbind();
-  } else { // Image not found, deleting image & defaulting texture to pure white
+  } else { // Image not found, deleting it & defaulting texture to pure white
     m_image.reset();
     makePlainColored(Vec3b(static_cast<uint8_t>(TexturePreset::WHITE)));
   }

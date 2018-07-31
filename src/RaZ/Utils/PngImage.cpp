@@ -159,10 +159,10 @@ void Image::savePng(std::ofstream& file, bool reverse) const {
   }, nullptr);
   png_write_info(writeStruct, infoStruct);
 
+  const auto dataPtr = static_cast<const uint8_t*>(m_data->getDataPtr());
+
   for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex)
-    png_write_row(writeStruct,
-                  &static_cast<const uint8_t*>(m_data->getDataPtr())[m_width * m_channelCount
-                                                                  * (reverse ? m_height - 1 - heightIndex : heightIndex)]);
+    png_write_row(writeStruct, &dataPtr[m_width * m_channelCount * (reverse ? m_height - 1 - heightIndex : heightIndex)]);
 
   png_write_end(writeStruct, infoStruct);
   png_destroy_write_struct(&writeStruct, &infoStruct);
