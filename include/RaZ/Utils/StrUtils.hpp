@@ -11,9 +11,19 @@ namespace Raz {
 
 namespace StrUtils {
 
+inline char toLowercase(char& character) {
+  character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+  return character;
+}
+
 inline std::string& toLowercase(std::string& text) {
   std::transform(text.begin(), text.end(), text.begin(), ::tolower);
   return text;
+}
+
+inline char toUppercase(char& character) {
+  character = static_cast<char>(std::toupper(static_cast<unsigned char>(character)));
+  return character;
 }
 
 inline std::string& toUppercase(std::string& text) {
@@ -21,9 +31,19 @@ inline std::string& toUppercase(std::string& text) {
   return text;
 }
 
+inline char toLowercaseCopy(char character) {
+  toLowercase(character);
+  return character;
+}
+
 inline std::string toLowercaseCopy(std::string text) {
   toLowercase(text);
   return text;
+}
+
+inline char toUppercaseCopy(char character) {
+  toUppercase(character);
+  return character;
 }
 
 inline std::string toUppercaseCopy(std::string text) {

@@ -5,6 +5,7 @@
 
 #define GLEW_STATIC
 
+#include "Math/Constants.hpp"
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
 #include "Math/Transform.hpp"
@@ -24,9 +25,11 @@
 #include "Render/Submesh.hpp"
 #include "Render/Texture.hpp"
 #include "Render/UniformBuffer.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
+#include "Utils/FileUtils.hpp"
 #include "Utils/Image.hpp"
 #include "Utils/Keyboard.hpp"
+#include "Utils/Overlay.hpp"
+#include "Utils/StrUtils.hpp"
 #include "Utils/Window.hpp"
 
 #endif // RAZ_RAZ_HPP
