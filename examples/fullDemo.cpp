@@ -7,14 +7,18 @@ int main() {
   Raz::WindowPtr window = std::make_unique<Raz::Window>(1280, 720, "RaZ - Full demo", 4);
   window->enableOverlay();
 
-  Raz::VertexShaderPtr vertShader   = std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl");
+  Raz::VertexShaderPtr vertShader = std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl");
   Raz::FragmentShaderPtr fragShader;
+
+  const auto img = std::make_shared<Raz::Texture>("../../assets/textures/lava.tga");
 
   const auto startTime = std::chrono::system_clock::now();
   // If FBX SDK linked, load an FBX mesh
 #if defined(FBX_ENABLED)
   fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/blinn-phong.glsl");
   Raz::ModelPtr model = Raz::Model::import("../../assets/meshes/shaderBall.fbx");
+
+  dynamic_cast<Raz::MaterialStandard*>(model->getMesh()->getMaterials().front().get())->setDiffuseMap(img);
 
   model->translate(0.f, -1.f, 0.f);
   model->scale(0.01f);
@@ -23,10 +27,12 @@ int main() {
   fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl");
   Raz::ModelPtr model = Raz::Model::import("../../assets/meshes/shield.obj");
 
+  dynamic_cast<Raz::MaterialCookTorrance*>(model->getMesh()->getMaterials().front().get())->setAlbedoMap(img);
+
   model->scale(0.2f);
   model->rotate(180.f, 0.f, 1.f, 0.f);
 #endif
-  const auto endTime   = std::chrono::system_clock::now();
+  const auto endTime = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
