@@ -70,6 +70,8 @@ public:
 private:
   void readPng(std::ifstream& file, bool reverse);
   void savePng(std::ofstream& file, bool reverse) const;
+  void readTga(std::ifstream& fileStream);
+  //void saveTga(std::ofstream& file) const;
 
   unsigned int m_width {};
   unsigned int m_height {};

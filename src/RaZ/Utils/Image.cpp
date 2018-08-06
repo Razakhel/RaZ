@@ -15,6 +15,8 @@ void Image::read(const std::string& filePath, bool reverse) {
 
     if (format == "png")
       readPng(file, reverse);
+    else if (format == "tga")
+      readTga(file);
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
   } else {
@@ -30,6 +32,8 @@ void Image::save(const std::string& filePath, bool reverse) const {
 
     if (format == "png")
       savePng(file, reverse);
+    /*else if (format == "tga")
+      saveTga(file);*/
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
   } else {
