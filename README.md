@@ -28,8 +28,8 @@ More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples
 
 | Objectives | Implemented |
 | :--------: | :---------: |
-| Mesh loading (OBJ/FBX/...) | **Yes** (OBJ) |
-| Texture loading (JPEG/PNG/TGA/BMP/BPG) | **Yes** (PNG) |
+| Mesh loading (OBJ/FBX/OFF...) | **Yes** (OBJ/FBX/OFF) |
+| Texture loading (JPEG/PNG/TGA/BMP/BPG) | **Yes** (PNG/TGA) |
 | Vector: operations, dot, cross, normalization, length/magnitude calculation | **Yes** |
 | Matrix: operations, transposition, determinant computation, inversion | **Yes** |
 | Camera &amp; transformations | **Yes** (rotation with quaternions) |
