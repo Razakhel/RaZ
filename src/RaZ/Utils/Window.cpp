@@ -138,6 +138,58 @@ void Window::enableVerticalSync(bool value) const {
 #endif
 }
 
+void Window::addCallback(Keyboard::Key key, std::function<void()> func) {
+  std::get<0>(m_callbacks).emplace_back(key, func);
+  glfwSetWindowUserPointer(m_window, &m_callbacks);
+
+  updateCallbacks();
+}
+
+void Window::addCallback(Mouse::MouseButton button, std::function<void()> func) {
+  std::get<1>(m_callbacks).emplace_back(button, func);
+  glfwSetWindowUserPointer(m_window, &m_callbacks);
+
+  updateCallbacks();
+}
+
+void Window::addCallback(Mouse::MouseWheel scroll, std::function<void(double, double)> func) {
+  std::get<2>(m_callbacks).emplace_back(scroll, func);
+  glfwSetWindowUserPointer(m_window, &m_callbacks);
+
+  updateCallbacks();
+}
+
+void Window::updateCallbacks() const {
+  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
+    const auto& keyCallbacks = std::get<0>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+      glfwSetWindowShouldClose(window, GL_TRUE);
+
+    for (const auto& callback : keyCallbacks) {
+      if (key == callback.first && action != GLFW_RELEASE)
+        callback.second();
+    }
+  });
+
+  glfwSetMouseButtonCallback(m_window, [] (GLFWwindow* window, int button, int action, int /* mods */) {
+    const auto& mouseCallbacks = std::get<1>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+
+    for (const auto& callback : mouseCallbacks) {
+      if (button == callback.first && action != GLFW_RELEASE)
+        callback.second();
+    }
+  });
+
+  glfwSetScrollCallback(m_window, [] (GLFWwindow* window, double xOffset, double yOffset) {
+    const auto& scrollCallbacks = std::get<2>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+
+    for (const auto& callback : scrollCallbacks) {
+      callback.second(xOffset, yOffset);
+    }
+  });
+}
+
 void Window::addOverlayElement(OverlayElementType type, const std::string& text,
                                std::function<void()> actionOn, std::function<void()> actionOff) {
   m_overlay->addElement(type, text, std::move(actionOn), std::move(actionOff));
@@ -162,27 +214,6 @@ void Window::addOverlayFrameTime(const std::string& formattedText) {
 
 void Window::addOverlayFpsCounter(const std::string& formattedText) {
   m_overlay->addFpsCounter(formattedText);
-}
-
-void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
-  m_keyCallbacks.emplace_back(key, func);
-  glfwSetWindowUserPointer(m_window, &m_keyCallbacks);
-
-  updateKeyCallbacks();
-}
-
-void Window::updateKeyCallbacks() const {
-  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
-    const KeyCallbacks& callbacksList = *static_cast<KeyCallbacks*>(glfwGetWindowUserPointer(window));
-
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GL_TRUE);
-
-    for (const auto& callback : callbacksList) {
-      if (key == callback.first && action != GLFW_RELEASE)
-        callback.second();
-    }
-  });
 }
 
 bool Window::run() const {

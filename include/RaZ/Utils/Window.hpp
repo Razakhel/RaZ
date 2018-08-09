@@ -16,11 +16,14 @@
 #include "glfw/include/GLFW/glfw3.h"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Overlay.hpp"
-#include "RaZ/Utils/Keyboard.hpp"
+#include "RaZ/Utils/Input.hpp"
 
 namespace Raz {
 
-using KeyCallbacks = std::vector<std::pair<int, std::function<void()>>>;
+using KeyboardCallbacks    = std::vector<std::pair<int, std::function<void()>>>;
+using MouseButtonCallbacks = std::vector<std::pair<int, std::function<void()>>>;
+using MouseScrollCallbacks = std::vector<std::pair<int, std::function<void(double, double)>>>;
+using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallbacks>;
 
 class Window {
 public:
@@ -37,6 +40,10 @@ public:
   bool recoverVerticalSyncState() const;
   void enableVerticalSync(bool value = true) const;
   void disableVerticalSync() const { enableVerticalSync(false); }
+  void addCallback(Keyboard::Key key, std::function<void()> func);
+  void addCallback(Mouse::MouseButton button, std::function<void()> func);
+  void addCallback(Mouse::MouseWheel scroll, std::function<void(double, double)> func);
+  void updateCallbacks() const;
   void enableOverlay() { m_overlay = std::make_unique<Overlay>(m_window); }
   void disableOverlay() { m_overlay.reset(); }
   void addOverlayElement(OverlayElementType type, const std::string& text,
@@ -46,8 +53,6 @@ public:
   void addOverlayCheckbox(const std::string& text, bool initVal, std::function<void()> actionOn, std::function<void()> actionOff);
   void addOverlayFrameTime(const std::string& formattedText);
   void addOverlayFpsCounter(const std::string& formattedText);
-  void addKeyCallback(Keyboard::Key key, std::function<void()> func);
-  void updateKeyCallbacks() const;
   bool run() const;
   void close();
 
@@ -56,8 +61,8 @@ public:
 private:
   unsigned int m_width {};
   unsigned int m_height {};
-  KeyCallbacks m_keyCallbacks {};
   GLFWwindow* m_window {};
+  InputCallbacks m_callbacks {};
   OverlayPtr m_overlay {};
 };
 
