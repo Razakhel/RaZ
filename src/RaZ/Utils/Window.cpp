@@ -159,35 +159,60 @@ void Window::addMouseScrollCallback(std::function<void(double, double)> func) {
   updateCallbacks();
 }
 
+void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
+  std::get<3>(m_callbacks) = std::make_tuple(m_width / 2, m_height / 2, std::move(func));
+  glfwSetWindowUserPointer(m_window, &m_callbacks);
+
+  updateCallbacks();
+}
+
 void Window::updateCallbacks() const {
-  glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
-    const auto& keyCallbacks = std::get<0>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+  if (!std::get<0>(m_callbacks).empty()) {
+    glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
+      const auto& keyCallbacks = std::get<0>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
 
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-      glfwSetWindowShouldClose(window, GL_TRUE);
+      for (const auto& callback : keyCallbacks) {
+        if (key == callback.first && action != GLFW_RELEASE) {
+          callback.second();
+        }
+      }
+    });
+  }
 
-    for (const auto& callback : keyCallbacks) {
-      if (key == callback.first && action != GLFW_RELEASE)
-        callback.second();
-    }
-  });
+  if (!std::get<1>(m_callbacks).empty()) {
+    glfwSetMouseButtonCallback(m_window, [] (GLFWwindow* window, int button, int action, int /* mods */) {
+      const auto& mouseCallbacks = std::get<1>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
 
-  glfwSetMouseButtonCallback(m_window, [] (GLFWwindow* window, int button, int action, int /* mods */) {
-    const auto& mouseCallbacks = std::get<1>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+      for (const auto& callback : mouseCallbacks) {
+        if (button == callback.first && action != GLFW_RELEASE)
+          callback.second();
+      }
+    });
+  }
 
-    for (const auto& callback : mouseCallbacks) {
-      if (button == callback.first && action != GLFW_RELEASE)
-        callback.second();
-    }
-  });
+  // Checking if the function is set
+  if (std::get<2>(m_callbacks)) {
+    glfwSetScrollCallback(m_window, [] (GLFWwindow* window, double xOffset, double yOffset) {
+      const auto& scrollCallback = std::get<2>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
 
-  glfwSetScrollCallback(m_window, [] (GLFWwindow* window, double xOffset, double yOffset) {
-    const auto& scrollCallbacks = std::get<2>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+      scrollCallback(xOffset, yOffset);
+    });
+  }
 
-    for (const auto& callback : scrollCallbacks) {
-      callback.second(xOffset, yOffset);
-    }
-  });
+  // Checking if the function is set
+  if (std::get<2>(std::get<3>(m_callbacks))) {
+    glfwSetCursorPosCallback(m_window, [] (GLFWwindow* window, double xPosition, double yPosition) {
+      auto& moveCallback = std::get<3>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+
+      double& xPrevPos = std::get<0>(moveCallback);
+      double& yPrevPos = std::get<1>(moveCallback);
+
+      std::get<2>(moveCallback)(xPosition - xPrevPos, yPosition - yPrevPos);
+
+      xPrevPos = xPosition;
+      yPrevPos = yPosition;
+    });
+  }
 }
 
 void Window::addOverlayElement(OverlayElementType type, const std::string& text,
