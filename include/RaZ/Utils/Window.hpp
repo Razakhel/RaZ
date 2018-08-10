@@ -22,8 +22,8 @@ namespace Raz {
 
 using KeyboardCallbacks    = std::vector<std::pair<int, std::function<void()>>>;
 using MouseButtonCallbacks = std::vector<std::pair<int, std::function<void()>>>;
-using MouseScrollCallbacks = std::vector<std::pair<int, std::function<void(double, double)>>>;
-using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallbacks>;
+using MouseScrollCallback  = std::function<void(double, double)>;
+using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback>;
 
 class Window {
 public:
@@ -44,6 +44,9 @@ public:
   void showCursor() const { changeCursorState(Cursor::State::NORMAL); }
   void hideCursor() const { changeCursorState(Cursor::State::HIDDEN); }
   void disableCursor() const { changeCursorState(Cursor::State::DISABLED); }
+  void addKeyCallback(Keyboard::Key key, std::function<void()> func);
+  void addMouseButtonCallback(Mouse::Button button, std::function<void()> func);
+  void addMouseScrollCallback(std::function<void(double, double)> func);
   void updateCallbacks() const;
   void enableOverlay() { m_overlay = std::make_unique<Overlay>(m_window); }
   void disableOverlay() { m_overlay.reset(); }

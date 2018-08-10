@@ -138,22 +138,22 @@ void Window::enableVerticalSync(bool value) const {
 #endif
 }
 
-void Window::addCallback(Keyboard::Key key, std::function<void()> func) {
+void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
   std::get<0>(m_callbacks).emplace_back(key, func);
   glfwSetWindowUserPointer(m_window, &m_callbacks);
 
   updateCallbacks();
 }
 
-void Window::addCallback(Mouse::MouseButton button, std::function<void()> func) {
+void Window::addMouseButtonCallback(Mouse::Button button, std::function<void()> func) {
   std::get<1>(m_callbacks).emplace_back(button, func);
   glfwSetWindowUserPointer(m_window, &m_callbacks);
 
   updateCallbacks();
 }
 
-void Window::addCallback(Mouse::MouseWheel scroll, std::function<void(double, double)> func) {
-  std::get<2>(m_callbacks).emplace_back(scroll, func);
+void Window::addMouseScrollCallback(std::function<void(double, double)> func) {
+  std::get<2>(m_callbacks) = std::move(func);
   glfwSetWindowUserPointer(m_window, &m_callbacks);
 
   updateCallbacks();
