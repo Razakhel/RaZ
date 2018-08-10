@@ -9,6 +9,9 @@
 
 #include "glew/include/GL/glew.h"
 #if defined(_WIN32)
+#if defined(_MSC_VER)
+#define NOMINMAX
+#endif
 #include "glew/include/GL/wglew.h"
 #elif defined(__gnu_linux__)
 #include "glew/include/GL/glxew.h"

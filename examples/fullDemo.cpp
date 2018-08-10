@@ -146,8 +146,8 @@ int main() {
   });
   windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {
     cameraPtr->rotate(45.f,
-                      static_cast<float>(yMove) / windowPtr->getWidth(),  // X & Y moves are inverted, unsure of why for now
-                      static_cast<float>(xMove) / windowPtr->getHeight(), // Dividing by window size to scale X & Y between -1 and 1
+                      static_cast<float>(yMove) / windowPtr->getHeight(), // X & Y moves are inverted, unsure of why for now
+                      static_cast<float>(xMove) / windowPtr->getWidth(),  // Dividing by window size to scale X & Y between -1 and 1
                       0.f);
   });
   windowPtr->disableCursor();
