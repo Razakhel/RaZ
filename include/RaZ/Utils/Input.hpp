@@ -99,17 +99,23 @@ enum Key {
 
 namespace Mouse {
 
-enum MouseButton {
+enum Button {
   LEFT_CLICK   = GLFW_MOUSE_BUTTON_LEFT,
   RIGHT_CLICK  = GLFW_MOUSE_BUTTON_RIGHT,
   MIDDLE_CLICK = GLFW_MOUSE_BUTTON_MIDDLE
 };
 
-enum MouseWheel {
-  SCROLL
+} // namespace Mouse
+
+namespace Cursor {
+
+enum State {
+  NORMAL   = GLFW_CURSOR_NORMAL,
+  HIDDEN   = GLFW_CURSOR_HIDDEN,
+  DISABLED = GLFW_CURSOR_DISABLED
 };
 
-} // namespace Mouse
+}
 
 } // namespace Raz
 

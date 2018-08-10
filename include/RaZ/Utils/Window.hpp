@@ -40,9 +40,10 @@ public:
   bool recoverVerticalSyncState() const;
   void enableVerticalSync(bool value = true) const;
   void disableVerticalSync() const { enableVerticalSync(false); }
-  void addCallback(Keyboard::Key key, std::function<void()> func);
-  void addCallback(Mouse::MouseButton button, std::function<void()> func);
-  void addCallback(Mouse::MouseWheel scroll, std::function<void(double, double)> func);
+  void changeCursorState(Cursor::State state) const { glfwSetInputMode(m_window, GLFW_CURSOR, state); }
+  void showCursor() const { changeCursorState(Cursor::State::NORMAL); }
+  void hideCursor() const { changeCursorState(Cursor::State::HIDDEN); }
+  void disableCursor() const { changeCursorState(Cursor::State::DISABLED); }
   void updateCallbacks() const;
   void enableOverlay() { m_overlay = std::make_unique<Overlay>(m_window); }
   void disableOverlay() { m_overlay.reset(); }
