@@ -32,6 +32,7 @@ public:
   void sendCameraPosition(const Vec3f& cameraPos) const { m_cameraUbo.sendData(cameraPos, sizeof(Mat4f) * 5); }
   bool run() const;
   void updateShaders() const;
+  void quit() const { m_window->setShouldClose(); }
 
 private:
   WindowPtr m_window {};

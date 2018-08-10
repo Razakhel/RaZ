@@ -60,6 +60,7 @@ public:
   void addOverlayFrameTime(const std::string& formattedText);
   void addOverlayFpsCounter(const std::string& formattedText);
   bool run() const;
+  void setShouldClose() const { glfwSetWindowShouldClose(m_window, true); }
   void close();
 
   ~Window() { close(); }
