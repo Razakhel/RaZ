@@ -16,6 +16,11 @@ Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
   computeInverseProjectionMatrix();
 }
 
+void Camera::setFieldOfView(float fieldOfViewDegrees) {
+  m_fieldOfView = fieldOfViewDegrees  * PI<float> / 180;
+  computePerspectiveMatrix();
+}
+
 void Camera::move(const Vec3f& displacement) {
   Transform::move(displacement);
   computeViewMatrix();

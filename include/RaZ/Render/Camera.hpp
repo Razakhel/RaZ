@@ -19,10 +19,13 @@ public:
          float nearPlane = 0.1f, float farPlane = 100.f,
          const Vec3f& position = Vec3f(0.f));
 
+  float getFieldOfViewDegrees() const { return m_fieldOfView * 180.f / PI<float>; }
   const Mat4f& getViewMatrix() const { return m_viewMat; }
   const Mat4f& getInverseViewMatrix() const { return m_invViewMat; }
   const Mat4f& getProjectionMatrix() const { return m_projMat; }
   const Mat4f& getInverseProjectionMatrix() const { return m_invProjMat; }
+
+  void setFieldOfView(float fieldOfViewDegrees);
 
   void move(float x, float y, float z) override { move(Vec3f({ x, y, z })); }
   void move(const Vec3f& displacement) override;
