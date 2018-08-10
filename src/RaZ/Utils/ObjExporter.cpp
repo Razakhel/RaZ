@@ -22,7 +22,7 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
 
     mtlFile << "\nnewmtl " << materialName << '\n';
 
-    if (material->getType() == MaterialType::MATERIAL_TYPE_COOK_TORRANCE) {
+    if (material->getType() == MaterialType::COOK_TORRANCE) {
       const auto matCT = dynamic_cast<MaterialCookTorrance*>(material.get());
 
       mtlFile << "\tKd " << matCT->getBaseColor()[0] << ' ' << matCT->getBaseColor()[1] << ' ' << matCT->getBaseColor()[2] << '\n';

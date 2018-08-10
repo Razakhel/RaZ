@@ -13,8 +13,8 @@
 namespace Raz {
 
 enum class MaterialType {
-  MATERIAL_TYPE_STANDARD = 0,
-  MATERIAL_TYPE_COOK_TORRANCE
+  STANDARD = 0,
+  COOK_TORRANCE
 };
 
 enum class MaterialPreset {
@@ -49,7 +49,7 @@ public:
   explicit MaterialStandard(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
   explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
 
-  MaterialType getType() const override { return MaterialType::MATERIAL_TYPE_STANDARD; }
+  MaterialType getType() const override { return MaterialType::STANDARD; }
   const Vec3f& getAmbient() const { return m_ambient; }
   const Vec3f& getDiffuse() const { return m_diffuse; }
   const Vec3f& getSpecular() const { return m_specular; }
@@ -114,7 +114,7 @@ public:
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
     : m_baseColor{ baseColor }, m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } {}
 
-  MaterialType getType() const override { return MaterialType::MATERIAL_TYPE_COOK_TORRANCE; }
+  MaterialType getType() const override { return MaterialType::COOK_TORRANCE; }
   const Vec3f& getBaseColor() const { return m_baseColor; }
   float getMetallicFactor() const { return m_metallicFactor; }
   float getRoughnessFactor() const { return m_roughnessFactor; }

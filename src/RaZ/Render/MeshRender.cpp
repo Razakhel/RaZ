@@ -40,7 +40,7 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
   const auto& newMaterial = Material::recoverMaterial(materialPreset, roughnessFactor);
 
   for (auto& material : m_materials) {
-    if (material->getType() == MaterialType::MATERIAL_TYPE_COOK_TORRANCE) {
+    if (material->getType() == MaterialType::COOK_TORRANCE) {
       auto materialCT = dynamic_cast<MaterialCookTorrance*>(material.get());
 
       materialCT->setBaseColor(newMaterial->getBaseColor());
