@@ -36,7 +36,7 @@ More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples
 | Lighting | **Yes** (point/directional lights) |
 | Materials &amp; textures | **Yes** (multi-textures functional) |
 | Deferred rendering | **Yes** (modularization in progress) |
-| Screen-Space Ambiant Occlusion (SSAO) | _On standby_ |
+| Screen-Space Ambient Occlusion (SSAO) | _On standby_ |
 | Screen-Space Reflections (SSR) | _On standby_ |
 | Normal mapping | **Yes** |
 | PBR rendering | **Yes** (Cook-Torrance model) |

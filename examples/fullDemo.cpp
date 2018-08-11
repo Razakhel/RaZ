@@ -142,12 +142,12 @@ int main() {
 
   // Mouse callbacks
   windowPtr->addMouseScrollCallback([&cameraPtr] (double /* xOffset */, double yOffset) {
-    cameraPtr->setFieldOfView(std::max(1.f, std::min(90.f, cameraPtr->getFieldOfViewDegrees() + static_cast<float>(yOffset) * 2.f)));
+    cameraPtr->setFieldOfView(std::max(1.f, std::min(90.f, cameraPtr->getFieldOfViewDegrees() + static_cast<float>(-yOffset) * 2.f)));
   });
   windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {
-    cameraPtr->rotate(45.f,
-                      static_cast<float>(yMove) / windowPtr->getHeight(), // X & Y moves are inverted, unsure of why for now
-                      static_cast<float>(xMove) / windowPtr->getWidth(),  // Dividing by window size to scale X & Y between -1 and 1
+    cameraPtr->rotate(1.f,
+                      (static_cast<float>(yMove) / windowPtr->getHeight() * 90.f), // X & Y moves are inverted, unsure of why for now
+                      (static_cast<float>(xMove) / windowPtr->getWidth() * 90.f),  // Dividing by window size to scale X & Y between -1 and 1
                       0.f);
   });
   windowPtr->disableCursor();
