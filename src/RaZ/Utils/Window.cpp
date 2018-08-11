@@ -169,11 +169,15 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
 void Window::updateCallbacks() const {
   if (!std::get<0>(m_callbacks).empty()) {
     glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
-      const auto& keyCallbacks = std::get<0>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+      auto& callbacks = *static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window));
+      const auto& keyCallbacks = std::get<0>(callbacks);
 
       for (const auto& callback : keyCallbacks) {
-        if (key == callback.first && action != GLFW_RELEASE) {
-          callback.second();
+        if (key == callback.first) {
+          if (action == GLFW_PRESS)
+            std::get<4>(callbacks).emplace(key, callback.second);
+          else if (action == GLFW_RELEASE)
+            std::get<4>(callbacks).erase(key);
         }
       }
     });
@@ -181,11 +185,16 @@ void Window::updateCallbacks() const {
 
   if (!std::get<1>(m_callbacks).empty()) {
     glfwSetMouseButtonCallback(m_window, [] (GLFWwindow* window, int button, int action, int /* mods */) {
-      const auto& mouseCallbacks = std::get<1>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
+      auto& callbacks = *static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window));
+      const auto& mouseCallbacks = std::get<1>(callbacks);
 
       for (const auto& callback : mouseCallbacks) {
-        if (button == callback.first && action != GLFW_RELEASE)
-          callback.second();
+        if (button == callback.first) {
+          if (action == GLFW_PRESS)
+            std::get<4>(callbacks).emplace(button, callback.second);
+          else if (action == GLFW_RELEASE)
+            std::get<4>(callbacks).erase(button);
+        }
       }
     });
   }
@@ -246,6 +255,10 @@ bool Window::run() const {
     return false;
 
   glfwPollEvents();
+
+  // Process actions belonging to pressed keys & mouse buttons
+  for (const auto& action : std::get<4>(m_callbacks))
+    action.second();
 
   if (m_overlay)
     m_overlay->render();

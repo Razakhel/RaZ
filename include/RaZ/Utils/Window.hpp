@@ -27,7 +27,8 @@ using KeyboardCallbacks    = std::vector<std::pair<int, std::function<void()>>>;
 using MouseButtonCallbacks = std::vector<std::pair<int, std::function<void()>>>;
 using MouseScrollCallback  = std::function<void(double, double)>;
 using MouseMoveCallback    = std::tuple<double, double, std::function<void(double, double)>>;
-using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback>;
+using InputActions         = std::unordered_map<int, std::function<void()>>;
+using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
 
 class Window {
 public:
