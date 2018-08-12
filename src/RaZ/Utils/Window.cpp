@@ -138,15 +138,16 @@ void Window::enableVerticalSync(bool value) const {
 #endif
 }
 
-void Window::addKeyCallback(Keyboard::Key key, std::function<void()> func) {
-  std::get<0>(m_callbacks).emplace_back(key, func);
+void Window::addKeyCallback(Keyboard::Key key, std::function<void(float)> actionPress, std::function<void()> actionRelease) {
+  std::get<0>(m_callbacks).emplace_back(key, std::move(actionPress), std::move(actionRelease));
   glfwSetWindowUserPointer(m_window, &m_callbacks);
 
   updateCallbacks();
 }
 
-void Window::addMouseButtonCallback(Mouse::Button button, std::function<void()> func) {
-  std::get<1>(m_callbacks).emplace_back(button, func);
+void Window::addMouseButtonCallback(Mouse::Button button, std::function<void(float)> actionPress,
+                                                          std::function<void()> actionRelease) {
+  std::get<1>(m_callbacks).emplace_back(button, std::move(actionPress), std::move(actionRelease));
   glfwSetWindowUserPointer(m_window, &m_callbacks);
 
   updateCallbacks();
@@ -173,11 +174,15 @@ void Window::updateCallbacks() const {
       const auto& keyCallbacks = std::get<0>(callbacks);
 
       for (const auto& callback : keyCallbacks) {
-        if (key == callback.first) {
-          if (action == GLFW_PRESS)
-            std::get<4>(callbacks).emplace(key, callback.second);
-          else if (action == GLFW_RELEASE)
+        if (key == std::get<0>(callback)) {
+          if (action == GLFW_PRESS) {
+            std::get<4>(callbacks).emplace(key, std::get<1>(callback));
+          } else if (action == GLFW_RELEASE) {
             std::get<4>(callbacks).erase(key);
+
+            if (std::get<2>(callback))
+              std::get<2>(callback)();
+          }
         }
       }
     });
@@ -189,11 +194,15 @@ void Window::updateCallbacks() const {
       const auto& mouseCallbacks = std::get<1>(callbacks);
 
       for (const auto& callback : mouseCallbacks) {
-        if (button == callback.first) {
-          if (action == GLFW_PRESS)
-            std::get<4>(callbacks).emplace(button, callback.second);
-          else if (action == GLFW_RELEASE)
+        if (button == std::get<0>(callback)) {
+          if (action == GLFW_PRESS) {
+            std::get<4>(callbacks).emplace(button, std::get<1>(callback));
+          } else if (action == GLFW_RELEASE) {
             std::get<4>(callbacks).erase(button);
+
+            if (std::get<2>(callback))
+              std::get<2>(callback)();
+          }
         }
       }
     });
@@ -262,7 +271,7 @@ bool Window::run() {
 
   // Process actions belonging to pressed keys & mouse buttons
   for (const auto& action : std::get<4>(m_callbacks))
-    action.second();
+    action.second(m_deltaTime);
 
   if (m_overlay)
     m_overlay->render();
