@@ -3,6 +3,7 @@
 #ifndef RAZ_WINDOW_HPP
 #define RAZ_WINDOW_HPP
 
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -63,7 +64,7 @@ public:
   void addOverlayCheckbox(const std::string& text, bool initVal, std::function<void()> actionOn, std::function<void()> actionOff);
   void addOverlayFrameTime(const std::string& formattedText);
   void addOverlayFpsCounter(const std::string& formattedText);
-  bool run() const;
+  bool run();
   void setShouldClose() const { glfwSetWindowShouldClose(m_window, true); }
   void close();
 
@@ -75,6 +76,8 @@ private:
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
   OverlayPtr m_overlay {};
+  std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime {};
+  float m_deltaTime {};
 };
 
 using WindowPtr = std::unique_ptr<Window>;
