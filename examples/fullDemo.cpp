@@ -78,79 +78,112 @@ int main() {
 
   // Allow wireframe toggling
   bool isWireframe = false;
-  windowPtr->addKeyCallback(Raz::Keyboard::Z, [&isWireframe] () {
+  windowPtr->addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
     isWireframe = !isWireframe;
     glPolygonMode(GL_FRONT_AND_BACK, (isWireframe ? GL_LINE : GL_FILL));
   });
 
   // Allow face culling toggling
   bool hasFaceCulling = true;
-  windowPtr->addKeyCallback(Raz::Keyboard::N, [&hasFaceCulling, &windowPtr] () {
+  windowPtr->addKeyCallback(Raz::Keyboard::N, [&hasFaceCulling, &windowPtr] (float /* deltaTime */) {
     windowPtr->enableFaceCulling((hasFaceCulling = !hasFaceCulling));
   });
 
-  windowPtr->addKeyCallback(Raz::Keyboard::ESCAPE, [&app] () { app.quit(); });
+  windowPtr->addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
 
   // Camera controls
-  windowPtr->addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr] () { cameraPtr->move( 0.f,  0.5f, 0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::V,     [&cameraPtr] () { cameraPtr->move( 0.f, -0.5f, 0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::W,     [&cameraPtr] () { cameraPtr->move( 0.f,  0.f,  0.5f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::S,     [&cameraPtr] () { cameraPtr->move( 0.f,  0.f, -0.5f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::A,     [&cameraPtr] () { cameraPtr->move(-0.5f, 0.f,  0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::D,     [&cameraPtr] () { cameraPtr->move( 0.5f, 0.f,  0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM8,  [&cameraPtr] () { cameraPtr->rotate(-10.f, 1.f, 0.f, 0.f); }); // Looking up
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM2,  [&cameraPtr] () { cameraPtr->rotate( 10.f, 1.f, 0.f, 0.f); }); // Looking down
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM4,  [&cameraPtr] () { cameraPtr->rotate(-10.f, 0.f, 1.f, 0.f); }); // Looking left
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM6,  [&cameraPtr] () { cameraPtr->rotate( 10.f, 0.f, 1.f, 0.f); }); // Looking right
+  float cameraSpeed = 1.f;
+  windowPtr->addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
+                            [&cameraSpeed] (float /* deltaTime */) { cameraSpeed = 2.f; },
+                            [&cameraSpeed] () { cameraSpeed = 1.f; });
+  windowPtr->addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr, &cameraSpeed] (float deltaTime) {
+    cameraPtr->move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::V, [&cameraPtr, &cameraSpeed] (float deltaTime) {
+    cameraPtr->move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::W, [&cameraPtr, &cameraSpeed] (float deltaTime) {
+    cameraPtr->move(0.f, 0.f, (10.f * deltaTime) * cameraSpeed);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::S, [&cameraPtr, &cameraSpeed] (float deltaTime) {
+    cameraPtr->move(0.f,  0.f, (-10.f * deltaTime) * cameraSpeed);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::A, [&cameraPtr, &cameraSpeed] (float deltaTime) {
+    cameraPtr->move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::D, [&cameraPtr, &cameraSpeed] (float deltaTime) {
+    cameraPtr->move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
+  });
+
+  windowPtr->addKeyCallback(Raz::Keyboard::NUM8, [&cameraPtr] (float deltaTime) {
+    cameraPtr->rotate(-1.f, 90.f * deltaTime, 0.f, 0.f); // Looking up
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::NUM2, [&cameraPtr] (float deltaTime) {
+    cameraPtr->rotate(1.f, 90.f * deltaTime, 0.f, 0.f); // Looking down
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::NUM4, [&cameraPtr] (float deltaTime) {
+    cameraPtr->rotate(-1.f, 0.f, 90.f * deltaTime, 0.f); // Looking left
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::NUM6, [&cameraPtr] (float deltaTime) {
+    cameraPtr->rotate(1.f, 0.f, 90.f * deltaTime, 0.f); // Looking right
+  });
 
   // Mesh controls
-  windowPtr->addKeyCallback(Raz::Keyboard::T,     [&modelPtr] () { modelPtr->move( 0.f,  0.f,  0.5f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::G,     [&modelPtr] () { modelPtr->move( 0.f,  0.f, -0.5f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::F,     [&modelPtr] () { modelPtr->move(-0.5f, 0.f,  0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::H,     [&modelPtr] () { modelPtr->move( 0.5f, 0.f,  0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::X,     [&modelPtr] () { modelPtr->scale(0.5f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::C,     [&modelPtr] () { modelPtr->scale(2.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::UP,    [&modelPtr] () { modelPtr->rotate(-10.f, 1.f, 0.f, 0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::DOWN,  [&modelPtr] () { modelPtr->rotate( 10.f, 1.f, 0.f, 0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::LEFT,  [&modelPtr] () { modelPtr->rotate(-10.f, 0.f, 1.f, 0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] () { modelPtr->rotate( 10.f, 0.f, 1.f, 0.f); });
+  windowPtr->addKeyCallback(Raz::Keyboard::T, [&modelPtr] (float deltaTime) { modelPtr->move(0.f, 0.f,  10.f * deltaTime); });
+  windowPtr->addKeyCallback(Raz::Keyboard::G, [&modelPtr] (float deltaTime) { modelPtr->move(0.f, 0.f, -10.f * deltaTime); });
+  windowPtr->addKeyCallback(Raz::Keyboard::F, [&modelPtr] (float deltaTime) { modelPtr->move(-10.f * deltaTime, 0.f, 0.f); });
+  windowPtr->addKeyCallback(Raz::Keyboard::H, [&modelPtr] (float deltaTime) { modelPtr->move( 10.f * deltaTime, 0.f, 0.f); });
+
+  windowPtr->addKeyCallback(Raz::Keyboard::UP, [&modelPtr] (float deltaTime) {
+    modelPtr->rotate(-1.f, 90.f * deltaTime, 0.f, 0.f);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] (float deltaTime) {
+    modelPtr->rotate( 1.f, 90.f * deltaTime, 0.f, 0.f);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] (float deltaTime) {
+    modelPtr->rotate(-1.f, 0.f, 90.f * deltaTime, 0.f);
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] (float deltaTime) {
+    modelPtr->rotate( 1.f, 0.f, 90.f * deltaTime, 0.f);
+  });
 
   // Light controls
-  windowPtr->addKeyCallback(Raz::Keyboard::I, [&lightPtr, &scenePtr] () {
-    lightPtr->translate(0.f, 0.f, 0.5f);
+  windowPtr->addKeyCallback(Raz::Keyboard::I, [&lightPtr, &scenePtr] (float deltaTime) {
+    lightPtr->translate(0.f, 0.f, 10.f * deltaTime);
     scenePtr->updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::K, [&lightPtr, &scenePtr] () {
-    lightPtr->translate(0.f, 0.f, -0.5f);
+  windowPtr->addKeyCallback(Raz::Keyboard::K, [&lightPtr, &scenePtr] (float deltaTime) {
+    lightPtr->translate(0.f, 0.f, -10.f * deltaTime);
     scenePtr->updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::J, [&lightPtr, &scenePtr] () {
-    lightPtr->translate(-0.5f, 0.f, 0.f);
+  windowPtr->addKeyCallback(Raz::Keyboard::J, [&lightPtr, &scenePtr] (float deltaTime) {
+    lightPtr->translate(-10.f * deltaTime, 0.f, 0.f);
     scenePtr->updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::L, [&lightPtr, &scenePtr] () {
-    lightPtr->translate(0.5f, 0.f, 0.f);
+  windowPtr->addKeyCallback(Raz::Keyboard::L, [&lightPtr, &scenePtr] (float deltaTime) {
+    lightPtr->translate(10.f * deltaTime, 0.f, 0.f);
     scenePtr->updateLights();
   });
 
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM0, [&scenePtr, &cameraPtr] () {
+  windowPtr->addMouseButtonCallback(Raz::Mouse::LEFT_CLICK, [&scenePtr, &cameraPtr] (float /* deltaTime */) {
     scenePtr->addLight(std::make_unique<Raz::PointLight>(cameraPtr->getPosition(), 10.f, Raz::Vec3f({ 1.f, 1.f, 1.f })));
     scenePtr->updateLights();
   });
 
-  windowPtr->addKeyCallback(Raz::Keyboard::F5, [&app] () { app.updateShaders(); });
+  windowPtr->addKeyCallback(Raz::Keyboard::F5, [&app] (float /* deltaTime */) { app.updateShaders(); });
 
   // Mouse callbacks
   windowPtr->addMouseScrollCallback([&cameraPtr] (double /* xOffset */, double yOffset) {
     cameraPtr->setFieldOfView(std::max(1.f, std::min(90.f, cameraPtr->getFieldOfViewDegrees() + static_cast<float>(-yOffset) * 2.f)));
   });
+
+  windowPtr->disableCursor(); // Disabling mouse cursor to allow continous rotations
   windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {
     cameraPtr->rotate(1.f,
                       (static_cast<float>(yMove) / windowPtr->getHeight() * 90.f), // X & Y moves are inverted, unsure of why for now
-                      (static_cast<float>(xMove) / windowPtr->getWidth() * 90.f),  // Dividing by window size to scale X & Y between -1 and 1
+                      (static_cast<float>(xMove) / windowPtr->getWidth() * 90.f),  // Dividing by window size to scale between -1 and 1
                       0.f);
   });
-  windowPtr->disableCursor();
 
   // Overlay features
   windowPtr->addOverlayText("RaZ - Full demo");
