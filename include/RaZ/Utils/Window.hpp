@@ -24,11 +24,11 @@
 
 namespace Raz {
 
-using KeyboardCallbacks    = std::vector<std::tuple<int, std::function<void(float)>, std::function<void()>>>;
-using MouseButtonCallbacks = std::vector<std::tuple<int, std::function<void(float)>, std::function<void()>>>;
+using KeyboardCallbacks    = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
+using MouseButtonCallbacks = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
 using MouseScrollCallback  = std::function<void(double, double)>;
 using MouseMoveCallback    = std::tuple<double, double, std::function<void(double, double)>>;
-using InputActions         = std::unordered_map<int, std::function<void(float)>>;
+using InputActions         = std::unordered_map<int, std::pair<std::function<void(float)>, Input::ActionTrigger>>;
 using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
 
 class Window {
@@ -50,8 +50,11 @@ public:
   void showCursor() const { changeCursorState(Cursor::State::NORMAL); }
   void hideCursor() const { changeCursorState(Cursor::State::HIDDEN); }
   void disableCursor() const { changeCursorState(Cursor::State::DISABLED); }
-  void addKeyCallback(Keyboard::Key key, std::function<void(float)> actionPress, std::function<void()> actionRelease = nullptr);
+  void addKeyCallback(Keyboard::Key key, std::function<void(float)> actionPress,
+                                         Input::ActionTrigger frequency = Input::ALWAYS,
+                                         std::function<void()> actionRelease = nullptr);
   void addMouseButtonCallback(Mouse::Button button, std::function<void(float)> actionPress,
+                                                    Input::ActionTrigger frequency = Input::ALWAYS,
                                                     std::function<void()> actionRelease = nullptr);
   void addMouseScrollCallback(std::function<void(double, double)> func);
   void addMouseMoveCallback(std::function<void(double, double)> func);
