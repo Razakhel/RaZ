@@ -81,13 +81,13 @@ int main() {
   windowPtr->addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
     isWireframe = !isWireframe;
     glPolygonMode(GL_FRONT_AND_BACK, (isWireframe ? GL_LINE : GL_FILL));
-  });
+  }, Raz::Input::ONCE);
 
   // Allow face culling toggling
   bool hasFaceCulling = true;
   windowPtr->addKeyCallback(Raz::Keyboard::N, [&hasFaceCulling, &windowPtr] (float /* deltaTime */) {
     windowPtr->enableFaceCulling((hasFaceCulling = !hasFaceCulling));
-  });
+  }, Raz::Input::ONCE);
 
   windowPtr->addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
 
@@ -95,6 +95,7 @@ int main() {
   float cameraSpeed = 1.f;
   windowPtr->addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
                             [&cameraSpeed] (float /* deltaTime */) { cameraSpeed = 2.f; },
+                            Raz::Input::ONCE,
                             [&cameraSpeed] () { cameraSpeed = 1.f; });
   windowPtr->addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr, &cameraSpeed] (float deltaTime) {
     cameraPtr->move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
@@ -127,12 +128,22 @@ int main() {
   windowPtr->addKeyCallback(Raz::Keyboard::NUM6, [&cameraPtr] (float deltaTime) {
     cameraPtr->rotate(1.f, 0.f, 90.f * deltaTime, 0.f); // Looking right
   });
+  // DO A BARREL ROLL
+  windowPtr->addKeyCallback(Raz::Keyboard::Q, [&cameraPtr] (float deltaTime) {
+    cameraPtr->rotate(1.f, 0.f, 0.f, 90.f * deltaTime); // Roll to the left
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::E, [&cameraPtr] (float deltaTime) {
+    cameraPtr->rotate(-1.f, 0.f, 0.f, 90.f * deltaTime); // Roll to the right
+  });
 
   // Mesh controls
   windowPtr->addKeyCallback(Raz::Keyboard::T, [&modelPtr] (float deltaTime) { modelPtr->move(0.f, 0.f,  10.f * deltaTime); });
   windowPtr->addKeyCallback(Raz::Keyboard::G, [&modelPtr] (float deltaTime) { modelPtr->move(0.f, 0.f, -10.f * deltaTime); });
   windowPtr->addKeyCallback(Raz::Keyboard::F, [&modelPtr] (float deltaTime) { modelPtr->move(-10.f * deltaTime, 0.f, 0.f); });
   windowPtr->addKeyCallback(Raz::Keyboard::H, [&modelPtr] (float deltaTime) { modelPtr->move( 10.f * deltaTime, 0.f, 0.f); });
+
+  windowPtr->addKeyCallback(Raz::Keyboard::X, [&modelPtr] (float /* deltaTime */) { modelPtr->scale(0.5f); }, Raz::Input::ONCE);
+  windowPtr->addKeyCallback(Raz::Keyboard::C, [&modelPtr] (float /* deltaTime */) { modelPtr->scale(2.f); }, Raz::Input::ONCE);
 
   windowPtr->addKeyCallback(Raz::Keyboard::UP, [&modelPtr] (float deltaTime) {
     modelPtr->rotate(-1.f, 90.f * deltaTime, 0.f, 0.f);
@@ -165,10 +176,10 @@ int main() {
     scenePtr->updateLights();
   });
 
-  windowPtr->addMouseButtonCallback(Raz::Mouse::LEFT_CLICK, [&scenePtr, &cameraPtr] (float /* deltaTime */) {
+  windowPtr->addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&scenePtr, &cameraPtr] (float /* deltaTime */) {
     scenePtr->addLight(std::make_unique<Raz::PointLight>(cameraPtr->getPosition(), 10.f, Raz::Vec3f({ 1.f, 1.f, 1.f })));
     scenePtr->updateLights();
-  });
+  }, Raz::Input::ONCE);
 
   windowPtr->addKeyCallback(Raz::Keyboard::F5, [&app] (float /* deltaTime */) { app.updateShaders(); });
 
@@ -177,13 +188,18 @@ int main() {
     cameraPtr->setFieldOfView(std::max(1.f, std::min(90.f, cameraPtr->getFieldOfViewDegrees() + static_cast<float>(-yOffset) * 2.f)));
   });
 
-  windowPtr->disableCursor(); // Disabling mouse cursor to allow continous rotations
   windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {
     cameraPtr->rotate(1.f,
                       (static_cast<float>(yMove) / windowPtr->getHeight() * 90.f), // X & Y moves are inverted, unsure of why for now
                       (static_cast<float>(xMove) / windowPtr->getWidth() * 90.f),  // Dividing by window size to scale between -1 and 1
                       0.f);
   });
+
+  windowPtr->disableCursor(); // Disabling mouse cursor to allow continous rotations
+  windowPtr->addKeyCallback(Raz::Keyboard::LEFT_ALT,
+                            [&windowPtr] (float /* deltaTime */) { windowPtr->showCursor(); },
+                            Raz::Input::ONCE,
+                            [&windowPtr] () { windowPtr->disableCursor(); });
 
   // Overlay features
   windowPtr->addOverlayText("RaZ - Full demo");
