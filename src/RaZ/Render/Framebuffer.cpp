@@ -4,9 +4,24 @@
 
 namespace Raz {
 
-Framebuffer::Framebuffer(unsigned int width, unsigned int height, const std::string& vertShaderPath, const std::string& fragShaderPath)
-  : m_program(std::make_unique<VertexShader>(vertShaderPath),
-              std::make_unique<FragmentShader>(fragShaderPath)) {
+Framebuffer::Framebuffer(unsigned int width, unsigned int height, const std::string& fragShaderPath) {
+  const std::string vertSource = R"(
+    #version 330 core
+
+    layout (location = 0) in vec2 vertPosition;
+    layout (location = 1) in vec2 vertTexcoords;
+
+    out vec2 fragTexcoords;
+
+    void main() {
+      fragTexcoords = vertTexcoords;
+
+      gl_Position = vec4(vertPosition, 0.0, 1.0);
+    }
+  )";
+
+  m_program.setShaders(VertexShader::loadFromSource(vertSource), std::make_unique<FragmentShader>(fragShaderPath));
+
   m_depthBuffer  = std::make_shared<Texture>(width, height, ImageColorspace::DEPTH);
   m_colorBuffer  = std::make_shared<Texture>(width, height, ImageColorspace::RGBA);
   m_normalBuffer = std::make_shared<Texture>(width, height, ImageColorspace::RGB);
