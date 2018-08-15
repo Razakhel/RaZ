@@ -121,23 +121,31 @@ ModelPtr Model::importFbx(const std::string& filePath) {
 
     const FbxPropertyT<FbxDouble3>& ambient = fbxMaterial->FindProperty(FbxSurfaceMaterial::sAmbient);
     if (ambient.IsValid())
-      material->setAmbient(ambient.Get()[0], ambient.Get()[1], ambient.Get()[2]);
+      material->setAmbient(static_cast<float>(ambient.Get()[0]),
+                           static_cast<float>(ambient.Get()[1]),
+                           static_cast<float>(ambient.Get()[2]));
 
     const FbxPropertyT<FbxDouble3>& diffuse = fbxMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
     if (diffuse.IsValid())
-      material->setDiffuse(diffuse.Get()[0], diffuse.Get()[1], diffuse.Get()[2]);
+      material->setDiffuse(static_cast<float>(diffuse.Get()[0]),
+                           static_cast<float>(diffuse.Get()[1]),
+                           static_cast<float>(diffuse.Get()[2]));
 
     const FbxPropertyT<FbxDouble3>& specular = fbxMaterial->FindProperty(FbxSurfaceMaterial::sSpecular);
     if (specular.IsValid())
-      material->setSpecular(specular.Get()[0], specular.Get()[1], specular.Get()[2]);
+      material->setSpecular(static_cast<float>(specular.Get()[0]),
+                            static_cast<float>(specular.Get()[1]),
+                            static_cast<float>(specular.Get()[2]));
 
     const FbxPropertyT<FbxDouble3>& emissive = fbxMaterial->FindProperty(FbxSurfaceMaterial::sEmissive);
     if (emissive.IsValid())
-      material->setEmissive(emissive.Get()[0], emissive.Get()[1], emissive.Get()[2]);
+      material->setEmissive(static_cast<float>(emissive.Get()[0]),
+                            static_cast<float>(emissive.Get()[1]),
+                            static_cast<float>(emissive.Get()[2]));
 
     const FbxPropertyT<FbxDouble>& transparency = fbxMaterial->FindProperty(FbxSurfaceMaterial::sTransparencyFactor);
     if (transparency.IsValid())
-      material->setTransparency(transparency.Get());
+      material->setTransparency(static_cast<float>(transparency.Get()));
 
     // Recovering textures
     const std::string texturePath = FileUtils::extractPathToFile(filePath);

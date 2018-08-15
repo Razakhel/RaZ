@@ -7,6 +7,15 @@
 
 namespace Raz {
 
+namespace Input {
+
+enum ActionTrigger {
+  ONCE,
+  ALWAYS
+};
+
+} // namespace Input
+
 namespace Keyboard {
 
 enum Key {
