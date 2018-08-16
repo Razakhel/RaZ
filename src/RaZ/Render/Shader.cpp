@@ -10,6 +10,9 @@
 namespace Raz {
 
 void Shader::load() const {
+  if (m_path.empty()) // Shader imported directly from source, no path available
+    return;
+
   std::ifstream shaderSource(m_path, std::ios::in | std::ios::binary | std::ios::ate);
 
   if (!shaderSource)
