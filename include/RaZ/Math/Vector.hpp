@@ -86,6 +86,14 @@ using Vec2d = Vec2<double>;
 using Vec3d = Vec3<double>;
 using Vec4d = Vec4<double>;
 
+namespace Axis {
+
+const Vec3f X({ 1.f, 0.f, 0.f });
+const Vec3f Y({ 0.f, 1.f, 0.f });
+const Vec3f Z({ 0.f, 0.f, 1.f });
+
+}
+
 } // namespace Raz
 
 #include "RaZ/Math/Vector.inl"
