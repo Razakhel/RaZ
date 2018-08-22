@@ -24,7 +24,7 @@ public:
   virtual void move(const Vec3f& displacement) { translate(displacement * Mat3f(m_rotation)); }
   virtual void translate(float x, float y, float z);
   virtual void translate(const Vec3f& values) { translate(values[0], values[1], values[2]); }
-  virtual void rotate(float angle, float x, float y, float z);
+  virtual void rotate(float angle, const Vec3f& axis);
   virtual void scale(float x, float y, float z);
   virtual void scale(float val) { scale(val, val, val); }
   virtual void scale(const Vec3f& values) { scale(values[0], values[1], values[2]); }

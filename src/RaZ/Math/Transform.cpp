@@ -9,8 +9,8 @@ void Transform::translate(float x, float y, float z) {
   m_position[2] += z;
 }
 
-void Transform::rotate(float angle, float x, float y, float z) {
-  const Quaternionf quaternion(angle, x, y, z);
+void Transform::rotate(float angle, const Vec3f& axis) {
+  const Quaternionf quaternion(angle, axis);
   m_rotation = m_rotation * quaternion.computeMatrix();
 }
 
