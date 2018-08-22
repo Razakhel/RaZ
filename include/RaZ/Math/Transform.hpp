@@ -20,6 +20,13 @@ public:
   const Vec3f& getScale() const { return m_scale; }
   Vec3f& getScale() { return m_scale; }
 
+  void setPosition(const Vec3f& position) { m_position = position; }
+  void setPosition(float x, float y, float z) { setPosition(Vec3f({ x, y, z })); }
+  void setRotation(const Mat4f& rotation) { m_rotation = rotation; }
+  void setScale(const Vec3f& scale) { m_scale = scale; }
+  void setScale(float val) { setScale(val, val, val); }
+  void setScale(float x, float y, float z) { setScale(Vec3f({ x, y, z })); }
+
   virtual void move(float x, float y, float z) { move(Vec3f({ x, y, z })); }
   virtual void move(const Vec3f& displacement) { translate(displacement * Mat3f(m_rotation)); }
   virtual void translate(float x, float y, float z);
