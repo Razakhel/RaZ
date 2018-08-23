@@ -33,8 +33,8 @@ void Camera::translate(float x, float y, float z) {
   computeInverseViewMatrix();
 }
 
-void Camera::rotate(float angle, float x, float y, float z) {
-  Transform::rotate(angle, x, y, z);
+void Camera::rotate(float angle, const Vec3f& axis) {
+  Transform::rotate(angle, axis);
   computeViewMatrix();
   computeInverseViewMatrix();
 }
