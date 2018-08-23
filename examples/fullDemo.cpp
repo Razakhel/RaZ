@@ -7,38 +7,22 @@ int main() {
   Raz::WindowPtr window = std::make_unique<Raz::Window>(1280, 720, "RaZ - Full demo", 4);
   window->enableOverlay();
 
-  Raz::VertexShaderPtr vertShader = std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl");
-  Raz::FragmentShaderPtr fragShader;
-
-  const auto img = std::make_shared<Raz::Texture>("../../assets/textures/lava.tga");
-
   const auto startTime = std::chrono::system_clock::now();
-  // If FBX SDK linked, load an FBX mesh
-#if defined(FBX_ENABLED)
-  fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/blinn-phong.glsl");
-  Raz::ModelPtr model = Raz::Model::import("../../assets/meshes/shaderBall.fbx");
-
-  dynamic_cast<Raz::MaterialStandard*>(model->getMesh()->getMaterials().front().get())->setDiffuseMap(img);
-
-  model->translate(0.f, -1.f, 0.f);
-  model->scale(0.01f);
-  model->rotate(180.f, 0.f, 1.f, 0.f);
-#else
-  fragShader = std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl");
   Raz::ModelPtr model = Raz::Model::import("../../assets/meshes/shield.obj");
-
-  dynamic_cast<Raz::MaterialCookTorrance*>(model->getMesh()->getMaterials().front().get())->setAlbedoMap(img);
-
-  model->scale(0.2f);
-  model->rotate(180.f, 0.f, 1.f, 0.f);
-#endif
   const auto endTime = std::chrono::system_clock::now();
 
   std::cout << "Mesh loading duration: "
             << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
             << " seconds." << std::endl;
 
-  Raz::ScenePtr scene = std::make_unique<Raz::Scene>(std::move(vertShader), std::move(fragShader));
+  model->scale(0.2f);
+  model->rotate(180.f, Raz::Axis::Y);
+
+  const auto img = std::make_shared<Raz::Texture>("../../assets/skyboxes/arches_pine_tree.hdr");
+  //dynamic_cast<Raz::MaterialCookTorrance*>(model->getMesh()->getMaterials().front().get())->setAlbedoMap(img);
+
+  Raz::ScenePtr scene = std::make_unique<Raz::Scene>(std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl"),
+                                                     std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl"));
 
   Raz::CubemapPtr cubemap = std::make_unique<Raz::Cubemap>("../../assets/skyboxes/clouds_right.png",
                                                            "../../assets/skyboxes/clouds_left.png",
@@ -117,23 +101,23 @@ int main() {
   });
 
   windowPtr->addKeyCallback(Raz::Keyboard::NUM8, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(-1.f, 90.f * deltaTime, 0.f, 0.f); // Looking up
+    cameraPtr->rotate(-90.f * deltaTime, Raz::Axis::X); // Looking up
   });
   windowPtr->addKeyCallback(Raz::Keyboard::NUM2, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(1.f, 90.f * deltaTime, 0.f, 0.f); // Looking down
+    cameraPtr->rotate(90.f * deltaTime, Raz::Axis::X); // Looking down
   });
   windowPtr->addKeyCallback(Raz::Keyboard::NUM4, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(-1.f, 0.f, 90.f * deltaTime, 0.f); // Looking left
+    cameraPtr->rotate(-90.f * deltaTime, Raz::Axis::Y); // Looking left
   });
   windowPtr->addKeyCallback(Raz::Keyboard::NUM6, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(1.f, 0.f, 90.f * deltaTime, 0.f); // Looking right
+    cameraPtr->rotate(90.f * deltaTime, Raz::Axis::Y); // Looking right
   });
   // DO A BARREL ROLL
   windowPtr->addKeyCallback(Raz::Keyboard::Q, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(1.f, 0.f, 0.f, 90.f * deltaTime); // Roll to the left
+    cameraPtr->rotate(90.f * deltaTime, Raz::Axis::Z); // Roll to the left
   });
   windowPtr->addKeyCallback(Raz::Keyboard::E, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(-1.f, 0.f, 0.f, 90.f * deltaTime); // Roll to the right
+    cameraPtr->rotate(-90.f * deltaTime, Raz::Axis::Z); // Roll to the right
   });
 
   // Mesh controls
@@ -146,16 +130,16 @@ int main() {
   windowPtr->addKeyCallback(Raz::Keyboard::C, [&modelPtr] (float /* deltaTime */) { modelPtr->scale(2.f); }, Raz::Input::ONCE);
 
   windowPtr->addKeyCallback(Raz::Keyboard::UP, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate(-1.f, 90.f * deltaTime, 0.f, 0.f);
+    modelPtr->rotate(-90.f * deltaTime, Raz::Axis::X);
   });
   windowPtr->addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate( 1.f, 90.f * deltaTime, 0.f, 0.f);
+    modelPtr->rotate(90.f * deltaTime, Raz::Axis::X);
   });
   windowPtr->addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate(-1.f, 0.f, 90.f * deltaTime, 0.f);
+    modelPtr->rotate(-90.f * deltaTime, Raz::Axis::Y);
   });
   windowPtr->addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate( 1.f, 0.f, 90.f * deltaTime, 0.f);
+    modelPtr->rotate(90.f * deltaTime, Raz::Axis::Y);
   });
 
   // Light controls
@@ -189,10 +173,10 @@ int main() {
   });
 
   windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {
-    cameraPtr->rotate(1.f,
-                      (static_cast<float>(yMove) / windowPtr->getHeight() * 90.f), // X & Y moves are inverted, unsure of why for now
-                      (static_cast<float>(xMove) / windowPtr->getWidth() * 90.f),  // Dividing by window size to scale between -1 and 1
-                      0.f);
+    // Dividing move by window size to scale between -1 and 1
+    // X & Y moves are inverted, unsure of why for now
+    cameraPtr->rotate(90.f * static_cast<float>(yMove) / windowPtr->getHeight(), Raz::Axis::X);
+    cameraPtr->rotate(90.f * static_cast<float>(xMove) / windowPtr->getWidth(), Raz::Axis::Y);
   });
 
   windowPtr->disableCursor(); // Disabling mouse cursor to allow continous rotations
