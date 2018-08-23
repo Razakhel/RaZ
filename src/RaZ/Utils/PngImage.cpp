@@ -1,5 +1,6 @@
 #include <array>
 #include <fstream>
+#include <iostream>
 
 #include "png/png.h"
 #include "png/zlib.h"
@@ -77,6 +78,9 @@ void Image::readPng(std::ifstream& file, bool reverse) {
       m_colorspace = ImageColorspace::RGBA;
       break;
   }
+
+  if (!png_set_interlace_handling(readStruct))
+    std::cerr << "Error: Couldn't set PNG interlace handling" << std::endl;
 
   png_set_scale_16(readStruct);
 
