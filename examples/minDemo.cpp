@@ -1,14 +1,14 @@
 #include "RaZ/RaZ.hpp"
 
 int main() {
-  Raz::WindowPtr window = std::make_unique<Raz::Window>(800, 600);
+  Raz::WindowPtr window = Raz::Window::create(800, 600);
 
   const Raz::Application app(std::move(window),
-                             std::make_unique<Raz::Scene>(std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl"),
-                                                          std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl")));
+                             Raz::Scene::create(Raz::VertexShader::create("../../shaders/vert.glsl"),
+                                                Raz::FragmentShader::create("../../shaders/cook-torrance.glsl")));
 
   app.getScene()->addModel(Raz::Model::import("../../assets/meshes/ball.obj"));
-  app.getScene()->addLight(std::make_unique<Raz::DirectionalLight>(Raz::Vec3f({ 0.f, 0.f, 1.f })));
+  app.getScene()->addLight(Raz::DirectionalLight::create(Raz::Vec3f({ 0.f, 0.f, 1.f })));
   app.getScene()->load();
 
   app.getCamera()->translate(0.f, 0.f, -5.f);

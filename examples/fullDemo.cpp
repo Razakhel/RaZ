@@ -4,7 +4,7 @@
 #include "RaZ/RaZ.hpp"
 
 int main() {
-  Raz::WindowPtr window = std::make_unique<Raz::Window>(1280, 720, "RaZ - Full demo", 4);
+  Raz::WindowPtr window = Raz::Window::create(1280, 720, "RaZ - Full demo", 4);
   window->enableOverlay();
 
   const auto startTime = std::chrono::system_clock::now();
@@ -18,32 +18,32 @@ int main() {
   model->scale(0.2f);
   model->rotate(180.f, Raz::Axis::Y);
 
-  const auto img = std::make_shared<Raz::Texture>("../../assets/skyboxes/arches_pine_tree.hdr");
+  const auto img = Raz::Texture::create("../../assets/skyboxes/arches_pine_tree.hdr");
   //dynamic_cast<Raz::MaterialCookTorrance*>(model->getMesh()->getMaterials().front().get())->setAlbedoMap(img);
 
-  Raz::ScenePtr scene = std::make_unique<Raz::Scene>(std::make_unique<Raz::VertexShader>("../../shaders/vert.glsl"),
-                                                     std::make_unique<Raz::FragmentShader>("../../shaders/cook-torrance.glsl"));
+  Raz::ScenePtr scene = Raz::Scene::create(Raz::VertexShader::create("../../shaders/vert.glsl"),
+                                           Raz::FragmentShader::create("../../shaders/cook-torrance.glsl"));
 
-  Raz::CubemapPtr cubemap = std::make_unique<Raz::Cubemap>("../../assets/skyboxes/clouds_right.png",
-                                                           "../../assets/skyboxes/clouds_left.png",
-                                                           "../../assets/skyboxes/clouds_top.png",
-                                                           "../../assets/skyboxes/clouds_bottom.png",
-                                                           "../../assets/skyboxes/clouds_front.png",
-                                                           "../../assets/skyboxes/clouds_back.png");
+  Raz::CubemapPtr cubemap = Raz::Cubemap::create("../../assets/skyboxes/clouds_right.png",
+                                                 "../../assets/skyboxes/clouds_left.png",
+                                                 "../../assets/skyboxes/clouds_top.png",
+                                                 "../../assets/skyboxes/clouds_bottom.png",
+                                                 "../../assets/skyboxes/clouds_front.png",
+                                                 "../../assets/skyboxes/clouds_back.png");
 
-  /*Raz::LightPtr light = std::make_unique<Raz::PointLight>(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
-                                                          10.f,                           // Energy
-                                                          Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/
-  Raz::LightPtr light = std::make_unique<Raz::DirectionalLight>(Raz::Vec3f({ 0.f, 0.f, 1.f }),  // Direction
-                                                                1.f,                            // Energy
-                                                                Raz::Vec3f({ 1.f, 1.f, 1.f }),  // Color (R/G/B)
-                                                                Raz::Vec3f({ 0.f, 1.f, 0.f })); // Position
+  /*Raz::LightPtr light = Raz::PointLight::create(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
+                                                  10.f,                           // Energy
+                                                  Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/
+  Raz::LightPtr light = Raz::DirectionalLight::create(Raz::Vec3f({ 0.f, 0.f, 1.f }),  // Direction
+                                                      1.f,                            // Energy
+                                                      Raz::Vec3f({ 1.f, 1.f, 1.f }),  // Color (R/G/B)
+                                                      Raz::Vec3f({ 0.f, 1.f, 0.f })); // Position
 
-  Raz::CameraPtr camera = std::make_unique<Raz::Camera>(window->getWidth(),
-                                                        window->getHeight(),
-                                                        45.f,                            // Field of view
-                                                        0.1f, 100.f,                     // Near plane, far plane
-                                                        Raz::Vec3f({ 0.f, 0.f, -5.f })); // Initial position
+  Raz::CameraPtr camera = Raz::Camera::create(window->getWidth(),
+                                              window->getHeight(),
+                                              45.f,                            // Field of view
+                                              0.1f, 100.f,                     // Near plane, far plane
+                                              Raz::Vec3f({ 0.f, 0.f, -5.f })); // Initial position
 
   const auto modelPtr  = model.get();
   const auto lightPtr  = light.get();
@@ -161,7 +161,7 @@ int main() {
   });
 
   windowPtr->addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&scenePtr, &cameraPtr] (float /* deltaTime */) {
-    scenePtr->addLight(std::make_unique<Raz::PointLight>(cameraPtr->getPosition(), 10.f, Raz::Vec3f({ 1.f, 1.f, 1.f })));
+    scenePtr->addLight(Raz::PointLight::create(cameraPtr->getPosition(), 10.f, Raz::Vec3f({ 1.f, 1.f, 1.f })));
     scenePtr->updateLights();
   }, Raz::Input::ONCE);
 
