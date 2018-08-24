@@ -12,6 +12,15 @@
 
 namespace Raz {
 
+class Material;
+using MaterialPtr = std::unique_ptr<Material>;
+
+class MaterialStandard;
+using MaterialStandardPtr = std::unique_ptr<MaterialStandard>;
+
+class MaterialCookTorrance;
+using MaterialCookTorrancePtr = std::unique_ptr<MaterialCookTorrance>;
+
 enum class MaterialType {
   STANDARD = 0,
   COOK_TORRANCE
@@ -22,16 +31,14 @@ enum class MaterialPreset {
   IRON, SILVER, ALUMINIUM, GOLD, COPPER, CHROMIUM, NICKEL, TITANIUM, COBALT, PLATINUM // Metallic presets
 };
 
-class MaterialCookTorrance;
-
 class Material {
 public:
   Material(const Material&) = default;
 
   virtual MaterialType getType() const = 0;
 
-  static std::unique_ptr<MaterialCookTorrance> recoverMaterial(MaterialPreset preset, float roughnessFactor);
-  virtual std::unique_ptr<Material> clone() const = 0;
+  static MaterialCookTorrancePtr recoverMaterial(MaterialPreset preset, float roughnessFactor);
+  virtual MaterialPtr clone() const = 0;
   virtual void initTextures(const ShaderProgram& program) const = 0;
   virtual void bindAttributes(const ShaderProgram& program) const = 0;
 
@@ -40,8 +47,6 @@ public:
 protected:
   Material() = default;
 };
-
-using MaterialPtr = std::unique_ptr<Material>;
 
 class MaterialStandard : public Material {
 public:
@@ -80,6 +85,9 @@ public:
   void setTransparencyMap(const TexturePtr& transparencyMap) { m_transparencyMap = transparencyMap; }
   void setBumpMap(const TexturePtr& bumpMap) { m_bumpMap = bumpMap; }
 
+  template <typename... Args>
+  static MaterialStandardPtr create(Args&&... args) { return std::make_unique<MaterialStandard>(std::forward<Args>(args)...); }
+
   void loadAmbientMap(const std::string& fileName) { m_ambientMap = std::make_shared<Texture>(fileName); }
   void loadDiffuseMap(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
   void loadSpecularMap(const std::string& fileName) { m_specularMap = std::make_shared<Texture>(fileName); }
@@ -87,7 +95,7 @@ public:
   void loadTransparencyMap(const std::string& fileName) { m_transparencyMap = std::make_shared<Texture>(fileName); }
   void loadBumpMap(const std::string& fileName) { m_bumpMap = std::make_shared<Texture>(fileName); }
 
-  std::unique_ptr<Material> clone() const override { return std::make_unique<MaterialStandard>(*this); }
+  MaterialPtr clone() const override { return MaterialStandard::create(*this); }
   void initTextures(const ShaderProgram& program) const override;
   void bindAttributes(const ShaderProgram& program) const override;
 
@@ -136,13 +144,16 @@ public:
   void setRoughnessMap(const TexturePtr& roughnessMap) { m_roughnessMap = roughnessMap; }
   void setAmbientOcclusionMap(const TexturePtr& ambientOcclusionMap) { m_ambientOcclusionMap = ambientOcclusionMap; }
 
+  template <typename... Args>
+  static MaterialCookTorrancePtr create(Args&&... args) { return std::make_unique<MaterialCookTorrance>(std::forward<Args>(args)...); }
+
   void loadAlbedoMap(const std::string& fileName) { m_albedoMap = std::make_shared<Texture>(fileName); }
   void loadNormalMap(const std::string& fileName) { m_normalMap = std::make_shared<Texture>(fileName); }
   void loadMetallicMap(const std::string& fileName) { m_metallicMap = std::make_shared<Texture>(fileName); }
   void loadRoughnessMap(const std::string& fileName) { m_roughnessMap = std::make_shared<Texture>(fileName); }
   void loadAmbientOcclusionMap(const std::string& fileName) { m_ambientOcclusionMap = std::make_shared<Texture>(fileName); }
 
-  std::unique_ptr<Material> clone() const override { return std::make_unique<MaterialCookTorrance>(*this); }
+  MaterialPtr clone() const override { return MaterialCookTorrance::create(*this); }
   void initTextures(const ShaderProgram& program) const override;
   void bindAttributes(const ShaderProgram& program) const override;
 

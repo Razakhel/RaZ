@@ -9,6 +9,9 @@
 
 namespace Raz {
 
+class Submesh;
+using SubmeshPtr = std::unique_ptr<Submesh>;
+
 class Submesh {
 public:
   Submesh() = default;
@@ -27,6 +30,9 @@ public:
   std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
   std::size_t getIndexCount() const { return getEbo().getIndices().size(); }
 
+  template <typename... Args>
+  static SubmeshPtr create(Args&&... args) { return std::make_unique<Submesh>(std::forward<Args>(args)...); }
+
   void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
 
   void load() const;
@@ -38,8 +44,6 @@ private:
 
   std::size_t m_materialIndex {};
 };
-
-using SubmeshPtr = std::unique_ptr<Submesh>;
 
 } // namespace Raz
 

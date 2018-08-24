@@ -14,6 +14,9 @@
 
 namespace Raz {
 
+class Cubemap;
+using CubemapPtr = std::unique_ptr<Cubemap>;
+
 class Cubemap {
 public:
   Cubemap();
@@ -23,6 +26,9 @@ public:
     : Cubemap() { load(rightTexturePath, leftTexturePath, topTexturePath, bottomTexturePath, frontTexturePath, backTexturePath); }
 
   const ShaderProgram& getProgram() const { return m_program; }
+
+  template <typename... Args>
+  static CubemapPtr create(Args&&... args) { return std::make_unique<Cubemap>(std::forward<Args>(args)...); }
 
   void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_viewProjUbo.sendData(viewProjMat, 0); }
 
@@ -38,8 +44,6 @@ private:
   ShaderProgram m_program;
   UniformBuffer m_viewProjUbo = UniformBuffer(sizeof(Mat4f), 1);
 };
-
-using CubemapPtr = std::unique_ptr<Cubemap>;
 
 } // namespace Raz
 

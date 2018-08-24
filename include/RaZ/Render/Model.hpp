@@ -11,7 +11,6 @@
 namespace Raz {
 
 class Model;
-
 using ModelPtr = std::unique_ptr<Model>;
 
 class Model : public Transform {
@@ -20,7 +19,9 @@ public:
 
   const MeshPtr& getMesh() const { return m_mesh; }
 
+  template <typename... Args> static ModelPtr create(Args&&... args) { return std::make_unique<Model>(std::forward<Args>(args)...); }
   static ModelPtr import(const std::string& filePath);
+
   void save(const std::string& filePath) const;
   void load(const ShaderProgram& program) const { m_mesh->load(&program); }
   void draw(const ShaderProgram& program) const { m_mesh->draw(&program); }

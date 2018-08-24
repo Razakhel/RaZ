@@ -12,6 +12,9 @@
 
 namespace Raz {
 
+class Camera;
+using CameraPtr = std::unique_ptr<Camera>;
+
 class Camera : public Transform {
 public:
   Camera(unsigned int frameWidth, unsigned int frameHeight,
@@ -26,6 +29,8 @@ public:
   const Mat4f& getInverseProjectionMatrix() const { return m_invProjMat; }
 
   void setFieldOfView(float fieldOfViewDegrees);
+
+  template <typename... Args> static CameraPtr create(Args&&... args) { return std::make_unique<Camera>(std::forward<Args>(args)...); }
 
   void move(float x, float y, float z) override { move(Vec3f({ x, y, z })); }
   void move(const Vec3f& displacement) override;
@@ -49,8 +54,6 @@ private:
   Mat4f m_projMat;
   Mat4f m_invProjMat;
 };
-
-using CameraPtr = std::unique_ptr<Camera>;
 
 } // namespace Raz
 

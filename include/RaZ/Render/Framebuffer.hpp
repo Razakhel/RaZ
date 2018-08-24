@@ -10,6 +10,9 @@
 
 namespace Raz {
 
+class Framebuffer;
+using FramebufferPtr = std::unique_ptr<Framebuffer>;
+
 class Framebuffer {
 public:
   Framebuffer(unsigned int width, unsigned int height, const std::string& fragShaderPath);
@@ -21,6 +24,9 @@ public:
   const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
   TexturePtr& getNormalBuffer() { return m_normalBuffer; }
   const ShaderProgram& getProgram() const { return m_program; }
+
+  template <typename... Args>
+  static FramebufferPtr create(Args&&... args) { return std::make_unique<Framebuffer>(std::forward<Args>(args)...); }
 
   void initBuffers() const;
   void bind() const;
@@ -36,8 +42,6 @@ private:
   TexturePtr m_normalBuffer;
   ShaderProgram m_program;
 };
-
-using FramebufferPtr = std::unique_ptr<Framebuffer>;
 
 } // namespace Raz
 

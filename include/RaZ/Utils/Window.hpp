@@ -24,6 +24,9 @@
 
 namespace Raz {
 
+class Window;
+using WindowPtr = std::unique_ptr<Window>;
+
 using KeyboardCallbacks    = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
 using MouseButtonCallbacks = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
 using MouseScrollCallback  = std::function<void(double, double)>;
@@ -41,6 +44,9 @@ public:
   void setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
   void setIcon(const Image& img) const;
   void setIcon(const std::string& fileName) const { setIcon(Image(fileName, true)); }
+
+  template <typename... Args> static WindowPtr create(Args&&... args) { return std::make_unique<Window>(std::forward<Args>(args)...); }
+
   void enableFaceCulling(bool value = true) const;
   void disableFaceCulling() const { enableFaceCulling(false); }
   bool recoverVerticalSyncState() const;
@@ -83,8 +89,6 @@ private:
   std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime {};
   float m_deltaTime {};
 };
-
-using WindowPtr = std::unique_ptr<Window>;
 
 } // namespace Raz
 

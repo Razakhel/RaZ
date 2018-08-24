@@ -10,6 +10,18 @@
 
 namespace Raz {
 
+class Light;
+using LightPtr = std::unique_ptr<Light>;
+
+class PointLight;
+using PointLightPtr = std::unique_ptr<PointLight>;
+
+class DirectionalLight;
+using DirectionalLightPtr = std::unique_ptr<DirectionalLight>;
+
+class SpotLight;
+using SpotLightPtr = std::unique_ptr<SpotLight>;
+
 class Light : public Transform {
 public:
   virtual Vec4f getHomogeneousPosition() const = 0;
@@ -35,13 +47,14 @@ protected:
   Vec3f m_color {};
 };
 
-using LightPtr = std::unique_ptr<Light>;
-
 class PointLight : public Light {
 public:
   explicit PointLight(const Vec3f& position, float energy = 1.f, const Vec3f& color = Vec3f(1.f)) : Light(position, energy, color) {}
 
   Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 1.f); }
+
+  template <typename... Args>
+  static PointLightPtr create(Args&&... args) { return std::make_unique<PointLight>(std::forward<Args>(args)...); }
 };
 
 class DirectionalLight : public Light {
@@ -50,6 +63,9 @@ public:
     : Light(position, direction, energy, color) {}
 
   Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 0.f); }
+
+  template <typename... Args>
+  static DirectionalLightPtr create(Args&&... args) { return std::make_unique<DirectionalLight>(std::forward<Args>(args)...); }
 };
 
 class SpotLight : public Light {
@@ -58,6 +74,9 @@ public:
     : Light(position, direction, angle, energy, color) {}
 
   Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 1.f); }
+
+  template <typename... Args>
+  static SpotLight create(Args&&... args) { return std::make_unique<SpotLight>(std::forward<Args>(args)...); }
 };
 
 } // namespace Raz

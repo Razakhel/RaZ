@@ -10,6 +10,18 @@
 
 namespace Raz {
 
+class Shader;
+using ShaderPtr = std::unique_ptr<Shader>;
+
+class VertexShader;
+using VertexShaderPtr = std::unique_ptr<VertexShader>;
+
+class FragmentShader;
+using FragmentShaderPtr = std::unique_ptr<FragmentShader>;
+
+class GeometryShader;
+using GeometryShaderPtr = std::unique_ptr<GeometryShader>;
+
 class Shader {
 public:
   GLuint getIndex() const { return m_index; }
@@ -30,30 +42,30 @@ public:
   VertexShader() { m_index = glCreateShader(GL_VERTEX_SHADER); }
   explicit VertexShader(std::string fileName);
 
-  static std::unique_ptr<VertexShader> loadFromSource(const std::string& source);
+  template <typename... Args>
+  static VertexShaderPtr create(Args&&... args) { return std::make_unique<VertexShader>(std::forward<Args>(args)...); }
+  static VertexShaderPtr loadFromSource(const std::string& source);
 };
-
-using VertexShaderPtr = std::unique_ptr<VertexShader>;
 
 class FragmentShader : public Shader {
 public:
   FragmentShader() { m_index = glCreateShader(GL_FRAGMENT_SHADER); }
   explicit FragmentShader(std::string fileName);
 
-  static std::unique_ptr<FragmentShader> loadFromSource(const std::string& source);
+  template <typename... Args>
+  static FragmentShaderPtr create(Args&&... args) { return std::make_unique<FragmentShader>(std::forward<Args>(args)...); }
+  static FragmentShaderPtr loadFromSource(const std::string& source);
 };
-
-using FragmentShaderPtr = std::unique_ptr<FragmentShader>;
 
 class GeometryShader : public Shader {
 public:
   GeometryShader() { m_index = glCreateShader(GL_GEOMETRY_SHADER); }
   explicit GeometryShader(std::string fileName);
 
-  static std::unique_ptr<GeometryShader> loadFromSource(const std::string& source);
+  template <typename... Args>
+  static GeometryShaderPtr create(Args&&... args) { return std::make_unique<GeometryShader>(std::forward<Args>(args)...); }
+  static GeometryShaderPtr loadFromSource(const std::string& source);
 };
-
-using GeometryShaderPtr = std::unique_ptr<GeometryShader>;
 
 } // namespace Raz
 

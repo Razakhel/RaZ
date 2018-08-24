@@ -13,6 +13,9 @@
 
 namespace Raz {
 
+class Overlay;
+using OverlayPtr = std::unique_ptr<Overlay>;
+
 enum class OverlayElementType { TEXT,
                                 BUTTON,
                                 CHECKBOX,
@@ -24,6 +27,9 @@ using OverlayElements = std::vector<std::tuple<OverlayElementType, std::string, 
 class Overlay {
 public:
   explicit Overlay(GLFWwindow* window);
+
+  template <typename... Args>
+  static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
 
   void addElement(OverlayElementType type, const std::string& text,
                   std::function<void()> actionOn = nullptr, std::function<void()> actionOff = nullptr);
@@ -40,8 +46,6 @@ private:
   OverlayElements m_elements;
   std::unordered_map<std::size_t, bool> m_toggles;
 };
-
-using OverlayPtr = std::unique_ptr<Overlay>;
 
 } // namespace Raz
 

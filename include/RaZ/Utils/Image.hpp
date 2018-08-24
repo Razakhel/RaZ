@@ -11,6 +11,12 @@
 
 namespace Raz {
 
+struct ImageData;
+using ImageDataPtr = std::unique_ptr<ImageData>;
+
+class Image;
+using ImagePtr = std::unique_ptr<Image>;
+
 enum class ImageDataType : uint8_t { BYTE = 0,
                                      FLOAT };
 
@@ -23,8 +29,6 @@ struct ImageData {
 
   virtual ~ImageData() = default;
 };
-
-using ImageDataPtr = std::unique_ptr<ImageData>;
 
 struct ImageDataB : public ImageData {
   ImageDataType getDataType() const override { return ImageDataType::BYTE; }
@@ -63,6 +67,8 @@ public:
   ImageDataType getDataType() const { return m_data->getDataType(); }
   const void* getDataPtr() const { return m_data->getDataPtr(); }
 
+  template <typename... Args> static ImagePtr create(Args&&... args) { return std::make_unique<Image>(std::forward<Args>(args)...); }
+
   bool isEmpty() const { return (!m_data || m_data->isEmpty()); }
   void read(const std::string& filePath, bool reverse = false);
   void save(const std::string& filePath, bool reverse = false) const;
@@ -80,8 +86,6 @@ private:
   uint8_t m_bitDepth {};
   ImageDataPtr m_data {};
 };
-
-using ImagePtr = std::unique_ptr<Image>;
 
 } // namespace Raz
 

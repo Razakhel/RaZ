@@ -12,6 +12,9 @@
 
 namespace Raz {
 
+class Scene;
+using ScenePtr = std::unique_ptr<Scene>;
+
 class Scene {
 public:
   Scene(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, GeometryShaderPtr geomShader = nullptr)
@@ -27,6 +30,8 @@ public:
 
   void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
 
+  template <typename... Args> static ScenePtr create(Args&&... args) { return std::make_unique<Scene>(std::forward<Args>(args)...); }
+
   void addModel(ModelPtr model) { m_models.emplace_back(std::move(model)); }
   void addLight(LightPtr light) { m_lights.emplace_back(std::move(light)); }
   void load() const;
@@ -39,8 +44,6 @@ private:
   std::vector<ModelPtr> m_models {};
   std::vector<LightPtr> m_lights {};
 };
-
-using ScenePtr = std::unique_ptr<Scene>;
 
 } // namespace Raz
 

@@ -12,6 +12,9 @@
 
 namespace Raz {
 
+class Mesh;
+using MeshPtr = std::unique_ptr<Mesh>;
+
 class Mesh {
 public:
   Mesh() { m_submeshes.emplace_back(std::make_unique<Submesh>()); }
@@ -23,11 +26,11 @@ public:
   std::size_t recoverVertexCount() const;
   std::size_t recoverTriangleCount() const;
 
-  static std::unique_ptr<Mesh> createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos);
-  static std::unique_ptr<Mesh> createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos,
-                                          const Vec3f& rightBottomPos, const Vec3f& leftBottomPos);
-  static std::unique_ptr<Mesh> createAABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos);
-
+  template <typename... Args> static MeshPtr create(Args&&... args) { return std::make_unique<Mesh>(std::forward<Args>(args)...); }
+  static MeshPtr createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos);
+  static MeshPtr createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos,
+                            const Vec3f& rightBottomPos, const Vec3f& leftBottomPos);
+  static MeshPtr createAABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos);
   static void drawQuad();
   static void drawCube();
 
@@ -41,8 +44,6 @@ private:
   std::vector<SubmeshPtr> m_submeshes {};
   std::vector<MaterialPtr> m_materials {};
 };
-
-using MeshPtr = std::unique_ptr<Mesh>;
 
 } // namespace Raz
 
