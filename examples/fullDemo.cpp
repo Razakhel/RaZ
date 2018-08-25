@@ -18,9 +18,6 @@ int main() {
   model->scale(0.2f);
   model->rotate(180.f, Raz::Axis::Y);
 
-  const auto img = Raz::Texture::create("../../assets/skyboxes/arches_pine_tree.hdr");
-  //dynamic_cast<Raz::MaterialCookTorrance*>(model->getMesh()->getMaterials().front().get())->setAlbedoMap(img);
-
   Raz::ScenePtr scene = Raz::Scene::create(Raz::VertexShader::create("../../shaders/vert.glsl"),
                                            Raz::FragmentShader::create("../../shaders/cook-torrance.glsl"));
 
@@ -175,8 +172,9 @@ int main() {
   windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {
     // Dividing move by window size to scale between -1 and 1
     // X & Y moves are inverted, unsure of why for now
-    cameraPtr->rotate(90.f * static_cast<float>(yMove) / windowPtr->getHeight(), Raz::Axis::X);
-    cameraPtr->rotate(90.f * static_cast<float>(xMove) / windowPtr->getWidth(), Raz::Axis::Y);
+    cameraPtr->rotate(90.f * static_cast<float>(yMove) / windowPtr->getHeight(),
+                      90.f * static_cast<float>(xMove) / windowPtr->getWidth(),
+                      0.f);
   });
 
   windowPtr->disableCursor(); // Disabling mouse cursor to allow continous rotations
