@@ -24,16 +24,19 @@ MeshPtr Mesh::createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, cons
   secondVert.normal   = (secondPos - thirdPos).cross(secondPos - firstPos).normalize();
   thirdVert.normal = (thirdPos - firstPos).cross(thirdPos - secondPos).normalize();
 
-  triangle->getSubmeshes().front()->getVbo().getVertices().resize(3);
-  triangle->getSubmeshes().front()->getEbo().getIndices().resize(3);
+  std::vector<Vertex>& vertices = triangle->getSubmeshes().front()->getVbo().getVertices();
+  std::vector<unsigned int>& indices = triangle->getSubmeshes().front()->getEbo().getIndices();
 
-  triangle->getSubmeshes().front()->getVbo().getVertices()[0] = firstVert;
-  triangle->getSubmeshes().front()->getVbo().getVertices()[1] = secondVert;
-  triangle->getSubmeshes().front()->getVbo().getVertices()[2] = thirdVert;
+  vertices.resize(3);
+  indices.resize(3);
 
-  triangle->getSubmeshes().front()->getEbo().getIndices()[0] = 1;
-  triangle->getSubmeshes().front()->getEbo().getIndices()[1] = 0;
-  triangle->getSubmeshes().front()->getEbo().getIndices()[2] = 2;
+  vertices[0] = firstVert;
+  vertices[1] = secondVert;
+  vertices[2] = thirdVert;
+
+  indices[0] = 1;
+  indices[1] = 0;
+  indices[2] = 2;
 
   triangle->load();
 
@@ -66,21 +69,24 @@ MeshPtr Mesh::createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, cons
   rightBottom.normal = (rightBottomPos - leftBottomPos).cross(rightBottomPos - rightTopPos).normalize();
   leftBottom.normal  = (leftBottomPos - leftTopPos).cross(leftBottomPos - rightBottomPos).normalize();
 
-  quad->getSubmeshes().front()->getVbo().getVertices().resize(4);
-  quad->getSubmeshes().front()->getEbo().getIndices().resize(6);
+  std::vector<Vertex>& vertices = quad->getSubmeshes().front()->getVbo().getVertices();
+  std::vector<unsigned int>& indices = quad->getSubmeshes().front()->getEbo().getIndices();
 
-  quad->getSubmeshes().front()->getVbo().getVertices()[0] = leftTop;
-  quad->getSubmeshes().front()->getVbo().getVertices()[1] = leftBottom;
-  quad->getSubmeshes().front()->getVbo().getVertices()[2] = rightBottom;
-  quad->getSubmeshes().front()->getVbo().getVertices()[3] = rightTop;
+  vertices.resize(4);
+  indices.resize(6);
 
-  quad->getSubmeshes().front()->getEbo().getIndices()[0] = 0;
-  quad->getSubmeshes().front()->getEbo().getIndices()[1] = 1;
-  quad->getSubmeshes().front()->getEbo().getIndices()[2] = 2;
+  vertices[0] = leftTop;
+  vertices[1] = leftBottom;
+  vertices[2] = rightBottom;
+  vertices[3] = rightTop;
 
-  quad->getSubmeshes().front()->getEbo().getIndices()[3] = 0;
-  quad->getSubmeshes().front()->getEbo().getIndices()[4] = 2;
-  quad->getSubmeshes().front()->getEbo().getIndices()[5] = 3;
+  indices[0] = 0;
+  indices[1] = 1;
+  indices[2] = 2;
+
+  indices[3] = 0;
+  indices[4] = 2;
+  indices[5] = 3;
 
   quad->load();
 
@@ -128,74 +134,77 @@ MeshPtr Mesh::createAABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomB
   // TODO: normals should not be computed (or even exist) for simple display cubes like a skybox
   // TODO: compute normals
 
-  aabb->getSubmeshes().front()->getVbo().getVertices().resize(8);
-  aabb->getSubmeshes().front()->getEbo().getIndices().resize(36);
+  std::vector<Vertex>& vertices = aabb->getSubmeshes().front()->getVbo().getVertices();
+  std::vector<unsigned int>& indices = aabb->getSubmeshes().front()->getEbo().getIndices();
 
-  aabb->getSubmeshes().front()->getVbo().getVertices()[0] = rightTopBack;
-  aabb->getSubmeshes().front()->getVbo().getVertices()[1] = rightTopFront;
+  vertices.resize(8);
+  indices.resize(36);
 
-  aabb->getSubmeshes().front()->getVbo().getVertices()[2] = rightBottomBack;
-  aabb->getSubmeshes().front()->getVbo().getVertices()[3] = rightBottomFront;
+  vertices[0] = rightTopBack;
+  vertices[1] = rightTopFront;
 
-  aabb->getSubmeshes().front()->getVbo().getVertices()[4] = leftTopBack;
-  aabb->getSubmeshes().front()->getVbo().getVertices()[5] = leftTopFront;
+  vertices[2] = rightBottomBack;
+  vertices[3] = rightBottomFront;
 
-  aabb->getSubmeshes().front()->getVbo().getVertices()[6] = leftBottomBack;
-  aabb->getSubmeshes().front()->getVbo().getVertices()[7] = leftBottomFront;
+  vertices[4] = leftTopBack;
+  vertices[5] = leftTopFront;
+
+  vertices[6] = leftBottomBack;
+  vertices[7] = leftBottomFront;
 
   // Right face
-  aabb->getSubmeshes().front()->getEbo().getIndices()[0]  = 1;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[1]  = 0;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[2]  = 2;
+  indices[0] = 1;
+  indices[1] = 0;
+  indices[2] = 2;
 
-  aabb->getSubmeshes().front()->getEbo().getIndices()[3]  = 1;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[4]  = 2;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[5]  = 3;
+  indices[3] = 1;
+  indices[4] = 2;
+  indices[5] = 3;
 
   // Left face
-  aabb->getSubmeshes().front()->getEbo().getIndices()[6]  = 4;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[7]  = 5;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[8]  = 7;
+  indices[6] = 4;
+  indices[7] = 5;
+  indices[8] = 7;
 
-  aabb->getSubmeshes().front()->getEbo().getIndices()[9]  = 4;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[10] = 7;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[11] = 6;
+  indices[9]  = 4;
+  indices[10] = 7;
+  indices[11] = 6;
 
   // Top face
-  aabb->getSubmeshes().front()->getEbo().getIndices()[12] = 4;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[13] = 0;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[14] = 1;
+  indices[12] = 4;
+  indices[13] = 0;
+  indices[14] = 1;
 
-  aabb->getSubmeshes().front()->getEbo().getIndices()[15] = 4;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[16] = 1;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[17] = 5;
+  indices[15] = 4;
+  indices[16] = 1;
+  indices[17] = 5;
 
   // Bottom face
-  aabb->getSubmeshes().front()->getEbo().getIndices()[18] = 7;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[19] = 3;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[20] = 2;
+  indices[18] = 7;
+  indices[19] = 3;
+  indices[20] = 2;
 
-  aabb->getSubmeshes().front()->getEbo().getIndices()[21] = 7;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[22] = 2;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[23] = 6;
+  indices[21] = 7;
+  indices[22] = 2;
+  indices[23] = 6;
 
   // Front face
-  aabb->getSubmeshes().front()->getEbo().getIndices()[24] = 5;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[25] = 1;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[26] = 3;
+  indices[24] = 5;
+  indices[25] = 1;
+  indices[26] = 3;
 
-  aabb->getSubmeshes().front()->getEbo().getIndices()[27] = 5;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[28] = 3;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[29] = 7;
+  indices[27] = 5;
+  indices[28] = 3;
+  indices[29] = 7;
 
   // Back face
-  aabb->getSubmeshes().front()->getEbo().getIndices()[30] = 0;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[31] = 4;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[32] = 6;
+  indices[30] = 0;
+  indices[31] = 4;
+  indices[32] = 6;
 
-  aabb->getSubmeshes().front()->getEbo().getIndices()[33] = 0;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[34] = 6;
-  aabb->getSubmeshes().front()->getEbo().getIndices()[35] = 2;
+  indices[33] = 0;
+  indices[34] = 6;
+  indices[35] = 2;
 
   aabb->load();
 
