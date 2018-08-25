@@ -36,6 +36,7 @@ public:
   void move(const Vec3f& displacement) override;
   void translate(float x, float y, float z) override;
   void translate(const Vec3f& values) override { translate(values[0], values[1], values[2]); }
+  void rotate(float xAngle, float yAngle, float zAngle) override;
   void rotate(float angle, const Vec3f& axis) override;
   const Mat4f& computeViewMatrix();
   const Mat4f& computeInverseViewMatrix();

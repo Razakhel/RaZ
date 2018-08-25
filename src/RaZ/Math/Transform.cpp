@@ -14,6 +14,13 @@ void Transform::rotate(float angle, const Vec3f& axis) {
   m_rotation = m_rotation * quaternion.computeMatrix();
 }
 
+void Transform::rotate(float xAngle, float yAngle, float zAngle) {
+  const Quaternionf xQuat(xAngle, Axis::X);
+  const Quaternionf yQuat(yAngle, Axis::Y);
+  const Quaternionf zQuat(zAngle, Axis::Z);
+  m_rotation = m_rotation * (xQuat.computeMatrix() * yQuat.computeMatrix() * zQuat.computeMatrix());
+}
+
 void Transform::scale(float x, float y, float z) {
   m_scale[0] *= x;
   m_scale[1] *= y;
