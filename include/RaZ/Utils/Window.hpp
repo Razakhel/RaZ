@@ -65,7 +65,7 @@ public:
   void addMouseScrollCallback(std::function<void(double, double)> func);
   void addMouseMoveCallback(std::function<void(double, double)> func);
   void updateCallbacks() const;
-  void enableOverlay() { m_overlay = std::make_unique<Overlay>(m_window); }
+  void enableOverlay() { m_overlay = Overlay::create(m_window); }
   void disableOverlay() { m_overlay.reset(); }
   void addOverlayElement(OverlayElementType type, const std::string& text,
                          std::function<void()> actionOn = nullptr, std::function<void()> actionOff = nullptr);

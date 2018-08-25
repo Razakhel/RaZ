@@ -37,7 +37,7 @@ public:
 private:
   WindowPtr m_window {};
   ScenePtr m_scene {};
-  CameraPtr m_camera = std::make_unique<Camera>(m_window->getWidth(), m_window->getHeight());
+  CameraPtr m_camera = Camera::create(m_window->getWidth(), m_window->getHeight());
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);
 };
 

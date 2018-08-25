@@ -32,7 +32,7 @@ std::unique_ptr<MaterialCookTorrance> Material::recoverMaterial(MaterialPreset p
     throw std::invalid_argument("Error: Couldn't find the given material preset");
 
   const auto& materialParams = materialParamsIter->second;
-  return std::make_unique<MaterialCookTorrance>(materialParams.first, materialParams.second, roughnessFactor);
+  return MaterialCookTorrance::create(materialParams.first, materialParams.second, roughnessFactor);
 }
 
 void MaterialStandard::initTextures(const ShaderProgram& program) const {

@@ -14,6 +14,12 @@ namespace Raz {
 struct ImageData;
 using ImageDataPtr = std::unique_ptr<ImageData>;
 
+struct ImageDataB;
+using ImageDataBPtr = std::unique_ptr<ImageDataB>;
+
+struct ImageDataF;
+using ImageDataFPtr = std::unique_ptr<ImageDataF>;
+
 class Image;
 using ImagePtr = std::unique_ptr<Image>;
 
@@ -21,19 +27,22 @@ enum class ImageDataType : uint8_t { BYTE = 0,
                                      FLOAT };
 
 struct ImageData {
-  virtual void* getDataPtr() = 0;
+  virtual ImageDataType getDataType() const = 0;
   virtual const void* getDataPtr() const = 0;
+  virtual void* getDataPtr() = 0;
 
   virtual bool isEmpty() const = 0;
-  virtual ImageDataType getDataType() const = 0;
 
   virtual ~ImageData() = default;
 };
 
 struct ImageDataB : public ImageData {
   ImageDataType getDataType() const override { return ImageDataType::BYTE; }
-  void* getDataPtr() override { return data.data(); }
   const void* getDataPtr() const override { return data.data(); }
+  void* getDataPtr() override { return data.data(); }
+
+  template <typename... Args>
+  static ImageDataBPtr create(Args&&... args) { return std::make_unique<ImageDataB>(std::forward<Args>(args)...); }
 
   bool isEmpty() const override { return data.empty(); }
 
@@ -42,8 +51,11 @@ struct ImageDataB : public ImageData {
 
 struct ImageDataF : public ImageData {
   ImageDataType getDataType() const override { return ImageDataType::FLOAT; }
-  void* getDataPtr() override { return data.data(); }
   const void* getDataPtr() const override { return data.data(); }
+  void* getDataPtr() override { return data.data(); }
+
+  template <typename... Args>
+  static ImageDataFPtr create(Args&&... args) { return std::make_unique<ImageDataF>(std::forward<Args>(args)...); }
 
   bool isEmpty() const override { return data.empty(); }
 

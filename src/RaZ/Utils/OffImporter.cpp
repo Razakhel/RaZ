@@ -5,8 +5,8 @@
 namespace Raz {
 
 ModelPtr Model::importOff(std::ifstream& file) {
-  MeshPtr mesh = std::make_unique<Mesh>();
-  mesh->getSubmeshes().emplace_back(std::make_unique<Submesh>());
+  MeshPtr mesh = Mesh::create();
+  mesh->getSubmeshes().emplace_back(Submesh::create());
 
   const SubmeshPtr& submesh = mesh->getSubmeshes().front();
 
@@ -45,7 +45,7 @@ ModelPtr Model::importOff(std::ifstream& file) {
 
   submesh->getIndices().shrink_to_fit();
 
-  return std::make_unique<Model>(std::move(mesh));
+  return Model::create(std::move(mesh));
 }
 
 } // namespace Raz

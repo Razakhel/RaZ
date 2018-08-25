@@ -8,7 +8,7 @@
 namespace Raz {
 
 ModelPtr Model::importFbx(const std::string& filePath) {
-  MeshPtr mesh = std::make_unique<Mesh>();
+  MeshPtr mesh = Mesh::create();
 
   FbxManager* manager = FbxManager::Create();
 
@@ -28,7 +28,7 @@ ModelPtr Model::importFbx(const std::string& filePath) {
   // Recovering geometry
   for (int meshIndex = 0; meshIndex < scene->GetGeometryCount(); ++meshIndex) {
     const auto fbxMesh = static_cast<FbxMesh*>(scene->GetGeometry(meshIndex));
-    SubmeshPtr submesh = std::make_unique<Submesh>();
+    SubmeshPtr submesh = Submesh::create();
 
     ////////////
     // Values //
@@ -117,7 +117,7 @@ ModelPtr Model::importFbx(const std::string& filePath) {
   // Recovering materials
   for (int matIndex = 0; matIndex < scene->GetMaterialCount(); ++matIndex) {
     const FbxSurfaceMaterial* fbxMaterial = scene->GetMaterial(matIndex);
-    auto material = std::make_unique<MaterialStandard>();
+    auto material = MaterialStandard::create();
 
     const FbxPropertyT<FbxDouble3>& ambient = fbxMaterial->FindProperty(FbxSurfaceMaterial::sAmbient);
     if (ambient.IsValid())
@@ -177,7 +177,7 @@ ModelPtr Model::importFbx(const std::string& filePath) {
     mesh->addMaterial(std::move(material));
   }
 
-  return std::make_unique<Model>(std::move(mesh));
+  return Model::create(std::move(mesh));
 }
 
 } // namespace Raz

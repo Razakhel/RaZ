@@ -34,7 +34,7 @@ TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textur
     map = loadedTexturePos->second;
   } else {
     const auto texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
-    map = std::make_shared<Texture>(texturePath);
+    map = Texture::create(texturePath);
     loadedTextures.emplace(textureFileName, map);
   }
 
@@ -46,8 +46,8 @@ void importMtl(const std::string& mtlFilePath,
                std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
-  auto standardMaterial = std::make_unique<MaterialStandard>();
-  auto cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
+  auto standardMaterial = MaterialStandard::create();
+  auto cookTorranceMaterial = MaterialCookTorrance::create();
 
   bool isStandardMaterial = false;
   bool isCookTorranceMaterial = false;
@@ -136,8 +136,8 @@ void importMtl(const std::string& mtlFilePath,
           else
             materials.emplace_back(std::move(standardMaterial));
 
-          cookTorranceMaterial = std::make_unique<MaterialCookTorrance>();
-          standardMaterial = std::make_unique<MaterialStandard>();
+          standardMaterial = MaterialStandard::create();
+          cookTorranceMaterial = MaterialCookTorrance::create();
 
           isStandardMaterial = false;
           isCookTorranceMaterial = false;
@@ -159,7 +159,7 @@ void importMtl(const std::string& mtlFilePath,
 } // namespace
 
 ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
-  MeshPtr mesh = std::make_unique<Mesh>();
+  MeshPtr mesh = Mesh::create();
   std::unordered_map<std::string, std::size_t> materialCorrespIndices;
 
   std::vector<Vec3f> positions;
@@ -279,7 +279,7 @@ ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
         texcoordsIndices.resize(newSize);
         normalsIndices.resize(newSize);
 
-        mesh->addSubmesh(std::make_unique<Submesh>());
+        mesh->addSubmesh(Submesh::create());
       }
 
       std::getline(file, line);
@@ -381,7 +381,7 @@ ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
       vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
   }
 
-  return std::make_unique<Model>(std::move(mesh));
+  return Model::create(std::move(mesh));
 }
 
 } // namespace Raz

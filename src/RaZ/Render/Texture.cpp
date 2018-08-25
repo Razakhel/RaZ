@@ -42,8 +42,8 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
 
 TexturePtr Texture::recoverTexture(TexturePreset texturePreset) {
   static const std::unordered_map<TexturePreset, TexturePtr> texturePresets = {
-    { TexturePreset::BLACK, std::make_shared<Texture>(0) },
-    { TexturePreset::WHITE, std::make_shared<Texture>(255) }
+    { TexturePreset::BLACK, Texture::create(0) },
+    { TexturePreset::WHITE, Texture::create(255) }
   };
 
   const auto materialParamsIter = texturePresets.find(texturePreset);
@@ -55,7 +55,7 @@ TexturePtr Texture::recoverTexture(TexturePreset texturePreset) {
 }
 
 void Texture::load(const std::string& fileName) {
-  m_image = std::make_unique<Image>(fileName);
+  m_image = Image::create(fileName);
 
   if (!m_image->isEmpty()) {
     bind();

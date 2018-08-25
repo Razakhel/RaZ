@@ -52,7 +52,7 @@ class MaterialStandard : public Material {
 public:
   MaterialStandard() = default;
   explicit MaterialStandard(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
-  explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
+  explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = Texture::create(fileName); }
 
   MaterialType getType() const override { return MaterialType::STANDARD; }
   const Vec3f& getAmbient() const { return m_ambient; }
@@ -88,12 +88,12 @@ public:
   template <typename... Args>
   static MaterialStandardPtr create(Args&&... args) { return std::make_unique<MaterialStandard>(std::forward<Args>(args)...); }
 
-  void loadAmbientMap(const std::string& fileName) { m_ambientMap = std::make_shared<Texture>(fileName); }
-  void loadDiffuseMap(const std::string& fileName) { m_diffuseMap = std::make_shared<Texture>(fileName); }
-  void loadSpecularMap(const std::string& fileName) { m_specularMap = std::make_shared<Texture>(fileName); }
-  void loadEmissiveMap(const std::string& fileName) { m_emissiveMap = std::make_shared<Texture>(fileName); }
-  void loadTransparencyMap(const std::string& fileName) { m_transparencyMap = std::make_shared<Texture>(fileName); }
-  void loadBumpMap(const std::string& fileName) { m_bumpMap = std::make_shared<Texture>(fileName); }
+  void loadAmbientMap(const std::string& fileName) { m_ambientMap = Texture::create(fileName); }
+  void loadDiffuseMap(const std::string& fileName) { m_diffuseMap = Texture::create(fileName); }
+  void loadSpecularMap(const std::string& fileName) { m_specularMap = Texture::create(fileName); }
+  void loadEmissiveMap(const std::string& fileName) { m_emissiveMap = Texture::create(fileName); }
+  void loadTransparencyMap(const std::string& fileName) { m_transparencyMap = Texture::create(fileName); }
+  void loadBumpMap(const std::string& fileName) { m_bumpMap = Texture::create(fileName); }
 
   MaterialPtr clone() const override { return MaterialStandard::create(*this); }
   void initTextures(const ShaderProgram& program) const override;
@@ -118,7 +118,7 @@ class MaterialCookTorrance : public Material {
 public:
   MaterialCookTorrance() = default;
   explicit MaterialCookTorrance(TexturePtr albedoMap) : m_albedoMap{ std::move(albedoMap) } {}
-  explicit MaterialCookTorrance(const std::string& fileName) { m_albedoMap = std::make_shared<Texture>(fileName); }
+  explicit MaterialCookTorrance(const std::string& fileName) { m_albedoMap = Texture::create(fileName); }
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
     : m_baseColor{ baseColor }, m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } {}
 
@@ -147,11 +147,11 @@ public:
   template <typename... Args>
   static MaterialCookTorrancePtr create(Args&&... args) { return std::make_unique<MaterialCookTorrance>(std::forward<Args>(args)...); }
 
-  void loadAlbedoMap(const std::string& fileName) { m_albedoMap = std::make_shared<Texture>(fileName); }
-  void loadNormalMap(const std::string& fileName) { m_normalMap = std::make_shared<Texture>(fileName); }
-  void loadMetallicMap(const std::string& fileName) { m_metallicMap = std::make_shared<Texture>(fileName); }
-  void loadRoughnessMap(const std::string& fileName) { m_roughnessMap = std::make_shared<Texture>(fileName); }
-  void loadAmbientOcclusionMap(const std::string& fileName) { m_ambientOcclusionMap = std::make_shared<Texture>(fileName); }
+  void loadAlbedoMap(const std::string& fileName) { m_albedoMap = Texture::create(fileName); }
+  void loadNormalMap(const std::string& fileName) { m_normalMap = Texture::create(fileName); }
+  void loadMetallicMap(const std::string& fileName) { m_metallicMap = Texture::create(fileName); }
+  void loadRoughnessMap(const std::string& fileName) { m_roughnessMap = Texture::create(fileName); }
+  void loadAmbientOcclusionMap(const std::string& fileName) { m_ambientOcclusionMap = Texture::create(fileName); }
 
   MaterialPtr clone() const override { return MaterialCookTorrance::create(*this); }
   void initTextures(const ShaderProgram& program) const override;

@@ -17,7 +17,7 @@ using MeshPtr = std::unique_ptr<Mesh>;
 
 class Mesh {
 public:
-  Mesh() { m_submeshes.emplace_back(std::make_unique<Submesh>()); }
+  Mesh() { m_submeshes.emplace_back(Submesh::create()); }
 
   const std::vector<SubmeshPtr>& getSubmeshes() const { return m_submeshes; }
   std::vector<SubmeshPtr>& getSubmeshes() { return m_submeshes; }

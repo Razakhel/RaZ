@@ -51,7 +51,7 @@ VertexShader::VertexShader(std::string fileName) : VertexShader() {
 }
 
 VertexShaderPtr VertexShader::loadFromSource(const std::string& source) {
-  auto vertShader = std::make_unique<VertexShader>();
+  auto vertShader = VertexShader::create();
 
   const char* data  = source.c_str();
   const auto length = static_cast<int>(source.size());
@@ -69,7 +69,7 @@ FragmentShader::FragmentShader(std::string fileName) : FragmentShader() {
 }
 
 FragmentShaderPtr FragmentShader::loadFromSource(const std::string& source) {
-  auto fragShader = std::make_unique<FragmentShader>();
+  auto fragShader = FragmentShader::create();
 
   const char* data  = source.c_str();
   const auto length = static_cast<int>(source.size());
@@ -87,7 +87,7 @@ GeometryShader::GeometryShader(std::string fileName) : GeometryShader() {
 }
 
 GeometryShaderPtr GeometryShader::loadFromSource(const std::string& source) {
-  auto fragShader = std::make_unique<GeometryShader>();
+  auto fragShader = GeometryShader::create();
 
   const char* data  = source.c_str();
   const auto length = static_cast<int>(source.size());

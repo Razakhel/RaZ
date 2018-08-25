@@ -3,7 +3,7 @@
 namespace Raz {
 
 MeshPtr Mesh::createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos) {
-  MeshPtr triangle = std::make_unique<Mesh>();
+  MeshPtr triangle = Mesh::create();
 
   // TODO: check if vertices are defined counterclockwise
 
@@ -41,7 +41,7 @@ MeshPtr Mesh::createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, cons
 }
 
 MeshPtr Mesh::createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos) {
-  MeshPtr quad = std::make_unique<Mesh>();
+  MeshPtr quad = Mesh::create();
 
   Vertex leftTop {};
   leftTop.position  = leftTopPos;
@@ -88,7 +88,7 @@ MeshPtr Mesh::createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, cons
 }
 
 MeshPtr Mesh::createAABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos) {
-  MeshPtr aabb = std::make_unique<Mesh>();
+  MeshPtr aabb = Mesh::create();
 
   // TODO: texcoords should not exist for simple display cubes like a skybox
 

@@ -20,11 +20,11 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height, const std::str
     }
   )";
 
-  m_program.setShaders(VertexShader::loadFromSource(vertSource), std::make_unique<FragmentShader>(fragShaderPath));
+  m_program.setShaders(VertexShader::loadFromSource(vertSource), FragmentShader::create(fragShaderPath));
 
-  m_depthBuffer  = std::make_shared<Texture>(width, height, ImageColorspace::DEPTH);
-  m_colorBuffer  = std::make_shared<Texture>(width, height, ImageColorspace::RGBA);
-  m_normalBuffer = std::make_shared<Texture>(width, height, ImageColorspace::RGB);
+  m_depthBuffer  = Texture::create(width, height, ImageColorspace::DEPTH);
+  m_colorBuffer  = Texture::create(width, height, ImageColorspace::RGBA);
+  m_normalBuffer = Texture::create(width, height, ImageColorspace::RGB);
   glGenFramebuffers(1, &m_index);
 
   const std::array<GLenum, 2> colorBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };

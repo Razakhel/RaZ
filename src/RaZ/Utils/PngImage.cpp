@@ -93,7 +93,7 @@ void Image::readPng(std::ifstream& file, bool reverse) {
 
   png_read_update_info(readStruct, infoStruct);
 
-  auto imgData = std::make_unique<ImageDataB>();
+  auto imgData = ImageDataB::create();
   imgData->data.resize(m_width * m_height * m_channelCount);
 
   std::vector<png_bytep> rowPtrs(m_height);
