@@ -72,6 +72,7 @@ public:
   void addOverlayText(const std::string& text);
   void addOverlayButton(const std::string& text, std::function<void()> action);
   void addOverlayCheckbox(const std::string& text, bool initVal, std::function<void()> actionOn, std::function<void()> actionOff);
+  void addOverlaySeparator();
   void addOverlayFrameTime(const std::string& formattedText);
   void addOverlayFpsCounter(const std::string& formattedText);
   bool run();

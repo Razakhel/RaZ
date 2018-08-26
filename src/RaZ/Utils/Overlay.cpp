@@ -32,6 +32,10 @@ void Overlay::addCheckbox(const std::string& text, bool initVal, std::function<v
   m_toggles[m_elements.size() - 1] = initVal;
 }
 
+void Overlay::addSeparator() {
+  addElement(OverlayElementType::SEPARATOR);
+}
+
 void Overlay::addFrameTime(const std::string& formattedText) {
   addElement(OverlayElementType::FRAME_TIME, formattedText);
 }
@@ -68,6 +72,10 @@ void Overlay::render() {
         }
         break;
       }
+
+      case OverlayElementType::SEPARATOR:
+        ImGui::Separator();
+        break;
 
       case OverlayElementType::FRAME_TIME:
         ImGui::Text(std::get<1>(element).c_str(), 1000.f / ImGui::GetIO().Framerate);

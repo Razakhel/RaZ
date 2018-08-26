@@ -19,6 +19,7 @@ using OverlayPtr = std::unique_ptr<Overlay>;
 enum class OverlayElementType { TEXT,
                                 BUTTON,
                                 CHECKBOX,
+                                SEPARATOR,
                                 FRAME_TIME,
                                 FPS_COUNTER };
 
@@ -31,11 +32,12 @@ public:
   template <typename... Args>
   static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
 
-  void addElement(OverlayElementType type, const std::string& text,
+  void addElement(OverlayElementType type, const std::string& text = "",
                   std::function<void()> actionOn = nullptr, std::function<void()> actionOff = nullptr);
   void addText(const std::string& text);
   void addButton(const std::string& text, std::function<void()> action);
   void addCheckbox(const std::string& text, bool initVal, std::function<void()> actionOn, std::function<void()> actionOff);
+  void addSeparator();
   void addFrameTime(const std::string& formattedText);
   void addFpsCounter(const std::string& formattedText);
   void render();

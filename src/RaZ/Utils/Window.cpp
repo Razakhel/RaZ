@@ -254,6 +254,10 @@ void Window::addOverlayCheckbox(const std::string& text, bool initVal,
   m_overlay->addCheckbox(text, initVal, std::move(actionOn), std::move(actionOff));
 }
 
+void Window::addOverlaySeparator() {
+  m_overlay->addSeparator();
+}
+
 void Window::addOverlayFrameTime(const std::string& formattedText) {
   m_overlay->addFrameTime(formattedText);
 }
