@@ -15,3 +15,6 @@ target_link_libraries(RaZ_fullDemo RaZ)
 
 add_executable(RaZ_minDemo minDemo.cpp)
 target_link_libraries(RaZ_minDemo RaZ)
+
+add_executable(RaZ_showcaseDemo showcaseDemo.cpp)
+target_link_libraries(RaZ_showcaseDemo RaZ)

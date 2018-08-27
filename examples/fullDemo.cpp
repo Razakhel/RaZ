@@ -188,6 +188,7 @@ int main() {
   windowPtr->addOverlayText("Scene's informations:");
   windowPtr->addOverlayText(std::to_string(scenePtr->recoverVertexCount()) + " vertices, "
                           + std::to_string(scenePtr->recoverTriangleCount()) + " triangles");
+  windowPtr->addOverlaySeparator();
   windowPtr->addOverlayCheckbox("Enable face culling",
                                 true,
                                 [&windowPtr] () { windowPtr->enableFaceCulling(); },
@@ -196,6 +197,7 @@ int main() {
                                 windowPtr->recoverVerticalSyncState(),
                                 [&windowPtr] () { windowPtr->enableVerticalSync(); },
                                 [&windowPtr] () { windowPtr->disableVerticalSync(); });
+  windowPtr->addOverlaySeparator();
   windowPtr->addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
   windowPtr->addOverlayFpsCounter("FPS: %.1f");
 
