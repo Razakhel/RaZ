@@ -40,6 +40,7 @@ public:
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
+  float getDeltaTime() const { return m_deltaTime; }
 
   void setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
   void setIcon(const Image& img) const;
