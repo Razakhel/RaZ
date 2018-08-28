@@ -142,7 +142,7 @@ void Cubemap::draw(const CameraPtr& camera) const {
   m_viewProjUbo.bind();
   sendViewProjectionMatrix(camera->getProjectionMatrix() * Mat4f(Mat3f(camera->getViewMatrix())));
 
-  Mesh::drawCube();
+  Mesh::drawUnitCube();
 
   glCullFace(GL_BACK);
   glDepthFunc(GL_LESS);

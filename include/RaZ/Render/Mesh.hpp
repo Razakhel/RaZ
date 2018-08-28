@@ -31,12 +31,8 @@ public:
   std::size_t recoverTriangleCount() const;
 
   template <typename... Args> static MeshPtr create(Args&&... args) { return std::make_unique<Mesh>(std::forward<Args>(args)...); }
-  static MeshPtr createTriangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos);
-  static MeshPtr createQuad(const Vec3f& leftTopPos, const Vec3f& rightTopPos,
-                            const Vec3f& rightBottomPos, const Vec3f& leftBottomPos);
-  static MeshPtr createAABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos);
-  static void drawQuad();
-  static void drawCube();
+  static void drawUnitQuad();
+  static void drawUnitCube();
 
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }

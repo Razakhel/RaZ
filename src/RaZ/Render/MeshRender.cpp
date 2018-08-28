@@ -20,18 +20,18 @@ std::size_t Mesh::recoverTriangleCount() const {
   return indexCount / 3;
 }
 
-void Mesh::drawQuad() {
-  static const MeshPtr quadMesh = Mesh::createQuad(Vec3f({ -1.f,  1.f, 0.f }),
-                                                   Vec3f({  1.f,  1.f, 0.f }),
-                                                   Vec3f({  1.f, -1.f, 0.f }),
-                                                   Vec3f({ -1.f, -1.f, 0.f }));
+void Mesh::drawUnitQuad() {
+  static const MeshPtr quadMesh = Mesh::create(Quad(Vec3f({ -1.f,  1.f, 0.f }),
+                                                    Vec3f({  1.f,  1.f, 0.f }),
+                                                    Vec3f({  1.f, -1.f, 0.f }),
+                                                    Vec3f({ -1.f, -1.f, 0.f })));
 
   quadMesh->draw();
 }
 
-void Mesh::drawCube() {
-  static const MeshPtr cubeMesh = Mesh::createAABB(Vec3f({  1.f,  1.f,  1.f }),
-                                                   Vec3f({ -1.f, -1.f, -1.f }));
+void Mesh::drawUnitCube() {
+  static const MeshPtr cubeMesh = Mesh::create(AABB(Vec3f({  1.f,  1.f,  1.f }),
+                                                    Vec3f({ -1.f, -1.f, -1.f })));
 
   cubeMesh->draw();
 }

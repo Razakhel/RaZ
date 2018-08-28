@@ -68,7 +68,7 @@ void Framebuffer::display() const {
   m_normalBuffer->bind();
 
   m_program.use();
-  Mesh::drawQuad();
+  Mesh::drawUnitQuad();
 }
 
 } // namespace Raz
