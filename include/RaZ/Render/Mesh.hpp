@@ -9,6 +9,7 @@
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/Submesh.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 namespace Raz {
 
@@ -18,6 +19,9 @@ using MeshPtr = std::unique_ptr<Mesh>;
 class Mesh {
 public:
   Mesh() { m_submeshes.emplace_back(Submesh::create()); }
+  explicit Mesh(const Triangle& triangle);
+  explicit Mesh(const Quad& quad);
+  explicit Mesh(const AABB& box);
 
   const std::vector<SubmeshPtr>& getSubmeshes() const { return m_submeshes; }
   std::vector<SubmeshPtr>& getSubmeshes() { return m_submeshes; }
