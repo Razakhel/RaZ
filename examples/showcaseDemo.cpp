@@ -112,17 +112,17 @@ int main() {
   loadBallScene(app);
 
   windowPtr->enableOverlay();
-  windowPtr->addOverlayButton("Load Sponza scene", [&app] () { loadSponzaScene(app); });
-  windowPtr->addOverlayButton("Load Ball scene", [&app] () { loadBallScene(app); });
-  windowPtr->addOverlayButton("Load Shield scene", [&app] () { loadShieldScene(app); });
+  windowPtr->addOverlayButton("Load Sponza scene",   [&app] () { loadSponzaScene(app); });
+  windowPtr->addOverlayButton("Load Ball scene",     [&app] () { loadBallScene(app); });
+  windowPtr->addOverlayButton("Load Shield scene",   [&app] () { loadShieldScene(app); });
   windowPtr->addOverlayButton("Load Cerberus scene", [&app] () { loadCerberusScene(app); });
 #if defined(FBX_ENABLED)
   windowPtr->addOverlayButton("Load Shader ball scene", [&app] () { loadShaderBallScene(app); });
 #endif
   windowPtr->addOverlaySeparator();
-  windowPtr->addOverlayButton("Remove skybox", [&app] () { app.getScene()->setCubemap(nullptr); });
+  windowPtr->addOverlayButton("Remove skybox",      [&app] () { app.getScene()->setCubemap(nullptr); });
   windowPtr->addOverlayButton("Load Clouds skybox", [&app] () { loadCloudsSkybox(app); });
-  windowPtr->addOverlayButton("Load Lake skybox", [&app] () { loadLakeSkybox(app); });
+  windowPtr->addOverlayButton("Load Lake skybox",   [&app] () { loadLakeSkybox(app); });
   windowPtr->addOverlaySeparator();
   windowPtr->addOverlayFpsCounter("FPS: %.1f");
 

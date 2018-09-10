@@ -29,12 +29,11 @@ int main() {
                                                  "../../assets/skyboxes/clouds_back.png");
 
   /*Raz::LightPtr light = Raz::PointLight::create(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
-                                                  10.f,                           // Energy
-                                                  Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/
+                                                10.f,                           // Energy
+                                                Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/
   Raz::LightPtr light = Raz::DirectionalLight::create(Raz::Vec3f({ 0.f, 0.f, 1.f }),  // Direction
                                                       1.f,                            // Energy
-                                                      Raz::Vec3f({ 1.f, 1.f, 1.f }),  // Color (R/G/B)
-                                                      Raz::Vec3f({ 0.f, 1.f, 0.f })); // Position
+                                                      Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)
 
   Raz::CameraPtr camera = Raz::Camera::create(window->getWidth(),
                                               window->getHeight(),
@@ -156,6 +155,14 @@ int main() {
     lightPtr->translate(10.f * deltaTime, 0.f, 0.f);
     scenePtr->updateLights();
   });
+  windowPtr->addKeyCallback(Raz::Keyboard::PAGEUP, [&lightPtr, &scenePtr] (float deltaTime) {
+    lightPtr->setEnergy(lightPtr->getEnergy() + 1.f * deltaTime);
+    scenePtr->updateLights();
+  });
+  windowPtr->addKeyCallback(Raz::Keyboard::PAGEDOWN, [&lightPtr, &scenePtr] (float deltaTime) {
+    lightPtr->setEnergy(std::max(0.f, lightPtr->getEnergy() - 1.f * deltaTime));
+    scenePtr->updateLights();
+  });
 
   windowPtr->addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&scenePtr, &cameraPtr] (float /* deltaTime */) {
     scenePtr->addLight(Raz::PointLight::create(cameraPtr->getPosition(), 10.f, Raz::Vec3f({ 1.f, 1.f, 1.f })));
@@ -166,7 +173,7 @@ int main() {
 
   // Mouse callbacks
   windowPtr->addMouseScrollCallback([&cameraPtr] (double /* xOffset */, double yOffset) {
-    cameraPtr->setFieldOfView(std::max(1.f, std::min(90.f, cameraPtr->getFieldOfViewDegrees() + static_cast<float>(-yOffset) * 2.f)));
+    cameraPtr->setFieldOfView(std::max(15.f, std::min(90.f, cameraPtr->getFieldOfViewDegrees() + static_cast<float>(-yOffset) * 2.f)));
   });
 
   windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {

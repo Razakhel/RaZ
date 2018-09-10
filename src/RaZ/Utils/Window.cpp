@@ -171,6 +171,7 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
 }
 
 void Window::updateCallbacks() const {
+  // Keyboard inputs
   if (!std::get<0>(m_callbacks).empty()) {
     glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
       auto& callbacks = *static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window));
@@ -191,6 +192,7 @@ void Window::updateCallbacks() const {
     });
   }
 
+  // Mouse buttons inputs
   if (!std::get<1>(m_callbacks).empty()) {
     glfwSetMouseButtonCallback(m_window, [] (GLFWwindow* window, int button, int action, int /* mods */) {
       auto& callbacks = *static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window));
@@ -211,7 +213,7 @@ void Window::updateCallbacks() const {
     });
   }
 
-  // Checking if the function is set
+  // Mouse scroll input
   if (std::get<2>(m_callbacks)) {
     glfwSetScrollCallback(m_window, [] (GLFWwindow* window, double xOffset, double yOffset) {
       const auto& scrollCallback = std::get<2>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
@@ -220,7 +222,7 @@ void Window::updateCallbacks() const {
     });
   }
 
-  // Checking if the function is set
+  // Mouse move input
   if (std::get<2>(std::get<3>(m_callbacks))) {
     glfwSetCursorPosCallback(m_window, [] (GLFWwindow* window, double xPosition, double yPosition) {
       auto& moveCallback = std::get<3>(*static_cast<InputCallbacks*>(glfwGetWindowUserPointer(window)));
