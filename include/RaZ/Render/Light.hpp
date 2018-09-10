@@ -32,6 +32,8 @@ public:
   float getEnergy() const { return m_energy; }
   float getAngle() const { return m_angle; }
 
+  void setEnergy(float energy) { m_energy = energy; }
+
   virtual ~Light() = default;
 
 protected:
