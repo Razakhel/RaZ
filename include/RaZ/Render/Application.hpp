@@ -12,7 +12,9 @@ namespace Raz {
 
 class Application {
 public:
+  explicit Application(WindowPtr window) : m_window{ std::move(window) } {}
   Application(WindowPtr window, ScenePtr scene);
+  Application(WindowPtr window, CameraPtr camera) : Application(std::move(window)) { m_camera = std::move(camera); }
   Application(WindowPtr window, ScenePtr scene, CameraPtr camera)
     : Application(std::move(window), std::move(scene)) { m_camera = std::move(camera); }
 
