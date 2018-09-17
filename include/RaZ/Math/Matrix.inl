@@ -405,4 +405,33 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator/=(float val) {
   return *this;
 }
 
+template <typename T, std::size_t W, std::size_t H>
+std::ostream& operator<<(std::ostream& stream, const Matrix<T, W, H>& mat) {
+  stream << "[[ " << mat.getData()[0];
+
+  for (std::size_t widthIndex = 1; widthIndex < W; ++widthIndex)
+    stream << "; " << mat.getData()[widthIndex];
+
+  stream << " ]\n";
+
+  for (std::size_t heightIndex = 1; heightIndex < H - 1; ++heightIndex) {
+    stream << " [ " << mat.getData()[heightIndex * W];
+
+    for (std::size_t widthIndex = 1; widthIndex < W; ++widthIndex)
+      stream << "; " << mat.getData()[heightIndex * W + widthIndex];
+
+    stream << " ]\n";
+  }
+
+  // To avoid breaking a line at the end
+  stream << " [ " << mat.getData()[(H - 1) * W];
+
+  for (std::size_t widthIndex = 1; widthIndex < W; ++widthIndex)
+    stream << "; " << mat.getData()[(H - 1) * W + widthIndex];
+
+  stream << " ]]";
+
+  return stream;
+}
+
 } // namespace Raz

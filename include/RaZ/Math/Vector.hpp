@@ -5,11 +5,20 @@
 
 #include <array>
 #include <cmath>
+#include <iostream>
 #include <initializer_list>
 
-#include "RaZ/Math/Matrix.hpp"
-
 namespace Raz {
+
+// Forward declaration of Matrix, to allow its usage into functions
+template <typename T, std::size_t W, std::size_t H>
+class Matrix;
+
+template <typename T, std::size_t Size>
+class Vector;
+
+template <typename T, std::size_t Size>
+std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec);
 
 template <typename T, std::size_t Size>
 class Vector {
@@ -57,6 +66,7 @@ public:
   T& operator[](std::size_t index) { return m_data[index]; }
   std::size_t operator()(const Vector&) const { return hash(0); }
   bool operator==(const Vector& vec) const { return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin()); }
+  friend std::ostream& operator<< <>(std::ostream& stream, const Vector& vec);
 
 private:
   std::array<T, Size> m_data {};

@@ -4,12 +4,20 @@
 #define RAZ_MATRIX_HPP
 
 #include <array>
+#include <iostream>
+#include <initializer_list>
 
 namespace Raz {
 
 // Forward declaration of Vector, to allow its usage into functions
 template <typename T, std::size_t Size>
 class Vector;
+
+template <typename T, std::size_t W, std::size_t H>
+class Matrix;
+
+template <typename T, std::size_t W, std::size_t H>
+std::ostream& operator<<(std::ostream& stream, const Matrix<T, W, H>& mat);
 
 template <typename T, std::size_t W, std::size_t H>
 class Matrix {
@@ -56,6 +64,7 @@ public:
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }
   bool operator==(const Matrix& mat) const { return std::equal(m_data.cbegin(), m_data.cend(), mat.getData().cbegin()); }
+  friend std::ostream& operator<< <>(std::ostream& stream, const Matrix& mat);
 
 private:
   std::array<T, W * H> m_data {};

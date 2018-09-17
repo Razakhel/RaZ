@@ -187,4 +187,16 @@ Vector<T, Size>& Vector<T, Size>::operator/=(float val) {
   return *this;
 }
 
+template <typename T, std::size_t Size>
+std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec) {
+  stream << "[ " << vec.getData()[0];
+
+  for (std::size_t i = 1; i < Size; ++i)
+    stream << "; " << vec.getData()[i];
+
+  stream << " ]";
+
+  return stream;
+}
+
 } // namespace Raz
