@@ -1,7 +1,7 @@
 #include <fstream>
 #include <map>
 
-#include "RaZ/Render/Model.hpp"
+#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 
 namespace Raz {
@@ -119,10 +119,10 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
 
 } // namespace
 
-void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
+void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
   file << "# OBJ file created with RaZ - https://github.com/Razakhel/RaZ\n\n";
 
-  if (!m_mesh->getMaterials().empty()) {
+  if (!m_materials.empty()) {
     const auto mtlFileName = FileUtils::extractFileNameFromPath(filePath, false) + ".mtl";
     const auto mtlFilePath = FileUtils::extractPathToFile(filePath) + mtlFileName;
 
@@ -130,14 +130,14 @@ void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
 
     std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
 
-    saveMtl(mtlFilePath, m_mesh->getMaterials());
+    saveMtl(mtlFilePath, m_materials);
   }
 
   std::map<std::array<float, 3>, std::size_t> posCorrespIndices;
   std::map<std::array<float, 2>, std::size_t> texCorrespIndices;
   std::map<std::array<float, 3>, std::size_t> normCorrespIndices;
 
-  for (const auto& submesh : m_mesh->getSubmeshes()) {
+  for (const auto& submesh : m_submeshes) {
     for (const auto& vertex : submesh->getVertices()) {
       const std::array<float, 3> pos = { vertex.position[0], vertex.position[1], vertex.position[2] };
 
@@ -169,12 +169,12 @@ void Model::saveObj(std::ofstream& file, const std::string& filePath) const {
 
   const auto fileName = FileUtils::extractFileNameFromPath(filePath, false);
 
-  for (std::size_t submeshIndex = 0; submeshIndex < m_mesh->getSubmeshes().size(); ++submeshIndex) {
-    const auto& submesh = m_mesh->getSubmeshes()[submeshIndex];
+  for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
+    const auto& submesh = m_submeshes[submeshIndex];
 
     file << "\no " << fileName << '_' << submeshIndex << '\n';
 
-    if (!m_mesh->getMaterials().empty())
+    if (!m_materials.empty())
       file << "usemtl " << fileName << '_' << submesh->getMaterialIndex() << '\n';
 
     for (std::size_t i = 0; i < submesh->getIndexCount(); i += 3) {

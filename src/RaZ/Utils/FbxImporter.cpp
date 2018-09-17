@@ -2,14 +2,12 @@
 #include <fstream>
 #include <iostream>
 
-#include "RaZ/Render/Model.hpp"
+#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 
 namespace Raz {
 
-ModelPtr Model::importFbx(const std::string& filePath) {
-  MeshPtr mesh = Mesh::create();
-
+void Mesh::importFbx(const std::string& filePath) {
   FbxManager* manager = FbxManager::Create();
 
   FbxIOSettings* ioSettings = FbxIOSettings::Create(manager, IOSROOT);
@@ -111,7 +109,7 @@ ModelPtr Model::importFbx(const std::string& filePath) {
         std::cerr << "Error: Materials can't be mapped by anything other than the whole submesh" << std::endl;
     }
 
-    mesh->addSubmesh(std::move(submesh));
+    addSubmesh(std::move(submesh));
   }
 
   // Recovering materials
@@ -174,10 +172,8 @@ ModelPtr Model::importFbx(const std::string& filePath) {
         material->loadNormalMap(texturePath + normalMap->GetRelativeFileName());
     }*/
 
-    mesh->addMaterial(std::move(material));
+    addMaterial(std::move(material));
   }
-
-  return Model::create(std::move(mesh));
 }
 
 } // namespace Raz

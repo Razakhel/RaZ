@@ -1,14 +1,13 @@
 #include <fstream>
 
-#include "RaZ/Render/Model.hpp"
+#include "RaZ/Render/Mesh.hpp"
 
 namespace Raz {
 
-ModelPtr Model::importOff(std::ifstream& file) {
-  MeshPtr mesh = Mesh::create();
-  mesh->getSubmeshes().emplace_back(Submesh::create());
+void Mesh::importOff(std::ifstream& file) {
+  m_submeshes.emplace_back(Submesh::create());
 
-  const SubmeshPtr& submesh = mesh->getSubmeshes().front();
+  const SubmeshPtr& submesh = m_submeshes.front();
 
   std::size_t vertexCount, faceCount;
   file.ignore(3);
@@ -44,8 +43,6 @@ ModelPtr Model::importOff(std::ifstream& file) {
   }
 
   submesh->getIndices().shrink_to_fit();
-
-  return Model::create(std::move(mesh));
 }
 
 } // namespace Raz

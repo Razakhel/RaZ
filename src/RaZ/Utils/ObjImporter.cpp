@@ -2,7 +2,7 @@
 #include <map>
 #include <sstream>
 
-#include "RaZ/Render/Model.hpp"
+#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 
 namespace Raz {
@@ -158,8 +158,7 @@ void importMtl(const std::string& mtlFilePath,
 
 } // namespace
 
-ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
-  MeshPtr mesh = Mesh::create();
+void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
   std::unordered_map<std::string, std::size_t> materialCorrespIndices;
 
   std::vector<Vec3f> positions;
@@ -259,7 +258,7 @@ ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
 
       const auto mtlFilePath = FileUtils::extractPathToFile(filePath) + mtlFileName;
 
-      importMtl(mtlFilePath, mesh->getMaterials(), materialCorrespIndices);
+      importMtl(mtlFilePath, m_materials, materialCorrespIndices);
     } else if (line[0] == 'u') {
       if (!materialCorrespIndices.empty()) {
         std::string materialName;
@@ -270,7 +269,7 @@ ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
         if (correspMaterial == materialCorrespIndices.cend())
           throw std::runtime_error("Error: No corresponding material found with the name '" + materialName + "'");
 
-        mesh->getSubmeshes().back()->setMaterialIndex(correspMaterial->second);
+        m_submeshes.back()->setMaterialIndex(correspMaterial->second);
       }
     } else if (line[0] == 'o' || line[0] == 'g') {
       if (!posIndices.front().empty()) {
@@ -279,7 +278,7 @@ ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
         texcoordsIndices.resize(newSize);
         normalsIndices.resize(newSize);
 
-        mesh->addSubmesh(Submesh::create());
+        addSubmesh(Submesh::create());
       }
 
       std::getline(file, line);
@@ -290,8 +289,8 @@ ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
 
   std::map<std::array<std::size_t, 3>, unsigned int> indicesMap;
 
-  for (std::size_t submeshIndex = 0; submeshIndex < mesh->getSubmeshes().size(); ++submeshIndex) {
-    SubmeshPtr& submesh = mesh->getSubmeshes()[submeshIndex];
+  for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
+    SubmeshPtr& submesh = m_submeshes[submeshIndex];
     indicesMap.clear();
 
     for (std::size_t partIndex = 0; partIndex < posIndices[submeshIndex].size(); ++partIndex) {
@@ -380,8 +379,6 @@ ModelPtr Model::importObj(std::ifstream& file, const std::string& filePath) {
     for (auto& vertex : submesh->getVertices())
       vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
   }
-
-  return Model::create(std::move(mesh));
 }
 
 } // namespace Raz

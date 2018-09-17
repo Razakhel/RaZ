@@ -1,25 +1,24 @@
 #include <fstream>
 
-#include "RaZ/Render/Model.hpp"
+#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 namespace Raz {
 
-ModelPtr Model::import(const std::string& filePath) {
-  ModelPtr model;
+void Mesh::import(const std::string& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
     const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 
     if (format == "obj")
-      model = importObj(file, filePath);
+      importObj(file, filePath);
     else if (format == "off")
-      model = importOff(file);
+      importOff(file);
     else if (format == "fbx")
 #if defined(FBX_ENABLED)
-      model = importFbx(filePath);
+      importFbx(filePath);
 #else
       throw std::runtime_error("Error: FBX disabled; check that you allowed its usage when building RaZ");
 #endif
@@ -28,11 +27,9 @@ ModelPtr Model::import(const std::string& filePath) {
   } else {
     throw std::runtime_error("Error: Couldn't open the file '" + filePath + "'");
   }
-
-  return model;
 }
 
-void Model::save(const std::string& filePath) const {
+void Mesh::save(const std::string& filePath) const {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
   const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 

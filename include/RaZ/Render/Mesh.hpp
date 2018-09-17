@@ -19,6 +19,7 @@ using MeshPtr = std::unique_ptr<Mesh>;
 class Mesh {
 public:
   Mesh() { m_submeshes.emplace_back(Submesh::create()); }
+  explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
   explicit Mesh(const Triangle& triangle);
   explicit Mesh(const Quad& quad);
   explicit Mesh(const AABB& box);
@@ -34,13 +35,23 @@ public:
   static void drawUnitQuad();
   static void drawUnitCube();
 
+  void import(const std::string& filePath);
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
   void load(const ShaderProgram* program = nullptr) const;
   void draw(const ShaderProgram* program = nullptr) const;
+  void save(const std::string& filePath) const;
 
 private:
+  void importObj(std::ifstream& file, const std::string& filePath);
+  void importOff(std::ifstream& file);
+#if defined(FBX_ENABLED)
+  void importFbx(const std::string& filePath);
+#endif
+
+  void saveObj(std::ofstream& file, const std::string& filePath) const;
+
   std::vector<SubmeshPtr> m_submeshes {};
   std::vector<MaterialPtr> m_materials {};
 };
