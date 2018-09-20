@@ -190,11 +190,13 @@ set(
     ${GLFW_SRC}
     ${IMGUI_SRC}
 
+    src/RaZ/*.cpp
     src/RaZ/Math/*.cpp
     src/RaZ/Render/*.cpp
     src/RaZ/Utils/*.cpp
 
-    include/RaZ/RaZ.hpp
+    include/RaZ/*.hpp
+    include/RaZ/*.inl
     include/RaZ/Math/*.hpp
     include/RaZ/Math/*.inl
     include/RaZ/Render/*.hpp
