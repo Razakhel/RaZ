@@ -25,6 +25,7 @@
 #include "Render/Submesh.hpp"
 #include "Render/Texture.hpp"
 #include "Render/UniformBuffer.hpp"
+#include "Utils/Bitset.hpp"
 #include "Utils/FileUtils.hpp"
 #include "Utils/Image.hpp"
 #include "Utils/Input.hpp"

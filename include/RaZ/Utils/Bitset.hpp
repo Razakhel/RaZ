@@ -21,8 +21,10 @@ public:
 
   Bitset operator&(const Bitset& bitset) const;
   Bitset operator|(const Bitset& bitset) const;
+  Bitset operator^(const Bitset& bitset) const;
   Bitset& operator|=(const Bitset& bitset);
   Bitset& operator&=(const Bitset& bitset);
+  Bitset& operator^=(const Bitset& bitset);
   bool operator[](std::size_t index) const { return m_bits[index]; }
   bool operator==(const Bitset& bitset) const { return std::equal(m_bits.cbegin(), m_bits.cend(), bitset.getBits().cbegin()); }
   bool operator!=(const Bitset& bitset) const { return !(*this == bitset); }

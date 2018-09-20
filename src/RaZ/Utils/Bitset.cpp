@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "RaZ/Utils/Bitset.hpp"
 
 namespace Raz {
@@ -21,6 +23,12 @@ Bitset Bitset::operator|(const Bitset& bitset) const {
   return res;
 }
 
+Bitset Bitset::operator^(const Bitset& bitset) const {
+  Bitset res = *this;
+  res ^= bitset;
+  return res;
+}
+
 Bitset& Bitset::operator&=(const Bitset& bitset) {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
     m_bits[bitIndex] = m_bits[bitIndex] & bitset.getBits()[bitIndex];
@@ -30,6 +38,12 @@ Bitset& Bitset::operator&=(const Bitset& bitset) {
 Bitset& Bitset::operator|=(const Bitset& bitset) {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
     m_bits[bitIndex] = m_bits[bitIndex] | bitset.getBits()[bitIndex];
+  return *this;
+}
+
+Bitset& Bitset::operator^=(const Bitset& bitset) {
+  for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
+    m_bits[bitIndex] = m_bits[bitIndex] ^ bitset.getBits()[bitIndex];
   return *this;
 }
 
