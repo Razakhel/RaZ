@@ -5,9 +5,9 @@
 
 #include <memory>
 
+#include "RaZ/Component.hpp"
 #include "RaZ/Math/Constants.hpp"
 #include "RaZ/Math/Matrix.hpp"
-#include "RaZ/Math/Transform.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 namespace Raz {
@@ -15,12 +15,11 @@ namespace Raz {
 class Camera;
 using CameraPtr = std::unique_ptr<Camera>;
 
-class Camera : public Transform {
+class Camera : public Component {
 public:
   Camera(unsigned int frameWidth, unsigned int frameHeight,
          float fieldOfViewDegrees = 45.f,
-         float nearPlane = 0.1f, float farPlane = 100.f,
-         const Vec3f& position = Vec3f(0.f));
+         float nearPlane = 0.1f, float farPlane = 100.f);
 
   float getFieldOfViewDegrees() const { return m_fieldOfView * 180.f / PI<float>; }
   const Mat4f& getViewMatrix() const { return m_viewMat; }
@@ -32,15 +31,9 @@ public:
 
   template <typename... Args> static CameraPtr create(Args&&... args) { return std::make_unique<Camera>(std::forward<Args>(args)...); }
 
-  void move(float x, float y, float z) override { move(Vec3f({ x, y, z })); }
-  void move(const Vec3f& displacement) override;
-  void translate(float x, float y, float z) override;
-  void translate(const Vec3f& values) override { translate(values[0], values[1], values[2]); }
-  void rotate(float xAngle, float yAngle, float zAngle) override;
-  void rotate(float angle, const Vec3f& axis) override;
-  const Mat4f& computeViewMatrix();
+  const Mat4f& computeViewMatrix(const Mat4f& inverseRotation, const Mat4f& translationMatrix);
   const Mat4f& computeInverseViewMatrix();
-  const Mat4f& computeLookAt(const Vec3f& target = Vec3f(0.f), const Vec3f& orientation = Vec3f({ 0.f, 1.f, 0.f }));
+  const Mat4f& computeLookAt(const Vec3f& position, const Vec3f& target = Vec3f(0.f), const Vec3f& orientation = Axis::Y);
   const Mat4f& computeInverseProjectionMatrix();
   const Mat4f& computePerspectiveMatrix();
 

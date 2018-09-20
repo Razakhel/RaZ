@@ -4,49 +4,20 @@ namespace Raz {
 
 Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
                float fieldOfViewDegrees,
-               float nearPlane, float farPlane,
-               const Vec3f& position) : m_frameRatio{ static_cast<float>(frameWidth) / static_cast<float>(frameHeight) },
-                                        m_fieldOfView{ fieldOfViewDegrees * PI<float> / 180 },
-                                        m_nearPlane{ nearPlane }, m_farPlane{ farPlane } {
-  m_position = position;
+               float nearPlane, float farPlane) : m_frameRatio{ static_cast<float>(frameWidth) / static_cast<float>(frameHeight) },
+                                                  m_nearPlane{ nearPlane }, m_farPlane{ farPlane } {
+  setFieldOfView(fieldOfViewDegrees);
+}
 
-  computeViewMatrix();
-  computeInverseViewMatrix();
+void Camera::setFieldOfView(float fieldOfViewDegrees) {
+  m_fieldOfView = fieldOfViewDegrees * PI<float> / 180;
+
   computePerspectiveMatrix();
   computeInverseProjectionMatrix();
 }
 
-void Camera::setFieldOfView(float fieldOfViewDegrees) {
-  m_fieldOfView = fieldOfViewDegrees  * PI<float> / 180;
-  computePerspectiveMatrix();
-}
-
-void Camera::move(const Vec3f& displacement) {
-  Transform::move(displacement);
-  computeViewMatrix();
-  computeInverseViewMatrix();
-}
-
-void Camera::translate(float x, float y, float z) {
-  Transform::translate(x, y, z);
-  computeViewMatrix();
-  computeInverseViewMatrix();
-}
-
-void Camera::rotate(float xAngle, float yAngle, float zAngle) {
-  Transform::rotate(xAngle, yAngle, zAngle);
-  computeViewMatrix();
-  computeInverseViewMatrix();
-}
-
-void Camera::rotate(float angle, const Vec3f& axis) {
-  Transform::rotate(angle, axis);
-  computeViewMatrix();
-  computeInverseViewMatrix();
-}
-
-const Mat4f& Camera::computeViewMatrix() {
-  m_viewMat = m_rotation.inverse() * computeTranslationMatrix(true);
+const Mat4f& Camera::computeViewMatrix(const Mat4f& inverseRotation, const Mat4f& translationMatrix) {
+  m_viewMat = inverseRotation * translationMatrix;
   return m_viewMat;
 }
 
@@ -55,15 +26,15 @@ const Mat4f& Camera::computeInverseViewMatrix() {
   return m_invViewMat;
 }
 
-const Mat4f& Camera::computeLookAt(const Vec3f& target, const Vec3f& orientation) {
-  const Vec3f zAxis((m_position - target).normalize());
+const Mat4f& Camera::computeLookAt(const Vec3f& position, const Vec3f& target, const Vec3f& orientation) {
+  const Vec3f zAxis((position - target).normalize());
   const Vec3f xAxis(zAxis.cross(orientation).normalize());
   const Vec3f yAxis(xAxis.cross(zAxis));
 
-  m_viewMat = Mat4f({{               xAxis[0],               yAxis[0],             -zAxis[0], 0.f },
-                     {               xAxis[1],               yAxis[1],             -zAxis[1], 0.f },
-                     {               xAxis[2],               yAxis[2],             -zAxis[2], 0.f },
-                     { xAxis.dot(-m_position), yAxis.dot(-m_position), zAxis.dot(m_position), 1.f }});
+  m_viewMat = Mat4f({{             xAxis[0],             yAxis[0],           -zAxis[0], 0.f },
+                     {             xAxis[1],             yAxis[1],           -zAxis[1], 0.f },
+                     {             xAxis[2],             yAxis[2],           -zAxis[2], 0.f },
+                     { xAxis.dot(-position), yAxis.dot(-position), zAxis.dot(position), 1.f }});
 
   return m_viewMat;
 }
