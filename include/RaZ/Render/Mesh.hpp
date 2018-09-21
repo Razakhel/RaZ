@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 
+#include "RaZ/Component.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/Submesh.hpp"
@@ -16,7 +17,7 @@ namespace Raz {
 class Mesh;
 using MeshPtr = std::unique_ptr<Mesh>;
 
-class Mesh {
+class Mesh : public Component {
 public:
   Mesh() { m_submeshes.emplace_back(Submesh::create()); }
   explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
@@ -39,8 +40,10 @@ public:
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
-  void load(const ShaderProgram* program = nullptr) const;
-  void draw(const ShaderProgram* program = nullptr) const;
+  void load() const;
+  void load(const ShaderProgram& program) const;
+  void draw() const;
+  void draw(const ShaderProgram& program) const;
   void save(const std::string& filePath) const;
 
 private:

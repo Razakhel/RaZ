@@ -58,25 +58,30 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
   }
 }
 
-void Mesh::load(const ShaderProgram* program) const {
+void Mesh::load() const {
   for (const auto& submesh : m_submeshes)
     submesh->load();
-
-  if (program) {
-    for (const auto& material : m_materials)
-      material->initTextures(*program);
-  }
 }
 
-void Mesh::draw(const ShaderProgram* program) const {
-  for (const auto& submesh : m_submeshes) {
-    if (program) {
-      if (!m_materials.empty()) {
-        const auto& material = m_materials[submesh->getMaterialIndex()];
+void Mesh::load(const ShaderProgram& program) const {
+  load();
 
-        if (material)
-          material->bindAttributes(*program);
-      }
+  for (const auto& material : m_materials)
+    material->initTextures(program);
+}
+
+void Mesh::draw() const {
+  for (const auto& submesh : m_submeshes)
+    submesh->draw();
+}
+
+void Mesh::draw(const ShaderProgram& program) const {
+  for (const auto& submesh : m_submeshes) {
+    if (!m_materials.empty()) {
+      const auto& material = m_materials[submesh->getMaterialIndex()];
+
+      if (material)
+        material->bindAttributes(program);
     }
 
     submesh->draw();
