@@ -268,19 +268,15 @@ void Window::addOverlayFpsCounter(const std::string& formattedText) {
   m_overlay->addFpsCounter(formattedText);
 }
 
-bool Window::run() {
+bool Window::run(float deltaTime) {
   if (glfwWindowShouldClose(m_window))
     return false;
 
   glfwPollEvents();
 
-  const auto currentTime = std::chrono::system_clock::now();
-  m_deltaTime            = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - m_lastFrameTime).count();
-  m_lastFrameTime        = currentTime;
-
   // Process actions belonging to pressed keys & mouse buttons
   for (const auto& action : std::get<4>(m_callbacks)) {
-    action.second.first(m_deltaTime);
+    action.second.first(deltaTime);
 
     if (action.second.second == Input::ONCE)
       std::get<4>(m_callbacks).erase(action.first);

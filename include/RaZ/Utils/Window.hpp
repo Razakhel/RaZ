@@ -40,7 +40,6 @@ public:
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
-  float getDeltaTime() const { return m_deltaTime; }
 
   void setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
   void setIcon(const Image& img) const;
@@ -76,7 +75,7 @@ public:
   void addOverlaySeparator();
   void addOverlayFrameTime(const std::string& formattedText);
   void addOverlayFpsCounter(const std::string& formattedText);
-  bool run();
+  bool run(float deltaTime);
   void setShouldClose() const { glfwSetWindowShouldClose(m_window, true); }
   void close();
 
@@ -88,8 +87,6 @@ private:
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
   OverlayPtr m_overlay {};
-  std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime {};
-  float m_deltaTime {};
 };
 
 } // namespace Raz
