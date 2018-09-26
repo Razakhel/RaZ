@@ -85,12 +85,22 @@ void ShaderProgram::sendUniform(int uniformIndex, int value) const {
 }
 
 template <>
-void ShaderProgram::sendUniform(int uniformIndex, unsigned int value) const {
-  glUniform1ui(uniformIndex, value);
+void ShaderProgram::sendUniform(int uniformIndex, uint8_t value) const {
+  glUniform1ui(uniformIndex, static_cast<unsigned int>(value));
 }
 
 template <>
-void ShaderProgram::sendUniform(int uniformIndex, std::size_t value) const {
+void ShaderProgram::sendUniform(int uniformIndex, uint16_t value) const {
+  glUniform1ui(uniformIndex, static_cast<unsigned int>(value));
+}
+
+template <>
+void ShaderProgram::sendUniform(int uniformIndex, uint32_t value) const {
+  glUniform1ui(uniformIndex, static_cast<unsigned int>(value));
+}
+
+template <>
+void ShaderProgram::sendUniform(int uniformIndex, uint64_t value) const {
   glUniform1ui(uniformIndex, static_cast<unsigned int>(value));
 }
 
