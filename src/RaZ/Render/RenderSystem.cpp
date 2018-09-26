@@ -1,5 +1,6 @@
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
+#include "RaZ/Render/Light.hpp"
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 
@@ -11,6 +12,7 @@ RenderSystem::RenderSystem(unsigned int windowWidth, unsigned int windowHeight,
   m_camera.addComponent<Transform>();
 
   m_acceptedComponents.setBit(Component::getId<Mesh>());
+  m_acceptedComponents.setBit(Component::getId<Light>());
 }
 
 void RenderSystem::linkEntity(const EntityPtr& entity) {
@@ -18,6 +20,9 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
 
   if (entity->hasComponent<Mesh>())
     entity->getComponent<Mesh>().load(m_program);
+
+  if (entity->hasComponent<Light>())
+    updateLights();
 }
 
 void RenderSystem::update(float deltaTime) {
@@ -61,6 +66,54 @@ void RenderSystem::update(float deltaTime) {
   }
 
   m_window.run(deltaTime);
+}
+
+void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
+  m_program.use();
+
+  const std::string strBase = "uniLights[" + std::to_string(lightIndex) + "].";
+
+  const std::string posStr    = strBase + "position";
+  const std::string colorStr  = strBase + "color";
+  const std::string energyStr = strBase + "energy";
+  const std::string angleStr  = strBase + "angle";
+
+  const auto& lightComp = entity->getComponent<Light>();
+  Vec4f homogeneousPos(entity->getComponent<Transform>().getPosition(), 1.f);
+
+  if (lightComp.getType() == LightType::DIRECTIONAL) {
+    homogeneousPos[3] = 0.f;
+    m_program.sendUniform(strBase + "direction", lightComp.getDirection());
+  }
+
+  m_program.sendUniform(posStr,    homogeneousPos);
+  m_program.sendUniform(colorStr,  lightComp.getColor());
+  m_program.sendUniform(energyStr, lightComp.getEnergy());
+  m_program.sendUniform(angleStr,  lightComp.getAngle());
+}
+
+void RenderSystem::updateLights() const {
+  std::size_t lightCount = 0;
+
+  for (const auto& entity : m_entities) {
+    if (entity->hasComponent<Light>()) {
+      updateLight(entity, lightCount);
+      ++lightCount;
+    }
+  }
+
+  m_program.sendUniform("uniLightCount", lightCount);
+}
+
+void RenderSystem::updateShaders() const {
+  m_program.updateShaders();
+
+  for (auto& entity : m_entities) {
+    if (entity->hasComponent<Mesh>())
+      entity->getComponent<Mesh>().load(m_program);
+  }
+
+  updateLights();
 }
 
 } // namespace Raz
