@@ -10,21 +10,20 @@
 
 namespace Raz {
 
-class Light;
-using LightPtr = std::unique_ptr<Light>;
+enum class LightType { POINT = 0,
+                       DIRECTIONAL,
+                       SPOT };
 
-class PointLight;
-using PointLightPtr = std::unique_ptr<PointLight>;
-
-class DirectionalLight;
-using DirectionalLightPtr = std::unique_ptr<DirectionalLight>;
-
-class SpotLight;
-using SpotLightPtr = std::unique_ptr<SpotLight>;
-
-class Light : public Transform {
+class Light : public Component {
 public:
-  virtual Vec4f getHomogeneousPosition() const = 0;
+  Light(LightType type, float energy, const Vec3f& color = Vec3f(1.f))
+    : m_type{ type }, m_energy{ energy }, m_color{ color } {}
+  Light(LightType type, const Vec3f& direction, float energy, const Vec3f& color = Vec3f(1.f))
+    : m_type{ type }, m_direction{ direction }, m_energy{ energy }, m_color{ color } {}
+  Light(LightType type, const Vec3f& direction, float energy, float angle, const Vec3f& color = Vec3f(1.f))
+    : m_type{ type }, m_direction{ direction }, m_energy{ energy }, m_angle{ angle }, m_color{ color } {}
+
+  LightType getType() const { return m_type; }
   const Vec3f& getDirection() const { return m_direction; }
   Vec3f& getDirection() { return m_direction; }
   const Vec3f& getColor() const { return m_color; }
@@ -32,53 +31,16 @@ public:
   float getEnergy() const { return m_energy; }
   float getAngle() const { return m_angle; }
 
+  void setType(LightType type) { m_type = type; }
   void setEnergy(float energy) { m_energy = energy; }
+  void setAngle(float angle) { m_angle = angle; }
 
-  virtual ~Light() = default;
-
-protected:
-  Light(const Vec3f& position, float energy, const Vec3f& color) : m_energy{ energy }, m_color{ color } { m_position = position; }
-  Light(const Vec3f& position, const Vec3f& direction, float energy, const Vec3f& color)
-    : m_direction{ direction }, m_energy{ energy }, m_color{ color } { m_position = position; }
-  Light(const Vec3f& position, const Vec3f& direction, float angle, float energy, const Vec3f& color)
-    : m_direction{ direction }, m_angle{ angle }, m_energy{ energy }, m_color{ color } { m_position = position; }
-
+private:
+  LightType m_type {};
   Vec3f m_direction {};
-  float m_angle  = 0.f;
   float m_energy = 1.f;
+  float m_angle  = 0.f;
   Vec3f m_color {};
-};
-
-class PointLight : public Light {
-public:
-  explicit PointLight(const Vec3f& position, float energy = 1.f, const Vec3f& color = Vec3f(1.f)) : Light(position, energy, color) {}
-
-  Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 1.f); }
-
-  template <typename... Args>
-  static PointLightPtr create(Args&&... args) { return std::make_unique<PointLight>(std::forward<Args>(args)...); }
-};
-
-class DirectionalLight : public Light {
-public:
-  DirectionalLight(const Vec3f& direction, float energy = 1.f, const Vec3f& color = Vec3f(1.f), const Vec3f& position = Vec3f(0.f))
-    : Light(position, direction, energy, color) {}
-
-  Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 0.f); }
-
-  template <typename... Args>
-  static DirectionalLightPtr create(Args&&... args) { return std::make_unique<DirectionalLight>(std::forward<Args>(args)...); }
-};
-
-class SpotLight : public Light {
-public:
-  SpotLight(const Vec3f& position, const Vec3f& direction, float angle, float energy = 1.f, const Vec3f& color = Vec3f(1.f))
-    : Light(position, direction, angle, energy, color) {}
-
-  Vec4f getHomogeneousPosition() const override { return Vec4f(m_position, 1.f); }
-
-  template <typename... Args>
-  static SpotLight create(Args&&... args) { return std::make_unique<SpotLight>(std::forward<Args>(args)...); }
 };
 
 } // namespace Raz
