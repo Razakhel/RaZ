@@ -40,6 +40,8 @@ void RenderSystem::update(float deltaTime) {
     sendViewProjectionMatrix(viewProjMat);
     sendCameraPosition(camTransform.getPosition());
 
+    m_program.sendUniform("uniCameraPos", camTransform.getPosition());
+
     camTransform.setUpdated(false);
   } else {
     viewProjMat = camera.getProjectionMatrix() * camera.getViewMatrix();
