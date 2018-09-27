@@ -5,6 +5,10 @@
 
 #define GLEW_STATIC
 
+#include "Application.hpp"
+#include "Entity.hpp"
+#include "Component.hpp"
+#include "World.hpp"
 #include "Math/Constants.hpp"
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
@@ -19,7 +23,6 @@
 #include "Render/Light.hpp"
 #include "Render/Material.hpp"
 #include "Render/Mesh.hpp"
-#include "Render/Scene.hpp"
 #include "Render/Shader.hpp"
 #include "Render/ShaderProgram.hpp"
 #include "Render/Submesh.hpp"
