@@ -3,6 +3,7 @@
 #ifndef RAZ_BITSET_HPP
 #define RAZ_BITSET_HPP
 
+#include <algorithm>
 #include <vector>
 
 namespace Raz {
@@ -16,6 +17,9 @@ public:
   std::vector<bool>& getBits() { return m_bits; }
   std::size_t getSize() const { return m_bits.size(); }
 
+  bool isEmpty() const;
+  std::size_t getEnabledBitCount() const { return static_cast<std::size_t>(std::count(m_bits.cbegin(), m_bits.cend(), true)); }
+  std::size_t getDisabledBitCount() const { return m_bits.size() - getEnabledBitCount(); }
   void setBit(std::size_t position, bool value = true);
   void resize(std::size_t newSize) { m_bits.resize(newSize); }
 
