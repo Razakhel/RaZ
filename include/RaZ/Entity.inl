@@ -9,11 +9,11 @@ bool Entity::hasComponent() const {
 }
 
 template <typename Comp>
-Comp& Entity::getComponent() {
+const Comp& Entity::getComponent() const {
   static_assert(std::is_base_of<Component, Comp>::value, "Error: Fetched component must be derived from Component.");
 
   if (hasComponent<Comp>())
-    return static_cast<Comp&>(*m_components[Component::getId<Comp>()]);
+    return static_cast<const Comp&>(*m_components[Component::getId<Comp>()]);
 
   throw std::runtime_error("Error: No component available of specified type");
 }

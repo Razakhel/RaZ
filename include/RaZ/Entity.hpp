@@ -27,7 +27,8 @@ public:
   template <typename... Args> static EntityPtr create(Args&&... args) { return std::make_unique<Entity>(std::forward<Args>(args)...); }
 
   template <typename Comp> bool hasComponent() const;
-  template <typename Comp> Comp& getComponent();
+  template <typename Comp> const Comp& getComponent() const;
+  template <typename Comp> Comp& getComponent() { return const_cast<Comp&>(static_cast<const Entity*>(this)->getComponent<Comp>()); }
   template <typename Comp, typename... Args> Comp& addComponent(Args&&... args);
   template <typename Comp> std::tuple<Comp&> addComponents();
   template <typename Comp1, typename Comp2, typename... C> std::tuple<Comp1&, Comp2&, C...> addComponents();
