@@ -10,10 +10,10 @@ int main() {
 
   render.getCameraEntity().getComponent<Raz::Transform>().setPosition(Raz::Vec3f({0.f, 0.f, -5.f}));
 
-  auto& mesh = world.addEntityWithComponent<Raz::Transform>();
+  Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
   mesh.addComponent<Raz::Mesh>("../../assets/meshes/ball.obj");
 
-  auto& light = world.addEntityWithComponent<Raz::Transform>();
+  Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
   light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,   // Type
                                  Raz::Vec3f({ 0.f, 0.f, 1.f }), // Direction
                                  1.f,                           // Energy

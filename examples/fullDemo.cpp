@@ -1,227 +1,185 @@
-#include <chrono>
-#include <iostream>
-
 #include "RaZ/RaZ.hpp"
 
 int main() {
-  Raz::WindowPtr window = Raz::Window::create(1280, 720, "RaZ - Full demo", 4);
-  window->enableOverlay();
+  Raz::Application app;
+  Raz::World& world = app.addWorld(Raz::World(10));
 
-  const auto startTime = std::chrono::system_clock::now();
-  Raz::ModelPtr model = Raz::Model::import("../../assets/meshes/shield.obj");
-  const auto endTime = std::chrono::system_clock::now();
+  auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
+  renderSystem.setProgram(Raz::ShaderProgram(Raz::VertexShader::create("../../shaders/vert.glsl"),
+                                             Raz::FragmentShader::create("../../shaders/cook-torrance.glsl")));
 
-  std::cout << "Mesh loading duration: "
-            << std::chrono::duration_cast<std::chrono::duration<float>>(endTime - startTime).count()
-            << " seconds." << std::endl;
+  Raz::Window& window = renderSystem.getWindow();
+  window.enableOverlay();
 
-  model->scale(0.2f);
-  model->rotate(180.f, Raz::Axis::Y);
+  Raz::Entity& camera = renderSystem.getCameraEntity();
+  auto& cameraComp    = camera.getComponent<Raz::Camera>();
+  auto& cameraTrans   = camera.getComponent<Raz::Transform>();
+  cameraTrans.setPosition(Raz::Vec3f({0.f, 0.f, -5.f}));
 
-  Raz::ScenePtr scene = Raz::Scene::create(Raz::VertexShader::create("../../shaders/vert.glsl"),
-                                           Raz::FragmentShader::create("../../shaders/cook-torrance.glsl"));
+  Raz::Entity& mesh = world.addEntity();
+  auto& meshTrans   = mesh.addComponent<Raz::Transform>();
+  mesh.addComponent<Raz::Mesh>("../../assets/meshes/shield.obj");
 
-  Raz::CubemapPtr cubemap = Raz::Cubemap::create("../../assets/skyboxes/clouds_right.png",
-                                                 "../../assets/skyboxes/clouds_left.png",
-                                                 "../../assets/skyboxes/clouds_top.png",
-                                                 "../../assets/skyboxes/clouds_bottom.png",
-                                                 "../../assets/skyboxes/clouds_front.png",
-                                                 "../../assets/skyboxes/clouds_back.png");
+  meshTrans.scale(0.2f);
+  meshTrans.rotate(180.f, Raz::Axis::Y);
 
-  /*Raz::LightPtr light = Raz::PointLight::create(Raz::Vec3f({ 0.f, 1.f, 0.f }),  // Position
-                                                10.f,                           // Energy
-                                                Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)*/
-  Raz::LightPtr light = Raz::DirectionalLight::create(Raz::Vec3f({ 0.f, 0.f, 1.f }),  // Direction
-                                                      1.f,                            // Energy
-                                                      Raz::Vec3f({ 1.f, 1.f, 1.f })); // Color (R/G/B)
+  Raz::Entity& light = world.addEntity();
+  /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT, // Type
+                                                   1.f,                   // Energy
+                                                   Raz::Vec3f(1.f));      // Color(RGB)*/
+  auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,   // Type
+                                                   Raz::Vec3f({ 0.f, 0.f, 1.f }), // Direction
+                                                   1.f,                           // Energy
+                                                   Raz::Vec3f(1.f));              // Color (RGB)
+  auto& lightTrans = light.addComponent<Raz::Transform>(Raz::Vec3f({ 0.f, 1.f, 0.f }));
 
-  Raz::CameraPtr camera = Raz::Camera::create(window->getWidth(),
-                                              window->getHeight(),
-                                              45.f,                            // Field of view
-                                              0.1f, 100.f,                     // Near plane, far plane
-                                              Raz::Vec3f({ 0.f, 0.f, -5.f })); // Initial position
-
-  const auto modelPtr  = model.get();
-  const auto lightPtr  = light.get();
-  const auto cameraPtr = camera.get();
-
-  scene->setCubemap(std::move(cubemap));
-  scene->addModel(std::move(model));
-  scene->addLight(std::move(light));
-  scene->updateLights();
-  scene->load();
-
-  Raz::Application app(std::move(window), std::move(scene), std::move(camera));
-
-  auto& windowPtr = app.getWindow();
-  auto& scenePtr  = app.getScene();
+  window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) { mesh.disable(); },
+                        Raz::Input::ONCE,
+                        [&mesh] () { mesh.enable(); });
 
   // Allow wireframe toggling
   bool isWireframe = false;
-  windowPtr->addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
+  window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
     isWireframe = !isWireframe;
     glPolygonMode(GL_FRONT_AND_BACK, (isWireframe ? GL_LINE : GL_FILL));
   }, Raz::Input::ONCE);
 
   // Allow face culling toggling
   bool hasFaceCulling = true;
-  windowPtr->addKeyCallback(Raz::Keyboard::N, [&hasFaceCulling, &windowPtr] (float /* deltaTime */) {
-    windowPtr->enableFaceCulling((hasFaceCulling = !hasFaceCulling));
+  window.addKeyCallback(Raz::Keyboard::N, [&hasFaceCulling, &window] (float /* deltaTime */) {
+    window.enableFaceCulling((hasFaceCulling = !hasFaceCulling));
   }, Raz::Input::ONCE);
 
-  windowPtr->addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
 
   // Camera controls
   float cameraSpeed = 1.f;
-  windowPtr->addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
-                            [&cameraSpeed] (float /* deltaTime */) { cameraSpeed = 2.f; },
-                            Raz::Input::ONCE,
-                            [&cameraSpeed] () { cameraSpeed = 1.f; });
-  windowPtr->addKeyCallback(Raz::Keyboard::SPACE, [&cameraPtr, &cameraSpeed] (float deltaTime) {
-    cameraPtr->move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
+  window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
+                        [&cameraSpeed] (float /* deltaTime */) { cameraSpeed = 2.f; },
+                        Raz::Input::ONCE,
+                        [&cameraSpeed] () { cameraSpeed = 1.f; });
+  window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+    cameraTrans.move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::V, [&cameraPtr, &cameraSpeed] (float deltaTime) {
-    cameraPtr->move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
+  window.addKeyCallback(Raz::Keyboard::V, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+    cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::W, [&cameraPtr, &cameraSpeed] (float deltaTime) {
-    cameraPtr->move(0.f, 0.f, (10.f * deltaTime) * cameraSpeed);
+  window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+    cameraTrans.move(0.f, 0.f, (10.f * deltaTime) * cameraSpeed);
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::S, [&cameraPtr, &cameraSpeed] (float deltaTime) {
-    cameraPtr->move(0.f,  0.f, (-10.f * deltaTime) * cameraSpeed);
+  window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+    cameraTrans.move(0.f,  0.f, (-10.f * deltaTime) * cameraSpeed);
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::A, [&cameraPtr, &cameraSpeed] (float deltaTime) {
-    cameraPtr->move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
+  window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+    cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::D, [&cameraPtr, &cameraSpeed] (float deltaTime) {
-    cameraPtr->move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
+  window.addKeyCallback(Raz::Keyboard::D, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+    cameraTrans.move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
   });
 
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM8, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(-90.f * deltaTime, Raz::Axis::X); // Looking up
+  window.addKeyCallback(Raz::Keyboard::NUM8, [&cameraTrans] (float deltaTime) {
+    cameraTrans.rotate(-90.f * deltaTime, Raz::Axis::X); // Looking up
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM2, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(90.f * deltaTime, Raz::Axis::X); // Looking down
+  window.addKeyCallback(Raz::Keyboard::NUM2, [&cameraTrans] (float deltaTime) {
+    cameraTrans.rotate(90.f * deltaTime, Raz::Axis::X); // Looking down
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM4, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(-90.f * deltaTime, Raz::Axis::Y); // Looking left
+  window.addKeyCallback(Raz::Keyboard::NUM4, [&cameraTrans] (float deltaTime) {
+    cameraTrans.rotate(-90.f * deltaTime, Raz::Axis::Y); // Looking left
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::NUM6, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(90.f * deltaTime, Raz::Axis::Y); // Looking right
+  window.addKeyCallback(Raz::Keyboard::NUM6, [&cameraTrans] (float deltaTime) {
+    cameraTrans.rotate(90.f * deltaTime, Raz::Axis::Y); // Looking right
   });
   // DO A BARREL ROLL
-  windowPtr->addKeyCallback(Raz::Keyboard::Q, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(90.f * deltaTime, Raz::Axis::Z); // Roll to the left
+  window.addKeyCallback(Raz::Keyboard::Q, [&cameraTrans] (float deltaTime) {
+    cameraTrans.rotate(90.f * deltaTime, Raz::Axis::Z); // Roll to the left
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::E, [&cameraPtr] (float deltaTime) {
-    cameraPtr->rotate(-90.f * deltaTime, Raz::Axis::Z); // Roll to the right
+  window.addKeyCallback(Raz::Keyboard::E, [&cameraTrans] (float deltaTime) {
+    cameraTrans.rotate(-90.f * deltaTime, Raz::Axis::Z); // Roll to the right
   });
 
   // Mesh controls
-  windowPtr->addKeyCallback(Raz::Keyboard::T, [&modelPtr] (float deltaTime) { modelPtr->move(0.f, 0.f,  10.f * deltaTime); });
-  windowPtr->addKeyCallback(Raz::Keyboard::G, [&modelPtr] (float deltaTime) { modelPtr->move(0.f, 0.f, -10.f * deltaTime); });
-  windowPtr->addKeyCallback(Raz::Keyboard::F, [&modelPtr] (float deltaTime) { modelPtr->move(-10.f * deltaTime, 0.f, 0.f); });
-  windowPtr->addKeyCallback(Raz::Keyboard::H, [&modelPtr] (float deltaTime) { modelPtr->move( 10.f * deltaTime, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::T, [&meshTrans] (float deltaTime) { meshTrans.move(0.f, 0.f,  10.f * deltaTime); });
+  window.addKeyCallback(Raz::Keyboard::G, [&meshTrans] (float deltaTime) { meshTrans.move(0.f, 0.f, -10.f * deltaTime); });
+  window.addKeyCallback(Raz::Keyboard::F, [&meshTrans] (float deltaTime) { meshTrans.move(-10.f * deltaTime, 0.f, 0.f); });
+  window.addKeyCallback(Raz::Keyboard::H, [&meshTrans] (float deltaTime) { meshTrans.move( 10.f * deltaTime, 0.f, 0.f); });
 
-  windowPtr->addKeyCallback(Raz::Keyboard::X, [&modelPtr] (float /* deltaTime */) { modelPtr->scale(0.5f); }, Raz::Input::ONCE);
-  windowPtr->addKeyCallback(Raz::Keyboard::C, [&modelPtr] (float /* deltaTime */) { modelPtr->scale(2.f); }, Raz::Input::ONCE);
+  window.addKeyCallback(Raz::Keyboard::X, [&meshTrans] (float /* deltaTime */) { meshTrans.scale(0.5f); }, Raz::Input::ONCE);
+  window.addKeyCallback(Raz::Keyboard::C, [&meshTrans] (float /* deltaTime */) { meshTrans.scale(2.f); }, Raz::Input::ONCE);
 
-  windowPtr->addKeyCallback(Raz::Keyboard::UP, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate(-90.f * deltaTime, Raz::Axis::X);
-  });
-  windowPtr->addKeyCallback(Raz::Keyboard::DOWN, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate(90.f * deltaTime, Raz::Axis::X);
-  });
-  windowPtr->addKeyCallback(Raz::Keyboard::LEFT, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate(-90.f * deltaTime, Raz::Axis::Y);
-  });
-  windowPtr->addKeyCallback(Raz::Keyboard::RIGHT, [&modelPtr] (float deltaTime) {
-    modelPtr->rotate(90.f * deltaTime, Raz::Axis::Y);
-  });
+  window.addKeyCallback(Raz::Keyboard::UP,    [&meshTrans] (float deltaTime) { meshTrans.rotate(-90.f * deltaTime, Raz::Axis::X); });
+  window.addKeyCallback(Raz::Keyboard::DOWN,  [&meshTrans] (float deltaTime) { meshTrans.rotate( 90.f * deltaTime, Raz::Axis::X); });
+  window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTrans] (float deltaTime) { meshTrans.rotate(-90.f * deltaTime, Raz::Axis::Y); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTrans] (float deltaTime) { meshTrans.rotate( 90.f * deltaTime, Raz::Axis::Y); });
 
   // Light controls
-  windowPtr->addKeyCallback(Raz::Keyboard::I, [&lightPtr, &scenePtr] (float deltaTime) {
-    lightPtr->translate(0.f, 0.f, 10.f * deltaTime);
-    scenePtr->updateLights();
+  window.addKeyCallback(Raz::Keyboard::I, [&lightTrans, &renderSystem] (float deltaTime) {
+    lightTrans.translate(0.f, 0.f, 10.f * deltaTime);
+    renderSystem.updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::K, [&lightPtr, &scenePtr] (float deltaTime) {
-    lightPtr->translate(0.f, 0.f, -10.f * deltaTime);
-    scenePtr->updateLights();
+  window.addKeyCallback(Raz::Keyboard::K, [&lightTrans, &renderSystem] (float deltaTime) {
+    lightTrans.translate(0.f, 0.f, -10.f * deltaTime);
+    renderSystem.updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::J, [&lightPtr, &scenePtr] (float deltaTime) {
-    lightPtr->translate(-10.f * deltaTime, 0.f, 0.f);
-    scenePtr->updateLights();
+  window.addKeyCallback(Raz::Keyboard::J, [&lightTrans, &renderSystem] (float deltaTime) {
+    lightTrans.translate(-10.f * deltaTime, 0.f, 0.f);
+    renderSystem.updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::L, [&lightPtr, &scenePtr] (float deltaTime) {
-    lightPtr->translate(10.f * deltaTime, 0.f, 0.f);
-    scenePtr->updateLights();
+  window.addKeyCallback(Raz::Keyboard::L, [&lightTrans, &renderSystem] (float deltaTime) {
+    lightTrans.translate(10.f * deltaTime, 0.f, 0.f);
+    renderSystem.updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::PAGEUP, [&lightPtr, &scenePtr] (float deltaTime) {
-    lightPtr->setEnergy(lightPtr->getEnergy() + 1.f * deltaTime);
-    scenePtr->updateLights();
+  window.addKeyCallback(Raz::Keyboard::PAGEUP, [&lightComp, &renderSystem] (float deltaTime) {
+    lightComp.setEnergy(lightComp.getEnergy() + 1.f * deltaTime);
+    renderSystem.updateLights();
   });
-  windowPtr->addKeyCallback(Raz::Keyboard::PAGEDOWN, [&lightPtr, &scenePtr] (float deltaTime) {
-    lightPtr->setEnergy(std::max(0.f, lightPtr->getEnergy() - 1.f * deltaTime));
-    scenePtr->updateLights();
+  window.addKeyCallback(Raz::Keyboard::PAGEDOWN, [&lightComp, &renderSystem] (float deltaTime) {
+    lightComp.setEnergy(std::max(0.f, lightComp.getEnergy() - 1.f * deltaTime));
+    renderSystem.updateLights();
   });
 
-  windowPtr->addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&scenePtr, &cameraPtr] (float /* deltaTime */) {
-    scenePtr->addLight(Raz::PointLight::create(cameraPtr->getPosition(), 10.f, Raz::Vec3f({ 1.f, 1.f, 1.f })));
-    scenePtr->updateLights();
+  window.addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&world, &cameraTrans] (float /* deltaTime */) {
+    auto& newLight = world.addEntityWithComponent<Raz::Light>(true,                  // Enabled
+                                                              Raz::LightType::POINT, // Type (point light)
+                                                              10.f);                 // Energy
+    newLight.addComponent<Raz::Transform>(cameraTrans.getPosition());
   }, Raz::Input::ONCE);
 
-  windowPtr->addKeyCallback(Raz::Keyboard::F5, [&app] (float /* deltaTime */) { app.updateShaders(); });
+  window.addKeyCallback(Raz::Keyboard::F5, [&renderSystem] (float /* deltaTime */) { renderSystem.updateShaders(); });
 
   // Mouse callbacks
-  windowPtr->addMouseScrollCallback([&cameraPtr] (double /* xOffset */, double yOffset) {
-    cameraPtr->setFieldOfView(std::max(15.f, std::min(90.f, cameraPtr->getFieldOfViewDegrees() + static_cast<float>(-yOffset) * 2.f)));
+  window.addMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
+    cameraComp.setFieldOfView(std::max(15.f, std::min(90.f, cameraComp.getFieldOfViewDegrees() + static_cast<float>(-yOffset) * 2.f)));
   });
 
-  windowPtr->addMouseMoveCallback([&cameraPtr, &windowPtr] (double xMove, double yMove) {
+  window.addMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
     // Dividing move by window size to scale between -1 and 1
-    // X & Y moves are inverted, unsure of why for now
-    cameraPtr->rotate(90.f * static_cast<float>(yMove) / windowPtr->getHeight(),
-                      90.f * static_cast<float>(xMove) / windowPtr->getWidth(),
-                      0.f);
+    cameraTrans.rotate(90.f * static_cast<float>(yMove) / window.getHeight(),
+                       90.f * static_cast<float>(xMove) / window.getWidth(),
+                       0.f);
   });
 
-  windowPtr->disableCursor(); // Disabling mouse cursor to allow continous rotations
-  windowPtr->addKeyCallback(Raz::Keyboard::LEFT_ALT,
-                            [&windowPtr] (float /* deltaTime */) { windowPtr->showCursor(); },
-                            Raz::Input::ONCE,
-                            [&windowPtr] () { windowPtr->disableCursor(); });
+  window.disableCursor(); // Disabling mouse cursor to allow continous rotations
+  window.addKeyCallback(Raz::Keyboard::LEFT_ALT,
+                        [&window] (float /* deltaTime */) { window.showCursor(); },
+                        Raz::Input::ONCE,
+                        [&window] () { window.disableCursor(); });
 
   // Overlay features
-  windowPtr->addOverlayText("RaZ - Full demo");
-  windowPtr->addOverlayText("Scene's informations:");
-  windowPtr->addOverlayText(std::to_string(scenePtr->recoverVertexCount()) + " vertices, "
-                          + std::to_string(scenePtr->recoverTriangleCount()) + " triangles");
-  windowPtr->addOverlaySeparator();
-  windowPtr->addOverlayCheckbox("Enable face culling",
-                                true,
-                                [&windowPtr] () { windowPtr->enableFaceCulling(); },
-                                [&windowPtr] () { windowPtr->disableFaceCulling(); });
-  windowPtr->addOverlayCheckbox("Enable vertical sync",
-                                windowPtr->recoverVerticalSyncState(),
-                                [&windowPtr] () { windowPtr->enableVerticalSync(); },
-                                [&windowPtr] () { windowPtr->disableVerticalSync(); });
-  windowPtr->addOverlaySeparator();
-  windowPtr->addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
-  windowPtr->addOverlayFpsCounter("FPS: %.1f");
+  window.addOverlayText("RaZ - Full demo");
+  window.addOverlaySeparator();
+  window.addOverlayCheckbox("Enable face culling",
+                            true,
+                            [&window] () { window.enableFaceCulling(); },
+                            [&window] () { window.disableFaceCulling(); });
+  window.addOverlayCheckbox("Enable vertical sync",
+                            window.recoverVerticalSyncState(),
+                            [&window] () { window.enableVerticalSync(); },
+                            [&window] () { window.disableVerticalSync(); });
+  window.addOverlaySeparator();
+  window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  window.addOverlayFpsCounter("FPS: %.1f");
 
-  auto lastTime = std::chrono::system_clock::now();
-  uint16_t nbFrames = 0;
-
-  while (app.run()) {
-    const auto currentTime = std::chrono::system_clock::now();
-    ++nbFrames;
-
-    if (std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - lastTime).count() >= 1.f) {
-      app.getWindow()->setTitle("RaZ - " + std::to_string(nbFrames) + " FPS");
-
-      nbFrames = 0;
-      lastTime = currentTime;
-    }
-  }
+  while (app.run());
 
   return EXIT_SUCCESS;
 }
