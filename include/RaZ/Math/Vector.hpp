@@ -40,7 +40,8 @@ public:
   Vector cross(const Vector& vec) const;
   Vector reflect(const Vector& normal) const { return (*this - normal * dot(normal) * 2); }
   Vector normalize() const;
-  float computeLength() const { return std::sqrt(dot(*this)); }
+  float computeLength() const { return std::sqrt(computeSquareLength()); }
+  float computeSquareLength() const { return dot(*this); }
   std::size_t hash(std::size_t seed) const;
 
   Vector& operator=(const Vector& vec) = default;
