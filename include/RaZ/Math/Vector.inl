@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <cassert>
+#include <limits>
 
 namespace Raz {
 
@@ -35,7 +37,7 @@ T Vector<T, Size>::dot(const Vector& vec) const {
 
 template <typename T, std::size_t Size>
 Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const {
-  static_assert(Size == 3, "Error: Both vectors must be 3 dimensional.");
+  static_assert(Size == 3, "Error: Both vectors must be 3 dimensional to compute a cross product.");
 
   Vector<T, Size> res;
 
@@ -185,6 +187,25 @@ Vector<T, Size>& Vector<T, Size>::operator/=(float val) {
   for (T& elt : m_data)
     elt /= val;
   return *this;
+}
+
+template <typename T, std::size_t Size>
+bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const {
+  if (std::is_floating_point<T>::value) {
+    // Using absolute & relative tolerances for floating points types: http://www.realtimecollisiondetection.net/pubs/Tolerances/
+    // Could be a better idea to use ULPs checking. Maybe slower though?
+    for (std::size_t i = 0; i < Size; ++i) {
+      const T val1 = m_data[i];
+      const T val2 = vec[i];
+
+      if (std::abs(val1 - val2) > std::numeric_limits<T>::epsilon() * std::max({ static_cast<T>(1), std::abs(val1), std::abs(val2) }))
+        return false;
+    }
+
+    return true;
+  } else {
+    return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin());
+  }
 }
 
 template <typename T, std::size_t Size>

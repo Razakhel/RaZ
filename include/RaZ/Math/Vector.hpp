@@ -40,11 +40,12 @@ public:
   Vector cross(const Vector& vec) const;
   Vector reflect(const Vector& normal) const { return (*this - normal * dot(normal) * 2); }
   Vector normalize() const;
-  float computeLength() const { return std::sqrt(computeSquareLength()); }
-  float computeSquareLength() const { return dot(*this); }
+  float computeLength() const { return std::sqrt(computeSquaredLength()); }
+  float computeSquaredLength() const { return dot(*this); }
   std::size_t hash(std::size_t seed) const;
 
-  Vector& operator=(const Vector& vec) = default;
+  Vector& operator=(const Vector&) = default;
+  Vector& operator=(Vector&&) noexcept = default;
   Vector operator-() const { return (*this * -1); }
   Vector operator+(const Vector& vec) const;
   Vector operator+(float val) const;
@@ -66,7 +67,7 @@ public:
   const T& operator[](std::size_t index) const { return m_data[index]; }
   T& operator[](std::size_t index) { return m_data[index]; }
   std::size_t operator()(const Vector&) const { return hash(0); }
-  bool operator==(const Vector& vec) const { return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin()); }
+  bool operator==(const Vector& vec) const;
   friend std::ostream& operator<< <>(std::ostream& stream, const Vector& vec);
 
 private:
