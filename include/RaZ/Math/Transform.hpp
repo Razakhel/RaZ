@@ -42,11 +42,10 @@ public:
   Mat4f computeTranslationMatrix(bool inverseTranslation = false) const;
   Mat4f computeTransformMatrix() const;
 
-protected:
+private:
   Vec3f m_position;
   Mat4f m_rotation;
   Vec3f m_scale;
-
   bool m_updated = true;
 };
 

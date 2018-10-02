@@ -41,7 +41,8 @@ public:
   float computeDeterminant() const;
   Matrix inverse() const;
 
-  Matrix& operator=(const Matrix& mat) = default;
+  Matrix& operator=(const Matrix&) = default;
+  Matrix& operator=(Matrix&&) noexcept = default;
   Matrix operator+(const Matrix& mat) const;
   Matrix operator+(float val) const;
   Matrix operator-(const Matrix& mat) const;
