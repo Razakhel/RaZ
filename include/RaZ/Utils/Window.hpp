@@ -18,6 +18,7 @@
 #include "glew/include/GL/glxew.h"
 #endif
 #include "glfw/include/GLFW/glfw3.h"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Overlay.hpp"
 #include "RaZ/Utils/Input.hpp"
@@ -76,6 +77,7 @@ public:
   void addOverlayFrameTime(const std::string& formattedText);
   void addOverlayFpsCounter(const std::string& formattedText);
   bool run(float deltaTime);
+  Vec2f recoverMousePosition() const;
   void setShouldClose() const { glfwSetWindowShouldClose(m_window, true); }
   void close();
 

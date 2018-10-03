@@ -293,6 +293,13 @@ bool Window::run(float deltaTime) {
   return true;
 }
 
+Vec2f Window::recoverMousePosition() const {
+  double xPos {}, yPos {};
+  glfwGetCursorPos(m_window, &xPos, &yPos);
+
+  return Vec2f({ static_cast<float>(xPos), static_cast<float>(yPos) });
+}
+
 void Window::close() {
   disableOverlay();
   glfwTerminate();
