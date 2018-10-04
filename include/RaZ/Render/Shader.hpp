@@ -29,8 +29,9 @@ public:
 
   void load() const;
   void compile() const;
+  void destroy() const { glDeleteShader(m_index); }
 
-  ~Shader() { glDeleteShader(m_index); }
+  ~Shader() { destroy(); }
 
 protected:
   GLuint m_index {};

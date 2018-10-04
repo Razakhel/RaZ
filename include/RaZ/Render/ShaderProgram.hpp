@@ -34,9 +34,10 @@ public:
   template <typename T> void sendUniform(int uniformIndex, T value) const;
   template <typename T, std::size_t Size> void sendUniform(int uniformIndex, const Vector<T, Size>& vec) const;
   template <typename T, std::size_t W, std::size_t H> void sendUniform(int uniformIndex, const Matrix<T, W, H>& mat) const;
-  template <typename T> void sendUniform(const std::string& uniformName, T value) const {
-    sendUniform(recoverUniformLocation(uniformName), value);
-  }
+  template <typename T> void sendUniform(const std::string& uniformName, T value) const;
+  void destroyVertexShader();
+  void destroyFragmentShader();
+  void destroyGeometryShader();
 
 private:
   void loadShaders() const;
@@ -52,5 +53,7 @@ private:
 };
 
 } // namespace Raz
+
+#include "RaZ/Render/ShaderProgram.inl"
 
 #endif // RAZ_SHADERPROGRAM_HPP

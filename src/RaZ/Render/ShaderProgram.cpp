@@ -129,4 +129,28 @@ void ShaderProgram::sendUniform(int uniformIndex, const Mat4f& mat) const {
   glUniformMatrix4fv(uniformIndex, 1, GL_FALSE, mat.getDataPtr());
 }
 
+void ShaderProgram::destroyVertexShader() {
+  if (!m_vertShader)
+    return;
+
+  glDetachShader(m_index, m_vertShader->getIndex());
+  m_vertShader->destroy();
+}
+
+void ShaderProgram::destroyFragmentShader() {
+  if (!m_fragShader)
+    return;
+
+  glDetachShader(m_index, m_fragShader->getIndex());
+  m_fragShader->destroy();
+}
+
+void ShaderProgram::destroyGeometryShader() {
+  if (!m_geomShader)
+    return;
+
+  glDetachShader(m_index, m_geomShader->getIndex());
+  m_geomShader->destroy();
+}
+
 } // namespace Raz
