@@ -32,6 +32,8 @@ public:
   void sendInverseProjectionMatrix(const Mat4f& invProjMat) const { m_cameraUbo.sendData(invProjMat, sizeof(Mat4f) * 3); }
   void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_cameraUbo.sendData(viewProjMat, sizeof(Mat4f) * 4); }
   void sendCameraPosition(const Vec3f& cameraPos) const { m_cameraUbo.sendData(cameraPos, sizeof(Mat4f) * 5); }
+  void sendCameraMatrices(const Mat4f& viewProjMat) const;
+  void sendCameraMatrices() const;
   void updateLight(const Entity* entity, std::size_t lightIndex) const;
   void updateLights() const;
   void updateShaders() const;

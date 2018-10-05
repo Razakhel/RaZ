@@ -32,20 +32,12 @@ void RenderSystem::update(float deltaTime) {
   Mat4f viewProjMat;
 
   if (camTransform.hasUpdated()) {
-    const Mat4f& viewMat    = camera.computeViewMatrix(camTransform.getRotation().inverse(),
-                                                       camTransform.computeTranslationMatrix(true));
-    const Mat4f& invViewMat = camera.computeInverseViewMatrix();
+    const Mat4f& viewMat = camera.computeViewMatrix(camTransform.getRotation().inverse(),
+                                                    camTransform.computeTranslationMatrix(true));
+    camera.computeInverseViewMatrix();
     viewProjMat = camera.getProjectionMatrix() * viewMat;
 
-    m_cameraUbo.bind();
-    sendViewMatrix(viewMat);
-    sendInverseViewMatrix(invViewMat);
-    sendProjectionMatrix(camera.getProjectionMatrix());
-    sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
-    sendViewProjectionMatrix(viewProjMat);
-    sendCameraPosition(camTransform.getPosition());
-
-    m_program.sendUniform("uniCameraPos", camTransform.getPosition());
+    sendCameraMatrices(viewProjMat);
 
     camTransform.setUpdated(false);
   } else {
@@ -66,6 +58,27 @@ void RenderSystem::update(float deltaTime) {
   }
 
   m_window.run(deltaTime);
+}
+
+void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
+  const auto& camera   = m_camera.getComponent<Camera>();
+  const auto& camTrans = m_camera.getComponent<Transform>();
+  const Vec3f& camPos  = camTrans.getPosition();
+
+  m_cameraUbo.bind();
+  sendViewMatrix(camera.getViewMatrix());
+  sendInverseViewMatrix(camera.getInverseViewMatrix());
+  sendProjectionMatrix(camera.getProjectionMatrix());
+  sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
+  sendViewProjectionMatrix(viewProjMat);
+  sendCameraPosition(camPos);
+
+  m_program.sendUniform("uniCameraPos", camPos);
+}
+
+void RenderSystem::sendCameraMatrices() const {
+  const auto& camera = m_camera.getComponent<Camera>();
+  sendCameraMatrices(camera.getProjectionMatrix() * camera.getViewMatrix());
 }
 
 void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
@@ -107,13 +120,13 @@ void RenderSystem::updateLights() const {
 
 void RenderSystem::updateShaders() const {
   m_program.updateShaders();
+  sendCameraMatrices();
+  updateLights();
 
   for (auto& entity : m_entities) {
     if (entity->hasComponent<Mesh>())
       entity->getComponent<Mesh>().load(m_program);
   }
-
-  updateLights();
 }
 
 } // namespace Raz
