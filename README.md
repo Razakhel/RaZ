@@ -10,7 +10,7 @@
 
 **RaZ** comes from, as you may have noticed, my username **Raz**akhel. This was also meant as a pun, since in french _RàZ_ is the acronym for "Remise à zéro", which basically means "reset". I didn't have any particular intent behind this double meaning. Except maybe hoping that using RaZ might reset your mind because of its awesomeness? Oh well.
 
-Written in modern C++ (14), it is primarily developed for learning purposes. It is intended to be as optimized as possible, while trying to stay as modular as it can (which currently isn't quite the case).
+Written in modern C++ (14), ECS driven, it is primarily developed for learning purposes. It is intended to be as optimized as possible, while trying to stay as modular as it can.
 
 This library is available for Linux and Windows. It is also supposed to run on macOS, but since I don't own a Mac I can't say for sure.
 
@@ -20,7 +20,7 @@ If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/w
 
 | Crytek Sponza | Hylian shield (PBR) |
 | :--------: | :---------: |
-| [![Crytek Sponza](https://i.imgur.com/Tr1nnjV.jpg)](https://i.imgur.com/Tr1nnjV.jpg) | [![Hyrule's shield](https://i.imgur.com/UZ90KKJ.jpg)](https://i.imgur.com/UZ90KKJ.jpg) |
+| [![Crytek Sponza](https://i.imgur.com/Tr1nnjV.jpg)](https://i.imgur.com/Tr1nnjV.jpg) | [![Hylian shield](https://i.imgur.com/UZ90KKJ.jpg)](https://i.imgur.com/UZ90KKJ.jpg) |
 
 More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples).
 
