@@ -12,14 +12,16 @@ bool System::containsEntity(const EntityPtr& entity) {
 }
 
 void System::linkEntity(const EntityPtr& entity) {
-  if (entity->getId() >= m_entities.size())
-    m_entities.resize(entity->getId() + 1);
-
-  m_entities[entity->getId()] = entity.get();
+  m_entities.push_back(entity.get());
 }
 
 void System::unlinkEntity(const EntityPtr& entity) {
-  m_entities[entity->getId()] = nullptr;
+  for (std::size_t entityIndex = 0; entityIndex < m_entities.size(); ++entityIndex) {
+    if (m_entities[entityIndex]->getId() == entity->getId()) {
+      m_entities.erase(m_entities.begin() + entityIndex);
+      break;
+    }
+  }
 }
 
 std::size_t System::m_maxId = 0;
