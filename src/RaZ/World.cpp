@@ -21,7 +21,7 @@ void World::update(float deltaTime) {
 void World::refresh() {
   // Reorganizing the entites, swapping enabled & disabled ones so that the enabled ones are in front
   auto entityBegin = m_entities.begin();
-  auto entityEnd   = (m_entities.begin() + m_enabledEntityCount - 1);
+  auto entityEnd   = m_entities.end() - 1;
 
   while (entityBegin != entityEnd) {
     if (!(*entityBegin)->isEnabled()) {
@@ -47,8 +47,8 @@ void World::refresh() {
     for (auto& system : m_systems) {
       const Bitset matchingComponents = system->getAcceptedComponents() & entity->getEnabledComponents();
 
-      // If the system doesn't contain the entity, check if it should (if the entity possesses the components needed by the system)
-      // Else, if the system shouldn't contain the entity, unlink it
+      // If the system doesn't contain the entity, check if it should (possesses the accepted components); if yes, link it
+      // Else, if the system contains the entity but shouldn't, unlink it
       if (!system->containsEntity(entity)) {
         if (!matchingComponents.isEmpty())
           system->linkEntity(entity);
