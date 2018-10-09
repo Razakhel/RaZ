@@ -96,6 +96,7 @@ endif ()
 
 option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
 option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
+option(RAZ_RUN_TESTS "Run tests after RaZ is built" ON)
 
 # FBX SDK usage
 if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
@@ -119,7 +120,7 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
                  "D:/${FBX_PATH}"
                  "E:/${FBX_PATH}")
 
-            # TODO: searching by default into 'vs2015'; should be MSVC-version dependant
+            # TODO: searching by default into 'vs2015'; should be MSVC-version dependent
             set(FBX_LIB_DIR "lib/vs2015/x64/${BUILD_TYPE}")
             set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.lib")
         elseif (CMAKE_COMPILER_IS_GNUCC)
@@ -332,4 +333,8 @@ target_link_libraries(
 
 if (${RAZ_BUILD_EXAMPLES})
     add_subdirectory(examples)
+endif ()
+
+if (${RAZ_RUN_TESTS})
+    add_subdirectory(tests)
 endif ()
