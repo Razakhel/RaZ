@@ -12,6 +12,7 @@ set(
 
     Main.cpp
 
+    RaZ/*.cpp
     RaZ/Math/*.cpp
 )
 
