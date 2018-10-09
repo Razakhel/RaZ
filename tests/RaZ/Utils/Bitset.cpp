@@ -34,3 +34,42 @@ TEST_CASE("Bitset basic checks") {
   compBitset.resize(7);
   REQUIRE_FALSE(compBitset.getSize() == fullZeros.getSize());
 }
+
+TEST_CASE("Bitset manipulations") {
+  REQUIRE((alternated1 & alternated1) == alternated1);
+  REQUIRE((alternated2 & alternated2) == alternated2);
+
+  REQUIRE((alternated1 | alternated1) == alternated1);
+  REQUIRE((alternated2 | alternated2) == alternated2);
+
+  REQUIRE((alternated1 ^ alternated1) == fullZeros);
+  REQUIRE((alternated2 ^ alternated2) == fullZeros);
+
+  //     AND test
+  //       ---
+  //    1 0 1 0 1 0
+  // &  0 1 0 1 0 1
+  //   _____________
+  // =  0 0 0 0 0 0
+  REQUIRE((alternated1 & alternated2) == fullZeros);
+  //      OR test
+  //        ---
+  //    1 0 1 0 1 0
+  // |  0 1 0 1 0 1
+  //   _____________
+  // =  1 1 1 1 1 1
+  REQUIRE((alternated1 | alternated2) == fullOnes);
+
+  //     XOR test
+  //       ---
+  //    1 0 1 0 1 0
+  // ^  0 1 0 1 0 1
+  //   _____________
+  // =  1 1 1 1 1 1
+  REQUIRE((alternated1 ^ alternated2) == fullOnes);
+
+  REQUIRE(~fullZeros == fullOnes);
+  REQUIRE(~fullOnes == fullZeros);
+  REQUIRE(~alternated1 == alternated2);
+  REQUIRE(~alternated2 == alternated1);
+}
