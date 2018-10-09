@@ -20,6 +20,15 @@ void Bitset::setBit(std::size_t position, bool value) {
   m_bits[position] = value;
 }
 
+Bitset Bitset::operator~() const {
+  Bitset res(m_bits.size());
+
+  for (std::size_t bitIndex = 0; bitIndex < m_bits.size(); ++bitIndex)
+    res.setBit(bitIndex, !m_bits[bitIndex]);
+
+  return res;
+}
+
 Bitset Bitset::operator&(const Bitset& bitset) const {
   Bitset res = *this;
   res &= bitset;

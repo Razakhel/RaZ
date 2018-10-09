@@ -26,6 +26,7 @@ public:
   void setBit(std::size_t position, bool value = true);
   void resize(std::size_t newSize) { m_bits.resize(newSize); }
 
+  Bitset operator~() const;
   Bitset operator&(const Bitset& bitset) const;
   Bitset operator|(const Bitset& bitset) const;
   Bitset operator^(const Bitset& bitset) const;
