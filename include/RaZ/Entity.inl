@@ -52,7 +52,7 @@ void Entity::removeComponent() {
   static_assert(std::is_base_of<Component, Comp>::value, "Error: Removed component must be derived from Component.");
 
   if (hasComponent<Comp>()) {
-    constexpr const std::size_t compId = Component::getId<Comp>();
+    const std::size_t compId = Component::getId<Comp>();
 
     m_components[compId].reset();
     m_enabledComponents.setBit(compId, false);
