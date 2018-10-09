@@ -14,7 +14,7 @@ class Bitset {
 public:
   Bitset() = default;
   explicit Bitset(std::size_t bitCount, bool initialValue = false) : m_bits(bitCount, initialValue) {}
-  Bitset(std::initializer_list<bool> values);
+  Bitset(std::initializer_list<bool> values) : m_bits(values.begin(), values.end()) {}
 
   const std::vector<bool>& getBits() const { return m_bits; }
   std::vector<bool>& getBits() { return m_bits; }
