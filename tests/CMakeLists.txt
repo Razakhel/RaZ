@@ -11,6 +11,8 @@ set(
     TESTS_SRC
 
     Main.cpp
+
+    RaZ/Math/*.cpp
 )
 
 file(
