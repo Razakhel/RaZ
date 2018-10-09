@@ -30,19 +30,25 @@ Bitset Bitset::operator~() const {
 }
 
 Bitset Bitset::operator&(const Bitset& bitset) const {
-  Bitset res = *this;
+  Bitset res(std::min(m_bits.size(), bitset.getSize()));
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + res.getSize(), res.getBits().begin());
+
   res &= bitset;
   return res;
 }
 
 Bitset Bitset::operator|(const Bitset& bitset) const {
-  Bitset res = *this;
+  Bitset res(std::min(m_bits.size(), bitset.getSize()));
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + res.getSize(), res.getBits().begin());
+
   res |= bitset;
   return res;
 }
 
 Bitset Bitset::operator^(const Bitset& bitset) const {
-  Bitset res = *this;
+  Bitset res(std::min(m_bits.size(), bitset.getSize()));
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + res.getSize(), res.getBits().begin());
+
   res ^= bitset;
   return res;
 }
