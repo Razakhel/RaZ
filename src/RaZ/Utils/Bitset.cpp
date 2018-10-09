@@ -4,6 +4,11 @@
 
 namespace Raz {
 
+Bitset::Bitset(std::initializer_list<bool> values) {
+  m_bits.resize(values.size());
+  std::fill(m_bits.begin(), m_bits.end(), values.begin());
+}
+
 bool Bitset::isEmpty() const {
   for (auto bit : m_bits) {
     if (bit)

@@ -4,6 +4,7 @@
 #define RAZ_BITSET_HPP
 
 #include <algorithm>
+#include <initializer_list>
 #include <vector>
 
 namespace Raz {
@@ -11,7 +12,8 @@ namespace Raz {
 class Bitset {
 public:
   Bitset() = default;
-  explicit Bitset(std::size_t bitCount) : m_bits(bitCount) {}
+  explicit Bitset(std::size_t bitCount, bool initialValue = false) : m_bits(bitCount, initialValue) {}
+  Bitset(std::initializer_list<bool> values);
 
   const std::vector<bool>& getBits() const { return m_bits; }
   std::vector<bool>& getBits() { return m_bits; }
