@@ -4,6 +4,7 @@
 #define RAZ_BITSET_HPP
 
 #include <algorithm>
+#include <iostream>
 #include <initializer_list>
 #include <vector>
 
@@ -34,6 +35,7 @@ public:
   bool operator[](std::size_t index) const { return m_bits[index]; }
   bool operator==(const Bitset& bitset) const { return std::equal(m_bits.cbegin(), m_bits.cend(), bitset.getBits().cbegin()); }
   bool operator!=(const Bitset& bitset) const { return !(*this == bitset); }
+  friend std::ostream& operator<<(std::ostream& stream, const Bitset& bitset);
 
 private:
   std::vector<bool> m_bits {};

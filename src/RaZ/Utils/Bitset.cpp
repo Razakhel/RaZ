@@ -61,4 +61,15 @@ Bitset& Bitset::operator^=(const Bitset& bitset) {
   return *this;
 }
 
+std::ostream& operator<<(std::ostream& stream, const Bitset& bitset) {
+  stream << "[ " << bitset[0];
+
+  for (std::size_t i = 1; i < bitset.getSize(); ++i)
+    stream << "; " << bitset[i];
+
+  stream << " ]";
+
+  return stream;
+}
+
 } // namespace Raz
