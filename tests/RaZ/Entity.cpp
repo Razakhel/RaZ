@@ -1,5 +1,7 @@
 #include "catch/catch.hpp"
 #include "RaZ/Entity.hpp"
+#include "RaZ/Math/Transform.hpp"
+#include "RaZ/Render/Mesh.hpp"
 
 namespace {
 
@@ -22,4 +24,22 @@ TEST_CASE("Entity base tests") {
 
   entity0.enable();
   REQUIRE(entity0.isEnabled());
+}
+
+TEST_CASE("Entity-component manipulations") {
+  REQUIRE(entity0.getComponents().empty());
+
+  REQUIRE_FALSE(entity0.hasComponent<Raz::Mesh>());
+  REQUIRE_FALSE(entity0.hasComponent<Raz::Transform>());
+
+  entity0.addComponent<Raz::Transform>();
+  REQUIRE(entity0.hasComponent<Raz::Transform>());
+  REQUIRE_FALSE(entity0.hasComponent<Raz::Mesh>());
+
+  REQUIRE(std::is_same<decltype(entity0.getComponent<Raz::Transform>()), Raz::Transform&>::value);
+  REQUIRE_THROWS(entity0.getComponent<Raz::Mesh>());
+
+  entity0.removeComponent<Raz::Transform>();
+  REQUIRE_FALSE(entity0.hasComponent<Raz::Transform>());
+  REQUIRE_THROWS(entity0.getComponent<Raz::Transform>());
 }
