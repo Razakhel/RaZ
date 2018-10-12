@@ -1,6 +1,7 @@
 #include "catch/catch.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Utils/FloatUtils.hpp"
 
 namespace {
 
@@ -10,14 +11,6 @@ const Raz::Vec3f vec32({ 541.41f, 47.25f, 6.321f });
 
 const Raz::Vec4f vec41({ 84.47f, 2.f, 0.001f, 847.12f });
 const Raz::Vec4f vec42({ 13.01f, 0.15f, 84.8f, 72.f });
-
-// Near-equality floating point check
-template <typename T>
-bool compareFloatingPoint(T val1, T val2) {
-  static_assert(std::is_floating_point<T>::value, "Error: Values' type must be floating point.");
-
-  return std::abs(val1 - val2) <= std::numeric_limits<T>::epsilon() * std::max({ static_cast<T>(1), std::abs(val1), std::abs(val2) });
-}
 
 } // namespace
 
@@ -37,9 +30,9 @@ TEST_CASE("Vector near-equality") {
   REQUIRE_FALSE(baseVec[1] == compVec[1]);
   REQUIRE_FALSE(baseVec[2] == compVec[2]);
 
-  REQUIRE(compareFloatingPoint(baseVec[0], compVec[0])); // Near-equality components check
-  REQUIRE(compareFloatingPoint(baseVec[1], compVec[1]));
-  REQUIRE(compareFloatingPoint(baseVec[2], compVec[2]));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(baseVec[0], compVec[0])); // Near-equality components check
+  REQUIRE(Raz::FloatUtils::checkNearEquality(baseVec[1], compVec[1]));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(baseVec[2], compVec[2]));
 
   REQUIRE(baseVec == compVec); // Vector::operator== does a near-equality check on floating point types
 }
@@ -58,8 +51,8 @@ TEST_CASE("Vector/vector operations") {
   REQUIRE((vec31 * vec32) == Raz::Vec3f({ 1721.6838f, 1984.5f, 5.524554f }));
 
   REQUIRE(vec31.dot(vec31) == vec31.computeSquaredLength());
-  REQUIRE(compareFloatingPoint(vec31.dot(vec31), 1774.876276f));
-  REQUIRE(compareFloatingPoint(vec31.dot(vec32), 3711.708354f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(vec31.dot(vec31), 1774.876276f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(vec31.dot(vec32), 3711.708354f));
   REQUIRE(vec31.dot(vec32) == vec32.dot(vec31)); // A · B == B · A
 
   REQUIRE(vec31.cross(vec32) == Raz::Vec3f({ 224.1855f, 453.09156f, -22588.965f }));
@@ -85,9 +78,9 @@ TEST_CASE("Vector/matrix operation") {
 }
 
 TEST_CASE("Vector manipulations") {
-  REQUIRE(compareFloatingPoint(vec31.normalize().computeLength(), 1.f));
-  REQUIRE(compareFloatingPoint(vec41.normalize().computeSquaredLength(), 1.f));
-  REQUIRE(compareFloatingPoint(Raz::Vec3f({ 0.f, 1.f, 0.f }).computeLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(vec31.normalize().computeLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(vec41.normalize().computeSquaredLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(Raz::Vec3f({ 0.f, 1.f, 0.f }).computeLength(), 1.f));
 
   // Testing Vector::reflect():
   //
