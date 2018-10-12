@@ -2,6 +2,8 @@
 #include <cassert>
 #include <limits>
 
+#include "RaZ/Utils/FloatUtils.hpp"
+
 namespace Raz {
 
 template <typename T, std::size_t Size>
@@ -41,9 +43,9 @@ Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const {
 
   Vector<T, Size> res;
 
-  res[0] =   m_data[1] * vec.getData()[2] - m_data[2] * vec.getData()[1];
-  res[1] = -(m_data[0] * vec.getData()[2] - m_data[2] * vec.getData()[0]);
-  res[2] =   m_data[0] * vec.getData()[1] - m_data[1] * vec.getData()[0];
+  res[0] =   m_data[1] * vec[2] - m_data[2] * vec[1];
+  res[1] = -(m_data[0] * vec[2] - m_data[2] * vec[0]);
+  res[2] =   m_data[0] * vec[1] - m_data[1] * vec[0];
 
   return res;
 }
@@ -192,13 +194,8 @@ Vector<T, Size>& Vector<T, Size>::operator/=(float val) {
 template <typename T, std::size_t Size>
 bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const {
   if (std::is_floating_point<T>::value) {
-    // Using absolute & relative tolerances for floating points types: http://www.realtimecollisiondetection.net/pubs/Tolerances/
-    // Could be a better idea to use ULPs checking. Maybe slower though?
     for (std::size_t i = 0; i < Size; ++i) {
-      const T val1 = m_data[i];
-      const T val2 = vec[i];
-
-      if (std::abs(val1 - val2) > std::numeric_limits<T>::epsilon() * std::max({ static_cast<T>(1), std::abs(val1), std::abs(val2) }))
+      if (!FloatUtils::checkNearEquality(m_data[i], vec[i]))
         return false;
     }
 
@@ -210,10 +207,10 @@ bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const {
 
 template <typename T, std::size_t Size>
 std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec) {
-  stream << "[ " << vec.getData()[0];
+  stream << "[ " << vec[0];
 
   for (std::size_t i = 1; i < Size; ++i)
-    stream << "; " << vec.getData()[i];
+    stream << "; " << vec[i];
 
   stream << " ]";
 
