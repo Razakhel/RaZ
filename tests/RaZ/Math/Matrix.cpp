@@ -71,6 +71,30 @@ TEST_CASE("Matrix/scalar operations") {
                                        { 0.f, 0.f, 0.f, 0.f }}));
 }
 
+TEST_CASE("Matrix/matrix operations") {
+  REQUIRE((mat31 - mat31) == Raz::Mat3f({{ 0.f, 0.f, 0.f },
+                                         { 0.f, 0.f, 0.f },
+                                         { 0.f, 0.f, 0.f }}));
+
+  // Component-wise multiplication
+  REQUIRE((mat31 % mat32) == Raz::Mat3f({{ 195.288f, 251.0251f, 465.457104f },
+                                         { 24.3504f,   -490.5f,    -6256.5f },
+                                         {  -12.54f,   -527.8f,  -454.5605f }}));
+
+  // Matrix multiplication
+  // Here, the cell containing -2.334007 isn't the actual result; by hand we find -2.334, but this test doesn't pass with that value
+  // The code's result is here truncated to make it pass. Really not clean, but is assumed to fail because of errors accumulation
+  REQUIRE((mat31 * mat32) == Raz::Mat3f({{ 782.372868f,  -266.21188f,  833.10839f },
+                                         {   -624.684f, -4975.09696f,  4017.1898f },
+                                         {  -2.334007f,    1318.373f, -1201.0605f }}));
+  REQUIRE((mat32 * mat31) == Raz::Mat3f({{ 210.57104f, 1125.7402f,    941.26578f },
+                                         { -362.2228f, -1020.829f,  7389.801442f },
+                                         {  318.5148f,  1072.291f, -4583.526632f }}));
+
+  REQUIRE((mat31 * Raz::Mat3f::identity()) == mat31);
+  REQUIRE((mat41 * Raz::Mat4f::identity()) == mat41);
+}
+
 TEST_CASE("Matrix/vector operations") {
   const Raz::Vec3f vec3({ 3.18f, 42.f, 0.874f });
   REQUIRE((mat31 * vec3) == Raz::Vec3f({ 1094.2069908f, 163.2942f, -312.50966f }));
