@@ -28,7 +28,7 @@ void Transform::translate(float x, float y, float z) {
 
 void Transform::rotate(float angle, const Vec3f& axis) {
   const Quaternionf quaternion(angle, axis);
-  m_rotation = m_rotation * quaternion.computeMatrix();
+  m_rotation = quaternion.computeMatrix() * m_rotation;
 
   m_updated = true;
 }
@@ -37,7 +37,7 @@ void Transform::rotate(float xAngle, float yAngle, float zAngle) {
   const Quaternionf xQuat(xAngle, Axis::X);
   const Quaternionf yQuat(yAngle, Axis::Y);
   const Quaternionf zQuat(zAngle, Axis::Z);
-  m_rotation = m_rotation * (xQuat.computeMatrix() * yQuat.computeMatrix() * zQuat.computeMatrix());
+  m_rotation = (xQuat.computeMatrix() * yQuat.computeMatrix() * zQuat.computeMatrix()) * m_rotation;
 
   m_updated = true;
 }
@@ -66,7 +66,7 @@ Mat4f Transform::computeTransformMatrix() const {
                      {        0.f,        0.f, m_scale[2], 0.f },
                      {        0.f,        0.f,        0.f, 1.f }});
 
-  return computeTranslationMatrix() * m_rotation * scale;
+  return scale * m_rotation * computeTranslationMatrix();
 }
 
 } // namespace Raz

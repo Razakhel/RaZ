@@ -35,22 +35,22 @@ void RenderSystem::update(float deltaTime) {
     const Mat4f& viewMat = camera.computeViewMatrix(camTransform.getRotation().inverse(),
                                                     camTransform.computeTranslationMatrix(true));
     camera.computeInverseViewMatrix();
-    viewProjMat = camera.getProjectionMatrix() * viewMat;
+    viewProjMat = viewMat * camera.getProjectionMatrix();
 
     sendCameraMatrices(viewProjMat);
 
     camTransform.setUpdated(false);
   } else {
-    viewProjMat = camera.getProjectionMatrix() * camera.getViewMatrix();
+    viewProjMat = camera.getViewMatrix() * camera.getProjectionMatrix();
   }
 
   for (auto& entity : m_entities) {
     if (entity->isEnabled()) {
       if (entity->hasComponent<Mesh>() && entity->hasComponent<Transform>()) {
-        const auto modelMat = entity->getComponent<Transform>().computeTransformMatrix();
+        const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
 
         m_program.sendUniform("uniModelMatrix", modelMat);
-        m_program.sendUniform("uniMvpMatrix", viewProjMat * modelMat);
+        m_program.sendUniform("uniMvpMatrix", modelMat * viewProjMat);
 
         entity->getComponent<Mesh>().draw(m_program);
       }
@@ -78,7 +78,7 @@ void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
 
 void RenderSystem::sendCameraMatrices() const {
   const auto& camera = m_camera.getComponent<Camera>();
-  sendCameraMatrices(camera.getProjectionMatrix() * camera.getViewMatrix());
+  sendCameraMatrices(camera.getViewMatrix() * camera.getProjectionMatrix());
 }
 
 void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {

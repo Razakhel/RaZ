@@ -140,7 +140,7 @@ void Cubemap::draw(const CameraPtr& camera) const {
   bind();
 
   m_viewProjUbo.bind();
-  sendViewProjectionMatrix(camera->getProjectionMatrix() * Mat4f(Mat3f(camera->getViewMatrix())));
+  sendViewProjectionMatrix(Mat4f(Mat3f(camera->getViewMatrix())) * camera->getProjectionMatrix());
 
   Mesh::drawUnitCube();
 
