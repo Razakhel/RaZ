@@ -340,11 +340,12 @@ Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const 
 
   Matrix<T, H, WI> res {};
 
-  for (std::size_t currHeightIndex = 0; currHeightIndex < H; ++currHeightIndex) {
-    for (std::size_t inHeightIndex = 0; inHeightIndex < HI; ++inHeightIndex) {
-      for (std::size_t currWidthIndex = 0; currWidthIndex < W; ++currWidthIndex)
-        res.getData()[inHeightIndex * WI + currWidthIndex] += m_data[currHeightIndex * W + currWidthIndex]
-                                                            * mat[inHeightIndex * WI + currHeightIndex];
+  for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
+    for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
+      T& val = res.getData()[heightIndex * W + widthIndex];
+
+      for (std::size_t stride = 0; stride < W; ++stride)
+        val += m_data[heightIndex * W + stride] * mat.getData()[stride * WI + widthIndex];
     }
   }
 
