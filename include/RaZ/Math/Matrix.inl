@@ -410,13 +410,9 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator/=(float val) {
 template <typename T, std::size_t W, std::size_t H>
 bool Matrix<T, W, H>::operator==(const Matrix<T, W, H>& mat) const {
   if (std::is_floating_point<T>::value) {
-    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
-      for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
-        const std::size_t finalIndex = heightIndex * W + widthIndex;
-
-        if (!FloatUtils::checkNearEquality(m_data[finalIndex], mat.getData()[finalIndex]))
-          return false;
-      }
+    for (std::size_t i = 0; i < W * H; ++i) {
+      if (!FloatUtils::checkNearEquality(m_data[i], mat.getData()[i]))
+        return false;
     }
 
     return true;
