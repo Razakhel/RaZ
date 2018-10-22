@@ -229,10 +229,6 @@ elseif (UNIX)
     add_definitions(
         -D_GLFW_X11
         -D_GLFW_HAS_XF86VM
-
-        #-fsanitize=undefined
-        #-fsanitize=address
-        #-fsanitize=leak
     )
 
     file(
@@ -247,13 +243,23 @@ elseif (UNIX)
         extern/glfw/src/*.m
     )
 
-    set(
-        LIBS
+    option(RAZ_USE_SANITIZERS "Use sanitizers" OFF)
 
-        ${LIBS}
-        #asan
-        #ubsan
-    )
+    if (RAZ_USE_SANITIZERS)
+        add_definitions(
+            -fsanitize=undefined
+            -fsanitize=address
+            -fsanitize=leak
+        )
+
+        set(
+            LIBS
+
+            ${LIBS}
+            asan
+            ubsan
+        )
+    endif ()
 
     set(
         DEPS
