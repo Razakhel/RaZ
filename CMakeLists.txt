@@ -295,8 +295,8 @@ elseif (WIN32)
     )
 endif ()
 
-# If compiler isn't MSVC or GCC (excluding MinGW), do not compile FBX loader
-if ((NOT MSVC AND NOT CMAKE_COMPILER_IS_GNUCC) OR MINGW)
+# If FBX SDK not found, do not compile FBX loader
+if (NOT FBX_FOUND)
     file(GLOB
          DISPOSABLE
 
