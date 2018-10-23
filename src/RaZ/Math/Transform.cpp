@@ -1,4 +1,3 @@
-#include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Math/Transform.hpp"
 
 namespace Raz {

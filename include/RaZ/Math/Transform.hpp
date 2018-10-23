@@ -5,6 +5,7 @@
 
 #include "RaZ/Component.hpp"
 #include "RaZ/Math/Matrix.hpp"
+#include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 namespace Raz {
@@ -25,6 +26,7 @@ public:
   void setPosition(const Vec3f& position);
   void setPosition(float x, float y, float z) { setPosition(Vec3f({ x, y, z })); }
   void setRotation(const Mat4f& rotation);
+  void setRotation(float angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis).computeMatrix()); }
   void setScale(const Vec3f& scale);
   void setScale(float val) { setScale(val, val, val); }
   void setScale(float x, float y, float z) { setScale(Vec3f({ x, y, z })); }
