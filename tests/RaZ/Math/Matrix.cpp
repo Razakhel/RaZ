@@ -49,6 +49,29 @@ TEST_CASE("Matrix near-equality") {
   REQUIRE(baseMat == compMat); // Matrix::operator== does a near-equality check on floating point types
 }
 
+TEST_CASE("Matrix resize") {
+  const Raz::Mat3f truncatedMat(mat41);
+  const Raz::Mat4f expandedMat(truncatedMat);
+
+  REQUIRE(truncatedMat == Raz::Mat3f({{  -3.2f, 53.032f,  832.451f },
+                                      { 10.01f,   3.15f,   -91.41f },
+                                      {   -6.f,  -7.78f,      90.f }}));
+  REQUIRE(expandedMat == Raz::Mat4f({{  -3.2f, 53.032f,  832.451f, 0.f },
+                                     { 10.01f,   3.15f,   -91.41f, 0.f },
+                                     {   -6.f,  -7.78f,      90.f, 0.f },
+                                     {    0.f,     0.f,       0.f, 1.f }}));
+
+  REQUIRE(Raz::Mat4f(mat31) == Raz::Mat4f({{ 4.12f,  25.1f, 30.7842f, 0.f },
+                                           { 3.04f,    5.f,   -64.5f, 0.f },
+                                           {  -1.f, -7.54f,    8.41f, 0.f },
+                                           {   0.f,    0.f,      0.f, 1.f }}));
+
+  REQUIRE(Raz::Mat4f(Raz::Mat3f(mat42)) == Raz::Mat4f({{   5.5f,  98.14f, -8.24f, 0.f },
+                                                       { 15.84f,  -145.f, 3.145f, 0.f },
+                                                       { -8.12f,  38.24f,   62.f, 0.f },
+                                                       {    0.f,     0.f,    0.f, 1.f }}));
+}
+
 TEST_CASE("Matrix/scalar operations") {
   REQUIRE((mat31 * 3.f) == Raz::Mat3f({{ 12.36f,   75.3f, 92.3526f },
                                        {  9.12f,    15.f,  -193.5f },
