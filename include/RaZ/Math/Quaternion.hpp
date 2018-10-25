@@ -13,8 +13,8 @@ class Quaternion {
   static_assert(std::is_floating_point<T>::value, "Error: Quaternion's type must be floating point.");
 
 public:
-  Quaternion(T angle, const Vec3<T>& axes);
-  Quaternion(T angle, float axisX, float axisY, float axisZ) : Quaternion(angle, Vec3<T>({ axisX, axisY, axisZ })) {}
+  Quaternion(T angleDegrees, const Vec3<T>& axes);
+  Quaternion(T angleDegrees, float axisX, float axisY, float axisZ) : Quaternion(angleDegrees, Vec3<T>({ axisX, axisY, axisZ })) {}
 
   Mat4<T> computeMatrix() const;
 

@@ -3,8 +3,8 @@
 namespace Raz {
 
 template <typename T>
-Quaternion<T>::Quaternion(T angle, const Vec3<T>& axes) {
-  const T halfAngle = (angle * PI<T> / 180) / 2;
+Quaternion<T>::Quaternion(T angleDegrees, const Vec3<T>& axes) {
+  const T halfAngle = (angleDegrees * PI<T> / 180) / 2;
   const T val       = std::sin(halfAngle);
 
   m_real      = std::cos(halfAngle);
@@ -13,17 +13,17 @@ Quaternion<T>::Quaternion(T angle, const Vec3<T>& axes) {
 
 template <typename T>
 Mat4<T> Quaternion<T>::computeMatrix() const {
-  const float xx = 2 * (m_complexes[0] * m_complexes[0]);
-  const float yy = 2 * (m_complexes[1] * m_complexes[1]);
-  const float zz = 2 * (m_complexes[2] * m_complexes[2]);
+  const T xx = 2 * (m_complexes[0] * m_complexes[0]);
+  const T yy = 2 * (m_complexes[1] * m_complexes[1]);
+  const T zz = 2 * (m_complexes[2] * m_complexes[2]);
 
-  const float xy = 2 * m_complexes[0] * m_complexes[1];
-  const float xz = 2 * m_complexes[0] * m_complexes[2];
-  const float yz = 2 * m_complexes[1] * m_complexes[2];
+  const T xy = 2 * m_complexes[0] * m_complexes[1];
+  const T xz = 2 * m_complexes[0] * m_complexes[2];
+  const T yz = 2 * m_complexes[1] * m_complexes[2];
 
-  const float xw = 2 * m_complexes[0] * m_real;
-  const float yw = 2 * m_complexes[1] * m_real;
-  const float zw = 2 * m_complexes[2] * m_real;
+  const T xw = 2 * m_complexes[0] * m_real;
+  const T yw = 2 * m_complexes[1] * m_real;
+  const T zw = 2 * m_complexes[2] * m_real;
 
   return Mat4<T>({{ 1 - yy - zz,     xy + zw,     xz - yw, 0.f },
                   {     xy - zw, 1 - xx - zz,     yz + xw, 0.f },
