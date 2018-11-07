@@ -10,9 +10,9 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
                                  GLenum type,
                                  unsigned int id,
                                  GLenum severity,
-                                 int /*length*/,
+                                 int /* length */,
                                  const char* message,
-                                 const void* /*userParam*/) {
+                                 const void* /* userParam */) {
   std::cerr << "OpenGL Debug - ";
 
   switch (source) {

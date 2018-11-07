@@ -8,7 +8,7 @@ World& Application::addWorld(World&& world) {
 }
 
 bool Application::run() {
-  if (!m_running)
+  if (!m_isRunning)
     return false;
 
   const auto currentTime = std::chrono::system_clock::now();
@@ -22,7 +22,7 @@ bool Application::run() {
 }
 
 void Application::quit() {
-  m_running = false;
+  m_isRunning = false;
 
   for (auto& world : m_worlds)
     world.destroy();

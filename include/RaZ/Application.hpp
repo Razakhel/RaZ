@@ -27,7 +27,7 @@ private:
 
   std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime {};
   float m_deltaTime {};
-  bool m_running = true;
+  bool m_isRunning = true;
 };
 
 } // namespace Raz

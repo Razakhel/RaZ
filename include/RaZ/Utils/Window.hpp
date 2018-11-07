@@ -44,7 +44,7 @@ public:
   const Vec4f& getClearColor() const { return m_clearColor; }
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
-  void setClearColor(float red, float green, float blue, float alpha) { setClearColor(Vec4f({ red, green, blue, alpha })); }
+  void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f({ red, green, blue, alpha })); }
   void setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
   void setIcon(const Image& img) const;
   void setIcon(const std::string& fileName) const { setIcon(Image(fileName, true)); }
