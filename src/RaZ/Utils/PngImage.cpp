@@ -43,10 +43,11 @@ void Image::readPng(std::ifstream& file, bool reverse) {
 
   png_read_info(readStruct, infoStruct);
 
-  m_width = png_get_image_width(readStruct, infoStruct);
-  m_height = png_get_image_height(readStruct, infoStruct);
+  m_width        = png_get_image_width(readStruct, infoStruct);
+  m_height       = png_get_image_height(readStruct, infoStruct);
   m_channelCount = png_get_channels(readStruct, infoStruct);
-  m_bitDepth = png_get_bit_depth(readStruct, infoStruct);
+  m_bitDepth     = png_get_bit_depth(readStruct, infoStruct);
+
   const uint8_t colorType = png_get_color_type(readStruct, infoStruct);
 
   switch (colorType) {

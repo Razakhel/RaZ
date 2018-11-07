@@ -130,7 +130,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   unbind();
 }
 
-void Cubemap::draw(const CameraPtr& camera) const {
+void Cubemap::draw(const Camera& camera) const {
   glDepthFunc(GL_LEQUAL);
   glCullFace(GL_FRONT);
 
@@ -140,7 +140,7 @@ void Cubemap::draw(const CameraPtr& camera) const {
   bind();
 
   m_viewProjUbo.bind();
-  sendViewProjectionMatrix(Mat4f(Mat3f(camera->getViewMatrix())) * camera->getProjectionMatrix());
+  sendViewProjectionMatrix(Mat4f(Mat3f(camera.getViewMatrix())) * camera.getProjectionMatrix());
 
   Mesh::drawUnitCube();
 

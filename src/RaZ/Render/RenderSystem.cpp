@@ -32,8 +32,8 @@ void RenderSystem::update(float deltaTime) {
   Mat4f viewProjMat;
 
   if (camTransform.hasUpdated()) {
-    const Mat4f& viewMat = camera.computeViewMatrix(camTransform.getRotation().inverse(),
-                                                    camTransform.computeTranslationMatrix(true));
+    const Mat4f& viewMat = camera.computeViewMatrix(camTransform.computeTranslationMatrix(true),
+                                                    camTransform.getRotation().inverse());
     camera.computeInverseViewMatrix();
     viewProjMat = viewMat * camera.getProjectionMatrix();
 

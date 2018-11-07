@@ -31,7 +31,7 @@ public:
 
   template <typename... Args> static CameraPtr create(Args&&... args) { return std::make_unique<Camera>(std::forward<Args>(args)...); }
 
-  const Mat4f& computeViewMatrix(const Mat4f& inverseRotation, const Mat4f& translationMatrix);
+  const Mat4f& computeViewMatrix(const Mat4f& translationMatrix, const Mat4f& inverseRotation);
   const Mat4f& computeInverseViewMatrix();
   const Mat4f& computeLookAt(const Vec3f& position, const Vec3f& target = Vec3f(0.f), const Vec3f& orientation = Axis::Y);
   const Mat4f& computeInverseProjectionMatrix();

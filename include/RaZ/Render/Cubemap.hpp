@@ -37,7 +37,7 @@ public:
             const std::string& frontTexturePath, const std::string& backTexturePath);
   void bind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_index); }
   void unbind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, 0); }
-  void draw(const CameraPtr& camera) const;
+  void draw(const Camera& camera) const;
 
 private:
   GLuint m_index {};

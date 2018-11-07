@@ -16,7 +16,7 @@ void Camera::setFieldOfView(float fieldOfViewDegrees) {
   computeInverseProjectionMatrix();
 }
 
-const Mat4f& Camera::computeViewMatrix(const Mat4f& inverseRotation, const Mat4f& translationMatrix) {
+const Mat4f& Camera::computeViewMatrix(const Mat4f& translationMatrix, const Mat4f& inverseRotation) {
   m_viewMat = translationMatrix * inverseRotation;
   return m_viewMat;
 }
