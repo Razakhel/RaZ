@@ -6,6 +6,7 @@
 #include "RaZ/Entity.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/System.hpp"
 #include "RaZ/Utils/Window.hpp"
@@ -21,8 +22,10 @@ public:
   const Entity& getCameraEntity() const { return m_camera; }
   Entity& getCameraEntity() { return m_camera; }
   const ShaderProgram& getProgram() const { return m_program; }
+  const CubemapPtr& getCubemap() const { return m_cubemap; }
 
   void setProgram(ShaderProgram&& program) { m_program = std::move(program); }
+  void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
 
   void linkEntity(const EntityPtr& entity) override;
   void update(float deltaTime) override;
@@ -36,6 +39,7 @@ public:
   void sendCameraMatrices() const;
   void updateLight(const Entity* entity, std::size_t lightIndex) const;
   void updateLights() const;
+  void removeCubemap() { m_cubemap.reset(); }
   void updateShaders() const;
   void destroy() override { m_window.setShouldClose(); }
 
@@ -43,6 +47,7 @@ private:
   Window m_window;
   Entity m_camera = Entity(0);
   ShaderProgram m_program {};
+  CubemapPtr m_cubemap {};
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);
 };
 

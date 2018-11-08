@@ -23,7 +23,7 @@ public:
   virtual void linkEntity(const EntityPtr& entity);
   virtual void unlinkEntity(const EntityPtr& entity);
   virtual void update(float deltaTime) = 0;
-  virtual void destroy() = 0;
+  virtual void destroy() {}
 
   virtual ~System() = default;
 

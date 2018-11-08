@@ -26,6 +26,8 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
 }
 
 void RenderSystem::update(float deltaTime) {
+  m_program.use();
+
   auto& camera       = m_camera.getComponent<Camera>();
   auto& camTransform = m_camera.getComponent<Transform>();
 
@@ -56,6 +58,9 @@ void RenderSystem::update(float deltaTime) {
       }
     }
   }
+
+  if (m_cubemap)
+    m_cubemap->draw(camera);
 
   m_window.run(deltaTime);
 }
