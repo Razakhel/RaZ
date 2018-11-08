@@ -23,6 +23,10 @@ int main() {
   meshTrans.scale(0.2f);
   meshTrans.rotate(180.f, Raz::Axis::Y);
 
+  renderSystem.setCubemap(Raz::Cubemap::create("../../assets/skyboxes/clouds_right.png", "../../assets/skyboxes/clouds_left.png",
+                                               "../../assets/skyboxes/clouds_top.png", "../../assets/skyboxes/clouds_bottom.png",
+                                               "../../assets/skyboxes/clouds_front.png", "../../assets/skyboxes/clouds_back.png"));
+
   Raz::Entity& light = world.addEntity();
   /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT, // Type
                                                    1.f,                   // Energy
@@ -158,7 +162,7 @@ int main() {
                        0.f);
   });
 
-  window.disableCursor(); // Disabling mouse cursor to allow continous rotations
+  window.disableCursor(); // Disabling mouse cursor to allow continuous rotations
   window.addKeyCallback(Raz::Keyboard::LEFT_ALT,
                         [&window] (float /* deltaTime */) { window.showCursor(); },
                         Raz::Input::ONCE,
