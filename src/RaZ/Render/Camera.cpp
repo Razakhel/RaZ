@@ -21,14 +21,9 @@ const Mat4f& Camera::computeViewMatrix(const Mat4f& translationMatrix, const Mat
   return m_viewMat;
 }
 
-const Mat4f& Camera::computeInverseViewMatrix() {
-  m_invViewMat = m_viewMat.inverse();
-  return m_invViewMat;
-}
-
-const Mat4f& Camera::computeLookAt(const Vec3f& position, const Vec3f& target, const Vec3f& orientation) {
+const Mat4f& Camera::computeLookAt(const Vec3f& position, const Vec3f& target, const Vec3f& upDirection) {
   const Vec3f zAxis((position - target).normalize());
-  const Vec3f xAxis(zAxis.cross(orientation).normalize());
+  const Vec3f xAxis(zAxis.cross(upDirection).normalize());
   const Vec3f yAxis(xAxis.cross(zAxis));
 
   m_viewMat = Mat4f({{             xAxis[0],             yAxis[0],           -zAxis[0], 0.f },
@@ -39,9 +34,9 @@ const Mat4f& Camera::computeLookAt(const Vec3f& position, const Vec3f& target, c
   return m_viewMat;
 }
 
-const Mat4f& Camera::computeInverseProjectionMatrix() {
-  m_invProjMat = m_projMat.inverse();
-  return m_invProjMat;
+const Mat4f& Camera::computeInverseViewMatrix() {
+  m_invViewMat = m_viewMat.inverse();
+  return m_invViewMat;
 }
 
 const Mat4f& Camera::computePerspectiveMatrix() {
@@ -56,6 +51,11 @@ const Mat4f& Camera::computePerspectiveMatrix() {
                      {          0.f,                0.f, -planeMult / planeDist, 1.f }});
 
   return m_projMat;
+}
+
+const Mat4f& Camera::computeInverseProjectionMatrix() {
+  m_invProjMat = m_projMat.inverse();
+  return m_invProjMat;
 }
 
 } // namespace Raz

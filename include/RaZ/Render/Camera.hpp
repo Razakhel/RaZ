@@ -31,11 +31,26 @@ public:
 
   template <typename... Args> static CameraPtr create(Args&&... args) { return std::make_unique<Camera>(std::forward<Args>(args)...); }
 
+  /// Standard view matrix computation.
+  /// \param translationMatrix Translation matrix.
+  /// \param inverseRotation Inverse rotation matrix.
+  /// \return Reference to the computed view matrix.
   const Mat4f& computeViewMatrix(const Mat4f& translationMatrix, const Mat4f& inverseRotation);
+  /// 'Look at' view matrix computation.
+  /// \param position Position of the camera.
+  /// \param target Position of where the camera's looking at.
+  /// \param upDirection Vector pointing to the up direction relative to the current orientation.
+  /// \return Reference to the computed view matrix.
+  const Mat4f& computeLookAt(const Vec3f& position, const Vec3f& target = Vec3f(0.f), const Vec3f& upDirection = Axis::Y);
+  /// Inverse view matrix computation.
+  /// \return Reference to the computed inverse view matrix.
   const Mat4f& computeInverseViewMatrix();
-  const Mat4f& computeLookAt(const Vec3f& position, const Vec3f& target = Vec3f(0.f), const Vec3f& orientation = Axis::Y);
-  const Mat4f& computeInverseProjectionMatrix();
+  /// Perspective projection matrix computation.
+  /// \return Reference to the computed projection matrix.
   const Mat4f& computePerspectiveMatrix();
+  /// Inverse projection matrix computation.
+  /// \return Reference to the computed inverse projection matrix.
+  const Mat4f& computeInverseProjectionMatrix();
 
 private:
   float m_frameRatio;
