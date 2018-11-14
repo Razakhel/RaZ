@@ -86,6 +86,29 @@ inline std::string trimCopy(std::string text) {
   return text;
 }
 
+inline std::vector<std::string> split(std::string inputStr, char delimiter) {
+  trimRight(inputStr);
+
+  std::vector<std::string> parts {};
+
+  while (!inputStr.empty()) {
+    const std::size_t delimPos = inputStr.find_first_of(delimiter);
+
+    if (delimPos > inputStr.size()) {
+      parts.push_back(inputStr);
+      break;
+    }
+
+    parts.push_back(inputStr.substr(0, delimPos));
+    trimRight(parts.back());
+
+    inputStr.erase(0, delimPos + 1);
+    trimLeft(inputStr);
+  }
+
+  return parts;
+}
+
 } // namespace StrUtils
 
 } // namespace Raz
