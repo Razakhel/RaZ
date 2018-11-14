@@ -29,3 +29,22 @@ TEST_CASE("String trimming") {
   REQUIRE(Raz::StrUtils::trimRightCopy(baseStr) == trimmedRightStr);
   REQUIRE(Raz::StrUtils::trimCopy(baseStr) == trimmedBothStr); // Trim both ends
 }
+
+TEST_CASE("String splitting") {
+  const std::string baseStr = "this'test  (is a)     good/test   /   ";
+
+  const std::vector<std::string> spaceSplit = Raz::StrUtils::split(baseStr, ' ');
+
+  REQUIRE(spaceSplit.size() == 5);
+  REQUIRE(spaceSplit[0] == "this'test");
+  REQUIRE(spaceSplit[1] == "(is");
+  REQUIRE(spaceSplit[2] == "a)");
+  REQUIRE(spaceSplit[3] == "good/test");
+  REQUIRE(spaceSplit[4] == "/");
+
+  const std::vector<std::string> slashSplit = Raz::StrUtils::split(baseStr, '/');
+
+  REQUIRE(slashSplit.size() == 2);
+  REQUIRE(slashSplit[0] == "this'test  (is a)     good");
+  REQUIRE(slashSplit[1] == "test");
+}
