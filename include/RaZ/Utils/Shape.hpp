@@ -7,6 +7,27 @@
 
 namespace Raz {
 
+/// Line segment defined by its two extremities' positions.
+class Line {
+public:
+  Line() = default;
+  Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
+
+  const Vec3f& getBeginPos() const { return m_beginPos; }
+  const Vec3f& getEndPos() const { return m_endPos; }
+
+  /// Line length computation. Use this if you really need the actual length; otherwise, prefer computeSquaredLength().
+  /// \return Line's length.
+  float computeLength() const { return (m_endPos - m_beginPos).computeLength(); }
+  /// Line squared length computation; to be preferred over computeLength() for faster operations.
+  /// \return Line's squared length.
+  float computeSquaredLength() const { return (m_endPos - m_beginPos).computeSquaredLength(); }
+
+private:
+  Vec3f m_beginPos {};
+  Vec3f m_endPos {};
+};
+
 struct Triangle {
   Triangle() = default;
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
