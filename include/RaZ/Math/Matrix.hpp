@@ -19,6 +19,10 @@ class Matrix;
 template <typename T, std::size_t W, std::size_t H>
 std::ostream& operator<<(std::ostream& stream, const Matrix<T, W, H>& mat);
 
+/// Mathematical matrix, with generic type and size.
+/// \tparam T Matrix's type.
+/// \tparam W Matrix's width.
+/// \tparam H Matrix's height.
 template <typename T, std::size_t W, std::size_t H>
 class Matrix {
 public:
@@ -36,35 +40,119 @@ public:
   const T* getDataPtr() const { return m_data.data(); }
   T* getDataPtr() { return m_data.data(); }
 
+  /// Identity matrix static creation; needs to be called with a square matrix type.
+  /// \return Identity matrix.
   static Matrix identity();
+  /// Transposed matrix computation.
+  /// \return Transposed matrix.
   Matrix<T, H, W> transpose() const;
+  /// Determinant computation.
+  /// \return Matrix's determinant.
   float computeDeterminant() const;
+  /// Inverse matrix computation.
+  /// \return Matrix's inverse.
   Matrix inverse() const;
 
+  /// Default copy assignment operator.
+  /// \return Reference on the copied matrix.
   Matrix& operator=(const Matrix&) = default;
+  /// Default move assignment operator.
+  /// \return Reference on the moved matrix.
   Matrix& operator=(Matrix&&) noexcept = default;
+  /// Element-wise matrix-matrix addition operator.
+  /// \param mat Matrix to be added.
+  /// \return Result of the summed matrices.
   Matrix operator+(const Matrix& mat) const;
+  /// Element-wise matrix-value addition operator.
+  /// \param val Value to be added.
+  /// \return Result of the matrix summed with the value.
   Matrix operator+(float val) const;
+  /// Element-wise matrix-matrix substraction operator.
+  /// \param mat Matrix to be substracted by.
+  /// \return Result of the substracted matrices.
   Matrix operator-(const Matrix& mat) const;
+  /// Element-wise matrix-value substraction operator.
+  /// \param val Value to be substracted by.
+  /// \return Result of the matrix substracted by the value.
   Matrix operator-(float val) const;
+  /// Element-wise matrix-matrix multiplication operator.
+  /// \param mat Matrix to be multiplied with.
+  /// \return Result of the multiplied matrices.
   Matrix operator%(const Matrix& mat) const;
+  /// Element-wise matrix-value multiplication operator.
+  /// \param val Value to be multiplied with.
+  /// \return Result of the matrix multiplied by the value.
   Matrix operator*(float val) const;
+  /// Element-wise matrix-matrix division.
+  /// \param mat Matrix to be divided by.
+  /// \return Result of the divided matrices.
   Matrix operator/(const Matrix& mat) const;
+  /// Element-wise matrix-value division.
+  /// \param val Value to be divided by.
+  /// \return Result of the matrix divided by the value.
   Matrix operator/(float val) const;
+  /// Matrix-vector multiplication operator (assumes the vector to be vertical).
+  /// \param vec Vector to be multiplied with.
+  /// \return Result of the matrix-vector multiplication.
   Vector<T, H> operator*(const Vector<T, H>& vec) const;
+  /// Matrix-matrix multiplication operator.
+  /// \tparam WI Input matrix's width.
+  /// \tparam HI Input matrix's height.
+  /// \param mat Matrix to be multiplied with.
+  /// \return Result of the multiplied matrices.
   template <std::size_t WI, std::size_t HI> Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat) const;
+  /// Element-wise matrix-matrix addition assignment operator.
+  /// \param mat Matrix to be added.
+  /// \return Reference to the original matrix.
   Matrix& operator+=(const Matrix& mat);
+  /// Element-wise matrix-value addition assignment operator.
+  /// \param val Value to be added.
+  /// \return Reference to the original matrix.
   Matrix& operator+=(float val);
+  /// Element-wise matrix-matrix substraction assignment operator.
+  /// \param mat Matrix to be substracted by.
+  /// \return Reference to the original matrix.
   Matrix& operator-=(const Matrix& mat);
+  /// Element-wise matrix-value substraction assignment operator.
+  /// \param val Value to be substracted by.
+  /// \return Reference to the original matrix.
   Matrix& operator-=(float val);
+  /// Element-wise matrix-matrix multiplication assignment operator.
+  /// \param mat Matrix to be multiplied with.
+  /// \return Reference to the original matrix.
   Matrix& operator%=(const Matrix& mat);
+  /// Matrix-matrix multiplication assignment operator.
+  /// \param val Value to be multiplied with.
+  /// \return Reference to the original matrix.
   Matrix& operator*=(float val);
+  /// Element-wise matrix-matrix division assignment operator.
+  /// \param mat Matrix to be divided by.
+  /// \return Reference to the original matrix.
   Matrix& operator/=(const Matrix& mat);
+  /// Element-wise matrix-value divions assignment operator.
+  /// \param val Value to be divided by.
+  /// \return Reference to the original matrix.
   Matrix& operator/=(float val);
+  /// Element fetching operator given width & height indices.
+  /// \param widthIndex Width index.
+  /// \param heightIndex Height index.
+  /// \return Reference to the fetched element.
   T& operator()(std::size_t widthIndex, std::size_t heightIndex) { return m_data[heightIndex * W + widthIndex]; }
+  /// Element fetching operator with a single index.
+  /// \param index Element's index.
+  /// \return Constant reference to the fetched element.
   const T& operator[](std::size_t index) const { return m_data[index]; }
+  /// Element fetching operator with a single index.
+  /// \param index Element's index.
+  /// \return Reference to the fetched element.
   T& operator[](std::size_t index) { return m_data[index]; }
+  /// Matrix equality comparison operator.
+  /// \param mat Matrix to be compared with.
+  /// \return True if matrices are equal, else otherwise.
   bool operator==(const Matrix& mat) const;
+  /// Output stream operator.
+  /// \param stream Stream to output into.
+  /// \param mat Matrix to be output.
   friend std::ostream& operator<< <>(std::ostream& stream, const Matrix& mat);
 
 private:
