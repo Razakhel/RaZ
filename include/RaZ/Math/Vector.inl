@@ -7,8 +7,14 @@
 namespace Raz {
 
 template <typename T, std::size_t Size>
+Vector<T, Size>::Vector(const Vector<T, Size + 1>& vec) {
+  for (std::size_t i = 0; i < Size; ++i)
+    m_data[i] = vec[i];
+}
+
+template <typename T, std::size_t Size>
 Vector<T, Size>::Vector(const Vector<T, Size - 1>& vec, T val) {
-  for (std::size_t i = 0; i < vec.getSize(); ++i)
+  for (std::size_t i = 0; i < Size - 1; ++i)
     m_data[i] = vec[i];
   m_data.back() = val;
 }

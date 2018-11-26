@@ -26,6 +26,7 @@ public:
   Vector() = default;
   Vector(const Vector&) = default;
   Vector(Vector&&) noexcept = default;
+  explicit Vector(const Vector<T, Size + 1>& vec);
   Vector(const Vector<T, Size - 1>& vec, T val);
   explicit Vector(T val) noexcept;
   Vector(std::initializer_list<T> list);
