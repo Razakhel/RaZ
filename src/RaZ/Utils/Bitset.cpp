@@ -53,6 +53,18 @@ Bitset Bitset::operator^(const Bitset& bitset) const {
   return res;
 }
 
+Bitset Bitset::operator<<(std::size_t shift) const {
+  Bitset res = *this;
+  res <<= shift;
+  return res;
+}
+
+Bitset Bitset::operator>>(std::size_t shift) const {
+  Bitset res = *this;
+  res >>= shift;
+  return res;
+}
+
 Bitset& Bitset::operator&=(const Bitset& bitset) {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
     m_bits[bitIndex] = m_bits[bitIndex] & bitset[bitIndex];
@@ -68,6 +80,16 @@ Bitset& Bitset::operator|=(const Bitset& bitset) {
 Bitset& Bitset::operator^=(const Bitset& bitset) {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
     m_bits[bitIndex] = m_bits[bitIndex] ^ bitset[bitIndex];
+  return *this;
+}
+
+Bitset& Bitset::operator<<=(std::size_t shift) {
+  m_bits.resize(m_bits.size() + shift);
+  return *this;
+}
+
+Bitset& Bitset::operator>>=(std::size_t shift) {
+  m_bits.resize(m_bits.size() - shift);
   return *this;
 }
 

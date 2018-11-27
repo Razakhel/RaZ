@@ -13,7 +13,7 @@ namespace Raz {
 class Bitset {
 public:
   Bitset() = default;
-  explicit Bitset(std::size_t bitCount, bool initialValue = false) : m_bits(bitCount, initialValue) {}
+  explicit Bitset(std::size_t bitCount, bool initVal = false) : m_bits(bitCount, initVal) {}
   Bitset(std::initializer_list<bool> values) : m_bits(values.begin(), values.end()) {}
 
   const std::vector<bool>& getBits() const { return m_bits; }
@@ -30,9 +30,13 @@ public:
   Bitset operator&(const Bitset& bitset) const;
   Bitset operator|(const Bitset& bitset) const;
   Bitset operator^(const Bitset& bitset) const;
+  Bitset operator<<(std::size_t shift) const;
+  Bitset operator>>(std::size_t shift) const;
   Bitset& operator|=(const Bitset& bitset);
   Bitset& operator&=(const Bitset& bitset);
   Bitset& operator^=(const Bitset& bitset);
+  Bitset& operator<<=(std::size_t shift);
+  Bitset& operator>>=(std::size_t shift);
   bool operator[](std::size_t index) const { return m_bits[index]; }
   bool operator==(const Bitset& bitset) const { return std::equal(m_bits.cbegin(), m_bits.cend(), bitset.getBits().cbegin()); }
   bool operator!=(const Bitset& bitset) const { return !(*this == bitset); }
