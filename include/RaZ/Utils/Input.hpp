@@ -9,6 +9,9 @@ namespace Raz {
 
 namespace Input {
 
+/// Values defining on which frequency an associated action should take place.
+///  ONCE: the action should be executed only once when the key/button is pressed/clicked.
+///  ALWAYS: the action should be executed as long as the key/button is pressed/clicked.
 enum ActionTrigger {
   ONCE,
   ALWAYS
@@ -18,6 +21,7 @@ enum ActionTrigger {
 
 namespace Keyboard {
 
+/// Values defining keyboard's keys.
 enum Key {
   // Letter keys
   A = GLFW_KEY_A,
@@ -108,6 +112,7 @@ enum Key {
 
 namespace Mouse {
 
+/// Values defining mouse buttons.
 enum Button {
   LEFT_CLICK   = GLFW_MOUSE_BUTTON_LEFT,
   RIGHT_CLICK  = GLFW_MOUSE_BUTTON_RIGHT,
@@ -118,6 +123,10 @@ enum Button {
 
 namespace Cursor {
 
+/// Values defining the mouse cursor's state.
+///  NORMAL: the cursor is displayed and behaves normally.
+///  HIDDEN: the cursor stays hidden but exists nonetheless, meaning that it can freely go out of the window.
+///  DISABLED: the cursor stays hidden while returning to the center continuously, meaning that it can't go out of the window.
 enum State {
   NORMAL   = GLFW_CURSOR_NORMAL,
   HIDDEN   = GLFW_CURSOR_HIDDEN,
