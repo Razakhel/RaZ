@@ -54,10 +54,10 @@ public:
   Matrix inverse() const;
 
   /// Default copy assignment operator.
-  /// \return Reference on the copied matrix.
+  /// \return Reference to the copied matrix.
   Matrix& operator=(const Matrix&) = default;
   /// Default move assignment operator.
-  /// \return Reference on the moved matrix.
+  /// \return Reference to the moved matrix.
   Matrix& operator=(Matrix&&) noexcept = default;
   /// Element-wise matrix-matrix addition operator.
   /// \param mat Matrix to be added.
@@ -83,11 +83,11 @@ public:
   /// \param val Value to be multiplied with.
   /// \return Result of the matrix multiplied by the value.
   Matrix operator*(float val) const;
-  /// Element-wise matrix-matrix division.
+  /// Element-wise matrix-matrix division operator.
   /// \param mat Matrix to be divided by.
   /// \return Result of the divided matrices.
   Matrix operator/(const Matrix& mat) const;
-  /// Element-wise matrix-value division.
+  /// Element-wise matrix-value division operator.
   /// \param val Value to be divided by.
   /// \return Result of the matrix divided by the value.
   Matrix operator/(float val) const;
@@ -121,7 +121,7 @@ public:
   /// \param mat Matrix to be multiplied with.
   /// \return Reference to the original matrix.
   Matrix& operator%=(const Matrix& mat);
-  /// Matrix-matrix multiplication assignment operator.
+  /// Element-wise matrix-value multiplication assignment operator.
   /// \param val Value to be multiplied with.
   /// \return Reference to the original matrix.
   Matrix& operator*=(float val);
@@ -147,8 +147,9 @@ public:
   /// \return Reference to the fetched element.
   T& operator[](std::size_t index) { return m_data[index]; }
   /// Matrix equality comparison operator.
+  /// Uses a near-equality check on floating types to take floating-point errors into account.
   /// \param mat Matrix to be compared with.
-  /// \return True if matrices are equal, else otherwise.
+  /// \return True if matrices are [nearly] equal, else otherwise.
   bool operator==(const Matrix& mat) const;
   /// Output stream operator.
   /// \param stream Stream to output into.
