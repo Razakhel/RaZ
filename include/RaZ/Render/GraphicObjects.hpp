@@ -16,7 +16,7 @@ struct Vertex {
   Vec3f normal {};
   Vec3f tangent {};
 
-  std::size_t operator()(const Vertex&) const { return tangent.hash(normal.hash(texcoords.hash(position.hash(0)))); }
+  std::size_t operator()() const { return tangent.hash(normal.hash(texcoords.hash(position.hash(0)))); }
   bool operator==(const Vertex& vert) const { return (position == vert.position)
                                                   && (texcoords == vert.texcoords)
                                                   && (normal == vert.normal)

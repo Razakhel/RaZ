@@ -37,38 +37,140 @@ public:
   const T* getDataPtr() const { return m_data.data(); }
   T* getDataPtr() { return m_data.data(); }
 
+  /// Computes the dot product (scalar product) between the current vector & the given one.
+  /// The dot product calculates the projection of one of the vectors onto the other; the order doesn't matter.
+  /// On normalized vectors, the returned value represents the cosine of the angle (in radians) between them.
+  /// \param vec Vector to compute the dot product with.
+  /// \return Dot product value.
   T dot(const Vector& vec) const;
+  /// Computes the cross product (vector product) between the current vector & the given one.
+  /// The cross product generates a vector which is orthogonal to the two others.
+  /// \param vec Vector to compute the cross product with.
+  /// \return Computed orthogonal vector.
   Vector cross(const Vector& vec) const;
+  /// Computes the reflection of the current vector over a direction.
+  /// The calling vector is assumed to be incident (directed to the surface it is reflected on).
+  /// \imageSize{vector_reflect.png, height: 20%; width: 20%;}
+  /// \image html vector_reflect.png "Incident vector reflection"
+  /// \param normal Direction to compute the reflection over.
+  /// \return Vector's reflection.
   Vector reflect(const Vector& normal) const { return (*this - normal * dot(normal) * 2); }
+  /// Computes the normalized vector.
+  /// Normalizing a vector makes it of length 1.
+  /// \return Normalized vector.
   Vector normalize() const;
+  /// Computes the length of the vector.
+  /// Calculating the actual length requires a square root operation to be involved, which is expensive.
+  /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredLength().
+  /// \return Vector's length.
   float computeLength() const { return std::sqrt(computeSquaredLength()); }
+  /// Computes the squared length of the vector.
+  /// The squared length is equal to the dot product of the vector with itself.
+  /// This calculation does not involve a square root; it is then to be preferred over computeLength() for faster operations.
+  /// \return Vector's squared length.
   float computeSquaredLength() const { return dot(*this); }
+  /// Computes the unique hash of the vector.
+  /// \param seed Value to use as a hash seed.
+  /// \return Vector's hash.
   std::size_t hash(std::size_t seed) const;
 
+  /// Default copy assignment operator.
+  /// \return Reference to the copied vector.
   Vector& operator=(const Vector&) = default;
+  /// Default move assignment operator.
+  /// \return Reference to the moved vector.
   Vector& operator=(Vector&&) noexcept = default;
+  /// Vector negation operator.
+  /// This unary minus negates the components of the vector, reversing its direction.
+  /// \return Negated vector.
   Vector operator-() const { return (*this * -1); }
+  /// Element-wise vector-vector addition operator.
+  /// \param vec Vector to be added.
+  /// \return Result of the summed vectors.
   Vector operator+(const Vector& vec) const;
+  /// Element-wise vector-value addition operator.
+  /// \param val Value to be added.
+  /// \return Result of the vector summed with the value.
   Vector operator+(float val) const;
+  /// Element-wise vector-vector substraction operator.
+  /// \param vec Vector to be substracted by.
+  /// \return Result of the substracted vectors.
   Vector operator-(const Vector& vec) const;
+  /// Element-wise vector-value substraction operator.
+  /// \param val Value to be substracted by.
+  /// \return Result of the vector substracted by the value.
   Vector operator-(float val) const;
+  /// Element-wise vector-vector multiplication operator.
+  /// \param vec Vector to be multiplied with.
+  /// \return Result of the multiplied vectors.
   Vector operator*(const Vector& vec) const;
+  /// Element-wise vector-value multiplication operator.
+  /// \param val Value to be multiplied with.
+  /// \return Result of the vector multiplied by the value.
   Vector operator*(float val) const;
+  /// Element-wise vector-vector division operator.
+  /// \param vec Vector to be added.
+  /// \return Result of the summed vectors.
   Vector operator/(const Vector& vec) const;
+  /// Element-wise vector-value division operator.
+  /// \param val Value to be divided by.
+  /// \return Result of the vector divided by the value.
   Vector operator/(float val) const;
+  /// Vector-matrix multiplication operator (assumes the vector to be horizontal).
+  /// \param mat Matrix to be multiplied with.
+  /// \return Result of the vector-matrix multiplication.
   template <std::size_t H> Vector operator*(const Matrix<T, Size, H>& mat) const;
+  /// Element-wise vector-vector addition assignment operator.
+  /// \param vec Vector to be added.
+  /// \return Reference to the original vector.
   Vector& operator+=(const Vector& vec);
+  /// Element-wise vector-value addition assignment operator.
+  /// \param val Value to be added.
+  /// \return Reference to the original vector.
   Vector& operator+=(float val);
+  /// Element-wise vector-vector substraction assignment operator.
+  /// \param vec Vector to be substracted by.
+  /// \return Reference to the original vector.
   Vector& operator-=(const Vector& vec);
+  /// Element-wise vector-value substraction assignment operator.
+  /// \param val Value to be substracted by.
+  /// \return Reference to the original vector.
   Vector& operator-=(float val);
+  /// Element-wise vector-vector multiplication assignment operator.
+  /// \param vec Vector to be multiplied with.
+  /// \return Reference to the original vector.
   Vector& operator*=(const Vector& vec);
+  /// Element-wise vector-value multiplication assignment operator.
+  /// \param val Value to be multiplied with.
+  /// \return Reference to the original vector.
   Vector& operator*=(float val);
+  /// Element-wise vector-vector division assignment operator.
+  /// \param vec Vector to be divided by.
+  /// \return Reference to the original vector.
   Vector& operator/=(const Vector& vec);
+  /// Element-wise vector-value division assignment operator.
+  /// \param val Value to be divided by.
+  /// \return Reference to the original vector.
   Vector& operator/=(float val);
+  /// Element fetching operator given its index.
+  /// \param index Element's index.
+  /// \return Constant reference to the fetched element.
   const T& operator[](std::size_t index) const { return m_data[index]; }
+  /// Element fetching operator given its index.
+  /// \param index Element's index.
+  /// \return Reference to the fetched element.
   T& operator[](std::size_t index) { return m_data[index]; }
-  std::size_t operator()(const Vector&) const { return hash(0); }
+  /// Hash computation operator.
+  /// \return Vector's hash.
+  std::size_t operator()() const { return hash(0); }
+  /// Vector equality comparison operator.
+  /// Uses a near-equality check on floating types to take floating-point errors into account.
+  /// \param vec Vector to be compared with.
+  /// \return True if vectors are [nearly] equal, else otherwise.
   bool operator==(const Vector& vec) const;
+  /// Output stream operator.
+  /// \param stream Stream to output into.
+  /// \param vec Vector to be output.
   friend std::ostream& operator<< <>(std::ostream& stream, const Vector& vec);
 
 private:
