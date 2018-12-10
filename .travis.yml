@@ -11,6 +11,10 @@ os:
 dist:
     - xenial
 
+# Disabling depth to fetch only the latest commit
+git:
+    depth: false
+
 addons:
     apt:
         update: true # Runs apt-get update before anything else
@@ -32,6 +36,8 @@ before_script:
     - tar xvf ./fbx_sdk.tar.gz
     - sudo chmod +x ./fbx20190_fbxsdk_linux
     - ./fbx20190_fbxsdk_linux /usr
+    # Agreeing to the software license
+    - yes
 
 script:
     - mkdir build
