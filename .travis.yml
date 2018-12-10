@@ -28,9 +28,8 @@ addons:
 
 before_script:
     # Installing the FBX SDK
-    - wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O /tmp/fbx_sdk.tar.gz
-    - tar xvf /tmp/fbx_sdk.tar.gz
-    - cd /tmp
+    - wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O ./fbx_sdk.tar.gz
+    - tar xvf ./fbx_sdk.tar.gz
     - sudo chmod +x ./fbx20190_fbxsdk_linux
     - ./fbx20190_fbxsdk_linux /usr
 
