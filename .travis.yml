@@ -19,8 +19,8 @@ addons:
     apt:
         update: true # Runs apt-get update before anything else
         packages:
-            # X11 as a needed dependency
-            - libx11-dev
+            # GL & X11 as needed dependencies
+            - mesa-utils libx11-dev libxcursor-dev
             # CMake, GCC & Clang to build RaZ
             - cmake
             - gcc
