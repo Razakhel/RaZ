@@ -32,17 +32,15 @@ addons:
 
 before_script:
     # Installing the FBX SDK
-    - wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O ./fbx_sdk.tar.gz
-    - tar xvf ./fbx_sdk.tar.gz
-    - sudo chmod +x ./fbx20190_fbxsdk_linux
-    - ./fbx20190_fbxsdk_linux /usr
-    # Agreeing to the software license
-    - yes
+    #- wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O ./fbx_sdk.tar.gz
+    #- tar xvf ./fbx_sdk.tar.gz
+    #- sudo chmod +x ./fbx20190_fbxsdk_linux
+    #- ./fbx20190_fbxsdk_linux /usr
 
 script:
     - mkdir build
     - cd build/
-    - cmake -G "Unix Makefiles" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=true -DRAZ_GEN_DOC=false ..
+    - cmake -G "Unix Makefiles" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=false -DRAZ_GEN_DOC=false ..
     - make -j4
 
     # Launch tests
