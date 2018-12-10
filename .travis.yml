@@ -20,7 +20,7 @@ addons:
         update: true # Runs apt-get update before anything else
         packages:
             # GL & X11 as needed dependencies
-            - libglew-dev libx11-dev libxcursor-dev libxrandr-dev
+            - libglew-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev
             # CMake, GCC & Clang to build RaZ
             - cmake
             - gcc
