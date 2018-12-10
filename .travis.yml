@@ -1,0 +1,53 @@
+language: cpp
+
+compiler:
+    - gcc
+    - clang
+
+os:
+    - linux
+
+# Xenial needed for CMake 3.6+ and C++14 (GCC 5.2+ & Clang 3.4+)
+dist:
+    - xenial
+
+addons:
+    apt:
+        update: true # Runs apt-get update before anything else
+        packages:
+            # X11 as a needed dependency
+            - libx11-dev
+            # CMake, GCC & Clang to build RaZ
+            - cmake
+            - gcc
+            - clang
+            # Doxygen & Dot to generate the documentation
+            - doxygen
+            - python-pydot
+            - python-pydot-ng
+
+before_script:
+    # Installing the FBX SDK
+    - wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O /tmp/fbx_sdk.tar.gz
+    - tar xvf /tmp/fbx_sdk.tar.gz
+    - cd /tmp
+    - sudo chmod +x ./fbx20190_fbxsdk_linux
+    - ./fbx20190_fbxsdk_linux /usr
+
+script:
+    - mkdir build
+    - cd build/
+    - cmake -G "Unix Makefiles" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=true -DRAZ_GEN_DOC=false ..
+    - make -j4
+
+    # Launch tests
+    - ./tests/RaZ_Tests
+
+#webhooks:
+#    urls:
+#        secure: URL
+#    on_success: change
+#    on_failure: always
+#    on_start: never
+#    on_cancel: never
+#    on_error: always
