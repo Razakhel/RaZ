@@ -42,12 +42,6 @@ if (CMAKE_COMPILER_IS_GNUCC)
                    -Wsized-deallocation \
                    -Wstrict-null-sentinel \
                    -Wsuggest-override \
-                   -Wduplicated-cond \
-                   -Wnull-dereference \
-                   -Waligned-new \
-                   -Walloc-zero -Walloca \
-                   -Wformat-overflow \
-                   -Wshadow=compatible-local \
                    -Wno-format-security -Wno-format-nonliteral \
                    -Wno-switch-default \
                    \
@@ -59,6 +53,22 @@ if (CMAKE_COMPILER_IS_GNUCC)
                    -Wno-missing-declarations \
                    -Wno-double-promotion \
                    -Wno-cast-qual") # Disabling some warnings triggered a lot by ImGui...
+
+    # Enabling some other warnings available since GCC 6
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 6 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6)
+        set(GCC_FLAGS "${GCC_FLAGS} \
+                      -Wduplicated-cond \
+                      -Wnull-dereference")
+    endif ()
+
+    # Enabling some other warnings available since GCC 7
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7)
+        set(GCC_FLAGS "${GCC_FLAGS} \
+                      -Walloc-zero -Walloca \
+                      -Wformat-overflow \
+                      -Wshadow=compatible-local \
+                      -Waligned-new")
+    endif ()
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
