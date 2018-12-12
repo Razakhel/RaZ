@@ -1,14 +1,18 @@
 FROM ubuntu:18.04
 
-# Updating & installing needed packages
+# Updating packages' repo
 RUN apt-get update
 
-# GL & X11 as needed dependencies
-RUN apt-get install -y libglew-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev
-# CMake, GCC & Clang to build RaZ
-RUN apt-get install -y cmake gcc clang
-# Doxygen & Dot to generate the documentation
-RUN apt-get install -y doxygen python-pydot python-pydot-ng
+# Installing needed packages:
+#   - GL & X11 as needed graphical dependencies
+#   - CMake, GCC & Clang to build RaZ
+#   - Doxygen & Dot to generate the documentation
+#   - Wget to download the FBX SDK
+RUN apt-get install -y \
+    libglew-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+    cmake gcc clang \
+    doxygen python-pydot python-pydot-ng \
+    wget
 
 # Installing the FBX SDK
 RUN wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O ./fbx_sdk.tar.gz
