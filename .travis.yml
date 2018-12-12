@@ -1,51 +1,34 @@
 language: cpp
 
+sudo: required
+
 compiler:
     - gcc
     - clang
 
+services:
+    - docker
+
 os:
     - linux
-
-# Xenial needed for CMake 3.6+ and C++14 (GCC 5.2+ & Clang 3.4+)
-dist:
-    - xenial
 
 # Disabling depth to fetch only the latest commit
 git:
     depth: false
 
-addons:
-    apt:
-        update: true # Runs apt-get update before anything else
-        packages:
-            # GL & X11 as needed dependencies
-            - libglew-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev
-            # CMake, GCC & Clang to build RaZ
-            - cmake
-            - gcc
-            - clang
-            # Doxygen & Dot to generate the documentation
-            - doxygen
-            - python-pydot
-            - python-pydot-ng
-
-before_script:
-    # Installing the FBX SDK
-    - wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O ./fbx_sdk.tar.gz
-    - tar xvf ./fbx_sdk.tar.gz
-    - sudo chmod +x ./fbx20190_fbxsdk_linux
-    # The installation asks for software user agreement (say 'yes') and afterwards if the README file should be opened (say 'n')
-    - printf 'yes\nn' | sudo ./fbx20190_fbxsdk_linux /usr
+install:
+    - docker build -t raz .
 
 script:
-    - mkdir build
-    - cd build/
-    - cmake -G "Unix Makefiles" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=true -DRAZ_GEN_DOC=false ..
-    - make -j4
-
-    # Launch tests
-    - ./tests/RaZ_Tests
+    # Run Docker, build RaZ & launch unit tests
+    - docker run --name RaZ -v `pwd`:/RaZ raz
+        sh -c "
+            mkdir build &&
+            cd build/ &&
+            cmake -G "Unix Makefiles" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=true -DRAZ_GEN_DOC=false .. &&
+            make -j4 ;
+            ./tests/RaZ_Tests
+        "
 
 #webhooks:
 #    urls:
