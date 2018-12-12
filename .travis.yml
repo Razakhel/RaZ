@@ -49,7 +49,7 @@ script:
             cd build/ &&
             cmake -G \"Unix Makefiles\" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=${RUN_TESTS} -DRAZ_USE_FBX=true .. &&
             make -j4 ;
-            if [[ "${RUN_TESTS_}" == "true" ]]; then ./tests/RaZ_Tests; fi
+            if [ "${RUN_TESTS}" == "true" ]; then ./tests/RaZ_Tests; fi
         "
 
 #webhooks:
