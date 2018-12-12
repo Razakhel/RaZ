@@ -25,7 +25,7 @@ script:
         sh -c "
             mkdir build &&
             cd build/ &&
-            cmake -G "Unix Makefiles" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=true -DRAZ_GEN_DOC=false .. &&
+            cmake -G \"Unix Makefiles\" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=true -DRAZ_GEN_DOC=false .. &&
             make -j4 ;
             ./tests/RaZ_Tests
         "
