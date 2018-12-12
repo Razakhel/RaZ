@@ -2,15 +2,37 @@ language: cpp
 
 sudo: required
 
-compiler:
-    - gcc
-    - clang
-
 services:
     - docker
 
 os:
     - linux
+
+matrix:
+    include:
+        - name: "RaZ - GCC"
+          env:
+            - CXX=g++
+            - CC=gcc
+            - RUN_TESTS=false
+
+        - name: "RaZ - Clang"
+          env:
+            - CXX=clang++
+            - CC=clang
+            - RUN_TESTS=false
+
+        - name: "RaZ - GCC + Tests"
+          env:
+            - CXX=g++
+            - CC=gcc
+            - RUN_TESTS=true
+
+        - name: "RaZ - Clang + Tests"
+          env:
+            - CXX=clang++
+            - CC=clang
+            - RUN_TESTS=true
 
 # Disabling depth to fetch only the latest commit
 git:
@@ -25,9 +47,9 @@ script:
         sh -c "
             mkdir build &&
             cd build/ &&
-            cmake -G \"Unix Makefiles\" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=true -DRAZ_USE_FBX=true -DRAZ_GEN_DOC=false .. &&
+            cmake -G \"Unix Makefiles\" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=${RUN_TESTS} -DRAZ_USE_FBX=true .. &&
             make -j4 ;
-            ./tests/RaZ_Tests
+            if [[ "${RUN_TESTS_}" == "true" ]]; then ./tests/RaZ_Tests; fi
         "
 
 #webhooks:
