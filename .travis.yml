@@ -43,13 +43,11 @@ install:
 
 script:
     # Run Docker, build RaZ & launch unit tests
-    - docker run --name RaZ -v `pwd`:/RaZ raz
+    - docker run --name RaZ -w /RaZ -v `pwd`:/RaZ raz
         bash -c "
-            mkdir build &&
-            cd build/ &&
             cmake -G \"Unix Makefiles\" -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_C_COMPILER=${C_COMPILER} \
-                                        -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=${RUN_TESTS} -DRAZ_USE_FBX=true .. &&
-            make -j4 ;
+                                        -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=${RUN_TESTS} -DRAZ_USE_FBX=true . &&
+            make -j4 &&
             if [[ ${RUN_TESTS} == true ]]; then ./tests/RaZ_Tests; fi
         "
 
