@@ -10,13 +10,14 @@ TEST_CASE("Components IDs checks") {
   // The ID is incremented with every distinct component call
   // No matter how many times one component is checked, it will always have the same ID
 
-  REQUIRE(Raz::Component::getId<Raz::Mesh>() == 0);      // Raz::Mesh's ID is fetched, gets 0; ID incremented
-  REQUIRE(Raz::Component::getId<Raz::Transform>() == 1); // Raz::Transform's ID is fetched, gets 1; ID incremented
-  REQUIRE(Raz::Component::getId<Raz::Light>() == 2);     // Raz::Light's ID is fetched, gets 2; ID incremented
-  REQUIRE(Raz::Component::getId<Raz::Camera>() == 3);    // Raz::Camera's ID is fetched, gets 3; ID incremented
+  const std::size_t transIndex  = Raz::Component::getId<Raz::Transform>();
+  const std::size_t cameraIndex = Raz::Component::getId<Raz::Camera>();
+  const std::size_t meshIndex   = Raz::Component::getId<Raz::Mesh>();
+  const std::size_t lightIndex  = Raz::Component::getId<Raz::Light>();
 
-  REQUIRE(Raz::Component::getId<Raz::Transform>() == 1); // Raz::Transform already has the ID 1
-  REQUIRE(Raz::Component::getId<Raz::Camera>() == 3);    // Raz::Camera already has the ID 3
-  REQUIRE(Raz::Component::getId<Raz::Mesh>() == 0);      // Raz::Mesh already has the ID 0
-  REQUIRE(Raz::Component::getId<Raz::Light>() == 2);     // Raz::Light already has the ID 2
+  // Every component already have an ID attributed to each of them, so calling them again won't change it
+  REQUIRE(transIndex == Raz::Component::getId<Raz::Transform>());
+  REQUIRE(cameraIndex == Raz::Component::getId<Raz::Camera>());
+  REQUIRE(meshIndex == Raz::Component::getId<Raz::Mesh>());
+  REQUIRE(lightIndex == Raz::Component::getId<Raz::Light>());
 }

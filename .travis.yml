@@ -47,7 +47,8 @@ script:
         bash -c "
             mkdir build &&
             cd build/ &&
-            cmake -G \"Unix Makefiles\" -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=${RUN_TESTS} -DRAZ_USE_FBX=true .. &&
+            cmake -G \"Unix Makefiles\" -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} \
+                                        -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=${RUN_TESTS} -DRAZ_USE_FBX=true .. &&
             make -j4 ;
             if [[ ${RUN_TESTS} == true ]]; then ./tests/RaZ_Tests; fi
         "
