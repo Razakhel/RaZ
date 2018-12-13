@@ -12,26 +12,26 @@ matrix:
     include:
         - name: "RaZ - GCC"
           env:
-            - CXX=g++
-            - CC=gcc
+            - CXX_COMPILER=g++
+            - C_COMPILER=gcc
             - RUN_TESTS=false
 
         - name: "RaZ - Clang"
           env:
-            - CXX=clang++
-            - CC=clang
+            - CXX_COMPILER=clang++
+            - C_COMPILER=clang
             - RUN_TESTS=false
 
         - name: "RaZ - GCC + Tests"
           env:
-            - CXX=g++
-            - CC=gcc
+            - CXX_COMPILER=g++
+            - C_COMPILER=gcc
             - RUN_TESTS=true
 
         - name: "RaZ - Clang + Tests"
           env:
-            - CXX=clang++
-            - CC=clang
+            - CXX_COMPILER=clang++
+            - C_COMPILER=clang
             - RUN_TESTS=true
 
 # Disabling depth to fetch only the latest commit
@@ -47,7 +47,7 @@ script:
         bash -c "
             mkdir build &&
             cd build/ &&
-            cmake -G \"Unix Makefiles\" -DCMAKE_C_COMPILER=${CC} -DCMAKE_CXX_COMPILER=${CXX} \
+            cmake -G \"Unix Makefiles\" -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_C_COMPILER=${C_COMPILER} \
                                         -DRAZ_BUILD_EXAMPLES=true -DRAZ_RUN_TESTS=${RUN_TESTS} -DRAZ_USE_FBX=true .. &&
             make -j4 ;
             if [[ ${RUN_TESTS} == true ]]; then ./tests/RaZ_Tests; fi

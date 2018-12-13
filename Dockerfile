@@ -21,5 +21,8 @@ RUN chmod +x ./fbx20190_fbxsdk_linux
 # The installation asks for software user agreement (say 'yes'), then afterwards if the README file should be opened (say 'n')
 RUN printf 'yes\nn' | ./fbx20190_fbxsdk_linux /usr
 
+# Adding /usr/bin to the PATH variable so that compilers are recognized easily
+RUN export PATH=$PATH:/usr/bin
+
 RUN mkdir /RaZ
 WORKDIR /RaZ
