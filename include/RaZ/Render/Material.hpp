@@ -26,9 +26,11 @@ enum class MaterialType {
   COOK_TORRANCE
 };
 
-enum class MaterialPreset {
-  CHARCOAL, GRASS, SAND, ICE, SNOW,                                                   // Dielectric presets
-  IRON, SILVER, ALUMINIUM, GOLD, COPPER, CHROMIUM, NICKEL, TITANIUM, COBALT, PLATINUM // Metallic presets
+enum class MaterialPreset : uint16_t {
+  CHARCOAL = 0, GRASS, SAND, ICE, SNOW,                                                // Dielectric presets
+  IRON, SILVER, ALUMINIUM, GOLD, COPPER, CHROMIUM, NICKEL, TITANIUM, COBALT, PLATINUM, // Metallic presets
+
+  PRESET_COUNT
 };
 
 class Material {

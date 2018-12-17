@@ -12,8 +12,12 @@
 
 namespace Raz {
 
-enum class TexturePreset : uint8_t { BLACK = 0,
-                                     WHITE = 255 };
+enum class TexturePreset : uint8_t {
+  BLACK = 0,
+  WHITE,
+
+  PRESET_COUNT
+};
 
 class Texture;
 using TexturePtr = std::shared_ptr<Texture>;
@@ -29,7 +33,7 @@ public:
 
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
-  static TexturePtr recoverTexture(TexturePreset texturePreset);
+  static TexturePtr recoverTexture(TexturePreset preset);
   static void activate(uint8_t index) { glActiveTexture(GL_TEXTURE0 + index); }
 
   void load(const std::string& fileName);

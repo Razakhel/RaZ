@@ -40,18 +40,13 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
   unbind();
 }
 
-TexturePtr Texture::recoverTexture(TexturePreset texturePreset) {
-  static const std::unordered_map<TexturePreset, TexturePtr> texturePresets = {
-    { TexturePreset::BLACK, Texture::create(0) },
-    { TexturePreset::WHITE, Texture::create(255) }
+TexturePtr Texture::recoverTexture(TexturePreset preset) {
+  static const std::array<TexturePtr, static_cast<std::size_t>(TexturePreset::PRESET_COUNT)> texturePresets = {
+    Texture::create(0),  // BLACK
+    Texture::create(255) // WHITE
   };
 
-  const auto materialParamsIter = texturePresets.find(texturePreset);
-
-  if (materialParamsIter == texturePresets.end())
-    throw std::invalid_argument("Error: Couldn't find the given texture preset");
-
-  return materialParamsIter->second;
+  return texturePresets[static_cast<std::size_t>(preset)];
 }
 
 void Texture::load(const std::string& fileName) {
