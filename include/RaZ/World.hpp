@@ -22,7 +22,8 @@ public:
   template <typename Sys1, typename Sys2, typename... S> std::tuple<Sys1&, Sys2&, S...> addSystems();
   template <typename Sys> void removeSystem();
   Entity& addEntity(bool enabled = true);
-  template <typename Comp, typename... Args> Entity& addEntityWithComponent(bool enabled = true, Args&&... args);
+  template <typename Comp, typename... Args> Entity& addEntityWithComponent(bool enabled, Args&&... args);
+  template <typename Comp, typename... Args> Entity& addEntityWithComponent() { return addEntityWithComponent<Comp>(true); }
   template <typename... C> Entity& addEntityWithComponents(bool enabled = true);
   void update(float deltaTime);
   void refresh();
