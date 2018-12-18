@@ -48,7 +48,7 @@ const Mat4f& Camera::computePerspectiveMatrix() {
   m_projMat = Mat4f({{ 1 / fovRatio,                0.f,                    0.f, 0.f },
                      {          0.f, 1 / halfFovTangent,                    0.f, 0.f },
                      {          0.f,                0.f, m_farPlane / planeDist, 1.f },
-                     {          0.f,                0.f, -planeMult / planeDist, 1.f }});
+                     {          0.f,                0.f, -planeMult / planeDist, 0.f }});
 
   return m_projMat;
 }
