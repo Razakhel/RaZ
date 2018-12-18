@@ -5,13 +5,15 @@ FROM ubuntu:18.04
 #   - CMake, GCC & Clang to build RaZ
 #   - Doxygen & Dot to generate the documentation
 #   - Wget to download the FBX SDK
+#   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
 RUN apt-get update && apt-get install -y \
     libglew-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev \
     cmake gcc-8 g++-8 clang-6.0 \
     doxygen python-pydot python-pydot-ng \
-    wget
+    wget \
+    xvfb
 
-# Setting an alternative to map gcc & g++ to gcc-8 & g++-8
+# Setting alternatives to map gcc & g++ to gcc-8 & g++-8, and clang & clang++ to clang-6.0 & clang++-6.0
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-8 && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-6.0 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-6.0
 
