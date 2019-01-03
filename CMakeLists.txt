@@ -8,98 +8,129 @@ if (NOT CMAKE_BUILD_TYPE) # Define build type to Release if not automatically se
 endif ()
 
 if (CMAKE_COMPILER_IS_GNUCC)
-    set(GCC_FLAGS "-pedantic -pedantic-errors \
-                   -Wall -Wextra \
-                   -Wcast-align -Wcast-qual \
-                   -Wdisabled-optimization \
-                   -Wfloat-equal \
-                   -Wformat-security -Wformat-signedness -Wformat=2 \
-                   -Wmissing-declarations -Wmissing-include-dirs \
-                   -Wnon-virtual-dtor \
-                   -Wold-style-cast \
-                   -Woverloaded-virtual \
-                   -Wpacked \
-                   -Wredundant-decls \
-                   -Wundef -Wuninitialized \
-                   -Wunused-macros \
-                   -Wvla \
-                   -Wconversion \
-                   -Wswitch-default -Wswitch-enum \
-                   -Wsuggest-attribute=noreturn \
-                   -Wzero-as-null-pointer-constant \
-                   -Wlogical-op \
-                   -Wvector-operation-performance \
-                   -Wdouble-promotion \
-                   -Wtrampolines \
-                   -Wuseless-cast \
-                   -Wconditionally-supported \
-                   -Wfloat-conversion \
-                   -Wopenmp-simd \
-                   -fsized-deallocation \
-                   -Warray-bounds=2 \
-                   -Wconditionally-supported \
-                   -Wnoexcept \
-                   -Wsized-deallocation \
-                   -Wstrict-null-sentinel \
-                   -Wsuggest-override \
-                   -Wno-format-security -Wno-format-nonliteral \
-                   -Wno-switch-default \
-                   \
-                   -Wno-old-style-cast \
-                   -Wno-zero-as-null-pointer-constant \
-                   -Wno-useless-cast \
-                   -Wno-float-equal \
-                   -Wno-conversion \
-                   -Wno-missing-declarations \
-                   -Wno-double-promotion \
-                   -Wno-cast-qual") # Disabling some warnings triggered a lot by ImGui...
+    set(
+        GCC_FLAGS
+
+        "-pedantic -pedantic-errors \
+         -Wall -Wextra \
+         -Wcast-align -Wcast-qual \
+         -Wdisabled-optimization \
+         -Wfloat-equal \
+         -Wformat-security -Wformat=2 \
+         -Wmissing-declarations -Wmissing-include-dirs \
+         -Wnon-virtual-dtor \
+         -Wold-style-cast \
+         -Woverloaded-virtual \
+         -Wpacked \
+         -Wredundant-decls \
+         -Wundef -Wuninitialized \
+         -Wunused-macros \
+         -Wvla \
+         -Wconversion \
+         -Wswitch-default -Wswitch-enum \
+         -Wsuggest-attribute=noreturn \
+         -Wzero-as-null-pointer-constant \
+         -Wlogical-op \
+         -Wvector-operation-performance \
+         -Wdouble-promotion \
+         -Wtrampolines \
+         -Wuseless-cast \
+         -Wconditionally-supported \
+         -Wfloat-conversion \
+         -Wopenmp-simd \
+         -Warray-bounds \
+         -Wconditionally-supported \
+         -Wnoexcept \
+         -Wstrict-null-sentinel \
+         -Wno-format-security -Wno-format-nonliteral \
+         -Wno-switch-default \
+         \
+         -Wno-old-style-cast \
+         -Wno-zero-as-null-pointer-constant \
+         -Wno-useless-cast \
+         -Wno-float-equal \
+         -Wno-conversion \
+         -Wno-missing-declarations \
+         -Wno-double-promotion \
+         -Wno-cast-qual" # Disabling some warnings triggered a lot by ImGui...
+    )
+
+    # Enabling some other warnings available since GCC 5
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+        set(
+            GCC_FLAGS
+
+            "${GCC_FLAGS} \
+             -Wformat-signedness \
+             -fsized-deallocation \
+             -Wsized-deallocation \
+             -Wsuggest-override \
+             -Warray-bounds=2"
+        )
+    endif ()
 
     # Enabling some other warnings available since GCC 6
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 6 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6)
-        set(GCC_FLAGS "${GCC_FLAGS} \
-                      -Wduplicated-cond \
-                      -Wnull-dereference")
+        set(
+            GCC_FLAGS
+
+            "${GCC_FLAGS} \
+             -Wduplicated-cond \
+             -Wnull-dereference"
+        )
     endif ()
 
     # Enabling some other warnings available since GCC 7
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7)
-        set(GCC_FLAGS "${GCC_FLAGS} \
-                      -Walloc-zero -Walloca \
-                      -Wformat-overflow \
-                      -Wshadow=compatible-local \
-                      -Waligned-new")
+        set(
+            GCC_FLAGS
+
+            "${GCC_FLAGS} \
+             -Walloc-zero -Walloca \
+             -Wformat-overflow \
+             -Wshadow=compatible-local \
+             -Waligned-new"
+        )
     endif ()
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(CLANG_FLAGS "-pedantic -pedantic-errors \
-                     -Weverything \
-                     -Wno-c++98-compat -Wno-c++98-compat-pedantic \
-                     -Wno-mismatched-tags \
-                     -Wno-padded \
-                     -Wno-shadow \
-                     -Wno-global-constructors \
-                     -Wno-weak-vtables \
-                     -Wno-exit-time-destructors \
-                     -Wno-covered-switch-default \
-                     -Wno-unused-template \
-                     -Wno-reserved-id-macro \
-                     -Wno-documentation -Wno-documentation-unknown-command")
+    set(
+        CLANG_FLAGS
+
+        "-pedantic -pedantic-errors \
+         -Weverything \
+         -Wno-c++98-compat -Wno-c++98-compat-pedantic \
+         -Wno-mismatched-tags \
+         -Wno-padded \
+         -Wno-shadow \
+         -Wno-global-constructors \
+         -Wno-weak-vtables \
+         -Wno-exit-time-destructors \
+         -Wno-covered-switch-default \
+         -Wno-unused-template \
+         -Wno-reserved-id-macro \
+         -Wno-documentation -Wno-documentation-unknown-command"
+    )
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_FLAGS}")
 elseif (MSVC)
-    set(MSVC_FLAGS "/W4 \
-                    \
-                    /wd4100 \
-                    /wd4127 \
-                    /wd4131 \
-                    /wd4152 \
-                    /wd4204 \
-                    /wd4244 \
-                    /wd4245 \
-                    /wd4267 \
-                    /wd4456 \
-                    /wd4996") # Disabling warnings triggered by libpng, GLEW & GLFW
+    set(
+        MSVC_FLAGS
+
+        "/W4 \
+         \
+         /wd4100 \
+         /wd4127 \
+         /wd4131 \
+         /wd4152 \
+         /wd4204 \
+         /wd4244 \
+         /wd4245 \
+         /wd4267 \
+         /wd4456 \
+         /wd4996" # Disabling warnings triggered by libpng, GLEW & GLFW
+    )
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_FLAGS}")
 endif ()
@@ -123,24 +154,27 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
             # Wildcards used to fetch from 'Program Files (x86)' as well, plus for every version: 2019.0, 2018.1.1, 2018.0, ...
             # TODO: minor, but should be sorted in reverse order: the more recent the better (always possible to manually select it)
             set(FBX_PATH "Program Files*/Autodesk/FBX/FBX SDK/*")
-            file(GLOB
-                 SEARCH_PATHS
+            file(
+                GLOB
+                SEARCH_PATHS
 
-                 "C:/${FBX_PATH}"
-                 "D:/${FBX_PATH}"
-                 "E:/${FBX_PATH}")
+                "C:/${FBX_PATH}"
+                "D:/${FBX_PATH}"
+                "E:/${FBX_PATH}")
 
             # TODO: searching by default into 'vs2015'; should be MSVC-version dependent
             set(FBX_LIB_DIR "lib/vs2015/x64/${BUILD_TYPE}")
             set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.lib")
         elseif (CMAKE_COMPILER_IS_GNUCC)
-            file(GLOB
-                 SEARCH_PATHS
+            file(
+                GLOB
+                SEARCH_PATHS
 
-                 "/usr"
-                 "/usr/local"
-                 "~/*FBX*"
-                 "~/*fbx*")
+                "/usr"
+                "/usr/local"
+                "~/*FBX*"
+                "~/*fbx*"
+             )
 
             set(FBX_LIB_DIR "lib/gcc4/x64/${BUILD_TYPE}")
             set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.a")
@@ -313,11 +347,13 @@ endif ()
 
 # If FBX SDK not found, do not compile FBX loader
 if (NOT FBX_FOUND)
-    file(GLOB
-         DISPOSABLE
+    file(
+        GLOB
+        DISPOSABLE
 
-         ${DISPOSABLE}
-         src/RaZ/Utils/FbxImporter.cpp)
+        ${DISPOSABLE}
+        src/RaZ/Utils/FbxImporter.cpp
+    )
 endif ()
 
 # Adding recursively every file we want to compile
