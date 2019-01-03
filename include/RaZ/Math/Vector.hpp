@@ -168,6 +168,11 @@ public:
   /// \param vec Vector to be compared with.
   /// \return True if vectors are [nearly] equal, else otherwise.
   bool operator==(const Vector& vec) const;
+  /// Vector unequality comparison operator.
+  /// Uses a near-equality check on floating types to take floating-point errors into account.
+  /// \param vec Vector to be compared with.
+  /// \return True if vectors are different, else otherwise.
+  bool operator!=(const Vector& vec) const { return !(*this == vec); }
   /// Output stream operator.
   /// \param stream Stream to output into.
   /// \param vec Vector to be output.
