@@ -31,6 +31,10 @@ public:
   /// This calculation does not involve a square root; it is then to be preferred over computeNorm() for faster operations.
   /// \return Quaternion's squared norm.
   T computeSquaredNorm() const { return (m_real * m_real + m_complexes.computeSquaredLength()); }
+  /// Computes the normalized quaternion to make it a unit one.
+  /// A unit quaternion is also called a <a href="https://en.wikipedia.org/wiki/Versor">versor</a>.
+  /// \return Normalized quaternion.
+  Quaternion<T> normalize() const;
   /// Computes the rotation matrix represented by the quaternion.
   /// This operation automatically scales the matrix so that it returns a unit one.
   /// \return Rotation matrix.

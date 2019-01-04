@@ -12,6 +12,21 @@ Quaternion<T>::Quaternion(T angleDegrees, const Vec3<T>& axis) {
 }
 
 template <typename T>
+Quaternion<T> Quaternion<T>::normalize() const {
+  Quaternion<T> res = *this;
+  const T sqNorm = computeSquaredNorm();
+
+  if (sqNorm > 0) {
+    const T invNorm = 1 / std::sqrt(sqNorm);
+
+    res.m_real      *= invNorm;
+    res.m_complexes *= invNorm;
+  }
+
+  return res;
+}
+
+template <typename T>
 Mat4<T> Quaternion<T>::computeMatrix() const {
   const T invSqNorm = 1 / computeSquaredNorm();
 
