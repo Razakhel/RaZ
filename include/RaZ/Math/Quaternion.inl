@@ -27,6 +27,14 @@ Quaternion<T> Quaternion<T>::normalize() const {
 }
 
 template <typename T>
+Quaternion<T> Quaternion<T>::conjugate() const {
+  Quaternion<T> res = *this;
+  res.m_complexes = -m_complexes;
+
+  return res;
+}
+
+template <typename T>
 Mat4<T> Quaternion<T>::computeMatrix() const {
   const T invSqNorm = 1 / computeSquaredNorm();
 

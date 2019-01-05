@@ -35,6 +35,10 @@ public:
   /// A unit quaternion is also called a <a href="https://en.wikipedia.org/wiki/Versor">versor</a>.
   /// \return Normalized quaternion.
   Quaternion<T> normalize() const;
+  /// Computes the conjugate of the quaternion.
+  /// A quaternion's conjugate is simply computed by multiplying the complex components by -1.
+  /// \return Quaternion's conjugate.
+  Quaternion<T> conjugate() const;
   /// Computes the rotation matrix represented by the quaternion.
   /// This operation automatically scales the matrix so that it returns a unit one.
   /// \return Rotation matrix.
