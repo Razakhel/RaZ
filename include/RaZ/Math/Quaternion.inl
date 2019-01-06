@@ -35,6 +35,21 @@ Quaternion<T> Quaternion<T>::conjugate() const {
 }
 
 template <typename T>
+Quaternion<T> Quaternion<T>::inverse() const {
+  Quaternion<T> res = *this;
+  const T sqNorm = computeSquaredNorm();
+
+  if (sqNorm > 0) {
+    const T invSqNorm = 1 / sqNorm;
+
+    res.m_real      *= invSqNorm;
+    res.m_complexes *= -invSqNorm;
+  }
+
+  return res;
+}
+
+template <typename T>
 Mat4<T> Quaternion<T>::computeMatrix() const {
   const T invSqNorm = 1 / computeSquaredNorm();
 

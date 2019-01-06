@@ -39,6 +39,10 @@ public:
   /// A quaternion's conjugate is simply computed by multiplying the complex components by -1.
   /// \return Quaternion's conjugate.
   Quaternion<T> conjugate() const;
+  /// Computes the inverse (or reciprocal) of the quaternion.
+  /// Inversing a quaternion consists of dividing the components of the conjugate by the squared norm.
+  /// \return Quaternion's inverse.
+  Quaternion<T> inverse() const;
   /// Computes the rotation matrix represented by the quaternion.
   /// This operation automatically scales the matrix so that it returns a unit one.
   /// \return Rotation matrix.
