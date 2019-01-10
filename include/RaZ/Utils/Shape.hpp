@@ -3,9 +3,38 @@
 #ifndef RAZ_SHAPE_HPP
 #define RAZ_SHAPE_HPP
 
+#include "RaZ/Component.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 namespace Raz {
+
+class Shape : public Component {
+public:
+  /// Point containment check.
+  /// \param point Point to be checked.
+  /// \return True if the point is contained by the shape, false otherwise.
+  virtual bool contains(const Vec3f& point) const = 0;
+  /// Shapes intersection check.
+  /// \param shape Shape to be checked.
+  /// \return True if both shapes intersect each other, false otherwise.
+  virtual bool intersects(const Shape& shape) const { return intersects(*this, shape); }
+  /// Point projection onto the shape.
+  /// \param point Point to compute the projection from.
+  /// \return Point projected onto the shape.
+  virtual Vec3f computeProjection(const Vec3f& point) const = 0;
+  /// Shape centroid computation.
+  /// \return Computed centroid.
+  virtual Vec3f computeCentroid() const = 0;
+
+private:
+  /// Generic shape intersection check.
+  /// \tparam S1 First shape's type.
+  /// \tparam S2 Second shape's type.
+  /// \return True if both shapes intersect each other, false otherwise.
+  template <typename S1, typename S2> bool intersects(const S1&, const S2&) const {
+    throw std::invalid_argument("Error: Shapes intersection is not implemented for those shapes types.");
+  }
+};
 
 /// Line segment defined by its two extremities' positions.
 class Line {
