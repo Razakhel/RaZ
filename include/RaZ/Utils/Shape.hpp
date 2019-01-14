@@ -45,17 +45,17 @@ public:
   /// \param aabb AABB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   virtual bool intersects(const AABB& aabb) const = 0;
-  /// Point projection onto the shape.
+  /// Computes the projection of a point (closest point) onto the shape.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the shape.
   virtual Vec3f computeProjection(const Vec3f& point) const = 0;
-  /// Shape centroid computation.
+  /// Computes the shape's centroid.
   /// \return Computed centroid.
   virtual Vec3f computeCentroid() const = 0;
 };
 
 /// Line segment defined by its two extremities' positions.
-class Line {
+class Line : public Shape {
 public:
   Line() = default;
   Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
@@ -63,10 +63,48 @@ public:
   const Vec3f& getBeginPos() const { return m_beginPos; }
   const Vec3f& getEndPos() const { return m_endPos; }
 
-  /// Line length computation. Use this if you really need the actual length; otherwise, prefer computeSquaredLength().
+  /// Point containment check.
+  /// \param point Point to be checked.
+  /// \return True if the point is located on the line, false otherwise.
+  bool contains(const Vec3f& point) const override { return computeProjection(point) == point; }
+  /// Line-line intersection check.
+  /// \param line Line to check if there is an intersection with.
+  /// \return True if both lines intersect each other, false otherwise.
+  bool intersects(const Line& line) const override;
+  /// Line-plane intersection check.
+  /// \param plane Plane to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Plane& plane) const override;
+  /// Line-sphere intersection check.
+  /// \param sphere Sphere to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Sphere& sphere) const override;
+  /// Line-triangle intersection check.
+  /// \param triangle Triangle to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Triangle& triangle) const override;
+  /// Line-quad intersection check.
+  /// \param quad Quad to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Quad& quad) const override;
+  /// Line-AABB intersection check.
+  /// \param aabb AABB to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const AABB& aabb) const override;
+  /// Computes the projection of a point (closest point) onto the line.
+  /// The projected point is necessarily located on the line.
+  /// \param point Point to compute the projection from.
+  /// \return Point projected onto the line.
+  Vec3f computeProjection(const Vec3f& point) const override;
+  /// Computes the line's centroid, which is the point lying directly between the two extremities.
+  /// \return Computed centroid.
+  Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) / 2.f; }
+  /// Line length computation.
+  /// To be used if actual length is needed; otherwise, prefer computeSquaredLength().
   /// \return Line's length.
   float computeLength() const { return (m_endPos - m_beginPos).computeLength(); }
-  /// Line squared length computation; to be preferred over computeLength() for faster operations.
+  /// Line squared length computation.
+  /// To be preferred over computeLength() for faster operations.
   /// \return Line's squared length.
   float computeSquaredLength() const { return (m_endPos - m_beginPos).computeSquaredLength(); }
 
