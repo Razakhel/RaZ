@@ -113,14 +113,58 @@ private:
   Vec3f m_endPos {};
 };
 
-struct Triangle {
+/// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
+class Triangle : public Shape {
+public:
   Triangle() = default;
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
-    : firstPos{ firstPos }, secondPos{ secondPos }, thirdPos{ thirdPos } {}
+    : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
-  Vec3f firstPos {};
-  Vec3f secondPos {};
-  Vec3f thirdPos {};
+  const Vec3f& getFirstPos() const { return m_firstPos; }
+  const Vec3f& getSecondPos() const { return m_secondPos; }
+  const Vec3f& getThirdPos() const { return m_thirdPos; }
+
+  /// Point containment check.
+  /// \param point Point to be checked.
+  /// \return True if the point is located on the triangle, false otherwise.
+  bool contains(const Vec3f& point) const override { return (computeProjection(point) == point); }
+  /// Triangle-line intersection check.
+  /// \param line Line to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Line& line) const override { return line.intersects(*this); }
+  /// Triangle-plane intersection check.
+  /// \param plane Plane to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Plane& plane) const override { return plane.intersects(*this); }
+  /// Triangle-sphere intersection check.
+  /// \param sphere Sphere to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Sphere& sphere) const override { return sphere.intersects(*this); }
+  /// Triangle-triangle intersection check.
+  /// \param triangle Triangle to check if there is an intersection with.
+  /// \return True if both triangles intersect each other, false otherwise.
+  bool intersects(const Triangle& triangle) const override;
+  /// Triangle-quad intersection check.
+  /// \param quad Quad to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Quad& quad) const override;
+  /// Triangle-AABB intersection check.
+  /// \param aabb AABB to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const AABB& aabb) const override;
+  /// Computes the projection of a point (closest point) onto the triangle.
+  /// The projected point is necessarily located on the triangle's surface.
+  /// \param point Point to compute the projection from.
+  /// \return Point projected onto the triangle.
+  Vec3f computeProjection(const Vec3f& point) const override;
+  /// Computes the triangle's centroid, which is the point lying directly between its three points.
+  /// \return Computed centroid.
+  Vec3f computeCentroid() const override { return (m_firstPos + m_secondPos + m_thirdPos) / 3.f; }
+
+private:
+  Vec3f m_firstPos {};
+  Vec3f m_secondPos {};
+  Vec3f m_thirdPos {};
 };
 
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.

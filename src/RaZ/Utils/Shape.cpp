@@ -46,6 +46,24 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
   return m_beginPos + lineVec * std::min(1.f, std::max(pointDist, 0.f));
 }
 
+// Triangle functions
+
+bool Triangle::intersects(const Triangle&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Triangle::intersects(const Quad&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Triangle::intersects(const AABB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+Vec3f Triangle::computeProjection(const Vec3f&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
 // Quad functions
 
 bool Quad::intersects(const Quad&) const {
