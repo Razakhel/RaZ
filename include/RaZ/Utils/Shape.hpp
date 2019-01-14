@@ -57,7 +57,6 @@ public:
 /// Line segment defined by its two extremities' positions.
 class Line : public Shape {
 public:
-  Line() = default;
   Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
 
   const Vec3f& getBeginPos() const { return m_beginPos; }
@@ -167,10 +166,59 @@ private:
   Vec3f m_normal {};
 };
 
+/// Sphere defined by its center position and a radius.
+class Sphere : public Shape {
+public:
+  Sphere(const Vec3f& centerPos, float radius) : m_centerPos{ centerPos }, m_radius{ radius } {}
+
+  const Vec3f& getCenter() const { return m_centerPos; }
+  float getRadius() const { return m_radius; }
+
+  /// Point containment check.
+  /// \param point Point to be checked.
+  /// \return True if the point is contained in the sphere, false otherwise.
+  bool contains(const Vec3f& point) const override { return ((m_centerPos - point).computeSquaredLength() < (m_radius * m_radius)); }
+  /// Sphere-line intersection check.
+  /// \param line Line to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Line& line) const override { return line.intersects(*this); }
+  /// Sphere-plane intersection check.
+  /// \param plane Plane to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Plane& plane) const override { return plane.intersects(*this); }
+  /// Sphere-sphere intersection check.
+  /// \param sphere Sphere to check if there is an intersection with.
+  /// \return True if both spheres intersect each other, false otherwise.
+  bool intersects(const Sphere& sphere) const override;
+  /// Sphere-triangle intersection check.
+  /// \param triangle Triangle to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Triangle& triangle) const override;
+  /// Sphere-quad intersection check.
+  /// \param quad Quad to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Quad& quad) const override;
+  /// Sphere-AABB intersection check.
+  /// \param aabb AABB to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const AABB& aabb) const override;
+  /// Computes the projection of a point (closest point) onto the sphere.
+  /// The projected point may be inside the sphere itself or on its surface.
+  /// \param point Point to compute the projection from.
+  /// \return Point projected onto/into the sphere.
+  Vec3f computeProjection(const Vec3f& point) const override { return (point - m_centerPos).normalize() * m_radius + m_centerPos; }
+  /// Computes the sphere's centroid, which is its center. Strictly equivalent to getCenterPos().
+  /// \return Computed centroid.
+  Vec3f computeCentroid() const override { return m_centerPos; }
+
+private:
+  Vec3f m_centerPos {};
+  float m_radius {};
+};
+
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
 class Triangle : public Shape {
 public:
-  Triangle() = default;
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
     : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
@@ -224,7 +272,6 @@ private:
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.
 class Quad : public Shape {
 public:
-  Quad() = default;
   Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos)
     : m_leftTopPos{ leftTopPos }, m_rightTopPos{ rightTopPos }, m_rightBottomPos{ rightBottomPos }, m_leftBottomPos{ leftBottomPos } {}
 

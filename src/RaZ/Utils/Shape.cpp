@@ -69,6 +69,30 @@ bool Plane::intersects(const AABB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+// Sphere functions
+
+bool Sphere::intersects(const Sphere& sphere) const {
+  const float spheresSqDist = (m_centerPos - sphere.getCenter()).computeSquaredLength();
+  const float sqRadii       = (m_radius * m_radius) + (sphere.getRadius() * sphere.getRadius());
+
+  return (spheresSqDist < sqRadii);
+}
+
+bool Sphere::intersects(const Triangle& triangle) const {
+  const Vec3f projPoint = triangle.computeProjection(m_centerPos);
+  return contains(projPoint);
+}
+
+bool Sphere::intersects(const Quad& quad) const {
+  const Vec3f projPoint = quad.computeProjection(m_centerPos);
+  return contains(projPoint);
+}
+
+bool Sphere::intersects(const AABB& aabb) const {
+  const Vec3f projPoint = aabb.computeProjection(m_centerPos);
+  return contains(projPoint);
+}
+
 // Triangle functions
 
 bool Triangle::intersects(const Triangle&) const {
