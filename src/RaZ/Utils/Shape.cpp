@@ -125,4 +125,54 @@ Vec3f Quad::computeProjection(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+// AABB functions
+
+bool AABB::contains(const Vec3f& point) const {
+  const bool isInBoundsX = point[0] >= m_leftBottomBackPos[0] && point[0] <= m_rightTopFrontPos[0];
+  const bool isInBoundsY = point[1] >= m_leftBottomBackPos[1] && point[1] <= m_rightTopFrontPos[1];
+  const bool isInBoundsZ = point[2] >= m_leftBottomBackPos[2] && point[2] <= m_rightTopFrontPos[2];
+
+  return (isInBoundsX && isInBoundsY && isInBoundsZ);
+}
+
+bool AABB::intersects(const AABB& aabb) const {
+  const Vec3f& minPoint1 = m_leftBottomBackPos;
+  const Vec3f& maxPoint1 = m_rightTopFrontPos;
+
+  const Vec3f& minPoint2 = aabb.getLeftBottomBackPos();
+  const Vec3f& maxPoint2 = aabb.getRightTopFrontPos();
+
+  // We determine for each axis if there are extremities that are overlapping
+  // If the max point of one AABB is further on an axis than the min point of the other, they intersect each other on this axis
+  //
+  //                         max1
+  //                          v
+  //    -----------------------
+  //    |                     |
+  //    |                -------------------
+  //    |                |    |            |
+  //    |                |    |            |
+  //    |                |    |            |
+  //    |                |    |            |
+  //    -----------------|-----            |
+  //                     |                 |
+  //                     -------------------
+  //                     ^
+  //                   min2
+
+  const bool intersectsX = (minPoint1[0] <= maxPoint2[0]) && (maxPoint1[0] >= minPoint2[0]);
+  const bool intersectsY = (minPoint1[1] <= maxPoint2[1]) && (maxPoint1[1] >= minPoint2[1]);
+  const bool intersectsZ = (minPoint1[2] <= maxPoint2[2]) && (maxPoint1[2] >= minPoint2[2]);
+
+  return (intersectsX && intersectsY && intersectsZ);
+}
+
+Vec3f AABB::computeProjection(const Vec3f& point) const {
+  const float closestX = std::max(std::min(point[0], m_rightTopFrontPos[0]), m_leftBottomBackPos[0]);
+  const float closestY = std::max(std::min(point[1], m_rightTopFrontPos[1]), m_leftBottomBackPos[1]);
+  const float closestZ = std::max(std::min(point[2], m_rightTopFrontPos[2]), m_leftBottomBackPos[2]);
+
+  return Vec3f({ closestX, closestY, closestZ });
+}
+
 } // namespace Raz

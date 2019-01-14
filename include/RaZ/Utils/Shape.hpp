@@ -324,13 +324,81 @@ private:
   Vec3f m_leftBottomPos {};
 };
 
-struct AABB {
-  AABB() = default;
+/// Axis-aligned bounding box defined by its right top front and left bottom back vertices' positions.
+///
+///          _______________________
+///         /|                    /|
+///        / |                   / |
+///       |---------------------| < rightTopFront
+///       |  |                  |  |
+///       |  |                  |  |
+///       |  |                  |  |
+///       |  |                  |  |
+///       | /-------------------|-/
+///       |/ ^ leftBottomBack   |/
+///       -----------------------
+///
+/// The extremities are called with such names according to the axes:
+///
+///                  Y
+///                  ^
+///                  |
+///                  |
+///                  |-------> X
+///                 /
+///                /
+///               v
+///               Z
+///
+/// As such, rightTopFront designs the point in [ +X; +Y; +Z ], and leftBottomBack designs the point in [ -X; -Y; -Z ].
+class AABB : public Shape {
+public:
   AABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos)
-    : rightTopFrontPos{ rightTopFrontPos }, leftBottomBackPos{ leftBottomBackPos } {}
+    : m_rightTopFrontPos{ rightTopFrontPos }, m_leftBottomBackPos{ leftBottomBackPos } {}
 
-  Vec3f rightTopFrontPos {};
-  Vec3f leftBottomBackPos {};
+  const Vec3f& getRightTopFrontPos() const { return m_rightTopFrontPos; }
+  const Vec3f& getLeftBottomBackPos() const { return m_leftBottomBackPos; }
+
+  /// Point containment check.
+  /// \param point Point to be checked.
+  /// \return True if the point is contained in the AABB, false otherwise.
+  bool contains(const Vec3f& point) const override;
+  /// AABB-line intersection check.
+  /// \param line Line to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Line& line) const override { return line.intersects(*this); }
+  /// AABB-plane intersection check.
+  /// \param plane Plane to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Plane& plane) const override { return plane.intersects(*this); }
+  /// AABB-sphere intersection check.
+  /// \param sphere Sphere to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Sphere& sphere) const override { return sphere.intersects(*this); }
+  /// AABB-triangle intersection check.
+  /// \param triangle Triangle to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Triangle& triangle) const override { return triangle.intersects(*this); }
+  /// AABB-quad intersection check.
+  /// \param quad Quad to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Quad& quad) const override { return quad.intersects(*this); }
+  /// AABB-AABB intersection check.
+  /// \param aabb AABB to check if there is an intersection with.
+  /// \return True if both AABBs intersect each other, false otherwise.
+  bool intersects(const AABB& aabb) const override;
+  /// Computes the projection of a point (closest point) onto the AABB.
+  /// The projected point may be inside the AABB itself or on its surface.
+  /// \param point Point to compute the projection from.
+  /// \return Point projected onto the shape.
+  Vec3f computeProjection(const Vec3f& point) const override;
+  /// Computes the AABB's centroid, which is the point lying directly between its two extremities.
+  /// \return Computed centroid.
+  Vec3f computeCentroid() const override { return (m_rightTopFrontPos + m_leftBottomBackPos) / 2.f; }
+
+private:
+  Vec3f m_rightTopFrontPos {};
+  Vec3f m_leftBottomBackPos {};
 };
 
 } // namespace Raz
