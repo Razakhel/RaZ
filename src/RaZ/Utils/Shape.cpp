@@ -46,4 +46,18 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
   return m_beginPos + lineVec * std::min(1.f, std::max(pointDist, 0.f));
 }
 
+// Quad functions
+
+bool Quad::intersects(const Quad&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Quad::intersects(const AABB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+Vec3f Quad::computeProjection(const Vec3f&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
 } // namespace Raz
