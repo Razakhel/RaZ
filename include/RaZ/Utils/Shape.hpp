@@ -113,6 +113,60 @@ private:
   Vec3f m_endPos {};
 };
 
+/// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
+class Plane : public Shape {
+public:
+  explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_distance{ distance }, m_normal{ normal } {}
+  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_distance{ position.computeLength() }, m_normal{ normal } {}
+  Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint)
+    : m_distance{ ((firstPoint + secondPoint + thirdPoint) / 3.f).computeLength() },
+      m_normal{ (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize() } {}
+
+  float getDistance() const { return m_distance; }
+  const Vec3f& getNormal() const { return m_normal; }
+
+  /// Point containment check.
+  /// \param point Point to be checked.
+  /// \return True if the point is located on the plane, false otherwise.
+  bool contains(const Vec3f& point) const override { return FloatUtils::checkNearEquality(m_normal.dot(point) - m_distance, 0.f); }
+  /// Plane-line intersection check.
+  /// \param line Line to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Line& line) const override { return line.intersects(*this); }
+  /// Plane-plane intersection check.
+  /// \param plane Plane to check if there is an intersection with.
+  /// \return True if both planes intersect each other, false otherwise.
+  bool intersects(const Plane& plane) const override;
+  /// Plane-sphere intersection check.
+  /// \param sphere Sphere to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Sphere& sphere) const override;
+  /// Plane-triangle intersection check.
+  /// \param triangle Triangle to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Triangle& triangle) const override;
+  /// Plane-quad intersection check.
+  /// \param quad Quad to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const Quad& quad) const override;
+  /// Plane-AABB intersection check.
+  /// \param aabb AABB to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  bool intersects(const AABB& aabb) const override;
+  /// Computes the projection of a point (closest point) onto the plane.
+  /// The projected point is necessarily located on the plane.
+  /// \param point Point to compute the projection from.
+  /// \return Point projected onto the plane.
+  Vec3f computeProjection(const Vec3f& point) const override { return point - m_normal * (m_normal.dot(point) - m_distance); }
+  /// Computes the plane's centroid, which is the point lying onto the plane at its distance from the center in its normal direction.
+  /// \return Computed centroid.
+  Vec3f computeCentroid() const override { return m_normal * m_distance; }
+
+private:
+  float m_distance {};
+  Vec3f m_normal {};
+};
+
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
 class Triangle : public Shape {
 public:

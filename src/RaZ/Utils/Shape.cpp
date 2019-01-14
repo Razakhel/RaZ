@@ -46,6 +46,29 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
   return m_beginPos + lineVec * std::min(1.f, std::max(pointDist, 0.f));
 }
 
+// Plane functions
+
+bool Plane::intersects(const Plane&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Plane::intersects(const Sphere& sphere) const {
+  const Vec3f projPoint = computeProjection(sphere.getCenter());
+  return sphere.contains(projPoint);
+}
+
+bool Plane::intersects(const Triangle&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Plane::intersects(const Quad&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Plane::intersects(const AABB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
 // Triangle functions
 
 bool Triangle::intersects(const Triangle&) const {
