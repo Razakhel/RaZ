@@ -8,16 +8,43 @@
 
 namespace Raz {
 
+class Line;
+class Plane;
+class Sphere;
+class Triangle;
+class Quad;
+class AABB;
+
 class Shape : public Component {
 public:
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is contained by the shape, false otherwise.
   virtual bool contains(const Vec3f& point) const = 0;
-  /// Shapes intersection check.
-  /// \param shape Shape to be checked.
+  /// Shape-line intersection check.
+  /// \param line Line to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
-  virtual bool intersects(const Shape& shape) const { return intersects(*this, shape); }
+  virtual bool intersects(const Line& line) const = 0;
+  /// Shape-plane intersection check.
+  /// \param plane Plane to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  virtual bool intersects(const Plane& plane) const = 0;
+  /// Shape-sphere intersection check.
+  /// \param sphere Sphere to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  virtual bool intersects(const Sphere& sphere) const = 0;
+  /// Shape-triangle intersection check.
+  /// \param triangle Triangle to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  virtual bool intersects(const Triangle& triangle) const = 0;
+  /// Shape-quad intersection check.
+  /// \param quad Quad to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  virtual bool intersects(const Quad& quad) const = 0;
+  /// Shape-AABB intersection check.
+  /// \param aabb AABB to check if there is an intersection with.
+  /// \return True if both shapes intersect each other, false otherwise.
+  virtual bool intersects(const AABB& aabb) const = 0;
   /// Point projection onto the shape.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the shape.
@@ -25,15 +52,6 @@ public:
   /// Shape centroid computation.
   /// \return Computed centroid.
   virtual Vec3f computeCentroid() const = 0;
-
-private:
-  /// Generic shape intersection check.
-  /// \tparam S1 First shape's type.
-  /// \tparam S2 Second shape's type.
-  /// \return True if both shapes intersect each other, false otherwise.
-  template <typename S1, typename S2> bool intersects(const S1&, const S2&) const {
-    throw std::invalid_argument("Error: Shapes intersection is not implemented for those shapes types.");
-  }
 };
 
 /// Line segment defined by its two extremities' positions.
