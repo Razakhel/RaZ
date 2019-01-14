@@ -275,11 +275,23 @@ bool Window::run(float deltaTime) {
   glfwPollEvents();
 
   // Process actions belonging to pressed keys & mouse buttons
-  for (const auto& action : std::get<4>(m_callbacks)) {
-    action.second.first(deltaTime);
+  auto& actions   = std::get<4>(m_callbacks);
+  auto actionIter = actions.begin();
 
-    if (action.second.second == Input::ONCE)
-      std::get<4>(m_callbacks).erase(action.first);
+  while (actionIter != actions.end()) {
+    auto& action = actionIter->second;
+
+    // An action consists of two parts:
+    //   - a callback associated to the triggered key or button
+    //   - a value indicating if it should be executed only once or every frame
+
+    action.first(deltaTime);
+
+    // Removing the current action if ONCE is given, or simply increment the iterator
+    if (action.second == Input::ONCE)
+      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
+    else
+      ++actionIter;
   }
 
   if (m_overlay)
