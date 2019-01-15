@@ -5,22 +5,26 @@ namespace Raz {
 Mesh::Mesh(const Triangle& triangle) : Mesh() {
   // TODO: check if vertices are defined counterclockwise
 
+  const Vec3f& firstPos  = triangle.getFirstPos();
+  const Vec3f& secondPos = triangle.getSecondPos();
+  const Vec3f& thirdPos  = triangle.getThirdPos();
+
   Vertex firstVert {};
-  firstVert.position  = triangle.firstPos;
+  firstVert.position  = firstPos;
   firstVert.texcoords = Vec2f({ 0.f, 0.f });
 
   Vertex secondVert {};
-  secondVert.position  = triangle.secondPos;
+  secondVert.position  = secondPos;
   secondVert.texcoords = Vec2f({ 0.5f, 1.f });
 
   Vertex thirdVert {};
-  thirdVert.position  = triangle.thirdPos;
+  thirdVert.position  = thirdPos;
   thirdVert.texcoords = Vec2f({ 1.f, 0.f });
 
   // Computing normals
-  firstVert.normal  = (triangle.firstPos - triangle.secondPos).cross(triangle.firstPos - triangle.thirdPos).normalize();
-  secondVert.normal = (triangle.secondPos - triangle.thirdPos).cross(triangle.secondPos - triangle.firstPos).normalize();
-  thirdVert.normal  = (triangle.thirdPos - triangle.firstPos).cross(triangle.thirdPos - triangle.secondPos).normalize();
+  firstVert.normal  = (firstPos - secondPos).cross(firstPos - thirdPos).normalize();
+  secondVert.normal = (secondPos - thirdPos).cross(secondPos - firstPos).normalize();
+  thirdVert.normal  = (thirdPos - firstPos).cross(thirdPos - secondPos).normalize();
 
   std::vector<Vertex>& vertices = m_submeshes.front()->getVbo().getVertices();
   std::vector<unsigned int>& indices = m_submeshes.front()->getEbo().getIndices();
@@ -40,28 +44,33 @@ Mesh::Mesh(const Triangle& triangle) : Mesh() {
 }
 
 Mesh::Mesh(const Quad& quad) : Mesh() {
+  const Vec3f& leftTopPos     = quad.getLeftTopPos();
+  const Vec3f& rightTopPos    = quad.getRightTopPos();
+  const Vec3f& rightBottomPos = quad.getRightBottomPos();
+  const Vec3f& leftBottomPos  = quad.getLeftBottomPos();
+
   Vertex leftTop {};
-  leftTop.position  = quad.leftTopPos;
+  leftTop.position  = leftTopPos;
   leftTop.texcoords = Vec2f({ 0.f, 1.f });
 
   Vertex rightTop {};
-  rightTop.position  = quad.rightTopPos;
+  rightTop.position  = rightTopPos;
   rightTop.texcoords = Vec2f({ 1.f, 1.f });
 
   Vertex rightBottom {};
-  rightBottom.position  = quad.rightBottomPos;
+  rightBottom.position  = rightBottomPos;
   rightBottom.texcoords = Vec2f({ 1.f, 0.f });
 
   Vertex leftBottom {};
-  leftBottom.position  = quad.leftBottomPos;
+  leftBottom.position  = leftBottomPos;
   leftBottom.texcoords = Vec2f({ 0.f, 0.f });
 
   // Computing normals
   // TODO: normals should not be computed (or even exist) for simple display quads like a framebuffer
-  leftTop.normal     = (quad.leftTopPos - quad.rightTopPos).cross(quad.leftTopPos - quad.leftBottomPos).normalize();
-  rightTop.normal    = (quad.rightTopPos - quad.rightBottomPos).cross(quad.rightTopPos - quad.leftTopPos).normalize();
-  rightBottom.normal = (quad.rightBottomPos - quad.leftBottomPos).cross(quad.rightBottomPos - quad.rightTopPos).normalize();
-  leftBottom.normal  = (quad.leftBottomPos - quad.leftTopPos).cross(quad.leftBottomPos - quad.rightBottomPos).normalize();
+  leftTop.normal     = (leftTopPos - rightTopPos).cross(leftTopPos - leftBottomPos).normalize();
+  rightTop.normal    = (rightTopPos - rightBottomPos).cross(rightTopPos - leftTopPos).normalize();
+  rightBottom.normal = (rightBottomPos - leftBottomPos).cross(rightBottomPos - rightTopPos).normalize();
+  leftBottom.normal  = (leftBottomPos - leftTopPos).cross(leftBottomPos - rightBottomPos).normalize();
 
   std::vector<Vertex>& vertices = m_submeshes.front()->getVbo().getVertices();
   std::vector<unsigned int>& indices = m_submeshes.front()->getEbo().getIndices();
@@ -86,12 +95,15 @@ Mesh::Mesh(const Quad& quad) : Mesh() {
 }
 
 Mesh::Mesh(const AABB& box) : Mesh() {
-  const float rightPos  = box.rightTopFrontPos[0];
-  const float leftPos   = box.leftBottomBackPos[0];
-  const float topPos    = box.rightTopFrontPos[1];
-  const float bottomPos = box.leftBottomBackPos[1];
-  const float frontPos  = box.rightTopFrontPos[2];
-  const float backPos   = box.leftBottomBackPos[2];
+  const Vec3f& rightTopFrontPos  = box.getRightTopFrontPos();
+  const Vec3f& leftBottomBackPos = box.getLeftBottomBackPos();
+
+  const float rightPos  = rightTopFrontPos[0];
+  const float leftPos   = leftBottomBackPos[0];
+  const float topPos    = rightTopFrontPos[1];
+  const float bottomPos = leftBottomBackPos[1];
+  const float frontPos  = rightTopFrontPos[2];
+  const float backPos   = leftBottomBackPos[2];
 
   // TODO: texcoords should not exist for simple display cubes like a skybox
 
@@ -100,7 +112,7 @@ Mesh::Mesh(const AABB& box) : Mesh() {
   rightTopBack.texcoords = Vec2f({ 0.f, 1.f });
 
   Vertex rightTopFront {};
-  rightTopFront.position  = box.rightTopFrontPos;
+  rightTopFront.position  = rightTopFrontPos;
   rightTopFront.texcoords = Vec2f({ 1.f, 1.f });
 
   Vertex rightBottomBack {};
@@ -120,7 +132,7 @@ Mesh::Mesh(const AABB& box) : Mesh() {
   leftTopFront.texcoords = Vec2f({ 0.f, 1.f });
 
   Vertex leftBottomBack {};
-  leftBottomBack.position  = box.leftBottomBackPos;
+  leftBottomBack.position  = leftBottomBackPos;
   leftBottomBack.texcoords = Vec2f({ 1.f, 0.f });
 
   Vertex leftBottomFront {};
