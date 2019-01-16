@@ -28,7 +28,6 @@ if (CMAKE_COMPILER_IS_GNUCC)
          -Wvla \
          -Wconversion \
          -Wswitch-default -Wswitch-enum \
-         -Wsuggest-attribute=noreturn \
          -Wzero-as-null-pointer-constant \
          -Wlogical-op \
          -Wvector-operation-performance \
