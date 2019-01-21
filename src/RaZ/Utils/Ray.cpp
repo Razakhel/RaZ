@@ -35,8 +35,9 @@ bool Ray::intersects(const AABB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-Vec3f Ray::computeProjection(const Vec3f&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+Vec3f Ray::computeProjection(const Vec3f& point) const {
+  const float pointDist = m_direction.dot(point - m_origin);
+  return (m_origin + m_direction * std::max(pointDist, 0.f));
 }
 
 } // namespace Raz
