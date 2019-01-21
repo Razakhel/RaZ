@@ -51,3 +51,35 @@ TEST_CASE("Ray-point intersection checks") {
   REQUIRE_FALSE(ray3.intersects(topPoint));
   REQUIRE_FALSE(ray3.intersects(topRightPoint));
 }
+
+TEST_CASE("Point projection checks") {
+  const Raz::Vec3f topPoint({ 0.f, 2.f, 0.f });
+  const Raz::Vec3f topRightPoint({ 2.f, 2.f, 0.f });
+
+  //     topPoint  topRightPoint
+  //     [ 0; 2 ]    [ 2; 2 ]
+  //
+  //        ^
+  //        |
+  //        x < [ 0; 0 ]
+  REQUIRE(ray1.computeProjection(topPoint) == topPoint);
+  REQUIRE(ray1.computeProjection(topRightPoint) == topPoint);
+
+  //     topPoint  topRightPoint
+  //     [ 0; 2 ]    [ 2; 2 ]
+  //
+  //          ^
+  //         /
+  //        x < [ 0; 0 ]
+  REQUIRE(ray2.computeProjection(topPoint) == Raz::Vec3f({ 1.f, 1.f, 0.f }));
+  REQUIRE(ray2.computeProjection(topRightPoint) == topRightPoint);
+
+  //     topPoint  topRightPoint
+  //     [ 0; 2 ]    [ 2; 2 ]
+  //
+  //             x < [ 1; 1 ]
+  //            /
+  //           v
+  REQUIRE(ray3.computeProjection(topPoint) == ray3.getOrigin());
+  REQUIRE(ray3.computeProjection(topRightPoint) == ray3.getOrigin());
+}
