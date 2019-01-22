@@ -16,13 +16,23 @@ public:
   const Vec3f& getOrigin() const { return m_origin; }
   const Vec3f& getDirection() const { return m_direction; }
 
+  /// Ray-point intersection check.
+  /// \param point Point to check if there is an intersection with.
+  /// \return True if the ray intersects the point, false otherwise.
   bool intersects(const Vec3f& point) const;
   bool intersects(const Line& line) const;
   bool intersects(const Plane& plane) const;
   bool intersects(const Sphere& sphere) const;
   bool intersects(const Triangle& triangle) const;
   bool intersects(const Quad& quad) const;
+  /// Ray-AABB intersection check.
+  /// \param aabb AABB to check if there is an intersection with.
+  /// \return True if the ray intersects the AABB, false otherwise.
   bool intersects(const AABB& aabb) const;
+  /// Computes the projection of a point (closest point) onto the ray.
+  /// The projected point is necessarily located between the ray's origin and towards infinity in the ray's direction.
+  /// \param point Point to compute the projection from.
+  /// \return Point projected onto the ray.
   Vec3f computeProjection(const Vec3f& point) const;
 
 private:
