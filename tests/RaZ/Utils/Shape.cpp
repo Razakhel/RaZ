@@ -7,7 +7,19 @@ namespace {
 const Raz::Line line1(Raz::Vec3f({ 0.f, 0.f, 0.f }), Raz::Vec3f({ 1.f, 0.f, 0.f }));
 const Raz::Line line2(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
 
-const Raz::Plane plane(1.f, Raz::Axis::Y);
+//      Plane 1      |       Plane 2      |      Plane 3
+//                   |                    |
+//       normal      |   \      normal    |    normal      /
+//         ^         |     \      ^       |       ^      /
+//         |         |       \   /        |        \   /
+//   ______|______   |         \/         |         \/
+//                   |           \        |        /
+//                   |             \      |      /
+//     [ 0; 0 ]      |    [ 0; 0 ]   \    |    /   [ 0; 0 ]
+
+const Raz::Plane plane1(1.f, Raz::Axis::Y);
+const Raz::Plane plane2(0.5f, Raz::Vec3f({ 1.f, 1.f, 0.f }).normalize());
+const Raz::Plane plane3(0.5f, Raz::Vec3f({ -1.f, 1.f, 0.f }).normalize());
 
 } // namespace
 
@@ -20,13 +32,30 @@ TEST_CASE("Line basic checks") {
 }
 
 TEST_CASE("Plane basic checks") {
-  const Raz::Plane plane2(Raz::Vec3f({ 0.f, 1.f, 0.f }), Raz::Axis::Y);
-  const Raz::Plane plane3(Raz::Vec3f({ 1.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, 1.f, -1.f }), Raz::Vec3f({ 0.f, 1.f, 1.f }));
+  const Raz::Plane testPlane1(Raz::Vec3f({ 0.f, 1.f, 0.f }), Raz::Axis::Y);
+  const Raz::Plane testPlane2(Raz::Vec3f({ 1.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, 1.f, -1.f }), Raz::Vec3f({ 0.f, 1.f, 1.f }));
 
   // Checking that the 3 planes are strictly equal to each other
-  REQUIRE(Raz::FloatUtils::checkNearEquality(plane.getDistance(), plane2.getDistance()));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(plane.getDistance(), plane3.getDistance()));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(testPlane1.getDistance(), testPlane2.getDistance()));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(testPlane1.getDistance(), testPlane2.getDistance()));
 
-  REQUIRE(plane.getNormal() == plane2.getNormal());
-  REQUIRE(plane.getNormal() == plane3.getNormal());
+  REQUIRE(testPlane1.getNormal() == testPlane2.getNormal());
+  REQUIRE(testPlane1.getNormal() == testPlane2.getNormal());
+}
+
+TEST_CASE("Plane-plane intersection") {
+  const Raz::Plane testPlane(2.f, -Raz::Axis::Y);
+
+  REQUIRE_FALSE(plane1.intersects(testPlane));
+  REQUIRE(plane2.intersects(testPlane));
+  REQUIRE(plane3.intersects(testPlane));
+
+  REQUIRE(plane1.intersects(plane2));
+  REQUIRE(plane1.intersects(plane3));
+  REQUIRE(plane2.intersects(plane3));
+
+  // A plane should not intersect itself
+  REQUIRE_FALSE(plane1.intersects(plane1));
+  REQUIRE_FALSE(plane2.intersects(plane2));
+  REQUIRE_FALSE(plane3.intersects(plane3));
 }
