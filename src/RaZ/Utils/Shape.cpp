@@ -48,8 +48,9 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
 
 // Plane functions
 
-bool Plane::intersects(const Plane&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Plane::intersects(const Plane& plane) const {
+  const float planesAngle = m_normal.dot(plane.getNormal());
+  return !FloatUtils::checkNearEquality(std::abs(planesAngle), 1.f);
 }
 
 bool Plane::intersects(const Sphere& sphere) const {
