@@ -3,8 +3,10 @@
 #ifndef RAZ_FLOATUTILS_HPP
 #define RAZ_FLOATUTILS_HPP
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
+#include <type_traits>
 
 namespace Raz {
 
