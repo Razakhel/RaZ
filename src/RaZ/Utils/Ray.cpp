@@ -2,6 +2,33 @@
 
 namespace Raz {
 
+namespace {
+
+bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secondHitDist) {
+  const float discriminant = b * b - 4.f * a * c;
+
+  if (discriminant < 0) {
+    return false;
+  } else if (discriminant == 0) {
+    const float hitDist = -0.5f * b / a;
+
+    firstHitDist  = hitDist;
+    secondHitDist = hitDist;
+  } else {
+    const float q = -0.5f * ((b > 0) ? b + std::sqrt(discriminant) : b - std::sqrt(discriminant));
+
+    firstHitDist  = q / a;
+    secondHitDist = c / q;
+  }
+
+  if (firstHitDist > secondHitDist)
+    std::swap(firstHitDist, secondHitDist);
+
+  return true;
+}
+
+} // namespace
+
 bool Ray::intersects(const Vec3f& point) const {
   if (point == m_origin)
     return true;
@@ -19,8 +46,20 @@ bool Ray::intersects(const Plane&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Ray::intersects(const Sphere&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Ray::intersects(const Sphere& sphere) const {
+  const Vec3f sphereDir = m_origin - sphere.getCenter();
+
+  const float raySqLength = m_direction.dot(m_direction);
+  const float rayDiff     = 2.f * m_direction.dot(sphereDir);
+  const float sphereDiff  = sphereDir.computeSquaredLength() - sphere.getRadius() * sphere.getRadius();
+
+  float firstHitDist {}, secondHitDist {};
+
+  if (!solveQuadratic(raySqLength, rayDiff, sphereDiff, firstHitDist, secondHitDist))
+    return false;
+
+  // If the hit distances are negative, we've hit a sphere located behind the ray's origin
+  return (firstHitDist > 0.f || secondHitDist > 0.f);
 }
 
 bool Ray::intersects(const Triangle&) const {
@@ -36,13 +75,13 @@ bool Ray::intersects(const AABB& aabb) const {
   Vec3f minPos = aabb.getLeftBottomBackPos();
   Vec3f maxPos = aabb.getRightTopFrontPos();
 
-  if (m_direction[0] < 0)
+  if (m_direction[0] < 0.f)
     std::swap(minPos[0], maxPos[0]);
 
-  if (m_direction[1] < 0)
+  if (m_direction[1] < 0.f)
     std::swap(minPos[1], maxPos[1]);
 
-  if (m_direction[2] < 0)
+  if (m_direction[2] < 0.f)
     std::swap(minPos[2], maxPos[2]);
 
   const Vec3f minHitPos = (minPos - m_origin) * invDir;

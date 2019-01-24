@@ -22,6 +22,10 @@ public:
   bool intersects(const Vec3f& point) const;
   bool intersects(const Line& line) const;
   bool intersects(const Plane& plane) const;
+  /// Ray-sphere intersection check.
+  /// The intersection is checked by calculating a quadratic equation to determine the hits distances.
+  /// \param sphere Sphere to check if there is an intersection with.
+  /// \return True if the ray intersects the sphere, false otherwise.
   bool intersects(const Sphere& sphere) const;
   bool intersects(const Triangle& triangle) const;
   bool intersects(const Quad& quad) const;
