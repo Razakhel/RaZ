@@ -52,6 +52,24 @@ TEST_CASE("Ray-point intersection checks") {
   REQUIRE_FALSE(ray3.intersects(topRightPoint));
 }
 
+TEST_CASE("Ray-sphere intersection") {
+  const Raz::Sphere sphere1(Raz::Vec3f(0.f), 1.f);
+  const Raz::Sphere sphere2(Raz::Vec3f({ 5.f, 10.f, 0.f }), 5.f);
+  const Raz::Sphere sphere3(Raz::Vec3f({ -10.f, -10.f, 0.f }), 1.f);
+
+  REQUIRE(ray1.intersects(sphere1));
+  REQUIRE(ray2.intersects(sphere1));
+  REQUIRE(ray3.intersects(sphere1));
+
+  REQUIRE(ray1.intersects(sphere2));
+  REQUIRE(ray2.intersects(sphere2));
+  REQUIRE_FALSE(ray3.intersects(sphere2));
+
+  REQUIRE_FALSE(ray1.intersects(sphere3));
+  REQUIRE_FALSE(ray2.intersects(sphere3));
+  REQUIRE(ray3.intersects(sphere3));
+}
+
 TEST_CASE("Point projection checks") {
   const Raz::Vec3f topPoint({ 0.f, 2.f, 0.f });
   const Raz::Vec3f topRightPoint({ 2.f, 2.f, 0.f });
