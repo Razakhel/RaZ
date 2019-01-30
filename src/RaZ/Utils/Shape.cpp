@@ -66,8 +66,15 @@ bool Plane::intersects(const Quad&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Plane::intersects(const AABB&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Plane::intersects(const AABB& aabb) const {
+  const Vec3f halfExtents = aabb.computeHalfExtents();
+
+  const float topBoxDist = halfExtents[0] * std::abs(m_normal[0])
+                         + halfExtents[1] * std::abs(m_normal[1])
+                         + halfExtents[2] * std::abs(m_normal[2]);
+  const float boxDist = m_normal.dot(aabb.computeCentroid()) - m_distance;
+
+  return (std::abs(boxDist) <= topBoxDist);
 }
 
 // Sphere functions
