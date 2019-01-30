@@ -12,7 +12,7 @@ const Raz::Bitset alternated2({ false, true, false, true, false, true }); // 0 1
 
 } // namespace
 
-TEST_CASE("Bitset basic checks") {
+TEST_CASE("Bitset basic") {
   REQUIRE(fullZeros.isEmpty());
   REQUIRE_FALSE(fullOnes.isEmpty());
 

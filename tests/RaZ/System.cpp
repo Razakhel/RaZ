@@ -12,7 +12,7 @@ public:
   void update(float /* deltaTime */) override {}
 };
 
-TEST_CASE("System basic checks") {
+TEST_CASE("System basic") {
   TestSystem testSystem {};
 
   // Window created to setup the OpenGL context, which Raz::Mesh needs to be instantiated

@@ -59,7 +59,7 @@ TEST_CASE("Vector/vector operations") {
   REQUIRE(vec31.cross(vec32) == -vec32.cross(vec31)); // A x B == -(B x A)
 }
 
-TEST_CASE("Vector/matrix operation") {
+TEST_CASE("Vector/matrix operations") {
   const Raz::Mat3f mat3({{ 4.12f,  25.1f, 30.7842f },
                          { 3.04f,    5.f,   -64.5f },
                          {  -1.f, -7.54f,    8.41f }});

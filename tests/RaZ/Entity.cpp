@@ -13,7 +13,7 @@ Raz::Entity entity2(2);
 
 } // namespace
 
-TEST_CASE("Entity base tests") {
+TEST_CASE("Entity basic") {
   REQUIRE(entity0.getId() == 0);
   REQUIRE(entity1.getId() == 1);
   REQUIRE(entity2.getId() == 2);
@@ -45,7 +45,7 @@ TEST_CASE("Entity-component manipulations") {
   REQUIRE_THROWS(entity0.getComponent<Raz::Transform>());
 }
 
-TEST_CASE("Entity bitset checks") {
+TEST_CASE("Entity bitset") {
   REQUIRE(entity1.getEnabledComponents().isEmpty());
   entity1.addComponent<Raz::Transform>();
   REQUIRE_FALSE(entity1.getEnabledComponents().isEmpty());

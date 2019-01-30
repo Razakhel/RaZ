@@ -5,7 +5,7 @@
 #include "RaZ/Render/Light.hpp"
 #include "RaZ/Render/Mesh.hpp"
 
-TEST_CASE("Components IDs checks") {
+TEST_CASE("Components IDs") {
   // With the CRTP, every component gets a different constant ID with the first call
   // The ID is incremented with every distinct component call
   // No matter how many times one component is checked, it will always have the same ID

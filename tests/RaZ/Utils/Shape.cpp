@@ -21,6 +21,26 @@ const Raz::Plane plane1(1.f, Raz::Axis::Y);
 const Raz::Plane plane2(0.5f, Raz::Vec3f({ 1.f, 1.f, 0.f }).normalize());
 const Raz::Plane plane3(0.5f, Raz::Vec3f({ -1.f, 1.f, 0.f }).normalize());
 
+//         _______________________
+//        /|                    /|
+//       / |                   / | / 1 -> [  1;  1; 1 ]
+//      |---------------------| < {  2 -> [  5;  5; 5 ]
+//      |  |                  |  | \ 3 -> [ -5; -5; 5 ]
+//      |  |                  |  |
+//      |  |                  |  |
+//      |  |                  |  |
+//      | /-------------------|-/
+//      |/ ^                  |/
+//      ---|-------------------
+//         |
+//  1 -> [  -1;  -1; -1 ]
+//  2 -> [   3;   3; -5 ]
+//  3 -> [ -10; -10; -5 ]
+
+const Raz::AABB aabb1(Raz::Vec3f(1.f), Raz::Vec3f(-1.f));
+const Raz::AABB aabb2(Raz::Vec3f(5.f), Raz::Vec3f({ 3.f, 3.f, -5.f }));
+const Raz::AABB aabb3(Raz::Vec3f({ -5.f, -5.f, 5.f }), Raz::Vec3f({ -10.f, -10.f, -5.f }));
+
 } // namespace
 
 TEST_CASE("Line basic checks") {
@@ -31,7 +51,7 @@ TEST_CASE("Line basic checks") {
   REQUIRE(Raz::FloatUtils::checkNearEquality(line2.computeSquaredLength(), 12.f));
 }
 
-TEST_CASE("Plane basic checks") {
+TEST_CASE("Plane basic") {
   const Raz::Plane testPlane1(Raz::Vec3f({ 0.f, 1.f, 0.f }), Raz::Axis::Y);
   const Raz::Plane testPlane2(Raz::Vec3f({ 1.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, 1.f, -1.f }), Raz::Vec3f({ 0.f, 1.f, 1.f }));
 
@@ -58,4 +78,14 @@ TEST_CASE("Plane-plane intersection") {
   REQUIRE_FALSE(plane1.intersects(plane1));
   REQUIRE_FALSE(plane2.intersects(plane2));
   REQUIRE_FALSE(plane3.intersects(plane3));
+}
+
+TEST_CASE("AABB basic") {
+  REQUIRE(aabb1.computeCentroid() == Raz::Vec3f(0.f));
+  REQUIRE(aabb2.computeCentroid() == Raz::Vec3f({ 4.f, 4.f, 0.f }));
+  REQUIRE(aabb3.computeCentroid() == Raz::Vec3f({ -7.5f, -7.5f, 0.f }));
+
+  REQUIRE(aabb1.computeHalfExtents() == Raz::Vec3f(1.f));
+  REQUIRE(aabb2.computeHalfExtents() == Raz::Vec3f({ 1.f, 1.f, 5.f }));
+  REQUIRE(aabb3.computeHalfExtents() == Raz::Vec3f({ 2.5f, 2.5f, 5.f }));
 }
