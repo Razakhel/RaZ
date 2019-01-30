@@ -43,7 +43,10 @@ const Raz::AABB aabb3(Raz::Vec3f({ -5.f, -5.f, 5.f }), Raz::Vec3f({ -10.f, -10.f
 
 } // namespace
 
-TEST_CASE("Line basic checks") {
+TEST_CASE("Line basic") {
+  REQUIRE(line1.computeCentroid() == Raz::Vec3f({ 0.5f, 0.f, 0.f }));
+  REQUIRE(line2.computeCentroid() == Raz::Vec3f(0.f));
+
   REQUIRE(Raz::FloatUtils::checkNearEquality(line1.computeLength(), 1.f));
   REQUIRE(Raz::FloatUtils::checkNearEquality(line1.computeSquaredLength(), 1.f));
 
