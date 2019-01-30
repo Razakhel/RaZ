@@ -72,11 +72,16 @@ bool Plane::intersects(const AABB&) const {
 
 // Sphere functions
 
-bool Sphere::intersects(const Sphere& sphere) const {
-  const float spheresSqDist = (m_centerPos - sphere.getCenter()).computeSquaredLength();
-  const float sqRadii       = (m_radius * m_radius) + (sphere.getRadius() * sphere.getRadius());
+bool Sphere::contains(const Raz::Vec3f& point) const {
+  const float pointSqDist = (m_centerPos - point).computeSquaredLength();
+  return (pointSqDist <= (m_radius * m_radius));
+}
 
-  return (spheresSqDist < sqRadii);
+bool Sphere::intersects(const Sphere& sphere) const {
+  const float sqDist  = (m_centerPos - sphere.getCenter()).computeSquaredLength();
+  const float sqRadii = (m_radius * m_radius) + (sphere.getRadius() * sphere.getRadius());
+
+  return (sqDist <= sqRadii);
 }
 
 bool Sphere::intersects(const Triangle& triangle) const {

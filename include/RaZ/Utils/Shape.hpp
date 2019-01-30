@@ -177,7 +177,7 @@ public:
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is contained in the sphere, false otherwise.
-  bool contains(const Vec3f& point) const override { return ((m_centerPos - point).computeSquaredLength() < (m_radius * m_radius)); }
+  bool contains(const Vec3f& point) const override;
   /// Sphere-line intersection check.
   /// \param line Line to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
@@ -395,6 +395,20 @@ public:
   /// Computes the AABB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_rightTopFrontPos + m_leftBottomBackPos) / 2.f; }
+  /// Computes the half extents of the box, starting from its centroid.
+  ///          _______________________
+  ///         /|          ^         /|
+  ///        / |        y |        / |
+  ///       |---------------------|  |
+  ///       |  |          |    x  |  |
+  ///       |  |          --------|->|
+  ///       |  |       z /        |  |
+  ///       |  |        v         |  |
+  ///       | /-------------------|-/
+  ///       |/                    |/
+  ///       -----------------------
+  /// \return AABB's half extents.
+  Vec3f computeHalfExtents() const { return (m_rightTopFrontPos - m_leftBottomBackPos) / 2.f; }
 
 private:
   Vec3f m_rightTopFrontPos {};
