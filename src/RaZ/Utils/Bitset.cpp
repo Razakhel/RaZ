@@ -5,7 +5,7 @@
 namespace Raz {
 
 bool Bitset::isEmpty() const {
-  for (auto bit : m_bits) {
+  for (auto&& bit : m_bits) {
     if (bit)
       return false;
   }
@@ -21,10 +21,10 @@ void Bitset::setBit(std::size_t position, bool value) {
 }
 
 Bitset Bitset::operator~() const {
-  Bitset res(m_bits.size());
+  Bitset res = *this;
 
-  for (std::size_t bitIndex = 0; bitIndex < m_bits.size(); ++bitIndex)
-    res.setBit(bitIndex, !m_bits[bitIndex]);
+  for (auto&& bit : res.getBits())
+    bit = !bit;
 
   return res;
 }
