@@ -62,8 +62,32 @@ bool Ray::intersects(const Sphere& sphere) const {
   return (firstHitDist > 0.f || secondHitDist > 0.f);
 }
 
-bool Ray::intersects(const Triangle&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Ray::intersects(const Triangle& triangle) const {
+  const Vec3f firstEdge   = triangle.getSecondPos() - triangle.getFirstPos();
+  const Vec3f secondEdge  = triangle.getThirdPos() - triangle.getFirstPos();
+  const Vec3f pVec        = m_direction.cross(secondEdge);
+  const float determinant = firstEdge.dot(pVec);
+
+  if (FloatUtils::checkNearEquality(std::abs(determinant), 0.f))
+    return false;
+
+  const float invDeterm = 1 / determinant;
+
+  const Vec3f invPlaneDir    = m_origin - triangle.getFirstPos();
+  const float firstBaryCoord = invPlaneDir.dot(pVec) * invDeterm;
+
+  if (firstBaryCoord < 0.f || firstBaryCoord > 1.f)
+    return false;
+
+  const Vec3f qVec = invPlaneDir.cross(firstEdge);
+  const float secondBaryCoord = qVec.dot(m_direction) * invDeterm;
+
+  if (secondBaryCoord < 0.f || firstBaryCoord + secondBaryCoord > 1.f)
+    return false;
+
+  const float hitDist = secondEdge.dot(qVec) * invDeterm;
+
+  return (hitDist > 0.f);
 }
 
 bool Ray::intersects(const Quad&) const {

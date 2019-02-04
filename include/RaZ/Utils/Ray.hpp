@@ -20,14 +20,27 @@ public:
   /// \param point Point to check if there is an intersection with.
   /// \return True if the ray intersects the point, false otherwise.
   bool intersects(const Vec3f& point) const;
+  /// Ray-line intersection check.
+  /// \param line Line to check if there is an intersection with.
+  /// \return True if the ray intersects the line, false otherwise.
   bool intersects(const Line& line) const;
+  /// Ray-plane intersection check.
+  /// \param plane Plane to check if there is an intersection with.
+  /// \return True if the ray intersects the plane, false otherwise.
   bool intersects(const Plane& plane) const;
   /// Ray-sphere intersection check.
   /// The intersection is checked by calculating a quadratic equation to determine the hits distances.
   /// \param sphere Sphere to check if there is an intersection with.
   /// \return True if the ray intersects the sphere, false otherwise.
   bool intersects(const Sphere& sphere) const;
+  /// Ray-triangle intersection check.
+  /// The intersection is checked by calculating the barycentic coordinates at the intersection point.
+  /// \param triangle Triangle to check if there is an intersection with.
+  /// \return True if the ray intersects the triangle, false otherwise.
   bool intersects(const Triangle& triangle) const;
+  /// Ray-quad intersection check.
+  /// \param quad Quad to check if there is an intersection with.
+  /// \return True if the ray intersects the quad, false otherwise.
   bool intersects(const Quad& quad) const;
   /// Ray-AABB intersection check.
   /// \param aabb AABB to check if there is an intersection with.
