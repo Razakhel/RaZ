@@ -70,6 +70,28 @@ TEST_CASE("Ray-sphere intersection") {
   REQUIRE(ray3.intersects(sphere3));
 }
 
+TEST_CASE("Ray-triangle intersection") {
+  // These triangles are defined so that:
+  //  - triangle1 is laying flat slightly above 0
+  //  - triangle2 is standing, parallel to the Y/Z plane (facing the X direction)
+  //  - triangle3 is crooked, its head pointing to [ -X; +Y ], slightly below 0
+  const Raz::Triangle triangle1(Raz::Vec3f({ -3.f, 0.5f, 3.f }), Raz::Vec3f({ 0.f, 0.5f, -3.f }), Raz::Vec3f({ 3.f, 0.5f, 3.f }));
+  const Raz::Triangle triangle2(Raz::Vec3f({ 0.5f, -0.5f, 3.f }), Raz::Vec3f({ 0.5f, -0.5f, -3.f }), Raz::Vec3f({ 0.5f, 3.f, 0.f }));
+  const Raz::Triangle triangle3(Raz::Vec3f({ 0.f, -1.f, 1.f }), Raz::Vec3f({ -1.5f, -1.5f, 0.f }), Raz::Vec3f({ 0.f, -1.75f, -1.f }));
+
+  REQUIRE(ray1.intersects(triangle1));
+  REQUIRE(ray2.intersects(triangle1));
+  REQUIRE(ray3.intersects(triangle1));
+
+  REQUIRE_FALSE(ray1.intersects(triangle2));
+  REQUIRE(ray2.intersects(triangle2));
+  REQUIRE(ray3.intersects(triangle2));
+
+  REQUIRE_FALSE(ray1.intersects(triangle3));
+  REQUIRE_FALSE(ray2.intersects(triangle3));
+  REQUIRE(ray3.intersects(triangle3));
+}
+
 TEST_CASE("Ray-AABB intersection") {
   //         _______________________
   //        /|                    /|
