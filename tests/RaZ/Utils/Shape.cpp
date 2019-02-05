@@ -3,9 +3,19 @@
 
 namespace {
 
-// Declaring shapes to be tested
+//       Line 1         |      Line 2       |       Line 3
+//                      |                   |
+//                      |     [ 0; 1 ]      |              [ 1; 1 ]
+//                      |         |         |                /
+//   ----------------   |         |         |              /
+//   ^              ^   |         |         |            /
+//  [ 0; 0 ]  [ 1; 0 ]  |         |         |          /
+//                      |         |         |        /
+//                      |     [ 0; 0 ]      |   [ -1; -1 ]
+
 const Raz::Line line1(Raz::Vec3f({ 0.f, 0.f, 0.f }), Raz::Vec3f({ 1.f, 0.f, 0.f }));
-const Raz::Line line2(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
+const Raz::Line line2(Raz::Vec3f({ 0.f, 0.f, 0.f }), Raz::Vec3f({ 0.f, 1.f, 0.f }));
+const Raz::Line line3(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
 
 //      Plane 1      |       Plane 2      |      Plane 3
 //                   |                    |
@@ -45,13 +55,31 @@ const Raz::AABB aabb3(Raz::Vec3f({ -5.f, -5.f, 5.f }), Raz::Vec3f({ -10.f, -10.f
 
 TEST_CASE("Line basic") {
   REQUIRE(line1.computeCentroid() == Raz::Vec3f({ 0.5f, 0.f, 0.f }));
-  REQUIRE(line2.computeCentroid() == Raz::Vec3f(0.f));
+  REQUIRE(line2.computeCentroid() == Raz::Vec3f({ 0.f, 0.5f, 0.f }));
+  REQUIRE(line3.computeCentroid() == Raz::Vec3f(0.f));
 
   REQUIRE(Raz::FloatUtils::checkNearEquality(line1.computeLength(), 1.f));
   REQUIRE(Raz::FloatUtils::checkNearEquality(line1.computeSquaredLength(), 1.f));
 
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line2.computeLength(), 3.464101615f));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line2.computeSquaredLength(), 12.f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(line2.computeLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(line2.computeSquaredLength(), 1.f));
+
+  REQUIRE(Raz::FloatUtils::checkNearEquality(line3.computeLength(), 3.464101615f));
+  REQUIRE(Raz::FloatUtils::checkNearEquality(line3.computeSquaredLength(), 12.f));
+}
+
+TEST_CASE("Line-plane intersection") {
+  REQUIRE_FALSE(line1.intersects(plane1));
+  REQUIRE(line1.intersects(plane2));
+  REQUIRE_FALSE(line1.intersects(plane3));
+
+  REQUIRE(line2.intersects(plane1));
+  REQUIRE(line2.intersects(plane2));
+  REQUIRE(line2.intersects(plane3));
+
+  REQUIRE(line3.intersects(plane1));
+  REQUIRE(line3.intersects(plane2));
+  REQUIRE_FALSE(line3.intersects(plane3));
 }
 
 TEST_CASE("Plane basic") {
