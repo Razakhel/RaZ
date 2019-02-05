@@ -8,8 +8,20 @@ bool Line::intersects(const Line&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Line::intersects(const Plane&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Line::intersects(const Plane& plane) const {
+  const Vec3f lineVec = m_endPos - m_beginPos;
+  const float lineVecPlaneAngle = lineVec.dot(plane.getNormal());
+
+  // If near 0, the line & the plane are parallel to each other
+  if (FloatUtils::checkNearEquality(lineVecPlaneAngle, 0.f))
+    return false;
+
+  const float lineStartPlaneAngle = m_beginPos.dot(plane.getNormal());
+
+  // Calculating the relative distance along the line where it is intersected by the plane
+  // If this distance is below 0 or above 1, the intersection isn't between the line's two extremities
+  const float intersectDist = (plane.getDistance() - lineStartPlaneAngle) / lineVecPlaneAngle;
+  return ((intersectDist >= 0.f) && (intersectDist <= 1.f));
 }
 
 bool Line::intersects(const Sphere& sphere) const {
