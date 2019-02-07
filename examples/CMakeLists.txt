@@ -10,11 +10,11 @@ if (FBX_FOUND)
     endif ()
 endif ()
 
-add_executable(RaZ_fullDemo fullDemo.cpp)
-target_link_libraries(RaZ_fullDemo RaZ)
+add_executable(RaZ_FullDemo fullDemo.cpp)
+target_link_libraries(RaZ_FullDemo RaZ)
 
-add_executable(RaZ_minDemo minDemo.cpp)
-target_link_libraries(RaZ_minDemo RaZ)
+add_executable(RaZ_MinDemo minDemo.cpp)
+target_link_libraries(RaZ_MinDemo RaZ)
 
-add_executable(RaZ_showcaseDemo showcaseDemo.cpp)
-target_link_libraries(RaZ_showcaseDemo RaZ)
+add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
+target_link_libraries(RaZ_ShowcaseDemo RaZ)

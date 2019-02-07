@@ -3,7 +3,8 @@ project(RaZ)
 
 set(CMAKE_CXX_STANDARD 14)
 
-if (NOT CMAKE_BUILD_TYPE) # Define build type to Release if not automatically set
+# Define build type to Release if not automatically set
+if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
 
@@ -134,13 +135,9 @@ elseif (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_FLAGS}")
 endif ()
 
-option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
-option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
-option(RAZ_RUN_TESTS "Run tests after RaZ is built" ON)
-
 # FBX SDK usage
 if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
-    option(RAZ_USE_FBX "Use FBX SDK to import/export FBX models" ON)
+    option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" ON)
 
     if (RAZ_USE_FBX)
         if ("${CMAKE_BUILD_TYPE}" MATCHES "(D|d)eb")
@@ -159,7 +156,8 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
 
                 "C:/${FBX_PATH}"
                 "D:/${FBX_PATH}"
-                "E:/${FBX_PATH}")
+                "E:/${FBX_PATH}"
+            )
 
             # TODO: searching by default into 'vs2015'; should be MSVC-version dependent
             set(FBX_LIB_DIR "lib/vs2015/x64/${BUILD_TYPE}")
@@ -371,21 +369,35 @@ list(
     ${DISPOSABLE}
 )
 
-if (${RAZ_BUILD_STATIC})
+option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
+if (RAZ_BUILD_STATIC)
     add_library(RaZ STATIC ${SOURCE_FILES})
 else ()
     add_library(RaZ SHARED ${SOURCE_FILES})
 endif ()
 
 target_link_libraries(
-    RaZ ${LIBS}
+    RaZ
+
+    ${LIBS}
     ${DEPS}
 )
 
-if (${RAZ_BUILD_EXAMPLES})
+# Build the examples
+option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
+if (RAZ_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
 
-if (${RAZ_RUN_TESTS})
+# Build the unit tests
+option(RAZ_BUILD_TESTS "Compile the tests after RaZ is built" ON)
+if (RAZ_BUILD_TESTS)
     add_subdirectory(tests)
+endif ()
+
+# Allows to generate the documentation
+find_package(Doxygen)
+option(RAZ_GEN_DOC "Generate documentation (requires Doxygen)" ${DOXYGEN_FOUND})
+if (RAZ_GEN_DOC)
+    add_subdirectory(doc)
 endif ()
