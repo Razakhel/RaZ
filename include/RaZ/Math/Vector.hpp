@@ -50,8 +50,8 @@ public:
   Vector cross(const Vector& vec) const;
   /// Computes the reflection of the current vector over a direction.
   /// The calling vector is assumed to be incident (directed to the surface it is reflected on).
-  /// \imageSize{vector_reflect.png, height: 20%; width: 20%;}
-  /// \image html vector_reflect.png "Incident vector reflection"
+  /// \imageSize{vector_reflect.jpg, height: 20%; width: 20%;}
+  /// \image html vector_reflect.jpg "Incident vector reflection"
   /// \param normal Direction to compute the reflection over.
   /// \return Vector's reflection.
   Vector reflect(const Vector& normal) const { return (*this - normal * dot(normal) * 2); }
