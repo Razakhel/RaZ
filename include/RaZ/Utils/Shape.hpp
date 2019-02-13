@@ -262,6 +262,9 @@ public:
   /// Computes the triangle's centroid, which is the point lying directly between its three points.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_firstPos + m_secondPos + m_thirdPos) / 3.f; }
+  /// Computes the triangle's normal from its points.
+  /// \return Computed normal.
+  Vec3f computeNormal() const;
 
 private:
   Vec3f m_firstPos {};

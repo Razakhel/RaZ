@@ -91,7 +91,7 @@ bool Plane::intersects(const AABB& aabb) const {
 
 // Sphere functions
 
-bool Sphere::contains(const Raz::Vec3f& point) const {
+bool Sphere::contains(const Vec3f& point) const {
   const float pointSqDist = (m_centerPos - point).computeSquaredLength();
   return (pointSqDist <= (m_radius * m_radius));
 }
@@ -134,6 +134,13 @@ bool Triangle::intersects(const AABB&) const {
 
 Vec3f Triangle::computeProjection(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
+}
+
+Vec3f Triangle::computeNormal() const {
+  const Vec3f firstEdge  = m_secondPos - m_firstPos;
+  const Vec3f secondEdge = m_thirdPos - m_firstPos;
+
+  return firstEdge.cross(secondEdge);
 }
 
 // Quad functions
