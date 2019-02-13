@@ -126,6 +126,22 @@ TEST_CASE("Triangle basic") {
   REQUIRE(triangle3.computeCentroid() == Raz::Vec3f({ -0.5f, -1.416666666f, 0.f }));
 }
 
+TEST_CASE("Triangle clockwiseness") {
+  REQUIRE(triangle1.isCounterClockwise(-Raz::Axis::Y));
+  REQUIRE(triangle2.isCounterClockwise(Raz::Axis::X));
+  REQUIRE(triangle3.isCounterClockwise((-Raz::Axis::X - Raz::Axis::Y).normalize())); // Pointing roughly towards [ -X; -Y ]
+
+  // Creating two triangles with the same points but in a different ordering
+  Raz::Triangle testTriangle1(Raz::Vec3f({ -1.f, 0.f, 0.f }), Raz::Vec3f({ 0.f, 1.f, 0.f }), Raz::Vec3f({ 1.f, 0.f, 0.f }));
+  Raz::Triangle testTriangle2(Raz::Vec3f({ 1.f, 0.f, 0.f }), Raz::Vec3f({ 0.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, 0.f, 0.f }));
+
+  REQUIRE_FALSE(testTriangle1.isCounterClockwise(Raz::Axis::Z));
+  REQUIRE(testTriangle2.isCounterClockwise(Raz::Axis::Z));
+
+  testTriangle1.makeCounterClockwise(Raz::Axis::Z);
+  REQUIRE(testTriangle1.isCounterClockwise(Raz::Axis::Z));
+}
+
 TEST_CASE("AABB basic") {
   REQUIRE(aabb1.computeCentroid() == Raz::Vec3f(0.f));
   REQUIRE(aabb2.computeCentroid() == Raz::Vec3f({ 4.f, 4.f, 0.f }));
