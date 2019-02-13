@@ -269,6 +269,9 @@ public:
   /// \param normal Normal from which to determinate the ordering.
   /// \return True if the triangle is counter-clockwise, false otherwise.
   bool isCounterClockwise(const Vec3f& normal) const { return (normal.dot(computeNormal()) > 0.f); }
+  /// Makes the triangle counter-clockwise around a normal. Does nothing if it already is.
+  /// \param normal Normal from which to determinate the ordering.
+  void makeCounterClockwise(const Vec3f& normal);
 
 private:
   Vec3f m_firstPos {};

@@ -143,6 +143,15 @@ Vec3f Triangle::computeNormal() const {
   return firstEdge.cross(secondEdge);
 }
 
+void Triangle::makeCounterClockwise(const Vec3f& normal) {
+  if (isCounterClockwise(normal))
+    return;
+
+  // It doesn't matter which ones are swapped, as long as two of them are
+  // The 3 points being adjacent, the ordering will be reversed all the same
+  std::swap(m_firstPos, m_secondPos);
+}
+
 // Quad functions
 
 bool Quad::intersects(const Quad&) const {
