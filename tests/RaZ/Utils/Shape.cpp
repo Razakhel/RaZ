@@ -31,6 +31,15 @@ const Raz::Plane plane1(1.f, Raz::Axis::Y);
 const Raz::Plane plane2(0.5f, Raz::Vec3f({ 1.f, 1.f, 0.f }).normalize());
 const Raz::Plane plane3(0.5f, Raz::Vec3f({ -1.f, 1.f, 0.f }).normalize());
 
+// These triangles are defined so that:
+//  - triangle1 is laying flat slightly above 0
+//  - triangle2 is standing, parallel to the Y/Z plane (facing the X direction)
+//  - triangle3 is crooked, its head pointing to [ -X; +Y ], slightly below 0
+
+const Raz::Triangle triangle1(Raz::Vec3f({ -3.f, 0.5f, 3.f }), Raz::Vec3f({ 0.f, 0.5f, -6.f }), Raz::Vec3f({ 3.f, 0.5f, 3.f }));
+const Raz::Triangle triangle2(Raz::Vec3f({ 0.5f, -0.5f, 3.f }), Raz::Vec3f({ 0.5f, -0.5f, -3.f }), Raz::Vec3f({ 0.5f, 3.f, 0.f }));
+const Raz::Triangle triangle3(Raz::Vec3f({ 0.f, -1.f, 1.f }), Raz::Vec3f({ -1.5f, -1.5f, 0.f }), Raz::Vec3f({ 0.f, -1.75f, -1.f }));
+
 //         _______________________
 //        /|                    /|
 //       / |                   / | / 1 -> [  1;  1; 1 ]
@@ -109,6 +118,12 @@ TEST_CASE("Plane-plane intersection") {
   REQUIRE_FALSE(plane1.intersects(plane1));
   REQUIRE_FALSE(plane2.intersects(plane2));
   REQUIRE_FALSE(plane3.intersects(plane3));
+}
+
+TEST_CASE("Triangle basic") {
+  REQUIRE(triangle1.computeCentroid() == Raz::Vec3f({ 0.f, 0.5f, 0.f }));
+  REQUIRE(triangle2.computeCentroid() == Raz::Vec3f({ 0.5f, 0.666666666f, 0.f }));
+  REQUIRE(triangle3.computeCentroid() == Raz::Vec3f({ -0.5f, -1.416666666f, 0.f }));
 }
 
 TEST_CASE("AABB basic") {
