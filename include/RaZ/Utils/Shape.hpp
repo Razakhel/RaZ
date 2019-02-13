@@ -265,6 +265,10 @@ public:
   /// Computes the triangle's normal from its points.
   /// \return Computed normal.
   Vec3f computeNormal() const;
+  /// Checks if the triangle's points are defined in a counter-clockwise manner around a normal.
+  /// \param normal Normal from which to determinate the ordering.
+  /// \return True if the triangle is counter-clockwise, false otherwise.
+  bool isCounterClockwise(const Vec3f& normal) const { return (normal.dot(computeNormal()) > 0.f); }
 
 private:
   Vec3f m_firstPos {};
