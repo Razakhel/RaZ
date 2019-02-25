@@ -340,6 +340,9 @@ elseif (WIN32)
 
         opengl32
     )
+
+    # To automatically export all the classes & functions
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS True)
 endif ()
 
 # If FBX SDK not found, do not compile FBX loader
