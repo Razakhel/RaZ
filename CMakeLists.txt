@@ -108,10 +108,20 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
          -Wno-weak-vtables \
          -Wno-exit-time-destructors \
          -Wno-covered-switch-default \
-         -Wno-unused-template \
          -Wno-reserved-id-macro \
+         -Wno-missing-braces \
          -Wno-documentation -Wno-documentation-unknown-command"
     )
+
+    # Disabling some warnings available since Clang 5
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+        set(
+            CLANG_FLAGS
+
+            "${CLANG_FLAGS} \
+             -Wno-unused-template"
+        )
+    endif ()
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_FLAGS}")
 elseif (MSVC)
