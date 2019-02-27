@@ -8,16 +8,16 @@
 #include <memory>
 #include <vector>
 
-#include "glew/include/GL/glew.h"
+#include "GL/glew.h"
 #if defined(_WIN32)
 #if defined(_MSC_VER)
 #define NOMINMAX
 #endif
-#include "glew/include/GL/wglew.h"
+#include "GL/wglew.h"
 #elif defined(__gnu_linux__)
-#include "glew/include/GL/glxew.h"
+#include "GL/glxew.h"
 #endif
-#include "glfw/include/GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Overlay.hpp"

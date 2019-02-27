@@ -3,7 +3,7 @@
 #ifndef RAZ_UNIFORMBUFFER_HPP
 #define RAZ_UNIFORMBUFFER_HPP
 
-#include "glew/include/GL/glew.h"
+#include "GL/glew.h"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"

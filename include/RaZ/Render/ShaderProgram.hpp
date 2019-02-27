@@ -6,7 +6,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "glew/include/GL/glew.h"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
