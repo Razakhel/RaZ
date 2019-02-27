@@ -414,3 +414,22 @@ option(RAZ_GEN_DOC "Generate documentation (requires Doxygen)" ${DOXYGEN_FOUND})
 if (RAZ_GEN_DOC)
     add_subdirectory(doc)
 endif ()
+
+# Allowing to install RaZ
+# Installing the library
+if (WIN32)
+    set(CMAKE_INSTALL_PREFIX "C:/RaZ")
+endif ()
+
+install(TARGETS RaZ DESTINATION lib)
+
+# Installing the headers
+set(
+    HEADERS_INSTALL
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include/GL
+    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include/GLFW
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ
+)
+
+install(DIRECTORY ${HEADERS_INSTALL} DESTINATION include)
