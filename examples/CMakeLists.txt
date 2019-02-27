@@ -4,9 +4,9 @@ project(RaZ_Examples)
 set(CMAKE_CXX_STANDARD 14)
 
 # If FBX SDK used, copy the DLL file into the examples folder to link it properly
-if (FBX_FOUND)
+if (RAZ_USE_FBX AND FBX_FOUND)
     if (MSVC)
-        file(COPY "${FBX_ROOT_DIR}/${FBX_LIB_DIR}/libfbxsdk.dll" DESTINATION ${CMAKE_BINARY_DIR}/examples)
+        file(COPY "${FBX_ROOT_DIR}/${FBX_LIB_DIR}/libfbxsdk.dll" DESTINATION "${CMAKE_BINARY_DIR}/examples")
     endif ()
 endif ()
 

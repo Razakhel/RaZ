@@ -147,65 +147,65 @@ endif ()
 
 # FBX SDK usage
 if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
-    option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" ON)
+    if ("${CMAKE_BUILD_TYPE}" MATCHES "(D|d)eb")
+        set(BUILD_TYPE "debug")
+    elseif ("${CMAKE_BUILD_TYPE}" MATCHES "(R|r)el")
+        set(BUILD_TYPE "release")
+    endif ()
+
+    if (MSVC)
+        # Wildcards used to fetch from 'Program Files (x86)' as well, plus for every version: 2019.0, 2018.1.1, 2018.0, ...
+        # TODO: minor, but should be sorted in reverse order: the more recent the better (always possible to manually select it)
+        set(FBX_PATH "Program Files*/Autodesk/FBX/FBX SDK/*")
+        file(
+            GLOB
+            SEARCH_PATHS
+
+            "C:/${FBX_PATH}"
+            "D:/${FBX_PATH}"
+            "E:/${FBX_PATH}"
+        )
+
+        # TODO: searching by default into 'vs2015'; should be MSVC-version dependent
+        set(FBX_LIB_DIR "lib/vs2015/x64/${BUILD_TYPE}")
+        set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.lib")
+    elseif (CMAKE_COMPILER_IS_GNUCC)
+        file(
+            GLOB
+            SEARCH_PATHS
+
+            "/usr"
+            "/usr/local"
+            "~/*FBX*"
+            "~/*fbx*"
+         )
+
+        set(FBX_LIB_DIR "lib/gcc4/x64/${BUILD_TYPE}")
+        set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.a")
+    endif ()
+
+    # Checking if correctly user-assigned or previously found
+    if (EXISTS ${FBX_ROOT_DIR}/include/fbxsdk.h AND EXISTS ${FBX_ROOT_DIR}/${FBX_LIB_SUBPATH})
+        set(FBX_FOUND TRUE)
+        set(LIBS ${LIBS} ${FBX_ROOT_DIR}/${FBX_LIB_SUBPATH})
+    else () # Not existing at requested place, searching for it elsewhere
+        foreach (PATH ${SEARCH_PATHS})
+            set(FBX_LIB "${PATH}/${FBX_LIB_SUBPATH}")
+
+            # If header & lib exist, include & link each other respectively
+            if (EXISTS "${PATH}/include/fbxsdk.h" AND EXISTS ${FBX_LIB})
+                set(FBX_ROOT_DIR ${PATH} CACHE PATH "Path to your FBX SDK root directory" FORCE)
+                set(FBX_FOUND TRUE)
+                set(LIBS ${LIBS} ${FBX_LIB})
+
+                break()
+            endif ()
+        endforeach ()
+    endif ()
+
+    option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" ${FBX_FOUND})
 
     if (RAZ_USE_FBX)
-        if ("${CMAKE_BUILD_TYPE}" MATCHES "(D|d)eb")
-            set(BUILD_TYPE "debug")
-        elseif ("${CMAKE_BUILD_TYPE}" MATCHES "(R|r)el")
-            set(BUILD_TYPE "release")
-        endif ()
-
-        if (MSVC)
-            # Wildcards used to fetch from 'Program Files (x86)' as well, plus for every version: 2019.0, 2018.1.1, 2018.0, ...
-            # TODO: minor, but should be sorted in reverse order: the more recent the better (always possible to manually select it)
-            set(FBX_PATH "Program Files*/Autodesk/FBX/FBX SDK/*")
-            file(
-                GLOB
-                SEARCH_PATHS
-
-                "C:/${FBX_PATH}"
-                "D:/${FBX_PATH}"
-                "E:/${FBX_PATH}"
-            )
-
-            # TODO: searching by default into 'vs2015'; should be MSVC-version dependent
-            set(FBX_LIB_DIR "lib/vs2015/x64/${BUILD_TYPE}")
-            set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.lib")
-        elseif (CMAKE_COMPILER_IS_GNUCC)
-            file(
-                GLOB
-                SEARCH_PATHS
-
-                "/usr"
-                "/usr/local"
-                "~/*FBX*"
-                "~/*fbx*"
-             )
-
-            set(FBX_LIB_DIR "lib/gcc4/x64/${BUILD_TYPE}")
-            set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.a")
-        endif ()
-
-        # Checking if correctly user-assigned or previously found
-        if (EXISTS ${FBX_ROOT_DIR}/include/fbxsdk.h AND EXISTS ${FBX_ROOT_DIR}/${FBX_LIB_SUBPATH})
-            set(FBX_FOUND TRUE)
-            set(LIBS ${LIBS} ${FBX_ROOT_DIR}/${FBX_LIB_SUBPATH})
-        else () # Not existing at requested place, searching for it elsewhere
-            foreach (PATH ${SEARCH_PATHS})
-                set(FBX_LIB "${PATH}/${FBX_LIB_SUBPATH}")
-
-                # If header & lib exist, include & link each other respectively
-                if (EXISTS "${PATH}/include/fbxsdk.h" AND EXISTS ${FBX_LIB})
-                    set(FBX_ROOT_DIR ${PATH} CACHE PATH "Path to your FBX SDK root directory" FORCE)
-                    set(FBX_FOUND TRUE)
-                    set(LIBS ${LIBS} ${FBX_LIB})
-
-                    break()
-                endif ()
-            endforeach ()
-        endif ()
-
         if (FBX_FOUND)
             add_definitions(-DFBX_ENABLED)
             add_definitions(-DFBXSDK_SHARED)
@@ -229,10 +229,10 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-AUX_SOURCE_DIRECTORY(extern/png PNG_SRC)
-AUX_SOURCE_DIRECTORY(extern/glew/src GLEW_SRC)
-AUX_SOURCE_DIRECTORY(extern/glfw/src GLFW_SRC)
-AUX_SOURCE_DIRECTORY(extern/imgui IMGUI_SRC)
+aux_source_directory(extern/png PNG_SRC)
+aux_source_directory(extern/glew/src GLEW_SRC)
+aux_source_directory(extern/glfw/src GLFW_SRC)
+aux_source_directory(extern/imgui IMGUI_SRC)
 
 set(
     SRC
@@ -356,7 +356,7 @@ elseif (WIN32)
 endif ()
 
 # If FBX SDK not found, do not compile FBX loader
-if (NOT FBX_FOUND)
+if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
     file(
         GLOB
         DISPOSABLE
