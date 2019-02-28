@@ -3,7 +3,7 @@
 #ifndef RAZ_FRAMEBUFFER_HPP
 #define RAZ_FRAMEBUFFER_HPP
 
-#include "glew/include/GL/glew.h"
+#include "GL/glew.h"
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Texture.hpp"

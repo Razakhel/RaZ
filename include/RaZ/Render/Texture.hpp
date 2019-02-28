@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "glew/include/GL/glew.h"
+#include "GL/glew.h"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
 

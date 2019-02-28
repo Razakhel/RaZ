@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iostream>
 
-#include "glew/include/GL/glew.h"
+#include "GL/glew.h"
 #include "RaZ/Render/Shader.hpp"
 
 namespace Raz {

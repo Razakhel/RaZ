@@ -6,7 +6,7 @@
 #include <memory>
 #include <string>
 
-#include "glew/include/GL/glew.h"
+#include "GL/glew.h"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
