@@ -40,6 +40,8 @@ public:
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
   const Vec4f& getClearColor() const { return m_clearColor; }
+  const InputCallbacks& getCallbacks() const { return m_callbacks; }
+  InputCallbacks& getCallbacks() { return m_callbacks; }
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
   void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f({ red, green, blue, alpha })); }
