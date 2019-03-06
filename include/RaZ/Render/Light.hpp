@@ -32,6 +32,7 @@ public:
   float getAngle() const { return m_angle; }
 
   void setType(LightType type) { m_type = type; }
+  void setDirection(const Vec3f& direction) { m_direction = direction; }
   void setEnergy(float energy) { m_energy = energy; }
   void setAngle(float angle) { m_angle = angle; }
 
