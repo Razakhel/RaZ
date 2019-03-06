@@ -23,16 +23,17 @@ public:
   template <typename Sys> void removeSystem();
   Entity& addEntity(bool enabled = true);
   template <typename Comp, typename... Args> Entity& addEntityWithComponent(bool enabled, Args&&... args);
-  template <typename Comp, typename... Args> Entity& addEntityWithComponent() { return addEntityWithComponent<Comp>(true); }
-  template <typename... C> Entity& addEntityWithComponents(bool enabled = true);
-  void update(float deltaTime);
+  template <typename Comp> Entity& addEntityWithComponent() { return addEntityWithComponent<Comp>(true); }
+  template <typename... Comps> Entity& addEntityWithComponents(bool enabled = true);
+  bool update(float deltaTime);
   void refresh();
-  void destroy();
 
 private:
   std::vector<SystemPtr> m_systems {};
+  Bitset m_activeSystems {};
+
   std::vector<EntityPtr> m_entities {};
-  std::size_t m_enabledEntityCount = 0;
+  std::size_t m_activeEntityCount = 0;
   std::size_t m_maxEntityIndex = 0;
 };
 

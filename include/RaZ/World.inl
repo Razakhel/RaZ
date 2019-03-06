@@ -30,6 +30,7 @@ Sys& World::addSystem(Args&&... args) {
     m_systems.resize(sysId + 1);
 
   m_systems[sysId] = std::make_unique<Sys>(std::forward<Args>(args)...);
+  m_activeSystems.setBit(sysId);
 
   return static_cast<Sys&>(*m_systems[sysId]);
 }
@@ -58,16 +59,16 @@ void World::removeSystem() {
 
 template <typename Comp, typename... Args>
 Entity& World::addEntityWithComponent(bool enabled, Args&&... args) {
-  auto& entity = addEntity(enabled);
+  Entity& entity = addEntity(enabled);
   entity.addComponent<Comp>(std::forward<Args>(args)...);
 
   return entity;
 }
 
-template <typename... C>
+template <typename... Comps>
 Entity& World::addEntityWithComponents(bool enabled) {
-  auto& entity = addEntity(enabled);
-  entity.addComponents<C...>();
+  Entity& entity = addEntity(enabled);
+  entity.addComponents<Comps...>();
 
   return entity;
 }

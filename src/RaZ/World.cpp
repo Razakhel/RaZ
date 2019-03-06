@@ -6,16 +6,22 @@ Entity& World::addEntity(bool enabled) {
   m_entities.push_back(Entity::create(m_maxEntityIndex++, enabled));
 
   if (enabled)
-    ++m_enabledEntityCount;
+    ++m_activeEntityCount;
 
   return *m_entities.back();
 }
 
-void World::update(float deltaTime) {
+bool World::update(float deltaTime) {
   refresh();
 
-  for (auto& system : m_systems)
-    system->update(deltaTime);
+  for (std::size_t systemIndex = 0; systemIndex < m_systems.size(); ++systemIndex) {
+    if (m_activeSystems[systemIndex]) {
+      if (!m_systems[systemIndex]->update(deltaTime))
+        m_activeSystems.setBit(systemIndex, false);
+    }
+  }
+
+  return !m_activeSystems.isEmpty();
 }
 
 void World::refresh() {
@@ -39,9 +45,9 @@ void World::refresh() {
     }
   }
 
-  m_enabledEntityCount = static_cast<std::size_t>(std::distance(m_entities.begin(), entityEnd) + 1);
+  m_activeEntityCount = static_cast<std::size_t>(std::distance(m_entities.begin(), entityEnd) + 1);
 
-  for (std::size_t entityIndex = 0; entityIndex < m_enabledEntityCount; ++entityIndex) {
+  for (std::size_t entityIndex = 0; entityIndex < m_activeEntityCount; ++entityIndex) {
     const auto& entity = m_entities[entityIndex];
 
     for (auto& system : m_systems) {
@@ -58,11 +64,6 @@ void World::refresh() {
       }
     }
   }
-}
-
-void World::destroy() {
-  for (auto& system : m_systems)
-    system->destroy();
 }
 
 } // namespace Raz
