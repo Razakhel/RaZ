@@ -25,7 +25,7 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
     updateLights();
 }
 
-void RenderSystem::update(float deltaTime) {
+bool RenderSystem::update(float deltaTime) {
   m_program.use();
 
   auto& camera       = m_camera.getComponent<Camera>();
@@ -62,7 +62,7 @@ void RenderSystem::update(float deltaTime) {
   if (m_cubemap)
     m_cubemap->draw(camera);
 
-  m_window.run(deltaTime);
+  return m_window.run(deltaTime);
 }
 
 void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {

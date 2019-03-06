@@ -22,7 +22,7 @@ public:
   bool containsEntity(const EntityPtr& entity);
   virtual void linkEntity(const EntityPtr& entity);
   virtual void unlinkEntity(const EntityPtr& entity);
-  virtual void update(float deltaTime) = 0;
+  virtual bool update(float deltaTime) = 0;
   virtual void destroy() {}
 
   virtual ~System() = default;

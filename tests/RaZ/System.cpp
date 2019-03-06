@@ -9,7 +9,7 @@ class TestSystem : public Raz::System {
 public:
   TestSystem() { m_acceptedComponents.setBit(Raz::Component::getId<Raz::Transform>()); } // [ 0 1 ]
 
-  void update(float /* deltaTime */) override {}
+  bool update(float /* deltaTime */) override { return true; }
 };
 
 TEST_CASE("System basic") {

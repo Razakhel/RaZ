@@ -28,7 +28,7 @@ public:
   void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
 
   void linkEntity(const EntityPtr& entity) override;
-  void update(float deltaTime) override;
+  bool update(float deltaTime) override;
   void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
   void sendInverseViewMatrix(const Mat4f& invViewMat) const { m_cameraUbo.sendData(invViewMat, sizeof(Mat4f)); }
   void sendProjectionMatrix(const Mat4f& projMat) const { m_cameraUbo.sendData(projMat, sizeof(Mat4f) * 2); }
