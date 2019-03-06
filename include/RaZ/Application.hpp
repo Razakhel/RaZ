@@ -18,9 +18,15 @@ public:
   std::vector<World>& getWorlds() { return m_worlds; }
   float getDeltaTime() const { return m_deltaTime; }
 
+  /// Adds a World into the Application.
+  /// \param world World to be added.
+  /// \return Reference to the newly added World.
   World& addWorld(World&& world);
+  /// Runs the application.
+  /// \return True if the application is still running, false otherwise.
   bool run();
-  void quit();
+  /// Tells the application to stop running.
+  void quit() { m_isRunning = false; }
 
 private:
   std::vector<World> m_worlds {};

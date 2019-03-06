@@ -8,9 +8,6 @@ World& Application::addWorld(World&& world) {
 }
 
 bool Application::run() {
-  if (!m_isRunning)
-    return false;
-
   const auto currentTime = std::chrono::system_clock::now();
   m_deltaTime            = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - m_lastFrameTime).count();
   m_lastFrameTime        = currentTime;
@@ -18,14 +15,7 @@ bool Application::run() {
   for (auto& world : m_worlds)
     world.update(m_deltaTime);
 
-  return true;
-}
-
-void Application::quit() {
-  m_isRunning = false;
-
-  for (auto& world : m_worlds)
-    world.destroy();
+  return m_isRunning;
 }
 
 } // namespace Raz
