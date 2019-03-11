@@ -5,8 +5,7 @@ namespace Raz {
 Entity& World::addEntity(bool enabled) {
   m_entities.push_back(Entity::create(m_maxEntityIndex++, enabled));
 
-  if (enabled)
-    ++m_activeEntityCount;
+  m_activeEntityCount += enabled;
 
   return *m_entities.back();
 }

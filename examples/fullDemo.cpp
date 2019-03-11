@@ -142,8 +142,7 @@ int main() {
   });
 
   window.addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&world, &cameraTrans] (float /* deltaTime */) {
-    auto& newLight = world.addEntityWithComponent<Raz::Light>(true,                  // Enabled
-                                                              Raz::LightType::POINT, // Type (point light)
+    auto& newLight = world.addEntityWithComponent<Raz::Light>(Raz::LightType::POINT, // Type (point light)
                                                               10.f);                 // Energy
     newLight.addComponent<Raz::Transform>(cameraTrans.getPosition());
   }, Raz::Input::ONCE);

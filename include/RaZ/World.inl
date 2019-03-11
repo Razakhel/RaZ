@@ -36,20 +36,6 @@ Sys& World::addSystem(Args&&... args) {
 }
 
 template <typename Sys>
-std::tuple<Sys&> World::addSystems() {
-  static_assert(std::is_base_of<System, Sys>::value, "Error: Added system must be derived from System.");
-
-  return std::forward_as_tuple(addSystem<Sys>());
-}
-
-template <typename Sys1, typename Sys2, typename... S>
-std::tuple<Sys1&, Sys2&, S...> World::addSystems() {
-  static_assert(std::is_base_of<System, Sys1>::value, "Error: Added system must be derived from System.");
-
-  return std::tuple_cat(std::forward_as_tuple(addSystem<Sys1>()), addSystems<Sys2, S...>());
-}
-
-template <typename Sys>
 void World::removeSystem() {
   static_assert(std::is_base_of<System, Sys>::value, "Error: Removed system must be derived from System.");
 
@@ -58,8 +44,8 @@ void World::removeSystem() {
 }
 
 template <typename Comp, typename... Args>
-Entity& World::addEntityWithComponent(bool enabled, Args&&... args) {
-  Entity& entity = addEntity(enabled);
+Entity& World::addEntityWithComponent(Args&&... args) {
+  Entity& entity = addEntity();
   entity.addComponent<Comp>(std::forward<Args>(args)...);
 
   return entity;
