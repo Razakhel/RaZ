@@ -17,6 +17,7 @@ namespace Raz {
 class Cubemap;
 using CubemapPtr = std::unique_ptr<Cubemap>;
 
+/// Cubemap class representing an environment map surrounding the scene (also known as a skybox).
 class Cubemap {
 public:
   Cubemap();
@@ -30,18 +31,30 @@ public:
   template <typename... Args>
   static CubemapPtr create(Args&&... args) { return std::make_unique<Cubemap>(std::forward<Args>(args)...); }
 
-  void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_viewProjUbo.sendData(viewProjMat, 0); }
-
+  /// Imports 6 textures and loads them onto the graphics card.
+  /// \param rightTexturePath Path to the texture located on the right of the cube.
+  /// \param leftTexturePath Path to the texture located on the left of the cube.
+  /// \param topTexturePath Path to the texture located on the top of the cube.
+  /// \param bottomTexturePath Path to the texture located on the bottom of the cube.
+  /// \param frontTexturePath Path to the texture located on the front of the cube.
+  /// \param backTexturePath Path to the texture located on the back of the cube.
   void load(const std::string& rightTexturePath, const std::string& leftTexturePath,
             const std::string& topTexturePath, const std::string& bottomTexturePath,
             const std::string& frontTexturePath, const std::string& backTexturePath);
+  /// Sends the view-projection matrix onto the graphics card.
+  /// \param viewProjMat View-projection matrix to be sent.
+  void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_viewProjUbo.sendData(viewProjMat, 0); }
+  /// Binds the cubemap texture.
   void bind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_index); }
+  /// Unbinds the cubemap texture.
   void unbind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, 0); }
+  /// Draws the cubemap around the scene.
+  /// \param camera Camera component from which will be taken the view & projection matrices.
   void draw(const Camera& camera) const;
 
 private:
   GLuint m_index {};
-  ShaderProgram m_program;
+  ShaderProgram m_program {};
   UniformBuffer m_viewProjUbo = UniformBuffer(sizeof(Mat4f), 1);
 };
 
