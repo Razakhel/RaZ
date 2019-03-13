@@ -17,11 +17,8 @@ public:
   Submesh() = default;
 
   const VertexArray& getVao() const { return m_vao; }
-  VertexArray& getVao() { return m_vao; }
   const VertexBuffer& getVbo() const { return m_vbo; }
-  VertexBuffer& getVbo() { return m_vbo; }
   const ElementBuffer& getEbo() const { return m_vao.getEbo(); }
-  ElementBuffer& getEbo() { return m_vao.getEbo(); }
   const std::vector<Vertex>& getVertices() const { return m_vbo.getVertices(); }
   std::vector<Vertex>& getVertices() { return m_vbo.getVertices(); }
   const std::vector<unsigned int>& getIndices() const { return m_vao.getEbo().getIndices(); }
@@ -35,7 +32,9 @@ public:
 
   void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
 
+  /// Loads the submesh's data (vertices & indices) onto the graphics card.
   void load() const;
+  /// Draws the submesh in the scene.
   void draw() const;
 
 private:

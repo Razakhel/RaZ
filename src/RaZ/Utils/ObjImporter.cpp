@@ -201,10 +201,10 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
     } else if (line[0] == 'f') { // Faces
       std::getline(file, line);
 
-      const char delim = '/';
+      const char delim      = '/';
       const auto nbVertices = static_cast<uint16_t>(std::count(line.cbegin(), line.cend(), ' '));
-      const auto nbParts = static_cast<uint8_t>(std::count(line.cbegin(), line.cend(), delim) / nbVertices + 1);
-      const bool quadFaces = (nbVertices == 4);
+      const auto nbParts    = static_cast<uint8_t>(std::count(line.cbegin(), line.cend(), delim) / nbVertices + 1);
+      const bool quadFaces  = (nbVertices == 4);
 
       std::stringstream indicesStream(line);
       std::vector<int64_t> partIndices(nbParts * nbVertices);

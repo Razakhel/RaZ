@@ -16,7 +16,7 @@ void Submesh::load() const {
                getVertices().data(),
                GL_STATIC_DRAW);
 
-  const uint8_t stride = sizeof(getVertices().front());
+  constexpr uint8_t stride = sizeof(getVertices().front());
 
   glVertexAttribPointer(0, 3,
                         GL_FLOAT, GL_FALSE,
@@ -24,21 +24,21 @@ void Submesh::load() const {
                         nullptr);
   glEnableVertexAttribArray(0);
 
-  const std::size_t positionSize = sizeof(getVertices().front().position);
+  constexpr std::size_t positionSize = sizeof(getVertices().front().position);
   glVertexAttribPointer(1, 2,
                         GL_FLOAT, GL_FALSE,
                         stride,
                         reinterpret_cast<void*>(positionSize));
   glEnableVertexAttribArray(1);
 
-  const std::size_t texcoordsSize = sizeof(getVertices().front().texcoords);
+  constexpr std::size_t texcoordsSize = sizeof(getVertices().front().texcoords);
   glVertexAttribPointer(2, 3,
                         GL_FLOAT, GL_FALSE,
                         stride,
                         reinterpret_cast<void*>(positionSize + texcoordsSize));
   glEnableVertexAttribArray(2);
 
-  const std::size_t normalSize = sizeof(getVertices().front().normal);
+  constexpr std::size_t normalSize = sizeof(getVertices().front().normal);
   glVertexAttribPointer(3, 3,
                         GL_FLOAT, GL_FALSE,
                         stride,
