@@ -8,6 +8,7 @@
 
 namespace Raz {
 
+/// World class handling systems & entities.
 class World {
 public:
   explicit World(std::size_t entityCount) { m_entities.reserve(entityCount); }
