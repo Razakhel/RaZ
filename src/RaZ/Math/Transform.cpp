@@ -25,17 +25,19 @@ void Transform::translate(float x, float y, float z) {
   m_updated = true;
 }
 
-void Transform::rotate(float angle, const Vec3f& axis) {
-  const Quaternionf quaternion(angle, axis);
+void Transform::rotate(float angleDegrees, const Vec3f& axis) {
+  assert("Error: Rotation axis must be normalized." && axis.computeLength() == 1.f);
+
+  const Quaternionf quaternion(angleDegrees, axis);
   m_rotation = quaternion.computeMatrix() * m_rotation;
 
   m_updated = true;
 }
 
-void Transform::rotate(float xAngle, float yAngle, float zAngle) {
-  const Quaternionf xQuat(xAngle, Axis::X);
-  const Quaternionf yQuat(yAngle, Axis::Y);
-  const Quaternionf zQuat(zAngle, Axis::Z);
+void Transform::rotate(float xAngleDegrees, float yAngleDegrees, float zAngleDegrees) {
+  const Quaternionf xQuat(xAngleDegrees, Axis::X);
+  const Quaternionf yQuat(yAngleDegrees, Axis::Y);
+  const Quaternionf zQuat(zAngleDegrees, Axis::Z);
   m_rotation = (xQuat.computeMatrix() * yQuat.computeMatrix() * zQuat.computeMatrix()) * m_rotation;
 
   m_updated = true;
@@ -49,8 +51,8 @@ void Transform::scale(float x, float y, float z) {
   m_updated = true;
 }
 
-Mat4f Transform::computeTranslationMatrix(bool inverseTranslation) const {
-  const Vec3f translation = (inverseTranslation ? -m_position : m_position);
+Mat4f Transform::computeTranslationMatrix(bool reverseTranslation) const {
+  const Vec3f translation = (reverseTranslation ? -m_position : m_position);
   const Mat4f translationMat({{            1.f,            0.f,            0.f, 0.f },
                               {            0.f,            1.f,            0.f, 0.f },
                               {            0.f,            0.f,            1.f, 0.f },
