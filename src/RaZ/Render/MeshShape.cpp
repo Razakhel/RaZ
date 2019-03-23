@@ -26,8 +26,8 @@ Mesh::Mesh(const Triangle& triangle) : Mesh() {
   secondVert.normal = (secondPos - thirdPos).cross(secondPos - firstPos).normalize();
   thirdVert.normal  = (thirdPos - firstPos).cross(thirdPos - secondPos).normalize();
 
-  std::vector<Vertex>& vertices = m_submeshes.front()->getVbo().getVertices();
-  std::vector<unsigned int>& indices = m_submeshes.front()->getEbo().getIndices();
+  std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
+  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
 
   vertices.resize(3);
   indices.resize(3);
@@ -72,8 +72,8 @@ Mesh::Mesh(const Quad& quad) : Mesh() {
   rightBottom.normal = (rightBottomPos - leftBottomPos).cross(rightBottomPos - rightTopPos).normalize();
   leftBottom.normal  = (leftBottomPos - leftTopPos).cross(leftBottomPos - rightBottomPos).normalize();
 
-  std::vector<Vertex>& vertices = m_submeshes.front()->getVbo().getVertices();
-  std::vector<unsigned int>& indices = m_submeshes.front()->getEbo().getIndices();
+  std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
+  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
 
   vertices.resize(4);
   indices.resize(6);
@@ -143,8 +143,8 @@ Mesh::Mesh(const AABB& box) : Mesh() {
   // TODO: normals should not be computed (or even exist) for simple display cubes like a skybox
   // TODO: compute normals
 
-  std::vector<Vertex>& vertices = m_submeshes.front()->getVbo().getVertices();
-  std::vector<unsigned int>& indices = m_submeshes.front()->getEbo().getIndices();
+  std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
+  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
 
   vertices.resize(8);
   indices.resize(36);
