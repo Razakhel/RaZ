@@ -35,6 +35,9 @@
 #include "Utils/Ray.hpp"
 #include "Utils/Shape.hpp"
 #include "Utils/StrUtils.hpp"
+#if defined(__GNUC__) && defined(_GLIBCXX_HAS_GTHREADS)
+#include "Utils/Threading.hpp"
+#endif
 #include "Utils/Window.hpp"
 
 #endif // RAZ_RAZ_HPP

@@ -254,6 +254,7 @@ set(
     include/RaZ/Render/*.hpp
     include/RaZ/Render/*.inl
     include/RaZ/Utils/*.hpp
+    include/RaZ/Utils/*.inl
 )
 
 # Defining preprocessor macros and selecting files to be removed
