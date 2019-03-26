@@ -16,6 +16,11 @@ namespace Raz {
 
 namespace Threading {
 
+/// Gets the number of concurrent threads available to the system.
+/// This number doesn't necessarily represent the CPU's actual number of threads.
+/// \return Number of threads available.
+unsigned int getSystemThreadCount();
+
 /// Calls a function asynchronously, to be executed without blocking the calling thread.
 /// \tparam T Return type of the given function.
 /// \tparam Args Types of the arguments to be forwarded to the given function.
