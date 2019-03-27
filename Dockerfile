@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 # Updating packages' repo & installing only the needed packages:
 #   - GL & X11 as needed graphical dependencies
-#   - CMake, GCC & Clang to build RaZ
+#   - CMake, Make, GCC & Clang to build RaZ
 #   - Doxygen & Dot to generate the documentation
 #   - Wget to download the FBX SDK
 #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
@@ -11,7 +11,7 @@ FROM ubuntu:18.04
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libglew-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev \
-        cmake gcc-8 g++-8 clang-6.0 \
+        cmake make gcc-8 g++-8 clang-6.0 \
         doxygen python-pydot python-pydot-ng \
         wget \
         xvfb && \
