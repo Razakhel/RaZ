@@ -6,9 +6,14 @@
 
 ---
 
-| <img alt="Linux build" src="https://www.screenconnect.com/Images/LogoLinux.png" align="center" height="30" width="30" /><br />Linux | <img alt="Windows build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg/414px-Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg.png" align="center" height="30" width="30" /><br />Windows | <img alt="Windows build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/245px-Apple_logo_black.svg.png" align="center" height="30" width="30" /><br />macOS |
-| :--------: | :--------: | :--------: |
-| [![Linux build status](https://travis-ci.com/Razakhel/RaZ.svg?branch=master)](https://travis-ci.com/Razakhel/RaZ) | No CI yet | No CI yet |
+| <img alt="Linux build" src="https://www.screenconnect.com/Images/LogoLinux.png" align="center" height="30" width="30" /><br />Linux | <img alt="Windows build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg/414px-Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg.png" align="center" height="30" width="30" /><br />Windows | <img alt="macOS build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/245px-Apple_logo_black.svg.png" align="center" height="30" width="30" /><br />macOS |
+| :---------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [![Linux build status](https://travis-ci.com/Razakhel/RaZ.svg?branch=master)](https://travis-ci.com/Razakhel/RaZ)                   | No CI yet                                                                                                                                                                                                                                                                  | No CI yet                                                                                                                                                                                      |
+
+| <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy                                                                                             |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://www.codacy.com/app/Razakhel/RaZ?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Razakhel/RaZ&amp;utm_campaign=Badge_Grade) |
+
 
 ## Summary
 
@@ -30,23 +35,23 @@ More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples
 
 ## Features
 
-| Objectives | Implemented |
-| :--------: | :---------: |
-| Mesh loading (OBJ/FBX/OFF...) | **Yes** (OBJ/FBX/OFF) |
-| Texture loading (JPEG/PNG/TGA/BMP/BPG) | **Yes** (PNG/TGA) |
-| Vector: operations, dot, cross, normalization, length/magnitude calculation | **Yes** |
-| Matrix: operations, transposition, determinant computation, inversion | **Yes** |
-| Camera &amp; transformations | **Yes** (rotation with quaternions) |
-| Lighting | **Yes** (point/directional lights) |
-| Materials &amp; textures | **Yes** (multi-textures functional) |
-| Deferred rendering | **Yes** (modularization in progress) |
-| Screen-Space Ambient Occlusion (SSAO) | _On standby_ |
-| Screen-Space Reflections (SSR) | _On standby_ |
-| Normal mapping | **Yes** |
-| PBR rendering | **Yes** (Cook-Torrance model) |
-| Image Based Lighting (IBL) | No |
-| Shadow mapping | No |
-| Bloom | No |
+| Objectives                                                                  | Implemented                          |
+| :-------------------------------------------------------------------------: | :----------------------------------: |
+| Mesh loading (OBJ/FBX/OFF...)                                               | **Yes** (OBJ/FBX/OFF)                |
+| Texture loading (JPEG/PNG/TGA/BMP/BPG)                                      | **Yes** (PNG/TGA)                    |
+| Vector: operations, dot, cross, normalization, length/magnitude calculation | **Yes**                              |
+| Matrix: operations, transposition, determinant computation, inversion       | **Yes**                              |
+| Camera &amp; transformations                                                | **Yes** (rotation with quaternions)  |
+| Lighting                                                                    | **Yes** (point/directional lights)   |
+| Materials &amp; textures                                                    | **Yes** (multi-textures functional)  |
+| Deferred rendering                                                          | **Yes** (modularization in progress) |
+| Screen-Space Ambient Occlusion (SSAO)                                       | _On standby_                         |
+| Screen-Space Reflections (SSR)                                              | _On standby_                         |
+| Normal mapping                                                              | **Yes**                              |
+| PBR rendering                                                               | **Yes** (Cook-Torrance model)        |
+| Image Based Lighting (IBL)                                                  | No                                   |
+| Shadow mapping                                                              | No                                   |
+| Bloom                                                                       | No                                   |
 
 ## 
 
