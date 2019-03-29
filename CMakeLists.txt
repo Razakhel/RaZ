@@ -316,8 +316,8 @@ elseif (UNIX)
     set(
         DEPS
 
-        X11
         GL
+        X11
         Xrandr
         Xcursor
         Xinerama

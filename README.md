@@ -10,10 +10,9 @@
 | :---------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [![Linux build status](https://travis-ci.com/Razakhel/RaZ.svg?branch=master)](https://travis-ci.com/Razakhel/RaZ)                   | No CI yet                                                                                                                                                                                                                                                                  | No CI yet                                                                                                                                                                                      |
 
-| <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy                                                                                             |
-| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://www.codacy.com/app/Razakhel/RaZ?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Razakhel/RaZ&amp;utm_campaign=Badge_Grade) |
-
+| <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy                                                                                              |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://www.codacy.com/app/Razakhel/RaZ?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Razakhel/RaZ&amp;utm_campaign=Badge_Grade) |
 
 ## Summary
 
@@ -27,8 +26,8 @@ If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/w
 
 ### Gallery
 
-| Crytek Sponza | Hylian shield (PBR) |
-| :--------: | :---------: |
+| Crytek Sponza                                                                        | Hylian shield (PBR)                                                                  |
+| :----------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: |
 | [![Crytek Sponza](https://i.imgur.com/Tr1nnjV.jpg)](https://i.imgur.com/Tr1nnjV.jpg) | [![Hylian shield](https://i.imgur.com/UZ90KKJ.jpg)](https://i.imgur.com/UZ90KKJ.jpg) |
 
 More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples).

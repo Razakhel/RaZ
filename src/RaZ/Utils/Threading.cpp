@@ -1,4 +1,5 @@
 #include <cassert>
+#include <vector>
 
 #include "RaZ/Utils/Threading.hpp"
 
