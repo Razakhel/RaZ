@@ -10,6 +10,7 @@
 
 #ifdef RAZ_THREADS_AVAILABLE
 
+#include <functional>
 #include <future>
 #include <thread>
 
@@ -34,6 +35,11 @@ inline void sleep(uint64_t milliseconds) { std::this_thread::sleep_for(std::chro
 /// \return A std::future holding the future result of the process.
 template <typename Func, typename... Args, typename ResultType = std::result_of_t<Func&&(Args&&...)>>
 std::future<ResultType> launchAsync(Func action, Args&&... args);
+
+/// Calls a function in parallel on a given number of separate threads of execution.
+/// \param action Action to be performed by each thread.
+/// \param threadCount Amount of threads to start an instance on.
+void parallelize(const std::function<void()>& action, std::size_t threadCount = getSystemThreadCount());
 
 } // namespace Threading
 
