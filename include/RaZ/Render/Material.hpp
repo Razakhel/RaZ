@@ -54,7 +54,7 @@ class MaterialStandard : public Material {
 public:
   MaterialStandard() = default;
   explicit MaterialStandard(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
-  explicit MaterialStandard(const std::string& fileName) { m_diffuseMap = Texture::create(fileName); }
+  explicit MaterialStandard(const std::string& fileName) : m_diffuseMap{ Texture::create(fileName) } {}
 
   MaterialType getType() const override { return MaterialType::STANDARD; }
   const Vec3f& getAmbient() const { return m_ambient; }
@@ -120,7 +120,7 @@ class MaterialCookTorrance : public Material {
 public:
   MaterialCookTorrance() = default;
   explicit MaterialCookTorrance(TexturePtr albedoMap) : m_albedoMap{ std::move(albedoMap) } {}
-  explicit MaterialCookTorrance(const std::string& fileName) { m_albedoMap = Texture::create(fileName); }
+  explicit MaterialCookTorrance(const std::string& fileName) : m_albedoMap{ Texture::create(fileName) } {}
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
     : m_baseColor{ baseColor }, m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } {}
 
