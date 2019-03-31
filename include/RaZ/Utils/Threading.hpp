@@ -18,6 +18,11 @@ namespace Raz {
 
 namespace Threading {
 
+struct IndexRange {
+  std::size_t beginIndex;
+  std::size_t endIndex;
+};
+
 /// Gets the number of concurrent threads available to the system.
 /// This number doesn't necessarily represent the CPU's actual number of threads.
 /// \return Number of threads available.
@@ -40,6 +45,15 @@ std::future<ResultType> launchAsync(Func action, Args&&... args);
 /// \param action Action to be performed by each thread.
 /// \param threadCount Amount of threads to start an instance on.
 void parallelize(const std::function<void()>& action, std::size_t threadCount = getSystemThreadCount());
+
+/// Calls a function in parallel on a given number of separate threads of execution.
+/// The collection is automatically splitted by indices, giving a separate start/end range to each thread.
+/// \tparam T Type of the collection to iterate over.
+/// \param collection Collection to iterate over on multiple threads.
+/// \param action Action to be performed by each thread, giving an index range as boundaries.
+/// \param threadCount Amount of threads to start an instance on.
+template <typename T>
+void parallelize(const T& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount = getSystemThreadCount());
 
 } // namespace Threading
 
