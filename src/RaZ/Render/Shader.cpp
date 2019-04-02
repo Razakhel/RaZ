@@ -9,6 +9,11 @@
 
 namespace Raz {
 
+void Shader::import(std::string fileName) {
+  m_path = std::move(fileName);
+  load();
+}
+
 void Shader::load() const {
   if (m_path.empty()) // Shader imported directly from source, no path available
     return;
@@ -24,7 +29,7 @@ void Shader::load() const {
   std::vector<char> bytes(fileSize);
   shaderSource.read(&bytes[0], static_cast<std::streamsize>(fileSize));
 
-  std::string content = std::string(&bytes[0], fileSize);
+  const std::string content(&bytes[0], fileSize);
 
   const char* data  = content.c_str();
   const auto length = static_cast<int>(content.size());
@@ -41,62 +46,49 @@ void Shader::compile() const {
     std::array<char, 512> infoLog {};
 
     glGetShaderInfoLog(m_index, static_cast<int>(infoLog.size()), nullptr, infoLog.data());
-    std::cerr << "Error: Vertex shader compilation failed.\n" << infoLog.data() << std::endl;
+    std::cerr << "Error: Shader compilation failed (ID " << m_index << ", path '" << m_path << "').\n" << infoLog.data() << std::endl;
   }
 }
 
-VertexShader::VertexShader(std::string fileName) : VertexShader() {
-  m_path = std::move(fileName);
-  load();
-}
-
-VertexShaderPtr VertexShader::loadFromSource(const std::string& source) {
-  auto vertShader = VertexShader::create();
-
+void Shader::loadSource(const std::string& source) {
   const char* data  = source.c_str();
   const auto length = static_cast<int>(source.size());
 
-  glShaderSource(vertShader->getIndex(), 1, &data, &length);
+  glShaderSource(m_index, 1, &data, &length);
+}
 
-  vertShader->compile();
+void Shader::destroy() const {
+  glDeleteShader(m_index);
+}
 
+VertexShader::VertexShader() {
+  m_index = glCreateShader(GL_VERTEX_SHADER);
+}
+
+VertexShader VertexShader::loadFromSource(const std::string& source) {
+  VertexShader vertShader;
+  vertShader.loadSource(source);
   return vertShader;
 }
 
-FragmentShader::FragmentShader(std::string fileName) : FragmentShader() {
-  m_path = std::move(fileName);
-  load();
+FragmentShader::FragmentShader() {
+  m_index = glCreateShader(GL_FRAGMENT_SHADER);
 }
 
-FragmentShaderPtr FragmentShader::loadFromSource(const std::string& source) {
-  auto fragShader = FragmentShader::create();
-
-  const char* data  = source.c_str();
-  const auto length = static_cast<int>(source.size());
-
-  glShaderSource(fragShader->getIndex(), 1, &data, &length);
-
-  fragShader->compile();
-
+FragmentShader FragmentShader::loadFromSource(const std::string& source) {
+  FragmentShader fragShader;
+  fragShader.loadSource(source);
   return fragShader;
 }
 
-GeometryShader::GeometryShader(std::string fileName) : GeometryShader() {
-  m_path = std::move(fileName);
-  load();
+GeometryShader::GeometryShader() {
+  m_index = glCreateShader(GL_GEOMETRY_SHADER);
 }
 
-GeometryShaderPtr GeometryShader::loadFromSource(const std::string& source) {
-  auto fragShader = GeometryShader::create();
-
-  const char* data  = source.c_str();
-  const auto length = static_cast<int>(source.size());
-
-  glShaderSource(fragShader->getIndex(), 1, &data, &length);
-
-  fragShader->compile();
-
-  return fragShader;
+GeometryShader GeometryShader::loadFromSource(const std::string& source) {
+  GeometryShader geomShader;
+  geomShader.loadSource(source);
+  return geomShader;
 }
 
 } // namespace Raz
