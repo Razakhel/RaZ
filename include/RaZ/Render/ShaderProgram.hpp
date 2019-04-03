@@ -14,20 +14,25 @@ namespace Raz {
 
 class ShaderProgram {
 public:
-  ShaderProgram() : m_index{ glCreateProgram() } {}
-  ShaderProgram(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, GeometryShaderPtr geomShader = nullptr)
+  ShaderProgram();
+  ShaderProgram(VertexShader vertShader, FragmentShader fragShader)
+    : ShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
+  ShaderProgram(VertexShader vertShader, FragmentShader fragShader, GeometryShader geomShader)
     : ShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader), std::move(geomShader)); }
 
-  GLuint getIndex() const { return m_index; }
+  unsigned int getIndex() const { return m_index; }
 
-  void setVertexShader(VertexShaderPtr vertShader);
-  void setFragmentShader(FragmentShaderPtr fragShader);
-  void setGeometryShader(GeometryShaderPtr geomShader);
-  void setShaders(VertexShaderPtr vertShader, FragmentShaderPtr fragShader, GeometryShaderPtr geomShader = nullptr);
+  void setVertexShader(VertexShader vertShader);
+  void setFragmentShader(FragmentShader fragShader);
+  void setGeometryShader(GeometryShader geomShader);
+  void setShaders(VertexShader vertShader, FragmentShader fragShader);
+  void setShaders(VertexShader vertShader, FragmentShader fragShader, GeometryShader geomShader);
 
+  void loadShaders() const;
+  void compileShaders() const;
   void link() const;
+  void use() const;
   void updateShaders() const;
-  void use() const { glUseProgram(m_index); }
   void createUniform(const std::string& uniformName);
   int recoverUniformLocation(const std::string& uniformName) const;
   template <typename T> void sendUniform(int uniformIndex, T value) const;
@@ -39,14 +44,11 @@ public:
   void destroyGeometryShader();
 
 private:
-  void loadShaders() const;
-  void compileShaders() const;
+  unsigned int m_index;
 
-  GLuint m_index;
-
-  VertexShaderPtr m_vertShader {};
-  FragmentShaderPtr m_fragShader {};
-  GeometryShaderPtr m_geomShader {};
+  VertexShader m_vertShader {};
+  FragmentShader m_fragShader {};
+  std::unique_ptr<GeometryShader> m_geomShader {};
 
   std::unordered_map<std::string, int> m_uniforms;
 };
