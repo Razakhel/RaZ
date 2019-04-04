@@ -3,44 +3,36 @@
 #ifndef RAZ_FRAMEBUFFER_HPP
 #define RAZ_FRAMEBUFFER_HPP
 
-#include "GL/glew.h"
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
-class Framebuffer;
-using FramebufferPtr = std::unique_ptr<Framebuffer>;
-
 class Framebuffer {
 public:
-  Framebuffer(unsigned int width, unsigned int height, const std::string& fragShaderPath);
+  Framebuffer();
+  explicit Framebuffer(ShaderProgram& program);
+  Framebuffer(unsigned int width, unsigned int height, ShaderProgram& program);
 
   const TexturePtr& getDepthBuffer() const { return m_depthBuffer; }
-  TexturePtr& getDepthBuffer() { return m_depthBuffer; }
-  const TexturePtr& getColorBuffer() const { return m_colorBuffer; }
-  TexturePtr& getColorBuffer() { return m_colorBuffer; }
   const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
-  TexturePtr& getNormalBuffer() { return m_normalBuffer; }
-  const ShaderProgram& getProgram() const { return m_program; }
+  const TexturePtr& getColorBuffer() const { return m_colorBuffer; }
 
-  template <typename... Args>
-  static FramebufferPtr create(Args&&... args) { return std::make_unique<Framebuffer>(std::forward<Args>(args)...); }
-
-  void initBuffers() const;
+  void initBuffers(const ShaderProgram& program) const;
   void bind() const;
-  void unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-  void display() const;
+  void unbind() const;
+  void display(const ShaderProgram& program) const;
+  void resize(unsigned int width, unsigned int height);
+  void assignVertexShader(ShaderProgram& program) const;
 
-  ~Framebuffer() { glDeleteFramebuffers(1, &m_index); }
+  ~Framebuffer();
 
 private:
-  GLuint m_index;
-  TexturePtr m_depthBuffer;
-  TexturePtr m_colorBuffer;
-  TexturePtr m_normalBuffer;
-  ShaderProgram m_program;
+  unsigned int m_index {};
+  TexturePtr m_depthBuffer {};
+  TexturePtr m_normalBuffer {};
+  TexturePtr m_colorBuffer {};
 };
 
 } // namespace Raz
