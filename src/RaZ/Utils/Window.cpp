@@ -1,5 +1,15 @@
 #include <iostream>
 
+#include "GL/glew.h"
+#if defined(_WIN32)
+#if defined(_MSC_VER)
+#define NOMINMAX
+#endif
+#include "GL/wglew.h"
+#elif defined(__gnu_linux__)
+#include "GL/glxew.h"
+#endif
+#include "GLFW/glfw3.h"
 #include "RaZ/Utils/Window.hpp"
 
 namespace Raz {
@@ -93,6 +103,10 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glEnable(GL_DEPTH_TEST);
 }
 
+void Window::setTitle(const std::string& title) const {
+  glfwSetWindowTitle(m_window, title.c_str());
+}
+
 void Window::setIcon(const Image& img) const {
   const GLFWimage icon = { static_cast<int>(img.getWidth()),
                            static_cast<int>(img.getHeight()),
@@ -138,6 +152,10 @@ void Window::enableVerticalSync(bool value) const {
     std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
   }
 #endif
+}
+
+void Window::changeCursorState(Cursor::State state) const {
+  glfwSetInputMode(m_window, GLFW_CURSOR, state);
 }
 
 void Window::addKeyCallback(Keyboard::Key key, std::function<void(float)> actionPress,
@@ -303,6 +321,10 @@ Vec2f Window::recoverMousePosition() const {
   glfwGetCursorPos(m_window, &xPos, &yPos);
 
   return Vec2f({ static_cast<float>(xPos), static_cast<float>(yPos) });
+}
+
+void Window::setShouldClose() const {
+  glfwSetWindowShouldClose(m_window, true);
 }
 
 void Window::close() {

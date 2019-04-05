@@ -3,6 +3,8 @@
 #ifndef RAZ_APPLICATION_HPP
 #define RAZ_APPLICATION_HPP
 
+#include <chrono>
+
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Utils/Window.hpp"
