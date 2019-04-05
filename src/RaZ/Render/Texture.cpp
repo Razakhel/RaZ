@@ -1,9 +1,14 @@
 #include <array>
 #include <unordered_map>
 
+#include "GL/glew.h"
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
+
+Texture::Texture() {
+  glGenTextures(1, &m_index);
+}
 
 Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace) : Texture() {
   bind();
@@ -47,6 +52,10 @@ TexturePtr Texture::recoverTexture(TexturePreset preset) {
   };
 
   return texturePresets[static_cast<std::size_t>(preset)];
+}
+
+void Texture::activate(uint8_t index) {
+  glActiveTexture(GL_TEXTURE0 + index);
 }
 
 void Texture::load(const std::string& fileName) {
@@ -109,6 +118,18 @@ void Texture::load(const std::string& fileName) {
     m_image.reset();
     makePlainColored(Vec3b(static_cast<uint8_t>(TexturePreset::WHITE)));
   }
+}
+
+void Texture::bind() const {
+  glBindTexture(GL_TEXTURE_2D, m_index);
+}
+
+void Texture::unbind() const {
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+Texture::~Texture() {
+  glDeleteTextures(1, &m_index);
 }
 
 void Texture::makePlainColored(const Vec3b& color) const {
