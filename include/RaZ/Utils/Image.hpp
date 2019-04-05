@@ -7,8 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "GL/glew.h"
-
 namespace Raz {
 
 struct ImageData;
@@ -23,8 +21,10 @@ using ImageDataFPtr = std::unique_ptr<ImageDataF>;
 class Image;
 using ImagePtr = std::unique_ptr<Image>;
 
-enum class ImageDataType : uint8_t { BYTE = 0,
-                                     FLOAT };
+enum class ImageDataType : uint8_t {
+  BYTE = 0,
+  FLOAT
+};
 
 struct ImageData {
   virtual ImageDataType getDataType() const = 0;
@@ -62,11 +62,13 @@ struct ImageDataF : public ImageData {
   std::vector<float> data;
 };
 
-enum class ImageColorspace { GRAY = GL_RED,
-                             GRAY_ALPHA = GL_RG,
-                             RGB = GL_RGB,
-                             RGBA = GL_RGBA,
-                             DEPTH = GL_DEPTH_COMPONENT };
+enum class ImageColorspace {
+  GRAY       = 6403,  // GL_RED
+  GRAY_ALPHA = 33319, // GL_RG
+  RGB        = 6407,  // GL_RGB
+  RGBA       = 6408,  // GL_RGBA
+  DEPTH      = 6402   // GL_DEPTH_COMPONENT
+};
 
 class Image {
 public:
@@ -88,7 +90,7 @@ public:
 private:
   void readPng(std::ifstream& file, bool reverse);
   void savePng(std::ofstream& file, bool reverse) const;
-  void readTga(std::ifstream& fileStream);
+  void readTga(std::ifstream& file);
   //void saveTga(std::ofstream& file) const;
 
   unsigned int m_width {};
