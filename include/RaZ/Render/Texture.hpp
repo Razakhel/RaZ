@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 
-#include "GL/glew.h"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
 
@@ -24,29 +23,29 @@ using TexturePtr = std::shared_ptr<Texture>;
 
 class Texture {
 public:
-  Texture() { glGenTextures(1, &m_index); }
+  Texture();
   explicit Texture(uint8_t value) : Texture() { makePlainColored(Vec3b(value)); }
   Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
 
-  GLuint getIndex() const { return m_index; }
+  unsigned int getIndex() const { return m_index; }
 
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
   static TexturePtr recoverTexture(TexturePreset preset);
-  static void activate(uint8_t index) { glActiveTexture(GL_TEXTURE0 + index); }
+  static void activate(uint8_t index);
 
   void load(const std::string& fileName);
   void save(const std::string& fileName, bool reverse = false) const { m_image->save(fileName, reverse); }
-  void bind() const { glBindTexture(GL_TEXTURE_2D, m_index); }
-  void unbind() const { glBindTexture(GL_TEXTURE_2D, 0); }
+  void bind() const;
+  void unbind() const;
 
-  ~Texture() { glDeleteTextures(1, &m_index); }
+  ~Texture();
 
 private:
   void makePlainColored(const Vec3b& color) const;
 
-  GLuint m_index {};
+  unsigned int m_index {};
   ImagePtr m_image {};
 };
 
