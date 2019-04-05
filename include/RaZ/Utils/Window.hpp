@@ -3,21 +3,9 @@
 #ifndef RAZ_WINDOW_HPP
 #define RAZ_WINDOW_HPP
 
-#include <chrono>
 #include <functional>
-#include <memory>
 #include <vector>
 
-#include "GL/glew.h"
-#if defined(_WIN32)
-#if defined(_MSC_VER)
-#define NOMINMAX
-#endif
-#include "GL/wglew.h"
-#elif defined(__gnu_linux__)
-#include "GL/glxew.h"
-#endif
-#include "GLFW/glfw3.h"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Overlay.hpp"
@@ -45,7 +33,7 @@ public:
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
   void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f({ red, green, blue, alpha })); }
-  void setTitle(const std::string& title) const { glfwSetWindowTitle(m_window, title.c_str()); }
+  void setTitle(const std::string& title) const;
   void setIcon(const Image& img) const;
   void setIcon(const std::string& fileName) const { setIcon(Image(fileName, true)); }
 
@@ -68,7 +56,7 @@ public:
   /// Defines the new behavior of the mouse's cursor, if it should be shown, hidden or disabled.
   /// The functions showCursor(), hideCursor() & disableCursor() can be used instead.
   /// \param state State to apply.
-  void changeCursorState(Cursor::State state) const { glfwSetInputMode(m_window, GLFW_CURSOR, state); }
+  void changeCursorState(Cursor::State state) const;
   /// Shows the mouse cursor.
   /// Default behavior.
   void showCursor() const { changeCursorState(Cursor::State::NORMAL); }
@@ -142,7 +130,7 @@ public:
   /// \return 2D vector representing the mouse's position relative to the window.
   Vec2f recoverMousePosition() const;
   /// Tells the window that it should close.
-  void setShouldClose() const { glfwSetWindowShouldClose(m_window, true); }
+  void setShouldClose() const;
   /// Closes the window.
   void close();
 
