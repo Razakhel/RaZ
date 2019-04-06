@@ -7,7 +7,7 @@ namespace Raz {
 void Mesh::importOff(std::ifstream& file) {
   m_submeshes.emplace_back(Submesh::create());
 
-  const SubmeshPtr& submesh = m_submeshes.front();
+  SubmeshPtr& submesh = m_submeshes.front();
 
   std::size_t vertexCount, faceCount;
   file.ignore(3);

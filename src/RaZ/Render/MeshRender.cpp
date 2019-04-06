@@ -5,7 +5,7 @@ namespace Raz {
 std::size_t Mesh::recoverVertexCount() const {
   std::size_t vertexCount = 0;
 
-  for (const auto& submesh : m_submeshes)
+  for (const SubmeshPtr& submesh : m_submeshes)
     vertexCount += submesh->getVertexCount();
 
   return vertexCount;
@@ -14,7 +14,7 @@ std::size_t Mesh::recoverVertexCount() const {
 std::size_t Mesh::recoverTriangleCount() const {
   std::size_t indexCount = 0;
 
-  for (const auto& submesh : m_submeshes)
+  for (const SubmeshPtr& submesh : m_submeshes)
     indexCount += submesh->getIndexCount();
 
   return indexCount / 3;
@@ -37,9 +37,9 @@ void Mesh::drawUnitCube() {
 }
 
 void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
-  const auto& newMaterial = Material::recoverMaterial(materialPreset, roughnessFactor);
+  const MaterialCookTorrancePtr& newMaterial = Material::recoverMaterial(materialPreset, roughnessFactor);
 
-  for (auto& material : m_materials) {
+  for (MaterialPtr& material : m_materials) {
     if (material->getType() == MaterialType::COOK_TORRANCE) {
       auto materialCT = dynamic_cast<MaterialCookTorrance*>(material.get());
 
@@ -59,26 +59,26 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
 }
 
 void Mesh::load() const {
-  for (const auto& submesh : m_submeshes)
+  for (const SubmeshPtr& submesh : m_submeshes)
     submesh->load();
 }
 
 void Mesh::load(const ShaderProgram& program) const {
   load();
 
-  for (const auto& material : m_materials)
+  for (const MaterialPtr& material : m_materials)
     material->initTextures(program);
 }
 
 void Mesh::draw() const {
-  for (const auto& submesh : m_submeshes)
+  for (const SubmeshPtr& submesh : m_submeshes)
     submesh->draw();
 }
 
 void Mesh::draw(const ShaderProgram& program) const {
-  for (const auto& submesh : m_submeshes) {
+  for (const SubmeshPtr& submesh : m_submeshes) {
     if (!m_materials.empty()) {
-      const auto& material = m_materials[submesh->getMaterialIndex()];
+      const MaterialPtr& material = m_materials[submesh->getMaterialIndex()];
 
       if (material)
         material->bindAttributes(program);

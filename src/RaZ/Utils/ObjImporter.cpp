@@ -33,7 +33,7 @@ TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textur
   if (loadedTexturePos != loadedTextures.cend()) {
     map = loadedTexturePos->second;
   } else {
-    const auto texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
+    const std::string texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
     map = Texture::create(texturePath);
     loadedTextures.emplace(textureFileName, map);
   }
@@ -46,7 +46,7 @@ void importMtl(const std::string& mtlFilePath,
                std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
-  auto standardMaterial = MaterialStandard::create();
+  auto standardMaterial     = MaterialStandard::create();
   auto cookTorranceMaterial = MaterialCookTorrance::create();
 
   bool isStandardMaterial = false;
@@ -256,7 +256,7 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
       std::string mtlFileName;
       file >> mtlFileName;
 
-      const auto mtlFilePath = FileUtils::extractPathToFile(filePath) + mtlFileName;
+      const std::string mtlFilePath = FileUtils::extractPathToFile(filePath) + mtlFileName;
 
       importMtl(mtlFilePath, m_materials, materialCorrespIndices);
     } else if (line[0] == 'u') {
@@ -376,7 +376,7 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
     }
 
     // Normalizing tangents to become unit vectors & to be averaged after being accumulated
-    for (auto& vertex : submesh->getVertices())
+    for (Vertex& vertex : submesh->getVertices())
       vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
   }
 }
