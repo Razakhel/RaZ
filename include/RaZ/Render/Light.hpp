@@ -10,9 +10,11 @@
 
 namespace Raz {
 
-enum class LightType { POINT = 0,
-                       DIRECTIONAL,
-                       SPOT };
+enum class LightType {
+  POINT = 0,
+  DIRECTIONAL,
+  SPOT
+};
 
 class Light : public Component {
 public:

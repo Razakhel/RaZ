@@ -3,6 +3,16 @@
 namespace Raz {
 
 void Submesh::load() const {
+  loadVertices();
+  loadIndices();
+}
+
+void Submesh::draw() const {
+  m_vao.bind();
+  glDrawElements(GL_TRIANGLES, static_cast<int>(getIndexCount()), GL_UNSIGNED_INT, nullptr);
+}
+
+void Submesh::loadVertices() const {
   m_vao.bind();
 
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -10,7 +20,13 @@ void Submesh::load() const {
                getIndices().data(),
                GL_STATIC_DRAW);
 
+  m_vao.unbind();
+}
+
+void Submesh::loadIndices() const {
+  m_vao.bind();
   m_vbo.bind();
+
   glBufferData(GL_ARRAY_BUFFER,
                static_cast<int64_t>(sizeof(getVertices().front()) * getVertices().size()),
                getVertices().data(),
@@ -47,11 +63,6 @@ void Submesh::load() const {
 
   m_vbo.unbind();
   m_vao.unbind();
-}
-
-void Submesh::draw() const {
-  m_vao.bind();
-  glDrawElements(GL_TRIANGLES, static_cast<int>(getIndexCount()), GL_UNSIGNED_INT, nullptr);
 }
 
 } // namespace Raz

@@ -137,8 +137,8 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
   std::map<std::array<float, 2>, std::size_t> texCorrespIndices;
   std::map<std::array<float, 3>, std::size_t> normCorrespIndices;
 
-  for (const auto& submesh : m_submeshes) {
-    for (const auto& vertex : submesh->getVertices()) {
+  for (const SubmeshPtr& submesh : m_submeshes) {
+    for (const Vertex& vertex : submesh->getVertices()) {
       const std::array<float, 3> pos = { vertex.position[0], vertex.position[1], vertex.position[2] };
 
       if (posCorrespIndices.find(pos) == posCorrespIndices.cend()) {
@@ -167,10 +167,10 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
     }
   }
 
-  const auto fileName = FileUtils::extractFileNameFromPath(filePath, false);
+  const std::string fileName = FileUtils::extractFileNameFromPath(filePath, false);
 
   for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
-    const auto& submesh = m_submeshes[submeshIndex];
+    const SubmeshPtr& submesh = m_submeshes[submeshIndex];
 
     file << "\no " << fileName << '_' << submeshIndex << '\n';
 
@@ -181,7 +181,7 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
       file << "f ";
 
       // First vertex
-      auto vertex = submesh->getVertices()[submesh->getIndices()[i + 1]];
+      Vertex vertex = submesh->getVertices()[submesh->getIndices()[i + 1]];
 
       std::array<float, 3> pos  = { vertex.position[0], vertex.position[1], vertex.position[2] };
       std::array<float, 2> tex  = { vertex.texcoords[0], vertex.texcoords[1] };

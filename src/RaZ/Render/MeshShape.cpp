@@ -27,14 +27,14 @@ Mesh::Mesh(const Triangle& triangle) : Mesh() {
   thirdVert.normal  = (thirdPos - firstPos).cross(thirdPos - secondPos).normalize();
 
   std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
-  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
-
   vertices.resize(3);
-  indices.resize(3);
 
   vertices[0] = firstVert;
   vertices[1] = secondVert;
   vertices[2] = thirdVert;
+
+  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
+  indices.resize(3);
 
   indices[0] = 1;
   indices[1] = 0;
@@ -73,15 +73,15 @@ Mesh::Mesh(const Quad& quad) : Mesh() {
   leftBottom.normal  = (leftBottomPos - leftTopPos).cross(leftBottomPos - rightBottomPos).normalize();
 
   std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
-  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
-
   vertices.resize(4);
-  indices.resize(6);
 
   vertices[0] = leftTop;
   vertices[1] = leftBottom;
   vertices[2] = rightBottom;
   vertices[3] = rightTop;
+
+  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
+  indices.resize(6);
 
   indices[0] = 0;
   indices[1] = 1;
@@ -144,10 +144,7 @@ Mesh::Mesh(const AABB& box) : Mesh() {
   // TODO: compute normals
 
   std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
-  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
-
   vertices.resize(8);
-  indices.resize(36);
 
   vertices[0] = rightTopBack;
   vertices[1] = rightTopFront;
@@ -160,6 +157,9 @@ Mesh::Mesh(const AABB& box) : Mesh() {
 
   vertices[6] = leftBottomBack;
   vertices[7] = leftBottomFront;
+
+  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
+  indices.resize(36);
 
   // Right face
   indices[0] = 1;
