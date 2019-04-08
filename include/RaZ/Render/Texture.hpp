@@ -21,6 +21,7 @@ enum class TexturePreset : uint8_t {
 class Texture;
 using TexturePtr = std::shared_ptr<Texture>;
 
+/// Texture class, handling images to be displayed into the scene.
 class Texture {
 public:
   Texture();
@@ -32,17 +33,31 @@ public:
 
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
-  static TexturePtr recoverTexture(TexturePreset preset);
-  static void activate(uint8_t index);
 
-  void load(const std::string& fileName);
-  void save(const std::string& fileName, bool reverse = false) const { m_image->save(fileName, reverse); }
+  /// Gets a texture based on a given preset.
+  /// \param preset Preset of the texture to get.
+  /// \return Recovered texture.
+  static TexturePtr recoverTexture(TexturePreset preset);
+  /// Activates the texture at the given index.
+  /// \param index Index of the active texture to set.
+  static void activate(uint8_t index);
+  /// Reads the texture in memory & loads it onto the graphics card.
+  /// \param filePath Path to the texture to load.
+  void load(const std::string& filePath);
+  /// Saves the texture on disk.
+  /// \param filePath Path to where to save the texture.
+  /// \param reverse Reverse the texture when saving.
+  void save(const std::string& filePath, bool reverse = false) const { m_image->save(filePath, reverse); }
+  /// Binds the texture.
   void bind() const;
+  /// Unbinds the texture.
   void unbind() const;
 
   ~Texture();
 
 private:
+  /// Fills the texture with a single pixel (creates a single-colored 1x1 texture).
+  /// \param color Color to fill the texture with.
   void makePlainColored(const Vec3b& color) const;
 
   unsigned int m_index {};
