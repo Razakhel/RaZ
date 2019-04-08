@@ -58,8 +58,8 @@ void Texture::activate(uint8_t index) {
   glActiveTexture(GL_TEXTURE0 + index);
 }
 
-void Texture::load(const std::string& fileName) {
-  m_image = Image::create(fileName);
+void Texture::load(const std::string& filePath) {
+  m_image = Image::create(filePath);
 
   if (!m_image->isEmpty()) {
     bind();
