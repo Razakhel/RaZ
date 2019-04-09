@@ -23,17 +23,17 @@ public:
   Submesh() = default;
   explicit Submesh(RenderMode renderMode) : m_renderMode{ renderMode } {}
   Submesh(const Submesh&) = delete;
-  Submesh(Submesh&&) = default;
+  Submesh(Submesh&&) noexcept = default;
 
-  const VertexArray& getVao() const { return m_vao; }
-  const VertexBuffer& getVbo() const { return m_vbo; }
-  const ElementBuffer& getEbo() const { return m_vao.getEbo(); }
   const std::vector<Vertex>& getVertices() const { return m_vbo.getVertices(); }
   std::vector<Vertex>& getVertices() { return m_vbo.getVertices(); }
-  std::size_t getVertexCount() const { return m_vbo.getVertices().size(); }
-  const std::vector<unsigned int>& getIndices() const { return m_vao.getEbo().getIndices(); }
-  std::vector<unsigned int>& getIndices() { return m_vao.getEbo().getIndices(); }
-  std::size_t getIndexCount() const { return getEbo().getIndices().size(); }
+  std::size_t getVertexCount() const { return getVertices().size(); }
+  const std::vector<unsigned int>& getTriangleIndices() const { return m_vao.getEbo().getTriangleIndices(); }
+  std::vector<unsigned int>& getTriangleIndices() { return m_vao.getEbo().getTriangleIndices(); }
+  const std::vector<unsigned int>& getLineIndices() const { return m_vao.getEbo().getLineIndices(); }
+  std::vector<unsigned int>& getLineIndices() { return m_vao.getEbo().getLineIndices(); }
+  std::size_t getTriangleIndexCount() const { return getLineIndices().size(); }
+  std::size_t getLineIndexCount() const { return getLineIndices().size(); }
   RenderMode getRenderMode() const { return m_renderMode; }
   std::size_t getMaterialIndex() const { return m_materialIndex; }
 
@@ -49,7 +49,7 @@ public:
   void draw() const;
 
   Submesh& operator=(const Submesh&) = delete;
-  Submesh& operator=(Submesh&&) = default;
+  Submesh& operator=(Submesh&&) noexcept = default;
 
 private:
   void loadVertices() const;
