@@ -5,7 +5,6 @@
 
 #include <vector>
 
-#include "GL/glew.h"
 #include "RaZ/Math/Vector.hpp"
 
 namespace Raz {
@@ -25,69 +24,69 @@ struct Vertex {
 
 class VertexArray {
 public:
-  VertexArray() { glGenVertexArrays(1, &m_index); }
+  VertexArray();
   VertexArray(const VertexArray&) = delete;
   VertexArray(VertexArray&&) noexcept = default;
 
-  GLuint getIndex() const { return m_index; }
+  unsigned int getIndex() const { return m_index; }
 
-  void bind() const { glBindVertexArray(m_index); }
-  void unbind() const { glBindVertexArray(0); }
+  void bind() const;
+  void unbind() const;
 
   VertexArray& operator=(const VertexArray&) = delete;
   VertexArray& operator=(VertexArray&&) noexcept = default;
 
-  ~VertexArray() { glDeleteVertexArrays(1, &m_index); }
+  ~VertexArray();
 
 private:
-  GLuint m_index {};
+  unsigned int m_index {};
 };
 
 class VertexBuffer {
 public:
-  VertexBuffer() { glGenBuffers(1, &m_index); }
+  VertexBuffer();
   VertexBuffer(const VertexBuffer&) = delete;
   VertexBuffer(VertexBuffer&&) noexcept = default;
 
-  GLuint getIndex() const { return m_index; }
+  unsigned int getIndex() const { return m_index; }
   const std::vector<Vertex>& getVertices() const { return m_vertices; }
   std::vector<Vertex>& getVertices() { return m_vertices; }
 
-  void bind() const { glBindBuffer(GL_ARRAY_BUFFER, m_index); }
-  void unbind() const { glBindBuffer(GL_ARRAY_BUFFER, 0); }
+  void bind() const;
+  void unbind() const;
 
   VertexBuffer& operator=(const VertexBuffer&) = delete;
   VertexBuffer& operator=(VertexBuffer&&) noexcept = default;
 
-  ~VertexBuffer() { glDeleteBuffers(1, &m_index); }
+  ~VertexBuffer();
 
 private:
-  GLuint m_index {};
+  unsigned int m_index {};
   std::vector<Vertex> m_vertices {};
 };
 
 class IndexBuffer {
 public:
-  IndexBuffer() { glGenBuffers(1, &m_index); }
+  IndexBuffer();
   IndexBuffer(const IndexBuffer&) = delete;
   IndexBuffer(IndexBuffer&&) noexcept = default;
 
-  GLuint getIndex() const { return m_index; }
+  unsigned int getIndex() const { return m_index; }
   const std::vector<unsigned int>& getLineIndices() const { return m_lineIndices; }
   std::vector<unsigned int>& getLineIndices() { return m_lineIndices; }
   const std::vector<unsigned int>& getTriangleIndices() const { return m_triangleIndices; }
   std::vector<unsigned int>& getTriangleIndices() noexcept { return m_triangleIndices; }
 
-  void bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index); }
-  void unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
+  void bind() const;
+  void unbind() const;
 
   IndexBuffer& operator=(const IndexBuffer&) = delete;
   IndexBuffer& operator=(IndexBuffer&&) noexcept = default;
 
-  ~IndexBuffer() { glDeleteBuffers(1, &m_index); }
+  ~IndexBuffer();
 
 private:
-  GLuint m_index {};
+  unsigned int m_index {};
   std::vector<unsigned int> m_lineIndices {};
   std::vector<unsigned int> m_triangleIndices {};
 };
