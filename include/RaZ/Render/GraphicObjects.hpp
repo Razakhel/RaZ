@@ -26,7 +26,7 @@ class VertexArray {
 public:
   VertexArray();
   VertexArray(const VertexArray&) = delete;
-  VertexArray(VertexArray&&) noexcept = default;
+  VertexArray(VertexArray&& vao) noexcept;
 
   unsigned int getIndex() const { return m_index; }
 
@@ -34,7 +34,7 @@ public:
   void unbind() const;
 
   VertexArray& operator=(const VertexArray&) = delete;
-  VertexArray& operator=(VertexArray&&) noexcept = default;
+  VertexArray& operator=(VertexArray&& vao) noexcept;
 
   ~VertexArray();
 
@@ -46,7 +46,7 @@ class VertexBuffer {
 public:
   VertexBuffer();
   VertexBuffer(const VertexBuffer&) = delete;
-  VertexBuffer(VertexBuffer&&) noexcept = default;
+  VertexBuffer(VertexBuffer&& vbo) noexcept;
 
   unsigned int getIndex() const { return m_index; }
   const std::vector<Vertex>& getVertices() const { return m_vertices; }
@@ -56,7 +56,7 @@ public:
   void unbind() const;
 
   VertexBuffer& operator=(const VertexBuffer&) = delete;
-  VertexBuffer& operator=(VertexBuffer&&) noexcept = default;
+  VertexBuffer& operator=(VertexBuffer&& vbo) noexcept;
 
   ~VertexBuffer();
 
@@ -69,7 +69,7 @@ class IndexBuffer {
 public:
   IndexBuffer();
   IndexBuffer(const IndexBuffer&) = delete;
-  IndexBuffer(IndexBuffer&&) noexcept = default;
+  IndexBuffer(IndexBuffer&& ibo) noexcept;
 
   unsigned int getIndex() const { return m_index; }
   const std::vector<unsigned int>& getLineIndices() const { return m_lineIndices; }
@@ -81,7 +81,7 @@ public:
   void unbind() const;
 
   IndexBuffer& operator=(const IndexBuffer&) = delete;
-  IndexBuffer& operator=(IndexBuffer&&) noexcept = default;
+  IndexBuffer& operator=(IndexBuffer&& ibo) noexcept;
 
   ~IndexBuffer();
 
