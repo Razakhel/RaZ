@@ -79,7 +79,7 @@ void IndexBuffer::unbind() const {
 
 IndexBuffer& IndexBuffer::operator=(IndexBuffer&& ibo) noexcept {
   std::swap(m_index, ibo.m_index);
-  m_lineIndices = std::move(ibo.m_lineIndices);
+  m_lineIndices     = std::move(ibo.m_lineIndices);
   m_triangleIndices = std::move(ibo.m_triangleIndices);
 
   return *this;
