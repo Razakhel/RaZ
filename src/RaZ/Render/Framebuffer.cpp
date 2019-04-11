@@ -31,6 +31,12 @@ Framebuffer::Framebuffer(unsigned int width, unsigned int height, ShaderProgram&
   unbind();
 }
 
+Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
+  : m_index{ std::exchange(fbo.m_index, GL_INVALID_INDEX) },
+    m_depthBuffer{ std::move(fbo.m_depthBuffer) },
+    m_normalBuffer{ std::move(fbo.m_normalBuffer) },
+    m_colorBuffer{ std::move(fbo.m_colorBuffer) } {}
+
 void Framebuffer::initBuffers(const ShaderProgram& program) const {
   bind();
 
@@ -93,7 +99,19 @@ void Framebuffer::assignVertexShader(ShaderProgram& program) const {
   program.setVertexShader(VertexShader::loadFromSource(vertSource));
 }
 
+Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
+  std::swap(m_index, fbo.m_index);
+  m_depthBuffer  = std::move(fbo.m_depthBuffer);
+  m_normalBuffer = std::move(fbo.m_normalBuffer);
+  m_colorBuffer  = std::move(fbo.m_colorBuffer);
+
+  return *this;
+}
+
 Framebuffer::~Framebuffer() {
+  if (m_index == GL_INVALID_INDEX)
+    return;
+
   glDeleteFramebuffers(1, &m_index);
 }
 

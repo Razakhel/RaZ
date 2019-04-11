@@ -14,6 +14,8 @@ public:
   Framebuffer();
   explicit Framebuffer(ShaderProgram& program);
   Framebuffer(unsigned int width, unsigned int height, ShaderProgram& program);
+  Framebuffer(const Framebuffer&) = delete;
+  Framebuffer(Framebuffer&& fbo) noexcept;
 
   const TexturePtr& getDepthBuffer() const { return m_depthBuffer; }
   const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
@@ -25,6 +27,9 @@ public:
   void display(const ShaderProgram& program) const;
   void resize(unsigned int width, unsigned int height);
   void assignVertexShader(ShaderProgram& program) const;
+
+  Framebuffer& operator=(const Framebuffer&) = delete;
+  Framebuffer& operator=(Framebuffer&& fbo) noexcept;
 
   ~Framebuffer();
 
