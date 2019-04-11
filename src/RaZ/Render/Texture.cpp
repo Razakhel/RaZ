@@ -45,6 +45,9 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
   unbind();
 }
 
+Texture::Texture(Texture&& texture) noexcept
+  : m_index{ std::exchange(texture.m_index, GL_INVALID_INDEX) }, m_image{ std::move(texture.m_image) } {}
+
 TexturePtr Texture::recoverTexture(TexturePreset preset) {
   static const std::array<TexturePtr, static_cast<std::size_t>(TexturePreset::PRESET_COUNT)> texturePresets = {
     Texture::create(0),  // BLACK
@@ -128,7 +131,17 @@ void Texture::unbind() const {
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+Texture& Texture::operator=(Texture&& texture) noexcept {
+  std::swap(m_index, texture.m_index);
+  m_image = std::move(texture.m_image);
+
+  return *this;
+}
+
 Texture::~Texture() {
+  if (m_index == GL_INVALID_INDEX)
+    return;
+
   glDeleteTextures(1, &m_index);
 }
 

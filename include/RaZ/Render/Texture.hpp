@@ -28,6 +28,8 @@ public:
   explicit Texture(uint8_t value) : Texture() { makePlainColored(Vec3b(value)); }
   Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
   explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
+  Texture(const Texture&) = delete;
+  Texture(Texture&& texture) noexcept;
 
   unsigned int getIndex() const { return m_index; }
 
@@ -52,6 +54,9 @@ public:
   void bind() const;
   /// Unbinds the texture.
   void unbind() const;
+
+  Texture& operator=(const Texture&) = delete;
+  Texture& operator=(Texture&& texture) noexcept;
 
   ~Texture();
 
