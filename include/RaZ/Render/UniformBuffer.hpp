@@ -12,25 +12,29 @@ namespace Raz {
 
 class UniformBuffer {
 public:
-  UniformBuffer() { glGenBuffers(1, &m_index); }
+  UniformBuffer();
   explicit UniformBuffer(unsigned int size, unsigned int bindingIndex);
-  UniformBuffer(const UniformBuffer&) = default;
+  UniformBuffer(const UniformBuffer&) = delete;
+  UniformBuffer(UniformBuffer&& ubo) noexcept;
 
-  GLuint getIndex() const { return m_index; }
+  unsigned int getIndex() const { return m_index; }
 
   void bindUniformBlock(const ShaderProgram& program, unsigned int uboIndex, unsigned int bindingIndex) const;
   void bindUniformBlock(const ShaderProgram& program, const std::string& uboName, unsigned int bindingIndex) const;
-  void bindBufferBase(unsigned int bindingIndex) const { glBindBufferBase(GL_UNIFORM_BUFFER, bindingIndex, m_index); }
-  void bind() const { glBindBuffer(GL_UNIFORM_BUFFER, m_index); }
-  void unbind() const { glBindBuffer(GL_UNIFORM_BUFFER, 0); }
+  void bindBufferBase(unsigned int bindingIndex) const;
+  void bind() const;
+  void unbind() const;
   template <typename T> void sendData(T data, unsigned int offset) const;
   template <typename T, std::size_t Size> void sendData(const Vector<T, Size>& vec, unsigned int offset) const;
   template <typename T, std::size_t W, std::size_t H> void sendData(const Matrix<T, W, H>& mat, unsigned int offset) const;
 
-  ~UniformBuffer() { glDeleteBuffers(1, &m_index); }
+  UniformBuffer& operator=(const UniformBuffer&) = delete;
+  UniformBuffer& operator=(UniformBuffer&& ubo) noexcept;
+
+  ~UniformBuffer();
 
 private:
-  GLuint m_index {};
+  unsigned int m_index {};
 };
 
 } // namespace Raz
