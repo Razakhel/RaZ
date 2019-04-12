@@ -20,14 +20,16 @@ public:
     : ShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
   ShaderProgram(VertexShader vertShader, FragmentShader fragShader, GeometryShader geomShader)
     : ShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader), std::move(geomShader)); }
+  ShaderProgram(const ShaderProgram&) = delete;
+  ShaderProgram(ShaderProgram&& program) noexcept;
 
   unsigned int getIndex() const { return m_index; }
 
-  void setVertexShader(VertexShader vertShader);
-  void setFragmentShader(FragmentShader fragShader);
-  void setGeometryShader(GeometryShader geomShader);
-  void setShaders(VertexShader vertShader, FragmentShader fragShader);
-  void setShaders(VertexShader vertShader, FragmentShader fragShader, GeometryShader geomShader);
+  void setVertexShader(VertexShader&& vertShader);
+  void setFragmentShader(FragmentShader&& fragShader);
+  void setGeometryShader(GeometryShader&& geomShader);
+  void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader);
+  void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader);
 
   /// Loads all the shaders contained by the program.
   void loadShaders() const;
@@ -77,6 +79,11 @@ public:
   void destroyFragmentShader();
   /// Destroys the geometry shader (if any), detaching it from the program & deleting it.
   void destroyGeometryShader();
+
+  ShaderProgram& operator=(const ShaderProgram&) = delete;
+  ShaderProgram& operator=(ShaderProgram&& program) noexcept;
+
+  ~ShaderProgram();
 
 private:
   unsigned int m_index {};

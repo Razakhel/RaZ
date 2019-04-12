@@ -11,29 +11,36 @@ namespace Raz {
 ShaderProgram::ShaderProgram()
   : m_index{ glCreateProgram() } {}
 
-void ShaderProgram::setVertexShader(VertexShader vertShader) {
+ShaderProgram::ShaderProgram(ShaderProgram&& program) noexcept
+  : m_index{ std::exchange(program.m_index, GL_INVALID_INDEX) },
+    m_vertShader{ std::move(program.m_vertShader) },
+    m_fragShader{ std::move(program.m_fragShader) },
+    m_geomShader{ std::move(program.m_geomShader) },
+    m_uniforms{ std::move(program.m_uniforms) } {}
+
+void ShaderProgram::setVertexShader(VertexShader&& vertShader) {
   m_vertShader = std::move(vertShader);
   glAttachShader(m_index, m_vertShader.getIndex());
 }
 
-void ShaderProgram::setFragmentShader(FragmentShader fragShader) {
+void ShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
   m_fragShader = std::move(fragShader);
   glAttachShader(m_index, m_fragShader.getIndex());
 }
 
-void ShaderProgram::setGeometryShader(GeometryShader geomShader) {
+void ShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
   m_geomShader = std::make_unique<GeometryShader>(std::move(geomShader));
   glAttachShader(m_index, m_geomShader->getIndex());
 }
 
-void ShaderProgram::setShaders(VertexShader vertShader, FragmentShader fragShader) {
+void ShaderProgram::setShaders(VertexShader&& vertShader, FragmentShader&& fragShader) {
   setVertexShader(std::move(vertShader));
   setFragmentShader(std::move(fragShader));
 
   updateShaders();
 }
 
-void ShaderProgram::setShaders(VertexShader vertShader, FragmentShader fragShader, GeometryShader geomShader) {
+void ShaderProgram::setShaders(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader) {
   setVertexShader(std::move(vertShader));
   setFragmentShader(std::move(fragShader));
   setGeometryShader(std::move(geomShader));
@@ -160,6 +167,23 @@ void ShaderProgram::destroyGeometryShader() {
   glDetachShader(m_index, m_geomShader->getIndex());
   m_geomShader->destroy();
   m_geomShader.reset();
+}
+
+ShaderProgram& ShaderProgram::operator=(ShaderProgram&& program) noexcept {
+  std::swap(m_index, program.m_index);
+  m_vertShader = std::move(program.m_vertShader);
+  m_fragShader = std::move(program.m_fragShader);
+  m_geomShader = std::move(program.m_geomShader);
+  m_uniforms   = std::move(program.m_uniforms);
+
+  return *this;
+}
+
+ShaderProgram::~ShaderProgram() {
+  if (m_index == GL_INVALID_INDEX)
+    return;
+
+  glDeleteProgram(m_index);
 }
 
 } // namespace Raz
