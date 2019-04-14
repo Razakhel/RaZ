@@ -1,3 +1,4 @@
+#include "GL/glew.h"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/Texture.hpp"
@@ -42,6 +43,7 @@ Cubemap::Cubemap() {
 
   m_program.setVertexShader(VertexShader::loadFromSource(vertSource));
   m_program.setFragmentShader(FragmentShader::loadFromSource(fragSource));
+  m_program.compileShaders();
   m_program.link();
 
   m_program.sendUniform("uniSkybox", 0);
@@ -128,6 +130,14 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   unbind();
+}
+
+void Cubemap::bind() const {
+  glBindTexture(GL_TEXTURE_CUBE_MAP, m_index);
+}
+
+void Cubemap::unbind() const {
+  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Cubemap::draw(const Camera& camera) const {
