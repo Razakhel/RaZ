@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 
-#include "GL/glew.h"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
@@ -45,15 +44,15 @@ public:
   /// \param viewProjMat View-projection matrix to be sent.
   void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_viewProjUbo.sendData(viewProjMat, 0); }
   /// Binds the cubemap texture.
-  void bind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, m_index); }
+  void bind() const;
   /// Unbinds the cubemap texture.
-  void unbind() const { glBindTexture(GL_TEXTURE_CUBE_MAP, 0); }
+  void unbind() const;
   /// Draws the cubemap around the scene.
   /// \param camera Camera component from which will be taken the view & projection matrices.
   void draw(const Camera& camera) const;
 
 private:
-  GLuint m_index {};
+  unsigned int m_index {};
   ShaderProgram m_program {};
   UniformBuffer m_viewProjUbo = UniformBuffer(sizeof(Mat4f), 1);
 };
