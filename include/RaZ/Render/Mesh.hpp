@@ -14,19 +14,16 @@
 
 namespace Raz {
 
-class Mesh;
-using MeshPtr = std::unique_ptr<Mesh>;
-
 class Mesh : public Component {
 public:
-  Mesh() { m_submeshes.emplace_back(Submesh::create()); }
+  Mesh() : m_submeshes(1) {}
   explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
   explicit Mesh(const Triangle& triangle);
   explicit Mesh(const Quad& quad);
   explicit Mesh(const AABB& box);
 
-  const std::vector<SubmeshPtr>& getSubmeshes() const { return m_submeshes; }
-  std::vector<SubmeshPtr>& getSubmeshes() { return m_submeshes; }
+  const std::vector<Submesh>& getSubmeshes() const { return m_submeshes; }
+  std::vector<Submesh>& getSubmeshes() { return m_submeshes; }
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
   std::size_t recoverVertexCount() const;
@@ -38,7 +35,7 @@ public:
 
   void import(const std::string& filePath);
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
-  void addSubmesh(SubmeshPtr submesh) { m_submeshes.emplace_back(std::move(submesh)); }
+  void addSubmesh(Submesh submesh = Submesh()) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
   void load() const;
   void load(const ShaderProgram& program) const;
@@ -55,7 +52,7 @@ private:
 
   void saveObj(std::ofstream& file, const std::string& filePath) const;
 
-  std::vector<SubmeshPtr> m_submeshes {};
+  std::vector<Submesh> m_submeshes {};
   std::vector<MaterialPtr> m_materials {};
 };
 

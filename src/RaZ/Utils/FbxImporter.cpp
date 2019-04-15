@@ -26,21 +26,23 @@ void Mesh::importFbx(const std::string& filePath) {
   // Recovering geometry
   for (int meshIndex = 0; meshIndex < scene->GetGeometryCount(); ++meshIndex) {
     const auto fbxMesh = static_cast<FbxMesh*>(scene->GetGeometry(meshIndex));
-    SubmeshPtr submesh = Submesh::create();
+    Submesh submesh;
 
     ////////////
     // Values //
     ////////////
 
+    std::vector<Vertex>& vertices = submesh.getVertices();
+
     // Recovering positions
-    submesh->getVertices().resize(fbxMesh->GetControlPointsCount());
+    vertices.resize(fbxMesh->GetControlPointsCount());
 
     for (int posIndex = 0; posIndex < fbxMesh->GetControlPointsCount(); ++posIndex) {
       const FbxVector4& pos = fbxMesh->GetControlPointAt(posIndex);
 
-      submesh->getVertices()[posIndex].position[0] = static_cast<float>(pos[0]);
-      submesh->getVertices()[posIndex].position[1] = static_cast<float>(pos[1]);
-      submesh->getVertices()[posIndex].position[2] = static_cast<float>(pos[2]);
+      vertices[posIndex].position[0] = static_cast<float>(pos[0]);
+      vertices[posIndex].position[1] = static_cast<float>(pos[1]);
+      vertices[posIndex].position[2] = static_cast<float>(pos[2]);
     }
 
     // Recovering texture coordinates (UVs)
@@ -51,8 +53,8 @@ void Mesh::importFbx(const std::string& filePath) {
       for (int texIndex = 0; texIndex < meshTexcoords->GetDirectArray().GetCount(); ++texIndex) {
         const FbxVector2& tex = meshTexcoords->GetDirectArray()[texIndex];
 
-        submesh->getVertices()[texIndex].texcoords[0] = static_cast<float>(tex[0]);
-        submesh->getVertices()[texIndex].texcoords[1] = static_cast<float>(tex[1]);
+        vertices[texIndex].texcoords[0] = static_cast<float>(tex[0]);
+        vertices[texIndex].texcoords[1] = static_cast<float>(tex[1]);
       }
     }
 
@@ -64,9 +66,9 @@ void Mesh::importFbx(const std::string& filePath) {
       for (int normIndex = 0; normIndex < meshNormals->GetDirectArray().GetCount(); ++normIndex) {
         const FbxVector4& norm = meshNormals->GetDirectArray()[normIndex];
 
-        submesh->getVertices()[normIndex].normal[0] = static_cast<float>(norm[0]);
-        submesh->getVertices()[normIndex].normal[1] = static_cast<float>(norm[1]);
-        submesh->getVertices()[normIndex].normal[2] = static_cast<float>(norm[2]);
+        vertices[normIndex].normal[0] = static_cast<float>(norm[0]);
+        vertices[normIndex].normal[1] = static_cast<float>(norm[1]);
+        vertices[normIndex].normal[2] = static_cast<float>(norm[2]);
       }
     }
 
@@ -79,24 +81,26 @@ void Mesh::importFbx(const std::string& filePath) {
       for (int tanIndex = 0; tanIndex < meshTangents->GetDirectArray().GetCount(); ++tanIndex) {
         const FbxVector4& tan = meshTangents->GetDirectArray()[tanIndex];
 
-        submesh->getVertices()[tanIndex].tangent = static_cast<float>(tan[0]);
-        submesh->getVertices()[tanIndex].tangent = static_cast<float>(tan[1]);
-        submesh->getVertices()[tanIndex].tangent = static_cast<float>(tan[2]);
+        vertices[tanIndex].tangent = static_cast<float>(tan[0]);
+        vertices[tanIndex].tangent = static_cast<float>(tan[1]);
+        vertices[tanIndex].tangent = static_cast<float>(tan[2]);
       }
     }*/
 
+    std::vector<unsigned int>& indices = submesh.getTriangleIndices();
+
     // Process recovered data
-    submesh->getIndices().reserve(static_cast<std::size_t>(fbxMesh->GetPolygonCount() * 3));
+    indices.reserve(static_cast<std::size_t>(fbxMesh->GetPolygonCount() * 3));
 
     for (int polyIndex = 0; polyIndex < fbxMesh->GetPolygonCount(); ++polyIndex) {
-      submesh->getIndices().emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
-      submesh->getIndices().emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 2));
-      submesh->getIndices().emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 1));
+      indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
+      indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 2));
+      indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 1));
 
       for (int polyVertIndex = 3; polyVertIndex < fbxMesh->GetPolygonSize(polyIndex); ++polyVertIndex) {
-        submesh->getIndices().emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
-        submesh->getIndices().emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex));
-        submesh->getIndices().emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex - 1));
+        indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
+        indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex));
+        indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex - 1));
       }
     }
 
@@ -104,7 +108,7 @@ void Mesh::importFbx(const std::string& filePath) {
     if (meshMaterial) {
       if (meshMaterial->GetMappingMode() == FbxLayerElement::EMappingMode::eAllSame)
         // TODO: small hack to avoid segfaulting when mesh count > material count, but clearly wrong; find another way
-        submesh->setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
+        submesh.setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
       else
         std::cerr << "Error: Materials can't be mapped by anything other than the whole submesh" << std::endl;
     }

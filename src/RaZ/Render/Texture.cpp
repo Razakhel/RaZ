@@ -80,7 +80,7 @@ void Texture::load(const std::string& filePath) {
       glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle.data());
     }
 
-    // Default internal format is the own image's colorspace; modified if the image is a floating point one
+    // Default internal format is the image's own colorspace; modified if the image is a floating point one
     auto colorFormat = static_cast<int>(m_image->getColorspace());
 
     if (m_image->getDataType() == ImageDataType::FLOAT) {

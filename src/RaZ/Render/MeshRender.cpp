@@ -5,8 +5,8 @@ namespace Raz {
 std::size_t Mesh::recoverVertexCount() const {
   std::size_t vertexCount = 0;
 
-  for (const SubmeshPtr& submesh : m_submeshes)
-    vertexCount += submesh->getVertexCount();
+  for (const Submesh& submesh : m_submeshes)
+    vertexCount += submesh.getVertexCount();
 
   return vertexCount;
 }
@@ -14,26 +14,31 @@ std::size_t Mesh::recoverVertexCount() const {
 std::size_t Mesh::recoverTriangleCount() const {
   std::size_t indexCount = 0;
 
-  for (const SubmeshPtr& submesh : m_submeshes)
-    indexCount += submesh->getIndexCount();
+  for (const Submesh& submesh : m_submeshes)
+    indexCount += submesh.getTriangleIndexCount();
 
   return indexCount / 3;
 }
 
 void Mesh::drawUnitQuad() {
-  static const MeshPtr quadMesh = Mesh::create(Quad(Vec3f({ -1.f,  1.f, 0.f }),
-                                                    Vec3f({  1.f,  1.f, 0.f }),
-                                                    Vec3f({  1.f, -1.f, 0.f }),
-                                                    Vec3f({ -1.f, -1.f, 0.f })));
+  static const Mesh quadMesh(Quad(Vec3f({ -1.f,  1.f, 0.f }),
+                                  Vec3f({  1.f,  1.f, 0.f }),
+                                  Vec3f({  1.f, -1.f, 0.f }),
+                                  Vec3f({ -1.f, -1.f, 0.f })));
 
-  quadMesh->draw();
+  quadMesh.draw();
 }
 
 void Mesh::drawUnitCube() {
-  static const MeshPtr cubeMesh = Mesh::create(AABB(Vec3f({  1.f,  1.f,  1.f }),
-                                                    Vec3f({ -1.f, -1.f, -1.f })));
+  static const Mesh cubeMesh(AABB(Vec3f({  1.f,  1.f,  1.f }),
+                                  Vec3f({ -1.f, -1.f, -1.f })));
 
-  cubeMesh->draw();
+  cubeMesh.draw();
+}
+
+void Mesh::setRenderMode(RenderMode renderMode) {
+  for (Submesh& submesh : m_submeshes)
+    submesh.setRenderMode(renderMode);
 }
 
 void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
@@ -59,8 +64,8 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
 }
 
 void Mesh::load() const {
-  for (const SubmeshPtr& submesh : m_submeshes)
-    submesh->load();
+  for (const Submesh& submesh : m_submeshes)
+    submesh.load();
 }
 
 void Mesh::load(const ShaderProgram& program) const {
@@ -71,20 +76,20 @@ void Mesh::load(const ShaderProgram& program) const {
 }
 
 void Mesh::draw() const {
-  for (const SubmeshPtr& submesh : m_submeshes)
-    submesh->draw();
+  for (const Submesh& submesh : m_submeshes)
+    submesh.draw();
 }
 
 void Mesh::draw(const ShaderProgram& program) const {
-  for (const SubmeshPtr& submesh : m_submeshes) {
+  for (const Submesh& submesh : m_submeshes) {
     if (!m_materials.empty()) {
-      const MaterialPtr& material = m_materials[submesh->getMaterialIndex()];
+      const MaterialPtr& material = m_materials[submesh.getMaterialIndex()];
 
       if (material)
         material->bindAttributes(program);
     }
 
-    submesh->draw();
+    submesh.draw();
   }
 }
 

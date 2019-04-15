@@ -16,9 +16,6 @@ enum class RenderMode : unsigned int {
   TRIANGLE = 4  // GL_TRIANGLES
 };
 
-class Submesh;
-using SubmeshPtr = std::unique_ptr<Submesh>;
-
 class Submesh {
 public:
   explicit Submesh(RenderMode renderMode = RenderMode::TRIANGLE) { setRenderMode(renderMode); }
@@ -39,9 +36,6 @@ public:
 
   void setRenderMode(RenderMode renderMode);
   void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
-
-  template <typename... Args>
-  static SubmeshPtr create(Args&&... args) { return std::make_unique<Submesh>(std::forward<Args>(args)...); }
 
   /// Loads the submesh's data (vertices & indices) onto the graphics card.
   void load() const;

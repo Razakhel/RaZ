@@ -269,7 +269,7 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
         if (correspMaterial == materialCorrespIndices.cend())
           throw std::runtime_error("Error: No corresponding material found with the name '" + materialName + "'");
 
-        m_submeshes.back()->setMaterialIndex(correspMaterial->second);
+        m_submeshes.back().setMaterialIndex(correspMaterial->second);
       }
     } else if (line[0] == 'o' || line[0] == 'g') {
       if (!posIndices.front().empty()) {
@@ -278,7 +278,7 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
         texcoordsIndices.resize(newSize);
         normalsIndices.resize(newSize);
 
-        addSubmesh(Submesh::create());
+        addSubmesh();
       }
 
       std::getline(file, line);
@@ -290,7 +290,7 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
   std::map<std::array<std::size_t, 3>, unsigned int> indicesMap;
 
   for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
-    SubmeshPtr& submesh = m_submeshes[submeshIndex];
+    Submesh& submesh = m_submeshes[submeshIndex];
     indicesMap.clear();
 
     for (std::size_t partIndex = 0; partIndex < posIndices[submeshIndex].size(); ++partIndex) {
@@ -358,8 +358,8 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
         const auto indexIter = indicesMap.find(vertIndices[vertPartIndex]);
 
         if (indexIter != indicesMap.cend()) {
-          submesh->getVertices()[indexIter->second].tangent += faceTangent; // Adding current tangent to be averaged later
-          submesh->getIndices().emplace_back(indexIter->second);
+          submesh.getVertices()[indexIter->second].tangent += faceTangent; // Adding current tangent to be averaged later
+          submesh.getTriangleIndices().emplace_back(indexIter->second);
         } else {
           Vertex vert {};
 
@@ -368,15 +368,15 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
           vert.normal    = faceNormals[vertPartIndex];
           vert.tangent   = faceTangent;
 
-          submesh->getIndices().emplace_back(indicesMap.size());
+          submesh.getTriangleIndices().emplace_back(indicesMap.size());
           indicesMap.emplace(vertIndices[vertPartIndex], indicesMap.size());
-          submesh->getVertices().push_back(vert);
+          submesh.getVertices().push_back(vert);
         }
       }
     }
 
     // Normalizing tangents to become unit vectors & to be averaged after being accumulated
-    for (Vertex& vertex : submesh->getVertices())
+    for (Vertex& vertex : submesh.getVertices())
       vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
   }
 }

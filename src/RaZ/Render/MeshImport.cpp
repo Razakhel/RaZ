@@ -9,7 +9,7 @@ namespace Raz {
 void Mesh::import(const std::string& filePath) {
   // Resetting the mesh to an empty state before importing
   m_submeshes.clear();
-  m_submeshes.push_back(Submesh::create());
+  m_submeshes.resize(1);
   m_materials.clear();
 
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);

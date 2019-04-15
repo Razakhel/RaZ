@@ -137,8 +137,8 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
   std::map<std::array<float, 2>, std::size_t> texCorrespIndices;
   std::map<std::array<float, 3>, std::size_t> normCorrespIndices;
 
-  for (const SubmeshPtr& submesh : m_submeshes) {
-    for (const Vertex& vertex : submesh->getVertices()) {
+  for (const Submesh& submesh : m_submeshes) {
+    for (const Vertex& vertex : submesh.getVertices()) {
       const std::array<float, 3> pos = { vertex.position[0], vertex.position[1], vertex.position[2] };
 
       if (posCorrespIndices.find(pos) == posCorrespIndices.cend()) {
@@ -170,18 +170,18 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
   const std::string fileName = FileUtils::extractFileNameFromPath(filePath, false);
 
   for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
-    const SubmeshPtr& submesh = m_submeshes[submeshIndex];
+    const Submesh& submesh = m_submeshes[submeshIndex];
 
     file << "\no " << fileName << '_' << submeshIndex << '\n';
 
     if (!m_materials.empty())
-      file << "usemtl " << fileName << '_' << submesh->getMaterialIndex() << '\n';
+      file << "usemtl " << fileName << '_' << submesh.getMaterialIndex() << '\n';
 
-    for (std::size_t i = 0; i < submesh->getIndexCount(); i += 3) {
+    for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
       file << "f ";
 
       // First vertex
-      Vertex vertex = submesh->getVertices()[submesh->getIndices()[i + 1]];
+      Vertex vertex = submesh.getVertices()[submesh.getTriangleIndices()[i + 1]];
 
       std::array<float, 3> pos  = { vertex.position[0], vertex.position[1], vertex.position[2] };
       std::array<float, 2> tex  = { vertex.texcoords[0], vertex.texcoords[1] };
@@ -194,7 +194,7 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
       file << posIndex  << '/' << texIndex  << '/' << normIndex << ' ';
 
       // Second vertex
-      vertex = submesh->getVertices()[submesh->getIndices()[i]];
+      vertex = submesh.getVertices()[submesh.getTriangleIndices()[i]];
 
       pos  = { vertex.position[0], vertex.position[1], vertex.position[2] };
       tex  = { vertex.texcoords[0], vertex.texcoords[1] };
@@ -207,7 +207,7 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
       file << posIndex  << '/' << texIndex  << '/' << normIndex << ' ';
 
       // Third vertex
-      vertex = submesh->getVertices()[submesh->getIndices()[i + 2]];
+      vertex = submesh.getVertices()[submesh.getTriangleIndices()[i + 2]];
 
       pos  = std::array<float, 3>({ vertex.position[0], vertex.position[1], vertex.position[2] });
       tex  = std::array<float, 2>({ vertex.texcoords[0], vertex.texcoords[1] });
