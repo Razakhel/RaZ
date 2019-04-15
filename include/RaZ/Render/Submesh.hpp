@@ -3,6 +3,7 @@
 #ifndef RAZ_SUBMESH_HPP
 #define RAZ_SUBMESH_HPP
 
+#include <functional>
 #include <memory>
 
 #include "RaZ/Render/GraphicObjects.hpp"
@@ -11,7 +12,7 @@ namespace Raz {
 
 enum class RenderMode : unsigned int {
   POINT    = 0, // GL_POINTS
-  LINE     = 1, // GL_LINES
+  //LINE     = 1, // GL_LINES
   TRIANGLE = 4  // GL_TRIANGLES
 };
 
@@ -20,24 +21,23 @@ using SubmeshPtr = std::unique_ptr<Submesh>;
 
 class Submesh {
 public:
-  Submesh() = default;
-  explicit Submesh(RenderMode renderMode) : m_renderMode{ renderMode } {}
+  explicit Submesh(RenderMode renderMode = RenderMode::TRIANGLE) { setRenderMode(renderMode); }
   Submesh(const Submesh&) = delete;
-  Submesh(Submesh&&) noexcept = default;
+  Submesh(Submesh&&) = default;
 
   const std::vector<Vertex>& getVertices() const { return m_vbo.getVertices(); }
   std::vector<Vertex>& getVertices() { return m_vbo.getVertices(); }
   std::size_t getVertexCount() const { return getVertices().size(); }
-  const std::vector<unsigned int>& getTriangleIndices() const { return m_vao.getEbo().getTriangleIndices(); }
-  std::vector<unsigned int>& getTriangleIndices() { return m_vao.getEbo().getTriangleIndices(); }
-  const std::vector<unsigned int>& getLineIndices() const { return m_vao.getEbo().getLineIndices(); }
-  std::vector<unsigned int>& getLineIndices() { return m_vao.getEbo().getLineIndices(); }
-  std::size_t getTriangleIndexCount() const { return getLineIndices().size(); }
+  const std::vector<unsigned int>& getLineIndices() const { return m_ibo.getLineIndices(); }
+  std::vector<unsigned int>& getLineIndices() { return m_ibo.getLineIndices(); }
   std::size_t getLineIndexCount() const { return getLineIndices().size(); }
+  const std::vector<unsigned int>& getTriangleIndices() const { return m_ibo.getTriangleIndices(); }
+  std::vector<unsigned int>& getTriangleIndices() { return m_ibo.getTriangleIndices(); }
+  std::size_t getTriangleIndexCount() const { return getTriangleIndices().size(); }
   RenderMode getRenderMode() const { return m_renderMode; }
   std::size_t getMaterialIndex() const { return m_materialIndex; }
 
-  void setRenderMode(RenderMode renderMode) { m_renderMode = renderMode; }
+  void setRenderMode(RenderMode renderMode);
   void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
 
   template <typename... Args>
@@ -57,7 +57,9 @@ private:
 
   VertexArray m_vao {};
   VertexBuffer m_vbo {};
+  IndexBuffer m_ibo {};
   RenderMode m_renderMode = RenderMode::TRIANGLE;
+  std::function<void(const Submesh&)> m_renderFunc {};
 
   std::size_t m_materialIndex {};
 };
