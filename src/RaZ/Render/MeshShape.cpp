@@ -26,14 +26,14 @@ Mesh::Mesh(const Triangle& triangle) : Mesh() {
   secondVert.normal = (secondPos - thirdPos).cross(secondPos - firstPos).normalize();
   thirdVert.normal  = (thirdPos - firstPos).cross(thirdPos - secondPos).normalize();
 
-  std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
+  std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
   vertices.resize(3);
 
   vertices[0] = firstVert;
   vertices[1] = secondVert;
   vertices[2] = thirdVert;
 
-  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
+  std::vector<unsigned int>& indices = m_submeshes.front().getTriangleIndices();
   indices.resize(3);
 
   indices[0] = 1;
@@ -72,7 +72,7 @@ Mesh::Mesh(const Quad& quad) : Mesh() {
   rightBottom.normal = (rightBottomPos - leftBottomPos).cross(rightBottomPos - rightTopPos).normalize();
   leftBottom.normal  = (leftBottomPos - leftTopPos).cross(leftBottomPos - rightBottomPos).normalize();
 
-  std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
+  std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
   vertices.resize(4);
 
   vertices[0] = leftTop;
@@ -80,7 +80,7 @@ Mesh::Mesh(const Quad& quad) : Mesh() {
   vertices[2] = rightBottom;
   vertices[3] = rightTop;
 
-  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
+  std::vector<unsigned int>& indices = m_submeshes.front().getTriangleIndices();
   indices.resize(6);
 
   indices[0] = 0;
@@ -143,7 +143,7 @@ Mesh::Mesh(const AABB& box) : Mesh() {
   // TODO: normals should not be computed (or even exist) for simple display cubes like a skybox
   // TODO: compute normals
 
-  std::vector<Vertex>& vertices = m_submeshes.front()->getVertices();
+  std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
   vertices.resize(8);
 
   vertices[0] = rightTopBack;
@@ -158,7 +158,7 @@ Mesh::Mesh(const AABB& box) : Mesh() {
   vertices[6] = leftBottomBack;
   vertices[7] = leftBottomFront;
 
-  std::vector<unsigned int>& indices = m_submeshes.front()->getIndices();
+  std::vector<unsigned int>& indices = m_submeshes.front().getTriangleIndices();
   indices.resize(36);
 
   // Right face
