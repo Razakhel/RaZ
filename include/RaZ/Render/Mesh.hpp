@@ -18,9 +18,9 @@ class Mesh : public Component {
 public:
   Mesh() : m_submeshes(1) {}
   explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
-  explicit Mesh(const Triangle& triangle);
-  explicit Mesh(const Quad& quad);
-  explicit Mesh(const AABB& box);
+  explicit Mesh(const Triangle& triangle, RenderMode renderMode = RenderMode::TRIANGLE);
+  explicit Mesh(const Quad& quad, RenderMode renderMode = RenderMode::TRIANGLE);
+  explicit Mesh(const AABB& box, RenderMode renderMode = RenderMode::TRIANGLE);
 
   const std::vector<Submesh>& getSubmeshes() const { return m_submeshes; }
   std::vector<Submesh>& getSubmeshes() { return m_submeshes; }
@@ -34,6 +34,7 @@ public:
   static void drawUnitCube();
 
   void import(const std::string& filePath);
+  void setRenderMode(RenderMode renderMode);
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(Submesh submesh = Submesh()) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
