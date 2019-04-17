@@ -2,7 +2,7 @@
 
 namespace Raz {
 
-Mesh::Mesh(const Triangle& triangle) : Mesh() {
+Mesh::Mesh(const Triangle& triangle, RenderMode renderMode) : Mesh() {
   // TODO: check if vertices are defined counterclockwise
 
   const Vec3f& firstPos  = triangle.getFirstPos();
@@ -40,10 +40,11 @@ Mesh::Mesh(const Triangle& triangle) : Mesh() {
   indices[1] = 0;
   indices[2] = 2;
 
+  setRenderMode(renderMode);
   load();
 }
 
-Mesh::Mesh(const Quad& quad) : Mesh() {
+Mesh::Mesh(const Quad& quad, RenderMode renderMode) : Mesh() {
   const Vec3f& leftTopPos     = quad.getLeftTopPos();
   const Vec3f& rightTopPos    = quad.getRightTopPos();
   const Vec3f& rightBottomPos = quad.getRightBottomPos();
@@ -91,10 +92,11 @@ Mesh::Mesh(const Quad& quad) : Mesh() {
   indices[4] = 2;
   indices[5] = 3;
 
+  setRenderMode(renderMode);
   load();
 }
 
-Mesh::Mesh(const AABB& box) : Mesh() {
+Mesh::Mesh(const AABB& box, RenderMode renderMode) : Mesh() {
   const Vec3f& rightTopFrontPos  = box.getRightTopFrontPos();
   const Vec3f& leftBottomBackPos = box.getLeftBottomBackPos();
 
@@ -215,6 +217,7 @@ Mesh::Mesh(const AABB& box) : Mesh() {
   indices[34] = 6;
   indices[35] = 2;
 
+  setRenderMode(renderMode);
   load();
 }
 
