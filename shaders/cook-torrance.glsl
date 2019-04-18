@@ -32,7 +32,14 @@ in MeshInfo {
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
 
-uniform vec3 uniCameraPos;
+layout (std140) uniform uboCameraMatrices {
+  mat4 viewMat;
+  mat4 invViewMat;
+  mat4 projectionMat;
+  mat4 invProjectionMat;
+  mat4 viewProjectionMat;
+  vec3 cameraPos;
+};
 
 uniform Material uniMaterial;
 
@@ -93,7 +100,7 @@ void main() {
   normal      = normalize(normal * 2.0 - 1.0);
   normal      = normalize(fragMeshInfo.vertTBNMatrix * normal);
 
-  vec3 viewDir = normalize(uniCameraPos - fragMeshInfo.vertPosition);
+  vec3 viewDir = normalize(cameraPos - fragMeshInfo.vertPosition);
 
   // Base Fresnel (F)
   vec3 baseReflectivity = mix(vec3(0.04), albedo, metallic);

@@ -34,7 +34,14 @@ in MeshInfo {
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
 
-uniform vec3 uniCameraPos;
+layout (std140) uniform uboCameraMatrices {
+  mat4 viewMat;
+  mat4 invViewMat;
+  mat4 projectionMat;
+  mat4 invProjectionMat;
+  mat4 viewProjectionMat;
+  vec3 cameraPos;
+};
 
 uniform Material uniMaterial;
 
@@ -50,7 +57,7 @@ void main() {
   vec3 diffuse  = vec3(0.0);
   vec3 specular = vec3(0.0);
 
-  vec3 viewDir = normalize(uniCameraPos - fragMeshInfo.vertPosition);
+  vec3 viewDir = normalize(cameraPos - fragMeshInfo.vertPosition);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
     // Diffuse

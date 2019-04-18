@@ -32,7 +32,14 @@ in MeshInfo {
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
 
-uniform mat4 uniViewProjMatrix;
+layout (std140) uniform uboCameraMatrices {
+  mat4 viewMat;
+  mat4 invViewMat;
+  mat4 projectionMat;
+  mat4 invProjectionMat;
+  mat4 viewProjectionMat;
+  vec3 cameraPos;
+};
 
 uniform Material uniMaterial;
 
@@ -45,7 +52,7 @@ void main() {
   float lightHitAngle = 0.0;
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
-    vec3 lightPos = (uniViewProjMatrix * uniLights[lightIndex].position).xyz;
+    vec3 lightPos = (viewProjectionMat * uniLights[lightIndex].position).xyz;
     vec3 lightDir;
 
     if (uniLights[lightIndex].position.w != 0.0) {
