@@ -4,15 +4,26 @@ namespace Raz {
 
 Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
                float fieldOfViewDegrees,
-               float nearPlane, float farPlane) : m_frameRatio{ static_cast<float>(frameWidth) / static_cast<float>(frameHeight) },
-                                                  m_nearPlane{ nearPlane }, m_farPlane{ farPlane } {
-  setFieldOfView(fieldOfViewDegrees);
+               float nearPlane, float farPlane,
+               ProjectionType projType) : m_frameRatio{ static_cast<float>(frameWidth) / frameHeight },
+                                          m_fieldOfView{ fieldOfViewDegrees * PI<float> / 180.f },
+                                          m_nearPlane{ nearPlane }, m_farPlane{ farPlane },
+                                          m_projType{ projType } {
+  computeProjectionMatrix();
+  computeInverseProjectionMatrix();
 }
 
 void Camera::setFieldOfView(float fieldOfViewDegrees) {
-  m_fieldOfView = fieldOfViewDegrees * PI<float> / 180;
+  m_fieldOfView = fieldOfViewDegrees * PI<float> / 180.f;
 
-  computePerspectiveMatrix();
+  computeProjectionMatrix();
+  computeInverseProjectionMatrix();
+}
+
+void Camera::setProjectionType(ProjectionType projType) {
+  m_projType = projType;
+
+  computeProjectionMatrix();
   computeInverseProjectionMatrix();
 }
 
@@ -51,6 +62,26 @@ const Mat4f& Camera::computePerspectiveMatrix() {
                      {          0.f,                0.f, -planeMult / planeDist, 0.f }});
 
   return m_projMat;
+}
+
+const Mat4f& Camera::computeOrthographicMatrix(float right, float left, float top, float bottom, float near, float far) {
+  const float xDist = right - left;
+  const float yDist = top - bottom;
+  const float zDist = far - near;
+
+  m_projMat = Mat4f({{ 2.f / xDist,         0.f,          0.f, -(right + left) / xDist },
+                     {         0.f, 2.f / yDist,          0.f, -(top + bottom) / yDist },
+                     {         0.f,         0.f, -2.f / zDist,   -(far + near) / zDist },
+                     {         0.f,         0.f,          0.f,                     1.f }});
+
+  return m_projMat;
+}
+
+const Mat4f& Camera::computeProjectionMatrix() {
+  if (m_projType == ProjectionType::ORTHOGRAPHIC)
+    return computeOrthographicMatrix(1.f, -1.f, -1.f, 1.f, m_nearPlane, m_farPlane);
+
+  return computePerspectiveMatrix();
 }
 
 const Mat4f& Camera::computeInverseProjectionMatrix() {

@@ -12,14 +12,18 @@
 
 namespace Raz {
 
-class Camera;
-using CameraPtr = std::unique_ptr<Camera>;
+enum class ProjectionType : uint8_t {
+  PERSPECTIVE = 0,
+  ORTHOGRAPHIC
+};
 
+/// Camera class, simulating a point of view for a scene to be rendered from.
 class Camera : public Component {
 public:
   Camera(unsigned int frameWidth, unsigned int frameHeight,
          float fieldOfViewDegrees = 45.f,
-         float nearPlane = 0.1f, float farPlane = 100.f);
+         float nearPlane = 0.1f, float farPlane = 100.f,
+         ProjectionType projType = ProjectionType::PERSPECTIVE);
 
   float getFieldOfViewDegrees() const { return m_fieldOfView * 180.f / PI<float>; }
   const Mat4f& getViewMatrix() const { return m_viewMat; }
@@ -28,8 +32,7 @@ public:
   const Mat4f& getInverseProjectionMatrix() const { return m_invProjMat; }
 
   void setFieldOfView(float fieldOfViewDegrees);
-
-  template <typename... Args> static CameraPtr create(Args&&... args) { return std::make_unique<Camera>(std::forward<Args>(args)...); }
+  void setProjectionType(ProjectionType projType);
 
   /// Standard view matrix computation.
   /// \param translationMatrix Translation matrix.
@@ -45,11 +48,25 @@ public:
   /// Inverse view matrix computation.
   /// \return Reference to the computed inverse view matrix.
   const Mat4f& computeInverseViewMatrix();
+  /// Projection matrix computation.
+  /// According to projection's type, either perspective or orthographic will be computed.
+  /// \return Reference to the computed perspective/orthographic matrix.
+  const Mat4f& computeProjectionMatrix();
   /// Perspective projection matrix computation.
-  /// \return Reference to the computed projection matrix.
+  /// \return Reference to the computed perspective projection matrix.
   const Mat4f& computePerspectiveMatrix();
+  /// Orthographic projection matrix computation.
+  /// \param right Right limit of the projection frustum.
+  /// \param left Left limit of the projection frustum.
+  /// \param top Top limit of the projection frustum.
+  /// \param bottom Bottom limit of the projection frustum.
+  /// \param near Near limit of the projection frustum.
+  /// \param far Far limit of the projection frustum.
+  /// \return Reference to the computed orthographic projection matrix.
+  const Mat4f& computeOrthographicMatrix(float right, float left, float top, float bottom, float near, float far);
   /// Inverse projection matrix computation.
-  /// \return Reference to the computed inverse projection matrix.
+  /// According to projection's type, either perspective or orthographic will be computed.
+  /// \return Reference to the computed inverse perspective/orthographic projection matrix.
   const Mat4f& computeInverseProjectionMatrix();
 
 private:
@@ -57,6 +74,7 @@ private:
   float m_fieldOfView;
   float m_nearPlane;
   float m_farPlane;
+  ProjectionType m_projType;
 
   Mat4f m_viewMat;
   Mat4f m_invViewMat;
