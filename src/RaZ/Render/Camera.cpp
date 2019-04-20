@@ -89,4 +89,11 @@ const Mat4f& Camera::computeInverseProjectionMatrix() {
   return m_invProjMat;
 }
 
+void Camera::resizeViewport(unsigned int frameWidth, unsigned int frameHeight) {
+  m_frameRatio  = static_cast<float>(frameWidth) / frameHeight;
+
+  computeProjectionMatrix();
+  computeInverseProjectionMatrix();
+}
+
 } // namespace Raz

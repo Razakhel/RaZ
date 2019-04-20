@@ -16,12 +16,14 @@ namespace Raz {
 class Overlay;
 using OverlayPtr = std::unique_ptr<Overlay>;
 
-enum class OverlayElementType { TEXT,
-                                BUTTON,
-                                CHECKBOX,
-                                SEPARATOR,
-                                FRAME_TIME,
-                                FPS_COUNTER };
+enum class OverlayElementType {
+  TEXT,
+  BUTTON,
+  CHECKBOX,
+  SEPARATOR,
+  FRAME_TIME,
+  FPS_COUNTER
+};
 
 using OverlayElements = std::vector<std::tuple<OverlayElementType, std::string, std::function<void()>, std::function<void()>>>;
 
