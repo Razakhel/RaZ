@@ -8,13 +8,10 @@
 
 namespace Raz {
 
-class Shader;
-using ShaderPtr = std::unique_ptr<Shader>;
-
 class Shader {
 public:
   Shader(const Shader&) = delete;
-  Shader(Shader&&) noexcept;
+  Shader(Shader&& shader) noexcept;
 
   unsigned int getIndex() const { return m_index; }
   const std::string& getPath() const { return m_path; }
@@ -25,7 +22,7 @@ public:
   void destroy() const;
 
   Shader& operator=(const Shader&) = delete;
-  Shader& operator=(Shader&&) noexcept;
+  Shader& operator=(Shader&& shader) noexcept;
 
   ~Shader() { destroy(); }
 

@@ -68,6 +68,19 @@ public:
   /// According to projection's type, either perspective or orthographic will be computed.
   /// \return Reference to the computed inverse perspective/orthographic projection matrix.
   const Mat4f& computeInverseProjectionMatrix();
+  /// Resizes the viewport.
+  /// Resizing the viewport recomputes the projection matrix.
+  /// \param frameWidth Viewport width.
+  /// \param frameHeight Viewport height.
+  void resizeViewport(unsigned int frameWidth, unsigned int frameHeight);
+  /// Unprojects to world space the given 3D point in homogeneous coordinates.
+  /// \param point Point to unproject.
+  /// \return Given point in world space.
+  Vec4f unproject(const Vec4f& point) const { return point * m_invViewMat * m_invProjMat; }
+  /// Unprojects to world space the given 3D point.
+  /// \param point Point to unproject.
+  /// \return Given point in world space.
+  Vec3f unproject(const Vec3f& point) const { return Vec3f(unproject(Vec4f(point, 0.f))); }
 
 private:
   float m_frameRatio;
