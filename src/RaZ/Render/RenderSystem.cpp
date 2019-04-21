@@ -13,20 +13,52 @@ RenderSystem::RenderSystem(unsigned int windowWidth, unsigned int windowHeight,
 
   m_acceptedComponents.setBit(Component::getId<Mesh>());
   m_acceptedComponents.setBit(Component::getId<Light>());
+
+  // Creating the SSR program & framebuffer
+  const auto ssrIndex = static_cast<std::size_t>(RenderPass::SSR);
+  m_programs[ssrIndex].setFragmentShader(FragmentShader("../../shaders/ssr.glsl"));
+  Framebuffer::assignVertexShader(m_programs[ssrIndex]);
+
+  // Initializing all our shader programs & framebuffers
+  for (std::size_t programIndex = 1; programIndex < m_programs.size(); ++programIndex) {
+    Framebuffer& framebuffer = m_framebuffers[programIndex];
+
+    framebuffer.resize(windowWidth, windowHeight);
+    framebuffer.initBuffers(m_programs[programIndex]);
+    framebuffer.mapBuffers();
+
+    m_cameraUbo.bindUniformBlock(m_programs[programIndex], "uboCameraMatrices", 0);
+  }
+
+  updateShaders();
+
+  m_cameraUbo.bindBufferBase(0);
+}
+
+void RenderSystem::setProgram(RenderPass renderPass, ShaderProgram&& program) {
+  const auto programIndex = static_cast<std::size_t>(renderPass);
+  ShaderProgram& passProgram = m_programs[programIndex];
+  passProgram = std::move(program);
+
+  if (renderPass != RenderPass::GEOMETRY)
+    Framebuffer::assignVertexShader(passProgram);
+
+  passProgram.updateShaders();
+  enableRenderPass(programIndex);
 }
 
 void RenderSystem::linkEntity(const EntityPtr& entity) {
   System::linkEntity(entity);
 
   if (entity->hasComponent<Mesh>())
-    entity->getComponent<Mesh>().load(m_program);
+    entity->getComponent<Mesh>().load(m_programs.front());
 
   if (entity->hasComponent<Light>())
     updateLights();
 }
 
 bool RenderSystem::update(float deltaTime) {
-  m_program.use();
+  m_programs.front().use();
 
   auto& camera       = m_camera.getComponent<Camera>();
   auto& camTransform = m_camera.getComponent<Transform>();
@@ -46,17 +78,27 @@ bool RenderSystem::update(float deltaTime) {
     viewProjMat = camera.getViewMatrix() * camera.getProjectionMatrix();
   }
 
+  const auto ssrIndex = static_cast<std::size_t>(RenderPass::SSR);
+
+  if (m_enabledPasses[ssrIndex])
+    m_framebuffers[ssrIndex].bind();
+
   for (auto& entity : m_entities) {
     if (entity->isEnabled()) {
       if (entity->hasComponent<Mesh>() && entity->hasComponent<Transform>()) {
         const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
 
-        m_program.sendUniform("uniModelMatrix", modelMat);
-        m_program.sendUniform("uniMvpMatrix", modelMat * viewProjMat);
+        m_programs.front().sendUniform("uniModelMatrix", modelMat);
+        m_programs.front().sendUniform("uniMvpMatrix", modelMat * viewProjMat);
 
-        entity->getComponent<Mesh>().draw(m_program);
+        entity->getComponent<Mesh>().draw(m_programs.front());
       }
     }
+  }
+
+  if (m_enabledPasses[ssrIndex]) {
+    m_framebuffers[ssrIndex].unbind();
+    m_framebuffers[ssrIndex].display(m_programs[ssrIndex]);
   }
 
   if (m_cubemap)
@@ -66,9 +108,7 @@ bool RenderSystem::update(float deltaTime) {
 }
 
 void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
-  const auto& camera   = m_camera.getComponent<Camera>();
-  const auto& camTrans = m_camera.getComponent<Transform>();
-  const Vec3f& camPos  = camTrans.getPosition();
+  const auto& camera = m_camera.getComponent<Camera>();
 
   m_cameraUbo.bind();
   sendViewMatrix(camera.getViewMatrix());
@@ -76,9 +116,7 @@ void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
   sendProjectionMatrix(camera.getProjectionMatrix());
   sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   sendViewProjectionMatrix(viewProjMat);
-  sendCameraPosition(camPos);
-
-  m_program.sendUniform("uniCameraPos", camPos);
+  sendCameraPosition(m_camera.getComponent<Transform>().getPosition());
 }
 
 void RenderSystem::sendCameraMatrices() const {
@@ -87,7 +125,7 @@ void RenderSystem::sendCameraMatrices() const {
 }
 
 void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
-  m_program.use();
+  m_programs.front().use();
 
   const std::string strBase = "uniLights[" + std::to_string(lightIndex) + "].";
 
@@ -101,13 +139,13 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
 
   if (lightComp.getType() == LightType::DIRECTIONAL) {
     homogeneousPos[3] = 0.f;
-    m_program.sendUniform(strBase + "direction", lightComp.getDirection());
+    m_programs.front().sendUniform(strBase + "direction", lightComp.getDirection());
   }
 
-  m_program.sendUniform(posStr,    homogeneousPos);
-  m_program.sendUniform(colorStr,  lightComp.getColor());
-  m_program.sendUniform(energyStr, lightComp.getEnergy());
-  m_program.sendUniform(angleStr,  lightComp.getAngle());
+  m_programs.front().sendUniform(posStr,    homogeneousPos);
+  m_programs.front().sendUniform(colorStr,  lightComp.getColor());
+  m_programs.front().sendUniform(energyStr, lightComp.getEnergy());
+  m_programs.front().sendUniform(angleStr,  lightComp.getAngle());
 }
 
 void RenderSystem::updateLights() const {
@@ -120,17 +158,21 @@ void RenderSystem::updateLights() const {
     }
   }
 
-  m_program.sendUniform("uniLightCount", lightCount);
+  m_programs.front().sendUniform("uniLightCount", lightCount);
 }
 
 void RenderSystem::updateShaders() const {
-  m_program.updateShaders();
+  for (std::size_t programIndex = 0; programIndex < m_programs.size(); ++programIndex) {
+    if (m_enabledPasses[programIndex])
+      m_programs[programIndex].updateShaders();
+  }
+
   sendCameraMatrices();
   updateLights();
 
-  for (auto& entity : m_entities) {
+  for (const auto& entity : m_entities) {
     if (entity->hasComponent<Mesh>())
-      entity->getComponent<Mesh>().load(m_program);
+      entity->getComponent<Mesh>().load(m_programs.front());
   }
 }
 
