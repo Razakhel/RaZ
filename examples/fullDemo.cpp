@@ -5,8 +5,8 @@ int main() {
   Raz::World& world = app.addWorld(Raz::World(10));
 
   auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
-  renderSystem.setProgram(Raz::ShaderProgram(Raz::VertexShader::create("../../shaders/vert.glsl"),
-                                             Raz::FragmentShader::create("../../shaders/cook-torrance.glsl")));
+  renderSystem.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
+                                                     Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
 
   Raz::Window& window = renderSystem.getWindow();
   window.enableOverlay();
@@ -14,7 +14,7 @@ int main() {
   Raz::Entity& camera = renderSystem.getCameraEntity();
   auto& cameraComp    = camera.getComponent<Raz::Camera>();
   auto& cameraTrans   = camera.getComponent<Raz::Transform>();
-  cameraTrans.setPosition(Raz::Vec3f({0.f, 0.f, -5.f}));
+  cameraTrans.setPosition(Raz::Vec3f({ 0.f, 0.f, -5.f }));
 
   Raz::Entity& mesh = world.addEntity();
   auto& meshTrans   = mesh.addComponent<Raz::Transform>();

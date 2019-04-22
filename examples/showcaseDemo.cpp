@@ -1,14 +1,14 @@
 #include "RaZ/RaZ.hpp"
 
 void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setProgram(Raz::ShaderProgram(Raz::VertexShader::create("../../shaders/vert.glsl"),
-                                       Raz::FragmentShader::create("../../shaders/blinn-phong.glsl")));
+  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
+                                               Raz::FragmentShader("../../shaders/blinn-phong.glsl")));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import("../../assets/meshes/crytek_sponza.obj");
-  meshComp.load(render.getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -1.f, 0.f);
@@ -17,14 +17,14 @@ void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setProgram(Raz::ShaderProgram(Raz::VertexShader::create("../../shaders/vert.glsl"),
-                                       Raz::FragmentShader::create("../../shaders/cook-torrance.glsl")));
+  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
+                                               Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import("../../assets/meshes/ball.obj");
-  meshComp.load(render.getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -33,14 +33,14 @@ void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setProgram(Raz::ShaderProgram(Raz::VertexShader::create("../../shaders/vert.glsl"),
-                                       Raz::FragmentShader::create("../../shaders/cook-torrance.glsl")));
+  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
+                                               Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import("../../assets/meshes/shield.obj");
-  meshComp.load(render.getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -49,14 +49,14 @@ void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setProgram(Raz::ShaderProgram(Raz::VertexShader::create("../../shaders/vert.glsl"),
-                                       Raz::FragmentShader::create("../../shaders/cook-torrance.glsl")));
+  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
+                                               Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import("../../assets/meshes/cerberus.obj");
-  meshComp.load(render.getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -66,14 +66,14 @@ void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
 #if defined(FBX_ENABLED)
 void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setProgram(Raz::ShaderProgram(Raz::VertexShader::create("../../shaders/vert.glsl"),
-                                       Raz::FragmentShader::create("../../shaders/blinn-phong.glsl")));
+  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
+                                               Raz::FragmentShader("../../shaders/blinn-phong.glsl")));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import("../../assets/meshes/shaderBall.fbx");
-  meshComp.load(render.getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -2.f, 5.f);
