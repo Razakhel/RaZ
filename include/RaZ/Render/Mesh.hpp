@@ -18,6 +18,7 @@ class Mesh : public Component {
 public:
   Mesh() : m_submeshes(1) {}
   explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
+  Mesh(const Plane& plane, float width, float depth, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const Triangle& triangle, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const Quad& quad, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const AABB& box, RenderMode renderMode = RenderMode::TRIANGLE);
@@ -29,7 +30,7 @@ public:
   std::size_t recoverVertexCount() const;
   std::size_t recoverTriangleCount() const;
 
-  template <typename... Args> static MeshPtr create(Args&&... args) { return std::make_unique<Mesh>(std::forward<Args>(args)...); }
+  static void drawUnitPlane(const Vec3f& normal = Axis::Y);
   static void drawUnitQuad();
   static void drawUnitCube();
 
