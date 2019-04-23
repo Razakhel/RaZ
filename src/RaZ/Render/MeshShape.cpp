@@ -2,6 +2,57 @@
 
 namespace Raz {
 
+Mesh::Mesh(const Plane& plane, float width, float depth, RenderMode renderMode) : Mesh() {
+  const float height = (plane.getNormal() * plane.getDistance())[1];
+
+  const Vec3f firstPos({ -width, height, depth });
+  const Vec3f secondPos({ width, height, depth });
+  const Vec3f thirdPos({ width, height, -depth });
+  const Vec3f fourthPos({ -width, height, -depth });
+
+  Vertex firstCorner {};
+  firstCorner.position  = firstPos;
+  firstCorner.normal    = plane.getNormal();
+  firstCorner.texcoords = Vec2f({ 0.f, 0.f });
+
+  Vertex secondCorner {};
+  secondCorner.position  = secondPos;
+  secondCorner.normal    = plane.getNormal();
+  secondCorner.texcoords = Vec2f({ 1.f, 0.f });
+
+  Vertex thirdCorner {};
+  thirdCorner.position  = thirdPos;
+  thirdCorner.normal    = plane.getNormal();
+  thirdCorner.texcoords = Vec2f({ 1.f, 1.f });
+
+  Vertex fourthCorner {};
+  fourthCorner.position  = fourthPos;
+  fourthCorner.normal    = plane.getNormal();
+  fourthCorner.texcoords = Vec2f({ 0.f, 1.f });
+
+  std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
+  vertices.resize(4);
+
+  vertices[0] = firstCorner;
+  vertices[1] = secondCorner;
+  vertices[2] = thirdCorner;
+  vertices[3] = fourthCorner;
+
+  std::vector<unsigned int>& indices = m_submeshes.front().getTriangleIndices();
+  indices.resize(6);
+
+  indices[0] = 1;
+  indices[1] = 0;
+  indices[2] = 2;
+
+  indices[3] = 2;
+  indices[4] = 0;
+  indices[5] = 3;
+
+  setRenderMode(renderMode);
+  load();
+}
+
 Mesh::Mesh(const Triangle& triangle, RenderMode renderMode) : Mesh() {
   // TODO: check if vertices are defined counterclockwise
 

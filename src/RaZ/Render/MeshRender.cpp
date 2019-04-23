@@ -20,6 +20,12 @@ std::size_t Mesh::recoverTriangleCount() const {
   return indexCount / 3;
 }
 
+void Mesh::drawUnitPlane(const Vec3f& normal) {
+  static const Mesh planeMesh(Plane(Vec3f(0.f), normal), 1.f, 1.f);
+
+  planeMesh.draw();
+}
+
 void Mesh::drawUnitQuad() {
   static const Mesh quadMesh(Quad(Vec3f({ -1.f,  1.f, 0.f }),
                                   Vec3f({  1.f,  1.f, 0.f }),
