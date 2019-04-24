@@ -41,6 +41,10 @@ bool Line::intersects(const AABB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+bool Line::intersects(const OBB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
 Vec3f Line::computeProjection(const Vec3f& point) const {
   const Vec3f lineVec   = m_endPos - m_beginPos;
   const float pointDist = lineVec.dot(point - m_beginPos) / lineVec.dot(lineVec);
@@ -89,6 +93,10 @@ bool Plane::intersects(const AABB& aabb) const {
   return (std::abs(boxDist) <= topBoxDist);
 }
 
+bool Plane::intersects(const OBB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
 // Sphere functions
 
 bool Sphere::contains(const Vec3f& point) const {
@@ -118,6 +126,10 @@ bool Sphere::intersects(const AABB& aabb) const {
   return contains(projPoint);
 }
 
+bool Sphere::intersects(const OBB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
 // Triangle functions
 
 bool Triangle::intersects(const Triangle&) const {
@@ -129,6 +141,10 @@ bool Triangle::intersects(const Quad&) const {
 }
 
 bool Triangle::intersects(const AABB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Triangle::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
@@ -159,6 +175,10 @@ bool Quad::intersects(const Quad&) const {
 }
 
 bool Quad::intersects(const AABB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool Quad::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
@@ -208,12 +228,30 @@ bool AABB::intersects(const AABB& aabb) const {
   return (intersectsX && intersectsY && intersectsZ);
 }
 
+bool AABB::intersects(const OBB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
 Vec3f AABB::computeProjection(const Vec3f& point) const {
   const float closestX = std::max(std::min(point[0], m_rightTopFrontPos[0]), m_leftBottomBackPos[0]);
   const float closestY = std::max(std::min(point[1], m_rightTopFrontPos[1]), m_leftBottomBackPos[1]);
   const float closestZ = std::max(std::min(point[2], m_rightTopFrontPos[2]), m_leftBottomBackPos[2]);
 
   return Vec3f({ closestX, closestY, closestZ });
+}
+
+// OBB functions
+
+bool OBB::contains(const Vec3f&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+bool OBB::intersects(const OBB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+Vec3f OBB::computeProjection(const Vec3f&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
 }
 
 } // namespace Raz
