@@ -265,6 +265,31 @@ Matrix<T, W, H> Matrix<T, W, H>::inverse() const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
+Vector<T, W> Matrix<T, W, H>::recoverRow(std::size_t rowIndex) const {
+  assert("Error: Given row index is out of bounds." && rowIndex < H);
+
+  Vector<T, W> res {};
+  const std::size_t rowBeginIndex = rowIndex * W;
+
+  for (std::size_t valIndex = 0; valIndex < W; ++valIndex)
+    res[valIndex] = m_data[rowBeginIndex + valIndex];
+
+  return res;
+}
+
+template <typename T, std::size_t W, std::size_t H>
+Vector<T, H> Matrix<T, W, H>::recoverColumn(std::size_t columnIndex) const {
+  assert("Error: Given column index is out of bounds." && columnIndex < W);
+
+  Vector<T, H> res {};
+
+  for (std::size_t valIndex = 0; valIndex < H; ++valIndex)
+    res[valIndex] = m_data[columnIndex + valIndex * W];
+
+  return res;
+}
+
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H> Matrix<T, W, H>::operator+(const Matrix& mat) const {
   Matrix<T, W, H> res = *this;
   res += mat;

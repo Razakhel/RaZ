@@ -52,6 +52,14 @@ public:
   /// Inverse matrix computation.
   /// \return Matrix's inverse.
   Matrix inverse() const;
+  /// Recovers the values in the row at the given index.
+  /// \param rowIndex Index of the row to recover.
+  /// \return Vector containing the row elements.
+  Vector<T, W> recoverRow(std::size_t rowIndex) const;
+  /// Recovers the values in the column at the given index.
+  /// \param columnIndex Index of the column to recover.
+  /// \return Vector containing the column elements.
+  Vector<T, H> recoverColumn(std::size_t columnIndex) const;
 
   /// Default copy assignment operator.
   /// \return Reference to the copied matrix.
