@@ -72,6 +72,25 @@ TEST_CASE("Matrix resize") {
                                                        {    0.f,     0.f,    0.f, 1.f }}));
 }
 
+TEST_CASE("Matrix row/column") {
+  REQUIRE(mat31.recoverRow(0) == Raz::Vec3f({ 4.12f,  25.1f, 30.7842f }));
+  REQUIRE(mat42.recoverRow(2) == Raz::Vec4f({ -8.12f, 38.24f, 62.f, 43.12f }));
+
+  REQUIRE(mat32.recoverColumn(2) == Raz::Vec3f({ 15.12f, 97.f, -54.05f }));
+  REQUIRE(mat41.recoverColumn(1) == Raz::Vec4f({ 53.032f, 3.15f, -7.78f, -74.8f }));
+
+  const Raz::Matrix<float, 8, 2> testMat({{ 1.f,  2.f,  3.f,  4.f,  5.f,  6.f,  7.f,  8.f },
+                                          { 9.f, 10.f, 11.f, 12.f, 13.f, 14.f, 15.f, 16.f }});
+
+  REQUIRE(testMat.recoverRow(1) == Raz::Vector<float, 8>({ 9.f, 10.f, 11.f, 12.f, 13.f, 14.f, 15.f, 16.f }));
+  REQUIRE(testMat.recoverColumn(5) == Raz::Vec2f({ 6.f, 14.f }));
+
+  const Raz::Matrix<float, 2, 8> testMatTrans = testMat.transpose();
+
+  REQUIRE(testMatTrans.recoverRow(7) == Raz::Vec2f({ 8.f, 16.f }));
+  REQUIRE(testMatTrans.recoverColumn(0) == Raz::Vector<float, 8>({ 1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f }));
+}
+
 TEST_CASE("Matrix/scalar operations") {
   REQUIRE((mat31 * 3.f) == Raz::Mat3f({{ 12.36f,   75.3f, 92.3526f },
                                        {  9.12f,    15.f,  -193.5f },
