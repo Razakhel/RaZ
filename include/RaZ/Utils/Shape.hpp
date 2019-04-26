@@ -436,6 +436,7 @@ public:
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_rightTopFrontPos + m_leftBottomBackPos) * 0.5f; }
   /// Computes the half extents of the box, starting from its centroid.
+  ///
   ///          _______________________
   ///         /|          ^         /|
   ///        / |        y |        / |
@@ -506,12 +507,13 @@ class OBB : public Shape {
 public:
   OBB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos, const Mat3f& rotation = Mat3f::identity())
       : m_aabb(rightTopFrontPos, leftBottomBackPos), m_rotation{ rotation } {}
+  explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
 
   const Vec3f& getRightTopFrontPos() const { return m_aabb.getRightTopFrontPos(); }
   const Vec3f& getLeftBottomBackPos() const { return m_aabb.getLeftBottomBackPos(); }
   const Mat3f& getRotation() const { return m_rotation; }
 
-  void setRotation(const Mat3f& rotation) { m_rotation = rotation; }
+  void setRotation(const Mat3f& rotation);
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -555,6 +557,7 @@ public:
   Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
   /// Computes the half extents of the box, starting from its centroid.
   /// These half extents are oriented according to the box's rotation.
+  ///
   ///          _______________________
   ///         /|          ^         /|
   ///        / |        y |        / |
@@ -572,6 +575,7 @@ public:
 private:
   AABB m_aabb;
   Mat3f m_rotation {};
+  Mat3f m_invRotation {};
 };
 
 } // namespace Raz

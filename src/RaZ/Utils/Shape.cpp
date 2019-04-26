@@ -242,6 +242,11 @@ Vec3f AABB::computeProjection(const Vec3f& point) const {
 
 // OBB functions
 
+void OBB::setRotation(const Mat3f& rotation) {
+  m_rotation    = rotation;
+  m_invRotation = m_rotation.inverse();
+}
+
 bool OBB::contains(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
