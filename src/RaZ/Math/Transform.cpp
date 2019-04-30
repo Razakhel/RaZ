@@ -4,16 +4,16 @@ namespace Raz {
 
 void Transform::setPosition(const Vec3f& position) {
   m_position = position;
-  m_updated = true;
+  m_updated  = true;
 }
 
 void Transform::setRotation(const Mat4f& rotation) {
   m_rotation = rotation;
-  m_updated = true;
+  m_updated  = true;
 }
 
 void Transform::setScale(const Vec3f& scale) {
-  m_scale = scale;
+  m_scale   = scale;
   m_updated = true;
 }
 
@@ -26,7 +26,7 @@ void Transform::translate(float x, float y, float z) {
 }
 
 void Transform::rotate(float angleDegrees, const Vec3f& axis) {
-  assert("Error: Rotation axis must be normalized." && axis.computeLength() == 1.f);
+  assert("Error: Rotation axis must be normalized." && FloatUtils::checkNearEquality(axis.computeLength(), 1.f));
 
   const Quaternionf quaternion(angleDegrees, axis);
   m_rotation = quaternion.computeMatrix() * m_rotation;
