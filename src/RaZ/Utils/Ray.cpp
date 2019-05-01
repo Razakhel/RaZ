@@ -38,7 +38,7 @@ bool Ray::intersects(const Vec3f& point) const {
   return FloatUtils::checkNearEquality(pointDir.dot(m_direction), 1.f);
 }
 
-bool Ray::intersects(const Line&) const {
+bool Ray::intersects(const Line&, RayHit*) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
@@ -46,7 +46,7 @@ bool Ray::intersects(const Plane&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Ray::intersects(const Sphere& sphere) const {
+bool Ray::intersects(const Sphere& sphere, RayHit* hit) const {
   const Vec3f sphereDir = m_origin - sphere.getCenter();
 
   const float raySqLength = m_direction.dot(m_direction);
@@ -59,7 +59,22 @@ bool Ray::intersects(const Sphere& sphere) const {
     return false;
 
   // If the hit distances are negative, we've hit a sphere located behind the ray's origin
-  return (firstHitDist > 0.f || secondHitDist > 0.f);
+  if (firstHitDist < 0.f) {
+    firstHitDist = secondHitDist;
+
+    if (firstHitDist < 0.f)
+      return false;
+  }
+
+  if (hit) {
+    const Vec3f hitPos = m_origin + m_direction * firstHitDist;
+
+    hit->position = hitPos;
+    hit->normal   = (hitPos - sphere.getCenter()).normalize();
+    hit->distance = firstHitDist;
+  }
+
+  return true;
 }
 
 bool Ray::intersects(const Triangle& triangle) const {
@@ -90,7 +105,7 @@ bool Ray::intersects(const Triangle& triangle) const {
   return (hitDist > 0.f);
 }
 
-bool Ray::intersects(const Quad&) const {
+bool Ray::intersects(const Quad&, RayHit*) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 

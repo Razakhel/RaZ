@@ -8,6 +8,13 @@
 
 namespace Raz {
 
+/// Ray hit used to get informations from a ray intersection.
+struct RayHit {
+  Vec3f position {};
+  Vec3f normal {};
+  float distance = std::numeric_limits<float>::max();
+};
+
 /// Ray defined by an origin and a normalized direction.
 class Ray {
 public:
@@ -23,7 +30,7 @@ public:
   /// Ray-line intersection check.
   /// \param line Line to check if there is an intersection with.
   /// \return True if the ray intersects the line, false otherwise.
-  bool intersects(const Line& line) const;
+  bool intersects(const Line& line, RayHit* hit = nullptr) const;
   /// Ray-plane intersection check.
   /// \param plane Plane to check if there is an intersection with.
   /// \return True if the ray intersects the plane, false otherwise.
@@ -32,7 +39,7 @@ public:
   /// The intersection is checked by calculating a quadratic equation to determine the hits distances.
   /// \param sphere Sphere to check if there is an intersection with.
   /// \return True if the ray intersects the sphere, false otherwise.
-  bool intersects(const Sphere& sphere) const;
+  bool intersects(const Sphere& sphere, RayHit* hit = nullptr) const;
   /// Ray-triangle intersection check.
   /// The intersection is checked by calculating the barycentic coordinates at the intersection point.
   /// \param triangle Triangle to check if there is an intersection with.
@@ -41,7 +48,7 @@ public:
   /// Ray-quad intersection check.
   /// \param quad Quad to check if there is an intersection with.
   /// \return True if the ray intersects the quad, false otherwise.
-  bool intersects(const Quad& quad) const;
+  bool intersects(const Quad& quad, RayHit* hit = nullptr) const;
   /// Ray-AABB intersection check.
   /// \param aabb AABB to check if there is an intersection with.
   /// \return True if the ray intersects the AABB, false otherwise.
