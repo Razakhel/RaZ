@@ -2,8 +2,8 @@
 
 struct Buffers {
   sampler2D depth;
-  sampler2D normal;
   sampler2D color;
+  sampler2D normal;
 };
 
 in vec2 fragTexcoords;

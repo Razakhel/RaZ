@@ -2,8 +2,8 @@
 
 struct Buffers {
   sampler2D depth;
-  sampler2D normal;
   sampler2D color;
+  sampler2D normal;
 };
 
 in vec2 fragTexcoords;
@@ -79,8 +79,9 @@ vec3 computeViewPosFromDepth(vec2 texcoords, float depth) {
 }
 
 void main() {
-  vec3 reflectColor   = texture(uniSceneBuffers.color, fragTexcoords).rgb;
-  float reflectFactor = texture(uniSceneBuffers.color, fragTexcoords).a;
+  vec4 pixelColor     = texture(uniSceneBuffers.color, fragTexcoords).rgba;
+  vec3 reflectColor   = pixelColor.rgb;
+  float reflectFactor = pixelColor.a;
 
   if (reflectFactor > 0.1) {
     float depth = texture(uniSceneBuffers.depth, fragTexcoords).r;

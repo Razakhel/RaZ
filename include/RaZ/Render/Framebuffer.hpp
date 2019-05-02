@@ -19,8 +19,8 @@ public:
   Framebuffer(Framebuffer&& fbo) noexcept;
 
   const TexturePtr& getDepthBuffer() const { return m_depthBuffer; }
-  const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
   const TexturePtr& getColorBuffer() const { return m_colorBuffer; }
+  const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
 
   /// Assigns a basic vertex shader to the given program, to display the framebuffer.
   /// \param program Shader program to assign the vertex shader to.
@@ -51,8 +51,8 @@ public:
 private:
   unsigned int m_index {};
   TexturePtr m_depthBuffer  = Texture::create(0, 0, ImageColorspace::DEPTH);
-  TexturePtr m_normalBuffer = Texture::create(0, 0, ImageColorspace::RGB);
   TexturePtr m_colorBuffer  = Texture::create(0, 0, ImageColorspace::RGBA);
+  TexturePtr m_normalBuffer = Texture::create(0, 0, ImageColorspace::RGB);
 };
 
 } // namespace Raz

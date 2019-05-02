@@ -17,8 +17,8 @@ Framebuffer::Framebuffer(ShaderProgram& program) : Framebuffer() {
 Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
   : m_index{ std::exchange(fbo.m_index, GL_INVALID_INDEX) },
     m_depthBuffer{ std::move(fbo.m_depthBuffer) },
-    m_normalBuffer{ std::move(fbo.m_normalBuffer) },
-    m_colorBuffer{ std::move(fbo.m_colorBuffer) } {
+    m_colorBuffer{ std::move(fbo.m_colorBuffer) },
+    m_normalBuffer{ std::move(fbo.m_normalBuffer) } {
   mapBuffers();
 }
 
@@ -46,8 +46,8 @@ void Framebuffer::initBuffers(const ShaderProgram& program) const {
 
   program.use();
   program.sendUniform("uniSceneBuffers.depth",  0);
-  program.sendUniform("uniSceneBuffers.normal", 1);
-  program.sendUniform("uniSceneBuffers.color",  2);
+  program.sendUniform("uniSceneBuffers.color",  1);
+  program.sendUniform("uniSceneBuffers.normal", 2);
 
   unbind();
 }
@@ -58,8 +58,8 @@ void Framebuffer::mapBuffers() const {
   bind();
 
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer->getIndex(), 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[0], GL_TEXTURE_2D, m_normalBuffer->getIndex(), 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[1], GL_TEXTURE_2D, m_colorBuffer->getIndex(), 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[0], GL_TEXTURE_2D, m_colorBuffer->getIndex(), 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[1], GL_TEXTURE_2D, m_normalBuffer->getIndex(), 0);
 
   glDrawBuffers(colorBuffers.size(), colorBuffers.data());
 
@@ -88,18 +88,18 @@ void Framebuffer::display(const ShaderProgram& program) const {
   m_depthBuffer->bind();
 
   Texture::activate(1);
-  m_normalBuffer->bind();
+  m_colorBuffer->bind();
 
   Texture::activate(2);
-  m_colorBuffer->bind();
+  m_normalBuffer->bind();
 
   Mesh::drawUnitQuad();
 }
 
 void Framebuffer::resize(unsigned int width, unsigned int height) {
   m_depthBuffer  = Texture::create(width, height, ImageColorspace::DEPTH);
-  m_normalBuffer = Texture::create(width, height, ImageColorspace::RGB);
   m_colorBuffer  = Texture::create(width, height, ImageColorspace::RGBA);
+  m_normalBuffer = Texture::create(width, height, ImageColorspace::RGB);
 
   mapBuffers();
 }
@@ -107,8 +107,8 @@ void Framebuffer::resize(unsigned int width, unsigned int height) {
 Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
   std::swap(m_index, fbo.m_index);
   m_depthBuffer  = std::move(fbo.m_depthBuffer);
-  m_normalBuffer = std::move(fbo.m_normalBuffer);
   m_colorBuffer  = std::move(fbo.m_colorBuffer);
+  m_normalBuffer = std::move(fbo.m_normalBuffer);
 
   mapBuffers();
 
