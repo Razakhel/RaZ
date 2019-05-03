@@ -15,8 +15,8 @@ namespace Raz {
 class Material;
 using MaterialPtr = std::unique_ptr<Material>;
 
-class MaterialStandard;
-using MaterialStandardPtr = std::unique_ptr<MaterialStandard>;
+class MaterialBlinnPhong;
+using MaterialBlinnPhongPtr = std::unique_ptr<MaterialBlinnPhong>;
 
 class MaterialCookTorrance;
 using MaterialCookTorrancePtr = std::unique_ptr<MaterialCookTorrance>;
@@ -50,11 +50,11 @@ protected:
   Material() = default;
 };
 
-class MaterialStandard : public Material {
+class MaterialBlinnPhong : public Material {
 public:
-  MaterialStandard() = default;
-  explicit MaterialStandard(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
-  explicit MaterialStandard(const std::string& fileName) : m_diffuseMap{ Texture::create(fileName) } {}
+  MaterialBlinnPhong() = default;
+  explicit MaterialBlinnPhong(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
+  explicit MaterialBlinnPhong(const std::string& fileName) : MaterialBlinnPhong(Texture::create(fileName)) {}
 
   MaterialType getType() const override { return MaterialType::STANDARD; }
   const Vec3f& getAmbient() const { return m_ambient; }
@@ -88,7 +88,7 @@ public:
   void setBumpMap(const TexturePtr& bumpMap) { m_bumpMap = bumpMap; }
 
   template <typename... Args>
-  static MaterialStandardPtr create(Args&&... args) { return std::make_unique<MaterialStandard>(std::forward<Args>(args)...); }
+  static MaterialBlinnPhongPtr create(Args&&... args) { return std::make_unique<MaterialBlinnPhong>(std::forward<Args>(args)...); }
 
   void loadAmbientMap(const std::string& fileName) { m_ambientMap = Texture::create(fileName); }
   void loadDiffuseMap(const std::string& fileName) { m_diffuseMap = Texture::create(fileName); }
@@ -97,7 +97,7 @@ public:
   void loadTransparencyMap(const std::string& fileName) { m_transparencyMap = Texture::create(fileName); }
   void loadBumpMap(const std::string& fileName) { m_bumpMap = Texture::create(fileName); }
 
-  MaterialPtr clone() const override { return MaterialStandard::create(*this); }
+  MaterialPtr clone() const override { return MaterialBlinnPhong::create(*this); }
   void initTextures(const ShaderProgram& program) const override;
   void bindAttributes(const ShaderProgram& program) const override;
 
@@ -120,7 +120,7 @@ class MaterialCookTorrance : public Material {
 public:
   MaterialCookTorrance() = default;
   explicit MaterialCookTorrance(TexturePtr albedoMap) : m_albedoMap{ std::move(albedoMap) } {}
-  explicit MaterialCookTorrance(const std::string& fileName) : m_albedoMap{ Texture::create(fileName) } {}
+  explicit MaterialCookTorrance(const std::string& fileName) : MaterialCookTorrance(Texture::create(fileName)) {}
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
     : m_baseColor{ baseColor }, m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } {}
 

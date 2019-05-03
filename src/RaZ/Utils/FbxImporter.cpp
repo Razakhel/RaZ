@@ -119,7 +119,7 @@ void Mesh::importFbx(const std::string& filePath) {
   // Recovering materials
   for (int matIndex = 0; matIndex < scene->GetMaterialCount(); ++matIndex) {
     const FbxSurfaceMaterial* fbxMaterial = scene->GetMaterial(matIndex);
-    auto material = MaterialStandard::create();
+    auto material = MaterialBlinnPhong::create();
 
     const FbxPropertyT<FbxDouble3>& ambient = fbxMaterial->FindProperty(FbxSurfaceMaterial::sAmbient);
     if (ambient.IsValid())

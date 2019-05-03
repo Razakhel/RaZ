@@ -46,10 +46,10 @@ void importMtl(const std::string& mtlFilePath,
                std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
-  auto standardMaterial     = MaterialStandard::create();
+  auto blinnPhongMaterial   = MaterialBlinnPhong::create();
   auto cookTorranceMaterial = MaterialCookTorrance::create();
 
-  bool isStandardMaterial = false;
+  bool isBlinnPhongMaterial   = false;
   bool isCookTorranceMaterial = false;
 
   if (file) {
@@ -67,31 +67,31 @@ void importMtl(const std::string& mtlFilePath,
         const float blue  = std::stof(thirdValue);
 
         if (tag[1] == 'a') {                           // Ambient/ambient occlusion factor [Ka]
-          standardMaterial->setAmbient(red, green, blue);
+          blinnPhongMaterial->setAmbient(red, green, blue);
         } else if (tag[1] == 'd') {                    // Diffuse/albedo factor [Kd]
-          standardMaterial->setDiffuse(red, green, blue);
+          blinnPhongMaterial->setDiffuse(red, green, blue);
         } else if (tag[1] == 's') {                    // Specular factor [Ks]
-          standardMaterial->setSpecular(red, green, blue);
+          blinnPhongMaterial->setSpecular(red, green, blue);
         } else if (tag[1] == 'e') {                    // Emissive factor [Ke]
-          standardMaterial->setEmissive(red, green, blue);
+          blinnPhongMaterial->setEmissive(red, green, blue);
         }
 
-        isStandardMaterial = true;
+        isBlinnPhongMaterial = true;
       } else if (tag[0] == 'm') {                      // Import texture
         const TexturePtr& map = loadTexture(mtlFilePath, nextValue);
 
         if (tag[4] == 'K') {                           // Standard maps
           if (tag[5] == 'a') {                         // Ambient/ambient occlusion map [map_Ka]
-            standardMaterial->setAmbientMap(map);
+            blinnPhongMaterial->setAmbientMap(map);
             cookTorranceMaterial->setAmbientOcclusionMap(map);
           } else if (tag[5] == 'd') {                  // Diffuse/albedo map [map_Kd]
-            standardMaterial->setDiffuseMap(map);
+            blinnPhongMaterial->setDiffuseMap(map);
             cookTorranceMaterial->setAlbedoMap(map);
           } else if (tag[5] == 's') {                  // Specular map [map_Ks]
-            standardMaterial->setSpecularMap(map);
-            isStandardMaterial = true;
+            blinnPhongMaterial->setSpecularMap(map);
+            isBlinnPhongMaterial = true;
           } else if (tag[5] == 'e') {                  // Emissive map [map_Ke]
-            standardMaterial->setEmissiveMap(map);
+            blinnPhongMaterial->setEmissiveMap(map);
           }
         }  else if (tag[4] == 'P') {                   // PBR maps
           if (tag[5] == 'm') {                         // Metallic map [map_Pm]
@@ -102,44 +102,44 @@ void importMtl(const std::string& mtlFilePath,
 
           isCookTorranceMaterial = true;
         } else if (tag[4] == 'd') {                    // Transparency map [map_d]
-          standardMaterial->setTransparencyMap(map);
-          isStandardMaterial = true;
+          blinnPhongMaterial->setTransparencyMap(map);
+          isBlinnPhongMaterial = true;
         } else if (tag[4] == 'b') {                    // Bump map [map_bump]
-          standardMaterial->setBumpMap(map);
-          isStandardMaterial = true;
+          blinnPhongMaterial->setBumpMap(map);
+          isBlinnPhongMaterial = true;
         }
       } else if (tag[0] == 'd') {                      // Transparency factor
-        standardMaterial->setTransparency(std::stof(nextValue));
-        isStandardMaterial = true;
+        blinnPhongMaterial->setTransparency(std::stof(nextValue));
+        isBlinnPhongMaterial = true;
       } else if (tag[0] == 'T') {
         if (tag[1] == 'r') {                           // Transparency factor (alias, 1 - d) [Tr]
-          standardMaterial->setTransparency(1.f - std::stof(nextValue));
-          isStandardMaterial = true;
+          blinnPhongMaterial->setTransparency(1.f - std::stof(nextValue));
+          isBlinnPhongMaterial = true;
         }/* else if (line[1] == 'f') {                 // Transmission filter [Tf]
 
-          isStandardMaterial = true;
+          isBlinnPhongMaterial = true;
         }*/
       }  else if (tag[0] == 'b') {                     // Bump map (alias) [bump]
-        standardMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue));
-        isStandardMaterial = true;
+        blinnPhongMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue));
+        isBlinnPhongMaterial = true;
       } else if (tag[0] == 'n') {
         if (tag[1] == 'o') {                           // Normal map [norm]
           cookTorranceMaterial->setNormalMap(loadTexture(mtlFilePath, nextValue));
         } else if (tag[1] == 'e') {                    // New material [newmtl]
           materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
 
-          if (!isStandardMaterial && !isCookTorranceMaterial)
+          if (!isBlinnPhongMaterial && !isCookTorranceMaterial)
             continue;
 
           if (isCookTorranceMaterial)
             materials.emplace_back(std::move(cookTorranceMaterial));
           else
-            materials.emplace_back(std::move(standardMaterial));
+            materials.emplace_back(std::move(blinnPhongMaterial));
 
-          standardMaterial = MaterialStandard::create();
+          blinnPhongMaterial   = MaterialBlinnPhong::create();
           cookTorranceMaterial = MaterialCookTorrance::create();
 
-          isStandardMaterial = false;
+          isBlinnPhongMaterial   = false;
           isCookTorranceMaterial = false;
         }
       } else {
@@ -153,7 +153,7 @@ void importMtl(const std::string& mtlFilePath,
   if (isCookTorranceMaterial)
     materials.emplace_back(std::move(cookTorranceMaterial));
   else
-    materials.emplace_back(std::move(standardMaterial));
+    materials.emplace_back(std::move(blinnPhongMaterial));
 }
 
 } // namespace

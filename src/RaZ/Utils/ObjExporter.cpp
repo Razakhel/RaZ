@@ -23,7 +23,7 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
     mtlFile << "\nnewmtl " << materialName << '\n';
 
     if (material->getType() == MaterialType::COOK_TORRANCE) {
-      const auto matCT = dynamic_cast<MaterialCookTorrance*>(material.get());
+      const auto matCT = static_cast<MaterialCookTorrance*>(material.get());
 
       mtlFile << "\tKd " << matCT->getBaseColor()[0] << ' ' << matCT->getBaseColor()[1] << ' ' << matCT->getBaseColor()[2] << '\n';
       mtlFile << "\tPm " << matCT->getMetallicFactor() << '\n';
@@ -64,54 +64,54 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
         matCT->getAmbientOcclusionMap()->save(ambOccMapPath, true);
       }
     } else {
-      const auto matSTD = dynamic_cast<MaterialStandard*>(material.get());
+      const auto matBP = static_cast<MaterialBlinnPhong*>(material.get());
 
-      mtlFile << "\tKa " << matSTD->getAmbient()[0] << ' ' << matSTD->getAmbient()[1] << ' ' << matSTD->getAmbient()[2] << '\n';
-      mtlFile << "\tKd " << matSTD->getDiffuse()[0] << ' ' << matSTD->getDiffuse()[1] << ' ' << matSTD->getDiffuse()[2] << '\n';
-      mtlFile << "\tKs " << matSTD->getSpecular()[0] << ' ' << matSTD->getSpecular()[1] << ' ' << matSTD->getSpecular()[2] << '\n';
-      mtlFile << "\tKe " << matSTD->getEmissive()[0] << ' ' << matSTD->getEmissive()[1] << ' ' << matSTD->getEmissive()[2] << '\n';
-      mtlFile << "\td  " << matSTD->getTransparency() << '\n';
+      mtlFile << "\tKa " << matBP->getAmbient()[0] << ' ' << matBP->getAmbient()[1] << ' ' << matBP->getAmbient()[2] << '\n';
+      mtlFile << "\tKd " << matBP->getDiffuse()[0] << ' ' << matBP->getDiffuse()[1] << ' ' << matBP->getDiffuse()[2] << '\n';
+      mtlFile << "\tKs " << matBP->getSpecular()[0] << ' ' << matBP->getSpecular()[1] << ' ' << matBP->getSpecular()[2] << '\n';
+      mtlFile << "\tKe " << matBP->getEmissive()[0] << ' ' << matBP->getEmissive()[1] << ' ' << matBP->getEmissive()[2] << '\n';
+      mtlFile << "\td  " << matBP->getTransparency() << '\n';
 
-      if (matSTD->getAmbientMap() && matSTD->getAmbientMap() != defaultTexture) {
+      if (matBP->getAmbientMap() && matBP->getAmbientMap() != defaultTexture) {
         const auto ambientMapPath = materialName + "_ambient.png";
 
         mtlFile << "\tmap_Ka " << ambientMapPath << '\n';
-        matSTD->getAmbientMap()->save(ambientMapPath);
+        matBP->getAmbientMap()->save(ambientMapPath);
       }
 
-      if (matSTD->getDiffuseMap() && matSTD->getDiffuseMap() != defaultTexture) {
+      if (matBP->getDiffuseMap() && matBP->getDiffuseMap() != defaultTexture) {
         const auto diffuseMapPath = materialName + "_diffuse.png";
 
         mtlFile << "\tmap_Kd " << diffuseMapPath << '\n';
-        matSTD->getDiffuseMap()->save(diffuseMapPath);
+        matBP->getDiffuseMap()->save(diffuseMapPath);
       }
 
-      if (matSTD->getSpecularMap() && matSTD->getSpecularMap() != defaultTexture) {
+      if (matBP->getSpecularMap() && matBP->getSpecularMap() != defaultTexture) {
         const auto specularMapPath = materialName + "_specular.png";
 
         mtlFile << "\tmap_Ks " << specularMapPath << '\n';
-        matSTD->getSpecularMap()->save(specularMapPath);
+        matBP->getSpecularMap()->save(specularMapPath);
       }
 
-      if (matSTD->getEmissiveMap() && matSTD->getEmissiveMap() != defaultTexture) {
+      if (matBP->getEmissiveMap() && matBP->getEmissiveMap() != defaultTexture) {
         const auto emissiveMapPath = materialName + "_emissive.png";
 
         mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
-        matSTD->getEmissiveMap()->save(emissiveMapPath);
+        matBP->getEmissiveMap()->save(emissiveMapPath);
       }
 
-      if (matSTD->getTransparencyMap() && matSTD->getTransparencyMap() != defaultTexture) {
+      if (matBP->getTransparencyMap() && matBP->getTransparencyMap() != defaultTexture) {
         const auto transparencyMapPath = materialName + "_transparency.png";
 
         mtlFile << "\tmap_d " << transparencyMapPath << '\n';
-        matSTD->getTransparencyMap()->save(transparencyMapPath);
+        matBP->getTransparencyMap()->save(transparencyMapPath);
       }
 
-      if (matSTD->getBumpMap() && matSTD->getBumpMap() != defaultTexture) {
+      if (matBP->getBumpMap() && matBP->getBumpMap() != defaultTexture) {
         const auto ambOccMapPath = materialName + "_bump.png";
 
         mtlFile << "\tmap_bump " << ambOccMapPath << '\n';
-        matSTD->getBumpMap()->save(ambOccMapPath);
+        matBP->getBumpMap()->save(ambOccMapPath);
       }
     }
   }

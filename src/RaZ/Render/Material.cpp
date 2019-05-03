@@ -26,7 +26,7 @@ std::unique_ptr<MaterialCookTorrance> Material::recoverMaterial(MaterialPreset p
   return MaterialCookTorrance::create(materialParams.first, materialParams.second, roughnessFactor);
 }
 
-void MaterialStandard::initTextures(const ShaderProgram& program) const {
+void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
   const std::string locationBase = "uniMaterial.";
 
   const std::string ambientMapLocation      = locationBase + "ambientMap";
@@ -44,7 +44,7 @@ void MaterialStandard::initTextures(const ShaderProgram& program) const {
   program.sendUniform(bumpMapLocation,         5);
 }
 
-void MaterialStandard::bindAttributes(const ShaderProgram& program) const {
+void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
   const std::string locationBase = "uniMaterial.";
 
   const std::string ambientLocation      = locationBase + "ambient";
