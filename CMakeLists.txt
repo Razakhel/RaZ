@@ -244,6 +244,7 @@ set(
 
     src/RaZ/*.cpp
     src/RaZ/Math/*.cpp
+    src/RaZ/Physics/*.cpp
     src/RaZ/Render/*.cpp
     src/RaZ/Utils/*.cpp
 
@@ -251,6 +252,7 @@ set(
     include/RaZ/*.inl
     include/RaZ/Math/*.hpp
     include/RaZ/Math/*.inl
+    include/RaZ/Physics/*.hpp
     include/RaZ/Render/*.hpp
     include/RaZ/Render/*.inl
     include/RaZ/Utils/*.hpp
@@ -353,7 +355,7 @@ elseif (WIN32)
     )
 
     # To automatically export all the classes & functions
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS True)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif ()
 
 # If FBX SDK not found, do not compile FBX loader
