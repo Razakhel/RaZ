@@ -88,7 +88,9 @@ void Mesh::draw() const {
 
 void Mesh::draw(const ShaderProgram& program) const {
   for (const Submesh& submesh : m_submeshes) {
-    if (!m_materials.empty()) {
+    if (submesh.getMaterialIndex() != std::numeric_limits<std::size_t>::max()) {
+      assert("Error: Material index does not reference any existing material." && submesh.getMaterialIndex() < m_materials.size());
+
       const MaterialPtr& material = m_materials[submesh.getMaterialIndex()];
 
       if (material)
