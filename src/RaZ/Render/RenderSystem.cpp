@@ -66,9 +66,16 @@ bool RenderSystem::update(float deltaTime) {
   Mat4f viewProjMat;
 
   if (camTransform.hasUpdated()) {
-    const Mat4f& viewMat = camera.computeViewMatrix(camTransform.computeTranslationMatrix(true),
-                                                    camTransform.getRotation().inverse());
+    if (camera.getCameraType() == CameraType::LOOK_AT) {
+      camera.computeLookAt(camTransform.getPosition());
+    } else {
+      camera.computeViewMatrix(camTransform.computeTranslationMatrix(true),
+                               camTransform.getRotation().inverse());
+    }
+
     camera.computeInverseViewMatrix();
+
+    const Mat4f& viewMat = camera.getViewMatrix();
     viewProjMat = viewMat * camera.getProjectionMatrix();
 
     sendCameraMatrices(viewProjMat);

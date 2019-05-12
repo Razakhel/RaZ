@@ -32,10 +32,10 @@ const Mat4f& Camera::computeViewMatrix(const Mat4f& translationMatrix, const Mat
   return m_viewMat;
 }
 
-const Mat4f& Camera::computeLookAt(const Vec3f& position, const Vec3f& target, const Vec3f& upDirection) {
-  const Vec3f zAxis((position - target).normalize());
-  const Vec3f xAxis(zAxis.cross(upDirection).normalize());
-  const Vec3f yAxis(xAxis.cross(zAxis));
+const Mat4f& Camera::computeLookAt(const Vec3f& position) {
+  const Vec3f zAxis = (position - m_target).normalize();
+  const Vec3f xAxis = zAxis.cross(m_upAxis).normalize();
+  const Vec3f yAxis = xAxis.cross(zAxis);
 
   m_viewMat = Mat4f({{             xAxis[0],             yAxis[0],           -zAxis[0], 0.f },
                      {             xAxis[1],             yAxis[1],           -zAxis[1], 0.f },
