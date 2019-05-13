@@ -83,6 +83,7 @@ enum class ImageColorspace {
 class Image {
 public:
   Image() = default;
+  Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
   explicit Image(const std::string& fileName, bool reverse = false) { read(fileName, reverse); }
 
   unsigned int getWidth() const { return m_width; }
@@ -90,6 +91,7 @@ public:
   ImageColorspace getColorspace() const { return m_colorspace; }
   ImageDataType getDataType() const { return m_data->getDataType(); }
   const void* getDataPtr() const { return m_data->getDataPtr(); }
+  void* getDataPtr() { return m_data->getDataPtr(); }
 
   template <typename... Args> static ImagePtr create(Args&&... args) { return std::make_unique<Image>(std::forward<Args>(args)...); }
 

@@ -7,6 +7,36 @@
 
 namespace Raz {
 
+Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace) : m_width{ width },
+                                                                                    m_height{ height },
+                                                                                    m_colorspace{ colorspace } {
+  switch (colorspace) {
+    case ImageColorspace::DEPTH:
+    case ImageColorspace::GRAY:
+      m_channelCount = 1;
+      break;
+
+    case ImageColorspace::GRAY_ALPHA:
+      m_channelCount = 2;
+      break;
+
+    case ImageColorspace::RGB:
+      m_channelCount = 3;
+      break;
+
+    case ImageColorspace::RGBA:
+      m_channelCount = 4;
+      break;
+  }
+
+  m_bitDepth = 8;
+
+  ImageDataBPtr imgData = ImageDataB::create();
+  imgData->data.resize(width * height * m_channelCount);
+
+  m_data = std::move(imgData);
+}
+
 void Image::read(const std::string& filePath, bool reverse) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 

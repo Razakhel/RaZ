@@ -2,7 +2,7 @@
 
 namespace Raz {
 
-std::unique_ptr<MaterialCookTorrance> Material::recoverMaterial(MaterialPreset preset, float roughnessFactor) {
+MaterialCookTorrancePtr Material::recoverMaterial(MaterialPreset preset, float roughnessFactor) {
   static const std::array<std::pair<Vec3f, float>, static_cast<std::size_t>(MaterialPreset::PRESET_COUNT)> materialPresetParams = {
       std::pair<Vec3f, float>(Vec3f(0.02f), 0.f), // CHARCOAL
       std::pair<Vec3f, float>(Vec3f(0.21f), 0.f), // GRASS
