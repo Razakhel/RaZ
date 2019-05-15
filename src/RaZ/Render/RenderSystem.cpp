@@ -183,4 +183,11 @@ void RenderSystem::updateShaders() const {
   }
 }
 
+void RenderSystem::saveToImage(const std::string& fileName) const {
+  Image img(m_window.getWidth(), m_window.getHeight());
+  glReadPixels(0, 0, m_window.getWidth(), m_window.getHeight(), GL_RGB, GL_UNSIGNED_BYTE, img.getDataPtr());
+
+  img.save(fileName, true);
+}
+
 } // namespace Raz
