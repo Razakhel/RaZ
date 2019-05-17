@@ -14,6 +14,7 @@ set(
 
     RaZ/*.cpp
     RaZ/Math/*.cpp
+    RaZ/Render/*.cpp
     RaZ/Utils/*.cpp
 )
 
