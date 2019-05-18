@@ -19,6 +19,7 @@ public:
   void import(std::string fileName);
   void load() const;
   void compile() const;
+  bool isCompiled() const;
   void destroy() const;
 
   Shader& operator=(const Shader&) = delete;

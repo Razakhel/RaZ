@@ -42,15 +42,19 @@ void Shader::load() const {
 void Shader::compile() const {
   glCompileShader(m_index);
 
-  int success;
-  glGetShaderiv(m_index, GL_COMPILE_STATUS, &success);
-
-  if (!success) {
+  if (!isCompiled()) {
     std::array<char, 512> infoLog {};
 
     glGetShaderInfoLog(m_index, static_cast<int>(infoLog.size()), nullptr, infoLog.data());
     std::cerr << "Error: Shader compilation failed (ID " << m_index << ", path '" << m_path << "').\n" << infoLog.data() << std::endl;
   }
+}
+
+bool Shader::isCompiled() const {
+  int success;
+  glGetShaderiv(m_index, GL_COMPILE_STATUS, &success);
+
+  return static_cast<bool>(success);
 }
 
 void Shader::loadSource(const std::string& source) {
