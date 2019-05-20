@@ -37,6 +37,9 @@ public:
   void compileShaders() const;
   /// Links the program to the graphics card.
   void link() const;
+  /// Checks if the program has been successfully linked.
+  /// \return True if the program is linked, false otherwise.
+  bool isLinked() const;
   /// Tells the graphics card to use the program.
   void use() const;
   /// Loads & compiles all the shaders contained by the program, then links & uses it.

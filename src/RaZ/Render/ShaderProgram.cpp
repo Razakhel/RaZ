@@ -65,15 +65,19 @@ void ShaderProgram::compileShaders() const {
 void ShaderProgram::link() const {
   glLinkProgram(m_index);
 
-  int success;
-  glGetProgramiv(m_index, GL_LINK_STATUS, &success);
-
-  if (!success) {
+  if (!isLinked()) {
     std::array<char, 512> infoLog {};
 
     glGetProgramInfoLog(m_index, static_cast<int>(infoLog.size()), nullptr, infoLog.data());
     std::cerr << "Error: Shader program link failed (ID " << m_index << ").\n" << infoLog.data() << std::endl;
   }
+}
+
+bool ShaderProgram::isLinked() const {
+  int success;
+  glGetProgramiv(m_index, GL_LINK_STATUS, &success);
+  
+  return static_cast<bool>(success);
 }
 
 void ShaderProgram::use() const {
