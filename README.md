@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img alt="RaZ logo" src="https://i.imgur.com/UuSXB7m.png" />
+    <img alt="RaZ logo" src="https://i.imgur.com/rwGGcpr.png" />
     <br />
     RaZ
 </h1>
