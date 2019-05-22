@@ -10,6 +10,7 @@ int main() {
 
   Raz::Window& window = renderSystem.getWindow();
   window.enableOverlay();
+  window.setIcon("../../assets/icons/RaZ_logo_128.png");
 
   Raz::Entity& camera = renderSystem.getCameraEntity();
   auto& cameraComp    = camera.getComponent<Raz::Camera>();

@@ -1,4 +1,6 @@
 <h1 align="center">
+    <img alt="RaZ logo" src="https://i.imgur.com/UuSXB7m.png" />
+    <br />
     RaZ
 </h1>
 
