@@ -424,7 +424,7 @@ if (WIN32)
     set(CMAKE_INSTALL_PREFIX "C:/RaZ")
 endif ()
 
-install(TARGETS RaZ DESTINATION lib)
+install(TARGETS RaZ DESTINATION "lib/$<CONFIG>")
 
 # Installing the headers
 set(
