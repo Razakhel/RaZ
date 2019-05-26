@@ -430,7 +430,6 @@ install(TARGETS RaZ DESTINATION "lib/$<CONFIG>")
 set(
     HEADERS_INSTALL
 
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include/GL
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include/GLFW
     ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ
 )
