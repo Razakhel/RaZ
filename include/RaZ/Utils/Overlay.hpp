@@ -3,13 +3,13 @@
 #ifndef RAZ_OVERLAY_HPP
 #define RAZ_OVERLAY_HPP
 
-#include <array>
 #include <functional>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
-#include "GLFW/glfw3.h"
+// Forward declaration of GLFWwindow, to allow its usage into functions
+struct GLFWwindow;
 
 namespace Raz {
 
