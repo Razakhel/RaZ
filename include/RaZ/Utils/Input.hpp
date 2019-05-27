@@ -3,8 +3,6 @@
 #ifndef RAZ_INPUT_HPP
 #define RAZ_INPUT_HPP
 
-#include "GLFW/glfw3.h"
-
 namespace Raz {
 
 namespace Input {
@@ -24,88 +22,91 @@ namespace Keyboard {
 /// Values defining keyboard's keys.
 enum Key {
   // Letter keys
-  A = GLFW_KEY_A,
-  B = GLFW_KEY_B,
-  C = GLFW_KEY_C,
-  D = GLFW_KEY_D,
-  E = GLFW_KEY_E,
-  F = GLFW_KEY_F,
-  G = GLFW_KEY_G,
-  H = GLFW_KEY_H,
-  I = GLFW_KEY_I,
-  J = GLFW_KEY_J,
-  K = GLFW_KEY_K,
-  L = GLFW_KEY_L,
-  M = GLFW_KEY_M,
-  N = GLFW_KEY_N,
-  O = GLFW_KEY_O,
-  P = GLFW_KEY_P,
-  Q = GLFW_KEY_Q,
-  R = GLFW_KEY_R,
-  S = GLFW_KEY_S,
-  T = GLFW_KEY_T,
-  U = GLFW_KEY_U,
-  V = GLFW_KEY_V,
-  W = GLFW_KEY_W,
-  X = GLFW_KEY_X,
-  Y = GLFW_KEY_Y,
-  Z = GLFW_KEY_Z,
+  A = 65, // GLFW_KEY_A
+  B = 66, // GLFW_KEY_B
+  C = 67, // GLFW_KEY_C
+  D = 68, // GLFW_KEY_D
+  E = 69, // GLFW_KEY_E
+  F = 70, // GLFW_KEY_F
+  G = 71, // GLFW_KEY_G
+  H = 72, // GLFW_KEY_H
+  I = 73, // GLFW_KEY_I
+  J = 74, // GLFW_KEY_J
+  K = 75, // GLFW_KEY_K
+  L = 76, // GLFW_KEY_L
+  M = 77, // GLFW_KEY_M
+  N = 78, // GLFW_KEY_N
+  O = 79, // GLFW_KEY_O
+  P = 80, // GLFW_KEY_P
+  Q = 81, // GLFW_KEY_Q
+  R = 82, // GLFW_KEY_R
+  S = 83, // GLFW_KEY_S
+  T = 84, // GLFW_KEY_T
+  U = 85, // GLFW_KEY_U
+  V = 86, // GLFW_KEY_V
+  W = 87, // GLFW_KEY_W
+  X = 88, // GLFW_KEY_X
+  Y = 89, // GLFW_KEY_Y
+  Z = 90, // GLFW_KEY_Z
 
   // Function keys
-  F1  = GLFW_KEY_F1,
-  F2  = GLFW_KEY_F2,
-  F3  = GLFW_KEY_F3,
-  F4  = GLFW_KEY_F4,
-  F5  = GLFW_KEY_F5,
-  F6  = GLFW_KEY_F6,
-  F7  = GLFW_KEY_F7,
-  F8  = GLFW_KEY_F8,
-  F9  = GLFW_KEY_F9,
-  F10 = GLFW_KEY_F10,
-  F11 = GLFW_KEY_F11,
-  F12 = GLFW_KEY_F12,
+  F1  = 290, // GLFW_KEY_F1
+  F2  = 291, // GLFW_KEY_F2
+  F3  = 292, // GLFW_KEY_F3
+  F4  = 293, // GLFW_KEY_F4
+  F5  = 294, // GLFW_KEY_F5
+  F6  = 295, // GLFW_KEY_F6
+  F7  = 296, // GLFW_KEY_F7
+  F8  = 297, // GLFW_KEY_F8
+  F9  = 298, // GLFW_KEY_F9
+  F10 = 299, // GLFW_KEY_F10
+  F11 = 300, // GLFW_KEY_F11
+  F12 = 301, // GLFW_KEY_F12
 
   // Arrow keys
-  UP    = GLFW_KEY_UP,
-  DOWN  = GLFW_KEY_DOWN,
-  RIGHT = GLFW_KEY_RIGHT,
-  LEFT  = GLFW_KEY_LEFT,
+  UP    = 265, // GLFW_KEY_UP
+  DOWN  = 264, // GLFW_KEY_DOWN
+  RIGHT = 262, // GLFW_KEY_RIGHT
+  LEFT  = 263, // GLFW_KEY_LEFT
 
   // Numpad
-  NUMLOCK   = GLFW_KEY_NUM_LOCK,
-  ADD       = GLFW_KEY_KP_ADD,
-  DECIMAL   = GLFW_KEY_KP_DECIMAL,
-  SUBSTRACT = GLFW_KEY_KP_SUBTRACT,
-  MULTIPLY  = GLFW_KEY_KP_MULTIPLY,
-  DIVIDE    = GLFW_KEY_KP_DIVIDE,
-  NUM0      = GLFW_KEY_KP_0,
-  NUM1      = GLFW_KEY_KP_1,
-  NUM2      = GLFW_KEY_KP_2,
-  NUM3      = GLFW_KEY_KP_3,
-  NUM4      = GLFW_KEY_KP_4,
-  NUM5      = GLFW_KEY_KP_5,
-  NUM6      = GLFW_KEY_KP_6,
-  NUM7      = GLFW_KEY_KP_7,
-  NUM8      = GLFW_KEY_KP_8,
-  NUM9      = GLFW_KEY_KP_9,
+  NUMLOCK   = 282, // GLFW_KEY_NUM_LOCK
+  ADD       = 334, // GLFW_KEY_KP_ADD
+  DECIMAL   = 330, // GLFW_KEY_KP_DECIMAL
+  SUBSTRACT = 333, // GLFW_KEY_KP_SUBTRACT
+  MULTIPLY  = 332, // GLFW_KEY_KP_MULTIPLY
+  DIVIDE    = 331, // GLFW_KEY_KP_DIVIDE
+  NUM0      = 320, // GLFW_KEY_KP_0
+  NUM1      = 321, // GLFW_KEY_KP_1
+  NUM2      = 322, // GLFW_KEY_KP_2
+  NUM3      = 323, // GLFW_KEY_KP_3
+  NUM4      = 324, // GLFW_KEY_KP_4
+  NUM5      = 325, // GLFW_KEY_KP_5
+  NUM6      = 326, // GLFW_KEY_KP_6
+  NUM7      = 327, // GLFW_KEY_KP_7
+  NUM8      = 328, // GLFW_KEY_KP_8
+  NUM9      = 329, // GLFW_KEY_KP_9
 
   // Modifiers
-  LEFT_SHIFT  = GLFW_KEY_LEFT_SHIFT,
-  RIGHT_SHIFT = GLFW_KEY_RIGHT_SHIFT,
-  LEFT_CTRL   = GLFW_KEY_LEFT_CONTROL,
-  RIGHT_CTRL  = GLFW_KEY_RIGHT_CONTROL,
-  LEFT_ALT    = GLFW_KEY_LEFT_ALT,
-  RIGHT_ALT   = GLFW_KEY_RIGHT_ALT,
+  LEFT_SHIFT  = 340, // GLFW_KEY_LEFT_SHIFT
+  RIGHT_SHIFT = 344, // GLFW_KEY_RIGHT_SHIFT
+  LEFT_CTRL   = 341, // GLFW_KEY_LEFT_CONTROL
+  RIGHT_CTRL  = 345, // GLFW_KEY_RIGHT_CONTROL
+  LEFT_ALT    = 342, // GLFW_KEY_LEFT_ALT
+  RIGHT_ALT   = 346, // GLFW_KEY_RIGHT_ALT
 
   // Miscellaneous
-  HOME      = GLFW_KEY_HOME,
-  END       = GLFW_KEY_END,
-  PAGEUP    = GLFW_KEY_PAGE_UP,
-  PAGEDOWN  = GLFW_KEY_PAGE_DOWN,
-  CAPSLOCK  = GLFW_KEY_CAPS_LOCK,
-  BACKSPACE = GLFW_KEY_BACKSPACE,
-  SPACE     = GLFW_KEY_SPACE,
-  ESCAPE    = GLFW_KEY_ESCAPE
+  HOME         = 268, // GLFW_KEY_HOME
+  END          = 269, // GLFW_KEY_END
+  PAGEUP       = 266, // GLFW_KEY_PAGE_UP
+  PAGEDOWN     = 267, // GLFW_KEY_PAGE_DOWN
+  CAPSLOCK     = 280, // GLFW_KEY_CAPS_LOCK
+  SPACE        = 32,  // GLFW_KEY_SPACE
+  BACKSPACE    = 259, // GLFW_KEY_BACKSPACE
+  INSERT       = 260, // GLFW_KEY_INSERT
+  ESCAPE       = 256, // GLFW_KEY_ESCAPE
+  PRINT_SCREEN = 283, // GLFW_KEY_PRINT_SCREEN
+  PAUSE        = 284, // GLFW_KEY_PAUSE
 };
 
 } // namespace Keyboard
@@ -114,9 +115,9 @@ namespace Mouse {
 
 /// Values defining mouse buttons.
 enum Button {
-  LEFT_CLICK   = GLFW_MOUSE_BUTTON_LEFT,
-  RIGHT_CLICK  = GLFW_MOUSE_BUTTON_RIGHT,
-  MIDDLE_CLICK = GLFW_MOUSE_BUTTON_MIDDLE
+  LEFT_CLICK   = 0, // GLFW_MOUSE_BUTTON_LEFT
+  RIGHT_CLICK  = 1, // GLFW_MOUSE_BUTTON_RIGHT
+  MIDDLE_CLICK = 2  // GLFW_MOUSE_BUTTON_MIDDLE
 };
 
 } // namespace Mouse
@@ -128,9 +129,9 @@ namespace Cursor {
 ///  HIDDEN: the cursor stays hidden but exists nonetheless, meaning that it can freely go out of the window.
 ///  DISABLED: the cursor stays hidden while returning to the center continuously, meaning that it can't go out of the window.
 enum State {
-  NORMAL   = GLFW_CURSOR_NORMAL,
-  HIDDEN   = GLFW_CURSOR_HIDDEN,
-  DISABLED = GLFW_CURSOR_DISABLED
+  NORMAL   = 212993, // GLFW_CURSOR_NORMAL (0x00034001)
+  HIDDEN   = 212994, // GLFW_CURSOR_HIDDEN (0x00034002)
+  DISABLED = 212995  // GLFW_CURSOR_DISABLED (0x00034003)
 };
 
 }

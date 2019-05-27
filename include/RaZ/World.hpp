@@ -11,6 +11,7 @@ namespace Raz {
 /// World class handling systems & entities.
 class World {
 public:
+  World() = default;
   explicit World(std::size_t entityCount) { m_entities.reserve(entityCount); }
 
   const std::vector<SystemPtr>& getSystems() const { return m_systems; }
