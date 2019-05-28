@@ -41,10 +41,10 @@ TEST_CASE("Matrix near-equality") {
   REQUIRE_FALSE(baseMat[2] == compMat[2]);
   REQUIRE_FALSE(baseMat[3] == compMat[3]);
 
-  REQUIRE(Raz::FloatUtils::checkNearEquality(baseMat[0], compMat[0])); // Near-equality components check
-  REQUIRE(Raz::FloatUtils::checkNearEquality(baseMat[1], compMat[1]));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(baseMat[2], compMat[2]));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(baseMat[3], compMat[3]));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(baseMat[0], compMat[0])); // Near-equality components check
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(baseMat[1], compMat[1]));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(baseMat[2], compMat[2]));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(baseMat[3], compMat[3]));
 
   REQUIRE(baseMat == compMat); // Matrix::operator== does a near-equality check on floating point types
 }

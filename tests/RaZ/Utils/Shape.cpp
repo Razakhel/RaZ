@@ -67,14 +67,14 @@ TEST_CASE("Line basic") {
   REQUIRE(line2.computeCentroid() == Raz::Vec3f({ 0.f, 0.5f, 0.f }));
   REQUIRE(line3.computeCentroid() == Raz::Vec3f(0.f));
 
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line1.computeLength(), 1.f));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line1.computeSquaredLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(line1.computeLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(line1.computeSquaredLength(), 1.f));
 
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line2.computeLength(), 1.f));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line2.computeSquaredLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(line2.computeLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(line2.computeSquaredLength(), 1.f));
 
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line3.computeLength(), 3.464101615f));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(line3.computeSquaredLength(), 12.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(line3.computeLength(), 3.464101615f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(line3.computeSquaredLength(), 12.f));
 }
 
 TEST_CASE("Line-plane intersection") {
@@ -96,8 +96,8 @@ TEST_CASE("Plane basic") {
   const Raz::Plane testPlane2(Raz::Vec3f({ 1.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, 1.f, -1.f }), Raz::Vec3f({ 0.f, 1.f, 1.f }));
 
   // Checking that the 3 planes are strictly equal to each other
-  REQUIRE(Raz::FloatUtils::checkNearEquality(testPlane1.getDistance(), testPlane2.getDistance()));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(testPlane1.getDistance(), testPlane2.getDistance()));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(testPlane1.getDistance(), testPlane2.getDistance()));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(testPlane1.getDistance(), testPlane2.getDistance()));
 
   REQUIRE(testPlane1.getNormal() == testPlane2.getNormal());
   REQUIRE(testPlane1.getNormal() == testPlane2.getNormal());

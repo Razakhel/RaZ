@@ -14,7 +14,7 @@ namespace FloatUtils {
 
 // Near-equality floating point check
 template <typename T>
-inline bool checkNearEquality(T val1, T val2) {
+inline constexpr bool areNearlyEqual(T val1, T val2) {
   static_assert(std::is_floating_point<T>::value, "Error: Values' type must be floating point.");
 
   // Using absolute & relative tolerances for floating points types: http://www.realtimecollisiondetection.net/pubs/Tolerances/

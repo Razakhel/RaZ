@@ -90,7 +90,7 @@ const Mat4f& Camera::computeInverseProjectionMatrix() {
 }
 
 void Camera::resizeViewport(unsigned int frameWidth, unsigned int frameHeight) {
-  m_frameRatio  = static_cast<float>(frameWidth) / frameHeight;
+  m_frameRatio = static_cast<float>(frameWidth) / frameHeight;
 
   computeProjectionMatrix();
   computeInverseProjectionMatrix();

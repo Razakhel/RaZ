@@ -26,7 +26,7 @@ void Transform::translate(float x, float y, float z) {
 }
 
 void Transform::rotate(float angleDegrees, const Vec3f& axis) {
-  assert("Error: Rotation axis must be normalized." && FloatUtils::checkNearEquality(axis.computeLength(), 1.f));
+  assert("Error: Rotation axis must be normalized." && FloatUtils::areNearlyEqual(axis.computeLength(), 1.f));
 
   const Quaternionf quaternion(angleDegrees, axis);
   m_rotation = quaternion.computeMatrix() * m_rotation;

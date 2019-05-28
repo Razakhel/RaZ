@@ -30,9 +30,9 @@ TEST_CASE("Vector near-equality") {
   REQUIRE_FALSE(baseVec[1] == compVec[1]);
   REQUIRE_FALSE(baseVec[2] == compVec[2]);
 
-  REQUIRE(Raz::FloatUtils::checkNearEquality(baseVec[0], compVec[0])); // Near-equality components check
-  REQUIRE(Raz::FloatUtils::checkNearEquality(baseVec[1], compVec[1]));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(baseVec[2], compVec[2]));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(baseVec[0], compVec[0])); // Near-equality components check
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(baseVec[1], compVec[1]));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(baseVec[2], compVec[2]));
 
   REQUIRE(baseVec == compVec); // Vector::operator== does a near-equality check on floating point types
 }
@@ -51,8 +51,8 @@ TEST_CASE("Vector/vector operations") {
   REQUIRE((vec31 * vec32) == Raz::Vec3f({ 1721.6838f, 1984.5f, 5.524554f }));
 
   REQUIRE(vec31.dot(vec31) == vec31.computeSquaredLength());
-  REQUIRE(Raz::FloatUtils::checkNearEquality(vec31.dot(vec31), 1774.876276f));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(vec31.dot(vec32), 3711.708354f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(vec31.dot(vec31), 1774.876276f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(vec31.dot(vec32), 3711.708354f));
   REQUIRE(vec31.dot(vec32) == vec32.dot(vec31)); // A · B == B · A
 
   REQUIRE(vec31.cross(vec32) == Raz::Vec3f({ 224.1855f, 453.09156f, -22588.965f }));
@@ -78,9 +78,9 @@ TEST_CASE("Vector/matrix operations") {
 }
 
 TEST_CASE("Vector manipulations") {
-  REQUIRE(Raz::FloatUtils::checkNearEquality(vec31.normalize().computeLength(), 1.f));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(vec41.normalize().computeSquaredLength(), 1.f));
-  REQUIRE(Raz::FloatUtils::checkNearEquality(Raz::Vec3f({ 0.f, 1.f, 0.f }).computeLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(vec31.normalize().computeLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(vec41.normalize().computeSquaredLength(), 1.f));
+  REQUIRE(Raz::FloatUtils::areNearlyEqual(Raz::Vec3f({ 0.f, 1.f, 0.f }).computeLength(), 1.f));
 
   // Testing Vector::reflect():
   //

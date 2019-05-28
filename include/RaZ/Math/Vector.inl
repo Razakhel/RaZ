@@ -201,7 +201,7 @@ template <typename T, std::size_t Size>
 bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const {
   if (std::is_floating_point<T>::value) {
     for (std::size_t i = 0; i < Size; ++i) {
-      if (!FloatUtils::checkNearEquality(m_data[i], vec[i]))
+      if (!FloatUtils::areNearlyEqual(m_data[i], vec[i]))
         return false;
     }
 

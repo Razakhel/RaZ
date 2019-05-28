@@ -13,7 +13,7 @@ bool Line::intersects(const Plane& plane) const {
   const float lineVecPlaneAngle = lineVec.dot(plane.getNormal());
 
   // If near 0, the line & the plane are parallel to each other
-  if (FloatUtils::checkNearEquality(lineVecPlaneAngle, 0.f))
+  if (FloatUtils::areNearlyEqual(lineVecPlaneAngle, 0.f))
     return false;
 
   const float lineStartPlaneAngle = m_beginPos.dot(plane.getNormal());
@@ -66,7 +66,7 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
 
 bool Plane::intersects(const Plane& plane) const {
   const float planesAngle = m_normal.dot(plane.getNormal());
-  return !FloatUtils::checkNearEquality(std::abs(planesAngle), 1.f);
+  return !FloatUtils::areNearlyEqual(std::abs(planesAngle), 1.f);
 }
 
 bool Plane::intersects(const Sphere& sphere) const {

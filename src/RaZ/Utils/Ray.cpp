@@ -35,7 +35,7 @@ bool Ray::intersects(const Vec3f& point) const {
 
   const Vec3f pointDir = (point - m_origin).normalize();
 
-  return FloatUtils::checkNearEquality(pointDir.dot(m_direction), 1.f);
+  return FloatUtils::areNearlyEqual(pointDir.dot(m_direction), 1.f);
 }
 
 bool Ray::intersects(const Line&, RayHit*) const {
@@ -83,7 +83,7 @@ bool Ray::intersects(const Triangle& triangle) const {
   const Vec3f pVec        = m_direction.cross(secondEdge);
   const float determinant = firstEdge.dot(pVec);
 
-  if (FloatUtils::checkNearEquality(std::abs(determinant), 0.f))
+  if (FloatUtils::areNearlyEqual(std::abs(determinant), 0.f))
     return false;
 
   const float invDeterm = 1 / determinant;
