@@ -10,7 +10,7 @@ endif ()
 
 if (CMAKE_COMPILER_IS_GNUCC)
     set(
-        GCC_FLAGS
+        COMPILER_FLAGS
 
         "-pedantic -pedantic-errors \
          -Wall -Wextra \
@@ -58,9 +58,9 @@ if (CMAKE_COMPILER_IS_GNUCC)
     # Enabling some other warnings available since GCC 5
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
         set(
-            GCC_FLAGS
+            COMPILER_FLAGS
 
-            "${GCC_FLAGS} \
+            "${COMPILER_FLAGS} \
              -Wformat-signedness \
              -fsized-deallocation \
              -Wsized-deallocation \
@@ -72,9 +72,9 @@ if (CMAKE_COMPILER_IS_GNUCC)
     # Enabling some other warnings available since GCC 6
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 6 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6)
         set(
-            GCC_FLAGS
+            COMPILER_FLAGS
 
-            "${GCC_FLAGS} \
+            "${COMPILER_FLAGS} \
              -Wduplicated-cond \
              -Wnull-dereference"
         )
@@ -83,20 +83,18 @@ if (CMAKE_COMPILER_IS_GNUCC)
     # Enabling some other warnings available since GCC 7
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7)
         set(
-            GCC_FLAGS
+            COMPILER_FLAGS
 
-            "${GCC_FLAGS} \
+            "${COMPILER_FLAGS} \
              -Walloc-zero -Walloca \
              -Wformat-overflow \
              -Wshadow=compatible-local \
              -Waligned-new"
         )
     endif ()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(
-        CLANG_FLAGS
+        COMPILER_FLAGS
 
         "-pedantic -pedantic-errors \
          -Weverything \
@@ -116,34 +114,40 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     # Disabling some warnings available since Clang 5
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
         set(
-            CLANG_FLAGS
+            COMPILER_FLAGS
 
-            "${CLANG_FLAGS} \
+            "${COMPILER_FLAGS} \
              -Wno-unused-template"
         )
     endif ()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CLANG_FLAGS}")
 elseif (MSVC)
     set(
-        MSVC_FLAGS
+        COMPILER_FLAGS
 
-        "/W4 \
-         \
-         /wd4100 \
-         /wd4127 \
-         /wd4131 \
-         /wd4152 \
-         /wd4204 \
-         /wd4244 \
-         /wd4245 \
-         /wd4267 \
-         /wd4456 \
-         /wd4996" # Disabling warnings triggered by libpng, GLEW & GLFW
+        /W4
+
+        # Disabling some warnings triggered by compiling files from external libraries
+        /wd4100 # [GLFW] Unreferenced formal parameter
+        /wd4127 # [libpng] Conditional expression is constant
+        /wd4131 # [libpng] Uses old-style declarator
+        /wd4152 # [GLFW] Non-standard extension (function/data pointer conversion in expression)
+        /wd4204 # [GLFW] Non-standard extension (non-constant aggregate initializer)
+        /wd4244 # [libpng, GLFW] Type narrowing from T (possible loss of data)
+        /wd4245 # [libpng] Signed/unsigned conversion
+        /wd4267 # [libpng] Type narrowing from size_t (possible loss of data)
+        /wd4456 # [GLEW] Shadowing (declaration of 'var' hides previous local declaration)
+        /wd4996 # [libpng, GLFW] Deprecated declaration
+
+        # Declaring external headers as system ones, to disable all warnings when including them
+        /experimental:external
+        /external:I ${CMAKE_CURRENT_SOURCE_DIR}/extern
+        /external:W0
     )
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MSVC_FLAGS}")
 endif ()
+
+# Replacing ';' by spaces, since setting elements without quotes in a variable separates them that way
+string(REPLACE ";" " " COMPILER_FLAGS "${COMPILER_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS}")
 
 # FBX SDK usage
 if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
