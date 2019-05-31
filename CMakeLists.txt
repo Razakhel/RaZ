@@ -10,119 +10,130 @@ endif ()
 
 if (CMAKE_COMPILER_IS_GNUCC)
     set(
-        COMPILER_FLAGS
+        RAZ_COMPILER_FLAGS
 
-        "-pedantic -pedantic-errors \
-         -Wall -Wextra \
-         -Wcast-align -Wcast-qual \
-         -Wdisabled-optimization \
-         -Wfloat-equal \
-         -Wformat-security -Wformat=2 \
-         -Wmissing-declarations -Wmissing-include-dirs \
-         -Wnon-virtual-dtor \
-         -Wold-style-cast \
-         -Woverloaded-virtual \
-         -Wpacked \
-         -Wredundant-decls \
-         -Wundef -Wuninitialized \
-         -Wunused-macros \
-         -Wvla \
-         -Wconversion \
-         -Wswitch-default -Wswitch-enum \
-         -Wzero-as-null-pointer-constant \
-         -Wlogical-op \
-         -Wvector-operation-performance \
-         -Wdouble-promotion \
-         -Wtrampolines \
-         -Wuseless-cast \
-         -Wconditionally-supported \
-         -Wfloat-conversion \
-         -Wopenmp-simd \
-         -Warray-bounds \
-         -Wconditionally-supported \
-         -Wnoexcept \
-         -Wstrict-null-sentinel \
-         -Wno-format-security -Wno-format-nonliteral \
-         -Wno-switch-default \
-         \
-         -Wno-old-style-cast \
-         -Wno-zero-as-null-pointer-constant \
-         -Wno-useless-cast \
-         -Wno-float-equal \
-         -Wno-conversion \
-         -Wno-missing-declarations \
-         -Wno-double-promotion \
-         -Wno-cast-qual" # Disabling some warnings triggered a lot by ImGui...
+        -pedantic
+        -pedantic-errors
+        -Wall
+        -Wextra
+        -Wcast-align
+        -Wcast-qual
+        -Wdisabled-optimization
+        -Wfloat-equal
+        -Wformat=2
+        -Wformat-security
+        -Wno-format-nonliteral
+        -Wmissing-declarations
+        -Wmissing-include-dirs
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wpacked
+        -Wredundant-decls
+        -Wundef
+        -Wuninitialized
+        -Wunused-macros
+        -Wvla
+        -Wconversion
+        -Wswitch-default
+        -Wswitch-enum
+        -Wzero-as-null-pointer-constant
+        -Wlogical-op
+        -Wvector-operation-performance
+        -Wdouble-promotion
+        -Wtrampolines
+        -Wuseless-cast
+        -Wconditionally-supported
+        -Wfloat-conversion
+        -Wopenmp-simd
+        -Warray-bounds
+        -Wnoexcept
+        -Wstrict-null-sentinel
+
+        # Disabling some warnings triggered a lot by ImGui...
+        -Wno-old-style-cast
+        -Wno-zero-as-null-pointer-constant
+        -Wno-useless-cast
+        -Wno-float-equal
+        -Wno-conversion
+        -Wno-missing-declarations
+        -Wno-double-promotion
+        -Wno-cast-qual
+        -Wno-switch-default
     )
 
     # Enabling some other warnings available since GCC 5
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
         set(
-            COMPILER_FLAGS
+            RAZ_COMPILER_FLAGS
 
-            "${COMPILER_FLAGS} \
-             -Wformat-signedness \
-             -fsized-deallocation \
-             -Wsized-deallocation \
-             -Wsuggest-override \
-             -Warray-bounds=2"
+            ${RAZ_COMPILER_FLAGS}
+            -Wformat-signedness
+            -fsized-deallocation
+            -Wsized-deallocation
+            -Wsuggest-override
+            -Warray-bounds=2
         )
     endif ()
 
     # Enabling some other warnings available since GCC 6
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 6 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6)
         set(
-            COMPILER_FLAGS
+            RAZ_COMPILER_FLAGS
 
-            "${COMPILER_FLAGS} \
-             -Wduplicated-cond \
-             -Wnull-dereference"
+            ${RAZ_COMPILER_FLAGS}
+            -Wduplicated-cond
+            -Wnull-dereference
         )
     endif ()
 
     # Enabling some other warnings available since GCC 7
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7)
         set(
-            COMPILER_FLAGS
+            RAZ_COMPILER_FLAGS
 
-            "${COMPILER_FLAGS} \
-             -Walloc-zero -Walloca \
-             -Wformat-overflow \
-             -Wshadow=compatible-local \
-             -Waligned-new"
+            ${RAZ_COMPILER_FLAGS}
+            -Walloc-zero
+            -Walloca
+            -Wformat-overflow
+            -Wshadow=compatible-local
+            -Waligned-new
         )
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(
-        COMPILER_FLAGS
+        RAZ_COMPILER_FLAGS
 
-        "-pedantic -pedantic-errors \
-         -Weverything \
-         -Wno-c++98-compat -Wno-c++98-compat-pedantic \
-         -Wno-mismatched-tags \
-         -Wno-padded \
-         -Wno-shadow \
-         -Wno-global-constructors \
-         -Wno-weak-vtables \
-         -Wno-exit-time-destructors \
-         -Wno-covered-switch-default \
-         -Wno-reserved-id-macro \
-         -Wno-missing-braces \
-         -Wno-documentation -Wno-documentation-unknown-command"
+        -pedantic
+        -pedantic-errors
+        -Weverything
+        -Wno-c++98-compat
+        -Wno-c++98-compat-pedantic
+        -Wno-mismatched-tags
+        -Wno-padded
+        -Wno-shadow
+        -Wno-global-constructors
+        -Wno-weak-vtables
+        -Wno-exit-time-destructors
+        -Wno-covered-switch-default
+        -Wno-reserved-id-macro
+        -Wno-missing-braces
+        -Wno-documentation
+        -Wno-documentation-unknown-command
     )
 
     # Disabling some warnings available since Clang 5
     if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
         set(
-            COMPILER_FLAGS
+            RAZ_COMPILER_FLAGS
 
-            "${COMPILER_FLAGS} \
-             -Wno-unused-template"
+            ${RAZ_COMPILER_FLAGS}
+            -Wno-unused-template
         )
     endif ()
 elseif (MSVC)
     set(
-        COMPILER_FLAGS
+        RAZ_COMPILER_FLAGS
 
         /W4
 
@@ -145,9 +156,6 @@ elseif (MSVC)
     )
 endif ()
 
-# Replacing ';' by spaces, since setting elements without quotes in a variable separates them that way
-string(REPLACE ";" " " COMPILER_FLAGS "${COMPILER_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS}")
 
 # FBX SDK usage
 if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
@@ -395,6 +403,13 @@ if (RAZ_BUILD_STATIC)
 else ()
     add_library(RaZ SHARED ${SOURCE_FILES})
 endif ()
+
+if (NOT MSVC)
+    # Defining the compiler flags only for C++; this doesn't work with MSVC
+    set(RAZ_COMPILER_FLAGS $<$<COMPILE_LANGUAGE:CXX>:${RAZ_COMPILER_FLAGS}>)
+endif ()
+
+target_compile_options(RaZ PUBLIC ${RAZ_COMPILER_FLAGS})
 
 target_link_libraries(
     RaZ
