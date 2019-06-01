@@ -3,10 +3,9 @@ project(RaZ)
 
 set(CMAKE_CXX_STANDARD 14)
 
-# Define build type to Release if not automatically set
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release")
-endif ()
+########################
+# RaZ - Compiler flags #
+########################
 
 if (CMAKE_COMPILER_IS_GNUCC)
     set(
@@ -217,27 +216,22 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
 
     option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" ${FBX_FOUND})
 
-    if (RAZ_USE_FBX)
-        if (FBX_FOUND)
-            add_definitions(-DFBX_ENABLED)
-            add_definitions(-DFBXSDK_SHARED)
-            include_directories(${FBX_ROOT_DIR}/include)
-
-            message("FBX SDK linked.")
-        else ()
-            set(FBX_ROOT_DIR "" CACHE PATH "Path to your FBX SDK root directory")
-            message(SEND_ERROR "Error: Couldn't find FBX SDK in expected places, please set its root directory manually.")
-        endif ()
-    endif ()
-endif ()
+######################
+# RaZ - Source files #
+######################
 
 include_directories(
+    SYSTEM # The dependencies' headers are included as system ones, disabling all warnings
+
     ${CMAKE_CURRENT_SOURCE_DIR}/extern
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/png
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
     ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
+)
+
+include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
@@ -247,7 +241,7 @@ aux_source_directory(extern/glfw/src GLFW_SRC)
 aux_source_directory(extern/imgui IMGUI_SRC)
 
 set(
-    SRC
+    RAZ_SRC
 
     ${PNG_SRC}
     ${GLEW_SRC}
@@ -384,24 +378,29 @@ endif ()
 # Adding recursively every file we want to compile
 file(
     GLOB
-    SOURCE_FILES
+    RAZ_FILES
 
-    ${SRC}
+    ${RAZ_SRC}
 )
 
 # Removing unwanted platform-specific files
 list(
     REMOVE_ITEM
-    SOURCE_FILES
+    RAZ_FILES
 
     ${DISPOSABLE}
 )
 
+###############
+# RaZ - Build #
+###############
+
 option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
+
 if (RAZ_BUILD_STATIC)
-    add_library(RaZ STATIC ${SOURCE_FILES})
+    add_library(RaZ STATIC ${RAZ_FILES})
 else ()
-    add_library(RaZ SHARED ${SOURCE_FILES})
+    add_library(RaZ SHARED ${RAZ_FILES})
 endif ()
 
 if (NOT MSVC)
@@ -437,7 +436,10 @@ if (RAZ_GEN_DOC)
     add_subdirectory(doc)
 endif ()
 
-# Allowing to install RaZ
+######################
+# RaZ - Installation #
+######################
+
 # Installing the library
 if (WIN32)
     set(CMAKE_INSTALL_PREFIX "C:/RaZ")
