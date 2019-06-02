@@ -3,6 +3,8 @@ project(RaZ)
 
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
 ########################
 # RaZ - Compiler flags #
 ########################
@@ -147,74 +149,8 @@ elseif (MSVC)
         /wd4267 # [libpng] Type narrowing from size_t (possible loss of data)
         /wd4456 # [GLEW] Shadowing (declaration of 'var' hides previous local declaration)
         /wd4996 # [libpng, GLFW] Deprecated declaration
-
-        # Declaring external headers as system ones, to disable all warnings when including them
-        /experimental:external
-        /external:I ${CMAKE_CURRENT_SOURCE_DIR}/extern
-        /external:W0
     )
 endif ()
-
-
-# FBX SDK usage
-if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
-    if ("${CMAKE_BUILD_TYPE}" MATCHES "(D|d)eb")
-        set(BUILD_TYPE "debug")
-    elseif ("${CMAKE_BUILD_TYPE}" MATCHES "(R|r)el")
-        set(BUILD_TYPE "release")
-    endif ()
-
-    if (MSVC)
-        # Wildcards used to fetch from 'Program Files (x86)' as well, plus for every version: 2019.0, 2018.1.1, 2018.0, ...
-        # TODO: minor, but should be sorted in reverse order: the more recent the better (always possible to manually select it)
-        set(FBX_PATH "Program Files*/Autodesk/FBX/FBX SDK/*")
-        file(
-            GLOB
-            SEARCH_PATHS
-
-            "C:/${FBX_PATH}"
-            "D:/${FBX_PATH}"
-            "E:/${FBX_PATH}"
-        )
-
-        # TODO: searching by default into 'vs2015'; should be MSVC-version dependent
-        set(FBX_LIB_DIR "lib/vs2015/x64/${BUILD_TYPE}")
-        set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.lib")
-    elseif (CMAKE_COMPILER_IS_GNUCC)
-        file(
-            GLOB
-            SEARCH_PATHS
-
-            "/usr"
-            "/usr/local"
-            "~/*FBX*"
-            "~/*fbx*"
-         )
-
-        set(FBX_LIB_DIR "lib/gcc4/x64/${BUILD_TYPE}")
-        set(FBX_LIB_SUBPATH "${FBX_LIB_DIR}/libfbxsdk.a")
-    endif ()
-
-    # Checking if correctly user-assigned or previously found
-    if (EXISTS ${FBX_ROOT_DIR}/include/fbxsdk.h AND EXISTS ${FBX_ROOT_DIR}/${FBX_LIB_SUBPATH})
-        set(FBX_FOUND TRUE)
-        set(LIBS ${LIBS} ${FBX_ROOT_DIR}/${FBX_LIB_SUBPATH})
-    else () # Not existing at requested place, searching for it elsewhere
-        foreach (PATH ${SEARCH_PATHS})
-            set(FBX_LIB "${PATH}/${FBX_LIB_SUBPATH}")
-
-            # If header & lib exist, include & link each other respectively
-            if (EXISTS "${PATH}/include/fbxsdk.h" AND EXISTS ${FBX_LIB})
-                set(FBX_ROOT_DIR ${PATH} CACHE PATH "Path to your FBX SDK root directory" FORCE)
-                set(FBX_FOUND TRUE)
-                set(LIBS ${LIBS} ${FBX_LIB})
-
-                break()
-            endif ()
-        endforeach ()
-    endif ()
-
-    option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" ${FBX_FOUND})
 
 ######################
 # RaZ - Source files #
@@ -362,6 +298,23 @@ elseif (WIN32)
 
     # To automatically export all the classes & functions
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+endif ()
+
+#########################
+# RaZ - FBX file format #
+#########################
+
+if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
+    option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" OFF)
+
+    if (RAZ_USE_FBX)
+        find_package(FBX)
+
+        if (FBX_FOUND)
+            set(LIBS ${LIBS}${FBX_LIB})
+            message("FBX SDK linked.")
+        endif ()
+    endif ()
 endif ()
 
 # If FBX SDK not found, do not compile FBX loader
