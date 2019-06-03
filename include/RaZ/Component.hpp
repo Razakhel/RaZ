@@ -25,6 +25,8 @@ public:
 
 protected:
   Component() = default;
+  Component(const Component&) = default;
+  Component(Component&&) noexcept = default;
 
 private:
   static std::size_t m_maxId;
