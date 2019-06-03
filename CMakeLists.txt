@@ -311,7 +311,7 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
         find_package(FBX)
 
         if (FBX_FOUND)
-            set(LIBS ${LIBS}${FBX_LIB})
+            set(LIBS ${LIBS} ${FBX_LIB})
             message("FBX SDK linked.")
         endif ()
     endif ()

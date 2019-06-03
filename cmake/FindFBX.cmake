@@ -46,10 +46,9 @@ if (EXISTS ${FBX_ROOT_DIR}/include/fbxsdk.h AND EXISTS ${FBX_ROOT_DIR}/${FBX_LIB
 else () # Not existing at requested place, searching for it elsewhere
     foreach (PATH ${SEARCH_PATHS})
         set(FBX_LIB_LOCATION "${PATH}/${FBX_LIB_SUBPATH}")
-        message("${FBX_LIB_LOCATION}")
 
         # If header & lib exist, include & link each other respectively
-        if (EXISTS "${PATH}/include/fbxsdk.h" AND EXISTS ${FBX_LIB})
+        if (EXISTS "${PATH}/include/fbxsdk.h" AND EXISTS ${FBX_LIB_LOCATION})
             set(FBX_ROOT_DIR ${PATH} CACHE PATH "Path to your FBX SDK root directory" FORCE)
             set(FBX_FOUND TRUE)
             set(FBX_LIB ${FBX_LIB} ${FBX_LIB_LOCATION})
