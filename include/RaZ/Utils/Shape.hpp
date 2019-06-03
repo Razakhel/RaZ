@@ -137,7 +137,7 @@ public:
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is located on the plane, false otherwise.
-  bool contains(const Vec3f& point) const override { return FloatUtils::checkNearEquality(m_normal.dot(point) - m_distance, 0.f); }
+  bool contains(const Vec3f& point) const override { return FloatUtils::areNearlyEqual(m_normal.dot(point) - m_distance, 0.f); }
   /// Plane-line intersection check.
   /// \param line Line to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
