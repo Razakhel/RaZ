@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(RaZ_Examples)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # If FBX SDK used, copy the DLL file into the examples folder to link it properly
 if (RAZ_USE_FBX AND FBX_FOUND)
