@@ -199,7 +199,7 @@ Vector<T, Size>& Vector<T, Size>::operator/=(float val) {
 
 template <typename T, std::size_t Size>
 bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const {
-  if (std::is_floating_point<T>::value) {
+  if constexpr (std::is_floating_point_v<T>) {
     for (std::size_t i = 0; i < Size; ++i) {
       if (!FloatUtils::areNearlyEqual(m_data[i], vec[i]))
         return false;
