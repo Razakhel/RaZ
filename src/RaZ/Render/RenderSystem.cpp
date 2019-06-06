@@ -1,3 +1,4 @@
+#include "GL/glew.h"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
