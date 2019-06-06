@@ -49,7 +49,7 @@ script:
             cmake -G \"Unix Makefiles\" -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_C_COMPILER=${C_COMPILER} \
                                         -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_USE_FBX=true . &&
             make -j4 &&
-            if [[ ${BUILD_TESTS} == true ]]; then xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests; fi
+            if [[ ${BUILD_TESTS} == true ]]; then xvfb-run -a --server-args='-screen 0 1280x720x16' cd tests/ && ./RaZ_Tests; fi
         "
 
 #webhooks:
