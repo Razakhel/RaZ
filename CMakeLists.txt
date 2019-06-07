@@ -101,6 +101,20 @@ if (CMAKE_COMPILER_IS_GNUCC)
             -Waligned-new
         )
     endif ()
+
+    # Enabling code coverage
+    option(RAZ_ENABLE_COVERAGE "Enable code coverage (GCC only)" OFF)
+
+    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND RAZ_ENABLE_COVERAGE)
+        set(
+            RAZ_COMPILER_FLAGS
+
+            ${RAZ_COMPILER_FLAGS}
+            -O0
+            -fprofile-arcs
+            -ftest-coverage
+        )
+    endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(
         RAZ_COMPILER_FLAGS
@@ -269,6 +283,15 @@ elseif (UNIX)
         pthread
         dl
     )
+
+    if (RAZ_ENABLE_COVERAGE)
+        set(
+            DEPS
+
+            ${DEPS}
+            gcov
+        )
+    endif ()
 elseif (WIN32)
     add_definitions(
         -D_GLFW_WIN32
