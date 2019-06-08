@@ -22,8 +22,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     gem install coveralls-lcov
 
-# Setting alternatives to map gcc & g++ to gcc-8 & g++-8, and clang & clang++ to clang-6.0 & clang++-6.0
+# Setting alternatives to map gcc, g++ & gcov to gcc-8, g++-8 & gcov-8, and clang & clang++ to clang-6.0 & clang++-6.0
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-8 && \
+    update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-8 60 && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-6.0 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-6.0
 
 # Installing the FBX SDK

@@ -55,12 +55,15 @@ script:
                                         -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
                                         -DRAZ_USE_FBX=true .. &&
             make -j4 &&
+            pwd && find . &&
             if [[ ${BUILD_TESTS} == true ]]; then
                 cd tests/ &&
-                xvfb-run -a --server-args='-screen 0 1280x720x16' ./RaZ_Tests;
+                xvfb-run -a --server-args='-screen 0 1280x720x16' ./RaZ_Tests &&
+                cd ..;
             fi &&
             if [[ ${COVERAGE} == true ]]; then
-                lcov -d ./CMakeFiles/RaZ.dir/src/ -c --exclude '/usr/*' -o coverage.info &&
+                lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
+                lcov -r coverage.info '/usr/*' -o coverage.info &&
                 lcov -l coverage.info &&
                 coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
             fi

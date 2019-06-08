@@ -110,6 +110,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
             RAZ_COMPILER_FLAGS
 
             ${RAZ_COMPILER_FLAGS}
+            -g
             -O0
             -fprofile-arcs
             -ftest-coverage
