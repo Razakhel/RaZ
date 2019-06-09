@@ -115,6 +115,12 @@ if (CMAKE_COMPILER_IS_GNUCC)
             -fprofile-arcs
             -ftest-coverage
         )
+
+        set(
+            RAZ_LINKER_FLAGS
+
+            gcov
+        )
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(
@@ -264,17 +270,18 @@ elseif (UNIX)
         )
 
         set(
-            LIBS
+            RAZ_LINKER_FLAGS
 
-            ${LIBS}
+            ${RAZ_LINKER_FLAGS}
             asan
             ubsan
         )
     endif ()
 
     set(
-        DEPS
+        RAZ_LINKER_FLAGS
 
+        ${RAZ_LINKER_FLAGS}
         GL
         X11
         Xrandr
@@ -284,15 +291,6 @@ elseif (UNIX)
         pthread
         dl
     )
-
-    if (RAZ_ENABLE_COVERAGE)
-        set(
-            DEPS
-
-            ${DEPS}
-            gcov
-        )
-    endif ()
 elseif (WIN32)
     add_definitions(
         -D_GLFW_WIN32
@@ -315,8 +313,9 @@ elseif (WIN32)
     )
 
     set(
-        DEPS
+        RAZ_LINKER_FLAGS
 
+        ${RAZ_LINKER_FLAGS}
         opengl32
     )
 
@@ -335,7 +334,7 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
         find_package(FBX)
 
         if (FBX_FOUND)
-            set(LIBS ${LIBS} ${FBX_LIB})
+            set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} ${FBX_LIB})
             message("FBX SDK linked.")
         endif ()
     endif ()
@@ -386,13 +385,7 @@ if (NOT MSVC)
 endif ()
 
 target_compile_options(RaZ PUBLIC ${RAZ_COMPILER_FLAGS})
-
-target_link_libraries(
-    RaZ
-
-    ${LIBS}
-    ${DEPS}
-)
+target_link_libraries(RaZ ${RAZ_LINKER_FLAGS})
 
 # Build the examples
 option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
