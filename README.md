@@ -4,7 +4,7 @@
     RaZ
 </h1>
 
-<h4 align="center">Modern &amp; multiplatform 3D engine in C++14</h4>
+<h4 align="center">Modern &amp; multiplatform 3D engine in C++17</h4>
 
 ---
 
@@ -12,9 +12,9 @@
 | :---------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | [![Linux build status](https://travis-ci.com/Razakhel/RaZ.svg?branch=master)](https://travis-ci.com/Razakhel/RaZ)                   | No CI yet                                                                                                                                                                                                                                                                  | No CI yet                                                                                                                                                                                      |
 
-| <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy                                                                                              |
-| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://www.codacy.com/app/Razakhel/RaZ?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Razakhel/RaZ&amp;utm_campaign=Badge_Grade) |
+| <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy | <img alt="Coveralls" src="https://avatars3.githubusercontent.com/ml/318?s=140&v=4" align="center" height="30" width="30" /><br />Coveralls           |
+| :------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------: |
+| [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://www.codacy.com/app/Razakhel/RaZ)            | [![Coverage Status](https://coveralls.io/repos/github/Razakhel/RaZ/badge.svg?branch=master)](https://coveralls.io/github/Razakhel/RaZ?branch=master) |
 
 ## Summary
 
