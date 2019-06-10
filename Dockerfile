@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.10
 
 # Updating packages' repo & installing only the needed packages:
 #   - GL & X11 as needed graphical dependencies
@@ -6,7 +6,7 @@ FROM ubuntu:18.04
 #   - Doxygen & Dot to generate the documentation
 #   - Wget to download the FBX SDK
 #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
-#   - Rubygems to get the 'gem' command, used to download coveralls-lcov
+#   - Rubygems to get the 'gem' command, used to download coveralls-lcov, and git to fetch info needed by coveralls-lcov
 # Cleaning the apt lists & removing lists' cache entries to save image space
 #   - See: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
 # Downloading coveralls-lcov to upload coverage to Coveralls
@@ -17,7 +17,7 @@ RUN apt-get update && \
         doxygen python-pydot python-pydot-ng \
         wget \
         xvfb \
-        rubygems && \
+        rubygems git && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     gem install coveralls-lcov
