@@ -18,3 +18,23 @@ TEST_CASE("Image manual creation") {
   REQUIRE(imgSmall.getDataType() == Raz::ImageDataType::BYTE);
   REQUIRE_FALSE(imgSmall.isEmpty());
 }
+
+TEST_CASE("Image imported PNG") {
+  const Raz::Image img("../../assets/textures/default.png");
+
+  REQUIRE(img.getWidth() == 128);
+  REQUIRE(img.getHeight() == 128);
+  REQUIRE(img.getColorspace() == Raz::ImageColorspace::RGBA);
+  REQUIRE(img.getDataType() == Raz::ImageDataType::BYTE);
+  REQUIRE_FALSE(img.isEmpty());
+}
+
+TEST_CASE("Image imported TGA") {
+  const Raz::Image img("../../assets/textures/lava.tga");
+
+  REQUIRE(img.getWidth() == 512);
+  REQUIRE(img.getHeight() == 512);
+  REQUIRE(img.getColorspace() == Raz::ImageColorspace::RGB);
+  REQUIRE(img.getDataType() == Raz::ImageDataType::BYTE);
+  REQUIRE_FALSE(img.isEmpty());
+}
