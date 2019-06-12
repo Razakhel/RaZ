@@ -114,6 +114,9 @@ if (CMAKE_COMPILER_IS_GNUCC)
             -O0
             -fprofile-arcs
             -ftest-coverage
+            -fno-inline
+            -fno-inline-small-functions
+            -fno-default-inline
         )
 
         set(
