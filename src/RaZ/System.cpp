@@ -24,6 +24,4 @@ void System::unlinkEntity(const EntityPtr& entity) {
   }
 }
 
-std::size_t System::m_maxId = 0;
-
 } // namespace Raz

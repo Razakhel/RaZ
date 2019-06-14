@@ -29,7 +29,7 @@ protected:
   Component(Component&&) noexcept = default;
 
 private:
-  static std::size_t m_maxId;
+  static inline std::size_t m_maxId = 0;
 };
 
 } // namespace Raz
