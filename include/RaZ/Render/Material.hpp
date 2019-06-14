@@ -22,7 +22,7 @@ class MaterialCookTorrance;
 using MaterialCookTorrancePtr = std::unique_ptr<MaterialCookTorrance>;
 
 enum class MaterialType {
-  STANDARD = 0,
+  BLINN_PHONG = 0,
   COOK_TORRANCE
 };
 
@@ -56,7 +56,7 @@ public:
   explicit MaterialBlinnPhong(TexturePtr diffuseMap) : m_diffuseMap{ std::move(diffuseMap) } {}
   explicit MaterialBlinnPhong(const std::string& fileName) : MaterialBlinnPhong(Texture::create(fileName)) {}
 
-  MaterialType getType() const override { return MaterialType::STANDARD; }
+  MaterialType getType() const override { return MaterialType::BLINN_PHONG; }
   const Vec3f& getAmbient() const { return m_ambient; }
   const Vec3f& getDiffuse() const { return m_diffuse; }
   const Vec3f& getSpecular() const { return m_specular; }
