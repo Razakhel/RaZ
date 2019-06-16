@@ -12,7 +12,11 @@ namespace Raz {
 
 namespace FloatUtils {
 
-// Near-equality floating point check
+/// Checks if two given floating point values are nearly equal to each other.
+/// \tparam T Type of both values to check; it must be a floating point type.
+/// \param val1 First value to compare.
+/// \param val2 Second value to compare.
+/// \return True if values are nearly equal, false otherwise.
 template <typename T>
 inline constexpr bool areNearlyEqual(T val1, T val2) {
   static_assert(std::is_floating_point<T>::value, "Error: Values' type must be floating point.");
