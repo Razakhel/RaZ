@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "catch/catch.hpp"
 #include "RaZ/Utils/Bitset.hpp"
 
@@ -52,6 +54,7 @@ TEST_CASE("Bitset manipulations") {
   //   _____________
   // =  0 0 0 0 0 0
   REQUIRE((alternated1 & alternated2) == fullZeros);
+
   //      OR test
   //        ---
   //    1 0 1 0 1 0
@@ -85,4 +88,16 @@ TEST_CASE("Bitset shifts") {
   shiftTest <<= 1; // 1 0 1 0 1 0
 
   REQUIRE(shiftTest == alternated1);
+}
+
+TEST_CASE("Bitset printing") {
+  std::stringstream stream;
+
+  stream << fullOnes;
+  REQUIRE(stream.str() == "[ 1; 1; 1; 1; 1; 1 ]");
+
+  stream.str(""); // Clearing the stream
+
+  stream << alternated1;
+  REQUIRE(stream.str() == "[ 1; 0; 1; 0; 1; 0 ]");
 }
