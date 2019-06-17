@@ -16,7 +16,6 @@ using SystemPtr = std::unique_ptr<System>;
 /// System class representing a base System to be inherited.
 class System {
 public:
-
   const Bitset& getAcceptedComponents() const { return m_acceptedComponents; }
 
   /// Gets the ID of the given system.
