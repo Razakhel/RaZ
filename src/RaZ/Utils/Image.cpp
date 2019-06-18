@@ -1,3 +1,4 @@
+#include <cassert>
 #include <fstream>
 #include <iostream>
 
@@ -6,6 +7,18 @@
 #include "RaZ/Utils/StrUtils.hpp"
 
 namespace Raz {
+
+bool ImageDataB::operator==(const ImageData& imgData) const {
+  assert("Error: Image data equality check requires having datas of the same type." && imgData.getDataType() == ImageDataType::BYTE);
+
+  return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataB*>(&imgData)->data.cbegin());
+}
+
+bool ImageDataF::operator==(const ImageData& imgData) const {
+  assert("Error: Image data equality check requires having datas of the same type." && imgData.getDataType() == ImageDataType::FLOAT);
+
+  return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataF*>(&imgData)->data.cbegin());
+}
 
 Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace) : m_width{ width },
                                                                                     m_height{ height },
@@ -69,6 +82,12 @@ void Image::save(const std::string& filePath, bool reverse) const {
   } else {
     throw std::runtime_error("Error: Unable to create a file as '" + filePath + "'; path to file must exist");
   }
+}
+
+bool Image::operator==(const Image& img) const {
+  assert("Error: Image equality check requires having images of the same type." && getDataType() == img.getDataType());
+
+  return (*m_data == *img.m_data);
 }
 
 } // namespace Raz

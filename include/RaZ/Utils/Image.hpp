@@ -36,6 +36,17 @@ struct ImageData {
   /// \return True if the image has no data, false otherwise.
   virtual bool isEmpty() const = 0;
 
+  /// Checks if the current image data is equal to another given one.
+  /// Datas' types must be the same.
+  /// \param imgData Image data to be compared with.
+  /// \return True if datas are equal, false otherwise.
+  virtual bool operator==(const ImageData& imgData) const = 0;
+  /// Checks if the current image data is different from another given one.
+  /// Datas' types must be the same.
+  /// \param imgData Image data to be compared with.
+  /// \return True if datas are different, false otherwise.
+  bool operator!=(const ImageData& imgData) const { return !(*this == imgData); }
+
   virtual ~ImageData() = default;
 };
 
@@ -52,6 +63,12 @@ struct ImageDataB : public ImageData {
   /// \return True if the image has no data, false otherwise.
   bool isEmpty() const override { return data.empty(); }
 
+  /// Checks if the current byte image data is equal to another given one.
+  /// The given data must be of byte type as well.
+  /// \param imgData Image data to be compared with.
+  /// \return True if datas are equal, false otherwise.
+  bool operator==(const ImageData& imgData) const override;
+
   std::vector<uint8_t> data;
 };
 
@@ -67,6 +84,12 @@ struct ImageDataF : public ImageData {
   /// Checks if the image doesn't contain data.
   /// \return True if the image has no data, false otherwise.
   bool isEmpty() const override { return data.empty(); }
+
+  /// Checks if the current floating point image data is equal to another given one.
+  /// The given data must be of floating point type as well.
+  /// \param imgData Image data to be compared with.
+  /// \return True if datas are equal, false otherwise.
+  bool operator==(const ImageData& imgData) const override;
 
   std::vector<float> data;
 };
@@ -106,6 +129,17 @@ public:
   /// \param filePath Path to where to save the image.
   /// \param reverse Reverse the image when saving.
   void save(const std::string& filePath, bool reverse = false) const;
+
+  /// Checks if the current image is equal to another given one.
+  /// Their inner datas must be of the same type.
+  /// \param img Image to be compared with.
+  /// \return True if images are the same, false otherwise.
+  bool operator==(const Image& img) const;
+  /// Checks if the current image is different from another given one.
+  /// Their inner datas must be of the same type.
+  /// \param img Image to be compared with.
+  /// \return True if images are different, false otherwise.
+  bool operator!=(const Image& img) const { return !(*this == img); }
 
 private:
   /// Reads a PNG image to memory.

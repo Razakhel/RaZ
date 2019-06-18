@@ -32,6 +32,7 @@ public:
   Texture(Texture&& texture) noexcept;
 
   unsigned int getIndex() const { return m_index; }
+  const ImagePtr& getImage() const { return m_image; }
 
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
