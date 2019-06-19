@@ -34,7 +34,7 @@ TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textur
     map = loadedTexturePos->second;
   } else {
     const std::string texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
-    map = Texture::create(texturePath);
+    map = Texture::create(texturePath, true); // Always flip vertically imported textures, since OpenGL maps them upside down
     loadedTextures.emplace(textureFileName, map);
   }
 
