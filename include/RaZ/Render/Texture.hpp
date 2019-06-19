@@ -27,7 +27,7 @@ public:
   Texture();
   explicit Texture(uint8_t value) : Texture() { makePlainColored(Vec3b(value)); }
   Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
-  explicit Texture(const std::string& fileName) : Texture() { load(fileName); }
+  explicit Texture(const std::string& fileName, bool flipVertically = false) : Texture() { load(fileName, flipVertically); }
   Texture(const Texture&) = delete;
   Texture(Texture&& texture) noexcept;
 
@@ -46,11 +46,12 @@ public:
   static void activate(uint8_t index);
   /// Reads the texture in memory & loads it onto the graphics card.
   /// \param filePath Path to the texture to load.
-  void load(const std::string& filePath);
+  /// \param flipVertically Flip vertically the texture when loading.
+  void load(const std::string& filePath, bool flipVertically = false);
   /// Saves the texture on disk.
   /// \param filePath Path to where to save the texture.
-  /// \param reverse Reverse the texture when saving.
-  void save(const std::string& filePath, bool reverse = false) const { m_image->save(filePath, reverse); }
+  /// \param flipVertically Flip vertically the texture when saving.
+  void save(const std::string& filePath, bool flipVertically = false) const { m_image->save(filePath, flipVertically); }
   /// Binds the texture.
   void bind() const;
   /// Unbinds the texture.

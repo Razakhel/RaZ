@@ -61,8 +61,8 @@ void Texture::activate(uint8_t index) {
   glActiveTexture(GL_TEXTURE0 + index);
 }
 
-void Texture::load(const std::string& filePath) {
-  m_image = Image::create(filePath);
+void Texture::load(const std::string& filePath, bool flipVertically) {
+  m_image = Image::create(filePath, flipVertically);
 
   if (!m_image->isEmpty()) {
     bind();

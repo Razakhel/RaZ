@@ -107,7 +107,7 @@ class Image {
 public:
   Image() = default;
   Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
-  explicit Image(const std::string& fileName, bool reverse = false) { read(fileName, reverse); }
+  explicit Image(const std::string& fileName, bool flipVertically = false) { read(fileName, flipVertically); }
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -123,12 +123,12 @@ public:
   bool isEmpty() const { return (!m_data || m_data->isEmpty()); }
   /// Reads the image to memory.
   /// \param filePath Path to the image to read.
-  /// \param reverse Reverse the image when reading.
-  void read(const std::string& filePath, bool reverse = false);
+  /// \param flipVertically Flip vertically the image when reading.
+  void read(const std::string& filePath, bool flipVertically = false);
   /// Saves the image on disk.
   /// \param filePath Path to where to save the image.
-  /// \param reverse Reverse the image when saving.
-  void save(const std::string& filePath, bool reverse = false) const;
+  /// \param flipVertically Flip vertically the image when saving.
+  void save(const std::string& filePath, bool flipVertically = false) const;
 
   /// Checks if the current image is equal to another given one.
   /// Their inner datas must be of the same type.
@@ -144,12 +144,12 @@ public:
 private:
   /// Reads a PNG image to memory.
   /// \param file File to read.
-  /// \param reverse Reverse the image when reading.
-  void readPng(std::ifstream& file, bool reverse);
+  /// \param flipVertically Flip vertically the image when reading.
+  void readPng(std::ifstream& file, bool flipVertically);
   /// Saves the image on disk in PNG.
   /// \param file File to save.
-  /// \param reverse Reverse the image when saving.
-  void savePng(std::ofstream& file, bool reverse) const;
+  /// \param flipVertically Flip vertically the image when saving.
+  void savePng(std::ofstream& file, bool flipVertically) const;
   /// Reads a TGA image to memory.
   /// \param file File to read.
   void readTga(std::ifstream& file);

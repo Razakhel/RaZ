@@ -50,14 +50,14 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
   m_data = std::move(imgData);
 }
 
-void Image::read(const std::string& filePath, bool reverse) {
+void Image::read(const std::string& filePath, bool flipVertically) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
     const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 
     if (format == "png")
-      readPng(file, reverse);
+      readPng(file, flipVertically);
     else if (format == "tga")
       readTga(file);
     else
@@ -67,14 +67,14 @@ void Image::read(const std::string& filePath, bool reverse) {
   }
 }
 
-void Image::save(const std::string& filePath, bool reverse) const {
+void Image::save(const std::string& filePath, bool flipVertically) const {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
   if (file) {
     const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
 
     if (format == "png")
-      savePng(file, reverse);
+      savePng(file, flipVertically);
     /*else if (format == "tga")
       saveTga(file);*/
     else
