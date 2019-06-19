@@ -21,7 +21,7 @@ bool validatePng(std::istream& file) {
 
 } // namespace
 
-void Image::readPng(std::ifstream& file, bool reverse) {
+void Image::readPng(std::ifstream& file, bool flipVertically) {
   if (!validatePng(file))
     throw std::runtime_error("Error: Not a valid PNG");
 
@@ -101,7 +101,7 @@ void Image::readPng(std::ifstream& file, bool reverse) {
 
   // Mapping row's elements to data's
   for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex)
-    rowPtrs[(reverse ? heightIndex : m_height - 1 - heightIndex)] = &imgData->data[m_width * m_channelCount * heightIndex];
+    rowPtrs[(flipVertically ? m_height - 1 - heightIndex : heightIndex)] = &imgData->data[m_width * m_channelCount * heightIndex];
 
   m_data = std::move(imgData);
 
@@ -110,7 +110,7 @@ void Image::readPng(std::ifstream& file, bool reverse) {
   png_destroy_read_struct(&readStruct, nullptr, &infoStruct);
 }
 
-void Image::savePng(std::ofstream& file, bool reverse) const {
+void Image::savePng(std::ofstream& file, bool flipVertically) const {
   png_structp writeStruct = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
   if (!writeStruct)
     throw std::runtime_error("Error: Couldn't initialize PNG write struct");
@@ -167,7 +167,7 @@ void Image::savePng(std::ofstream& file, bool reverse) const {
   const auto dataPtr = static_cast<const uint8_t*>(m_data->getDataPtr());
 
   for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex)
-    png_write_row(writeStruct, &dataPtr[m_width * m_channelCount * (reverse ? m_height - 1 - heightIndex : heightIndex)]);
+    png_write_row(writeStruct, &dataPtr[m_width * m_channelCount * (flipVertically ? m_height - 1 - heightIndex : heightIndex)]);
 
   png_write_end(writeStruct, infoStruct);
   png_destroy_write_struct(&writeStruct, &infoStruct);
