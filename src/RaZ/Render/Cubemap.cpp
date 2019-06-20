@@ -57,7 +57,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                    const std::string& frontTexturePath, const std::string& backTexturePath) {
   bind();
 
-  Image img(rightTexturePath, true);
+  Image img(rightTexturePath);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                0,
                static_cast<int>(img.getColorspace()),
@@ -68,7 +68,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
-  img.read(leftTexturePath, true);
+  img.read(leftTexturePath);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
                0,
                static_cast<int>(img.getColorspace()),
@@ -79,7 +79,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
-  img.read(topTexturePath, true);
+  img.read(topTexturePath);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
                0,
                static_cast<int>(img.getColorspace()),
@@ -90,7 +90,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
-  img.read(bottomTexturePath, true);
+  img.read(bottomTexturePath);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
                0,
                static_cast<int>(img.getColorspace()),
@@ -101,7 +101,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
-  img.read(frontTexturePath, true);
+  img.read(frontTexturePath);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                0,
                static_cast<int>(img.getColorspace()),
@@ -112,7 +112,7 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
                GL_UNSIGNED_BYTE,
                img.getDataPtr());
 
-  img.read(backTexturePath, true);
+  img.read(backTexturePath);
   glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
                0,
                static_cast<int>(img.getColorspace()),
