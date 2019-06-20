@@ -76,7 +76,7 @@ void ShaderProgram::link() const {
 bool ShaderProgram::isLinked() const {
   int success;
   glGetProgramiv(m_index, GL_LINK_STATUS, &success);
-  
+
   return static_cast<bool>(success);
 }
 
@@ -105,8 +105,23 @@ int ShaderProgram::recoverUniformLocation(const std::string& uniformName) const 
 }
 
 template <>
-void ShaderProgram::sendUniform(int uniformIndex, int value) const {
-  glUniform1i(uniformIndex, value);
+void ShaderProgram::sendUniform(int uniformIndex, int8_t value) const {
+  glUniform1i(uniformIndex, static_cast<int>(value));
+}
+
+template <>
+void ShaderProgram::sendUniform(int uniformIndex, int16_t value) const {
+  glUniform1i(uniformIndex, static_cast<int>(value));
+}
+
+template <>
+void ShaderProgram::sendUniform(int uniformIndex, int32_t value) const {
+  glUniform1i(uniformIndex, static_cast<int>(value));
+}
+
+template <>
+void ShaderProgram::sendUniform(int uniformIndex, int64_t value) const {
+  glUniform1i(uniformIndex, static_cast<int>(value));
 }
 
 template <>
@@ -135,6 +150,11 @@ void ShaderProgram::sendUniform(int uniformIndex, float value) const {
 }
 
 template <>
+void ShaderProgram::sendUniform(int uniformIndex, const Vec2f& vec) const {
+  glUniform2fv(uniformIndex, 1, vec.getDataPtr());
+}
+
+template <>
 void ShaderProgram::sendUniform(int uniformIndex, const Vec3f& vec) const {
   glUniform3fv(uniformIndex, 1, vec.getDataPtr());
 }
@@ -142,6 +162,11 @@ void ShaderProgram::sendUniform(int uniformIndex, const Vec3f& vec) const {
 template <>
 void ShaderProgram::sendUniform(int uniformIndex, const Vec4f& vec) const {
   glUniform4fv(uniformIndex, 1, vec.getDataPtr());
+}
+
+template <>
+void ShaderProgram::sendUniform(int uniformIndex, const Mat2f& mat) const {
+  glUniformMatrix2fv(uniformIndex, 1, GL_FALSE, mat.getDataPtr());
 }
 
 template <>
