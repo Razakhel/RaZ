@@ -10,3 +10,14 @@ TEST_CASE("Mesh imported OBJ quad faces") {
 
   REQUIRE(mesh.getMaterials().empty());
 }
+
+#if defined(FBX_ENABLED)
+TEST_CASE("Mesh imported FBX") {
+  const Raz::Mesh mesh("../../assets/meshes/shaderBall.fbx");
+
+  REQUIRE(mesh.getSubmeshes().size() == 8);
+  REQUIRE(mesh.recoverVertexCount() == 40004);
+  REQUIRE(mesh.recoverTriangleCount() == 78312);
+  REQUIRE(mesh.getMaterials().size() == 4);
+}
+#endif
