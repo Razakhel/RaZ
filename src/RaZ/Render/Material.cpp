@@ -27,17 +27,17 @@ MaterialCookTorrancePtr Material::recoverMaterial(MaterialPreset preset, float r
 }
 
 void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
-  const std::string locationBase = "uniMaterial.";
+  static const std::string locationBase = "uniMaterial.";
 
-  const std::string ambientMapLocation      = locationBase + "ambientMap";
-  const std::string diffuseMapLocation      = locationBase + "diffuseMap";
-  const std::string specularMapLocation     = locationBase + "specularMap";
-  const std::string emissiveMapLocation     = locationBase + "emissiveMap";
-  const std::string transparencyMapLocation = locationBase + "transparencyMap";
-  const std::string bumpMapLocation         = locationBase + "bumpMap";
+  static const std::string diffuseMapLocation      = locationBase + "diffuseMap";
+  static const std::string ambientMapLocation      = locationBase + "ambientMap";
+  static const std::string specularMapLocation     = locationBase + "specularMap";
+  static const std::string emissiveMapLocation     = locationBase + "emissiveMap";
+  static const std::string transparencyMapLocation = locationBase + "transparencyMap";
+  static const std::string bumpMapLocation         = locationBase + "bumpMap";
 
-  program.sendUniform(ambientMapLocation,      0);
-  program.sendUniform(diffuseMapLocation,      1);
+  program.sendUniform(diffuseMapLocation,      0);
+  program.sendUniform(ambientMapLocation,      1);
   program.sendUniform(specularMapLocation,     2);
   program.sendUniform(emissiveMapLocation,     3);
   program.sendUniform(transparencyMapLocation, 4);
@@ -45,25 +45,25 @@ void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
 }
 
 void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
-  const std::string locationBase = "uniMaterial.";
+  static const std::string locationBase = "uniMaterial.";
 
-  const std::string ambientLocation      = locationBase + "ambient";
-  const std::string diffuseLocation      = locationBase + "diffuse";
-  const std::string specularLocation     = locationBase + "specular";
-  const std::string emissiveLocation     = locationBase + "emissive";
-  const std::string transparencyLocation = locationBase + "transparency";
+  static const std::string diffuseLocation      = locationBase + "diffuse";
+  static const std::string ambientLocation      = locationBase + "ambient";
+  static const std::string specularLocation     = locationBase + "specular";
+  static const std::string emissiveLocation     = locationBase + "emissive";
+  static const std::string transparencyLocation = locationBase + "transparency";
 
+  program.sendUniform(diffuseLocation,      m_baseColor);
   program.sendUniform(ambientLocation,      m_ambient);
-  program.sendUniform(diffuseLocation,      m_diffuse);
   program.sendUniform(specularLocation,     m_specular);
   program.sendUniform(emissiveLocation,     m_emissive);
   program.sendUniform(transparencyLocation, m_transparency);
 
   Texture::activate(0);
-  m_ambientMap->bind();
+  m_baseColorMap->bind();
 
   Texture::activate(1);
-  m_diffuseMap->bind();
+  m_ambientMap->bind();
 
   Texture::activate(2);
   m_specularMap->bind();
@@ -79,13 +79,13 @@ void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
 }
 
 void MaterialCookTorrance::initTextures(const ShaderProgram& program) const {
-  const std::string locationBase = "uniMaterial.";
+  static const std::string locationBase = "uniMaterial.";
 
-  const std::string albedoMapLocation           = locationBase + "albedoMap";
-  const std::string normalMapLocation           = locationBase + "normalMap";
-  const std::string metallicMapLocation         = locationBase + "metallicMap";
-  const std::string roughnessMapLocation        = locationBase + "roughnessMap";
-  const std::string ambientOcclusionMapLocation = locationBase + "ambientOcclusionMap";
+  static const std::string albedoMapLocation           = locationBase + "albedoMap";
+  static const std::string normalMapLocation           = locationBase + "normalMap";
+  static const std::string metallicMapLocation         = locationBase + "metallicMap";
+  static const std::string roughnessMapLocation        = locationBase + "roughnessMap";
+  static const std::string ambientOcclusionMapLocation = locationBase + "ambientOcclusionMap";
 
   program.sendUniform(albedoMapLocation,           0);
   program.sendUniform(normalMapLocation,           1);
@@ -95,18 +95,18 @@ void MaterialCookTorrance::initTextures(const ShaderProgram& program) const {
 }
 
 void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
-  const std::string locationBase = "uniMaterial.";
+  static const std::string locationBase = "uniMaterial.";
 
-  const std::string baseColorLocation       = locationBase + "baseColor";
-  const std::string metallicFactorLocation  = locationBase + "metallicFactor";
-  const std::string roughnessFactorLocation = locationBase + "roughnessFactor";
+  static const std::string baseColorLocation       = locationBase + "baseColor";
+  static const std::string metallicFactorLocation  = locationBase + "metallicFactor";
+  static const std::string roughnessFactorLocation = locationBase + "roughnessFactor";
 
   program.sendUniform(baseColorLocation,       m_baseColor);
   program.sendUniform(metallicFactorLocation,  m_metallicFactor);
   program.sendUniform(roughnessFactorLocation, m_roughnessFactor);
 
   Texture::activate(0);
-  m_albedoMap->bind();
+  m_baseColorMap->bind();
 
   Texture::activate(1);
   m_normalMap->bind();
