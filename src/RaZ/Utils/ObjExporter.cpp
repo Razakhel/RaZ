@@ -21,11 +21,11 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
     const std::string materialName = mtlFileName + '_' + std::to_string(matIndex);
 
     mtlFile << "\nnewmtl " << materialName << '\n';
+    mtlFile << "\tKd " << material->getBaseColor()[0] << ' ' << material->getBaseColor()[1] << ' ' << material->getBaseColor()[2] << '\n';
 
     if (material->getType() == MaterialType::COOK_TORRANCE) {
       const auto matCT = static_cast<MaterialCookTorrance*>(material.get());
 
-      mtlFile << "\tKd " << matCT->getBaseColor()[0] << ' ' << matCT->getBaseColor()[1] << ' ' << matCT->getBaseColor()[2] << '\n';
       mtlFile << "\tPm " << matCT->getMetallicFactor() << '\n';
       mtlFile << "\tPr " << matCT->getRoughnessFactor() << '\n';
 
@@ -66,7 +66,6 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
     } else {
       const auto matBP = static_cast<MaterialBlinnPhong*>(material.get());
 
-      mtlFile << "\tKd " << matBP->getBaseColor()[0] << ' ' << matBP->getBaseColor()[1] << ' ' << matBP->getBaseColor()[2] << '\n';
       mtlFile << "\tKa " << matBP->getAmbient()[0] << ' ' << matBP->getAmbient()[1] << ' ' << matBP->getAmbient()[2] << '\n';
       mtlFile << "\tKs " << matBP->getSpecular()[0] << ' ' << matBP->getSpecular()[1] << ' ' << matBP->getSpecular()[2] << '\n';
       mtlFile << "\tKe " << matBP->getEmissive()[0] << ' ' << matBP->getEmissive()[1] << ' ' << matBP->getEmissive()[2] << '\n';
