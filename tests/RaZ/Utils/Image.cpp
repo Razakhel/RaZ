@@ -48,3 +48,90 @@ TEST_CASE("Image imported TGA") {
   REQUIRE(img.getDataType() == Raz::ImageDataType::BYTE);
   REQUIRE_FALSE(img.isEmpty());
 }
+
+TEST_CASE("Image exported PNG") {
+  Raz::Image img(3, 3, Raz::ImageColorspace::RGBA);
+
+  // Creating a 3x3 image, configured as such (x are white pixels):
+  //
+  // -------------
+  // | x | x |   |
+  // -------------
+  // |   | x |   |
+  // -------------
+  // |   |   |   |
+  // -------------
+
+  // Indices are as follows (stride of 4 every pixel since it is RGBA, thus 4 channels):
+  //
+  // ----------------
+  // |  0 |  4 |  8 |
+  // ----------------
+  // | 12 | 16 | 20 |
+  // ----------------
+  // | 24 | 28 | 32 |
+  // ----------------
+
+  // Top-left pixel
+  *static_cast<uint8_t*>(img.getDataPtr())       = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 1) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 2) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 3) = 255;
+
+  // Top-center pixel
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 4) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 5) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 6) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 7) = 255;
+
+  // Center pixel
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 16) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 17) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 18) = 255;
+  *(static_cast<uint8_t*>(img.getDataPtr()) + 19) = 255;
+
+  img.save("testExport.png");
+
+  // Checking that the reimported image is the same as the original one
+  REQUIRE(img == Raz::Image("testExport.png"));
+
+  {
+    const Raz::Image imgImportFlipped("testExport.png", true);
+
+    // Image imported with a vertical flip, now should be as follows:
+    //
+    // -------------
+    // |   |   |   |
+    // -------------
+    // |   | x |   |
+    // -------------
+    // | x | x |   |
+    // -------------
+
+    REQUIRE_FALSE(img == imgImportFlipped);
+
+    // Center pixel
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 16) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 17) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 18) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 19) == 255);
+
+    // Bottom-left pixel
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 24) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 25) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 26) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 27) == 255);
+
+    // Bottom-center pixel
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 28) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 29) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 30) == 255);
+    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 31) == 255);
+
+    // Re-flipping the image when saving
+    imgImportFlipped.save("testExport.png", true);
+  }
+
+  // Checking that the re-flipped image is now equal to the original one
+  REQUIRE(img == Raz::Image("testExport.png"));
+}
