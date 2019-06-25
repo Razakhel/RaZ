@@ -35,7 +35,7 @@ public:
   void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f({ red, green, blue, alpha })); }
   void setTitle(const std::string& title) const;
   void setIcon(const Image& img) const;
-  void setIcon(const std::string& fileName) const { setIcon(Image(fileName, true)); }
+  void setIcon(const std::string& filePath) const { setIcon(Image(filePath, false)); }
 
   /// Changes the face culling's state.
   /// Enables or disables face culling according to the given parameter.
