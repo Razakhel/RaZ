@@ -14,9 +14,7 @@
 #include <future>
 #include <thread>
 
-namespace Raz {
-
-namespace Threading {
+namespace Raz::Threading {
 
 struct IndexRange {
   std::size_t beginIndex;
@@ -48,16 +46,16 @@ void parallelize(const std::function<void()>& action, std::size_t threadCount = 
 
 /// Calls a function in parallel on a given number of separate threads of execution.
 /// The collection is automatically splitted by indices, giving a separate start/end range to each thread.
-/// \tparam T Type of the collection to iterate over.
+/// \tparam ContainerType Type of the collection to iterate over.
 /// \param collection Collection to iterate over on multiple threads.
 /// \param action Action to be performed by each thread, giving an index range as boundaries.
 /// \param threadCount Amount of threads to start an instance on.
-template <typename T>
-void parallelize(const T& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount = getSystemThreadCount());
+template <typename ContainerType>
+void parallelize(const ContainerType& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount = getSystemThreadCount());
 
 } // namespace Threading
 
-} // namespace Raz
+} // namespace Raz::Threading
 
 #include "Threading.inl"
 

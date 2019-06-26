@@ -9,14 +9,14 @@ std::future<ResultType> launchAsync(Func action, Args&&... args) {
   return std::async(std::move(action), std::forward<Args>(args)...);
 }
 
-template <typename T>
-void parallelize(const T& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount) {
+template <typename ContainerType>
+void parallelize(const ContainerType& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
-  std::vector<std::thread> threads(std::min(threadCount, collection.size()));
+  std::vector<std::thread> threads(std::min(threadCount, std::size(collection)));
 
   // This performs a mathematical round: if the result of the division gives a number below X.5, ceil it; otherwise, round it
-  const std::size_t rangeCount = (collection.size() + threadCount / 2) / threadCount;
+  const std::size_t rangeCount = (std::size(collection) + threadCount / 2) / threadCount;
 
   std::size_t beginIndex = 0;
   std::size_t endIndex   = rangeCount;
@@ -30,7 +30,7 @@ void parallelize(const T& collection, const std::function<void(IndexRange)>& act
   }
 
   // The last thread is created independently with just the remaining number of elements
-  threads.back() = std::thread(action, IndexRange{ beginIndex, std::min(endIndex, collection.size()) });
+  threads.back() = std::thread(action, IndexRange{ beginIndex, std::min(endIndex, std::size(collection)) });
 
   for (std::thread& thread : threads)
     thread.join();
