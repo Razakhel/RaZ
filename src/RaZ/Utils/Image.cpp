@@ -59,7 +59,7 @@ void Image::read(const std::string& filePath, bool flipVertically) {
     if (format == "png")
       readPng(file, flipVertically);
     else if (format == "tga")
-      readTga(file);
+      readTga(file, flipVertically);
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
   } else {
@@ -76,7 +76,7 @@ void Image::save(const std::string& filePath, bool flipVertically) const {
     if (format == "png")
       savePng(file, flipVertically);
     /*else if (format == "tga")
-      saveTga(file);*/
+      saveTga(file, flipVertically);*/
     else
       std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
   } else {

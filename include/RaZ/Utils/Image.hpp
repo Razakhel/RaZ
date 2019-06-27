@@ -146,17 +146,19 @@ private:
   /// \param file File to read.
   /// \param flipVertically Flip vertically the image when reading.
   void readPng(std::ifstream& file, bool flipVertically);
-  /// Saves the image on disk in PNG.
+  /// Saves the image on disk in PNG format.
   /// \param file File to save.
   /// \param flipVertically Flip vertically the image when saving.
   void savePng(std::ofstream& file, bool flipVertically) const;
   /// Reads a TGA image to memory.
   /// \param file File to read.
-  void readTga(std::ifstream& file);
+  /// \param flipVertically Flip vertically the image when reading.
+  void readTga(std::ifstream& file, bool flipVertically);
   /*
-  /// Saves the image on disk in TGA.
+  /// Saves the image on disk in TGA format.
   /// \param file File to save.
-  void saveTga(std::ofstream& file) const;
+  /// \param flipVertically Flip vertically the image when saving.
+  void saveTga(std::ofstream& file, bool flipVertically) const;
   */
 
   unsigned int m_width {};
@@ -164,6 +166,7 @@ private:
   ImageColorspace m_colorspace {};
   uint8_t m_channelCount {};
   uint8_t m_bitDepth {};
+
   ImageDataPtr m_data {};
 };
 

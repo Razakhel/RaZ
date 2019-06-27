@@ -6,7 +6,7 @@
 
 namespace Raz {
 
-void Image::readTga(std::ifstream& file) {
+void Image::readTga(std::ifstream& file, bool flipVertically) {
   // Declaring a single array of unsigned char, reused everywhere later
   std::array<unsigned char, 2> bytes {};
 
@@ -72,6 +72,7 @@ void Image::readTga(std::ifstream& file) {
   // Image specs (10 bytes)
 
   // X- & Y-origin (2 bytes each) - TODO: handle origins
+  // It is expected to have 0 for both origins
   uint16_t xOrigin = 0, yOrigin = 0;
   file.read(reinterpret_cast<char*>(&xOrigin), 2);
   file.read(reinterpret_cast<char*>(&yOrigin), 2);
@@ -99,10 +100,16 @@ void Image::readTga(std::ifstream& file) {
     file.read(reinterpret_cast<char*>(values.data()), values.size());
 
     if (m_channelCount == 3) { // 3 channels, RGB
-      for (std::size_t i = 0; i < values.size(); i += 3) { // Values are laid out as BGR
-        imgData->data[i + 2] = values[i];
-        imgData->data[i + 1] = values[i + 1];
-        imgData->data[i]     = values[i + 2];
+      for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex) {
+        for (std::size_t widthIndex = 0; widthIndex < m_width; ++widthIndex) {
+          const std::size_t inPixelIndex = (heightIndex * m_width + widthIndex) * m_channelCount;
+          const std::size_t outPixelIndex = ((flipVertically ? heightIndex : m_height - 1 - heightIndex) * m_width + widthIndex) * m_channelCount;
+
+          // Values are laid out as BGR, they need to be reordered to RGB
+          imgData->data[outPixelIndex + 2] = values[inPixelIndex];
+          imgData->data[outPixelIndex + 1] = values[inPixelIndex + 1];
+          imgData->data[outPixelIndex]     = values[inPixelIndex + 2];
+        }
       }
     } else { // 1 channel, grayscale
       std::move(values.begin(), values.end(), imgData->data.begin());
