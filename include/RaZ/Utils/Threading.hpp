@@ -21,6 +21,24 @@ struct IndexRange {
   std::size_t endIndex;
 };
 
+template <typename ContainerType>
+class IterRange {
+  using ContainerIter      = typename ContainerType::iterator;
+  using ContainerConstIter = typename ContainerType::const_iterator;
+
+public:
+  IterRange(ContainerIter begin, ContainerIter end) : m_begin{ begin }, m_end{ end } {}
+
+  ContainerConstIter cbegin() const noexcept { return m_begin; }
+  ContainerIter begin() { return m_begin; }
+  ContainerConstIter* cend() const noexcept { return m_end; }
+  ContainerIter end() { return m_end; }
+
+private:
+  ContainerIter m_begin;
+  ContainerIter m_end;
+};
+
 /// Gets the number of concurrent threads available to the system.
 /// This number doesn't necessarily represent the CPU's actual number of threads.
 /// \return Number of threads available.
@@ -46,6 +64,7 @@ void parallelize(const std::function<void()>& action, std::size_t threadCount = 
 
 /// Calls a function in parallel on a given number of separate threads of execution.
 /// The collection is automatically splitted by indices, giving a separate start/end range to each thread.
+/// \note The container must either be a constant-size C array or have a size() function.
 /// \tparam ContainerType Type of the collection to iterate over.
 /// \param collection Collection to iterate over on multiple threads.
 /// \param action Action to be performed by each thread, giving an index range as boundaries.
@@ -53,7 +72,17 @@ void parallelize(const std::function<void()>& action, std::size_t threadCount = 
 template <typename ContainerType>
 void parallelize(const ContainerType& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount = getSystemThreadCount());
 
-} // namespace Threading
+/// Calls a function in parallel on a given number of separate threads of execution.
+/// The collection is automatically splitted by iterator ranges, giving a separate start/end range to each thread.
+/// \note The container must either be a constant-size C array, or have a public ContainerType::iterator type and begin() & size() functions.
+/// \tparam ContainerType Type of the collection to iterate over.
+/// \param collection Collection to iterate over on multiple threads.
+/// \param action Action to be performed by each thread, giving an iterator range as boundaries.
+/// \param threadCount Amount of threads to start an instance on.
+template <typename ContainerType>
+void parallelize(ContainerType& collection,
+                 const std::function<void(IterRange<std::common_type_t<ContainerType>>)>& action,
+                 std::size_t threadCount = getSystemThreadCount());
 
 } // namespace Raz::Threading
 

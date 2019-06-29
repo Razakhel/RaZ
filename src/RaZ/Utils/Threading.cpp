@@ -5,9 +5,7 @@
 
 #ifdef RAZ_THREADS_AVAILABLE
 
-namespace Raz {
-
-namespace Threading {
+namespace Raz::Threading {
 
 unsigned int getSystemThreadCount() {
   const unsigned int threadCount = std::thread::hardware_concurrency();
@@ -26,8 +24,6 @@ void parallelize(const std::function<void()>& action, std::size_t threadCount) {
     thread.join();
 }
 
-} // namespace Threading
-
-} // namespace Raz
+} // namespace Raz::Threading
 
 #endif // RAZ_THREADS_AVAILABLE
