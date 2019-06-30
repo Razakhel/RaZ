@@ -21,10 +21,17 @@ std::size_t computeSum(const std::vector<int>& values) {
   return std::accumulate(values.cbegin(), values.cend(), static_cast<std::size_t>(0));
 }
 
-void parallelIncrementation(std::vector<int>& values) {
+void indexParallelIncrementation(std::vector<int>& values) {
   Raz::Threading::parallelize(values, [&values] (Raz::Threading::IndexRange range) {
     for (std::size_t i = range.beginIndex; i < range.endIndex; ++i)
       ++values[i];
+  }, 4);
+}
+
+void iteratorParallelIncrementation(std::vector<int>& values) {
+  Raz::Threading::parallelize(values, [] (Raz::Threading::IterRange<std::vector<int>> range) {
+    for (int& value : range)
+      ++value;
   }, 4);
 }
 
@@ -40,23 +47,45 @@ TEST_CASE("Async basic") {
   REQUIRE(res.get() == 42);
 }
 
-TEST_CASE("Parallelize (with indices) divisible vector increment") {
+TEST_CASE("Index parallelization - divisible size") {
   std::vector<int> values(2048); // Choosing a size that can be easily divided
   fillRandom(values);
 
   const std::size_t sumBeforeIncrement = computeSum(values);
-  parallelIncrementation(values);
+  indexParallelIncrementation(values);
   const std::size_t sumAfterIncrement = computeSum(values);
 
   REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
-TEST_CASE("Parallelize (with indices) indivisible vector increment") {
+TEST_CASE("Index parallelization - indivisible size") {
   std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be easily divided
   fillRandom(values);
 
   const std::size_t sumBeforeIncrement = computeSum(values);
-  parallelIncrementation(values);
+  indexParallelIncrementation(values);
+  const std::size_t sumAfterIncrement = computeSum(values);
+
+  REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
+}
+
+TEST_CASE("Iterator parallelization - divisible size") {
+  std::vector<int> values(2048); // Choosing a size that can be easily divided
+  fillRandom(values);
+
+  const std::size_t sumBeforeIncrement = computeSum(values);
+  iteratorParallelIncrementation(values);
+  const std::size_t sumAfterIncrement = computeSum(values);
+
+  REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
+}
+
+TEST_CASE("Iterator parallelization - indivisible size") {
+  std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be easily divided
+  fillRandom(values);
+
+  const std::size_t sumBeforeIncrement = computeSum(values);
+  iteratorParallelIncrementation(values);
   const std::size_t sumAfterIncrement = computeSum(values);
 
   REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
