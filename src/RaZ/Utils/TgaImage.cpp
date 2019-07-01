@@ -101,9 +101,11 @@ void Image::readTga(std::ifstream& file, bool flipVertically) {
 
     if (m_channelCount == 3) { // 3 channels, RGB
       for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex) {
+        const std::size_t finalHeightIndex = (flipVertically ? heightIndex : m_height - 1 - heightIndex);
+
         for (std::size_t widthIndex = 0; widthIndex < m_width; ++widthIndex) {
           const std::size_t inPixelIndex = (heightIndex * m_width + widthIndex) * m_channelCount;
-          const std::size_t outPixelIndex = ((flipVertically ? heightIndex : m_height - 1 - heightIndex) * m_width + widthIndex) * m_channelCount;
+          const std::size_t outPixelIndex = (finalHeightIndex * m_width + widthIndex) * m_channelCount;
 
           // Values are laid out as BGR, they need to be reordered to RGB
           imgData->data[outPixelIndex + 2] = values[inPixelIndex];

@@ -40,13 +40,50 @@ TEST_CASE("Image imported PNG") {
 }
 
 TEST_CASE("Image imported TGA") {
-  const Raz::Image img("../../assets/textures/lava.tga");
+  const Raz::Image img("../../tests/assets/images/defaultTest.tga");
 
-  REQUIRE(img.getWidth() == 512);
-  REQUIRE(img.getHeight() == 512);
+  REQUIRE(img.getWidth() == 2);
+  REQUIRE(img.getHeight() == 2);
   REQUIRE(img.getColorspace() == Raz::ImageColorspace::RGB);
   REQUIRE(img.getDataType() == Raz::ImageDataType::BYTE);
   REQUIRE_FALSE(img.isEmpty());
+
+  REQUIRE(*static_cast<const uint8_t*>(img.getDataPtr())       == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 1) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 2) == 191);
+
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 3) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 4) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 5) == 239);
+
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 6) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 7) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 8) == 239);
+
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 9)  == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 10) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 11) == 191);
+
+  // Checking that the same image with a vertical flip has correct values
+  const Raz::Image imgFlipped("../../tests/assets/images/defaultTest.tga", true);
+
+  REQUIRE(imgFlipped != img);
+
+  REQUIRE(*static_cast<const uint8_t*>(imgFlipped.getDataPtr())       == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 1) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 2) == 239);
+
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 3) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 4) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 5) == 191);
+
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 6) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 7) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 8) == 191);
+
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 9)  == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 10) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 11) == 239);
 }
 
 TEST_CASE("Image exported PNG") {
