@@ -37,6 +37,40 @@ TEST_CASE("Image imported PNG") {
   REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 5) == 239);
   REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 6) == 239);
   REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 7) == 255);
+
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 8)  == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 9)  == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 10) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 11) == 255);
+
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 12) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 13) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 14) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(img.getDataPtr()) + 15) == 255);
+
+  const Raz::Image imgFlipped("../../tests/assets/images/defaultTest.png", true);
+
+  REQUIRE(imgFlipped != img);
+
+  REQUIRE(*static_cast<const uint8_t*>(imgFlipped.getDataPtr())       == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 1) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 2) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 3) == 255);
+
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 4) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 5) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 6) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 7) == 255);
+
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 8)  == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 9)  == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 10) == 191);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 11) == 255);
+
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 12) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 13) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 14) == 239);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 15) == 255);
 }
 
 TEST_CASE("Image imported TGA") {
@@ -132,42 +166,42 @@ TEST_CASE("Image exported PNG") {
   // Checking that the reimported image is the same as the original one
   REQUIRE(img == Raz::Image("testExport.png"));
 
-  {
-    const Raz::Image imgImportFlipped("testExport.png", true);
+  img.save("testExportFlipped.png", true);
 
-    // Image imported with a vertical flip, now should be as follows:
-    //
-    // -------------
-    // |   |   |   |
-    // -------------
-    // |   | x |   |
-    // -------------
-    // | x | x |   |
-    // -------------
+  const Raz::Image imgFlipped("testExportFlipped.png");
 
-    REQUIRE_FALSE(img == imgImportFlipped);
+  // Image imported with a vertical flip, now should be as follows:
+  //
+  // -------------
+  // |   |   |   |
+  // -------------
+  // |   | x |   |
+  // -------------
+  // | x | x |   |
+  // -------------
 
-    // Center pixel
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 16) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 17) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 18) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 19) == 255);
+  REQUIRE(img != imgFlipped);
 
-    // Bottom-left pixel
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 24) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 25) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 26) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 27) == 255);
+  // Center pixel
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 16) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 17) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 18) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 19) == 255);
 
-    // Bottom-center pixel
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 28) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 29) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 30) == 255);
-    REQUIRE(*(static_cast<const uint8_t*>(imgImportFlipped.getDataPtr()) + 31) == 255);
+  // Bottom-left pixel
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 24) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 25) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 26) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 27) == 255);
 
-    // Re-flipping the image when saving
-    imgImportFlipped.save("testExport.png", true);
-  }
+  // Bottom-center pixel
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 28) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 29) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 30) == 255);
+  REQUIRE(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 31) == 255);
+
+  // Re-flipping the image when saving
+  imgFlipped.save("testExport.png", true);
 
   // Checking that the re-flipped image is now equal to the original one
   REQUIRE(img == Raz::Image("testExport.png"));
