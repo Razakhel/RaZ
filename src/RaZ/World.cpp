@@ -24,6 +24,9 @@ bool World::update(float deltaTime) {
 }
 
 void World::refresh() {
+  if (m_entities.empty())
+    return;
+
   // Reorganizing the entites, swapping enabled & disabled ones so that the enabled ones are in front
   auto entityBegin = m_entities.begin();
   auto entityEnd   = m_entities.end() - 1;
