@@ -3,6 +3,7 @@
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
 #include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 
 namespace Raz {
@@ -111,6 +112,10 @@ bool RenderSystem::update(float deltaTime) {
 
   if (m_cubemap)
     m_cubemap->draw(camera);
+
+#if !defined(NDEBUG)
+  Renderer::checkErrors();
+#endif
 
   return m_window.run(deltaTime);
 }

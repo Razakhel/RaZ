@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "GL/glew.h"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
 
 namespace Raz {
@@ -79,7 +80,7 @@ Shader& Shader::operator=(Shader&& shader) noexcept {
 }
 
 VertexShader::VertexShader() {
-  m_index = glCreateShader(GL_VERTEX_SHADER);
+  m_index = Renderer::createShader(ShaderType::VERTEX);
 }
 
 VertexShader VertexShader::loadFromSource(const std::string& source) {
@@ -89,7 +90,7 @@ VertexShader VertexShader::loadFromSource(const std::string& source) {
 }
 
 FragmentShader::FragmentShader() {
-  m_index = glCreateShader(GL_FRAGMENT_SHADER);
+  m_index = Renderer::createShader(ShaderType::FRAGMENT);
 }
 
 FragmentShader FragmentShader::loadFromSource(const std::string& source) {
@@ -99,7 +100,7 @@ FragmentShader FragmentShader::loadFromSource(const std::string& source) {
 }
 
 GeometryShader::GeometryShader() {
-  m_index = glCreateShader(GL_GEOMETRY_SHADER);
+  m_index = Renderer::createShader(ShaderType::GEOMETRY);
 }
 
 GeometryShader GeometryShader::loadFromSource(const std::string& source) {

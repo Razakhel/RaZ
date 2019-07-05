@@ -1,10 +1,11 @@
 #include "GL/glew.h"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 
 namespace Raz {
 
 UniformBuffer::UniformBuffer() {
-  glGenBuffers(1, &m_index);
+  Renderer::generateBuffers(1, &m_index);
 }
 
 UniformBuffer::UniformBuffer(unsigned int size, unsigned int bindingIndex) : UniformBuffer() {
@@ -30,11 +31,11 @@ void UniformBuffer::bindBufferBase(unsigned int bindingIndex) const {
 }
 
 void UniformBuffer::bind() const {
-  glBindBuffer(GL_UNIFORM_BUFFER, m_index);
+  Renderer::bindBuffer(GL_UNIFORM_BUFFER, m_index);
 }
 
 void UniformBuffer::unbind() const {
-  glBindBuffer(GL_UNIFORM_BUFFER, 0);
+  Renderer::unbindBuffer(GL_UNIFORM_BUFFER);
 }
 
 template <>
@@ -117,7 +118,7 @@ UniformBuffer::~UniformBuffer() {
   if (m_index == GL_INVALID_INDEX)
     return;
 
-  glDeleteBuffers(1, &m_index);
+  Renderer::deleteBuffers(1, &m_index);
 }
 
 } // namespace Raz

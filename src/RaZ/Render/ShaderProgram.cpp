@@ -4,6 +4,7 @@
 #include "GL/glew.h"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 
 namespace Raz {
@@ -63,25 +64,15 @@ void ShaderProgram::compileShaders() const {
 }
 
 void ShaderProgram::link() const {
-  glLinkProgram(m_index);
-
-  if (!isLinked()) {
-    std::array<char, 512> infoLog {};
-
-    glGetProgramInfoLog(m_index, static_cast<int>(infoLog.size()), nullptr, infoLog.data());
-    std::cerr << "Error: Shader program link failed (ID " << m_index << ").\n" << infoLog.data() << std::endl;
-  }
+  Renderer::linkProgram(m_index);
 }
 
 bool ShaderProgram::isLinked() const {
-  int success;
-  glGetProgramiv(m_index, GL_LINK_STATUS, &success);
-
-  return static_cast<bool>(success);
+  return Renderer::isProgramLinked(m_index);
 }
 
 void ShaderProgram::use() const {
-  glUseProgram(m_index);
+  Renderer::useProgram(m_index);
 }
 
 void ShaderProgram::updateShaders() const {
@@ -101,7 +92,7 @@ int ShaderProgram::recoverUniformLocation(const std::string& uniformName) const 
   if (uniform != m_uniforms.cend())
     return uniform->second;
 
-  return glGetUniformLocation(m_index, uniformName.c_str());
+  return Renderer::recoverUniformLocation(m_index, uniformName.c_str());
 }
 
 template <>

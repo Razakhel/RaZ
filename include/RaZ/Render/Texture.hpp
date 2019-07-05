@@ -41,9 +41,6 @@ public:
   /// \param preset Preset of the texture to get.
   /// \return Recovered texture.
   static TexturePtr recoverTexture(TexturePreset preset);
-  /// Activates the texture at the given index.
-  /// \param index Index of the active texture to set.
-  static void activate(uint8_t index);
   /// Reads the texture in memory & loads it onto the graphics card.
   /// \param filePath Path to the texture to load.
   /// \param flipVertically Flip vertically the texture when loading.

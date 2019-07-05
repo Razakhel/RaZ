@@ -10,6 +10,7 @@
 #include "GL/glxew.h"
 #endif
 #include "GLFW/glfw3.h"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Window.hpp"
 
 namespace Raz {
@@ -26,31 +27,31 @@ void GLAPIENTRY callbackDebugLog(GLenum source,
   std::cerr << "OpenGL Debug - ";
 
   switch (source) {
-    case GL_DEBUG_SOURCE_API: std::cerr << "Source: OpenGL\t"; break;
-    case GL_DEBUG_SOURCE_WINDOW_SYSTEM: std::cerr << "Source: Windows\t"; break;
+    case GL_DEBUG_SOURCE_API:             std::cerr << "Source: OpenGL\t"; break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cerr << "Source: Windows\t"; break;
     case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cerr << "Source: Shader compiler\t"; break;
-    case GL_DEBUG_SOURCE_THIRD_PARTY: std::cerr << "Source: Third party\t"; break;
-    case GL_DEBUG_SOURCE_APPLICATION: std::cerr << "Source: Application\t"; break;
-    case GL_DEBUG_SOURCE_OTHER: std::cerr << "Source: Other\t"; break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cerr << "Source: Third party\t"; break;
+    case GL_DEBUG_SOURCE_APPLICATION:     std::cerr << "Source: Application\t"; break;
+    case GL_DEBUG_SOURCE_OTHER:           std::cerr << "Source: Other\t"; break;
     default: break;
   }
 
   switch (type) {
-    case GL_DEBUG_TYPE_ERROR: std::cerr << "Type: Error\t"; break;
+    case GL_DEBUG_TYPE_ERROR:               std::cerr << "Type: Error\t"; break;
     case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cerr << "Type: Deprecated behavior\t"; break;
-    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: std::cerr << "Type: Undefined behavior\t"; break;
-    case GL_DEBUG_TYPE_PORTABILITY: std::cerr << "Type: Portability\t"; break;
-    case GL_DEBUG_TYPE_PERFORMANCE: std::cerr << "Type: Performance\t"; break;
-    case GL_DEBUG_TYPE_OTHER: std::cerr << "Type: Other\t"; break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cerr << "Type: Undefined behavior\t"; break;
+    case GL_DEBUG_TYPE_PORTABILITY:         std::cerr << "Type: Portability\t"; break;
+    case GL_DEBUG_TYPE_PERFORMANCE:         std::cerr << "Type: Performance\t"; break;
+    case GL_DEBUG_TYPE_OTHER:               std::cerr << "Type: Other\t"; break;
     default: break;
   }
 
-  std::cout << "ID: " << id << "\t";
+  std::cerr << "ID: " << id << "\t";
 
   switch (severity) {
-    case GL_DEBUG_SEVERITY_HIGH: std::cerr << "Severity: High\t"; break;
+    case GL_DEBUG_SEVERITY_HIGH:   std::cerr << "Severity: High\t"; break;
     case GL_DEBUG_SEVERITY_MEDIUM: std::cerr << "Severity: Medium\t"; break;
-    case GL_DEBUG_SEVERITY_LOW: std::cerr << "Severity: Low\t"; break;
+    case GL_DEBUG_SEVERITY_LOW:    std::cerr << "Severity: Low\t"; break;
     default: break;
   }
 
@@ -95,12 +96,12 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 #if !defined(__APPLE__) // Setting the debug message callback provokes a crash on macOS
   glDebugMessageCallback(&callbackDebugLog, nullptr);
 #endif
-  glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+  Renderer::enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
   glfwSetWindowUserPointer(m_window, this);
 
   enableFaceCulling();
-  glEnable(GL_DEPTH_TEST);
+  Renderer::enable(GL_DEPTH_TEST);
 }
 
 void Window::setTitle(const std::string& title) const {
@@ -116,9 +117,9 @@ void Window::setIcon(const Image& img) const {
 
 void Window::enableFaceCulling(bool value) const {
   if (value)
-    glEnable(GL_CULL_FACE);
+    Renderer::enable(GL_CULL_FACE);
   else
-    glDisable(GL_CULL_FACE);
+    Renderer::disable(GL_CULL_FACE);
 }
 
 bool Window::recoverVerticalSyncState() const {

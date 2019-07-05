@@ -1,4 +1,5 @@
 #include "RaZ/Render/Material.hpp"
+#include "RaZ/Render/Renderer.hpp"
 
 namespace Raz {
 
@@ -59,22 +60,22 @@ void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
   program.sendUniform(emissiveLocation,     m_emissive);
   program.sendUniform(transparencyLocation, m_transparency);
 
-  Texture::activate(0);
+  Renderer::activateTexture(0);
   m_baseColorMap->bind();
 
-  Texture::activate(1);
+  Renderer::activateTexture(1);
   m_ambientMap->bind();
 
-  Texture::activate(2);
+  Renderer::activateTexture(2);
   m_specularMap->bind();
 
-  Texture::activate(3);
+  Renderer::activateTexture(3);
   m_emissiveMap->bind();
 
-  Texture::activate(4);
+  Renderer::activateTexture(4);
   m_transparencyMap->bind();
 
-  Texture::activate(5);
+  Renderer::activateTexture(5);
   m_bumpMap->bind();
 }
 
@@ -105,19 +106,19 @@ void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
   program.sendUniform(metallicFactorLocation,  m_metallicFactor);
   program.sendUniform(roughnessFactorLocation, m_roughnessFactor);
 
-  Texture::activate(0);
+  Renderer::activateTexture(0);
   m_baseColorMap->bind();
 
-  Texture::activate(1);
+  Renderer::activateTexture(1);
   m_normalMap->bind();
 
-  Texture::activate(2);
+  Renderer::activateTexture(2);
   m_metallicMap->bind();
 
-  Texture::activate(3);
+  Renderer::activateTexture(3);
   m_roughnessMap->bind();
 
-  Texture::activate(4);
+  Renderer::activateTexture(4);
   m_ambientOcclusionMap->bind();
 }
 

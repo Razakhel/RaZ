@@ -2,6 +2,7 @@
 
 #include "GL/glew.h"
 #include "RaZ/Render/Framebuffer.hpp"
+#include "RaZ/Render/Renderer.hpp"
 
 namespace Raz {
 
@@ -84,13 +85,13 @@ void Framebuffer::display(const ShaderProgram& program) const {
 
   program.use();
 
-  Texture::activate(0);
+  Renderer::activateTexture(0);
   m_depthBuffer->bind();
 
-  Texture::activate(1);
+  Renderer::activateTexture(1);
   m_colorBuffer->bind();
 
-  Texture::activate(2);
+  Renderer::activateTexture(2);
   m_normalBuffer->bind();
 
   Mesh::drawUnitQuad();

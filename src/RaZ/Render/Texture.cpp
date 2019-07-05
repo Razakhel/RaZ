@@ -57,10 +57,6 @@ TexturePtr Texture::recoverTexture(TexturePreset preset) {
   return texturePresets[static_cast<std::size_t>(preset)];
 }
 
-void Texture::activate(uint8_t index) {
-  glActiveTexture(GL_TEXTURE0 + index);
-}
-
 void Texture::load(const std::string& filePath, bool flipVertically) {
   m_image = Image::create(filePath, flipVertically);
 

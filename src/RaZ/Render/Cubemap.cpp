@@ -1,6 +1,7 @@
 #include "GL/glew.h"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
@@ -133,11 +134,11 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
 }
 
 void Cubemap::bind() const {
-  glBindTexture(GL_TEXTURE_CUBE_MAP, m_index);
+  Renderer::bindTexture(GL_TEXTURE_CUBE_MAP, m_index);
 }
 
 void Cubemap::unbind() const {
-  glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+  Renderer::unbindTexture(GL_TEXTURE_CUBE_MAP);
 }
 
 void Cubemap::draw(const Camera& camera) const {
@@ -146,7 +147,7 @@ void Cubemap::draw(const Camera& camera) const {
 
   m_program.use();
 
-  Texture::activate(0);
+  Renderer::activateTexture(0);
   bind();
 
   m_viewProjUbo.bind();
