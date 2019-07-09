@@ -1,6 +1,7 @@
 #include "GLFW/glfw3.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 #include "RaZ/Utils/Overlay.hpp"
 
 namespace Raz {
@@ -8,69 +9,68 @@ namespace Raz {
 Overlay::Overlay(GLFWwindow* window) {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-  ImGui_ImplGlfw_Init(window, true);
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 330 core");
   ImGui::StyleColorsDark();
 }
 
-void Overlay::addElement(OverlayElementType type, const std::string& text,
-                         std::function<void()> actionOn, std::function<void()> actionOff) {
-  if (type == OverlayElementType::CHECKBOX)
-    m_toggles.emplace(m_elements.size(), false);
-
-  m_elements.emplace_back(std::make_tuple(type, text, std::move(actionOn), std::move(actionOff)));
+void Overlay::addLabel(std::string label) {
+  m_elements.emplace_back(OverlayLabel::create(std::move(label)));
 }
 
-void Overlay::addText(const std::string& text) {
-  addElement(OverlayElementType::TEXT, text);
+void Overlay::addButton(std::string label, std::function<void()> action) {
+  m_elements.emplace_back(OverlayButton::create(std::move(label), std::move(action)));
 }
 
-void Overlay::addButton(const std::string& text, std::function<void()> action) {
-  addElement(OverlayElementType::BUTTON, text, std::move(action));
-}
-
-void Overlay::addCheckbox(const std::string& text, bool initVal, std::function<void()> actionOn, std::function<void()> actionOff) {
-  addElement(OverlayElementType::CHECKBOX, text, std::move(actionOn), std::move(actionOff));
-  m_toggles[m_elements.size() - 1] = initVal;
+void Overlay::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
+  m_elements.emplace_back(OverlayCheckbox::create(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
 }
 
 void Overlay::addSeparator() {
-  addElement(OverlayElementType::SEPARATOR);
+  m_elements.emplace_back(OverlaySeparator::create());
 }
 
-void Overlay::addFrameTime(const std::string& formattedText) {
-  addElement(OverlayElementType::FRAME_TIME, formattedText);
+void Overlay::addFrameTime(std::string formattedLabel) {
+  m_elements.emplace_back(OverlayFrameTime::create(std::move(formattedLabel)));
 }
 
-void Overlay::addFpsCounter(const std::string& formattedText) {
-  addElement(OverlayElementType::FPS_COUNTER, formattedText);
+void Overlay::addFpsCounter(std::string formattedLabel) {
+  m_elements.emplace_back(OverlayFpsCounter::create(std::move(formattedLabel)));
 }
 
 void Overlay::render() {
+  ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
 
-  for (std::size_t eltIndex = 0; eltIndex < m_elements.size(); ++eltIndex) {
-    const auto& element = m_elements[eltIndex];
-
-    switch (std::get<0>(element)) {
-      case OverlayElementType::TEXT:
-        ImGui::TextUnformatted(std::get<1>(element).c_str());
+  for (auto& element : m_elements) {
+    switch (element->getType()) {
+      case OverlayElementType::LABEL:
+        ImGui::TextUnformatted(element->label.c_str());
         break;
 
-      case OverlayElementType::BUTTON:
-        if (ImGui::Button(std::get<1>(element).c_str()))
-          std::get<2>(element)();
+      case OverlayElementType::BUTTON: {
+        const auto& button = static_cast<OverlayButton&>(*element);
+
+        if (ImGui::Button(button.label.c_str()))
+          button.action();
+
         break;
+      }
 
       case OverlayElementType::CHECKBOX: {
-        bool prevValue = m_toggles[eltIndex];
-        ImGui::Checkbox(std::get<1>(element).c_str(), &m_toggles[eltIndex]);
+        auto& checkbox = static_cast<OverlayCheckbox&>(*element);
+        const bool prevValue = checkbox.isChecked;
 
-        if (m_toggles[eltIndex] != prevValue) {
-          if (m_toggles[eltIndex])
-            std::get<2>(element)();
+        ImGui::Checkbox(checkbox.label.c_str(), &checkbox.isChecked);
+
+        if (checkbox.isChecked != prevValue) {
+          if (checkbox.isChecked)
+            checkbox.actionOn();
           else
-            std::get<3>(element)();
+            checkbox.actionOff();
         }
+
         break;
       }
 
@@ -79,20 +79,21 @@ void Overlay::render() {
         break;
 
       case OverlayElementType::FRAME_TIME:
-        ImGui::Text(std::get<1>(element).c_str(), 1000.f / ImGui::GetIO().Framerate);
+        ImGui::Text(element->label.c_str(), 1000.f / ImGui::GetIO().Framerate);
         break;
 
       case OverlayElementType::FPS_COUNTER:
-        ImGui::Text(std::get<1>(element).c_str(), ImGui::GetIO().Framerate);
+        ImGui::Text(element->label.c_str(), ImGui::GetIO().Framerate);
         break;
     }
   }
 
   ImGui::Render();
-  ImGui_ImplGlfw_RenderDrawData(ImGui::GetDrawData());
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 Overlay::~Overlay() {
+  ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
 }
