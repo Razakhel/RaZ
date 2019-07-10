@@ -20,6 +20,7 @@ enum class OverlayElementType {
   LABEL,
   BUTTON,
   CHECKBOX,
+  TEXTBOX,
   SEPARATOR,
   FRAME_TIME,
   FPS_COUNTER
@@ -35,6 +36,7 @@ public:
   void addLabel(std::string label);
   void addButton(std::string label, std::function<void()> action);
   void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
+  void addTextbox(std::string label, std::function<void(const std::string&)> callback);
   void addSeparator();
   void addFrameTime(std::string formattedLabel);
   void addFpsCounter(std::string formattedLabel);
@@ -54,6 +56,9 @@ private:
 
   struct OverlayCheckbox;
   using OverlayCheckboxPtr = std::unique_ptr<OverlayCheckbox>;
+
+  struct OverlayTextbox;
+  using OverlayTextboxPtr = std::unique_ptr<OverlayTextbox>;
 
   struct OverlaySeparator;
   using OverlaySeparatorPtr = std::unique_ptr<OverlaySeparator>;
@@ -107,6 +112,18 @@ private:
     std::function<void()> actionOn {};
     std::function<void()> actionOff {};
     bool isChecked {};
+  };
+
+  struct OverlayTextbox : public OverlayElement {
+    OverlayTextbox(std::string label, std::function<void(const std::string&)> callback) : OverlayElement(std::move(label)), callback{ std::move(callback) } {}
+
+    OverlayElementType getType() const override { return OverlayElementType::TEXTBOX; }
+
+    template <typename... Args>
+    static OverlayTextboxPtr create(Args&&... args) { return std::make_unique<OverlayTextbox>(std::forward<Args>(args)...); }
+
+    std::string text {};
+    std::function<void(const std::string&)> callback {};
   };
 
   struct OverlaySeparator : public OverlayElement {

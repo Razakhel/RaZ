@@ -8,10 +8,12 @@ namespace Raz {
 
 Overlay::Overlay(GLFWwindow* window) {
   IMGUI_CHECKVERSION();
+
   ImGui::CreateContext();
+  ImGui::StyleColorsDark();
+
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330 core");
-  ImGui::StyleColorsDark();
 }
 
 void Overlay::addLabel(std::string label) {
@@ -24,6 +26,11 @@ void Overlay::addButton(std::string label, std::function<void()> action) {
 
 void Overlay::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
   m_elements.emplace_back(OverlayCheckbox::create(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
+}
+
+void Overlay::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
+  m_elements.emplace_back(OverlayTextbox::create(std::move(label), std::move(callback)));
+  static_cast<OverlayTextbox&>(*m_elements.back()).text.reserve(64);
 }
 
 void Overlay::addSeparator() {
@@ -70,6 +77,30 @@ void Overlay::render() {
           else
             checkbox.actionOff();
         }
+
+        break;
+      }
+
+      case OverlayElementType::TEXTBOX: {
+        static auto callback = [] (ImGuiTextEditCallbackData* data) {
+          auto& textbox = *static_cast<OverlayTextbox*>(data->UserData);
+
+          textbox.text += static_cast<char>(data->EventChar);
+
+          if (textbox.callback)
+            textbox.callback(textbox.text);
+
+          return 0;
+        };
+
+        auto& textbox = static_cast<OverlayTextbox&>(*element);
+
+        ImGui::InputText(textbox.label.c_str(),
+                         textbox.text.data(),
+                         textbox.text.capacity(),
+                         ImGuiInputTextFlags_CallbackCharFilter,
+                         callback,
+                         &textbox);
 
         break;
       }
