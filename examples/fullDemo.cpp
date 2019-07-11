@@ -170,16 +170,16 @@ int main() {
                         [&window] () { window.disableCursor(); });
 
   // Overlay features
-  window.addOverlayText("RaZ - Full demo");
+  window.addOverlayLabel("RaZ - Full demo");
   window.addOverlaySeparator();
   window.addOverlayCheckbox("Enable face culling",
-                            true,
                             [&window] () { window.enableFaceCulling(); },
-                            [&window] () { window.disableFaceCulling(); });
+                            [&window] () { window.disableFaceCulling(); },
+                            true);
   window.addOverlayCheckbox("Enable vertical sync",
-                            window.recoverVerticalSyncState(),
                             [&window] () { window.enableVerticalSync(); },
-                            [&window] () { window.disableVerticalSync(); });
+                            [&window] () { window.disableVerticalSync(); },
+                            window.recoverVerticalSyncState());
   window.addOverlaySeparator();
   window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
   window.addOverlayFpsCounter("FPS: %.1f");
