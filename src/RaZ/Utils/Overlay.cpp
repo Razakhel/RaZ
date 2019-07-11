@@ -45,6 +45,10 @@ void Overlay::addFpsCounter(std::string formattedLabel) {
   m_elements.emplace_back(OverlayFpsCounter::create(std::move(formattedLabel)));
 }
 
+bool Overlay::hasKeyboardFocus() const {
+  return ImGui::GetIO().WantCaptureKeyboard;
+}
+
 void Overlay::render() {
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();

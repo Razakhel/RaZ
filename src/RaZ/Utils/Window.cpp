@@ -284,24 +284,27 @@ bool Window::run(float deltaTime) {
 
   glfwPollEvents();
 
-  // Process actions belonging to pressed keys & mouse buttons
-  auto& actions   = std::get<4>(m_callbacks);
-  auto actionIter = actions.begin();
+  // Input callbacks should not be executed if the overlay requested keyboard focus
+  if (!m_overlay || !m_overlay->hasKeyboardFocus()) {
+    // Process actions belonging to pressed keys & mouse buttons
+    auto& actions   = std::get<4>(m_callbacks);
+    auto actionIter = actions.begin();
 
-  while (actionIter != actions.end()) {
-    auto& action = actionIter->second;
+    while (actionIter != actions.end()) {
+      auto& action = actionIter->second;
 
-    // An action consists of two parts:
-    //   - a callback associated to the triggered key or button
-    //   - a value indicating if it should be executed only once or every frame
+      // An action consists of two parts:
+      //   - a callback associated to the triggered key or button
+      //   - a value indicating if it should be executed only once or every frame
 
-    action.first(deltaTime);
+      action.first(deltaTime);
 
-    // Removing the current action if ONCE is given, or simply increment the iterator
-    if (action.second == Input::ONCE)
-      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
-    else
-      ++actionIter;
+      // Removing the current action if ONCE is given, or simply increment the iterator
+      if (action.second == Input::ONCE)
+        actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
+      else
+        ++actionIter;
+    }
   }
 
   if (m_overlay)

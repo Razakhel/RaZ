@@ -40,6 +40,7 @@ public:
   void addSeparator();
   void addFrameTime(std::string formattedLabel);
   void addFpsCounter(std::string formattedLabel);
+  bool hasKeyboardFocus() const;
   void render();
 
   ~Overlay();
