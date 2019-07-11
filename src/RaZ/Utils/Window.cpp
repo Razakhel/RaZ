@@ -250,34 +250,32 @@ void Window::updateCallbacks() const {
   }
 }
 
-void Window::addOverlayElement(OverlayElementType type, const std::string& text,
-                               std::function<void()> actionOn, std::function<void()> actionOff) {
-  m_overlay->addElement(type, text, std::move(actionOn), std::move(actionOff));
+void Window::addOverlayLabel(std::string label) {
+  m_overlay->addLabel(std::move(label));
 }
 
-void Window::addOverlayText(const std::string& text) {
-  m_overlay->addText(text);
+void Window::addOverlayButton(std::string label, std::function<void()> action) {
+  m_overlay->addButton(std::move(label), std::move(action));
 }
 
-void Window::addOverlayButton(const std::string& text, std::function<void()> action) {
-  m_overlay->addButton(text, std::move(action));
+void Window::addOverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
+  m_overlay->addCheckbox(std::move(label), std::move(actionOn), std::move(actionOff), initVal);
 }
 
-void Window::addOverlayCheckbox(const std::string& text, bool initVal,
-                                std::function<void()> actionOn, std::function<void()> actionOff) {
-  m_overlay->addCheckbox(text, initVal, std::move(actionOn), std::move(actionOff));
+void Window::addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback) {
+  m_overlay->addTextbox(std::move(label), std::move(callback));
 }
 
 void Window::addOverlaySeparator() {
   m_overlay->addSeparator();
 }
 
-void Window::addOverlayFrameTime(const std::string& formattedText) {
-  m_overlay->addFrameTime(formattedText);
+void Window::addOverlayFrameTime(std::string formattedLabel) {
+  m_overlay->addFrameTime(std::move(formattedLabel));
 }
 
-void Window::addOverlayFpsCounter(const std::string& formattedText) {
-  m_overlay->addFpsCounter(formattedText);
+void Window::addOverlayFpsCounter(std::string formattedLabel) {
+  m_overlay->addFpsCounter(std::move(formattedLabel));
 }
 
 bool Window::run(float deltaTime) {

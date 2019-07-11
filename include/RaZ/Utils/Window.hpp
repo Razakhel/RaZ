@@ -94,34 +94,31 @@ public:
   void enableOverlay() { m_overlay = Overlay::create(m_window); }
   /// Disables the overlay.
   void disableOverlay() { m_overlay.reset(); }
-  /// Adds an element on the overlay.
-  /// \param type Type of the element to add.
-  /// \param text Text to be displayed beside the element.
-  /// \param actionOn Action to be executed when clicked or toggled on.
-  /// \param actionOff Action to be executed when toggled off.
-  void addOverlayElement(OverlayElementType type, const std::string& text,
-                         std::function<void()> actionOn = nullptr, std::function<void()> actionOff = nullptr);
-  /// Adds text on the overlay.
-  /// \param text Text to be displayed.
-  void addOverlayText(const std::string& text);
+  /// Adds a label on the overlay.
+  /// \param label Text to be displayed.
+  void addOverlayLabel(std::string label);
   /// Adds a button on the overlay.
-  /// \param text Text to be displayed beside the button.
+  /// \param label Text to be displayed beside the button.
   /// \param action Action to be executed when clicked.
-  void addOverlayButton(const std::string& text, std::function<void()> action);
+  void addOverlayButton(std::string label, std::function<void()> action);
   /// Adds a checkbox on the overlay.
-  /// \param text Text to be displayed beside the checkbox.
-  /// \param initVal Initial value, checked or not.
+  /// \param label Text to be displayed beside the checkbox.
   /// \param actionOn Action to be executed when toggled on.
   /// \param actionOff Action to be executed when toggled off.
-  void addOverlayCheckbox(const std::string& text, bool initVal, std::function<void()> actionOn, std::function<void()> actionOff);
+  /// \param initVal Initial value, checked or not.
+  void addOverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
+  /// Adds a texbox on the overlay.
+  /// \param label Text to be displayed beside the checkbox.
+  /// \param callback Function to be called every time the content is modified.
+  void addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback);
   /// Adds an horizontal separator on the overlay.
   void addOverlaySeparator();
   /// Adds a frame time display on the overlay.
-  /// \param formattedText Text with a formatting placeholder to display the frame time (%.Xf, X being the precision after the comma).
-  void addOverlayFrameTime(const std::string& formattedText);
+  /// \param formattedLabel Text with a formatting placeholder to display the frame time (%.Xf, X being the precision after the comma).
+  void addOverlayFrameTime(std::string formattedLabel);
   /// Adds a FPS (frames per second) counter on the overlay.
-  /// \param formattedText Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
-  void addOverlayFpsCounter(const std::string& formattedText);
+  /// \param formattedLabel Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
+  void addOverlayFpsCounter(std::string formattedLabel);
   /// Runs the window, refreshing its state by displaying the rendered scene, drawing the overlay, etc.
   /// \param deltaTime Amount of time elapsed since the last frame.
   /// \return True if the window hasn't been required to close, false otherwise.
