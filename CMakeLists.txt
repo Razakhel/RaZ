@@ -3,7 +3,7 @@ project(RaZ)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 ########################
 # RaZ - Compiler flags #
@@ -338,6 +338,7 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
 
         if (FBX_FOUND)
             set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} ${FBX_LIB})
+
             message("FBX SDK linked.")
         endif ()
     endif ()
@@ -421,10 +422,10 @@ endif ()
 install(TARGETS RaZ DESTINATION "lib/$<CONFIG>")
 
 # Installing the headers
-set(
-    HEADERS_INSTALL
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ
-)
-
+set(HEADERS_INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ)
 install(DIRECTORY ${HEADERS_INSTALL} DESTINATION include)
+
+# If FBX SDK used, install the DLL file into the bin/ folder
+if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)
+    install(FILES "${FBX_CONFIG_DLL}" DESTINATION "bin/$<CONFIG>")
+endif ()
