@@ -27,7 +27,7 @@ void UniformBuffer::bindUniformBlock(const ShaderProgram& program, const std::st
 }
 
 void UniformBuffer::bindBufferBase(unsigned int bindingIndex) const {
-  glBindBufferBase(GL_UNIFORM_BUFFER, bindingIndex, m_index);
+  Renderer::bindBufferBase(GL_UNIFORM_BUFFER, bindingIndex, m_index);
 }
 
 void UniformBuffer::bind() const {

@@ -13,8 +13,8 @@ namespace Raz {
 Shader::Shader(Shader&& shader) noexcept
   : m_index{ std::exchange(shader.m_index, GL_INVALID_INDEX) }, m_path{ std::move(shader.m_path) } {}
 
-void Shader::import(std::string fileName) {
-  m_path = std::move(fileName);
+void Shader::import(std::string filePath) {
+  m_path = std::move(filePath);
   load();
 }
 
@@ -69,7 +69,7 @@ void Shader::destroy() const {
   if (m_index == GL_INVALID_INDEX)
     return;
 
-  glDeleteShader(m_index);
+  Renderer::deleteShader(m_index);
 }
 
 Shader& Shader::operator=(Shader&& shader) noexcept {

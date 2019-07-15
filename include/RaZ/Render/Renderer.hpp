@@ -25,6 +25,7 @@ public:
   static void disable(unsigned int code);
   static void bindBuffer(unsigned int type, unsigned int index);
   static void unbindBuffer(unsigned int type) { bindBuffer(type, 0); }
+  static void bindBufferBase(unsigned int type, unsigned int bindingIndex, unsigned int bufferIndex);
   static void bindTexture(unsigned int type, unsigned int index);
   static void unbindTexture(unsigned int type) { bindTexture(type, 0); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
@@ -39,6 +40,7 @@ public:
   static unsigned int createShader(ShaderType type);
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
+  static void deleteShader(unsigned int index);
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
   static void activateTexture(unsigned int index);
   static void checkErrors();

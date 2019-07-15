@@ -59,6 +59,16 @@ void Renderer::bindBuffer(unsigned int type, unsigned int index) {
 #endif
 }
 
+void Renderer::bindBufferBase(unsigned int type, unsigned int bindingIndex, unsigned int bufferIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindBufferBase(type, bindingIndex, bufferIndex);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::bindTexture(unsigned int type, unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -199,6 +209,16 @@ void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex)
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDetachShader(programIndex, shaderIndex);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::deleteShader(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteShader(index);
 
 #if !defined(NDEBUG)
   checkErrors();
