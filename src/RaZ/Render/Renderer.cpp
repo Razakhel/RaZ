@@ -99,14 +99,16 @@ void Renderer::deleteBuffers(unsigned int count, unsigned int* index) {
 #endif
 }
 
-unsigned int Renderer::createShader(ShaderType type) {
-  const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
+unsigned int Renderer::createProgram() {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  const unsigned int programIndex = glCreateProgram();
 
 #if !defined(NDEBUG)
   checkErrors();
 #endif
 
-  return shaderIndex;
+  return programIndex;
 }
 
 int Renderer::getProgramInfo(unsigned int index, unsigned int infoType) {
@@ -155,6 +157,48 @@ void Renderer::useProgram(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glUseProgram(index);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::deleteProgram(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteProgram(index);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+unsigned int Renderer::createShader(ShaderType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+
+  return shaderIndex;
+}
+
+void Renderer::attachShader(unsigned int programIndex, unsigned int shaderIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glAttachShader(programIndex, shaderIndex);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDetachShader(programIndex, shaderIndex);
 
 #if !defined(NDEBUG)
   checkErrors();

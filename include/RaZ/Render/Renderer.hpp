@@ -30,11 +30,15 @@ public:
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static void generateBuffers(unsigned int count, unsigned int* index);
   static void deleteBuffers(unsigned int count, unsigned int* index);
-  static unsigned int createShader(ShaderType type);
+  static unsigned int createProgram();
   static int getProgramInfo(unsigned int index, unsigned int infoType);
   static bool isProgramLinked(unsigned int index);
   static void linkProgram(unsigned int index);
   static void useProgram(unsigned int index);
+  static void deleteProgram(unsigned int index);
+  static unsigned int createShader(ShaderType type);
+  static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
+  static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
   static void activateTexture(unsigned int index);
   static void checkErrors();
