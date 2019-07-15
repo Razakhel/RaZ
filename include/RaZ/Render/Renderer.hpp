@@ -19,7 +19,8 @@ public:
   Renderer(const Renderer&) = delete;
   Renderer(Renderer&&) noexcept = delete;
 
-  static void checkErrors();
+  static void initialize();
+  static bool isInitialized() { return s_isInitialized; }
   static void enable(unsigned int code);
   static void disable(unsigned int code);
   static void bindBuffer(unsigned int type, unsigned int index);
@@ -36,11 +37,15 @@ public:
   static void useProgram(unsigned int index);
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
   static void activateTexture(unsigned int index);
+  static void checkErrors();
 
   Renderer& operator=(const Renderer&) = delete;
   Renderer& operator=(Renderer&&) noexcept = delete;
 
   ~Renderer() = delete;
+
+private:
+  static inline bool s_isInitialized = false;
 };
 
 } // namespace Raz

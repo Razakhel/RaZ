@@ -20,20 +20,18 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
 
 } // namespace
 
-void Renderer::checkErrors() {
-  while (true) {
-    const unsigned int errorCode = glGetError();
+void Renderer::initialize() {
+  glewExperimental = GL_TRUE;
 
-    if (errorCode == GL_NO_ERROR)
-      break;
-
-    std::cerr << "OpenGL error - " << recoverGlErrorStr(errorCode) << " (code " << errorCode << ")\n";
-  };
-
-  std::cerr << std::flush;
+  if (glewInit() != GLEW_OK)
+    std::cerr << "Error: Failed to initialize GLEW." << std::endl;
+  else
+    s_isInitialized = true;
 }
 
 void Renderer::enable(unsigned int code) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glEnable(code);
 
 #if !defined(NDEBUG)
@@ -42,6 +40,8 @@ void Renderer::enable(unsigned int code) {
 }
 
 void Renderer::disable(unsigned int code) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glDisable(code);
 
 #if !defined(NDEBUG)
@@ -50,6 +50,8 @@ void Renderer::disable(unsigned int code) {
 }
 
 void Renderer::bindBuffer(unsigned int type, unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glBindBuffer(type, index);
 
 #if !defined(NDEBUG)
@@ -58,6 +60,8 @@ void Renderer::bindBuffer(unsigned int type, unsigned int index) {
 }
 
 void Renderer::bindTexture(unsigned int type, unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glBindTexture(type, index);
 
 #if !defined(NDEBUG)
@@ -66,6 +70,8 @@ void Renderer::bindTexture(unsigned int type, unsigned int index) {
 }
 
 void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glViewport(xOrigin, yOrigin, width, height);
 
 #if !defined(NDEBUG)
@@ -74,6 +80,8 @@ void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsi
 }
 
 void Renderer::generateBuffers(unsigned int count, unsigned int* index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glGenBuffers(count, index);
 
 #if !defined(NDEBUG)
@@ -82,6 +90,8 @@ void Renderer::generateBuffers(unsigned int count, unsigned int* index) {
 }
 
 void Renderer::deleteBuffers(unsigned int count, unsigned int* index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glDeleteBuffers(count, index);
 
 #if !defined(NDEBUG)
@@ -100,6 +110,8 @@ unsigned int Renderer::createShader(ShaderType type) {
 }
 
 int Renderer::getProgramInfo(unsigned int index, unsigned int infoType) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   int res;
   glGetProgramiv(index, infoType, &res);
 
@@ -111,6 +123,8 @@ int Renderer::getProgramInfo(unsigned int index, unsigned int infoType) {
 }
 
 bool Renderer::isProgramLinked(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   const bool isLinked = getProgramInfo(index, GL_LINK_STATUS);
 
 #if !defined(NDEBUG)
@@ -121,6 +135,8 @@ bool Renderer::isProgramLinked(unsigned int index) {
 }
 
 void Renderer::linkProgram(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glLinkProgram(index);
 
   if (!isProgramLinked(index)) {
@@ -136,6 +152,8 @@ void Renderer::linkProgram(unsigned int index) {
 }
 
 void Renderer::useProgram(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glUseProgram(index);
 
 #if !defined(NDEBUG)
@@ -144,6 +162,8 @@ void Renderer::useProgram(unsigned int index) {
 }
 
 int Renderer::recoverUniformLocation(unsigned int programIndex, const char* uniformName) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   const int location = glGetUniformLocation(programIndex, uniformName);
 
 #if !defined(NDEBUG)
@@ -157,11 +177,26 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
 }
 
 void Renderer::activateTexture(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
   glActiveTexture(GL_TEXTURE0 + index);
 
 #if !defined(NDEBUG)
   checkErrors();
 #endif
+}
+
+void Renderer::checkErrors() {
+  while (true) {
+    const unsigned int errorCode = glGetError();
+
+    if (errorCode == GL_NO_ERROR)
+      break;
+
+    std::cerr << "OpenGL error - " << recoverGlErrorStr(errorCode) << " (code " << errorCode << ")\n";
+  };
+
+  std::cerr << std::flush;
 }
 
 } // namespace Raz

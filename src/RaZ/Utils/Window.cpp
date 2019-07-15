@@ -89,9 +89,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 
   glViewport(0, 0, static_cast<int>(width), static_cast<int>(height));
 
-  glewExperimental = GL_TRUE;
-  if (glewInit() != GLEW_OK)
-    std::cerr << "Error: Failed to initialize GLEW." << std::endl;
+  Renderer::initialize();
 
 #if !defined(__APPLE__) // Setting the debug message callback provokes a crash on macOS
   glDebugMessageCallback(&callbackDebugLog, nullptr);
