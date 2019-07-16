@@ -38,6 +38,8 @@ public:
   static void useProgram(unsigned int index);
   static void deleteProgram(unsigned int index);
   static unsigned int createShader(ShaderType type);
+  static int getShaderInfo(unsigned int index, unsigned int infoType);
+  static bool isShaderCompiled(unsigned int index);
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);

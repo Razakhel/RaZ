@@ -52,10 +52,7 @@ void Shader::compile() const {
 }
 
 bool Shader::isCompiled() const {
-  int success;
-  glGetShaderiv(m_index, GL_COMPILE_STATUS, &success);
-
-  return static_cast<bool>(success);
+  return Renderer::isShaderCompiled(m_index);
 }
 
 void Shader::loadSource(const std::string& source) {

@@ -195,6 +195,31 @@ unsigned int Renderer::createShader(ShaderType type) {
   return shaderIndex;
 }
 
+int Renderer::getShaderInfo(unsigned int index, unsigned int infoType) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  int res;
+  glGetShaderiv(index, infoType, &res);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+
+  return res;
+}
+
+bool Renderer::isShaderCompiled(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  const bool isCompiled = getShaderInfo(index, GL_COMPILE_STATUS);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+
+  return isCompiled;
+}
+
 void Renderer::attachShader(unsigned int programIndex, unsigned int shaderIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
