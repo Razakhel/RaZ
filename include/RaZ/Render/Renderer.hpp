@@ -7,7 +7,11 @@
 
 namespace Raz {
 
-enum class ShaderType {
+enum class BufferType : unsigned int {
+  UNIFORM_BUFFER = 35345 // GL_UNIFORM_BUFFER
+};
+
+enum class ShaderType : unsigned int {
   VERTEX   = 35633, // GL_VERTEX_SHADER
   FRAGMENT = 35632, // GL_FRAGMENT_SHADER
   GEOMETRY = 36313  // GL_GEOMETRY_SHADER
@@ -30,6 +34,8 @@ public:
   static void unbindTexture(unsigned int type) { bindTexture(type, 0); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static void generateBuffers(unsigned int count, unsigned int* index);
+  static void sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data);
+  template <typename T> static void sendBufferSubData(BufferType type, ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
   static void deleteBuffers(unsigned int count, unsigned int* index);
   static unsigned int createProgram();
   static int getProgramInfo(unsigned int index, unsigned int infoType);

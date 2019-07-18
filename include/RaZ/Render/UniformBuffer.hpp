@@ -6,6 +6,7 @@
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Render/Renderer.hpp"
 
 namespace Raz {
 
@@ -23,9 +24,13 @@ public:
   void bindBufferBase(unsigned int bindingIndex) const;
   void bind() const;
   void unbind() const;
-  template <typename T> void sendData(T data, unsigned int offset) const;
-  template <typename T, std::size_t Size> void sendData(const Vector<T, Size>& vec, unsigned int offset) const;
-  template <typename T, std::size_t W, std::size_t H> void sendData(const Matrix<T, W, H>& mat, unsigned int offset) const;
+  template <typename T> void sendData(T data, unsigned int offset) const { Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER, offset, sizeof(T), &data); }
+  template <typename T, std::size_t Size>
+  void sendData(const Vector<T, Size>& vec, unsigned int offset) const { Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER,
+                                                                                                     offset, sizeof(vec), vec.getDataPtr()); }
+  template <typename T, std::size_t W, std::size_t H>
+  void sendData(const Matrix<T, W, H>& mat, unsigned int offset) const { Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER,
+                                                                                                     offset, sizeof(mat), mat.getDataPtr()); }
 
   UniformBuffer& operator=(const UniformBuffer&) = delete;
   UniformBuffer& operator=(UniformBuffer&& ubo) noexcept;

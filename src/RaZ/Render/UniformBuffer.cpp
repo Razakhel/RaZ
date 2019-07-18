@@ -1,5 +1,4 @@
 #include "GL/glew.h"
-#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 
 namespace Raz {
@@ -36,76 +35,6 @@ void UniformBuffer::bind() const {
 
 void UniformBuffer::unbind() const {
   Renderer::unbindBuffer(GL_UNIFORM_BUFFER);
-}
-
-template <>
-void UniformBuffer::sendData(int8_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(int16_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(int32_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(int64_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(uint8_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(uint16_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(uint32_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(uint64_t data, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(data), &data);
-}
-
-template <>
-void UniformBuffer::sendData(const Vec2f& vec, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(vec), vec.getDataPtr());
-}
-
-template <>
-void UniformBuffer::sendData(const Vec3f& vec, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(vec), vec.getDataPtr());
-}
-
-template <>
-void UniformBuffer::sendData(const Vec4f& vec, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(vec), vec.getDataPtr());
-}
-
-template <>
-void UniformBuffer::sendData(const Mat2f& mat, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(mat), mat.getDataPtr());
-}
-
-template <>
-void UniformBuffer::sendData(const Mat3f& mat, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(mat), mat.getDataPtr());
-}
-
-template <>
-void UniformBuffer::sendData(const Mat4f& mat, unsigned int offset) const {
-  glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(mat), mat.getDataPtr());
 }
 
 UniformBuffer& UniformBuffer::operator=(UniformBuffer&& ubo) noexcept {

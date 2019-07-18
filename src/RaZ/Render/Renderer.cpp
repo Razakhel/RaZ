@@ -99,6 +99,16 @@ void Renderer::generateBuffers(unsigned int count, unsigned int* index) {
 #endif
 }
 
+void Renderer::sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBufferSubData(static_cast<unsigned int>(type), offset, dataSize, data);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::deleteBuffers(unsigned int count, unsigned int* index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
