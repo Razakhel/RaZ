@@ -11,6 +11,10 @@ enum class BufferType : unsigned int {
   UNIFORM_BUFFER = 35345 // GL_UNIFORM_BUFFER
 };
 
+enum class TextureType : unsigned int {
+  CUBEMAP = 34067 // GL_TEXTURE_CUBE_MAP
+};
+
 enum class ShaderType : unsigned int {
   VERTEX   = 35633, // GL_VERTEX_SHADER
   FRAGMENT = 35632, // GL_FRAGMENT_SHADER
@@ -27,11 +31,11 @@ public:
   static bool isInitialized() { return s_isInitialized; }
   static void enable(unsigned int code);
   static void disable(unsigned int code);
-  static void bindBuffer(unsigned int type, unsigned int index);
-  static void unbindBuffer(unsigned int type) { bindBuffer(type, 0); }
-  static void bindBufferBase(unsigned int type, unsigned int bindingIndex, unsigned int bufferIndex);
-  static void bindTexture(unsigned int type, unsigned int index);
-  static void unbindTexture(unsigned int type) { bindTexture(type, 0); }
+  static void bindBuffer(BufferType type, unsigned int index);
+  static void unbindBuffer(BufferType type) { bindBuffer(type, 0); }
+  static void bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex);
+  static void bindTexture(TextureType type, unsigned int index);
+  static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static void generateBuffers(unsigned int count, unsigned int* index);
   static void sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data);

@@ -26,15 +26,15 @@ void UniformBuffer::bindUniformBlock(const ShaderProgram& program, const std::st
 }
 
 void UniformBuffer::bindBufferBase(unsigned int bindingIndex) const {
-  Renderer::bindBufferBase(GL_UNIFORM_BUFFER, bindingIndex, m_index);
+  Renderer::bindBufferBase(BufferType::UNIFORM_BUFFER, bindingIndex, m_index);
 }
 
 void UniformBuffer::bind() const {
-  Renderer::bindBuffer(GL_UNIFORM_BUFFER, m_index);
+  Renderer::bindBuffer(BufferType::UNIFORM_BUFFER, m_index);
 }
 
 void UniformBuffer::unbind() const {
-  Renderer::unbindBuffer(GL_UNIFORM_BUFFER);
+  Renderer::unbindBuffer(BufferType::UNIFORM_BUFFER);
 }
 
 UniformBuffer& UniformBuffer::operator=(UniformBuffer&& ubo) noexcept {

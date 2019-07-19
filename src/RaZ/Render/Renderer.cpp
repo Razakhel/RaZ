@@ -49,30 +49,30 @@ void Renderer::disable(unsigned int code) {
 #endif
 }
 
-void Renderer::bindBuffer(unsigned int type, unsigned int index) {
+void Renderer::bindBuffer(BufferType type, unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glBindBuffer(type, index);
+  glBindBuffer(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
   checkErrors();
 #endif
 }
 
-void Renderer::bindBufferBase(unsigned int type, unsigned int bindingIndex, unsigned int bufferIndex) {
+void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glBindBufferBase(type, bindingIndex, bufferIndex);
+  glBindBufferBase(static_cast<unsigned int>(type), bindingIndex, bufferIndex);
 
 #if !defined(NDEBUG)
   checkErrors();
 #endif
 }
 
-void Renderer::bindTexture(unsigned int type, unsigned int index) {
+void Renderer::bindTexture(TextureType type, unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glBindTexture(type, index);
+  glBindTexture(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
   checkErrors();

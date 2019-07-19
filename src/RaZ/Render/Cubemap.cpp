@@ -134,11 +134,11 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
 }
 
 void Cubemap::bind() const {
-  Renderer::bindTexture(GL_TEXTURE_CUBE_MAP, m_index);
+  Renderer::bindTexture(TextureType::CUBEMAP, m_index);
 }
 
 void Cubemap::unbind() const {
-  Renderer::unbindTexture(GL_TEXTURE_CUBE_MAP);
+  Renderer::unbindTexture(TextureType::CUBEMAP);
 }
 
 void Cubemap::draw(const Camera& camera) const {
