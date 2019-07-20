@@ -3,8 +3,6 @@
 #ifndef RAZ_RENDERER_HPP
 #define RAZ_RENDERER_HPP
 
-#include "RaZ/Render/Mesh.hpp"
-
 namespace Raz {
 
 enum class BufferType : unsigned int {
@@ -34,6 +32,7 @@ public:
   static void bindBuffer(BufferType type, unsigned int index);
   static void unbindBuffer(BufferType type) { bindBuffer(type, 0); }
   static void bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex);
+  static void activateTexture(unsigned int index);
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
@@ -54,7 +53,8 @@ public:
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
-  static void activateTexture(unsigned int index);
+  static void bindFramebuffer(unsigned int index);
+  static void unbindFramebuffer() { bindFramebuffer(0); }
   static void checkErrors();
 
   Renderer& operator=(const Renderer&) = delete;

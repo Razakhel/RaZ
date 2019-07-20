@@ -1,6 +1,9 @@
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 
+#include <cassert>
+#include <iostream>
+
 namespace Raz {
 
 namespace {
@@ -63,6 +66,16 @@ void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsign
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glBindBufferBase(static_cast<unsigned int>(type), bindingIndex, bufferIndex);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::activateTexture(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glActiveTexture(GL_TEXTURE0 + index);
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -162,10 +175,10 @@ void Renderer::linkProgram(unsigned int index) {
   glLinkProgram(index);
 
   if (!isProgramLinked(index)) {
-    std::array<char, 512> infoLog {};
+    char infoLog[512];
 
-    glGetProgramInfoLog(index, static_cast<int>(infoLog.size()), nullptr, infoLog.data());
-    std::cerr << "Error: Shader program link failed (ID " << index << ").\n" << infoLog.data() << std::endl;
+    glGetProgramInfoLog(index, std::size(infoLog), nullptr, infoLog);
+    std::cerr << "Error: Shader program link failed (ID " << index << ").\n" << infoLog << std::endl;
   }
 
 #if !defined(NDEBUG)
@@ -275,10 +288,10 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   return location;
 }
 
-void Renderer::activateTexture(unsigned int index) {
+void Renderer::bindFramebuffer(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glActiveTexture(GL_TEXTURE0 + index);
+  glBindFramebuffer(GL_FRAMEBUFFER, index);
 
 #if !defined(NDEBUG)
   checkErrors();

@@ -71,13 +71,13 @@ void Framebuffer::mapBuffers() const {
 }
 
 void Framebuffer::bind() const {
-  glBindFramebuffer(GL_FRAMEBUFFER, m_index);
+  Renderer::bindFramebuffer(m_index);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Framebuffer::unbind() const {
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  Renderer::unbindFramebuffer();
 }
 
 void Framebuffer::display(const ShaderProgram& program) const {
