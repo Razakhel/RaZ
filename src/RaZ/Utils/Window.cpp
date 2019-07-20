@@ -311,7 +311,7 @@ bool Window::run(float deltaTime) {
   glfwSwapBuffers(m_window);
 
   glClearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  Renderer::clear(MaskType::COLOR, MaskType::DEPTH);
 
   return true;
 }

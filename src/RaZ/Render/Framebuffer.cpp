@@ -72,8 +72,7 @@ void Framebuffer::mapBuffers() const {
 
 void Framebuffer::bind() const {
   Renderer::bindFramebuffer(m_index);
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  Renderer::clear(MaskType::COLOR, MaskType::DEPTH);
 }
 
 void Framebuffer::unbind() const {
@@ -81,7 +80,7 @@ void Framebuffer::unbind() const {
 }
 
 void Framebuffer::display(const ShaderProgram& program) const {
-  glClear(GL_COLOR_BUFFER_BIT);
+  Renderer::clear(MaskType::COLOR);
 
   program.use();
 

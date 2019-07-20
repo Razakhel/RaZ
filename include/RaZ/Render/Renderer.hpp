@@ -5,6 +5,12 @@
 
 namespace Raz {
 
+enum class MaskType : unsigned int {
+  COLOR   = 16384, // GL_COLOR_BUFFER_BIT
+  DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
+  STENCIL = 1024   // GL_STENCIL_BUFFER_BIT
+};
+
 enum class BufferType : unsigned int {
   UNIFORM_BUFFER = 35345 // GL_UNIFORM_BUFFER
 };
@@ -29,6 +35,11 @@ public:
   static bool isInitialized() { return s_isInitialized; }
   static void enable(unsigned int code);
   static void disable(unsigned int code);
+  static void clear(MaskType type) { clear(static_cast<unsigned int>(type)); }
+  static void clear(MaskType type1, MaskType type2) { clear(static_cast<unsigned int>(type1) | static_cast<unsigned int>(type2)); }
+  static void clear(MaskType type1, MaskType type2, MaskType type3) { clear(static_cast<unsigned int>(type1)
+                                                                          | static_cast<unsigned int>(type2)
+                                                                          | static_cast<unsigned int>(type3)); }
   static void bindBuffer(BufferType type, unsigned int index);
   static void unbindBuffer(BufferType type) { bindBuffer(type, 0); }
   static void bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex);
@@ -63,6 +74,8 @@ public:
   ~Renderer() = delete;
 
 private:
+  static void clear(unsigned int mask);
+
   static inline bool s_isInitialized = false;
 };
 

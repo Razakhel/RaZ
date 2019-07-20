@@ -311,4 +311,14 @@ void Renderer::checkErrors() {
   std::cerr << std::flush;
 }
 
+void Renderer::clear(unsigned int mask) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glClear(mask);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 } // namespace Raz
