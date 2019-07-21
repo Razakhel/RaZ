@@ -67,8 +67,10 @@ public:
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
+  static void generateFramebuffers(unsigned int count, unsigned int* indices);
   static void bindFramebuffer(unsigned int index);
   static void unbindFramebuffer() { bindFramebuffer(0); }
+  static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   static void checkErrors();
 
   Renderer& operator=(const Renderer&) = delete;

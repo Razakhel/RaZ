@@ -308,10 +308,30 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   return location;
 }
 
+void Renderer::generateFramebuffers(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenFramebuffers(count, indices);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::bindFramebuffer(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glBindFramebuffer(GL_FRAMEBUFFER, index);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteFramebuffers(count, indices);
 
 #if !defined(NDEBUG)
   checkErrors();
