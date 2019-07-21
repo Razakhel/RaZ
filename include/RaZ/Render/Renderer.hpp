@@ -16,7 +16,8 @@ enum class BufferType : unsigned int {
 };
 
 enum class TextureType : unsigned int {
-  CUBEMAP = 34067 // GL_TEXTURE_CUBE_MAP
+  TEXTURE_2D = 3553, // GL_TEXTURE_2D
+  CUBEMAP    = 34067 // GL_TEXTURE_CUBE_MAP
 };
 
 enum class ShaderType : unsigned int {
@@ -40,17 +41,19 @@ public:
   static void clear(MaskType type1, MaskType type2, MaskType type3) { clear(static_cast<unsigned int>(type1)
                                                                           | static_cast<unsigned int>(type2)
                                                                           | static_cast<unsigned int>(type3)); }
+  static void generateBuffers(unsigned int count, unsigned int* indices);
   static void bindBuffer(BufferType type, unsigned int index);
   static void unbindBuffer(BufferType type) { bindBuffer(type, 0); }
   static void bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex);
+  static void sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data);
+  template <typename T> static void sendBufferSubData(BufferType type, ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
+  static void deleteBuffers(unsigned int count, unsigned int* indices);
+  static void generateTextures(unsigned int count, unsigned int* indices);
   static void activateTexture(unsigned int index);
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
+  static void deleteTextures(unsigned int count, unsigned int* indices);
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
-  static void generateBuffers(unsigned int count, unsigned int* index);
-  static void sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data);
-  template <typename T> static void sendBufferSubData(BufferType type, ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
-  static void deleteBuffers(unsigned int count, unsigned int* index);
   static unsigned int createProgram();
   static int getProgramInfo(unsigned int index, unsigned int infoType);
   static bool isProgramLinked(unsigned int index);

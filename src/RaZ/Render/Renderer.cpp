@@ -52,6 +52,16 @@ void Renderer::disable(unsigned int code) {
 #endif
 }
 
+void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenBuffers(count, indices);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::bindBuffer(BufferType type, unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -66,6 +76,36 @@ void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsign
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glBindBufferBase(static_cast<unsigned int>(type), bindingIndex, bufferIndex);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBufferSubData(static_cast<unsigned int>(type), offset, dataSize, data);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteBuffers(count, indices);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenTextures(count, indices);
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -92,40 +132,20 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
 #endif
 }
 
+void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteTextures(count, indices);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glViewport(xOrigin, yOrigin, width, height);
-
-#if !defined(NDEBUG)
-  checkErrors();
-#endif
-}
-
-void Renderer::generateBuffers(unsigned int count, unsigned int* index) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-
-  glGenBuffers(count, index);
-
-#if !defined(NDEBUG)
-  checkErrors();
-#endif
-}
-
-void Renderer::sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-
-  glBufferSubData(static_cast<unsigned int>(type), offset, dataSize, data);
-
-#if !defined(NDEBUG)
-  checkErrors();
-#endif
-}
-
-void Renderer::deleteBuffers(unsigned int count, unsigned int* index) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-
-  glDeleteBuffers(count, index);
 
 #if !defined(NDEBUG)
   checkErrors();

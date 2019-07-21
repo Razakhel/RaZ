@@ -2,12 +2,13 @@
 #include <unordered_map>
 
 #include "GL/glew.h"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
 Texture::Texture() {
-  glGenTextures(1, &m_index);
+  Renderer::generateTextures(1, &m_index);
 }
 
 Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace) : Texture() {
@@ -120,11 +121,11 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
 }
 
 void Texture::bind() const {
-  glBindTexture(GL_TEXTURE_2D, m_index);
+  Renderer::bindTexture(TextureType::TEXTURE_2D, m_index);
 }
 
 void Texture::unbind() const {
-  glBindTexture(GL_TEXTURE_2D, 0);
+  Renderer::unbindTexture(TextureType::TEXTURE_2D);
 }
 
 Texture& Texture::operator=(Texture&& texture) noexcept {
@@ -139,6 +140,9 @@ Texture::~Texture() {
     return;
 
   glDeleteTextures(1, &m_index);
+
+  // This currently goes on an infinite error-printing loop
+  //Renderer::deleteTextures(1, &m_index);
 }
 
 void Texture::makePlainColored(const Vec3b& color) const {
