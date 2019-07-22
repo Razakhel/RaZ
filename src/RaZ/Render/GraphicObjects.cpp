@@ -1,5 +1,6 @@
 #include "GL/glew.h"
 #include "RaZ/Render/GraphicObjects.hpp"
+#include "RaZ/Render/Renderer.hpp"
 
 namespace Raz {
 
@@ -29,21 +30,18 @@ VertexArray::~VertexArray() {
 }
 
 VertexBuffer::VertexBuffer() {
-  if (m_index == GL_INVALID_INDEX)
-    return;
-
-  glGenBuffers(1, &m_index);
+  Renderer::generateBuffers(1, &m_index);
 }
 
 VertexBuffer::VertexBuffer(VertexBuffer&& vbo) noexcept
   : m_index{ std::exchange(vbo.m_index, GL_INVALID_INDEX) }, m_vertices{ std::move(vbo.m_vertices) } {}
 
 void VertexBuffer::bind() const {
-  glBindBuffer(GL_ARRAY_BUFFER, m_index);
+  Renderer::bindBuffer(BufferType::ARRAY_BUFFER, m_index);
 }
 
 void VertexBuffer::unbind() const {
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  Renderer::unbindBuffer(BufferType::ARRAY_BUFFER);
 }
 
 VertexBuffer& VertexBuffer::operator=(VertexBuffer&& vbo) noexcept {
@@ -58,10 +56,13 @@ VertexBuffer::~VertexBuffer() {
     return;
 
   glDeleteBuffers(1, &m_index);
+
+  // This currently goes on an infinite error-printing loop
+  //Renderer::deleteBuffers(1, &m_index);
 }
 
 IndexBuffer::IndexBuffer() {
-  glGenBuffers(1, &m_index);
+  Renderer::generateBuffers(1, &m_index);
 }
 
 IndexBuffer::IndexBuffer(IndexBuffer&& ibo) noexcept
@@ -70,11 +71,11 @@ IndexBuffer::IndexBuffer(IndexBuffer&& ibo) noexcept
     m_triangleIndices{ std::move(ibo.m_triangleIndices) } {}
 
 void IndexBuffer::bind() const {
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index);
+  Renderer::bindBuffer(BufferType::ELEMENT_BUFFER, m_index);
 }
 
 void IndexBuffer::unbind() const {
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  Renderer::unbindBuffer(BufferType::ELEMENT_BUFFER);
 }
 
 IndexBuffer& IndexBuffer::operator=(IndexBuffer&& ibo) noexcept {
@@ -90,6 +91,9 @@ IndexBuffer::~IndexBuffer() {
     return;
 
   glDeleteBuffers(1, &m_index);
+
+  // This currently goes on an infinite error-printing loop
+  //Renderer::deleteBuffers(1, &m_index);
 }
 
 } // namespace Raz

@@ -12,7 +12,9 @@ enum class MaskType : unsigned int {
 };
 
 enum class BufferType : unsigned int {
-  UNIFORM_BUFFER = 35345 // GL_UNIFORM_BUFFER
+  ARRAY_BUFFER   = 34962, // GL_ARRAY_BUFFER
+  ELEMENT_BUFFER = 34963, // GL_ELEMENT_ARRAY_BUFFER
+  UNIFORM_BUFFER = 35345  // GL_UNIFORM_BUFFER
 };
 
 enum class TextureType : unsigned int {
