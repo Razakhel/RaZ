@@ -263,6 +263,23 @@ bool Renderer::isShaderCompiled(unsigned int index) {
   return isCompiled;
 }
 
+void Renderer::compileShader(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glCompileShader(index);
+
+  if (!isShaderCompiled(index)) {
+    char infoLog[512];
+
+    glGetShaderInfoLog(index, std::size(infoLog), nullptr, infoLog);
+    std::cerr << "Error: Shader compilation failed (ID " << index << ").\n" << infoLog << std::endl;
+  }
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::attachShader(unsigned int programIndex, unsigned int shaderIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

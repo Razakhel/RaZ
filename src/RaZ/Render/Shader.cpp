@@ -1,8 +1,6 @@
-#include <array>
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
@@ -41,14 +39,7 @@ void Shader::load() const {
 }
 
 void Shader::compile() const {
-  glCompileShader(m_index);
-
-  if (!isCompiled()) {
-    std::array<char, 512> infoLog {};
-
-    glGetShaderInfoLog(m_index, static_cast<int>(infoLog.size()), nullptr, infoLog.data());
-    std::cerr << "Error: Shader compilation failed (ID " << m_index << ", path '" << m_path << "').\n" << infoLog.data() << std::endl;
-  }
+  Renderer::compileShader(m_index);
 }
 
 bool Shader::isCompiled() const {
