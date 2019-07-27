@@ -122,6 +122,30 @@ void Renderer::activateTexture(unsigned int index) {
 #endif
 }
 
+void Renderer::sendImageData2D(TextureType type,
+                               int mipmapLevel,
+                               TextureInternalFormat internalFormat,
+                               int width, int height,
+                               TextureFormat format,
+                               TextureDataType dataType,
+                               const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexImage2D(static_cast<unsigned int>(type),
+               mipmapLevel,
+               static_cast<int>(internalFormat),
+               width,
+               height,
+               0,
+               static_cast<unsigned int>(format),
+               static_cast<unsigned int>(dataType),
+               data);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::bindTexture(TextureType type, unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

@@ -22,6 +22,43 @@ enum class TextureType : unsigned int {
   CUBEMAP    = 34067 // GL_TEXTURE_CUBE_MAP
 };
 
+enum class TextureFormat : unsigned int {
+  RED           = 6403,  // GL_RED
+  RG            = 33319, // GL_RG
+  RGB           = 6407,  // GL_RGB
+  BGR           = 32992, // GL_BGR
+  RGBA          = 6408,  // GL_RGBA
+  BGRA          = 32993, // GL_BGRA
+  SRGB          = 35904, // GL_SRGB
+  DEPTH         = 6402,  // GL_DEPTH_COMPONENT
+  DEPTH_STENCIL = 34041  // GL_DEPTH_STENCIL
+};
+
+enum class TextureInternalFormat : unsigned int {
+  // Base formats
+  RED           = static_cast<unsigned int>(TextureFormat::RED),
+  RG            = static_cast<unsigned int>(TextureFormat::RG),
+  RGB           = static_cast<unsigned int>(TextureFormat::RGB),
+  BGR           = static_cast<unsigned int>(TextureFormat::BGR),
+  RGBA          = static_cast<unsigned int>(TextureFormat::RGBA),
+  BGRA          = static_cast<unsigned int>(TextureFormat::BGRA),
+  SRGB          = static_cast<unsigned int>(TextureFormat::SRGB),
+  DEPTH         = static_cast<unsigned int>(TextureFormat::DEPTH),
+  DEPTH_STENCIL = static_cast<unsigned int>(TextureFormat::DEPTH_STENCIL),
+
+  // Sized formats
+  RED16F   = 33325, // GL_R16F
+  RG16F    = 33327, // GL_RG16F
+  RGB16F   = 34843, // GL_RGB16F
+  RGBA16F  = 34842, // GL_RGBA16F
+  DEPTH32F = 36012, // GL_DEPTH_COMPONENT32F
+};
+
+enum class TextureDataType : unsigned int {
+  UBYTE = 5121, // GL_UNSIGNED_BYTE
+  FLOAT = 5126  // GL_FLOAT
+};
+
 enum class ShaderType : unsigned int {
   VERTEX   = 35633, // GL_VERTEX_SHADER
   FRAGMENT = 35632, // GL_FRAGMENT_SHADER
@@ -52,6 +89,12 @@ public:
   static void deleteBuffers(unsigned int count, unsigned int* indices);
   static void generateTextures(unsigned int count, unsigned int* indices);
   static void activateTexture(unsigned int index);
+  static void sendImageData2D(TextureType type,
+                              int mipmapLevel,
+                              TextureInternalFormat internalFormat,
+                              int width, int height,
+                              TextureFormat format,
+                              TextureDataType dataType, const void* data);
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void deleteTextures(unsigned int count, unsigned int* indices);
