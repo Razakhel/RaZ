@@ -3,11 +3,11 @@
 #ifndef RAZ_TEXTURE_HPP
 #define RAZ_TEXTURE_HPP
 
-#include <memory>
-#include <string>
-
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
+
+#include <memory>
+#include <string>
 
 namespace Raz {
 

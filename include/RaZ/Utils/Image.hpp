@@ -3,6 +3,8 @@
 #ifndef RAZ_IMAGE_HPP
 #define RAZ_IMAGE_HPP
 
+#include "RaZ/Render/Renderer.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -94,12 +96,12 @@ struct ImageDataF : public ImageData {
   std::vector<float> data;
 };
 
-enum class ImageColorspace {
-  GRAY       = 6403,  // GL_RED
-  GRAY_ALPHA = 33319, // GL_RG
-  RGB        = 6407,  // GL_RGB
-  RGBA       = 6408,  // GL_RGBA
-  DEPTH      = 6402   // GL_DEPTH_COMPONENT
+enum class ImageColorspace : unsigned int {
+  GRAY       = static_cast<unsigned int>(TextureFormat::RED),
+  GRAY_ALPHA = static_cast<unsigned int>(TextureFormat::RG),
+  RGB        = static_cast<unsigned int>(TextureFormat::RGB),
+  RGBA       = static_cast<unsigned int>(TextureFormat::RGBA),
+  DEPTH      = static_cast<unsigned int>(TextureFormat::DEPTH)
 };
 
 /// Image class, handling images of different formats.

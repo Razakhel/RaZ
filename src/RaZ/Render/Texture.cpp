@@ -1,6 +1,3 @@
-#include <array>
-#include <unordered_map>
-
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
@@ -18,29 +15,27 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 static_cast<unsigned int>(colorspace),
-                 static_cast<int>(width),
-                 static_cast<int>(height),
-                 0,
-                 static_cast<unsigned int>(colorspace),
-                 GL_UNSIGNED_BYTE,
-                 nullptr);
+    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                              0,
+                              static_cast<TextureInternalFormat>(colorspace),
+                              static_cast<int>(width),
+                              static_cast<int>(height),
+                              static_cast<TextureFormat>(colorspace),
+                              TextureDataType::UBYTE,
+                              nullptr);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_DEPTH_COMPONENT32F,
-                 static_cast<int>(width),
-                 static_cast<int>(height),
-                 0,
-                 static_cast<unsigned int>(colorspace),
-                 GL_FLOAT,
-                 nullptr);
+    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                              0,
+                              TextureInternalFormat::DEPTH32F,
+                              static_cast<int>(width),
+                              static_cast<int>(height),
+                              static_cast<TextureFormat>(colorspace),
+                              TextureDataType::FLOAT,
+                              nullptr);
   }
 
   unbind();
@@ -78,24 +73,24 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
     }
 
     // Default internal format is the image's own colorspace; modified if the image is a floating point one
-    auto colorFormat = static_cast<int>(m_image->getColorspace());
+    auto colorFormat = static_cast<TextureInternalFormat>(m_image->getColorspace());
 
     if (m_image->getDataType() == ImageDataType::FLOAT) {
       switch (m_image->getColorspace()) {
         case ImageColorspace::GRAY:
-          colorFormat = GL_R16F;
+          colorFormat = TextureInternalFormat::RED16F;
           break;
 
         case ImageColorspace::GRAY_ALPHA:
-          colorFormat = GL_RG16F;
+          colorFormat = TextureInternalFormat::RG16F;
           break;
 
         case ImageColorspace::RGB:
-          colorFormat = GL_RGB16F;
+          colorFormat = TextureInternalFormat::RGB16F;
           break;
 
         case ImageColorspace::RGBA:
-          colorFormat = GL_RGBA16F;
+          colorFormat = TextureInternalFormat::RGBA16F;
           break;
 
         case ImageColorspace::DEPTH: // Unhandled here
@@ -103,15 +98,14 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
       }
     }
 
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 colorFormat,
-                 static_cast<int>(m_image->getWidth()),
-                 static_cast<int>(m_image->getHeight()),
-                 0,
-                 static_cast<unsigned int>(m_image->getColorspace()),
-                 (m_image->getDataType() == ImageDataType::FLOAT ? GL_FLOAT : GL_UNSIGNED_BYTE),
-                 m_image->getDataPtr());
+    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                              0,
+                              colorFormat,
+                              static_cast<int>(m_image->getWidth()),
+                              static_cast<int>(m_image->getHeight()),
+                              static_cast<TextureFormat>(m_image->getColorspace()),
+                              (m_image->getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
+                              m_image->getDataPtr());
     glGenerateMipmap(GL_TEXTURE_2D);
     unbind();
   } else { // Image not found, deleting it & defaulting texture to pure white
@@ -147,7 +141,7 @@ Texture::~Texture() {
 
 void Texture::makePlainColored(const Vec3b& color) const {
   bind();
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, color.getDataPtr());
+  Renderer::sendImageData2D(TextureType::TEXTURE_2D, 0, TextureInternalFormat::RGB, 1, 1, TextureFormat::RGB, TextureDataType::UBYTE, color.getDataPtr());
   unbind();
 }
 
