@@ -95,6 +95,10 @@ public:
                               int width, int height,
                               TextureFormat format,
                               TextureDataType dataType, const void* data);
+  /// Generate mipmaps (levels of detail) of the currently bound texture.
+  /// \param type Type of the texture to generate mipmaps from.
+  static void generateMipmap(TextureType type);
+  static void generateMipmap(unsigned int textureIndex);
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void deleteTextures(unsigned int count, unsigned int* indices);

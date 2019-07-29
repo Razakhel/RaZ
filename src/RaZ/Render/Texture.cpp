@@ -23,7 +23,7 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
                               static_cast<TextureFormat>(colorspace),
                               TextureDataType::UBYTE,
                               nullptr);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    Renderer::generateMipmap(TextureType::TEXTURE_2D);
   } else {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -106,7 +106,7 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
                               static_cast<TextureFormat>(m_image->getColorspace()),
                               (m_image->getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
                               m_image->getDataPtr());
-    glGenerateMipmap(GL_TEXTURE_2D);
+    Renderer::generateMipmap(TextureType::TEXTURE_2D);
     unbind();
   } else { // Image not found, deleting it & defaulting texture to pure white
     m_image.reset();

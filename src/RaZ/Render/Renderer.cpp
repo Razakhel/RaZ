@@ -146,6 +146,26 @@ void Renderer::sendImageData2D(TextureType type,
 #endif
 }
 
+void Renderer::generateMipmap(TextureType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenerateMipmap(static_cast<unsigned int>(type));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::generateMipmap(unsigned int textureIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenerateTextureMipmap(textureIndex);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::bindTexture(TextureType type, unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
