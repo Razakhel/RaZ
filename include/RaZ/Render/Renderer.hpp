@@ -22,6 +22,25 @@ enum class TextureType : unsigned int {
   CUBEMAP    = 34067 // GL_TEXTURE_CUBE_MAP
 };
 
+enum class TextureParam : unsigned int {
+  MINIFY_FILTER  = 10241, // GL_TEXTURE_MIN_FILTER
+  MAGNIFY_FILTER = 10240, // GL_TEXTURE_MAG_FILTER
+  WRAP_S         = 10242, // GL_TEXTURE_WRAP_S
+  WRAP_T         = 10243, // GL_TEXTURE_WRAP_T
+  WRAP_R         = 32882, // GL_TEXTURE_WRAP_R
+  SWIZZLE_RGBA   = 36422  // GL_TEXTURE_SWIZZLE_RGBA
+};
+
+enum class TextureParamValue : unsigned int {
+  NEAREST                = 9728, // GL_NEAREST
+  LINEAR                 = 9729, // GL_LINEAR
+  NEAREST_MIPMAP_NEAREST = 9984, // GL_NEAREST_MIPMAP_NEAREST
+  LINEAR_MIPMAP_NEAREST  = 9985, // GL_LINEAR_MIPMAP_NEAREST
+  NEAREST_MIPMAP_LINEAR  = 9986, // GL_NEAREST_MIPMAP_LINEAR
+  LINEAR_MIPMAP_LINEAR   = 9987, // GL_LINEAR_MIPMAP_LINEAR
+  REPEAT                 = 10497 // GL_REPEAT
+};
+
 enum class TextureFormat : unsigned int {
   RED           = 6403,  // GL_RED
   RG            = 33319, // GL_RG
@@ -89,10 +108,20 @@ public:
   static void deleteBuffers(unsigned int count, unsigned int* indices);
   static void generateTextures(unsigned int count, unsigned int* indices);
   static void activateTexture(unsigned int index);
+  static void setTextureParameter(TextureType type, TextureParam param, int value);
+  static void setTextureParameter(TextureType type, TextureParam param, float value);
+  static void setTextureParameter(TextureType type, TextureParam param, const int* value);
+  static void setTextureParameter(TextureType type, TextureParam param, const float* value);
+  static void setTextureParameter(TextureType type, TextureParam param, TextureParamValue value) { setTextureParameter(type, param, static_cast<int>(value)); }
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, int value);
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, float value);
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const int* value);
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const float* value);
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param, static_cast<int>(value)); }
   static void sendImageData2D(TextureType type,
-                              int mipmapLevel,
+                              unsigned int mipmapLevel,
                               TextureInternalFormat internalFormat,
-                              int width, int height,
+                              unsigned int width, unsigned int height,
                               TextureFormat format,
                               TextureDataType dataType, const void* data);
   /// Generate mipmaps (levels of detail) of the currently bound texture.

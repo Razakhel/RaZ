@@ -122,13 +122,92 @@ void Renderer::activateTexture(unsigned int index) {
 #endif
 }
 
+void Renderer::setTextureParameter(TextureType type, TextureParam param, int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexParameteri(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setTextureParameter(TextureType type, TextureParam param, float value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexParameterf(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setTextureParameter(TextureType type, TextureParam param, const int* value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setTextureParameter(TextureType type, TextureParam param, const float* value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexParameterfv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTextureParameteri(textureIndex, static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, float value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTextureParameterf(textureIndex, static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const int* value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const float* value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::sendImageData2D(TextureType type,
-                               int mipmapLevel,
+                               unsigned int mipmapLevel,
                                TextureInternalFormat internalFormat,
-                               int width, int height,
+                               unsigned int width, unsigned int height,
                                TextureFormat format,
-                               TextureDataType dataType,
-                               const void* data) {
+                               TextureDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glTexImage2D(static_cast<unsigned int>(type),
