@@ -287,11 +287,11 @@ unsigned int Renderer::createProgram() {
   return programIndex;
 }
 
-int Renderer::getProgramInfo(unsigned int index, unsigned int infoType) {
+int Renderer::getProgramStatus(unsigned int index, ProgramStatus status) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   int res;
-  glGetProgramiv(index, infoType, &res);
+  glGetProgramiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -303,7 +303,7 @@ int Renderer::getProgramInfo(unsigned int index, unsigned int infoType) {
 bool Renderer::isProgramLinked(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  const bool isLinked = getProgramInfo(index, GL_LINK_STATUS);
+  const bool isLinked = getProgramStatus(index, ProgramStatus::LINK);
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -361,11 +361,11 @@ unsigned int Renderer::createShader(ShaderType type) {
   return shaderIndex;
 }
 
-int Renderer::getShaderInfo(unsigned int index, unsigned int infoType) {
+int Renderer::getShaderStatus(unsigned int index, ShaderStatus status) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   int res;
-  glGetShaderiv(index, infoType, &res);
+  glGetShaderiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -377,7 +377,7 @@ int Renderer::getShaderInfo(unsigned int index, unsigned int infoType) {
 bool Renderer::isShaderCompiled(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  const bool isCompiled = getShaderInfo(index, GL_COMPILE_STATUS);
+  const bool isCompiled = getShaderStatus(index, ShaderStatus::COMPILE);
 
 #if !defined(NDEBUG)
   checkErrors();

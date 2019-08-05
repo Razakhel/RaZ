@@ -78,10 +78,18 @@ enum class TextureDataType : unsigned int {
   FLOAT = 5126  // GL_FLOAT
 };
 
+enum class ProgramStatus : unsigned int {
+  LINK = 35714 // GL_LINK_STATUS
+};
+
 enum class ShaderType : unsigned int {
   VERTEX   = 35633, // GL_VERTEX_SHADER
   FRAGMENT = 35632, // GL_FRAGMENT_SHADER
   GEOMETRY = 36313  // GL_GEOMETRY_SHADER
+};
+
+enum class ShaderStatus : unsigned int {
+  COMPILE = 35713 // GL_COMPILE_STATUS
 };
 
 class Renderer {
