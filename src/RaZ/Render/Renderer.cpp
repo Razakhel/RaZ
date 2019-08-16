@@ -32,20 +32,20 @@ void Renderer::initialize() {
     s_isInitialized = true;
 }
 
-void Renderer::enable(unsigned int code) {
+void Renderer::enable(Capability capability) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glEnable(code);
+  glEnable(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
   checkErrors();
 #endif
 }
 
-void Renderer::disable(unsigned int code) {
+void Renderer::disable(Capability capability) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glDisable(code);
+  glDisable(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
   checkErrors();

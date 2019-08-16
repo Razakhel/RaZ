@@ -5,6 +5,39 @@
 
 namespace Raz {
 
+enum class Capability : unsigned int {
+  CULL           = 2884,  // GL_CULL_FACE
+  DITHER         = 3024,  // GL_DITHER
+  BLEND          = 3042,  // GL_BLEND
+  COLOR_LOGIC_OP = 3058,  // GL_COLOR_LOGIC_OP
+
+  DEPTH_CLAMP  = 34383, // GL_DEPTH_CLAMP
+  DEPTH_TEST   = 2929,  // GL_DEPTH_TEST
+  SCISSOR_TEST = 3089,  // GL_SCISSOR_TEST
+  STENCIL_TEST = 2960,  // GL_STENCIL_TEST
+
+  LINE_SMOOTH          = 2848,  // GL_LINE_SMOOTH
+  POLYGON_SMOOTH       = 2881,  // GL_POLYGON_SMOOTH
+  POLYGON_OFFSET_POINT = 10753, // GL_POLYGON_OFFSET_POINT
+  POLYGON_OFFSET_LINE  = 10754, // GL_POLYGON_OFFSET_LINE
+  POLYGON_OFFSET_FILL  = 32823, // GL_POLYGON_OFFSET_FILL
+
+  MULTISAMPLE              = 32925, // GL_MULTISAMPLE
+  SAMPLE_ALPHA_TO_COVERAGE = 32926, // GL_SAMPLE_ALPHA_TO_COVERAGE
+  SAMPLE_ALPHA_TO_ONE      = 32927, // GL_SAMPLE_ALPHA_TO_ONE
+  SAMPLE_COVERAGE          = 32928, // GL_SAMPLE_COVERAGE
+  SAMPLE_SHADING           = 35894, // GL_SAMPLE_SHADING
+  SAMPLE_MASK              = 36433, // GL_SAMPLE_MASK
+
+  POINT_SIZE        = 34370, // GL_PROGRAM_POINT_SIZE
+  CUBEMAP_SEAMLESS  = 34895, // GL_TEXTURE_CUBE_MAP_SEAMLESS
+  FRAMEBUFFER_SRGB  = 36281, // GL_FRAMEBUFFER_SRGB
+  PRIMITIVE_RESTART = 36765, // GL_PRIMITIVE_RESTART
+
+  DEBUG_OUTPUT             = 37600, // GL_DEBUG_OUTPUT
+  DEBUG_OUTPUT_SYNCHRONOUS = 33346  // GL_DEBUG_OUTPUT_SYNCHRONOUS
+};
+
 enum class MaskType : unsigned int {
   COLOR   = 16384, // GL_COLOR_BUFFER_BIT
   DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
@@ -100,8 +133,8 @@ public:
 
   static void initialize();
   static bool isInitialized() { return s_isInitialized; }
-  static void enable(unsigned int code);
-  static void disable(unsigned int code);
+  static void enable(Capability capability);
+  static void disable(Capability capability);
   static void clear(MaskType type) { clear(static_cast<unsigned int>(type)); }
   static void clear(MaskType type1, MaskType type2) { clear(static_cast<unsigned int>(type1) | static_cast<unsigned int>(type2)); }
   static void clear(MaskType type1, MaskType type2, MaskType type3) { clear(static_cast<unsigned int>(type1)

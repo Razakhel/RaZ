@@ -94,12 +94,12 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 #if !defined(__APPLE__) // Setting the debug message callback provokes a crash on macOS
   glDebugMessageCallback(&callbackDebugLog, nullptr);
 #endif
-  Renderer::enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+  Renderer::enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
 
   glfwSetWindowUserPointer(m_window, this);
 
   enableFaceCulling();
-  Renderer::enable(GL_DEPTH_TEST);
+  Renderer::enable(Capability::DEPTH_TEST);
 }
 
 void Window::setTitle(const std::string& title) const {
@@ -115,9 +115,9 @@ void Window::setIcon(const Image& img) const {
 
 void Window::enableFaceCulling(bool value) const {
   if (value)
-    Renderer::enable(GL_CULL_FACE);
+    Renderer::enable(Capability::CULL);
   else
-    Renderer::disable(GL_CULL_FACE);
+    Renderer::disable(Capability::CULL);
 }
 
 bool Window::recoverVerticalSyncState() const {
@@ -133,7 +133,7 @@ bool Window::recoverVerticalSyncState() const {
   }
 #endif
 
-  std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
+  std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
   return false;
 }
 
@@ -141,16 +141,17 @@ void Window::enableVerticalSync(bool value) const {
 #if defined(_WIN32)
   if (wglGetExtensionsStringEXT())
     wglSwapIntervalEXT(static_cast<int>(value));
-  else
-    std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
+    return;
+  }
 #elif defined(__gnu_linux__)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
     glXSwapIntervalEXT(glXGetCurrentDisplay(), glXGetCurrentDrawable(), value);
     glXSwapIntervalMESA(static_cast<unsigned int>(value));
-  } else {
-    std::cerr << "Warning: Vertical synchronisation unsupported." << std::endl;
+    return;
   }
 #endif
+
+  std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
 }
 
 void Window::changeCursorState(Cursor::State state) const {
