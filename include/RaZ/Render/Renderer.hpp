@@ -174,13 +174,13 @@ public:
   static void deleteTextures(unsigned int count, unsigned int* indices);
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static unsigned int createProgram();
-  static int getProgramInfo(unsigned int index, unsigned int infoType);
+  static int getProgramStatus(unsigned int index, ProgramStatus status);
   static bool isProgramLinked(unsigned int index);
   static void linkProgram(unsigned int index);
   static void useProgram(unsigned int index);
   static void deleteProgram(unsigned int index);
   static unsigned int createShader(ShaderType type);
-  static int getShaderInfo(unsigned int index, unsigned int infoType);
+  static int getShaderStatus(unsigned int index, ShaderStatus status);
   static bool isShaderCompiled(unsigned int index);
   static void compileShader(unsigned int index);
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
