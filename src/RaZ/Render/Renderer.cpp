@@ -10,14 +10,15 @@ namespace {
 
 inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
   switch (errorCode) {
-    case GL_INVALID_ENUM:      return "Unrecognized error code (Invalid enum)";
-    case GL_INVALID_VALUE:     return "Numeric argument out of range (Invalid value)";
-    case GL_INVALID_OPERATION: return "Operation illegal in current state (Invalid operation)";
-    case GL_STACK_OVERFLOW:    return "Stack overflow";
-    case GL_STACK_UNDERFLOW:   return "Stack underflow";
-    case GL_OUT_OF_MEMORY:     return "Not enough memory left (Out of memory)";
-    case GL_NO_ERROR:          return "No error";
-    default:                   return "Unknown error";
+    case GL_INVALID_ENUM:                  return "Unrecognized error code (Invalid enum)";
+    case GL_INVALID_VALUE:                 return "Numeric argument out of range (Invalid value)";
+    case GL_INVALID_OPERATION:             return "Operation illegal in current state (Invalid operation)";
+    case GL_INVALID_FRAMEBUFFER_OPERATION: return "Framebuffer object is incomplete (Invalid framebuffer operation)";
+    case GL_STACK_OVERFLOW:                return "Stack overflow";
+    case GL_STACK_UNDERFLOW:               return "Stack underflow";
+    case GL_OUT_OF_MEMORY:                 return "Not enough memory left (Out of memory)";
+    case GL_NO_ERROR:                      return "No error";
+    default:                               return "Unknown error";
   }
 }
 
@@ -50,6 +51,18 @@ void Renderer::disable(Capability capability) {
 #if !defined(NDEBUG)
   checkErrors();
 #endif
+}
+
+bool Renderer::isEnabled(Capability capability) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  const bool isEnabled = glIsEnabled(static_cast<unsigned int>(capability));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+
+  return isEnabled;
 }
 
 void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {

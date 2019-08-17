@@ -135,6 +135,7 @@ public:
   static bool isInitialized() { return s_isInitialized; }
   static void enable(Capability capability);
   static void disable(Capability capability);
+  static bool isEnabled(Capability capability);
   static void clear(MaskType type) { clear(static_cast<unsigned int>(type)); }
   static void clear(MaskType type1, MaskType type2) { clear(static_cast<unsigned int>(type1) | static_cast<unsigned int>(type2)); }
   static void clear(MaskType type1, MaskType type2, MaskType type3) { clear(static_cast<unsigned int>(type1)
