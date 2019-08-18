@@ -7,7 +7,7 @@
 namespace Raz {
 
 Framebuffer::Framebuffer() {
-  Renderer::generateFramebuffers(1, &m_index);
+  Renderer::generateFramebuffer(m_index);
 }
 
 Framebuffer::Framebuffer(ShaderProgram& program) : Framebuffer() {
@@ -119,7 +119,7 @@ Framebuffer::~Framebuffer() {
   if (m_index == GL_INVALID_INDEX)
     return;
 
-  Renderer::deleteFramebuffers(1, &m_index);
+  Renderer::deleteFramebuffer(m_index);
 }
 
 } // namespace Raz

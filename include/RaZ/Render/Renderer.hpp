@@ -142,13 +142,19 @@ public:
                                                                           | static_cast<unsigned int>(type2)
                                                                           | static_cast<unsigned int>(type3)); }
   static void generateBuffers(unsigned int count, unsigned int* indices);
+  template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }
+  static void generateBuffer(unsigned int& index) { generateBuffers(1, &index); }
   static void bindBuffer(BufferType type, unsigned int index);
   static void unbindBuffer(BufferType type) { bindBuffer(type, 0); }
   static void bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex);
   static void sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data);
   template <typename T> static void sendBufferSubData(BufferType type, ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
   static void deleteBuffers(unsigned int count, unsigned int* indices);
+  template <std::size_t N> static void deleteBuffers(unsigned int (&indices)[N]) { deleteBuffers(N, indices); }
+  static void deleteBuffer(unsigned int& index) { deleteBuffers(1, &index); }
   static void generateTextures(unsigned int count, unsigned int* indices);
+  template <std::size_t N> static void generateTextures(unsigned int (&indices)[N]) { generateTextures(N, indices); }
+  static void generateTexture(unsigned int& index) { generateTextures(1, &index); }
   static void activateTexture(unsigned int index);
   static void setTextureParameter(TextureType type, TextureParam param, int value);
   static void setTextureParameter(TextureType type, TextureParam param, float value);
@@ -173,6 +179,8 @@ public:
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void deleteTextures(unsigned int count, unsigned int* indices);
+  template <std::size_t N> static void deleteTextures(unsigned int (&indices)[N]) { deleteTextures(N, indices); }
+  static void deleteTexture(unsigned int& index) { deleteTextures(1, &index); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static unsigned int createProgram();
   static int getProgramStatus(unsigned int index, ProgramStatus status);
@@ -189,9 +197,13 @@ public:
   static void deleteShader(unsigned int index);
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
   static void generateFramebuffers(unsigned int count, unsigned int* indices);
+  template <std::size_t N> static void generateFramebuffers(unsigned int (&indices)[N]) { generateFramebuffers(N, indices); }
+  static void generateFramebuffer(unsigned int& index) { generateFramebuffers(1, &index); }
   static void bindFramebuffer(unsigned int index);
   static void unbindFramebuffer() { bindFramebuffer(0); }
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
+  template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
+  static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
   static void checkErrors();
 
   Renderer& operator=(const Renderer&) = delete;

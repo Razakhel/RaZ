@@ -30,7 +30,7 @@ VertexArray::~VertexArray() {
 }
 
 VertexBuffer::VertexBuffer() {
-  Renderer::generateBuffers(1, &m_index);
+  Renderer::generateBuffer(m_index);
 }
 
 VertexBuffer::VertexBuffer(VertexBuffer&& vbo) noexcept
@@ -58,11 +58,11 @@ VertexBuffer::~VertexBuffer() {
   glDeleteBuffers(1, &m_index);
 
   // This currently goes on an infinite error-printing loop
-  //Renderer::deleteBuffers(1, &m_index);
+  //Renderer::deleteBuffer(m_index);
 }
 
 IndexBuffer::IndexBuffer() {
-  Renderer::generateBuffers(1, &m_index);
+  Renderer::generateBuffer(m_index);
 }
 
 IndexBuffer::IndexBuffer(IndexBuffer&& ibo) noexcept
@@ -93,7 +93,7 @@ IndexBuffer::~IndexBuffer() {
   glDeleteBuffers(1, &m_index);
 
   // This currently goes on an infinite error-printing loop
-  //Renderer::deleteBuffers(1, &m_index);
+  //Renderer::deleteBuffer(m_index);
 }
 
 } // namespace Raz

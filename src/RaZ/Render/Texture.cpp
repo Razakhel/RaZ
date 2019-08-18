@@ -5,7 +5,7 @@
 namespace Raz {
 
 Texture::Texture() {
-  Renderer::generateTextures(1, &m_index);
+  Renderer::generateTexture(m_index);
 }
 
 Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace) : Texture() {
@@ -136,7 +136,7 @@ Texture::~Texture() {
   glDeleteTextures(1, &m_index);
 
   // This currently goes on an infinite error-printing loop
-  //Renderer::deleteTextures(1, &m_index);
+  //Renderer::deleteTexture(m_index);
 }
 
 void Texture::makePlainColored(const Vec3b& color) const {

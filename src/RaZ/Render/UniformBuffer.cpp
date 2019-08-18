@@ -4,7 +4,7 @@
 namespace Raz {
 
 UniformBuffer::UniformBuffer() {
-  Renderer::generateBuffers(1, &m_index);
+  Renderer::generateBuffer(m_index);
 }
 
 UniformBuffer::UniformBuffer(unsigned int size, unsigned int bindingIndex) : UniformBuffer() {
@@ -47,7 +47,7 @@ UniformBuffer::~UniformBuffer() {
   if (m_index == GL_INVALID_INDEX)
     return;
 
-  Renderer::deleteBuffers(1, &m_index);
+  Renderer::deleteBuffer(m_index);
 }
 
 } // namespace Raz
