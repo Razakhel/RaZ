@@ -10,7 +10,7 @@ namespace {
 
 void fillRandom(std::vector<int>& values) {
   std::random_device randDevice;
-  std::mt19937 randGen(randDevice());
+  static std::mt19937 randGen(randDevice());
   std::uniform_int_distribution<int> randDist(0, static_cast<int>(values.size()) - 1);
 
   for (int& val : values)

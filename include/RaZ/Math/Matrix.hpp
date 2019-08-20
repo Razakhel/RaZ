@@ -19,8 +19,8 @@ class Matrix;
 template <typename T, std::size_t W, std::size_t H>
 std::ostream& operator<<(std::ostream& stream, const Matrix<T, W, H>& mat);
 
-/// Mathematical matrix, with generic type and size.
-/// \tparam T Matrix's type.
+/// Matrix class, representing a mathematical matrix, with generic type and size.
+/// \tparam T Type of the matrix's data.
 /// \tparam W Matrix's width.
 /// \tparam H Matrix's height.
 template <typename T, std::size_t W, std::size_t H>

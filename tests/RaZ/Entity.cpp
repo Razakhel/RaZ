@@ -37,7 +37,7 @@ TEST_CASE("Entity-component manipulations") {
   REQUIRE(entity0.hasComponent<Raz::Transform>());
   REQUIRE_FALSE(entity0.hasComponent<Raz::Mesh>());
 
-  REQUIRE(std::is_same<decltype(entity0.getComponent<Raz::Transform>()), Raz::Transform&>::value);
+  REQUIRE(std::is_same_v<decltype(entity0.getComponent<Raz::Transform>()), Raz::Transform&>);
   REQUIRE_THROWS(entity0.getComponent<Raz::Mesh>());
 
   entity0.removeComponent<Raz::Transform>();

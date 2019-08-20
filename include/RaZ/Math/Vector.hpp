@@ -20,6 +20,9 @@ class Vector;
 template <typename T, std::size_t Size>
 std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec);
 
+/// Vector class, representing a mathematical vector, with generic type and size.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
 template <typename T, std::size_t Size>
 class Vector {
 public:

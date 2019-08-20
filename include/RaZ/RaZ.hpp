@@ -6,9 +6,11 @@
 #define GLEW_STATIC
 
 #include "Application.hpp"
-#include "Entity.hpp"
 #include "Component.hpp"
+#include "Entity.hpp"
+#include "System.hpp"
 #include "World.hpp"
+#include "Math/Angle.hpp"
 #include "Math/Constants.hpp"
 #include "Math/Matrix.hpp"
 #include "Math/Quaternion.hpp"
@@ -20,10 +22,11 @@
 #include "Render/Cubemap.hpp"
 #include "Render/Framebuffer.hpp"
 #include "Render/GraphicObjects.hpp"
-#include "Render/RenderSystem.hpp"
 #include "Render/Light.hpp"
 #include "Render/Material.hpp"
 #include "Render/Mesh.hpp"
+#include "Render/Renderer.hpp"
+#include "Render/RenderSystem.hpp"
 #include "Render/Shader.hpp"
 #include "Render/ShaderProgram.hpp"
 #include "Render/Submesh.hpp"
@@ -31,6 +34,7 @@
 #include "Render/UniformBuffer.hpp"
 #include "Utils/Bitset.hpp"
 #include "Utils/FileUtils.hpp"
+#include "Utils/FloatUtils.hpp"
 #include "Utils/Image.hpp"
 #include "Utils/Input.hpp"
 #include "Utils/Overlay.hpp"
@@ -40,6 +44,9 @@
 #if defined(__GNUC__) && defined(_GLIBCXX_HAS_GTHREADS)
 #include "Utils/Threading.hpp"
 #endif
+#include "Utils/TypeUtils.hpp"
 #include "Utils/Window.hpp"
+
+using namespace Raz::Literals;
 
 #endif // RAZ_RAZ_HPP

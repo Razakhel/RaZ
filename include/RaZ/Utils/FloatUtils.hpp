@@ -19,7 +19,7 @@ namespace FloatUtils {
 /// \return True if values are nearly equal, false otherwise.
 template <typename T>
 inline constexpr bool areNearlyEqual(T val1, T val2) {
-  static_assert(std::is_floating_point<T>::value, "Error: Values' type must be floating point.");
+  static_assert(std::is_floating_point_v<T>, "Error: Values' type must be floating point.");
 
   // Using absolute & relative tolerances for floating points types: http://www.realtimecollisiondetection.net/pubs/Tolerances/
   // Could be a better idea to use ULPs checking. May be slower though?

@@ -13,7 +13,7 @@ namespace Raz {
 /// \tparam T Type of the values to be held by the quaternion.
 template <typename T = float>
 class Quaternion {
-  static_assert(std::is_floating_point<T>::value, "Error: Quaternion's type must be floating point.");
+  static_assert(std::is_floating_point_v<T>, "Error: Quaternion's type must be floating point.");
 
 public:
   Quaternion(T angleDegrees, const Vec3<T>& axis);
