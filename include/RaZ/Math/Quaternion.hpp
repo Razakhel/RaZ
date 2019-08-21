@@ -3,6 +3,7 @@
 #ifndef RAZ_QUATERNION_HPP
 #define RAZ_QUATERNION_HPP
 
+#include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 
@@ -16,8 +17,8 @@ class Quaternion {
   static_assert(std::is_floating_point_v<T>, "Error: Quaternion's type must be floating point.");
 
 public:
-  Quaternion(T angleDegrees, const Vec3<T>& axis);
-  Quaternion(T angleDegrees, float axisX, float axisY, float axisZ) : Quaternion(angleDegrees, Vec3<T>({ axisX, axisY, axisZ })) {}
+  Quaternion(Radians<T> angle, const Vec3<T>& axis);
+  Quaternion(Radians<T> angle, float axisX, float axisY, float axisZ) : Quaternion(angle, Vec3<T>({ axisX, axisY, axisZ })) {}
   Quaternion(const Quaternion&) = default;
   Quaternion(Quaternion&&) noexcept = default;
 

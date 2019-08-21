@@ -3,8 +3,8 @@
 namespace Raz {
 
 template <typename T>
-Quaternion<T>::Quaternion(T angleDegrees, const Vec3<T>& axis) {
-  const T halfAngle = (angleDegrees * PI<T> / 180) / 2;
+Quaternion<T>::Quaternion(Radians<T> angle, const Vec3<T>& axis) {
+  const T halfAngle = angle / 2;
   const T val       = std::sin(halfAngle);
 
   m_real      = std::cos(halfAngle);
@@ -29,7 +29,7 @@ Quaternion<T> Quaternion<T>::normalize() const {
 template <typename T>
 Quaternion<T> Quaternion<T>::conjugate() const {
   Quaternion<T> res = *this;
-  res.m_complexes = -m_complexes;
+  res.m_complexes   = -m_complexes;
 
   return res;
 }

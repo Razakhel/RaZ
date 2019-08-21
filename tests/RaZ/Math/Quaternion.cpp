@@ -1,11 +1,13 @@
 #include "catch/catch.hpp"
 #include "RaZ/Math/Quaternion.hpp"
 
+using namespace Raz::Literals;
+
 namespace {
 
-const Raz::Quaternionf quat1(10.f, Raz::Axis::X);
-const Raz::Quaternionf quat2(90.f, 1.f, -2.f, 5.f);
-const Raz::Quaternionf quat3(180.f, 1.f, -2.f, 5.f);
+const Raz::Quaternionf quat1(10.0_deg, Raz::Axis::X);
+const Raz::Quaternionf quat2(90.0_deg, 1.f, -2.f, 5.f);
+const Raz::Quaternionf quat3(180.0_deg, 1.f, -2.f, 5.f);
 
 } // namespace
 
