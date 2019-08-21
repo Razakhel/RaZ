@@ -3,6 +3,8 @@
 #ifndef RAZ_RENDERER_HPP
 #define RAZ_RENDERER_HPP
 
+#include <cstddef>
+
 namespace Raz {
 
 enum class Capability : unsigned int {
