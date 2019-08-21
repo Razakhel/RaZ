@@ -3,12 +3,13 @@
 #ifndef RAZ_CAMERA_HPP
 #define RAZ_CAMERA_HPP
 
-#include <memory>
-
 #include "RaZ/Component.hpp"
+#include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Constants.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
+
+#include <memory>
 
 namespace Raz {
 
@@ -25,19 +26,20 @@ enum class ProjectionType : uint8_t {
 /// Camera class, simulating a point of view for a scene to be rendered from.
 class Camera : public Component {
 public:
+  Camera() = default;
   Camera(unsigned int frameWidth, unsigned int frameHeight,
-         float fieldOfViewDegrees = 45.f,
+         Radiansf fieldOfView = Degreesf(45.f),
          float nearPlane = 0.1f, float farPlane = 100.f,
          ProjectionType projType = ProjectionType::PERSPECTIVE);
 
-  float getFieldOfViewDegrees() const { return m_fieldOfView * 180.f / PI<float>; }
+  Radiansf getFieldOfView() const { return m_fieldOfView; }
   CameraType getCameraType() const { return m_cameraType; }
   const Mat4f& getViewMatrix() const { return m_viewMat; }
   const Mat4f& getInverseViewMatrix() const { return m_invViewMat; }
   const Mat4f& getProjectionMatrix() const { return m_projMat; }
   const Mat4f& getInverseProjectionMatrix() const { return m_invProjMat; }
 
-  void setFieldOfView(float fieldOfViewDegrees);
+  void setFieldOfView(Radiansf fieldOfView);
   void setCameraType(CameraType camType) { m_cameraType = camType; }
   void setProjectionType(ProjectionType projType);
   void setTarget(const Vec3f& target) { m_target = target; }
@@ -89,21 +91,21 @@ public:
   Vec3f unproject(const Vec3f& point) const { return Vec3f(unproject(Vec4f(point, 0.f))); }
 
 private:
-  float m_frameRatio;
-  float m_fieldOfView;
-  float m_nearPlane;
-  float m_farPlane;
+  float m_frameRatio     = 1.f;
+  Radiansf m_fieldOfView = Degreesf(45.f);
+  float m_nearPlane      = 0.1f;
+  float m_farPlane       = 100.f;
 
-  CameraType m_cameraType = CameraType::FREE_FLY;
-  ProjectionType m_projType;
+  CameraType m_cameraType   = CameraType::FREE_FLY;
+  ProjectionType m_projType = ProjectionType::PERSPECTIVE;
 
-  Vec3f m_target {};
+  Vec3f m_target = Vec3f(0.f);
   Vec3f m_upAxis = Axis::Y;
 
-  Mat4f m_viewMat;
-  Mat4f m_invViewMat;
-  Mat4f m_projMat;
-  Mat4f m_invProjMat;
+  Mat4f m_viewMat    = Mat4f::identity();
+  Mat4f m_invViewMat = Mat4f::identity();
+  Mat4f m_projMat    = Mat4f::identity();
+  Mat4f m_invProjMat = Mat4f::identity();
 };
 
 } // namespace Raz

@@ -3,18 +3,18 @@
 namespace Raz {
 
 Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
-               float fieldOfViewDegrees,
+               Radiansf fieldOfView,
                float nearPlane, float farPlane,
                ProjectionType projType) : m_frameRatio{ static_cast<float>(frameWidth) / frameHeight },
-                                          m_fieldOfView{ fieldOfViewDegrees * PI<float> / 180.f },
+                                          m_fieldOfView{ fieldOfView },
                                           m_nearPlane{ nearPlane }, m_farPlane{ farPlane },
                                           m_projType{ projType } {
   computeProjectionMatrix();
   computeInverseProjectionMatrix();
 }
 
-void Camera::setFieldOfView(float fieldOfViewDegrees) {
-  m_fieldOfView = fieldOfViewDegrees * PI<float> / 180.f;
+void Camera::setFieldOfView(Radiansf fieldOfView) {
+  m_fieldOfView = fieldOfView;
 
   computeProjectionMatrix();
   computeInverseProjectionMatrix();
