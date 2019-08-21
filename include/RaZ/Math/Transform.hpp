@@ -27,7 +27,7 @@ public:
   void setPosition(const Vec3f& position);
   void setPosition(float x, float y, float z) { setPosition(Vec3f({ x, y, z })); }
   void setRotation(const Mat4f& rotation);
-  void setRotation(float angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis).computeMatrix()); }
+  void setRotation(Radiansf angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis).computeMatrix()); }
   void setScale(const Vec3f& scale);
   void setScale(float val) { setScale(val, val, val); }
   void setScale(float x, float y, float z) { setScale(Vec3f({ x, y, z })); }
@@ -50,15 +50,15 @@ public:
   /// \param displacement Displacement to be translated by.
   void translate(const Vec3f& displacement) { translate(displacement[0], displacement[1], displacement[2]); }
   /// Rotates around the given axes.
-  /// \param xAngleDegrees Value of X to rotate around.
-  /// \param yAngleDegrees Value of Y to rotate around.
-  /// \param zAngleDegrees Value of Z to rotate around.
-  void rotate(float xAngleDegrees, float yAngleDegrees, float zAngleDegrees);
+  /// \param xAngle Value of X to rotate around.
+  /// \param yAngle Value of Y to rotate around.
+  /// \param zAngle Value of Z to rotate around.
+  void rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle);
   /// Rotates by the given angle around the given axis.
   /// The axis must be a normalized vector for this function to work properly.
-  /// \param angleDegrees Angle to rotate by.
+  /// \param angle Angle to rotate by.
   /// \param axis Axis to rotate around.
-  void rotate(float angleDegrees, const Vec3f& axis);
+  void rotate(Radiansf angle, const Vec3f& axis);
   /// Scales by the given values.
   /// The scaling is a coefficient: scaling by a value of 2 doubles the size, while a value of 0.5 shrinks it by half.
   /// \param x Value of X to be scaled by.

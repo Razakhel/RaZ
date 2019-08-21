@@ -44,7 +44,7 @@ void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
-  meshTrans.setRotation(180.f, Raz::Axis::Y);
+  meshTrans.setRotation(180.0_deg, Raz::Axis::Y);
   meshTrans.setScale(0.15f);
 }
 
@@ -77,7 +77,7 @@ void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -2.f, 5.f);
-  meshTrans.setRotation(180.f, Raz::Axis::Y);
+  meshTrans.setRotation(180.0_deg, Raz::Axis::Y);
   meshTrans.setScale(0.015f);
 }
 #endif
@@ -145,7 +145,7 @@ int main() {
   });
 
   while (app.run())
-    meshTrans.rotate(45.f * app.getDeltaTime(), Raz::Axis::Y);
+    meshTrans.rotate(Raz::Degreesf(45.f * app.getDeltaTime()), Raz::Axis::Y);
 
   return EXIT_SUCCESS;
 }
