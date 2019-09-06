@@ -64,7 +64,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
     )
 
     # Enabling some other warnings available since GCC 5
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
         set(
             RAZ_COMPILER_FLAGS
 
@@ -78,7 +78,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
     endif ()
 
     # Enabling some other warnings available since GCC 6
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 6 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 6)
         set(
             RAZ_COMPILER_FLAGS
 
@@ -89,7 +89,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
     endif ()
 
     # Enabling some other warnings available since GCC 7
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
         set(
             RAZ_COMPILER_FLAGS
 
@@ -148,7 +148,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     )
 
     # Disabling some warnings available since Clang 5
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 5 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
         set(
             RAZ_COMPILER_FLAGS
 
@@ -180,33 +180,8 @@ endif ()
 # RaZ - Source files #
 ######################
 
-include_directories(
-    SYSTEM # The dependencies' headers are included as system ones, disabling all warnings
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/png
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glew/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/glfw/deps
-    ${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui
-)
-
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-
-aux_source_directory(extern/png PNG_SRC)
-aux_source_directory(extern/glew/src GLEW_SRC)
-aux_source_directory(extern/glfw/src GLFW_SRC)
-aux_source_directory(extern/imgui IMGUI_SRC)
-
 set(
     RAZ_SRC
-
-    ${PNG_SRC}
-    ${GLEW_SRC}
-    ${GLFW_SRC}
-    ${IMGUI_SRC}
 
     src/RaZ/*.cpp
     src/RaZ/Math/*.cpp
@@ -225,44 +200,8 @@ set(
     include/RaZ/Utils/*.inl
 )
 
-# Defining preprocessor macros and selecting files to be removed
-if (APPLE)
-    add_definitions(
-        -D_GLFW_COCOA
-        -D_GLFW_USE_CHDIR
-        -D_GLFW_USE_MENUBAR
-        -D_GLFW_USE_RETINA
-    )
-
-    file(
-        GLOB
-        DISPOSABLE
-
-        extern/glfw/src/win32*
-        extern/glfw/src/x11*
-        extern/glfw/src/wl*
-        extern/glfw/src/mir*
-        extern/glfw/src/glx*
-        extern/glfw/src/linux*
-    )
-elseif (UNIX)
-    add_definitions(
-        -D_GLFW_X11
-        -D_GLFW_HAS_XF86VM
-    )
-
-    file(
-        GLOB
-        DISPOSABLE
-
-        extern/glfw/src/cocoa*
-        extern/glfw/src/win32*
-        extern/glfw/src/wl*
-        extern/glfw/src/wgl*
-        extern/glfw/src/mir*
-        extern/glfw/src/*.m
-    )
-
+# Defining platform-dependent options & linking flags
+if (UNIX AND NOT APPLE)
     option(RAZ_USE_SANITIZERS "Use sanitizers" OFF)
 
     if (RAZ_USE_SANITIZERS)
@@ -280,48 +219,7 @@ elseif (UNIX)
             ubsan
         )
     endif ()
-
-    set(
-        RAZ_LINKER_FLAGS
-
-        ${RAZ_LINKER_FLAGS}
-        GL
-        X11
-        Xrandr
-        Xcursor
-        Xinerama
-        Xxf86vm
-        pthread
-        dl
-    )
 elseif (WIN32)
-    add_definitions(
-        -D_GLFW_WIN32
-        -DGLEW_BUILD
-        #-DGLEW_NO_GLU
-    )
-
-    file(
-        GLOB
-        DISPOSABLE
-
-        extern/glfw/src/cocoa*
-        extern/glfw/src/x11*
-        extern/glfw/src/wl*
-        extern/glfw/src/mir*
-        extern/glfw/src/glx*
-        extern/glfw/src/linux*
-        extern/glfw/src/posix*
-        extern/glfw/src/*.m
-    )
-
-    set(
-        RAZ_LINKER_FLAGS
-
-        ${RAZ_LINKER_FLAGS}
-        opengl32
-    )
-
     # To automatically export all the classes & functions
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif ()
@@ -337,22 +235,11 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
         find_package(FBX)
 
         if (FBX_FOUND)
-            set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} ${FBX_LIB})
+            set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} "${FBX_LIB}")
 
-            message("FBX SDK linked.")
+            message("--- FBX SDK linked")
         endif ()
     endif ()
-endif ()
-
-# If FBX SDK not found, do not compile FBX loader
-if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
-    file(
-        GLOB
-        DISPOSABLE
-
-        ${DISPOSABLE}
-        src/RaZ/Utils/FbxImporter.cpp
-    )
 endif ()
 
 # Adding recursively every file we want to compile
@@ -363,24 +250,32 @@ file(
     ${RAZ_SRC}
 )
 
-# Removing unwanted platform-specific files
-list(
-    REMOVE_ITEM
-    RAZ_FILES
+# If FBX SDK not found, do not compile FBX loader
+if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
+    list(
+        REMOVE_ITEM
+        RAZ_FILES
 
-    ${DISPOSABLE}
-)
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/FbxImporter.cpp"
+    )
+endif ()
 
 ###############
 # RaZ - Build #
 ###############
 
 option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
-
 if (RAZ_BUILD_STATIC)
     add_library(RaZ STATIC ${RAZ_FILES})
 else ()
     add_library(RaZ SHARED ${RAZ_FILES})
+endif ()
+
+target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+if (FBX_FOUND)
+    target_include_directories(RaZ PUBLIC "${FBX_INCLUDE}")
+    target_compile_definitions(RaZ PRIVATE ${FBX_DEFS})
 endif ()
 
 if (NOT MSVC)
@@ -388,17 +283,22 @@ if (NOT MSVC)
     set(RAZ_COMPILER_FLAGS $<$<COMPILE_LANGUAGE:CXX>:${RAZ_COMPILER_FLAGS}>)
 endif ()
 
+# Compiling RaZ
 target_compile_options(RaZ PUBLIC ${RAZ_COMPILER_FLAGS})
 target_link_libraries(RaZ ${RAZ_LINKER_FLAGS})
 
+# Compiling external libraries
+add_subdirectory(extern)
+target_link_libraries(RaZ RaZ_Dependencies)
+
 # Build the examples
-option(RAZ_BUILD_EXAMPLES "Build examples along RaZ" ON)
+option(RAZ_BUILD_EXAMPLES "Build examples" ON)
 if (RAZ_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif ()
 
 # Build the unit tests
-option(RAZ_BUILD_TESTS "Compile the tests after RaZ is built" ON)
+option(RAZ_BUILD_TESTS "Build unit tests" ON)
 if (RAZ_BUILD_TESTS)
     add_subdirectory(tests)
 endif ()
@@ -422,8 +322,7 @@ endif ()
 install(TARGETS RaZ DESTINATION "lib/$<CONFIG>")
 
 # Installing the headers
-set(HEADERS_INSTALL ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ)
-install(DIRECTORY ${HEADERS_INSTALL} DESTINATION include)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ" DESTINATION include)
 
 # If FBX SDK used, install the DLL file into the bin/ folder
 if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)

@@ -49,7 +49,7 @@ if (NOT FBX_FOUND)
             "D:/${FBX_PATH}"
             "E:/${FBX_PATH}"
         )
-    elseif (CMAKE_COMPILER_IS_GNUC)
+    elseif (CMAKE_COMPILER_IS_GNUCC)
         file(
             GLOB
             SEARCH_PATHS
@@ -76,9 +76,14 @@ if (NOT FBX_FOUND)
 endif ()
 
 if (FBX_FOUND)
-    add_definitions(-DFBX_ENABLED)
-    add_definitions(-DFBXSDK_SHARED)
-    include_directories(${FBX_ROOT_DIR}/include)
+    set(
+        FBX_DEFS
+
+        -DFBX_ENABLED
+        -DFBXSDK_SHARED
+    )
+
+    set(FBX_INCLUDE "${FBX_ROOT_DIR}/include")
 else ()
     set(FBX_ROOT_DIR "" CACHE PATH "Path to your FBX SDK root directory")
     message(SEND_ERROR "Error: Couldn't find FBX SDK in expected places, please set its root directory manually.")
