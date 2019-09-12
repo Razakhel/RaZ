@@ -27,12 +27,12 @@ template <typename T, std::size_t Size>
 class Vector {
 public:
   Vector() = default;
-  Vector(const Vector&) = default;
-  Vector(Vector&&) noexcept = default;
   explicit Vector(const Vector<T, Size + 1>& vec);
   Vector(const Vector<T, Size - 1>& vec, T val);
   explicit Vector(T val) noexcept;
   Vector(std::initializer_list<T> list);
+  Vector(const Vector&) = default;
+  Vector(Vector&&) noexcept = default;
 
   std::size_t getSize() const { return Size; }
   const std::array<T, Size>& getData() const { return m_data; }
@@ -96,23 +96,23 @@ public:
   /// \return Result of the vector summed with the value.
   Vector operator+(float val) const;
   /// Element-wise vector-vector substraction operator.
-  /// \param vec Vector to be substracted by.
+  /// \param vec Vector to be substracted.
   /// \return Result of the substracted vectors.
   Vector operator-(const Vector& vec) const;
   /// Element-wise vector-value substraction operator.
-  /// \param val Value to be substracted by.
+  /// \param val Value to be substracted.
   /// \return Result of the vector substracted by the value.
   Vector operator-(float val) const;
   /// Element-wise vector-vector multiplication operator.
-  /// \param vec Vector to be multiplied with.
+  /// \param vec Vector to be multiplied by.
   /// \return Result of the multiplied vectors.
   Vector operator*(const Vector& vec) const;
   /// Element-wise vector-value multiplication operator.
-  /// \param val Value to be multiplied with.
+  /// \param val Value to be multiplied by.
   /// \return Result of the vector multiplied by the value.
   Vector operator*(float val) const;
   /// Element-wise vector-vector division operator.
-  /// \param vec Vector to be added.
+  /// \param vec Vector to be divided by.
   /// \return Result of the summed vectors.
   Vector operator/(const Vector& vec) const;
   /// Element-wise vector-value division operator.
@@ -120,40 +120,40 @@ public:
   /// \return Result of the vector divided by the value.
   Vector operator/(float val) const;
   /// Vector-matrix multiplication operator (assumes the vector to be horizontal).
-  /// \param mat Matrix to be multiplied with.
+  /// \param mat Matrix to be multiplied by.
   /// \return Result of the vector-matrix multiplication.
   template <std::size_t H> Vector operator*(const Matrix<T, Size, H>& mat) const;
   /// Element-wise vector-vector addition assignment operator.
   /// \param vec Vector to be added.
-  /// \return Reference to the original vector.
+  /// \return Reference to the modified original vector.
   Vector& operator+=(const Vector& vec);
   /// Element-wise vector-value addition assignment operator.
   /// \param val Value to be added.
-  /// \return Reference to the original vector.
+  /// \return Reference to the modified original vector.
   Vector& operator+=(float val);
   /// Element-wise vector-vector substraction assignment operator.
-  /// \param vec Vector to be substracted by.
-  /// \return Reference to the original vector.
+  /// \param vec Vector to be substracted.
+  /// \return Reference to the modified original vector.
   Vector& operator-=(const Vector& vec);
   /// Element-wise vector-value substraction assignment operator.
-  /// \param val Value to be substracted by.
-  /// \return Reference to the original vector.
+  /// \param val Value to be substracted.
+  /// \return Reference to the modified original vector.
   Vector& operator-=(float val);
   /// Element-wise vector-vector multiplication assignment operator.
-  /// \param vec Vector to be multiplied with.
-  /// \return Reference to the original vector.
+  /// \param vec Vector to be multiplied by.
+  /// \return Reference to the modified original vector.
   Vector& operator*=(const Vector& vec);
   /// Element-wise vector-value multiplication assignment operator.
-  /// \param val Value to be multiplied with.
-  /// \return Reference to the original vector.
+  /// \param val Value to be multiplied by.
+  /// \return Reference to the modified original vector.
   Vector& operator*=(float val);
   /// Element-wise vector-vector division assignment operator.
   /// \param vec Vector to be divided by.
-  /// \return Reference to the original vector.
+  /// \return Reference to the modified original vector.
   Vector& operator/=(const Vector& vec);
   /// Element-wise vector-value division assignment operator.
   /// \param val Value to be divided by.
-  /// \return Reference to the original vector.
+  /// \return Reference to the modified original vector.
   Vector& operator/=(float val);
   /// Element fetching operator given its index.
   /// \param index Element's index.

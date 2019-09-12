@@ -17,9 +17,52 @@ template <typename T>
 struct Degrees {
   static_assert(std::is_floating_point_v<T>, "Error: Degrees' type must be floating point.");
 
-  explicit constexpr Degrees(T value) : value{ value } {}
-  explicit constexpr Degrees(Radians<T> rad) : value{ rad * 180 / PI<T> } {}
+  constexpr explicit Degrees(T val) : value{ val } {}
+  constexpr explicit Degrees(Radians<T> rad) : value{ rad.value * 180 / PI<T> } {}
+  constexpr Degrees(const Degrees&) = default;
+  constexpr Degrees(Degrees&&) noexcept = default;
 
+  /// Default copy assignment operator.
+  /// \return Reference to the copied degrees object.
+  constexpr Degrees& operator=(const Degrees&) = default;
+  /// Default move assignment operator.
+  /// \return Reference to the moved degrees object.
+  constexpr Degrees& operator=(Degrees&&) noexcept = default;
+  /// Degrees negation operator.
+  /// \return Negated degrees object.
+  constexpr Degrees operator-() const { return Degrees(-value); }
+  /// Degrees-value addition operator.
+  /// \param val Value to be added.
+  /// \return Result of the degrees object summed with the value.
+  constexpr Degrees operator+(T val) const { return Degrees(value + val); }
+  /// Degrees-value substraction operator.
+  /// \param val Value to be substracted.
+  /// \return Result of the degrees object substracted by the value.
+  constexpr Degrees operator-(T val) const { return Degrees(value - val); }
+  /// Degrees-value multiplication operator.
+  /// \param val Value to be multiplied by.
+  /// \return Result of the degrees object multiplied by the value.
+  constexpr Degrees operator*(T val) const { return Degrees(value * val); }
+  /// Degrees-value division operator.
+  /// \param val Value to be divided by.
+  /// \return Result of the degrees object divided by the value.
+  constexpr Degrees operator/(T val) const { return Degrees(value / val); }
+  /// Radians-value addition assignment operator.
+  /// \param val Value to be added.
+  /// \return Reference to the modified original degrees object.
+  constexpr Degrees& operator+=(T val) { value += val; return *this; }
+  /// Radians-value substraction assignment operator.
+  /// \param val Value to be substracted.
+  /// \return Reference to the modified original degrees object.
+  constexpr Degrees& operator-=(T val) { value -= val; return *this; }
+  /// Radians-value multiplication assignment operator.
+  /// \param val Value to be multiplied by.
+  /// \return Reference to the modified original degrees object.
+  constexpr Degrees& operator*=(T val) { value *= val; return *this; }
+  /// Radians-value division assignment operator.
+  /// \param val Value to be divided by.
+  /// \return Reference to the modified original degrees object.
+  constexpr Degrees& operator/=(T val) { value /= val; return *this; }
   /// Checks if the current degrees angle is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param deg Degrees to be compared with.
@@ -38,8 +81,6 @@ struct Degrees {
   /// \tparam T2 Type to convert the value into.
   /// \return Radians object of the new type.
   template <typename T2> constexpr operator Radians<T2>() const { return Radians<T2>(Degrees<T2>(static_cast<T2>(value))); }
-  /// Implicit degrees to value conversion operator.
-  constexpr operator T() const { return value; }
 
   T value;
 };
@@ -54,9 +95,52 @@ template <typename T>
 struct Radians {
   static_assert(std::is_floating_point_v<T>, "Error: Radians' type must be floating point.");
 
-  explicit constexpr Radians(T value) : value{ value } {}
-  explicit constexpr Radians(Degrees<T> deg) : value{ deg * PI<T> / 180 } {}
+  constexpr explicit Radians(T val) : value{ val } {}
+  constexpr explicit Radians(Degrees<T> deg) : value{ deg.value * PI<T> / 180 } {}
+  Radians(const Radians&) = default;
+  Radians(Radians&&) noexcept = default;
 
+  /// Default copy assignment operator.
+  /// \return Reference to the copied radians object.
+  Radians& operator=(const Radians&) = default;
+  /// Default move assignment operator.
+  /// \return Reference to the moved radians object.
+  Radians& operator=(Radians&&) noexcept = default;
+  /// Radians negation operator.
+  /// \return Negated radians object.
+  constexpr Radians operator-() const { return Radians(-value); }
+  /// Radians-value addition operator.
+  /// \param val Value to be added.
+  /// \return Result of the radians object summed with the value.
+  constexpr Radians operator+(T val) const { return Radians(value + val); }
+  /// Radians-value substraction operator.
+  /// \param val Value to be substracted.
+  /// \return Result of the radians object substracted by the value.
+  constexpr Radians operator-(T val) const { return Radians(value - val); }
+  /// Radians-value multiplication operator.
+  /// \param val Value to be multiplied by.
+  /// \return Result of the radians object multiplied by the value.
+  constexpr Radians operator*(T val) const { return Radians(value * val); }
+  /// Radians-value division operator.
+  /// \param val Value to be divided by.
+  /// \return Result of the radians object divided by the value.
+  constexpr Radians operator/(T val) const { return Radians(value / val); }
+  /// Radians-value addition assignment operator.
+  /// \param val Value to be added.
+  /// \return Reference to the modified original radians object.
+  constexpr Radians& operator+=(T val) { value += val; return *this; }
+  /// Radians-value substraction assignment operator.
+  /// \param val Value to be substracted.
+  /// \return Reference to the modified original radians object.
+  constexpr Radians& operator-=(T val) { value -= val; return *this; }
+  /// Radians-value multiplication assignment operator.
+  /// \param val Value to be multiplied by.
+  /// \return Reference to the modified original radians object.
+  constexpr Radians& operator*=(T val) { value *= val; return *this; }
+  /// Radians-value division assignment operator.
+  /// \param val Value to be divided by.
+  /// \return Reference to the modified original radians object.
+  constexpr Radians& operator/=(T val) { value /= val; return *this; }
   /// Checks if the current radians angle is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param rad Radians to be compared with.
@@ -75,8 +159,6 @@ struct Radians {
   /// \tparam T2 Type to convert the value into.
   /// \return Degrees object of the new type.
   template <typename T2> constexpr operator Degrees<T2>() const { return Degrees<T2>(Radians<T2>(static_cast<T2>(value))); }
-  /// Implicit radians to value conversion operator.
-  constexpr operator T() const { return value; }
 
   T value;
 };
@@ -88,13 +170,13 @@ using Radiansld = Radians<long double>;
 namespace Literals {
 
 /// Degrees user-defined literal.
-/// \param value Value in degrees.
+/// \param val Value in degrees.
 /// \return Degrees object containing the given value.
-constexpr Degreesld operator "" _deg(long double value) { return Degreesld(value); }
+constexpr Degreesld operator "" _deg(long double val) { return Degreesld(val); }
 /// Radians user-defined literal.
-/// \param value Value in radians.
+/// \param val Value in radians.
 /// \return Radians object containing the given value.
-constexpr Radiansld operator "" _rad(long double value) { return Radiansld(value); }
+constexpr Radiansld operator "" _rad(long double val) { return Radiansld(val); }
 
 } // namespace Literals
 

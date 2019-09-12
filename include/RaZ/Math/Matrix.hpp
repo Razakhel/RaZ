@@ -27,11 +27,11 @@ template <typename T, std::size_t W, std::size_t H>
 class Matrix {
 public:
   Matrix() = default;
-  Matrix(const Matrix&) = default;
-  Matrix(Matrix&&) noexcept = default;
   explicit Matrix(const Matrix<T, W + 1, H + 1>& mat);
   explicit Matrix(const Matrix<T, W - 1, H - 1>& mat);
   Matrix(std::initializer_list<std::initializer_list<T>> list);
+  Matrix(const Matrix&) = default;
+  Matrix(Matrix&&) noexcept = default;
 
   std::size_t getWidth() const { return W; }
   std::size_t getHeight() const { return H; }
@@ -76,19 +76,19 @@ public:
   /// \return Result of the matrix summed with the value.
   Matrix operator+(float val) const;
   /// Element-wise matrix-matrix substraction operator.
-  /// \param mat Matrix to be substracted by.
+  /// \param mat Matrix to be substracted.
   /// \return Result of the substracted matrices.
   Matrix operator-(const Matrix& mat) const;
   /// Element-wise matrix-value substraction operator.
-  /// \param val Value to be substracted by.
+  /// \param val Value to be substracted.
   /// \return Result of the matrix substracted by the value.
   Matrix operator-(float val) const;
   /// Element-wise matrix-matrix multiplication operator.
-  /// \param mat Matrix to be multiplied with.
+  /// \param mat Matrix to be multiplied by.
   /// \return Result of the multiplied matrices.
   Matrix operator%(const Matrix& mat) const;
   /// Element-wise matrix-value multiplication operator.
-  /// \param val Value to be multiplied with.
+  /// \param val Value to be multiplied by.
   /// \return Result of the matrix multiplied by the value.
   Matrix operator*(float val) const;
   /// Element-wise matrix-matrix division operator.
@@ -100,46 +100,46 @@ public:
   /// \return Result of the matrix divided by the value.
   Matrix operator/(float val) const;
   /// Matrix-vector multiplication operator (assumes the vector to be vertical).
-  /// \param vec Vector to be multiplied with.
+  /// \param vec Vector to be multiplied by.
   /// \return Result of the matrix-vector multiplication.
   Vector<T, H> operator*(const Vector<T, H>& vec) const;
   /// Matrix-matrix multiplication operator.
   /// \tparam WI Input matrix's width.
   /// \tparam HI Input matrix's height.
-  /// \param mat Matrix to be multiplied with.
+  /// \param mat Matrix to be multiplied by.
   /// \return Result of the multiplied matrices.
   template <std::size_t WI, std::size_t HI> Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat) const;
   /// Element-wise matrix-matrix addition assignment operator.
   /// \param mat Matrix to be added.
-  /// \return Reference to the original matrix.
+  /// \return Reference to the modified original matrix.
   Matrix& operator+=(const Matrix& mat);
   /// Element-wise matrix-value addition assignment operator.
   /// \param val Value to be added.
-  /// \return Reference to the original matrix.
+  /// \return Reference to the modified original matrix.
   Matrix& operator+=(float val);
   /// Element-wise matrix-matrix substraction assignment operator.
-  /// \param mat Matrix to be substracted by.
-  /// \return Reference to the original matrix.
+  /// \param mat Matrix to be substracted.
+  /// \return Reference to the modified original matrix.
   Matrix& operator-=(const Matrix& mat);
   /// Element-wise matrix-value substraction assignment operator.
-  /// \param val Value to be substracted by.
-  /// \return Reference to the original matrix.
+  /// \param val Value to be substracted.
+  /// \return Reference to the modified original matrix.
   Matrix& operator-=(float val);
   /// Element-wise matrix-matrix multiplication assignment operator.
-  /// \param mat Matrix to be multiplied with.
-  /// \return Reference to the original matrix.
+  /// \param mat Matrix to be multiplied by.
+  /// \return Reference to the modified original matrix.
   Matrix& operator%=(const Matrix& mat);
   /// Element-wise matrix-value multiplication assignment operator.
-  /// \param val Value to be multiplied with.
-  /// \return Reference to the original matrix.
+  /// \param val Value to be multiplied by.
+  /// \return Reference to the modified original matrix.
   Matrix& operator*=(float val);
   /// Element-wise matrix-matrix division assignment operator.
   /// \param mat Matrix to be divided by.
-  /// \return Reference to the original matrix.
+  /// \return Reference to the modified original matrix.
   Matrix& operator/=(const Matrix& mat);
   /// Element-wise matrix-value divions assignment operator.
   /// \param val Value to be divided by.
-  /// \return Reference to the original matrix.
+  /// \return Reference to the modified original matrix.
   Matrix& operator/=(float val);
   /// Element fetching operator given width & height indices.
   /// \param widthIndex Width index.
