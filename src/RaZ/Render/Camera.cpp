@@ -51,7 +51,7 @@ const Mat4f& Camera::computeInverseViewMatrix() {
 }
 
 const Mat4f& Camera::computePerspectiveMatrix() {
-  const float halfFovTangent = std::tan(m_fieldOfView * 0.5f);
+  const float halfFovTangent = std::tan(m_fieldOfView.value * 0.5f);
   const float planeDist      = m_farPlane - m_nearPlane;
   const float planeMult      = m_farPlane * m_nearPlane;
   const float fovRatio       = m_frameRatio * halfFovTangent;
