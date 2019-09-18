@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Render/Shader.hpp"
 #include "RaZ/Utils/Window.hpp"
 

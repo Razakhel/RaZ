@@ -3,8 +3,9 @@
 #ifndef RAZ_CATCH_HPP
 #define RAZ_CATCH_HPP
 
-#include "catch/catch.hpp"
 #include "RaZ/Utils/FloatUtils.hpp"
+
+#include <catch/catch.hpp>
 
 #include <iomanip>
 #include <sstream>

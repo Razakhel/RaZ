@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Utils/TypeUtils.hpp"
 
 TEST_CASE("TypeUtils type str") {

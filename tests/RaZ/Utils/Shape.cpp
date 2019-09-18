@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Utils/Shape.hpp"
 
 namespace {

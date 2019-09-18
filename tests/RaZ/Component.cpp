@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Component.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"

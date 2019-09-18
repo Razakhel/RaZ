@@ -4,6 +4,14 @@ set(CMAKE_CXX_STANDARD 17)
 
 enable_testing()
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(
+        RAZ_TESTS_COMPILER_FLAGS
+
+        -Wno-float-equal
+    )
+endif ()
+
 set(
     TESTS_SRC
 
@@ -25,7 +33,18 @@ file(
 )
 
 add_executable(RaZ_Tests ${TESTS_FILES})
-target_include_directories(RaZ_Tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Catch")
+target_include_directories(
+    RaZ_Tests
+
+    PRIVATE
+
+    "${CMAKE_CURRENT_SOURCE_DIR}/Catch"
+    "${CMAKE_HOME_DIRECTORY}/extern"
+)
+
+# Disabling some warnings in tests
+target_compile_options(RaZ_Tests PRIVATE ${RAZ_TESTS_COMPILER_FLAGS})
+
 target_link_libraries(RaZ_Tests RaZ)
 
 add_test(RaZ_Tests RaZ_Tests)

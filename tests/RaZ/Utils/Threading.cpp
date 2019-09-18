@@ -1,3 +1,7 @@
+#include "Catch.hpp"
+
+#include "RaZ/Utils/Threading.hpp"
+
 #include <numeric>
 #include <random>
 

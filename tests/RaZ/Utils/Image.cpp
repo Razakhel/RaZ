@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Utils/Image.hpp"
 
 TEST_CASE("Image manual creation") {

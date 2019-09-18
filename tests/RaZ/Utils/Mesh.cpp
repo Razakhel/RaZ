@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Render/Mesh.hpp"
 
 TEST_CASE("Mesh imported OBJ quad faces") {

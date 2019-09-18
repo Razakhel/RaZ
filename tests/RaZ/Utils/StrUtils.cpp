@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Utils/StrUtils.hpp"
 
 TEST_CASE("String case changes") {

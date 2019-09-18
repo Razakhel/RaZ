@@ -1,4 +1,5 @@
-#include "catch/catch.hpp"
+#include "Catch.hpp"
+
 #include "RaZ/Math/Quaternion.hpp"
 
 using namespace Raz::Literals;
