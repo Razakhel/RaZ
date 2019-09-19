@@ -5,9 +5,6 @@
 #include <numeric>
 #include <random>
 
-#include "catch/catch.hpp"
-#include "RaZ/Utils/Threading.hpp"
-
 #ifdef RAZ_THREADS_AVAILABLE
 
 namespace {

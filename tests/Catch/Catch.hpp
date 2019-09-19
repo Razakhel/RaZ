@@ -22,13 +22,8 @@ public:
   /// Creates an instance of a near-equality check custom matcher.
   /// \param comparison Value to be compared with.
   /// \param absTol Absolute tolerance to compare the values with.
-  constexpr explicit IsNearlyEqualTo(T comparison, TolT absTol = std::numeric_limits<TolT>::epsilon()) : m_comparison{ comparison }, m_absTol{ absTol } {
-    // Use 'double' if T is defined to 'long double', otherwise use the given type
-    // 'long double' is not defined (yet?) for Catch's functions
-    using NarrowT = std::conditional_t<std::is_same_v<T, long double>, double, T>;
-
-    Catch::StringMaker<NarrowT>::precision = std::numeric_limits<NarrowT>::digits10 + 1;
-  }
+  constexpr explicit IsNearlyEqualTo(T comparison, TolT absTol = std::numeric_limits<TolT>::epsilon())
+    : m_comparison{ comparison }, m_absTol{ absTol } {}
 
   /// Checks if the given value is nearly equal to the comparison one.
   /// \param base Base value to compare to.

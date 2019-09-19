@@ -4,9 +4,6 @@
 
 #include <sstream>
 
-#include "catch/catch.hpp"
-#include "RaZ/Utils/Bitset.hpp"
-
 namespace {
 
 // Declaring bitsets to be tested
