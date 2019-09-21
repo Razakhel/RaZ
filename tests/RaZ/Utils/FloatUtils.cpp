@@ -3,12 +3,17 @@
 #include "RaZ/Utils/FloatUtils.hpp"
 
 TEST_CASE("Near-equality absolute") {
-  constexpr float floatEpsilon   = std::numeric_limits<float>::epsilon();
-  constexpr double doubleEpsilon = std::numeric_limits<double>::epsilon();
+  constexpr float floatEpsilon            = std::numeric_limits<float>::epsilon();
+  constexpr double doubleEpsilon          = std::numeric_limits<double>::epsilon();
+  constexpr long double longDoubleEpsilon = std::numeric_limits<long double>::epsilon();
 
-  REQUIRE(Raz::FloatUtils::areNearlyEqual(0.f, floatEpsilon));
-  REQUIRE(Raz::FloatUtils::areNearlyEqual(0.0, doubleEpsilon));
+  // An epsilon difference is considered nearly equal
+  CHECK(Raz::FloatUtils::areNearlyEqual(0.f,  floatEpsilon));
+  CHECK(Raz::FloatUtils::areNearlyEqual(0.0,  doubleEpsilon));
+  CHECK(Raz::FloatUtils::areNearlyEqual(0.0L, longDoubleEpsilon));
 
-  REQUIRE_FALSE(Raz::FloatUtils::areNearlyEqual(0.f, floatEpsilon * 2.f));
-  REQUIRE_FALSE(Raz::FloatUtils::areNearlyEqual(0.0, doubleEpsilon * 2.0));
+  // A two-epsilon difference is however not considered nearly equal
+  CHECK_FALSE(Raz::FloatUtils::areNearlyEqual(0.f,  floatEpsilon * 2.f));
+  CHECK_FALSE(Raz::FloatUtils::areNearlyEqual(0.0,  doubleEpsilon * 2.0));
+  CHECK_FALSE(Raz::FloatUtils::areNearlyEqual(0.0L, longDoubleEpsilon * 2.0L));
 }

@@ -20,7 +20,7 @@ const Raz::Ray ray3(Raz::Vec3f({ 1.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, -1.f, 0.f 
 } // namespace
 
 TEST_CASE("Ray-point intersection") {
-  REQUIRE(ray1.intersects(ray1.getOrigin()));
+  CHECK(ray1.intersects(ray1.getOrigin()));
 
   const Raz::Vec3f topPoint({ 0.f, 2.f, 0.f });
   const Raz::Vec3f topRightPoint({ 2.f, 2.f, 0.f });
@@ -31,8 +31,8 @@ TEST_CASE("Ray-point intersection") {
   //        ^
   //        |
   //        x < [ 0; 0 ]
-  REQUIRE(ray1.intersects(topPoint));
-  REQUIRE_FALSE(ray1.intersects(topRightPoint));
+  CHECK(ray1.intersects(topPoint));
+  CHECK_FALSE(ray1.intersects(topRightPoint));
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -40,8 +40,8 @@ TEST_CASE("Ray-point intersection") {
   //          ^
   //         /
   //        x < [ 0; 0 ]
-  REQUIRE_FALSE(ray2.intersects(topPoint));
-  REQUIRE(ray2.intersects(topRightPoint));
+  CHECK_FALSE(ray2.intersects(topPoint));
+  CHECK(ray2.intersects(topRightPoint));
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -49,8 +49,8 @@ TEST_CASE("Ray-point intersection") {
   //             x < [ 1; 1 ]
   //            /
   //           v
-  REQUIRE_FALSE(ray3.intersects(topPoint));
-  REQUIRE_FALSE(ray3.intersects(topRightPoint));
+  CHECK_FALSE(ray3.intersects(topPoint));
+  CHECK_FALSE(ray3.intersects(topRightPoint));
 }
 
 TEST_CASE("Ray-sphere intersection") {
@@ -58,17 +58,17 @@ TEST_CASE("Ray-sphere intersection") {
   const Raz::Sphere sphere2(Raz::Vec3f({ 5.f, 10.f, 0.f }), 5.f);
   const Raz::Sphere sphere3(Raz::Vec3f({ -10.f, -10.f, 0.f }), 1.f);
 
-  REQUIRE(ray1.intersects(sphere1));
-  REQUIRE(ray2.intersects(sphere1));
-  REQUIRE(ray3.intersects(sphere1));
+  CHECK(ray1.intersects(sphere1));
+  CHECK(ray2.intersects(sphere1));
+  CHECK(ray3.intersects(sphere1));
 
-  REQUIRE(ray1.intersects(sphere2));
-  REQUIRE(ray2.intersects(sphere2));
-  REQUIRE_FALSE(ray3.intersects(sphere2));
+  CHECK(ray1.intersects(sphere2));
+  CHECK(ray2.intersects(sphere2));
+  CHECK_FALSE(ray3.intersects(sphere2));
 
-  REQUIRE_FALSE(ray1.intersects(sphere3));
-  REQUIRE_FALSE(ray2.intersects(sphere3));
-  REQUIRE(ray3.intersects(sphere3));
+  CHECK_FALSE(ray1.intersects(sphere3));
+  CHECK_FALSE(ray2.intersects(sphere3));
+  CHECK(ray3.intersects(sphere3));
 }
 
 TEST_CASE("Ray-triangle intersection") {
@@ -80,17 +80,17 @@ TEST_CASE("Ray-triangle intersection") {
   const Raz::Triangle triangle2(Raz::Vec3f({ 0.5f, -0.5f, 3.f }), Raz::Vec3f({ 0.5f, -0.5f, -3.f }), Raz::Vec3f({ 0.5f, 3.f, 0.f }));
   const Raz::Triangle triangle3(Raz::Vec3f({ 0.f, -1.f, 1.f }), Raz::Vec3f({ -1.5f, -1.5f, 0.f }), Raz::Vec3f({ 0.f, -1.75f, -1.f }));
 
-  REQUIRE(ray1.intersects(triangle1));
-  REQUIRE(ray2.intersects(triangle1));
-  REQUIRE(ray3.intersects(triangle1));
+  CHECK(ray1.intersects(triangle1));
+  CHECK(ray2.intersects(triangle1));
+  CHECK(ray3.intersects(triangle1));
 
-  REQUIRE_FALSE(ray1.intersects(triangle2));
-  REQUIRE(ray2.intersects(triangle2));
-  REQUIRE(ray3.intersects(triangle2));
+  CHECK_FALSE(ray1.intersects(triangle2));
+  CHECK(ray2.intersects(triangle2));
+  CHECK(ray3.intersects(triangle2));
 
-  REQUIRE_FALSE(ray1.intersects(triangle3));
-  REQUIRE_FALSE(ray2.intersects(triangle3));
-  REQUIRE(ray3.intersects(triangle3));
+  CHECK_FALSE(ray1.intersects(triangle3));
+  CHECK_FALSE(ray2.intersects(triangle3));
+  CHECK(ray3.intersects(triangle3));
 }
 
 TEST_CASE("Ray-AABB intersection") {
@@ -114,17 +114,17 @@ TEST_CASE("Ray-AABB intersection") {
   const Raz::AABB aabb2(Raz::Vec3f(5.f), Raz::Vec3f({ 3.f, 3.f, -5.f }));
   const Raz::AABB aabb3(Raz::Vec3f({ -5.f, -5.f, 5.f }), Raz::Vec3f({ -10.f, -10.f, -5.f }));
 
-  REQUIRE(ray1.intersects(aabb1));
-  REQUIRE(ray2.intersects(aabb1));
-  REQUIRE(ray3.intersects(aabb1));
+  CHECK(ray1.intersects(aabb1));
+  CHECK(ray2.intersects(aabb1));
+  CHECK(ray3.intersects(aabb1));
 
-  REQUIRE_FALSE(ray1.intersects(aabb2));
-  REQUIRE(ray2.intersects(aabb2));
-  REQUIRE_FALSE(ray3.intersects(aabb2));
+  CHECK_FALSE(ray1.intersects(aabb2));
+  CHECK(ray2.intersects(aabb2));
+  CHECK_FALSE(ray3.intersects(aabb2));
 
-  REQUIRE_FALSE(ray1.intersects(aabb3));
-  REQUIRE_FALSE(ray2.intersects(aabb3));
-  REQUIRE(ray3.intersects(aabb3));
+  CHECK_FALSE(ray1.intersects(aabb3));
+  CHECK_FALSE(ray2.intersects(aabb3));
+  CHECK(ray3.intersects(aabb3));
 }
 
 TEST_CASE("Point projection") {
@@ -137,8 +137,8 @@ TEST_CASE("Point projection") {
   //        ^
   //        |
   //        x < [ 0; 0 ]
-  REQUIRE(ray1.computeProjection(topPoint) == topPoint);
-  REQUIRE(ray1.computeProjection(topRightPoint) == topPoint);
+  CHECK(ray1.computeProjection(topPoint) == topPoint);
+  CHECK(ray1.computeProjection(topRightPoint) == topPoint);
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -146,8 +146,8 @@ TEST_CASE("Point projection") {
   //          ^
   //         /
   //        x < [ 0; 0 ]
-  REQUIRE(ray2.computeProjection(topPoint) == Raz::Vec3f({ 1.f, 1.f, 0.f }));
-  REQUIRE(ray2.computeProjection(topRightPoint) == topRightPoint);
+  CHECK(ray2.computeProjection(topPoint) == Raz::Vec3f({ 1.f, 1.f, 0.f }));
+  CHECK(ray2.computeProjection(topRightPoint) == topRightPoint);
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -155,6 +155,6 @@ TEST_CASE("Point projection") {
   //             x < [ 1; 1 ]
   //            /
   //           v
-  REQUIRE(ray3.computeProjection(topPoint) == ray3.getOrigin());
-  REQUIRE(ray3.computeProjection(topRightPoint) == ray3.getOrigin());
+  CHECK(ray3.computeProjection(topPoint) == ray3.getOrigin());
+  CHECK(ray3.computeProjection(topRightPoint) == ray3.getOrigin());
 }

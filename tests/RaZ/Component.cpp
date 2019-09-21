@@ -17,8 +17,8 @@ TEST_CASE("Components IDs") {
   const std::size_t lightIndex  = Raz::Component::getId<Raz::Light>();
 
   // Every component already have an ID attributed to each of them, so calling them again won't change it
-  REQUIRE(transIndex == Raz::Component::getId<Raz::Transform>());
-  REQUIRE(cameraIndex == Raz::Component::getId<Raz::Camera>());
-  REQUIRE(meshIndex == Raz::Component::getId<Raz::Mesh>());
-  REQUIRE(lightIndex == Raz::Component::getId<Raz::Light>());
+  CHECK(transIndex == Raz::Component::getId<Raz::Transform>());
+  CHECK(cameraIndex == Raz::Component::getId<Raz::Camera>());
+  CHECK(meshIndex == Raz::Component::getId<Raz::Mesh>());
+  CHECK(lightIndex == Raz::Component::getId<Raz::Light>());
 }

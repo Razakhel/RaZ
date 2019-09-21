@@ -19,7 +19,7 @@ TEST_CASE("Vertex shader basic") {
   const Raz::VertexShader vertShader = Raz::VertexShader::loadFromSource(vertSource);
 
   vertShader.compile();
-  REQUIRE(vertShader.isCompiled());
+  CHECK(vertShader.isCompiled());
 }
 
 TEST_CASE("Fragment shader basic") {
@@ -40,7 +40,7 @@ TEST_CASE("Fragment shader basic") {
   const Raz::FragmentShader fragShader = Raz::FragmentShader::loadFromSource(fragSource);
 
   fragShader.compile();
-  REQUIRE(fragShader.isCompiled());
+  CHECK(fragShader.isCompiled());
 }
 
 TEST_CASE("Vertex shader imported") {
@@ -51,7 +51,7 @@ TEST_CASE("Vertex shader imported") {
   const Raz::VertexShader vertShader("../../shaders/vert.glsl");
 
   vertShader.compile();
-  REQUIRE(vertShader.isCompiled());
+  CHECK(vertShader.isCompiled());
 }
 
 TEST_CASE("Fragment shader imported") {
@@ -62,5 +62,5 @@ TEST_CASE("Fragment shader imported") {
   const Raz::FragmentShader fragShader("../../shaders/lambert.glsl");
 
   fragShader.compile();
-  REQUIRE(fragShader.isCompiled());
+  CHECK(fragShader.isCompiled());
 }

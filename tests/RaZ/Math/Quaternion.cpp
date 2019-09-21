@@ -13,14 +13,14 @@ const Raz::Quaternionf quat3(180.0_deg, 1.f, -2.f, 5.f);
 } // namespace
 
 TEST_CASE("Quaternion norm computation") {
-  CHECK(Raz::FloatUtils::areNearlyEqual(quat1.computeSquaredNorm(), 1.f));
-  CHECK(Raz::FloatUtils::areNearlyEqual(quat1.computeNorm(), 1.f));
+  CHECK_THAT(quat1.computeSquaredNorm(), IsNearlyEqualTo(1.f));
+  CHECK_THAT(quat1.computeNorm(), IsNearlyEqualTo(1.f));
 
-  CHECK(Raz::FloatUtils::areNearlyEqual(quat2.computeSquaredNorm(), 15.5f));
-  CHECK(Raz::FloatUtils::areNearlyEqual(quat2.computeNorm(), 3.93700385f));
+  CHECK_THAT(quat2.computeSquaredNorm(), IsNearlyEqualTo(15.5f));
+  CHECK_THAT(quat2.computeNorm(), IsNearlyEqualTo(3.93700385f));
 
-  CHECK(Raz::FloatUtils::areNearlyEqual(quat3.computeSquaredNorm(), 30.f));
-  CHECK(Raz::FloatUtils::areNearlyEqual(quat3.computeNorm(), 5.47722578f));
+  CHECK_THAT(quat3.computeSquaredNorm(), IsNearlyEqualTo(30.f));
+  CHECK_THAT(quat3.computeNorm(), IsNearlyEqualTo(5.47722578f));
 }
 
 TEST_CASE("Quaternion matrix computation") {

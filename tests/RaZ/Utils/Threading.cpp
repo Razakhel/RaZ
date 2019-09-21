@@ -45,7 +45,7 @@ TEST_CASE("Async basic") {
 
   res.wait();
 
-  REQUIRE(res.get() == 42);
+  CHECK(res.get() == 42);
 }
 
 TEST_CASE("Index parallelization - divisible size") {
@@ -56,7 +56,7 @@ TEST_CASE("Index parallelization - divisible size") {
   indexParallelIncrementation(values);
   const std::size_t sumAfterIncrement = computeSum(values);
 
-  REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
+  CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
 TEST_CASE("Index parallelization - indivisible size") {
@@ -67,7 +67,7 @@ TEST_CASE("Index parallelization - indivisible size") {
   indexParallelIncrementation(values);
   const std::size_t sumAfterIncrement = computeSum(values);
 
-  REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
+  CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
 TEST_CASE("Iterator parallelization - divisible size") {
@@ -78,7 +78,7 @@ TEST_CASE("Iterator parallelization - divisible size") {
   iteratorParallelIncrementation(values);
   const std::size_t sumAfterIncrement = computeSum(values);
 
-  REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
+  CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
 TEST_CASE("Iterator parallelization - indivisible size") {
@@ -89,7 +89,7 @@ TEST_CASE("Iterator parallelization - indivisible size") {
   iteratorParallelIncrementation(values);
   const std::size_t sumAfterIncrement = computeSum(values);
 
-  REQUIRE(sumBeforeIncrement + values.size() == sumAfterIncrement);
+  CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
 #endif // RAZ_THREADS_AVAILABLE
