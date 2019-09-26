@@ -29,15 +29,18 @@ public:
   bool intersects(const Vec3f& point) const;
   /// Ray-line intersection check.
   /// \param line Line to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
   /// \return True if the ray intersects the line, false otherwise.
   bool intersects(const Line& line, RayHit* hit = nullptr) const;
   /// Ray-plane intersection check.
   /// \param plane Plane to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
   /// \return True if the ray intersects the plane, false otherwise.
-  bool intersects(const Plane& plane) const;
+  bool intersects(const Plane& plane, RayHit* hit = nullptr) const;
   /// Ray-sphere intersection check.
   /// The intersection is checked by calculating a quadratic equation to determine the hits distances.
   /// \param sphere Sphere to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
   /// \return True if the ray intersects the sphere, false otherwise.
   bool intersects(const Sphere& sphere, RayHit* hit = nullptr) const;
   /// Ray-triangle intersection check.
@@ -47,6 +50,7 @@ public:
   bool intersects(const Triangle& triangle) const;
   /// Ray-quad intersection check.
   /// \param quad Quad to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
   /// \return True if the ray intersects the quad, false otherwise.
   bool intersects(const Quad& quad, RayHit* hit = nullptr) const;
   /// Ray-AABB intersection check.

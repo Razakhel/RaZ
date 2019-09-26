@@ -42,8 +42,25 @@ bool Ray::intersects(const Line&, RayHit*) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Ray::intersects(const Plane&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Ray::intersects(const Plane& plane, RayHit* hit) const {
+  const float dirAngle = m_direction.dot(plane.getNormal());
+
+  if (dirAngle >= 0.f) // The plane is facing the same direction as the ray
+    return false;
+
+  const float origAngle = m_origin.dot(plane.getNormal());
+  const float hitDist   = (plane.getDistance() - origAngle) / dirAngle;
+
+  if (hitDist <= 0.f) // The plane is behind the ray
+    return false;
+
+  if (hit) {
+    hit->position = m_origin + m_direction * hitDist;
+    hit->normal   = plane.getNormal();
+    hit->distance = hitDist;
+  }
+
+  return true;
 }
 
 bool Ray::intersects(const Sphere& sphere, RayHit* hit) const {
