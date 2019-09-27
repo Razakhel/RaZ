@@ -53,6 +53,40 @@ TEST_CASE("Ray-point intersection") {
   CHECK_FALSE(ray3.intersects(topRightPoint));
 }
 
+TEST_CASE("Ray-plane intersection") {
+  //       Plane 1      |      Plane 2      |      Plane 3      |      Plane 4
+  //                    |                   |                   |
+  //   \      normal    |    \              |              /    |
+  //     \      ^       |      \            |            /      |        normal
+  //       \   /        |        \          |          /        |          ^
+  //         \/         |        / \        |        /  \       |          |
+  //           \        |       /    \      |      /     \      |    ______|______
+  //             \      |      v       \    |    /        v     |
+  //               \    |   normal          |          normal   |     [ 0; 0.5 ]
+
+  const Raz::Vec3f initPos({ 0.f, 0.5f, 0.f });
+  const Raz::Plane plane1(initPos, Raz::Vec3f({ 1.f, 1.f, 0.f }).normalize());
+  const Raz::Plane plane2(initPos, Raz::Vec3f({ -1.f, -1.f, 0.f }).normalize());
+  const Raz::Plane plane3(initPos, Raz::Vec3f({ 1.f, -1.f, 0.f }).normalize());
+  const Raz::Plane plane4(initPos, Raz::Axis::Y);
+
+  CHECK_FALSE(ray1.intersects(plane1));
+  CHECK_FALSE(ray2.intersects(plane1));
+  CHECK(ray3.intersects(plane1));
+
+  CHECK_FALSE(ray1.intersects(plane2));
+  CHECK(ray2.intersects(plane2));
+  CHECK_FALSE(ray3.intersects(plane2));
+
+  CHECK_FALSE(ray1.intersects(plane3));
+  CHECK_FALSE(ray2.intersects(plane3));
+  CHECK_FALSE(ray3.intersects(plane3));
+
+  CHECK_FALSE(ray1.intersects(plane4));
+  CHECK_FALSE(ray2.intersects(plane4));
+  CHECK(ray3.intersects(plane4));
+}
+
 TEST_CASE("Ray-sphere intersection") {
   const Raz::Sphere sphere1(Raz::Vec3f(0.f), 1.f);
   const Raz::Sphere sphere2(Raz::Vec3f({ 5.f, 10.f, 0.f }), 5.f);
