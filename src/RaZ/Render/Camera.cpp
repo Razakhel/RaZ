@@ -5,7 +5,7 @@ namespace Raz {
 Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
                Radiansf fieldOfView,
                float nearPlane, float farPlane,
-               ProjectionType projType) : m_frameRatio{ static_cast<float>(frameWidth) / frameHeight },
+               ProjectionType projType) : m_frameRatio{ static_cast<float>(frameWidth) / static_cast<float>(frameHeight) },
                                           m_fieldOfView{ fieldOfView },
                                           m_nearPlane{ nearPlane }, m_farPlane{ farPlane },
                                           m_projType{ projType } {
@@ -90,7 +90,7 @@ const Mat4f& Camera::computeInverseProjectionMatrix() {
 }
 
 void Camera::resizeViewport(unsigned int frameWidth, unsigned int frameHeight) {
-  m_frameRatio = static_cast<float>(frameWidth) / frameHeight;
+  m_frameRatio = static_cast<float>(frameWidth) / static_cast<float>(frameHeight);
 
   computeProjectionMatrix();
   computeInverseProjectionMatrix();

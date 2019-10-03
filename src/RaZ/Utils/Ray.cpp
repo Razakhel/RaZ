@@ -7,18 +7,18 @@ namespace {
 bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secondHitDist) {
   const float discriminant = b * b - 4.f * a * c;
 
-  if (discriminant < 0) {
+  if (discriminant < 0.f) {
     return false;
-  } else if (discriminant == 0) {
-    const float hitDist = -0.5f * b / a;
-
-    firstHitDist  = hitDist;
-    secondHitDist = hitDist;
-  } else {
+  } else if (discriminant > 0.f) {
     const float q = -0.5f * ((b > 0) ? b + std::sqrt(discriminant) : b - std::sqrt(discriminant));
 
     firstHitDist  = q / a;
     secondHitDist = c / q;
+  } else { // discriminant == 0
+    const float hitDist = -0.5f * b / a;
+
+    firstHitDist  = hitDist;
+    secondHitDist = hitDist;
   }
 
   if (firstHitDist > secondHitDist)
@@ -45,7 +45,7 @@ bool Ray::intersects(const Line&, RayHit*) const {
 bool Ray::intersects(const Plane& plane, RayHit* hit) const {
   const float dirAngle = m_direction.dot(plane.getNormal());
 
-  if (dirAngle >= 0.f) // The plane is facing the same direction as the ray
+  if (dirAngle >= 0.f) // The plane is facing in the same direction as the ray
     return false;
 
   const float origAngle = m_origin.dot(plane.getNormal());
@@ -70,7 +70,8 @@ bool Ray::intersects(const Sphere& sphere, RayHit* hit) const {
   const float rayDiff     = 2.f * m_direction.dot(sphereDir);
   const float sphereDiff  = sphereDir.computeSquaredLength() - sphere.getRadius() * sphere.getRadius();
 
-  float firstHitDist {}, secondHitDist {};
+  float firstHitDist {};
+  float secondHitDist {};
 
   if (!solveQuadratic(raySqLength, rayDiff, sphereDiff, firstHitDist, secondHitDist))
     return false;

@@ -34,6 +34,7 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
       break;
 
     case ImageColorspace::RGB:
+    default:
       m_channelCount = 3;
       break;
 

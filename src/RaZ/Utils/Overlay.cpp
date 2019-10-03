@@ -60,7 +60,8 @@ void Overlay::render() {
         ImGui::TextUnformatted(element->label.c_str());
         break;
 
-      case OverlayElementType::BUTTON: {
+      case OverlayElementType::BUTTON:
+      {
         const auto& button = static_cast<OverlayButton&>(*element);
 
         if (ImGui::Button(button.label.c_str()))
@@ -69,7 +70,8 @@ void Overlay::render() {
         break;
       }
 
-      case OverlayElementType::CHECKBOX: {
+      case OverlayElementType::CHECKBOX:
+      {
         auto& checkbox = static_cast<OverlayCheckbox&>(*element);
         const bool prevValue = checkbox.isChecked;
 
@@ -85,7 +87,8 @@ void Overlay::render() {
         break;
       }
 
-      case OverlayElementType::TEXTBOX: {
+      case OverlayElementType::TEXTBOX:
+      {
         static auto callback = [] (ImGuiTextEditCallbackData* data) {
           auto& textbox = *static_cast<OverlayTextbox*>(data->UserData);
 
@@ -114,11 +117,14 @@ void Overlay::render() {
         break;
 
       case OverlayElementType::FRAME_TIME:
-        ImGui::Text(element->label.c_str(), 1000.f / ImGui::GetIO().Framerate);
+        ImGui::Text(element->label.c_str(), static_cast<double>(1000.f / ImGui::GetIO().Framerate));
         break;
 
       case OverlayElementType::FPS_COUNTER:
-        ImGui::Text(element->label.c_str(), ImGui::GetIO().Framerate);
+        ImGui::Text(element->label.c_str(), static_cast<double>(ImGui::GetIO().Framerate));
+        break;
+
+      default:
         break;
     }
   }

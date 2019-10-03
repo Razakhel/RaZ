@@ -8,7 +8,7 @@ void Submesh::setRenderMode(RenderMode renderMode) {
 
   switch (m_renderMode) {
     case RenderMode::POINT:
-      m_renderFunc = [] (const Submesh& submesh) { glDrawArrays(GL_POINTS, 0, submesh.getVertexCount()); };
+      m_renderFunc = [] (const Submesh& submesh) { glDrawArrays(GL_POINTS, 0, static_cast<int>(submesh.getVertexCount())); };
       break;
 
 //    case RenderMode::LINE: {
@@ -22,7 +22,9 @@ void Submesh::setRenderMode(RenderMode renderMode) {
 //      break;
 //    }
 
-    case RenderMode::TRIANGLE: {
+    case RenderMode::TRIANGLE:
+    default:
+    {
       m_renderFunc = [] (const Submesh& submesh) {
         glDrawElements(GL_TRIANGLES, static_cast<int>(submesh.getTriangleIndexCount()), GL_UNSIGNED_INT, nullptr);
       };

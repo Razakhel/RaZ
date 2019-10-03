@@ -131,6 +131,7 @@ void Image::savePng(std::ofstream& file, bool flipVertically) const {
       break;
 
     case ImageColorspace::RGB:
+    default:
       colorType = PNG_COLOR_TYPE_RGB;
       break;
 

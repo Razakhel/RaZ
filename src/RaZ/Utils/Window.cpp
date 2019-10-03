@@ -139,7 +139,7 @@ bool Window::recoverVerticalSyncState() const {
 
 void Window::enableVerticalSync(bool value) const {
 #if defined(_WIN32)
-  if (wglGetExtensionsStringEXT())
+  if (wglGetExtensionsStringEXT()) {
     wglSwapIntervalEXT(static_cast<int>(value));
     return;
   }
@@ -331,6 +331,8 @@ void Window::setShouldClose() const {
 void Window::close() {
   disableOverlay();
   glfwTerminate();
+
+  m_window = nullptr;
 }
 
 } // namespace Raz

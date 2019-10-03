@@ -86,6 +86,7 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
           break;
 
         case ImageColorspace::RGB:
+        default:
           colorFormat = TextureInternalFormat::RGB16F;
           break;
 

@@ -118,7 +118,7 @@ void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
 void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glGenTextures(count, indices);
+  glGenTextures(static_cast<int>(count), indices);
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -224,10 +224,10 @@ void Renderer::sendImageData2D(TextureType type,
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glTexImage2D(static_cast<unsigned int>(type),
-               mipmapLevel,
+               static_cast<int>(mipmapLevel),
                static_cast<int>(internalFormat),
-               width,
-               height,
+               static_cast<int>(width),
+               static_cast<int>(height),
                0,
                static_cast<unsigned int>(format),
                static_cast<unsigned int>(dataType),
@@ -271,7 +271,7 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
 void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glDeleteTextures(count, indices);
+  glDeleteTextures(static_cast<int>(count), indices);
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -281,7 +281,7 @@ void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
 void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glViewport(xOrigin, yOrigin, width, height);
+  glViewport(xOrigin, yOrigin, static_cast<int>(width), static_cast<int>(height));
 
 #if !defined(NDEBUG)
   checkErrors();
@@ -333,7 +333,7 @@ void Renderer::linkProgram(unsigned int index) {
   if (!isProgramLinked(index)) {
     char infoLog[512];
 
-    glGetProgramInfoLog(index, std::size(infoLog), nullptr, infoLog);
+    glGetProgramInfoLog(index, static_cast<int>(std::size(infoLog)), nullptr, infoLog);
     std::cerr << "Error: Shader program link failed (ID " << index << ").\n" << infoLog << std::endl;
   }
 
@@ -407,7 +407,7 @@ void Renderer::compileShader(unsigned int index) {
   if (!isShaderCompiled(index)) {
     char infoLog[512];
 
-    glGetShaderInfoLog(index, std::size(infoLog), nullptr, infoLog);
+    glGetShaderInfoLog(index, static_cast<int>(std::size(infoLog)), nullptr, infoLog);
     std::cerr << "Error: Shader compilation failed (ID " << index << ").\n" << infoLog << std::endl;
   }
 

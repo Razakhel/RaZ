@@ -62,7 +62,7 @@ void Framebuffer::mapBuffers() const {
   glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[0], GL_TEXTURE_2D, m_colorBuffer->getIndex(), 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[1], GL_TEXTURE_2D, m_normalBuffer->getIndex(), 0);
 
-  glDrawBuffers(colorBuffers.size(), colorBuffers.data());
+  glDrawBuffers(static_cast<int>(colorBuffers.size()), colorBuffers.data());
 
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     std::cerr << "Error: Framebuffer is not complete." << std::endl;

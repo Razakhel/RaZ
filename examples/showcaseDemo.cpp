@@ -1,6 +1,6 @@
 #include "RaZ/RaZ.hpp"
 
-void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
+inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
                                                Raz::FragmentShader("../../shaders/blinn-phong.glsl")));
   render.updateLights();
@@ -16,7 +16,7 @@ void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   meshTrans.setScale(0.01f);
 }
 
-void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
+inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
                                                Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
   render.updateLights();
@@ -32,7 +32,7 @@ void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   meshTrans.setScale(1.f);
 }
 
-void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
+inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
                                                Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
   render.updateLights();
@@ -48,7 +48,7 @@ void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   meshTrans.setScale(0.15f);
 }
 
-void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
+inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
                                                Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
   render.updateLights();
@@ -65,7 +65,7 @@ void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 #if defined(FBX_ENABLED)
-void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
+inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
                                                Raz::FragmentShader("../../shaders/blinn-phong.glsl")));
   render.updateLights();
@@ -82,7 +82,7 @@ void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 #endif
 
-void loadCloudsSkybox(Raz::RenderSystem& render) {
+inline void loadCloudsSkybox(Raz::RenderSystem& render) {
   render.setCubemap(Raz::Cubemap::create("../../assets/skyboxes/clouds_right.png",
                                          "../../assets/skyboxes/clouds_left.png",
                                          "../../assets/skyboxes/clouds_top.png",
@@ -91,7 +91,7 @@ void loadCloudsSkybox(Raz::RenderSystem& render) {
                                          "../../assets/skyboxes/clouds_back.png"));
 }
 
-void loadLakeSkybox(Raz::RenderSystem& render) {
+inline void loadLakeSkybox(Raz::RenderSystem& render) {
   render.setCubemap(Raz::Cubemap::create("../../assets/skyboxes/lake_right.png",
                                          "../../assets/skyboxes/lake_left.png",
                                          "../../assets/skyboxes/lake_top.png",
