@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # RaZ - Compiler flags #
 ########################
 
-if (CMAKE_COMPILER_IS_GNUCC)
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(
         RAZ_COMPILER_FLAGS
 
@@ -17,50 +17,41 @@ if (CMAKE_COMPILER_IS_GNUCC)
         -pedantic-errors
         -Wall
         -Wextra
+
+        -Warray-bounds
         -Wcast-align
         -Wcast-qual
+        -Wconditionally-supported
+        -Wconversion
         -Wdisabled-optimization
-        -Wfloat-equal
+        -Wdouble-promotion
+        -Wfloat-conversion
         -Wformat=2
         -Wformat-security
-        -Wno-format-nonliteral
+        -Wlogical-op
         -Wmissing-declarations
         -Wmissing-include-dirs
+        -Wnoexcept
         -Wnon-virtual-dtor
         -Wold-style-cast
+        -Wopenmp-simd
         -Woverloaded-virtual
         -Wpacked
         -Wredundant-decls
+        -Wstrict-aliasing
+        -Wstrict-null-sentinel
+        -Wswitch-default
+        -Wswitch-enum
+        -Wtrampolines
         -Wundef
         -Wuninitialized
         -Wunused-macros
-        -Wvla
-        -Wconversion
-        -Wswitch-default
-        -Wswitch-enum
-        -Wzero-as-null-pointer-constant
-        -Wlogical-op
-        -Wvector-operation-performance
-        -Wdouble-promotion
-        -Wtrampolines
         -Wuseless-cast
-        -Wconditionally-supported
-        -Wfloat-conversion
-        -Wopenmp-simd
-        -Warray-bounds
-        -Wnoexcept
-        -Wstrict-null-sentinel
+        -Wvector-operation-performance
+        -Wvla
+        -Wzero-as-null-pointer-constant
 
-        # Disabling some warnings triggered a lot by ImGui...
-        -Wno-old-style-cast
-        -Wno-zero-as-null-pointer-constant
-        -Wno-useless-cast
-        -Wno-float-equal
-        -Wno-conversion
-        -Wno-missing-declarations
-        -Wno-double-promotion
-        -Wno-cast-qual
-        -Wno-switch-default
+        -Wno-format-nonliteral
     )
 
     # Enabling some other warnings available since GCC 5
@@ -69,11 +60,11 @@ if (CMAKE_COMPILER_IS_GNUCC)
             RAZ_COMPILER_FLAGS
 
             ${RAZ_COMPILER_FLAGS}
-            -Wformat-signedness
             -fsized-deallocation
+            -Warray-bounds=2
+            -Wformat-signedness
             -Wsized-deallocation
             -Wsuggest-override
-            -Warray-bounds=2
         )
     endif ()
 
@@ -94,11 +85,11 @@ if (CMAKE_COMPILER_IS_GNUCC)
             RAZ_COMPILER_FLAGS
 
             ${RAZ_COMPILER_FLAGS}
-            -Walloc-zero
+            -Waligned-new
             -Walloca
+            -Walloc-zero
             -Wformat-overflow
             -Wshadow=compatible-local
-            -Waligned-new
         )
     endif ()
 
@@ -112,11 +103,11 @@ if (CMAKE_COMPILER_IS_GNUCC)
             ${RAZ_COMPILER_FLAGS}
             -g
             -O0
-            -fprofile-arcs
-            -ftest-coverage
             -fno-inline
             -fno-inline-small-functions
             -fno-default-inline
+            -fprofile-arcs
+            -ftest-coverage
         )
 
         set(
@@ -125,26 +116,27 @@ if (CMAKE_COMPILER_IS_GNUCC)
             gcov
         )
     endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(
         RAZ_COMPILER_FLAGS
 
         -pedantic
         -pedantic-errors
         -Weverything
+
         -Wno-c++98-compat
         -Wno-c++98-compat-pedantic
-        -Wno-mismatched-tags
-        -Wno-padded
-        -Wno-shadow
-        -Wno-global-constructors
-        -Wno-weak-vtables
-        -Wno-exit-time-destructors
         -Wno-covered-switch-default
-        -Wno-reserved-id-macro
-        -Wno-missing-braces
         -Wno-documentation
         -Wno-documentation-unknown-command
+        -Wno-exit-time-destructors
+        -Wno-global-constructors
+        -Wno-mismatched-tags
+        -Wno-missing-braces
+        -Wno-padded
+        -Wno-reserved-id-macro
+        -Wno-shadow
+        -Wno-weak-vtables
     )
 
     # Disabling some warnings available since Clang 5
@@ -200,8 +192,16 @@ set(
     include/RaZ/Utils/*.inl
 )
 
+# Adding recursively every file we want to compile
+file(
+    GLOB
+    RAZ_FILES
+
+    ${RAZ_SRC}
+)
+
 # Defining platform-dependent options & linking flags
-if (UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE) # Linux
     option(RAZ_USE_SANITIZERS "Use sanitizers" OFF)
 
     if (RAZ_USE_SANITIZERS)
@@ -241,14 +241,6 @@ if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for Min
         endif ()
     endif ()
 endif ()
-
-# Adding recursively every file we want to compile
-file(
-    GLOB
-    RAZ_FILES
-
-    ${RAZ_SRC}
-)
 
 # If FBX SDK not found, do not compile FBX loader
 if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
