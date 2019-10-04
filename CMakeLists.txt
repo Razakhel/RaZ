@@ -283,12 +283,12 @@ if (NOT MSVC)
 endif ()
 
 # Compiling RaZ
-target_compile_options(RaZ PUBLIC ${RAZ_COMPILER_FLAGS})
-target_link_libraries(RaZ ${RAZ_LINKER_FLAGS})
+target_compile_options(RaZ PRIVATE ${RAZ_COMPILER_FLAGS})
+target_link_libraries(RaZ PRIVATE ${RAZ_LINKER_FLAGS})
 
 # Compiling external libraries
 add_subdirectory(extern)
-target_link_libraries(RaZ RaZ_Dependencies)
+target_link_libraries(RaZ PRIVATE RaZ_Dependencies)
 
 # Build the examples
 option(RAZ_BUILD_EXAMPLES "Build examples" ON)

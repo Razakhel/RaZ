@@ -1,4 +1,3 @@
-#include "GL/glew.h"
 #include "RaZ/RaZ.hpp"
 
 int main() {
@@ -42,19 +41,6 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) { mesh.disable(); },
                         Raz::Input::ONCE,
                         [&mesh] () { mesh.enable(); });
-
-  // Allow wireframe toggling
-  bool isWireframe = false;
-  window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
-    isWireframe = !isWireframe;
-    glPolygonMode(GL_FRONT_AND_BACK, (isWireframe ? GL_LINE : GL_FILL));
-  }, Raz::Input::ONCE);
-
-  // Allow face culling toggling
-  bool hasFaceCulling = true;
-  window.addKeyCallback(Raz::Keyboard::N, [&hasFaceCulling, &window] (float /* deltaTime */) {
-    window.enableFaceCulling((hasFaceCulling = !hasFaceCulling));
-  }, Raz::Input::ONCE);
 
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
 
