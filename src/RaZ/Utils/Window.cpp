@@ -69,8 +69,14 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   if (!glfwInit())
     throw std::runtime_error("Error: Failed to initialize GLFW");
 
+#ifdef RAZ_USE_GL4
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+#else
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#endif
+
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_SAMPLES, AASampleCount);

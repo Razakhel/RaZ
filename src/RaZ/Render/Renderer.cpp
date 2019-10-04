@@ -175,6 +175,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
 #endif
 }
 
+#ifdef RAZ_USE_GL4
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -214,6 +215,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   checkErrors();
 #endif
 }
+#endif
 
 void Renderer::sendImageData2D(TextureType type,
                                unsigned int mipmapLevel,
@@ -248,6 +250,7 @@ void Renderer::generateMipmap(TextureType type) {
 #endif
 }
 
+#ifdef RAZ_USE_GL4
 void Renderer::generateMipmap(unsigned int textureIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -257,6 +260,7 @@ void Renderer::generateMipmap(unsigned int textureIndex) {
   checkErrors();
 #endif
 }
+#endif
 
 void Renderer::bindTexture(TextureType type, unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());

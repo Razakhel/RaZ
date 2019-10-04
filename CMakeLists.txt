@@ -265,6 +265,13 @@ endif ()
 
 target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+# OpenGL version
+option(RAZ_USE_GL4 "Use OpenGL 4" OFF)
+if (RAZ_USE_GL4)
+    target_compile_definitions(RaZ PRIVATE RAZ_USE_GL4)
+endif ()
+
+# FBX usage
 if (FBX_FOUND)
     target_include_directories(RaZ PUBLIC "${FBX_INCLUDE}")
     target_compile_definitions(RaZ PRIVATE ${FBX_DEFS})

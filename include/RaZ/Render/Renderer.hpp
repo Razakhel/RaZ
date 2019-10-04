@@ -163,11 +163,23 @@ public:
   static void setTextureParameter(TextureType type, TextureParam param, const int* value);
   static void setTextureParameter(TextureType type, TextureParam param, const float* value);
   static void setTextureParameter(TextureType type, TextureParam param, TextureParamValue value) { setTextureParameter(type, param, static_cast<int>(value)); }
+#ifdef RAZ_USE_GL4
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, int value);
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, float value);
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, const int* value);
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, const float* value);
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param, static_cast<int>(value)); }
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param,
+                                                                                                                                static_cast<int>(value)); }
+#endif
+  /// Sends the image's data corresponding to the currently bound texture.
+  /// \param type Type of the texture.
+  /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
+  /// \param internalFormat Image internal format.
+  /// \param width Image width.
+  /// \param height Image height.
+  /// \param format Image format.
+  /// \param dataType Type of the data to be sent.
+  /// \param data Data to be sent.
   static void sendImageData2D(TextureType type,
                               unsigned int mipmapLevel,
                               TextureInternalFormat internalFormat,
@@ -177,7 +189,9 @@ public:
   /// Generate mipmaps (levels of detail) of the currently bound texture.
   /// \param type Type of the texture to generate mipmaps from.
   static void generateMipmap(TextureType type);
+#ifdef RAZ_USE_GL4
   static void generateMipmap(unsigned int textureIndex);
+#endif
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void deleteTextures(unsigned int count, unsigned int* indices);
