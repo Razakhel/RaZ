@@ -8,6 +8,49 @@ namespace Raz {
 
 namespace {
 
+#ifdef RAZ_USE_GL4
+inline void GLAPIENTRY callbackDebugLog(GLenum source,
+                                        GLenum type,
+                                        unsigned int id,
+                                        GLenum severity,
+                                        int /* length */,
+                                        const char* message,
+                                        const void* /* userParam */) {
+  std::cerr << "OpenGL Debug - ";
+
+  switch (source) {
+    case GL_DEBUG_SOURCE_API:             std::cerr << "Source: OpenGL\t"; break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cerr << "Source: Windows\t"; break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cerr << "Source: Shader compiler\t"; break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cerr << "Source: Third party\t"; break;
+    case GL_DEBUG_SOURCE_APPLICATION:     std::cerr << "Source: Application\t"; break;
+    case GL_DEBUG_SOURCE_OTHER:           std::cerr << "Source: Other\t"; break;
+    default: break;
+  }
+
+  switch (type) {
+    case GL_DEBUG_TYPE_ERROR:               std::cerr << "Type: Error\t"; break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cerr << "Type: Deprecated behavior\t"; break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cerr << "Type: Undefined behavior\t"; break;
+    case GL_DEBUG_TYPE_PORTABILITY:         std::cerr << "Type: Portability\t"; break;
+    case GL_DEBUG_TYPE_PERFORMANCE:         std::cerr << "Type: Performance\t"; break;
+    case GL_DEBUG_TYPE_OTHER:               std::cerr << "Type: Other\t"; break;
+    default: break;
+  }
+
+  std::cerr << "ID: " << id << "\t";
+
+  switch (severity) {
+    case GL_DEBUG_SEVERITY_HIGH:   std::cerr << "Severity: High\t"; break;
+    case GL_DEBUG_SEVERITY_MEDIUM: std::cerr << "Severity: Medium\t"; break;
+    case GL_DEBUG_SEVERITY_LOW:    std::cerr << "Severity: Low\t"; break;
+    default: break;
+  }
+
+  std::cerr << "Message: " << message << std::endl;
+}
+#endif
+
 inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
   switch (errorCode) {
     case GL_INVALID_ENUM:                  return "Unrecognized error code (Invalid enum)";
@@ -26,6 +69,11 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
 
 void Renderer::initialize() {
   glewExperimental = GL_TRUE;
+
+#if !defined(__APPLE__) && defined(RAZ_USE_GL4) // Setting the debug message callback provokes a crash on macOS
+  glDebugMessageCallback(&callbackDebugLog, nullptr);
+  enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
 
   if (glewInit() != GLEW_OK)
     std::cerr << "Error: Failed to initialize GLEW." << std::endl;
