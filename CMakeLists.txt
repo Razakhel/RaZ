@@ -286,9 +286,24 @@ endif ()
 target_compile_options(RaZ PRIVATE ${RAZ_COMPILER_FLAGS})
 target_link_libraries(RaZ PRIVATE ${RAZ_LINKER_FLAGS})
 
-# Compiling external libraries
+# Compiling & linking external libraries
 add_subdirectory(extern)
-target_link_libraries(RaZ PRIVATE RaZ_Dependencies)
+
+if (RAZ_USE_LIBPNG)
+    target_link_libraries(RaZ PRIVATE libpng)
+endif ()
+
+if (RAZ_USE_GLEW)
+    target_link_libraries(RaZ PRIVATE GLEW)
+endif ()
+
+if (RAZ_USE_GLFW)
+    target_link_libraries(RaZ PRIVATE GLFW)
+endif ()
+
+if (RAZ_USE_IMGUI)
+    target_link_libraries(RaZ PRIVATE ImGui)
+endif ()
 
 # Build the examples
 option(RAZ_BUILD_EXAMPLES "Build examples" ON)
