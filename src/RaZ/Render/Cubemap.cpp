@@ -7,7 +7,7 @@
 namespace Raz {
 
 Cubemap::Cubemap() {
-  glGenTextures(1, &m_index);
+  Renderer::generateTexture(m_index);
 
   const std::string vertSource = R"(
     #version 330 core
@@ -59,76 +59,70 @@ void Cubemap::load(const std::string& rightTexturePath, const std::string& leftT
   bind();
 
   Image img(rightTexturePath);
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-               0,
-               static_cast<int>(img.getColorspace()),
-               static_cast<int>(img.getWidth()),
-               static_cast<int>(img.getHeight()),
-               0,
-               static_cast<unsigned int>(img.getColorspace()),
-               GL_UNSIGNED_BYTE,
-               img.getDataPtr());
+  Renderer::sendImageData2D(TextureType::CUBEMAP_POS_X,
+                            0,
+                            static_cast<TextureInternalFormat>(img.getColorspace()),
+                            img.getWidth(),
+                            img.getHeight(),
+                            static_cast<TextureFormat>(img.getColorspace()),
+                            TextureDataType::UBYTE,
+                            img.getDataPtr());
 
   img.read(leftTexturePath);
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-               0,
-               static_cast<int>(img.getColorspace()),
-               static_cast<int>(img.getWidth()),
-               static_cast<int>(img.getHeight()),
-               0,
-               static_cast<unsigned int>(img.getColorspace()),
-               GL_UNSIGNED_BYTE,
-               img.getDataPtr());
+  Renderer::sendImageData2D(TextureType::CUBEMAP_NEG_X,
+                            0,
+                            static_cast<TextureInternalFormat>(img.getColorspace()),
+                            img.getWidth(),
+                            img.getHeight(),
+                            static_cast<TextureFormat>(img.getColorspace()),
+                            TextureDataType::UBYTE,
+                            img.getDataPtr());
 
   img.read(topTexturePath);
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-               0,
-               static_cast<int>(img.getColorspace()),
-               static_cast<int>(img.getWidth()),
-               static_cast<int>(img.getHeight()),
-               0,
-               static_cast<unsigned int>(img.getColorspace()),
-               GL_UNSIGNED_BYTE,
-               img.getDataPtr());
+  Renderer::sendImageData2D(TextureType::CUBEMAP_POS_Y,
+                            0,
+                            static_cast<TextureInternalFormat>(img.getColorspace()),
+                            img.getWidth(),
+                            img.getHeight(),
+                            static_cast<TextureFormat>(img.getColorspace()),
+                            TextureDataType::UBYTE,
+                            img.getDataPtr());
 
   img.read(bottomTexturePath);
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-               0,
-               static_cast<int>(img.getColorspace()),
-               static_cast<int>(img.getWidth()),
-               static_cast<int>(img.getHeight()),
-               0,
-               static_cast<unsigned int>(img.getColorspace()),
-               GL_UNSIGNED_BYTE,
-               img.getDataPtr());
+  Renderer::sendImageData2D(TextureType::CUBEMAP_NEG_Y,
+                            0,
+                            static_cast<TextureInternalFormat>(img.getColorspace()),
+                            img.getWidth(),
+                            img.getHeight(),
+                            static_cast<TextureFormat>(img.getColorspace()),
+                            TextureDataType::UBYTE,
+                            img.getDataPtr());
 
   img.read(frontTexturePath);
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-               0,
-               static_cast<int>(img.getColorspace()),
-               static_cast<int>(img.getWidth()),
-               static_cast<int>(img.getHeight()),
-               0,
-               static_cast<unsigned int>(img.getColorspace()),
-               GL_UNSIGNED_BYTE,
-               img.getDataPtr());
+  Renderer::sendImageData2D(TextureType::CUBEMAP_POS_Z,
+                            0,
+                            static_cast<TextureInternalFormat>(img.getColorspace()),
+                            img.getWidth(),
+                            img.getHeight(),
+                            static_cast<TextureFormat>(img.getColorspace()),
+                            TextureDataType::UBYTE,
+                            img.getDataPtr());
 
   img.read(backTexturePath);
-  glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-               0,
-               static_cast<int>(img.getColorspace()),
-               static_cast<int>(img.getWidth()),
-               static_cast<int>(img.getHeight()),
-               0,
-               static_cast<unsigned int>(img.getColorspace()),
-               GL_UNSIGNED_BYTE,
-               img.getDataPtr());
+  Renderer::sendImageData2D(TextureType::CUBEMAP_NEG_Z,
+                            0,
+                            static_cast<TextureInternalFormat>(img.getColorspace()),
+                            img.getWidth(),
+                            img.getHeight(),
+                            static_cast<TextureFormat>(img.getColorspace()),
+                            TextureDataType::UBYTE,
+                            img.getDataPtr());
 
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::WRAP_S, TextureParamValue::CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::WRAP_R, TextureParamValue::CLAMP_TO_EDGE);
 
   unbind();
 }
