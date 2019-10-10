@@ -1,15 +1,14 @@
-#include <vector>
-#include <fstream>
-#include <sstream>
-
-#include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
+
+#include <fstream>
+#include <sstream>
+#include <vector>
 
 namespace Raz {
 
 Shader::Shader(Shader&& shader) noexcept
-  : m_index{ std::exchange(shader.m_index, GL_INVALID_INDEX) }, m_path{ std::move(shader.m_path) } {}
+  : m_index{ std::exchange(shader.m_index, std::numeric_limits<unsigned int>::max()) }, m_path{ std::move(shader.m_path) } {}
 
 void Shader::import(std::string filePath) {
   m_path = std::move(filePath);
@@ -29,13 +28,9 @@ void Shader::load() const {
   shaderSource.seekg(0, std::ios::beg);
 
   std::vector<char> bytes(fileSize);
-  shaderSource.read(&bytes[0], static_cast<std::streamsize>(fileSize));
+  shaderSource.read(bytes.data(), static_cast<std::streamsize>(fileSize));
 
-  const std::string content(&bytes[0], fileSize);
-
-  const char* data  = content.c_str();
-  const auto length = static_cast<int>(content.size());
-  glShaderSource(m_index, 1, &data, &length);
+  Renderer::sendShaderSource(m_index, bytes.data(), fileSize);
 }
 
 void Shader::compile() const {
@@ -47,14 +42,11 @@ bool Shader::isCompiled() const {
 }
 
 void Shader::loadSource(const std::string& source) {
-  const char* data  = source.c_str();
-  const auto length = static_cast<int>(source.size());
-
-  glShaderSource(m_index, 1, &data, &length);
+  Renderer::sendShaderSource(m_index, source);
 }
 
 void Shader::destroy() const {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   Renderer::deleteShader(m_index);

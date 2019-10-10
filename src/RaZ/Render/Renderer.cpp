@@ -451,6 +451,17 @@ bool Renderer::isShaderCompiled(unsigned int index) {
   return isCompiled;
 }
 
+void Renderer::sendShaderSource(unsigned int index, const char* source, std::size_t length) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  const auto sourceLength = static_cast<int>(length);
+  glShaderSource(index, 1, &source, &sourceLength);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::compileShader(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
