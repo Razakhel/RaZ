@@ -3,12 +3,12 @@
 #ifndef RAZ_SHADERPROGRAM_HPP
 #define RAZ_SHADERPROGRAM_HPP
 
-#include <string>
-#include <unordered_map>
-
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
+
+#include <string>
+#include <unordered_map>
 
 namespace Raz {
 

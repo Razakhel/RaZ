@@ -7,9 +7,7 @@
 #include <cctype>
 #include <string>
 
-namespace Raz {
-
-namespace StrUtils {
+namespace Raz::StrUtils {
 
 /// Transforms in-place a character to lowercase.
 /// \param character Character to be transformed.
@@ -23,7 +21,7 @@ inline char toLowercase(char& character) {
 /// \param text String to be transformed.
 /// \return Reference to the lowercase string.
 inline std::string& toLowercase(std::string& text) {
-  std::transform(text.begin(), text.end(), text.begin(), ::tolower);
+  std::transform(text.begin(), text.end(), text.begin(), [] (char character) { return toLowercase(character); });
   return text;
 }
 
@@ -39,7 +37,7 @@ inline char toUppercase(char& character) {
 /// \param text String to be transformed.
 /// \return Reference to the uppercase string.
 inline std::string& toUppercase(std::string& text) {
-  std::transform(text.begin(), text.end(), text.begin(), ::toupper);
+  std::transform(text.begin(), text.end(), text.begin(), [] (char character) { return toUppercase(character); });
   return text;
 }
 
@@ -155,8 +153,6 @@ inline std::vector<std::string> split(std::string text, char delimiter) {
   return parts;
 }
 
-} // namespace StrUtils
-
-} // namespace Raz
+} // namespace Raz::StrUtils
 
 #endif // RAZ_STRUTILS_HPP

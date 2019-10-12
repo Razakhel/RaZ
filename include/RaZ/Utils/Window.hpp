@@ -3,13 +3,13 @@
 #ifndef RAZ_WINDOW_HPP
 #define RAZ_WINDOW_HPP
 
-#include <functional>
-#include <vector>
-
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Overlay.hpp"
 #include "RaZ/Utils/Input.hpp"
+
+#include <functional>
+#include <vector>
 
 namespace Raz {
 

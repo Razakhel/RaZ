@@ -3,14 +3,14 @@
 #ifndef RAZ_MESH_HPP
 #define RAZ_MESH_HPP
 
-#include <memory>
-#include <string>
-
 #include "RaZ/Component.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/Submesh.hpp"
 #include "RaZ/Utils/Shape.hpp"
+
+#include <memory>
+#include <string>
 
 namespace Raz {
 

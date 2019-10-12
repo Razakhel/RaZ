@@ -3,10 +3,10 @@
 #ifndef RAZ_SUBMESH_HPP
 #define RAZ_SUBMESH_HPP
 
+#include "RaZ/Render/GraphicObjects.hpp"
+
 #include <functional>
 #include <memory>
-
-#include "RaZ/Render/GraphicObjects.hpp"
 
 namespace Raz {
 

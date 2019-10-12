@@ -31,16 +31,16 @@ void Mesh::importOff(std::ifstream& file) {
     std::vector<std::size_t> partsIndices(partCount);
     file >> partsIndices[0] >> partsIndices[1] >> partsIndices[2];
 
-    indices.emplace_back(partsIndices[0]);
-    indices.emplace_back(partsIndices[1]);
-    indices.emplace_back(partsIndices[2]);
+    indices.emplace_back(static_cast<unsigned int>(partsIndices[0]));
+    indices.emplace_back(static_cast<unsigned int>(partsIndices[1]));
+    indices.emplace_back(static_cast<unsigned int>(partsIndices[2]));
 
     for (uint16_t partIndex = 3; partIndex < partCount; ++partIndex) {
       file >> partsIndices[partIndex];
 
-      indices.emplace_back(partsIndices[0]);
-      indices.emplace_back(partsIndices[partIndex - 1]);
-      indices.emplace_back(partsIndices[partIndex]);
+      indices.emplace_back(static_cast<unsigned int>(partsIndices[0]));
+      indices.emplace_back(static_cast<unsigned int>(partsIndices[partIndex - 1]));
+      indices.emplace_back(static_cast<unsigned int>(partsIndices[partIndex]));
     }
   }
 

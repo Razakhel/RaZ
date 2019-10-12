@@ -215,8 +215,8 @@ public:
   static unsigned int createShader(ShaderType type);
   static int getShaderStatus(unsigned int index, ShaderStatus status);
   static bool isShaderCompiled(unsigned int index);
-  static void sendShaderSource(unsigned int index, const char* source, std::size_t length);
-  static void sendShaderSource(unsigned int index, const std::string& source) { sendShaderSource(index, source.c_str(), source.size()); }
+  static void sendShaderSource(unsigned int index, const char* source, int length);
+  static void sendShaderSource(unsigned int index, const std::string& source) { sendShaderSource(index, source.c_str(), static_cast<int>(source.size())); }
   static void compileShader(unsigned int index);
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);

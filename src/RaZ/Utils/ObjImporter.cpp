@@ -1,9 +1,9 @@
+#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
+
 #include <fstream>
 #include <map>
 #include <sstream>
-
-#include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
 
 namespace Raz {
 
@@ -59,7 +59,8 @@ void importMtl(const std::string& mtlFilePath,
       file >> tag >> nextValue;
 
       if (tag[0] == 'K') { // Assign properties
-        std::string secondValue, thirdValue;
+        std::string secondValue;
+        std::string thirdValue;
         file >> secondValue >> thirdValue;
 
         const float red   = std::stof(nextValue);
@@ -368,8 +369,8 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
           vert.normal    = faceNormals[vertPartIndex];
           vert.tangent   = faceTangent;
 
-          submesh.getTriangleIndices().emplace_back(indicesMap.size());
-          indicesMap.emplace(vertIndices[vertPartIndex], indicesMap.size());
+          submesh.getTriangleIndices().emplace_back(static_cast<unsigned int>(indicesMap.size()));
+          indicesMap.emplace(vertIndices[vertPartIndex], static_cast<unsigned int>(indicesMap.size()));
           submesh.getVertices().push_back(vert);
         }
       }

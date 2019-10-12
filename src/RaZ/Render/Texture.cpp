@@ -18,8 +18,8 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
     Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                               0,
                               static_cast<TextureInternalFormat>(colorspace),
-                              static_cast<int>(width),
-                              static_cast<int>(height),
+                              width,
+                              height,
                               static_cast<TextureFormat>(colorspace),
                               TextureDataType::UBYTE,
                               nullptr);
@@ -31,8 +31,8 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
     Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                               0,
                               TextureInternalFormat::DEPTH32F,
-                              static_cast<int>(width),
-                              static_cast<int>(height),
+                              width,
+                              height,
                               static_cast<TextureFormat>(colorspace),
                               TextureDataType::FLOAT,
                               nullptr);
@@ -46,8 +46,8 @@ Texture::Texture(Texture&& texture) noexcept
 
 TexturePtr Texture::recoverTexture(TexturePreset preset) {
   static const std::array<TexturePtr, static_cast<std::size_t>(TexturePreset::PRESET_COUNT)> texturePresets = {
-    Texture::create(0),  // BLACK
-    Texture::create(255) // WHITE
+    create(static_cast<uint8_t>(0)),  // BLACK
+    create(static_cast<uint8_t>(255)) // WHITE
   };
 
   return texturePresets[static_cast<std::size_t>(preset)];
@@ -102,8 +102,8 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
     Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                               0,
                               colorFormat,
-                              static_cast<int>(m_image->getWidth()),
-                              static_cast<int>(m_image->getHeight()),
+                              m_image->getWidth(),
+                              m_image->getHeight(),
                               static_cast<TextureFormat>(m_image->getColorspace()),
                               (m_image->getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
                               m_image->getDataPtr());

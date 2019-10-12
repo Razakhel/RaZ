@@ -153,18 +153,7 @@ elseif (MSVC)
         RAZ_COMPILER_FLAGS
 
         /W4
-
-        # Disabling some warnings triggered by compiling files from external libraries
-        /wd4100 # [GLFW] Unreferenced formal parameter
-        /wd4127 # [libpng] Conditional expression is constant
-        /wd4131 # [libpng] Uses old-style declarator
-        /wd4152 # [GLFW] Non-standard extension (function/data pointer conversion in expression)
-        /wd4204 # [GLFW] Non-standard extension (non-constant aggregate initializer)
-        /wd4244 # [libpng, GLFW] Type narrowing from T (possible loss of data)
-        /wd4245 # [libpng] Signed/unsigned conversion
-        /wd4267 # [libpng] Type narrowing from size_t (possible loss of data)
-        /wd4456 # [GLEW] Shadowing (declaration of 'var' hides previous local declaration)
-        /wd4996 # [libpng, GLFW] Deprecated declaration
+        /permissive-
     )
 endif ()
 

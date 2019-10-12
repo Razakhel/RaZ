@@ -30,7 +30,7 @@ void Shader::load() const {
   std::vector<char> bytes(fileSize);
   shaderSource.read(bytes.data(), static_cast<std::streamsize>(fileSize));
 
-  Renderer::sendShaderSource(m_index, bytes.data(), fileSize);
+  Renderer::sendShaderSource(m_index, bytes.data(), static_cast<int>(fileSize));
 }
 
 void Shader::compile() const {

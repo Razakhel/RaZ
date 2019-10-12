@@ -73,14 +73,18 @@ void Image::readTga(std::ifstream& file, bool flipVertically) {
 
   // X- & Y-origin (2 bytes each) - TODO: handle origins
   // It is expected to have 0 for both origins
-  uint16_t xOrigin = 0, yOrigin = 0;
+  uint16_t xOrigin = 0;
   file.read(reinterpret_cast<char*>(&xOrigin), 2);
+
+  uint16_t yOrigin = 0;
   file.read(reinterpret_cast<char*>(&yOrigin), 2);
 
   // Width & height (2 bytes each)
-  uint16_t width, height;
+  uint16_t width;
   file.read(reinterpret_cast<char*>(&width), 2);
   m_width = width;
+
+  uint16_t height;
   file.read(reinterpret_cast<char*>(&height), 2);
   m_height = height;
 
@@ -97,7 +101,7 @@ void Image::readTga(std::ifstream& file, bool flipVertically) {
 
   if (!runLengthEncoding) {
     std::vector<uint8_t> values(imgData->data.size());
-    file.read(reinterpret_cast<char*>(values.data()), values.size());
+    file.read(reinterpret_cast<char*>(values.data()), static_cast<std::streamsize>(values.size()));
 
     if (m_channelCount == 3) { // 3 channels, RGB
       for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex) {
