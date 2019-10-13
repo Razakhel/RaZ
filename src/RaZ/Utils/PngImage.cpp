@@ -3,11 +3,11 @@
 #include <iostream>
 
 #if defined(__EMSCRIPTEN__)
-    #include <png.h>
-    #include <zlib.h>
+#include <png.h>
+#include <zlib.h>
 #else
-    #include "png/png.h"
-    #include "png/zlib.h"
+#include "png/png.h"
+#include "png/zlib.h"
 #endif
 
 #include "RaZ/Utils/Image.hpp"

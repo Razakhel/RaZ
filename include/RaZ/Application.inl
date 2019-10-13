@@ -7,7 +7,7 @@ namespace Raz {
 template <typename F>
 void Application::run(F&& callback) {
 #ifdef __EMSCRIPTEN__
-  auto emCallback = [callback=std::forward<F>(callback), this] {
+  auto emCallback = [callback = std::forward<F>(callback), this] {
     runOnce();
     callback();
   };
@@ -16,7 +16,7 @@ void Application::run(F&& callback) {
     (*static_cast<decltype(&emCallback)>(lambda))();
   }, &emCallback, 0, 1);
 #else
-  while(runOnce()) {
+  while (runOnce()) {
     std::forward<F>(callback)();
   }
 #endif
