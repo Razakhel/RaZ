@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-# detect
+# Detect whether Emscripten is being used
 if (CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
   set(RAZ_USE_EMSCRIPTEN true)
 endif ()
@@ -149,16 +149,16 @@ elseif (RAZ_COMPILER_CLANG)
     if (RAZ_USE_EMSCRIPTEN)
         set(
             RAZ_COMPILER_FLAGS
-            ${RAZ_COMPILER_FLAGS}
 
+            ${RAZ_COMPILER_FLAGS}
             "SHELL:-s USE_GLFW=3"
             "SHELL:-s USE_LIBPNG=1"
         )
 
         set(
             RAZ_LINKER_FLAGS
-            ${RAZ_LINKER_FLAGS}
 
+            ${RAZ_LINKER_FLAGS}
             "-s USE_LIBPNG=1"
             "-s USE_GLFW=3"
             "-s USE_WEBGL2=1"

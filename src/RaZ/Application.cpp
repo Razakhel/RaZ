@@ -13,6 +13,16 @@ World& Application::addWorld(World world) {
   return m_worlds.back();
 }
 
+void Application::run() {
+#ifdef __EMSCRIPTEN__
+  emscripten_set_main_loop_arg([] (void* instance) {
+    static_cast<decltype(this)>(instance)->runOnce();
+  }, this, 0, 1);
+#else
+  while (runOnce());
+#endif
+}
+
 bool Application::runOnce() {
   const auto currentTime = std::chrono::system_clock::now();
   m_deltaTime            = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - m_lastFrameTime).count();
@@ -24,16 +34,6 @@ bool Application::runOnce() {
   }
 
   return m_isRunning && !m_activeWorlds.isEmpty();
-}
-
-void Application::run() {
-#ifdef __EMSCRIPTEN__
-  emscripten_set_main_loop_arg([] (void* instance) {
-    static_cast<decltype(this)>(instance)->runOnce();
-  }, this, 0, 1);
-#else
-  while (runOnce());
-#endif
 }
 
 } // namespace Raz
