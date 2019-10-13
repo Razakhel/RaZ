@@ -28,7 +28,7 @@ bool Application::runOnce() {
 
 void Application::run() {
 #ifdef __EMSCRIPTEN__
-  emscripten_set_main_loop_arg([](void* instance){
+  emscripten_set_main_loop_arg([] (void* instance) {
     static_cast<decltype(this)>(instance)->runOnce();
   }, this, 0, 1);
 #else

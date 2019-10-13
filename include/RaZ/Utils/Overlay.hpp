@@ -5,9 +5,9 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
 
 // Forward declaration of GLFWwindow, to allow its usage into functions
 struct GLFWwindow;
