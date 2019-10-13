@@ -13,6 +13,10 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Window.hpp"
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/html5.h>
+#endif
+
 namespace Raz {
 
 Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t AASampleCount) : m_width{ width },
@@ -266,6 +270,10 @@ bool Window::run(float deltaTime) {
     m_overlay->render();
 
   glfwSwapBuffers(m_window);
+
+#if defined(__EMSCRIPTEN__)
+  emscripten_webgl_commit_frame();
+#endif
 
   glClearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
   Renderer::clear(MaskType::COLOR, MaskType::DEPTH);

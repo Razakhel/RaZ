@@ -4,7 +4,7 @@
 
 project(ImGui)
 
-if (NOT RAZ_USE_GLEW)
+if (NOT RAZ_USE_GLEW AND NOT RAZ_EMSCRIPTEN)
     message(SEND_ERROR "Error: ImGui requires GLEW to be used.")
 endif ()
 
@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 aux_source_directory(imgui IMGUI_SRC)
 
-if (NOT RAZ_USE_GLFW)
+if (NOT RAZ_USE_GLFW AND NOT RAZ_EMSCRIPTEN)
     list(
         REMOVE_ITEM
         IMGUI_SRC
@@ -45,6 +45,8 @@ target_include_directories(
 # Disabling all compilers warnings
 if (MSVC)
     target_compile_options(ImGui PRIVATE /w)
+elseif(RAZ_EMSCRIPTEN)
+    target_compile_options(ImGui PRIVATE -w -DIMGUI_IMPL_OPENGL_ES3 -s USE_GLFW=3)
 else ()
     target_compile_options(ImGui PRIVATE -w)
 endif ()

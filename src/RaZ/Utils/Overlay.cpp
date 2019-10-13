@@ -13,7 +13,11 @@ Overlay::Overlay(GLFWwindow* window) {
   ImGui::StyleColorsDark();
 
   ImGui_ImplGlfw_InitForOpenGL(window, true);
+#if !defined(__EMSCRIPTEN__)
   ImGui_ImplOpenGL3_Init("#version 330 core");
+#else
+  ImGui_ImplOpenGL3_Init("#version 300 es");
+#endif
 }
 
 void Overlay::addLabel(std::string label) {

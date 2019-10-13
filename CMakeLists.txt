@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# detect
+if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+  set(RAZ_EMSCRIPTEN true)
+endif()
+
 ########################
 # RaZ - Compiler flags #
 ########################
@@ -138,6 +143,29 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         -Wno-shadow
         -Wno-weak-vtables
     )
+
+    if (RAZ_EMSCRIPTEN)
+        set(
+            RAZ_COMPILER_FLAGS
+            ${RAZ_COMPILER_FLAGS}
+
+            "SHELL:-s USE_GLFW=3"
+            "SHELL:-s USE_LIBPNG=1"
+        )
+
+        set(
+            RAZ_LINKER_FLAGS
+            ${RAZ_LINKER_FLAGS}
+
+            "-s USE_LIBPNG=1"
+            "-s USE_GLFW=3"
+            "-s USE_WEBGL2=1"
+            "-s OFFSCREEN_FRAMEBUFFER=1"
+            "-s OFFSCREENCANVAS_SUPPORT=1"
+            "-s DOUBLE_MODE=0"
+            glfw
+        )
+    endif()
 
     # Disabling some warnings available since Clang 5
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)

@@ -171,7 +171,7 @@ int main() {
   window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
   window.addOverlayFpsCounter("FPS: %.1f");
 
-  while (app.run());
+  app.run();
 
   return EXIT_SUCCESS;
 }

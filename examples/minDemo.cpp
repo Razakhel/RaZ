@@ -21,7 +21,7 @@ int main() {
 
   render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
 
-  while (app.run());
+  app.run();
 
   return EXIT_SUCCESS;
 }
