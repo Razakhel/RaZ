@@ -65,7 +65,7 @@ script:
                 lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
                 lcov -r coverage.info '/usr/*' -o coverage.info &&
                 lcov -l coverage.info &&
-                coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
+                coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info;
             fi
         "
 
