@@ -148,6 +148,7 @@ void Renderer::setFaceCulling(FaceOrientation orientation) {
 }
 
 void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
+#if !defined(USE_OPENGL_ES)
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glPolygonMode(static_cast<unsigned int>(orientation), static_cast<unsigned int>(mode));
@@ -155,6 +156,7 @@ void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
 #if !defined(NDEBUG)
   printErrors();
 #endif
+#endif // !defined(USE_OPENGL_ES)
 }
 
 void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data) {

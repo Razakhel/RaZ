@@ -48,6 +48,9 @@ if (WIN32 OR CYGWIN)
 elseif (APPLE)
     set(RAZ_PLATFORM_MAC ON)
     target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_MAC)
+elseif (RAZ_USE_EMSCRIPTEN)
+    set(RAZ_PLATFORM_EMSCRIPTEN ON)
+    target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_EMSCRIPTEN USE_OPENGL_ES)
 elseif (UNIX)
     set(RAZ_PLATFORM_LINUX ON)
     target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_LINUX)
@@ -124,7 +127,11 @@ if (ENABLE_DEBUG_INFO)
     )
 endif ()
 
-target_compile_definitions(RaZ PUBLIC RAZ_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
+if (RAZ_USE_EMSCRIPTEN)
+    target_compile_definitions(RaZ PUBLIC RAZ_ROOT="/")
+else ()
+    target_compile_definitions(RaZ PUBLIC RAZ_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
+endif ()
 
 ########################
 # RaZ - Compiler flags #
