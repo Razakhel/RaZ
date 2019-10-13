@@ -8,6 +8,7 @@ namespace Raz {
 Cubemap::Cubemap() {
   Renderer::generateTexture(m_index);
 
+#if !defined(__EMSCRIPTEN__)
   const std::string vertSource = R"(
     #version 330 core
 
@@ -40,6 +41,46 @@ Cubemap::Cubemap() {
       fragColor = texture(uniSkybox, fragTexcoords);
     }
   )";
+#else
+  // version must be on first line
+  const std::string vertSource = R"(#version 300 es
+
+    precision highp float;
+    precision highp int;
+
+    layout (location = 0) in vec3 vertPosition;
+
+    layout (std140) uniform uboCubemapMatrix {
+      mat4 viewProjMat;
+    };
+
+    out vec3 fragTexcoords;
+
+    void main() {
+      fragTexcoords = vertPosition;
+
+      vec4 pos = viewProjMat * vec4(vertPosition, 1.0);
+      gl_Position = pos.xyww;
+    }
+  )";
+
+  // version must be on first line
+  const std::string fragSource = R"(#version 300 es
+
+    precision highp float;
+    precision highp int;
+
+    in vec3 fragTexcoords;
+
+    uniform samplerCube uniSkybox;
+
+    layout (location = 0) out vec4 fragColor;
+
+    void main() {
+      fragColor = texture(uniSkybox, fragTexcoords);
+    }
+  )";
+#endif
 
   m_program.setVertexShader(VertexShader::loadFromSource(vertSource));
   m_program.setFragmentShader(FragmentShader::loadFromSource(fragSource));

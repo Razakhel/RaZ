@@ -5,115 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-#################
-# RaZ - Library #
-#################
-
-option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
-if (RAZ_BUILD_STATIC)
-    add_library(RaZ STATIC)
-else ()
-    add_library(RaZ SHARED)
-endif ()
-
-##########################
-# RaZ - Useful variables #
-##########################
-
-if (MSVC)
-    set(RAZ_COMPILER_MSVC ON)
-    target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_MSVC)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(RAZ_COMPILER_CLANG ON)
-    target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_CLANG)
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(RAZ_COMPILER_GCC ON)
-    target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_GCC)
-endif ()
-
-if (WIN32 OR CYGWIN)
-    set(RAZ_PLATFORM_WINDOWS ON)
-    target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_WINDOWS)
-elseif (APPLE)
-    set(RAZ_PLATFORM_MAC ON)
-    target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_MAC)
-elseif (UNIX)
-    set(RAZ_PLATFORM_LINUX ON)
-    target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_LINUX)
-endif ()
-
-if (RAZ_COMPILER_MSVC)
-    set(RAZ_CONFIG_DEBUG   "$<IF:$<CONFIG:Debug>,ON,OFF>")
-    set(RAZ_CONFIG_RELEASE "$<IF:$<CONFIG:Debug>,OFF,ON>")
-    set(RAZ_CONFIG_SHORT   "$<IF:$<CONFIG:Debug>,Debug,Release>")
-
-    target_compile_definitions(RaZ PUBLIC $<IF:$<CONFIG:Debug>,RAZ_CONFIG_DEBUG,RAZ_CONFIG_RELEASE>)
-
-    set(CONFIG_STR_UPPER $<UPPER_CASE:$<CONFIG>>)
-else ()
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(RAZ_CONFIG_DEBUG   ON)
-        set(RAZ_CONFIG_RELEASE OFF)
-        set(RAZ_CONFIG_SHORT   "Debug")
-
-        target_compile_definitions(RaZ PUBLIC RAZ_CONFIG_DEBUG)
-    else ()
-        set(RAZ_CONFIG_DEBUG   OFF)
-        set(RAZ_CONFIG_RELEASE ON)
-        set(RAZ_CONFIG_SHORT   "Release")
-
-        target_compile_definitions(RaZ PUBLIC RAZ_CONFIG_RELEASE)
-    endif ()
-
-    string(TOUPPER ${CMAKE_BUILD_TYPE} CONFIG_STR_UPPER)
-endif ()
-
-set(RAZ_BUILD_FLAGS "${CMAKE_CXX_FLAGS_${CONFIG_STR_UPPER}}")
-
-option(ENABLE_DEBUG_INFO "Creates a debug target which prints useful values" OFF)
-
-if (ENABLE_DEBUG_INFO)
-    cmake_host_system_information(RESULT PLATFORM_RELEASE QUERY OS_RELEASE)
-    cmake_host_system_information(RESULT PLATFORM_VERSION QUERY OS_VERSION)
-
-    # Trimming potential leading & trailing space characters (happens for Windows' values)
-    string(STRIP ${PLATFORM_RELEASE} PLATFORM_RELEASE)
-    string(STRIP ${PLATFORM_VERSION} PLATFORM_VERSION)
-
-    add_custom_target(
-        RaZ_PrintDebugInfo
-
-        ${CMAKE_COMMAND} -E echo "" &&
-        ${CMAKE_COMMAND} -E echo "####################" &&
-        ${CMAKE_COMMAND} -E echo "# [RaZ] Debug info #" &&
-        ${CMAKE_COMMAND} -E echo "####################" &&
-        ${CMAKE_COMMAND} -E echo "" &&
-
-        ${CMAKE_COMMAND} -E echo "--- Platform" &&
-        ${CMAKE_COMMAND} -E echo "  Name:    ${CMAKE_SYSTEM_NAME}" &&
-        ${CMAKE_COMMAND} -E echo "  Release: ${PLATFORM_RELEASE}" &&
-        ${CMAKE_COMMAND} -E echo "  Version: ${PLATFORM_VERSION}" &&
-        ${CMAKE_COMMAND} -E echo "" &&
-
-        ${CMAKE_COMMAND} -E echo "--- Compiler" &&
-        ${CMAKE_COMMAND} -E echo "  ID:      ${CMAKE_CXX_COMPILER_ID}" &&
-        ${CMAKE_COMMAND} -E echo "  Version: ${CMAKE_CXX_COMPILER_VERSION}" &&
-        ${CMAKE_COMMAND} -E echo "  Path:    ${CMAKE_CXX_COMPILER}" &&
-        ${CMAKE_COMMAND} -E echo "" &&
-
-        ${CMAKE_COMMAND} -E echo "--- Configuration" &&
-        ${CMAKE_COMMAND} -E echo "  Name:               $<CONFIG>" &&
-        ${CMAKE_COMMAND} -E echo "  RAZ_CONFIG_DEBUG:   ${RAZ_CONFIG_DEBUG}" &&
-        ${CMAKE_COMMAND} -E echo "  RAZ_CONFIG_RELEASE: ${RAZ_CONFIG_RELEASE}" &&
-        ${CMAKE_COMMAND} -E echo "  RAZ_CONFIG_SHORT:   ${RAZ_CONFIG_SHORT}" &&
-        ${CMAKE_COMMAND} -E echo "" &&
-
-        ${CMAKE_COMMAND} -E echo "--- Build flags: '${RAZ_BUILD_FLAGS}'" &&
-        ${CMAKE_COMMAND} -E echo ""
-    )
-endif ()
-
-target_compile_definitions(RaZ PUBLIC RAZ_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
+# detect
+if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+  set(RAZ_EMSCRIPTEN true)
+endif()
 
 ########################
 # RaZ - Compiler flags #
@@ -250,6 +145,29 @@ elseif (RAZ_COMPILER_CLANG)
         -Wno-switch-enum
         -Wno-weak-vtables
     )
+
+    if (RAZ_EMSCRIPTEN)
+        set(
+            RAZ_COMPILER_FLAGS
+            ${RAZ_COMPILER_FLAGS}
+
+            "SHELL:-s USE_GLFW=3"
+            "SHELL:-s USE_LIBPNG=1"
+        )
+
+        set(
+            RAZ_LINKER_FLAGS
+            ${RAZ_LINKER_FLAGS}
+
+            "-s USE_LIBPNG=1"
+            "-s USE_GLFW=3"
+            "-s USE_WEBGL2=1"
+            "-s OFFSCREEN_FRAMEBUFFER=1"
+            "-s OFFSCREENCANVAS_SUPPORT=1"
+            "-s DOUBLE_MODE=0"
+            glfw
+        )
+    endif()
 
     # Disabling some warnings available since Clang 5
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)

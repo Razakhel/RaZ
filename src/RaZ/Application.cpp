@@ -1,5 +1,9 @@
 #include "RaZ/Application.hpp"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 namespace Raz {
 
 World& Application::addWorld(World world) {
@@ -9,7 +13,7 @@ World& Application::addWorld(World world) {
   return m_worlds.back();
 }
 
-bool Application::run() {
+bool Application::runOnce() {
   const auto currentTime = std::chrono::system_clock::now();
   m_deltaTime            = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - m_lastFrameTime).count();
   m_lastFrameTime        = currentTime;
@@ -20,6 +24,16 @@ bool Application::run() {
   }
 
   return m_isRunning && !m_activeWorlds.isEmpty();
+}
+
+void Application::run() {
+#ifdef __EMSCRIPTEN__
+  emscripten_set_main_loop_arg([](void* instance){
+    static_cast<decltype(this)>(instance)->runOnce();
+  }, this, 0, 1);
+#else
+  while (runOnce());
+#endif
 }
 
 } // namespace Raz

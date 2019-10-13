@@ -1,5 +1,11 @@
-#include "png/png.h"
-#include "png/zlib.h"
+#if defined(__EMSCRIPTEN__)
+    #include <png.h>
+    #include <zlib.h>
+#else
+    #include "png/png.h"
+    #include "png/zlib.h"
+#endif
+
 #include "RaZ/Utils/Image.hpp"
 
 #include <array>

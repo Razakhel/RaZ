@@ -141,8 +141,9 @@ int main() {
     cameraTrans.translate(0.f, 0.f, 0.5f * static_cast<float>(yOffset));
   });
 
-  while (app.run())
+  app.run([&]{
     meshTrans.rotate(45.0_deg * app.getDeltaTime(), Raz::Axis::Y);
+  });
 
   return EXIT_SUCCESS;
 }

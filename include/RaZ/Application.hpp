@@ -25,8 +25,14 @@ public:
   /// \return Reference to the newly added World.
   World& addWorld(World world);
   /// Runs the application.
+  void run();
+  /// Runs the application and call the given callable between each cycle.
+  /// \param callback the callback to call between each cycle
+  template <typename F>
+  void run(F&& callback);
+  /// Runs one cycle of the application.
   /// \return True if the application is still running, false otherwise.
-  bool run();
+  bool runOnce();
   /// Tells the application to stop running.
   void quit() { m_isRunning = false; }
 
@@ -40,5 +46,7 @@ private:
 };
 
 } // namespace Raz
+
+#include "RaZ/Application.inl"
 
 #endif // RAZ_APPLICATION_HPP
