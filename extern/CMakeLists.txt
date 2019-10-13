@@ -4,7 +4,7 @@
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
-if(NOT RAZ_EMSCRIPTEN)
+if (NOT RAZ_USE_EMSCRIPTEN)
 
     option(RAZ_USE_LIBPNG "Compile & use libpng" ON)
     if (RAZ_USE_LIBPNG)
@@ -26,9 +26,9 @@ if(NOT RAZ_EMSCRIPTEN)
         include(ImGui)
     endif ()
 
-else()
+else ()
     set(RAZ_USE_LIBPNG OFF)
     set(RAZ_USE_GLFW OFF)
     set(RAZ_USE_GLEW OFF)
     set(RAZ_USE_IMGUI ON)
-endif()
+endif ()

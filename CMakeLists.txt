@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # detect
-if(CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
-  set(RAZ_EMSCRIPTEN true)
-endif()
+if (CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
+  set(RAZ_USE_EMSCRIPTEN true)
+endif ()
 
 ########################
 # RaZ - Compiler flags #
@@ -146,7 +146,7 @@ elseif (RAZ_COMPILER_CLANG)
         -Wno-weak-vtables
     )
 
-    if (RAZ_EMSCRIPTEN)
+    if (RAZ_USE_EMSCRIPTEN)
         set(
             RAZ_COMPILER_FLAGS
             ${RAZ_COMPILER_FLAGS}
@@ -167,7 +167,7 @@ elseif (RAZ_COMPILER_CLANG)
             "-s DOUBLE_MODE=0"
             glfw
         )
-    endif()
+    endif ()
 
     # Disabling some warnings available since Clang 5
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)

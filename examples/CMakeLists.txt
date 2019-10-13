@@ -11,11 +11,11 @@ target_link_libraries(RaZ_MinDemo RaZ)
 add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
 target_link_libraries(RaZ_ShowcaseDemo RaZ)
 
-if(RAZ_EMSCRIPTEN)
+if (RAZ_USE_EMSCRIPTEN)
     set_target_properties(RaZ_FullDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_MinDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_ShowcaseDemo PROPERTIES SUFFIX ".html")
-endif()
+endif ()
 
 
 # If FBX SDK used with MSVC, copy the DLL into the examples/ folder to link it properly
