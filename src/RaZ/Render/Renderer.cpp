@@ -113,6 +113,26 @@ bool Renderer::isEnabled(Capability capability) {
   return isEnabled;
 }
 
+void Renderer::setDepthFunction(DepthFunction func) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDepthFunc(static_cast<unsigned int>(func));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setFaceCulling(FaceCulling cull) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glCullFace(static_cast<unsigned int>(cull));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

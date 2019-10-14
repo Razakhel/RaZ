@@ -41,6 +41,23 @@ enum class Capability : unsigned int {
   DEBUG_OUTPUT_SYNCHRONOUS = 33346  // GL_DEBUG_OUTPUT_SYNCHRONOUS
 };
 
+enum class DepthFunction : unsigned int {
+  NEVER         = 512, // GL_NEVER
+  EQUAL         = 514, // GL_EQUAL
+  NOT_EQUAL     = 517, // GL_NOTEQUAL
+  LESS          = 513, // GL_LESS
+  LESS_EQUAL    = 515, // GL_LEQUAL
+  GREATER       = 516, // GL_GREATER
+  GREATER_EQUAL = 518, // GL_GEQUAL
+  ALWAYS        = 519  // GL_ALWAYS
+};
+
+enum class FaceCulling : unsigned int {
+  FRONT      = 1028, // GL_FRONT
+  BACK       = 1029, // GL_BACK
+  FRONT_BACK = 1032  // GL_FRONT_AND_BACK
+};
+
 enum class MaskType : unsigned int {
   COLOR   = 16384, // GL_COLOR_BUFFER_BIT
   DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
@@ -151,6 +168,8 @@ public:
   static void clear(MaskType type1, MaskType type2, MaskType type3) { clear(static_cast<unsigned int>(type1)
                                                                           | static_cast<unsigned int>(type2)
                                                                           | static_cast<unsigned int>(type3)); }
+  static void setDepthFunction(DepthFunction func);
+  static void setFaceCulling(FaceCulling cull);
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }
   static void generateBuffer(unsigned int& index) { generateBuffers(1, &index); }
