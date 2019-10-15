@@ -9,8 +9,8 @@ namespace Raz {
 
 namespace {
 
-Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
-                     const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
+inline Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
+                            const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
   const Vec3f firstEdge = secondPos - firstPos;
   const Vec3f secondEdge = thirdPos - firstPos;
 
@@ -24,7 +24,7 @@ Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f&
   return tangent;
 }
 
-TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textureFileName) {
+inline TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textureFileName) {
   static std::unordered_map<std::string, TexturePtr> loadedTextures;
 
   TexturePtr map {};

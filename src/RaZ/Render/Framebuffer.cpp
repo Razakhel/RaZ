@@ -16,7 +16,7 @@ Framebuffer::Framebuffer(ShaderProgram& program) : Framebuffer() {
 }
 
 Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
-  : m_index{ std::exchange(fbo.m_index, GL_INVALID_INDEX) },
+  : m_index{ std::exchange(fbo.m_index, std::numeric_limits<unsigned int>::max()) },
     m_depthBuffer{ std::move(fbo.m_depthBuffer) },
     m_colorBuffer{ std::move(fbo.m_colorBuffer) },
     m_normalBuffer{ std::move(fbo.m_normalBuffer) } {
@@ -116,7 +116,7 @@ Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
 }
 
 Framebuffer::~Framebuffer() {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   Renderer::deleteFramebuffer(m_index);

@@ -13,7 +13,7 @@ ShaderProgram::ShaderProgram()
   : m_index{ Renderer::createProgram() } {}
 
 ShaderProgram::ShaderProgram(ShaderProgram&& program) noexcept
-  : m_index{ std::exchange(program.m_index, GL_INVALID_INDEX) },
+  : m_index{ std::exchange(program.m_index, std::numeric_limits<unsigned int>::max()) },
     m_vertShader{ std::move(program.m_vertShader) },
     m_fragShader{ std::move(program.m_fragShader) },
     m_geomShader{ std::move(program.m_geomShader) },
@@ -200,7 +200,7 @@ ShaderProgram& ShaderProgram::operator=(ShaderProgram&& program) noexcept {
 }
 
 ShaderProgram::~ShaderProgram() {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   Renderer::deleteProgram(m_index);

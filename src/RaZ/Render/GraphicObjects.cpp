@@ -9,7 +9,7 @@ VertexArray::VertexArray() {
 }
 
 VertexArray::VertexArray(VertexArray&& vao) noexcept
-  : m_index{ std::exchange(vao.m_index, GL_INVALID_INDEX) } {}
+  : m_index{ std::exchange(vao.m_index, std::numeric_limits<unsigned int>::max()) } {}
 
 void VertexArray::bind() const {
   glBindVertexArray(m_index);
@@ -34,7 +34,7 @@ VertexBuffer::VertexBuffer() {
 }
 
 VertexBuffer::VertexBuffer(VertexBuffer&& vbo) noexcept
-  : m_index{ std::exchange(vbo.m_index, GL_INVALID_INDEX) }, m_vertices{ std::move(vbo.m_vertices) } {}
+  : m_index{ std::exchange(vbo.m_index, std::numeric_limits<unsigned int>::max()) }, m_vertices{ std::move(vbo.m_vertices) } {}
 
 void VertexBuffer::bind() const {
   Renderer::bindBuffer(BufferType::ARRAY_BUFFER, m_index);
@@ -52,7 +52,7 @@ VertexBuffer& VertexBuffer::operator=(VertexBuffer&& vbo) noexcept {
 }
 
 VertexBuffer::~VertexBuffer() {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   glDeleteBuffers(1, &m_index);
@@ -66,7 +66,7 @@ IndexBuffer::IndexBuffer() {
 }
 
 IndexBuffer::IndexBuffer(IndexBuffer&& ibo) noexcept
-  : m_index{ std::exchange(ibo.m_index, GL_INVALID_INDEX) },
+  : m_index{ std::exchange(ibo.m_index, std::numeric_limits<unsigned int>::max()) },
     m_lineIndices{ std::move(ibo.m_lineIndices) },
     m_triangleIndices{ std::move(ibo.m_triangleIndices) } {}
 
@@ -87,7 +87,7 @@ IndexBuffer& IndexBuffer::operator=(IndexBuffer&& ibo) noexcept {
 }
 
 IndexBuffer::~IndexBuffer() {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   glDeleteBuffers(1, &m_index);

@@ -42,7 +42,7 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
 }
 
 Texture::Texture(Texture&& texture) noexcept
-  : m_index{ std::exchange(texture.m_index, GL_INVALID_INDEX) }, m_image{ std::move(texture.m_image) } {}
+  : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) }, m_image{ std::move(texture.m_image) } {}
 
 TexturePtr Texture::recoverTexture(TexturePreset preset) {
   static const std::array<TexturePtr, static_cast<std::size_t>(TexturePreset::PRESET_COUNT)> texturePresets = {
@@ -131,7 +131,7 @@ Texture& Texture::operator=(Texture&& texture) noexcept {
 }
 
 Texture::~Texture() {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   glDeleteTextures(1, &m_index);
