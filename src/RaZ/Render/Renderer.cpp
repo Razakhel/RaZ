@@ -543,7 +543,107 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   return location;
 }
 
-void Renderer::generateFramebuffers(unsigned int count, unsigned int* indices) {
+void Renderer::sendUniform(int uniformIndex, int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1i(uniformIndex, value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniform(int uniformIndex, unsigned int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1ui(uniformIndex, value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniform(int uniformIndex, float value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1f(uniformIndex, value);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniformVector1(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniformVector2(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform2fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniformVector3(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform3fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniformVector4(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform4fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniformMatrix2x2(int uniformIndex, const float* values, int count, bool transpose) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniformMatrix2fv(uniformIndex, count, transpose, values);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniformMatrix3x3(int uniformIndex, const float* values, int count, bool transpose) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniformMatrix3fv(uniformIndex, count, transpose, values);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendUniformMatrix4x4(int uniformIndex, const float* values, int count, bool transpose) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniformMatrix4fv(uniformIndex, count, transpose, values);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::generateFramebuffers(int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glGenFramebuffers(count, indices);

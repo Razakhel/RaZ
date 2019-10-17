@@ -240,8 +240,63 @@ public:
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
+  /// Gets the uniform's location (ID) corresponding to the given name.
+  /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).
+  /// \param programIndex Index of the shader program to which is bound the uniform.
+  /// \param uniformName Name of the uniform to recover the location from.
+  /// \return Location (ID) of the uniform.
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
-  static void generateFramebuffers(unsigned int count, unsigned int* indices);
+  /// Sends an integer as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param value Integer to be sent.
+  static void sendUniform(int uniformIndex, int value);
+  /// Sends an unsigned integer as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param value Unsigned integer to be sent.
+  static void sendUniform(int uniformIndex, unsigned int value);
+  /// Sends a floating-point value as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param value Floating-point value to be sent.
+  static void sendUniform(int uniformIndex, float value);
+  /// Sends a floating-point 1D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector1(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 2D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector2(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 3D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector3(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 4D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector4(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 2x2 matrix as uniform.
+  /// \param uniformIndex Index of the uniform to send the matrix's data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of matrices to be sent.
+  /// \param transpose Defines whether the matrix should be transposed when sent; false if sending it as column-major, true if row-major.
+  static void sendUniformMatrix2x2(int uniformIndex, const float* values, int count = 1, bool transpose = false);
+  /// Sends a floating-point 3x3 matrix as uniform.
+  /// \param uniformIndex Index of the uniform to send the matrix's data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of matrices to be sent.
+  /// \param transpose Defines whether the matrix should be transposed when sent; false if sending it as column-major, true if row-major.
+  static void sendUniformMatrix3x3(int uniformIndex, const float* values, int count = 1, bool transpose = false);
+  /// Sends a floating-point 4x4 matrix as uniform.
+  /// \param uniformIndex Index of the uniform to send the matrix's data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of matrices to be sent.
+  /// \param transpose Defines whether the matrix should be transposed when sent; false if sending it as column-major, true if row-major.
+  static void sendUniformMatrix4x4(int uniformIndex, const float* values, int count = 1, bool transpose = false);
+  static void generateFramebuffers(int count, unsigned int* indices);
   template <std::size_t N> static void generateFramebuffers(unsigned int (&indices)[N]) { generateFramebuffers(N, indices); }
   static void generateFramebuffer(unsigned int& index) { generateFramebuffers(1, &index); }
   static void bindFramebuffer(unsigned int index);
