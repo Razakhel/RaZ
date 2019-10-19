@@ -119,7 +119,7 @@ void Image::savePng(std::ofstream& file, bool flipVertically) const {
   if (!infoStruct)
     throw std::runtime_error("Error: Couldn't initialize PNG info struct");
 
-  uint32_t colorType {};
+  int colorType {};
   switch (m_colorspace) {
     case ImageColorspace::GRAY:
     case ImageColorspace::DEPTH:
@@ -161,7 +161,7 @@ void Image::savePng(std::ofstream& file, bool flipVertically) const {
 
   png_set_write_fn(writeStruct, &file, [] (png_structp pngWritePtr, png_bytep data, png_size_t length) {
     png_voidp outPtr = png_get_io_ptr(pngWritePtr);
-    static_cast<std::ostream*>(outPtr)->write(reinterpret_cast<const char*>(data), length);
+    static_cast<std::ostream*>(outPtr)->write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(length));
   }, nullptr);
   png_write_info(writeStruct, infoStruct);
 

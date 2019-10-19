@@ -274,7 +274,8 @@ bool Window::run(float deltaTime) {
 }
 
 Vec2f Window::recoverMousePosition() const {
-  double xPos {}, yPos {};
+  double xPos {};
+  double yPos {};
   glfwGetCursorPos(m_window, &xPos, &yPos);
 
   return Vec2f({ static_cast<float>(xPos), static_cast<float>(yPos) });

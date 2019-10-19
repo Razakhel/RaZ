@@ -34,8 +34,8 @@ public:
   static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
 
   void addLabel(std::string label);
-  void addButton(std::string label, std::function<void()> action);
-  void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
+  void addButton(std::string label, std::function<void()> clickAction);
+  void addCheckbox(std::string label, std::function<void()> checkAction, std::function<void()> uncheckAction, bool initVal);
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
   void addSeparator();
   void addFrameTime(std::string formattedLabel);
@@ -91,7 +91,7 @@ private:
   };
 
   struct OverlayButton : public OverlayElement {
-    OverlayButton(std::string label, std::function<void()> action) : OverlayElement(std::move(label)), action{ std::move(action) } {}
+    OverlayButton(std::string label, std::function<void()> clickAction) : OverlayElement(std::move(label)), action{ std::move(clickAction) } {}
 
     OverlayElementType getType() const override { return OverlayElementType::BUTTON; }
 
@@ -102,8 +102,8 @@ private:
   };
 
   struct OverlayCheckbox : public OverlayElement {
-    OverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal)
-      : OverlayElement(std::move(label)), actionOn{ std::move(actionOn) }, actionOff{ std::move(actionOff) }, isChecked{ initVal } {}
+    OverlayCheckbox(std::string label, std::function<void()> checkAction, std::function<void()> uncheckAction, bool initVal)
+      : OverlayElement(std::move(label)), actionOn{ std::move(checkAction) }, actionOff{ std::move(uncheckAction) }, isChecked{ initVal } {}
 
     OverlayElementType getType() const override { return OverlayElementType::CHECKBOX; }
 

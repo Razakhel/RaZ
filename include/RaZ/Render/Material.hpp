@@ -3,12 +3,12 @@
 #ifndef RAZ_MATERIAL_HPP
 #define RAZ_MATERIAL_HPP
 
-#include <unordered_map>
-
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Texture.hpp"
+
+#include <unordered_map>
 
 namespace Raz {
 

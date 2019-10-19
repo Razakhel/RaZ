@@ -3,13 +3,13 @@
 #ifndef RAZ_CUBEMAP_HPP
 #define RAZ_CUBEMAP_HPP
 
-#include <memory>
-#include <string>
-
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Utils/Image.hpp"
+
+#include <memory>
+#include <string>
 
 namespace Raz {
 

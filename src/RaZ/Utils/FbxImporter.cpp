@@ -1,9 +1,9 @@
+#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
+
 #include <fbxsdk.h>
 #include <fstream>
 #include <iostream>
-
-#include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
 
 namespace Raz {
 

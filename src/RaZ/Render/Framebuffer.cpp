@@ -1,8 +1,8 @@
-#include <iostream>
-
 #include "GL/glew.h"
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/Renderer.hpp"
+
+#include <iostream>
 
 namespace Raz {
 
