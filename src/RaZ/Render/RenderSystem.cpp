@@ -171,7 +171,7 @@ void RenderSystem::updateLights() const {
     }
   }
 
-  m_programs.front().sendUniform("uniLightCount", lightCount);
+  m_programs.front().sendUniform("uniLightCount", static_cast<unsigned int>(lightCount));
 }
 
 void RenderSystem::updateShaders() const {
