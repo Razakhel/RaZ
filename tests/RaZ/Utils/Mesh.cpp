@@ -3,7 +3,7 @@
 #include "RaZ/Render/Mesh.hpp"
 
 TEST_CASE("Mesh imported OBJ quad faces") {
-  const Raz::Mesh mesh("../../assets/meshes/ballQuads.obj");
+  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "../assets/meshes/ballQuads.obj"s);
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 439);
@@ -14,7 +14,7 @@ TEST_CASE("Mesh imported OBJ quad faces") {
 
 #if defined(FBX_ENABLED)
 TEST_CASE("Mesh imported FBX") {
-  const Raz::Mesh mesh("../../assets/meshes/shaderBall.fbx");
+  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "../assets/meshes/shaderBall.fbx"s);
 
   CHECK(mesh.getSubmeshes().size() == 8);
   CHECK(mesh.recoverVertexCount() == 40004);

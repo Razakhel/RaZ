@@ -10,6 +10,8 @@
 #include <iomanip>
 #include <sstream>
 
+using namespace std::literals;
+
 /// Custom Catch matcher, which checks for near-equality between floating point values.
 /// \tparam T Type of the value to be compared to.
 /// \tparam TolT Tolerance type, which may differ from the value type.
