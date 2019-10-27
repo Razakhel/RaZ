@@ -5,11 +5,31 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+##########################
+# RaZ - Useful variables #
+##########################
+
+if (MSVC)
+    set(RAZ_COMPILER_MSVC ON)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(RAZ_COMPILER_CLANG ON)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(RAZ_COMPILER_GCC ON)
+endif ()
+
+if (WIN32 OR CYGWIN)
+    set(RAZ_PLATFORM_WINDOWS ON)
+elseif (APPLE)
+    set(RAZ_PLATFORM_MAC ON)
+elseif (UNIX)
+    set(RAZ_PLATFORM_LINUX ON)
+endif ()
+
 ########################
 # RaZ - Compiler flags #
 ########################
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (RAZ_COMPILER_GCC)
     set(
         RAZ_COMPILER_FLAGS
 
@@ -96,7 +116,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # Enabling code coverage
     option(RAZ_ENABLE_COVERAGE "Enable code coverage (GCC only)" OFF)
 
-    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" AND RAZ_ENABLE_COVERAGE)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND RAZ_ENABLE_COVERAGE)
         set(
             RAZ_COMPILER_FLAGS
 
@@ -116,7 +136,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
             gcov
         )
     endif ()
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+elseif (RAZ_COMPILER_CLANG)
     set(
         RAZ_COMPILER_FLAGS
 
@@ -148,13 +168,16 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             -Wno-unused-template
         )
     endif ()
-elseif (MSVC)
+elseif (RAZ_COMPILER_MSVC)
     set(
         RAZ_COMPILER_FLAGS
 
         /W4
         /permissive-
     )
+
+    # To automatically export all the classes & functions
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif ()
 
 ######################
@@ -190,7 +213,7 @@ file(
 )
 
 # Defining platform-dependent options & linking flags
-if (UNIX AND NOT APPLE) # Linux
+if (RAZ_PLATFORM_LINUX)
     option(RAZ_USE_SANITIZERS "Use sanitizers" OFF)
 
     if (RAZ_USE_SANITIZERS)
@@ -208,16 +231,13 @@ if (UNIX AND NOT APPLE) # Linux
             ubsan
         )
     endif ()
-elseif (WIN32)
-    # To automatically export all the classes & functions
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif ()
 
 #########################
 # RaZ - FBX file format #
 #########################
 
-if (MSVC OR CMAKE_COMPILER_IS_GNUCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is triggered by IS_GNUCC
+if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_GCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is considered as GCC
     option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" OFF)
 
     if (RAZ_USE_FBX)
@@ -266,7 +286,7 @@ if (FBX_FOUND)
     target_compile_definitions(RaZ PRIVATE ${FBX_DEFS})
 endif ()
 
-if (NOT MSVC)
+if (NOT RAZ_COMPILER_MSVC)
     # Defining the compiler flags only for C++; this doesn't work with MSVC
     set(RAZ_COMPILER_FLAGS $<$<COMPILE_LANGUAGE:CXX>:${RAZ_COMPILER_FLAGS}>)
 endif ()
@@ -318,7 +338,7 @@ endif ()
 ######################
 
 # Installing the library
-if (WIN32)
+if (RAZ_PLATFORM_WINDOWS)
     set(CMAKE_INSTALL_PREFIX "C:/RaZ")
 endif ()
 
@@ -328,6 +348,6 @@ install(TARGETS RaZ DESTINATION "lib/$<CONFIG>")
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ" DESTINATION include)
 
 # If FBX SDK used, install the DLL file into the bin/ folder
-if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)
+if (RAZ_COMPILER_MSVC AND RAZ_USE_FBX AND FBX_FOUND)
     install(FILES "${FBX_CONFIG_DLL}" DESTINATION "bin/$<CONFIG>")
 endif ()
