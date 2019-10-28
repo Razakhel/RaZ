@@ -295,6 +295,12 @@ endif ()
 target_compile_options(RaZ PRIVATE ${RAZ_COMPILER_FLAGS})
 target_link_libraries(RaZ PRIVATE ${RAZ_LINKER_FLAGS})
 
+# Cygwin's Clang needs to use GCC's standard library
+if (CYGWIN AND RAZ_COMPILER_CLANG)
+    target_compile_options(RaZ PRIVATE -stdlib=libstdc++)
+    target_link_libraries(RaZ PRIVATE stdc++)
+endif ()
+
 # Compiling & linking external libraries
 add_subdirectory(extern)
 

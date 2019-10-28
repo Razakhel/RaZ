@@ -9,12 +9,12 @@ set(CMAKE_C_STANDARD 11)
 aux_source_directory(glew/src GLEW_SRC)
 
 # Defining preprocessor macros
-if (WIN32)
+if (WIN32 OR CYGWIN)
     set(
         GLEW_DEFINITIONS
 
         -DGLEW_BUILD
-        #-DGLEW_NO_GLU
+        -DGLEW_NO_GLU
     )
 
     set(
@@ -29,6 +29,18 @@ if (RAZ_BUILD_STATIC)
     add_library(GLEW STATIC ${GLEW_SRC})
 else ()
     add_library(GLEW SHARED ${GLEW_SRC})
+endif ()
+
+if (CYGWIN)
+    # Cygwin voluntarily removes the _WIN32 definition, which GLEW requires here
+    target_compile_definitions(GLEW PRIVATE -D_WIN32)
+
+    # Since ptrdiff_t is redefined with Clang, it needs some more tinkering...
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        # ptrdiff_t is actually redefined by GLEW; _PTR_DIFF_T_ is added so that this doesn't happen
+        # __need_ptrdiff_t is then defined so that the standard library can make the type available by itself
+        target_compile_definitions(GLEW PRIVATE -D_PTRDIFF_T_ -D__need_ptrdiff_t)
+    endif ()
 endif ()
 
 target_include_directories(GLEW SYSTEM PUBLIC glew/include)

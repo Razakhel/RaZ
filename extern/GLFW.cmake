@@ -9,7 +9,32 @@ set(CMAKE_C_STANDARD 11)
 aux_source_directory(glfw/src GLFW_FILES)
 
 # Defining preprocessor macros and selecting files to be removed
-if (APPLE)
+if (WIN32 OR CYGWIN)
+    set(
+        GLFW_DEFINITIONS
+
+        -D_GLFW_WIN32
+    )
+
+    file(
+        GLOB
+        GLFW_UNUSED_FILES
+
+        glfw/src/cocoa*
+        glfw/src/x11*
+        glfw/src/wl*
+        glfw/src/mir*
+        glfw/src/glx*
+        glfw/src/linux*
+        glfw/src/posix*
+        glfw/src/*.m
+    )
+
+    if (CYGWIN)
+        # GLFW needs to be linked against the Windows Gdi32 library with Cygwin
+        set(GLFW_LINKER_FLAGS Gdi32)
+    endif ()
+elseif (APPLE)
     set(
         GLFW_DEFINITIONS
 
@@ -61,26 +86,6 @@ elseif (UNIX)
         Xcursor
         Xinerama
         Xxf86vm
-    )
-elseif (WIN32)
-    set(
-        GLFW_DEFINITIONS
-
-        -D_GLFW_WIN32
-    )
-
-    file(
-        GLOB
-        GLFW_UNUSED_FILES
-
-        glfw/src/cocoa*
-        glfw/src/x11*
-        glfw/src/wl*
-        glfw/src/mir*
-        glfw/src/glx*
-        glfw/src/linux*
-        glfw/src/posix*
-        glfw/src/*.m
     )
 endif ()
 
