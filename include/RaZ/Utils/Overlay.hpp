@@ -5,9 +5,9 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
 
 // Forward declaration of GLFWwindow, to allow its usage into functions
 struct GLFWwindow;
@@ -35,8 +35,8 @@ public:
   static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
 
   void addLabel(std::string label);
-  void addButton(std::string label, std::function<void()> clickAction);
-  void addCheckbox(std::string label, std::function<void()> checkAction, std::function<void()> uncheckAction, bool initVal);
+  void addButton(std::string label, std::function<void()> actionClick);
+  void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
   void addSeparator();
   void addFrameTime(std::string formattedLabel);
@@ -47,42 +47,49 @@ public:
   ~Overlay();
 
 private:
-  struct OverlayElement;
+  class OverlayElement;
   using OverlayElementPtr = std::unique_ptr<OverlayElement>;
 
-  struct OverlayLabel;
+  class OverlayLabel;
   using OverlayLabelPtr = std::unique_ptr<OverlayLabel>;
 
-  struct OverlayButton;
+  class OverlayButton;
   using OverlayButtonPtr = std::unique_ptr<OverlayButton>;
 
-  struct OverlayCheckbox;
+  class OverlayCheckbox;
   using OverlayCheckboxPtr = std::unique_ptr<OverlayCheckbox>;
 
-  struct OverlayTextbox;
+  class OverlayTextbox;
   using OverlayTextboxPtr = std::unique_ptr<OverlayTextbox>;
 
-  struct OverlaySeparator;
+  class OverlaySeparator;
   using OverlaySeparatorPtr = std::unique_ptr<OverlaySeparator>;
 
-  struct OverlayFrameTime;
+  class OverlayFrameTime;
   using OverlayFrameTimePtr = std::unique_ptr<OverlayFrameTime>;
 
-  struct OverlayFpsCounter;
+  class OverlayFpsCounter;
   using OverlayFpsCounterPtr = std::unique_ptr<OverlayFpsCounter>;
 
-  struct OverlayElement {
+  class OverlayElement {
+    friend Overlay;
+
+  public:
     OverlayElement() = default;
-    explicit OverlayElement(std::string label) : label{ std::move(label) } {}
+    explicit OverlayElement(std::string label) : m_label{ std::move(label) } {}
 
     virtual OverlayElementType getType() const = 0;
 
     virtual ~OverlayElement() = default;
 
-    std::string label {};
+  private:
+    std::string m_label {};
   };
 
-  struct OverlayLabel : public OverlayElement {
+  class OverlayLabel : public OverlayElement {
+    friend Overlay;
+
+  public:
     explicit OverlayLabel(std::string label) : OverlayElement(std::move(label)) {}
 
     OverlayElementType getType() const override { return OverlayElementType::LABEL; }
@@ -91,51 +98,65 @@ private:
     static OverlayLabelPtr create(Args&&... args) { return std::make_unique<OverlayLabel>(std::forward<Args>(args)...); }
   };
 
-  struct OverlayButton : public OverlayElement {
-    OverlayButton(std::string label, std::function<void()> clickAction) : OverlayElement(std::move(label)), action{ std::move(clickAction) } {}
+  class OverlayButton : public OverlayElement {
+    friend Overlay;
+
+  public:
+    OverlayButton(std::string label, std::function<void()> actionClick) : OverlayElement(std::move(label)), m_actionClick{ std::move(actionClick) } {}
 
     OverlayElementType getType() const override { return OverlayElementType::BUTTON; }
 
     template <typename... Args>
     static OverlayButtonPtr create(Args&&... args) { return std::make_unique<OverlayButton>(std::forward<Args>(args)...); }
 
-    std::function<void()> action {};
+  private:
+    std::function<void()> m_actionClick {};
   };
 
-  struct OverlayCheckbox : public OverlayElement {
-    OverlayCheckbox(std::string label, std::function<void()> checkAction, std::function<void()> uncheckAction, bool initVal)
-      : OverlayElement(std::move(label)), actionOn{ std::move(checkAction) }, actionOff{ std::move(uncheckAction) }, isChecked{ initVal } {}
+  class OverlayCheckbox : public OverlayElement {
+    friend Overlay;
+
+  public:
+    OverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal)
+      : OverlayElement(std::move(label)), m_actionOn{ std::move(actionOn) }, m_actionOff{ std::move(actionOff) }, m_isChecked{ initVal } {}
 
     OverlayElementType getType() const override { return OverlayElementType::CHECKBOX; }
 
     template <typename... Args>
     static OverlayCheckboxPtr create(Args&&... args) { return std::make_unique<OverlayCheckbox>(std::forward<Args>(args)...); }
 
-    std::function<void()> actionOn {};
-    std::function<void()> actionOff {};
-    bool isChecked {};
+  private:
+    std::function<void()> m_actionOn {};
+    std::function<void()> m_actionOff {};
+    bool m_isChecked {};
   };
 
-  struct OverlayTextbox : public OverlayElement {
-    OverlayTextbox(std::string label, std::function<void(const std::string&)> callback) : OverlayElement(std::move(label)), callback{ std::move(callback) } {}
+  class OverlayTextbox : public OverlayElement {
+    friend Overlay;
+
+  public:
+    OverlayTextbox(std::string label, std::function<void(const std::string&)> callback) : OverlayElement(std::move(label)), m_callback{ std::move(callback) } {}
 
     OverlayElementType getType() const override { return OverlayElementType::TEXTBOX; }
 
     template <typename... Args>
     static OverlayTextboxPtr create(Args&&... args) { return std::make_unique<OverlayTextbox>(std::forward<Args>(args)...); }
 
-    std::string text {};
-    std::function<void(const std::string&)> callback {};
+  private:
+    std::string m_text {};
+    std::function<void(const std::string&)> m_callback {};
   };
 
-  struct OverlaySeparator : public OverlayElement {
+  class OverlaySeparator : public OverlayElement {
+  public:
     OverlayElementType getType() const override { return OverlayElementType::SEPARATOR; }
 
     template <typename... Args>
     static OverlaySeparatorPtr create(Args&&... args) { return std::make_unique<OverlaySeparator>(std::forward<Args>(args)...); }
   };
 
-  struct OverlayFrameTime : public OverlayElement {
+  class OverlayFrameTime : public OverlayElement {
+  public:
     explicit OverlayFrameTime(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
 
     OverlayElementType getType() const override { return OverlayElementType::FRAME_TIME; }
@@ -144,7 +165,8 @@ private:
     static OverlayFrameTimePtr create(Args&&... args) { return std::make_unique<OverlayFrameTime>(std::forward<Args>(args)...); }
   };
 
-  struct OverlayFpsCounter : public OverlayElement {
+  class OverlayFpsCounter : public OverlayElement {
+  public:
     explicit OverlayFpsCounter(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
 
     OverlayElementType getType() const override { return OverlayElementType::FPS_COUNTER; }
