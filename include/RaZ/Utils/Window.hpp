@@ -23,7 +23,9 @@ using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks,
 /// Graphical window to render the scenes on, with input custom actions.
 class Window {
 public:
-  Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t AASampleCount = 1);
+  Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t antiAliasingSampleCount = 1);
+  Window(const Window&) = delete;
+  Window(Window&&) = default;
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -131,12 +133,16 @@ public:
   /// Closes the window.
   void close();
 
+  Window& operator=(const Window&) = delete;
+  Window& operator=(Window&&) = default;
+
   ~Window() { close(); }
 
 private:
   unsigned int m_width {};
   unsigned int m_height {};
   Vec4f m_clearColor = Vec4f({ 0.15f, 0.15f, 0.15f, 1.f });
+
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
   OverlayPtr m_overlay {};

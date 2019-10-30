@@ -681,7 +681,7 @@ void Renderer::checkErrors() {
       break;
 
     std::cerr << "OpenGL error - " << recoverGlErrorStr(errorCode) << " (code " << errorCode << ")\n";
-  };
+  }
 
   std::cerr << std::flush;
 }

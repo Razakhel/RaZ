@@ -20,9 +20,7 @@ bool ImageDataF::operator==(const ImageData& imgData) const {
   return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataF*>(&imgData)->data.cbegin());
 }
 
-Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace) : m_width{ width },
-                                                                                    m_height{ height },
-                                                                                    m_colorspace{ colorspace } {
+Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace) : m_width{ width }, m_height{ height }, m_colorspace{ colorspace } {
   switch (colorspace) {
     case ImageColorspace::DEPTH:
     case ImageColorspace::GRAY:

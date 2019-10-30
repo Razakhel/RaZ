@@ -15,8 +15,7 @@
 
 namespace Raz {
 
-Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t AASampleCount) : m_width{ width },
-                                                                                                           m_height{ height } {
+Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
   glfwSetErrorCallback([] (int error, const char* description) {
     std::cerr << "GLFW error " << error << ": " << description << std::endl;
   });
@@ -33,11 +32,15 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 #endif
 
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-  glfwWindowHint(GLFW_SAMPLES, AASampleCount);
+  glfwWindowHint(GLFW_RESIZABLE, false);
+  glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
+
+#if !defined(NDEBUG)
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+#endif
 
 #if defined(__APPLE__) // Setting the OpenGL forward compatibility is required on macOS
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 #endif
 
   m_window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);

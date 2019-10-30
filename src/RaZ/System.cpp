@@ -12,7 +12,7 @@ bool System::containsEntity(const EntityPtr& entity) {
 }
 
 void System::linkEntity(const EntityPtr& entity) {
-  m_entities.push_back(entity.get());
+  m_entities.emplace_back(entity.get());
 }
 
 void System::unlinkEntity(const EntityPtr& entity) {

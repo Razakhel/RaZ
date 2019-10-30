@@ -13,7 +13,7 @@ namespace Raz::StrUtils {
 /// \param character Character to be transformed.
 /// \return Lowercase character.
 inline char toLowercase(char& character) {
-  character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+  character = static_cast<char>(std::tolower(character));
   return character;
 }
 
@@ -29,7 +29,7 @@ inline std::string& toLowercase(std::string& text) {
 /// \param character Character to be transformed.
 /// \return Uppercase character.
 inline char toUppercase(char& character) {
-  character = static_cast<char>(std::toupper(static_cast<unsigned char>(character)));
+  character = static_cast<char>(std::toupper(character));
   return character;
 }
 
@@ -139,11 +139,11 @@ inline std::vector<std::string> split(std::string text, char delimiter) {
     const std::size_t delimPos = text.find_first_of(delimiter);
 
     if (delimPos > text.size()) {
-      parts.push_back(text);
+      parts.emplace_back(std::move(text));
       break;
     }
 
-    parts.push_back(text.substr(0, delimPos));
+    parts.emplace_back(text.substr(0, delimPos));
     trimRight(parts.back());
 
     text.erase(0, delimPos + 1);

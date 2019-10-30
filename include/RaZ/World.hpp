@@ -13,6 +13,8 @@ class World {
 public:
   World() = default;
   explicit World(std::size_t entityCount) { m_entities.reserve(entityCount); }
+  World(const World&) = delete;
+  World(World&&) noexcept = default;
 
   const std::vector<SystemPtr>& getSystems() const { return m_systems; }
   const std::vector<EntityPtr>& getEntities() const { return m_entities; }
@@ -56,6 +58,9 @@ public:
   bool update(float deltaTime);
   /// Refreshes the world, reorganizing its entities to optimize caching by moving the active entities in front.
   void refresh();
+
+  World& operator=(const World&) = delete;
+  World& operator=(World&&) noexcept = default;
 
 private:
   std::vector<SystemPtr> m_systems {};
