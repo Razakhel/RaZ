@@ -1,12 +1,12 @@
 #include <iostream>
 
 #include "GL/glew.h"
-#if defined(_WIN32)
-#if defined(_MSC_VER)
+#if defined(RAZ_PLATFORM_WINDOWS)
+#if defined(RAZ_COMPILER_MSVC)
 #define NOMINMAX
 #endif
 #include "GL/wglew.h"
-#elif defined(__gnu_linux__)
+#elif defined(RAZ_PLATFORM_LINUX)
 #include "GL/glxew.h"
 #endif
 #include "GLFW/glfw3.h"
@@ -39,7 +39,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
 
-#if defined(__APPLE__) // Setting the OpenGL forward compatibility is required on macOS
+#if defined(RAZ_PLATFORM_MAC) // Setting the OpenGL forward compatibility is required on macOS
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 #endif
 
@@ -80,10 +80,10 @@ void Window::enableFaceCulling(bool value) const {
 }
 
 bool Window::recoverVerticalSyncState() const {
-#if defined(_WIN32)
+#if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT())
     return static_cast<bool>(wglGetSwapIntervalEXT());
-#elif defined(__gnu_linux__)
+#elif defined(RAZ_PLATFORM_LINUX)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
     unsigned int interval;
     glXQueryDrawable(glXGetCurrentDisplay(), glXGetCurrentDrawable(), GLX_SWAP_INTERVAL_EXT, &interval);
@@ -97,12 +97,12 @@ bool Window::recoverVerticalSyncState() const {
 }
 
 void Window::enableVerticalSync(bool value) const {
-#if defined(_WIN32)
+#if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT()) {
     wglSwapIntervalEXT(static_cast<int>(value));
     return;
   }
-#elif defined(__gnu_linux__)
+#elif defined(RAZ_PLATFORM_LINUX)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
     glXSwapIntervalEXT(glXGetCurrentDisplay(), glXGetCurrentDrawable(), value);
     glXSwapIntervalMESA(static_cast<unsigned int>(value));

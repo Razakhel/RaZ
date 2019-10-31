@@ -70,7 +70,7 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
 void Renderer::initialize() {
   glewExperimental = GL_TRUE;
 
-#if !defined(__APPLE__) && defined(RAZ_USE_GL4) // Setting the debug message callback provokes a crash on macOS
+#if !defined(RAZ_PLATFORM_MAC) && defined(RAZ_USE_GL4) // Setting the debug message callback provokes a crash on macOS
   glDebugMessageCallback(&callbackDebugLog, nullptr);
   enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
 #endif

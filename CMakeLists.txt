@@ -5,24 +5,41 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+#################
+# RaZ - Library #
+#################
+
+option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
+if (RAZ_BUILD_STATIC)
+    add_library(RaZ STATIC)
+else ()
+    add_library(RaZ SHARED)
+endif ()
+
 ##########################
 # RaZ - Useful variables #
 ##########################
 
 if (MSVC)
     set(RAZ_COMPILER_MSVC ON)
+    target_compile_definitions(RaZ PUBLIC -DRAZ_COMPILER_MSVC)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(RAZ_COMPILER_CLANG ON)
+    target_compile_definitions(RaZ PUBLIC -DRAZ_COMPILER_CLANG)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(RAZ_COMPILER_GCC ON)
+    target_compile_definitions(RaZ PUBLIC -DRAZ_COMPILER_GCC)
 endif ()
 
 if (WIN32 OR CYGWIN)
     set(RAZ_PLATFORM_WINDOWS ON)
+    target_compile_definitions(RaZ PUBLIC -DRAZ_PLATFORM_WINDOWS)
 elseif (APPLE)
     set(RAZ_PLATFORM_MAC ON)
+    target_compile_definitions(RaZ PUBLIC -DRAZ_PLATFORM_MAC)
 elseif (UNIX)
     set(RAZ_PLATFORM_LINUX ON)
+    target_compile_definitions(RaZ PUBLIC -DRAZ_PLATFORM_LINUX)
 endif ()
 
 ########################
@@ -265,12 +282,7 @@ endif ()
 # RaZ - Build #
 ###############
 
-option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
-if (RAZ_BUILD_STATIC)
-    add_library(RaZ STATIC ${RAZ_FILES})
-else ()
-    add_library(RaZ SHARED ${RAZ_FILES})
-endif ()
+target_sources(RaZ PRIVATE ${RAZ_FILES})
 
 target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
