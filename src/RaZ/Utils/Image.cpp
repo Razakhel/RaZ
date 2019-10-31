@@ -43,10 +43,19 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
 
   m_bitDepth = 8;
 
-  ImageDataBPtr imgData = ImageDataB::create();
-  imgData->data.resize(width * height * m_channelCount);
+  const std::size_t imageDataSize = width * height * m_channelCount;
 
-  m_data = std::move(imgData);
+  if (colorspace == ImageColorspace::DEPTH) {
+    ImageDataFPtr imgData = ImageDataF::create();
+    imgData->data.resize(imageDataSize);
+
+    m_data = std::move(imgData);
+  } else {
+    ImageDataBPtr imgData = ImageDataB::create();
+    imgData->data.resize(imageDataSize);
+
+    m_data = std::move(imgData);
+  }
 }
 
 void Image::read(const std::string& filePath, bool flipVertically) {
