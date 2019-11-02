@@ -189,9 +189,27 @@ void RenderSystem::updateShaders() const {
   }
 }
 
-void RenderSystem::saveToImage(const std::string& fileName) const {
-  Image img(m_window.getWidth(), m_window.getHeight());
-  glReadPixels(0, 0, m_window.getWidth(), m_window.getHeight(), GL_RGB, GL_UNSIGNED_BYTE, img.getDataPtr());
+void RenderSystem::saveToImage(const std::string& fileName, TextureFormat format) const {
+  ImageColorspace colorspace = ImageColorspace::RGB;
+  TextureDataType dataType   = TextureDataType::UBYTE;
+
+  switch (format) {
+    case TextureFormat::DEPTH:
+      colorspace = ImageColorspace::DEPTH;
+      dataType   = TextureDataType::FLOAT;
+      break;
+
+    case TextureFormat::RGBA:
+    case TextureFormat::BGRA:
+      colorspace = ImageColorspace::RGBA;
+      break;
+
+    default:
+      break;
+  }
+
+  Image img(m_sceneWidth, m_sceneHeight, colorspace);
+  Renderer::recoverFrame(m_sceneWidth, m_sceneHeight, format, dataType, img.getDataPtr());
 
   img.save(fileName, true);
 }

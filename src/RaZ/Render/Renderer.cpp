@@ -133,6 +133,16 @@ void Renderer::setFaceCulling(FaceCulling cull) {
 #endif
 }
 
+void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glReadPixels(0, 0, static_cast<int>(width), static_cast<int>(height), static_cast<unsigned int>(format), static_cast<unsigned int>(dataType), data);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

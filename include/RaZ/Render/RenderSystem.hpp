@@ -74,7 +74,7 @@ public:
   void updateLights() const;
   void removeCubemap() { m_cubemap.reset(); }
   void updateShaders() const;
-  void saveToImage(const std::string& fileName) const;
+  void saveToImage(const std::string& fileName, TextureFormat format = TextureFormat::RGB) const;
   void destroy() override { m_window.setShouldClose(); }
 
 private:

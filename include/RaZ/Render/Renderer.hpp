@@ -103,6 +103,8 @@ enum class TextureParamValue : unsigned int {
 
 enum class TextureFormat : unsigned int {
   RED           = 6403,  // GL_RED
+  GREEN         = 6404,  // GL_GREEN
+  BLUE          = 6405,  // GL_BLUE
   RG            = 33319, // GL_RG
   RGB           = 6407,  // GL_RGB
   BGR           = 32992, // GL_BGR
@@ -110,6 +112,7 @@ enum class TextureFormat : unsigned int {
   BGRA          = 32993, // GL_BGRA
   SRGB          = 35904, // GL_SRGB
   DEPTH         = 6402,  // GL_DEPTH_COMPONENT
+  STENCIL       = 6401,  // GL_STENCIL_INDEX
   DEPTH_STENCIL = 34041  // GL_DEPTH_STENCIL
 };
 
@@ -170,6 +173,7 @@ public:
                                                                           | static_cast<unsigned int>(type3)); }
   static void setDepthFunction(DepthFunction func);
   static void setFaceCulling(FaceCulling cull);
+  static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }
   static void generateBuffer(unsigned int& index) { generateBuffers(1, &index); }
