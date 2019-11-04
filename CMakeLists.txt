@@ -263,12 +263,15 @@ if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_GCC AND NOT MINGW) # FBX SDK unavailable f
         if (FBX_FOUND)
             set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} "${FBX_LIB}")
 
+            target_compile_definitions(RaZ PUBLIC ${FBX_DEFINITIONS})
+            target_include_directories(RaZ PUBLIC "${FBX_INCLUDE}")
+
             message("--- FBX SDK linked")
         endif ()
     endif ()
 endif ()
 
-# If FBX SDK not found, do not compile FBX loader
+# If FBX SDK not used or found, do not compile FBX loader
 if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
     list(
         REMOVE_ITEM
@@ -290,12 +293,6 @@ target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 option(RAZ_USE_GL4 "Use OpenGL 4" OFF)
 if (RAZ_USE_GL4)
     target_compile_definitions(RaZ PRIVATE RAZ_USE_GL4)
-endif ()
-
-# FBX usage
-if (FBX_FOUND)
-    target_include_directories(RaZ PUBLIC "${FBX_INCLUDE}")
-    target_compile_definitions(RaZ PRIVATE ${FBX_DEFS})
 endif ()
 
 if (NOT RAZ_COMPILER_MSVC)
