@@ -221,7 +221,7 @@ set(
     include/RaZ/Utils/*.inl
 )
 
-# Adding recursively every file we want to compile
+# Adding every file to be compiled
 file(
     GLOB
     RAZ_FILES

@@ -25,11 +25,7 @@ if (WIN32 OR CYGWIN)
 endif ()
 
 # Building GLEW
-if (RAZ_BUILD_STATIC)
-    add_library(GLEW STATIC ${GLEW_SRC})
-else ()
-    add_library(GLEW SHARED ${GLEW_SRC})
-endif ()
+add_library(GLEW OBJECT ${GLEW_SRC})
 
 if (CYGWIN)
     # Cygwin voluntarily removes the _WIN32 definition, which GLEW requires here

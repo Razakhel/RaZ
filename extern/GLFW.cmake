@@ -105,11 +105,7 @@ list(
 )
 
 # Building GLFW
-if (RAZ_BUILD_STATIC)
-    add_library(GLFW STATIC ${GLFW_SRC})
-else ()
-    add_library(GLFW SHARED ${GLFW_SRC})
-endif ()
+add_library(GLFW OBJECT ${GLFW_SRC})
 
 target_include_directories(
     GLFW
