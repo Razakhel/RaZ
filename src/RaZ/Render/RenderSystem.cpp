@@ -1,4 +1,3 @@
-#include "GL/glew.h"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
@@ -8,62 +7,65 @@
 
 namespace Raz {
 
-RenderSystem::RenderSystem(unsigned int windowWidth, unsigned int windowHeight,
-                           const std::string& windowTitle) : m_window(windowWidth, windowHeight, windowTitle) {
-  m_camera.addComponent<Camera>(windowWidth, windowHeight);
-  m_camera.addComponent<Transform>();
+const GeometryPass& RenderSystem::getGeometryPass() const {
+  const RenderPassPtr& renderPass = m_renderPasses[static_cast<std::size_t>(RenderPassType::GEOMETRY)];
 
-  m_acceptedComponents.setBit(Component::getId<Mesh>());
-  m_acceptedComponents.setBit(Component::getId<Light>());
+  assert("Error: Geometry pass isn't enabled." && renderPass);
 
-  // Creating the SSR program & framebuffer
-  const auto ssrIndex = static_cast<std::size_t>(RenderPass::SSR);
-  m_programs[ssrIndex].setFragmentShader(FragmentShader("../../shaders/ssr.glsl"));
-  Framebuffer::assignVertexShader(m_programs[ssrIndex]);
-
-  // Initializing all our shader programs & framebuffers
-  for (std::size_t programIndex = 1; programIndex < m_programs.size(); ++programIndex) {
-    Framebuffer& framebuffer = m_framebuffers[programIndex];
-
-    framebuffer.resize(windowWidth, windowHeight);
-    framebuffer.initBuffers(m_programs[programIndex]);
-    framebuffer.mapBuffers();
-
-    m_cameraUbo.bindUniformBlock(m_programs[programIndex], "uboCameraMatrices", 0);
-  }
-
-  updateShaders();
-
-  m_cameraUbo.bindBufferBase(0);
+  return static_cast<const GeometryPass&>(*renderPass);
 }
 
-void RenderSystem::setProgram(RenderPass renderPass, ShaderProgram&& program) {
-  const auto programIndex = static_cast<std::size_t>(renderPass);
-  ShaderProgram& passProgram = m_programs[programIndex];
-  passProgram = std::move(program);
+const SSRPass& RenderSystem::getSSRPass() const {
+  const RenderPassPtr& renderPass = m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)];
 
-  if (renderPass != RenderPass::GEOMETRY)
-    Framebuffer::assignVertexShader(passProgram);
+  assert("Error: SSR pass isn't enabled." && renderPass);
 
-  passProgram.updateShaders();
-  enableRenderPass(programIndex);
+  return static_cast<const SSRPass&>(*renderPass);
+}
+
+void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
+  m_sceneWidth  = width;
+  m_sceneHeight = height;
+
+  Renderer::resizeViewport(0, 0, m_sceneWidth, m_sceneHeight);
+
+  if (m_window)
+    m_window->resize(m_sceneWidth, m_sceneHeight);
+
+  m_cameraEntity.getComponent<Camera>().resizeViewport(m_sceneWidth, m_sceneHeight);
+
+  for (RenderPassPtr& renderPass : m_renderPasses) {
+    if (renderPass)
+      renderPass->resize(width, height);
+  }
+}
+
+void RenderSystem::enableGeometryPass(VertexShader vertShader, FragmentShader fragShader) {
+  m_renderPasses[static_cast<std::size_t>(RenderPassType::GEOMETRY)] = std::make_unique<GeometryPass>(m_sceneWidth, m_sceneHeight,
+                                                                                                      std::move(vertShader), std::move(fragShader));
+}
+
+void RenderSystem::enableSSRPass(FragmentShader fragShader) {
+  m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)] = std::make_unique<SSRPass>(m_sceneWidth, m_sceneHeight, std::move(fragShader));
 }
 
 void RenderSystem::linkEntity(const EntityPtr& entity) {
   System::linkEntity(entity);
 
   if (entity->hasComponent<Mesh>())
-    entity->getComponent<Mesh>().load(m_programs.front());
+    entity->getComponent<Mesh>().load(m_renderPasses.front()->getProgram());
 
   if (entity->hasComponent<Light>())
     updateLights();
 }
 
 bool RenderSystem::update(float deltaTime) {
-  m_programs.front().use();
+  assert("Error: Geometry pass must be enabled for the RenderSystem to be updated." && m_renderPasses.front());
 
-  auto& camera       = m_camera.getComponent<Camera>();
-  auto& camTransform = m_camera.getComponent<Transform>();
+  m_renderPasses.front()->getProgram().use();
+
+  auto& camera       = m_cameraEntity.getComponent<Camera>();
+  auto& camTransform = m_cameraEntity.getComponent<Transform>();
 
   Mat4f viewProjMat;
 
@@ -87,27 +89,19 @@ bool RenderSystem::update(float deltaTime) {
     viewProjMat = camera.getViewMatrix() * camera.getProjectionMatrix();
   }
 
-  const auto ssrIndex = static_cast<std::size_t>(RenderPass::SSR);
-
-  if (m_enabledPasses[ssrIndex])
-    m_framebuffers[ssrIndex].bind();
-
   for (auto& entity : m_entities) {
     if (entity->isEnabled()) {
       if (entity->hasComponent<Mesh>() && entity->hasComponent<Transform>()) {
         const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
 
-        m_programs.front().sendUniform("uniModelMatrix", modelMat);
-        m_programs.front().sendUniform("uniMvpMatrix", modelMat * viewProjMat);
+        const ShaderProgram& geometryProgram = m_renderPasses.front()->getProgram();
 
-        entity->getComponent<Mesh>().draw(m_programs.front());
+        geometryProgram.sendUniform("uniModelMatrix", modelMat);
+        geometryProgram.sendUniform("uniMvpMatrix", modelMat * viewProjMat);
+
+        entity->getComponent<Mesh>().draw(geometryProgram);
       }
     }
-  }
-
-  if (m_enabledPasses[ssrIndex]) {
-    m_framebuffers[ssrIndex].unbind();
-    m_framebuffers[ssrIndex].display(m_programs[ssrIndex]);
   }
 
   if (m_cubemap)
@@ -117,11 +111,14 @@ bool RenderSystem::update(float deltaTime) {
   Renderer::checkErrors();
 #endif
 
-  return m_window.run(deltaTime);
+  if (m_window)
+    return m_window->run(deltaTime);
+
+  return true;
 }
 
 void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
-  const auto& camera = m_camera.getComponent<Camera>();
+  const auto& camera = m_cameraEntity.getComponent<Camera>();
 
   m_cameraUbo.bind();
   sendViewMatrix(camera.getViewMatrix());
@@ -129,16 +126,20 @@ void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
   sendProjectionMatrix(camera.getProjectionMatrix());
   sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   sendViewProjectionMatrix(viewProjMat);
-  sendCameraPosition(m_camera.getComponent<Transform>().getPosition());
+  sendCameraPosition(m_cameraEntity.getComponent<Transform>().getPosition());
 }
 
 void RenderSystem::sendCameraMatrices() const {
-  const auto& camera = m_camera.getComponent<Camera>();
+  const auto& camera = m_cameraEntity.getComponent<Camera>();
   sendCameraMatrices(camera.getViewMatrix() * camera.getProjectionMatrix());
 }
 
 void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
-  m_programs.front().use();
+  assert("Error: Geometry pass must be enabled for the RenderSystem's lights to be updated." && m_renderPasses.front());
+
+  const ShaderProgram& geometryProgram = getGeometryPass().getProgram();
+
+  geometryProgram.use();
 
   const std::string strBase = "uniLights[" + std::to_string(lightIndex) + "].";
 
@@ -152,16 +153,21 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
 
   if (lightComp.getType() == LightType::DIRECTIONAL) {
     homogeneousPos[3] = 0.f;
-    m_programs.front().sendUniform(strBase + "direction", lightComp.getDirection());
+    geometryProgram.sendUniform(strBase + "direction", lightComp.getDirection());
   }
 
-  m_programs.front().sendUniform(posStr,    homogeneousPos);
-  m_programs.front().sendUniform(colorStr,  lightComp.getColor());
-  m_programs.front().sendUniform(energyStr, lightComp.getEnergy());
-  m_programs.front().sendUniform(angleStr,  lightComp.getAngle());
+  geometryProgram.sendUniform(posStr,    homogeneousPos);
+  geometryProgram.sendUniform(colorStr,  lightComp.getColor());
+  geometryProgram.sendUniform(energyStr, lightComp.getEnergy());
+  geometryProgram.sendUniform(angleStr,  lightComp.getAngle());
 }
 
 void RenderSystem::updateLights() const {
+  assert("Error: Geometry pass must be enabled for the RenderSystem's lights to be updated." && m_renderPasses.front());
+
+  if (!m_renderPasses.front())
+    return;
+
   std::size_t lightCount = 0;
 
   for (const auto& entity : m_entities) {
@@ -171,13 +177,15 @@ void RenderSystem::updateLights() const {
     }
   }
 
-  m_programs.front().sendUniform("uniLightCount", static_cast<unsigned int>(lightCount));
+  getGeometryPass().getProgram().sendUniform("uniLightCount", static_cast<unsigned int>(lightCount));
 }
 
 void RenderSystem::updateShaders() const {
-  for (std::size_t programIndex = 0; programIndex < m_programs.size(); ++programIndex) {
-    if (m_enabledPasses[programIndex])
-      m_programs[programIndex].updateShaders();
+  assert("Error: Geometry pass must be enabled for the RenderSystem's shaders to be updated." && m_renderPasses.front());
+
+  for (const RenderPassPtr& renderPass : m_renderPasses) {
+    if (renderPass)
+      renderPass->getProgram().updateShaders();
   }
 
   sendCameraMatrices();
@@ -185,7 +193,7 @@ void RenderSystem::updateShaders() const {
 
   for (const auto& entity : m_entities) {
     if (entity->hasComponent<Mesh>())
-      entity->getComponent<Mesh>().load(m_programs.front());
+      entity->getComponent<Mesh>().load(getGeometryPass().getProgram());
   }
 }
 
@@ -212,6 +220,36 @@ void RenderSystem::saveToImage(const std::string& fileName, TextureFormat format
   Renderer::recoverFrame(m_sceneWidth, m_sceneHeight, format, dataType, img.getDataPtr());
 
   img.save(fileName, true);
+}
+
+void RenderSystem::initialize() {
+  Renderer::initialize();
+
+  m_cameraEntity.addComponent<Camera>();
+  m_cameraEntity.addComponent<Transform>();
+
+  m_acceptedComponents.setBit(Component::getId<Mesh>());
+  m_acceptedComponents.setBit(Component::getId<Light>());
+
+  m_cameraUbo.bindBufferBase(0);
+
+  for (std::size_t passIndex = 1; passIndex < m_renderPasses.size(); ++passIndex) {
+    const RenderPassPtr& pass = m_renderPasses[passIndex];
+
+    if (pass) {
+      const ShaderProgram& passProgram = pass->getProgram();
+
+      pass->getFramebuffer().initBuffers(passProgram);
+      m_cameraUbo.bindUniformBlock(passProgram, "uboCameraMatrices", 0);
+    }
+  }
+
+  sendCameraMatrices();
+}
+
+void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight) {
+  initialize();
+  resizeViewport(sceneWidth, sceneHeight);
 }
 
 } // namespace Raz

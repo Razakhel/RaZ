@@ -8,58 +8,51 @@
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
+#include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/System.hpp"
 #include "RaZ/Utils/Window.hpp"
 
 namespace Raz {
 
-enum class RenderPass : uint8_t {
-  GEOMETRY = 0,
-  //LIGHTING,
-  //SSAO,
-  SSR,
-  //SHADOW,
-  //TRANSPARENCY,
-
-  RENDER_PASS_COUNT
-};
-
-using ShaderPrograms = std::array<ShaderProgram, static_cast<std::size_t>(RenderPass::RENDER_PASS_COUNT)>;
-using Framebuffers   = std::array<Framebuffer, static_cast<std::size_t>(RenderPass::RENDER_PASS_COUNT)>;
-
+/// RenderSystem class, handling the rendering part.
 class RenderSystem : public System {
 public:
-  RenderSystem(unsigned int windowWidth, unsigned int windowHeight, const std::string& windowTitle = "");
+  /// Creates a render system, initializing its inner data.
+  RenderSystem() { initialize(); }
+  /// Creates a render system with a given scene size.
+  /// \param sceneWidth Width of the scene.
+  /// \param sceneHeight Height of the scene.
+  RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight) : RenderSystem() { resizeViewport(sceneWidth, sceneHeight); }
+  /// Creates a render system along with a Window.
+  /// \param sceneWidth Width of the scene.
+  /// \param sceneHeight Height of the scene.
+  /// \param windowTitle Title of the window.
+  /// \param antiAliasingSampleCount Number of anti-aliasing samples.
+  RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight, const std::string& windowTitle, uint8_t antiAliasingSampleCount = 1)
+    : m_window{ Window::create(sceneWidth, sceneHeight, windowTitle, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
 
-  const Window& getWindow() const { return m_window; }
-  Window& getWindow() { return m_window; }
-  const Entity& getCameraEntity() const { return m_camera; }
-  Entity& getCameraEntity() { return m_camera; }
-  const Camera& getCamera() const { return m_camera.getComponent<Camera>(); }
-  Camera& getCamera() { return m_camera.getComponent<Camera>(); }
-  const ShaderProgram& getProgram(RenderPass renderPass) const { return m_programs[static_cast<std::size_t>(renderPass)]; }
-  const ShaderProgram& getGeometryProgram() const { return getProgram(RenderPass::GEOMETRY); }
-  //const ShaderProgram& getLightingProgram() const { return getProgram(RenderPass::LIGHTING); }
-  //const ShaderProgram& getSSAOProgram() const { return getProgram(RenderPass::SSAO); }
-  const ShaderProgram& getSSRProgram() const { return getProgram(RenderPass::SSR); }
-  //const ShaderProgram& getShadowProgram() const { return getProgram(RenderPass::SHADOW); }
-  //const ShaderProgram& getTransparencyProgram() const { return getProgram(RenderPass::TRANSPARENCY); }
-  const CubemapPtr& getCubemap() const { return m_cubemap; }
+  bool hasWindow() const { return (m_window != nullptr); }
+  const Window& getWindow() const { assert("Error: Window must be set before being accessed." && m_window); return *m_window; }
+  Window& getWindow() { return const_cast<Window&>(static_cast<const RenderSystem*>(this)->getWindow()); }
+  const Entity& getCameraEntity() const { return m_cameraEntity; }
+  Entity& getCameraEntity() { return m_cameraEntity; }
+  const Camera& getCamera() const { return m_cameraEntity.getComponent<Camera>(); }
+  Camera& getCamera() { return m_cameraEntity.getComponent<Camera>(); }
+  const GeometryPass& getGeometryPass() const;
+  GeometryPass& getGeometryPass() { return const_cast<GeometryPass&>(static_cast<const RenderSystem*>(this)->getGeometryPass()); }
+  const SSRPass& getSSRPass() const;
+  SSRPass& getSSRPass() { return const_cast<SSRPass&>(static_cast<const RenderSystem*>(this)->getSSRPass()); }
+  const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && m_cubemap); return *m_cubemap; }
 
-  void setProgram(RenderPass renderPass, ShaderProgram&& program);
-  void setGeometryProgram(ShaderProgram&& program) { setProgram(RenderPass::GEOMETRY, std::move(program)); }
-  //void setLightingProgram(ShaderProgram&& program) { setProgram(RenderPass::LIGHTING, std::move(program)); }
-  //void setSSAOProgram(ShaderProgram&& program) { setProgram(RenderPass::SSAO, std::move(program)); }
-  void setSSRProgram(ShaderProgram&& program) { setProgram(RenderPass::SSR, std::move(program)); }
-  //void setShadowProgram(ShaderProgram&& program) { setProgram(RenderPass::SHADOW, std::move(program)); }
-  //void setTransparencyProgram(ShaderProgram&& program) { setProgram(RenderPass::TRANSPARENCY, std::move(program)); }
   void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
 
-  void enableRenderPass(RenderPass renderPass, bool value = true) { enableRenderPass(static_cast<std::size_t>(renderPass), value); }
-  void enableRenderPass(std::size_t programIndex, bool value = true) { m_enabledPasses.setBit(programIndex, value); }
-  void disableRenderPass(RenderPass renderPass) { enableRenderPass(renderPass, false); }
-  void disableRenderPass(std::size_t programIndex) { enableRenderPass(programIndex, false); }
+  void resizeViewport(unsigned int width, unsigned int height);
+  void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
+  void enableGeometryPass(VertexShader vertShader, FragmentShader fragShader);
+  void enableSSRPass(FragmentShader fragShader);
+  void disableGeometryPass() { m_renderPasses[static_cast<std::size_t>(RenderPassType::GEOMETRY)].reset(); }
+  void disableSSRPass() { m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)].reset(); }
   void linkEntity(const EntityPtr& entity) override;
   bool update(float deltaTime) override;
   void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
@@ -75,15 +68,19 @@ public:
   void removeCubemap() { m_cubemap.reset(); }
   void updateShaders() const;
   void saveToImage(const std::string& fileName, TextureFormat format = TextureFormat::RGB) const;
-  void destroy() override { m_window.setShouldClose(); }
+  void destroy() override { if (m_window) m_window->setShouldClose(); }
 
 private:
-  Window m_window;
-  Entity m_camera = Entity(0);
+  void initialize();
+  void initialize(unsigned int sceneWidth, unsigned int sceneHeight);
 
-  ShaderPrograms m_programs {};
-  Framebuffers m_framebuffers {};
-  Bitset m_enabledPasses = Bitset(static_cast<std::size_t>(RenderPass::RENDER_PASS_COUNT));
+  unsigned int m_sceneWidth {};
+  unsigned int m_sceneHeight {};
+
+  WindowPtr m_window {};
+  Entity m_cameraEntity = Entity(0);
+
+  std::array<RenderPassPtr, static_cast<std::size_t>(RenderPassType::RENDER_PASS_COUNT)> m_renderPasses {};
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);
 
   CubemapPtr m_cubemap {};
