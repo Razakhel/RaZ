@@ -42,6 +42,8 @@ elseif (UNIX)
     target_compile_definitions(RaZ PUBLIC -DRAZ_PLATFORM_LINUX)
 endif ()
 
+target_compile_definitions(RaZ PUBLIC -DRAZ_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
+
 ########################
 # RaZ - Compiler flags #
 ########################
@@ -195,6 +197,11 @@ elseif (RAZ_COMPILER_MSVC)
 
     # To automatically export all the classes & functions
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+
+    # CMake automatically appends /W3 to the standard flags, which produces a warning with MSVC when adding another level; this has to be removed
+    # TODO: if possible, this should be done per target, not globally
+    string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 endif ()
 
 ######################
