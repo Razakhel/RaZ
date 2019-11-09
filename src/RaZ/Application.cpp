@@ -2,7 +2,7 @@
 
 namespace Raz {
 
-World& Application::addWorld(World&& world) {
+World& Application::addWorld(World world) {
   m_worlds.emplace_back(std::move(world));
   m_activeWorlds.setBit(m_worlds.size() - 1);
 

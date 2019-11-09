@@ -23,7 +23,7 @@ public:
   /// Adds a World into the Application.
   /// \param world World to be added.
   /// \return Reference to the newly added World.
-  World& addWorld(World&& world);
+  World& addWorld(World world);
   /// Runs the application.
   /// \return True if the application is still running, false otherwise.
   bool run();

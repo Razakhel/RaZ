@@ -13,6 +13,9 @@
 
 namespace Raz {
 
+class Window;
+using WindowPtr = std::unique_ptr<Window>;
+
 using KeyboardCallbacks    = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
 using MouseButtonCallbacks = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
 using MouseScrollCallback  = std::function<void(double, double)>;
@@ -39,6 +42,13 @@ public:
   void setIcon(const Image& img) const;
   void setIcon(const std::string& filePath) const { setIcon(Image(filePath, false)); }
 
+  template <typename... Args>
+  static WindowPtr create(Args&&... args) { return std::make_unique<Window>(std::forward<Args>(args)...); }
+
+  /// Resizes the window.
+  /// \param width New window width.
+  /// \param height New window height.
+  void resize(unsigned int width, unsigned int height);
   /// Changes the face culling's state.
   /// Enables or disables face culling according to the given parameter.
   /// \param value Value to apply.

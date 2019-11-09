@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "GL/glew.h"
 #if defined(RAZ_PLATFORM_WINDOWS)
 #if defined(RAZ_COMPILER_MSVC)
@@ -12,6 +10,8 @@
 #include "GLFW/glfw3.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Window.hpp"
+
+#include <iostream>
 
 namespace Raz {
 
@@ -70,6 +70,13 @@ void Window::setIcon(const Image& img) const {
                            static_cast<int>(img.getHeight()),
                            const_cast<unsigned char*>(static_cast<const uint8_t*>(img.getDataPtr())) };
   glfwSetWindowIcon(m_window, 1, &icon);
+}
+
+void Window::resize(unsigned int width, unsigned int height) {
+  m_width  = width;
+  m_height = height;
+
+  glfwSetWindowSize(m_window, static_cast<int>(width), static_cast<int>(height));
 }
 
 void Window::enableFaceCulling(bool value) const {
