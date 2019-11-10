@@ -1,16 +1,18 @@
 #include "RaZ/RaZ.hpp"
 
+using namespace std::literals;
+
 int main() {
   Raz::Application app;
   Raz::World& world = app.addWorld(Raz::World(10));
 
-  auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
-  renderSystem.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
-                                                     Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
+  auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ", 2);
+  renderSystem.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s),
+                                  Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
 
   Raz::Window& window = renderSystem.getWindow();
   window.enableOverlay();
-  window.setIcon("../../assets/icons/RaZ_logo_128.png");
+  window.setIcon(RAZ_ROOT + "assets/icons/RaZ_logo_128.png"s);
 
   Raz::Entity& camera = renderSystem.getCameraEntity();
   auto& cameraComp    = camera.getComponent<Raz::Camera>();
@@ -19,14 +21,14 @@ int main() {
 
   Raz::Entity& mesh = world.addEntity();
   auto& meshTrans   = mesh.addComponent<Raz::Transform>();
-  mesh.addComponent<Raz::Mesh>("../../assets/meshes/shield.obj");
+  mesh.addComponent<Raz::Mesh>(RAZ_ROOT + "assets/meshes/shield.obj"s);
 
   meshTrans.scale(0.2f);
   meshTrans.rotate(180.0_deg, Raz::Axis::Y);
 
-  renderSystem.setCubemap(Raz::Cubemap::create("../../assets/skyboxes/clouds_right.png", "../../assets/skyboxes/clouds_left.png",
-                                               "../../assets/skyboxes/clouds_top.png", "../../assets/skyboxes/clouds_bottom.png",
-                                               "../../assets/skyboxes/clouds_front.png", "../../assets/skyboxes/clouds_back.png"));
+  renderSystem.setCubemap(Raz::Cubemap::create(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s, RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
+                                               RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,   RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
+                                               RAZ_ROOT + "assets/skyboxes/clouds_front.png"s, RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
 
   Raz::Entity& light = world.addEntity();
   /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT, // Type

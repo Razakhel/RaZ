@@ -1,14 +1,15 @@
 #include "RaZ/RaZ.hpp"
 
+using namespace std::literals;
+
 inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
-                                               Raz::FragmentShader("../../shaders/blinn-phong.glsl")));
+  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
-  meshComp.import("../../assets/meshes/crytek_sponza.obj");
-  meshComp.load(render.getGeometryProgram());
+  meshComp.import(RAZ_ROOT + "assets/meshes/crytek_sponza.obj"s);
+  meshComp.load(render.getGeometryPass().getProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -1.f, 0.f);
@@ -17,14 +18,13 @@ inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
-                                               Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
+  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
-  meshComp.import("../../assets/meshes/ball.obj");
-  meshComp.load(render.getGeometryProgram());
+  meshComp.import(RAZ_ROOT + "assets/meshes/ball.obj"s);
+  meshComp.load(render.getGeometryPass().getProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -33,14 +33,13 @@ inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
-                                               Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
+  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
-  meshComp.import("../../assets/meshes/shield.obj");
-  meshComp.load(render.getGeometryProgram());
+  meshComp.import(RAZ_ROOT + "assets/meshes/shield.obj"s);
+  meshComp.load(render.getGeometryPass().getProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -49,14 +48,13 @@ inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
-                                               Raz::FragmentShader("../../shaders/cook-torrance.glsl")));
+  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
-  meshComp.import("../../assets/meshes/cerberus.obj");
-  meshComp.load(render.getGeometryProgram());
+  meshComp.import(RAZ_ROOT + "assets/meshes/cerberus.obj"s);
+  meshComp.load(render.getGeometryPass().getProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -66,14 +64,13 @@ inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
 #if defined(FBX_ENABLED)
 inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.setGeometryProgram(Raz::ShaderProgram(Raz::VertexShader("../../shaders/vert.glsl"),
-                                               Raz::FragmentShader("../../shaders/blinn-phong.glsl")));
+  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
   render.updateLights();
   render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
-  meshComp.import("../../assets/meshes/shaderBall.fbx");
-  meshComp.load(render.getGeometryProgram());
+  meshComp.import(RAZ_ROOT + "assets/meshes/shaderBall.fbx"s);
+  meshComp.load(render.getGeometryPass().getProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -2.f, 5.f);
@@ -83,21 +80,21 @@ inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 #endif
 
 inline void loadCloudsSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap::create("../../assets/skyboxes/clouds_right.png",
-                                         "../../assets/skyboxes/clouds_left.png",
-                                         "../../assets/skyboxes/clouds_top.png",
-                                         "../../assets/skyboxes/clouds_bottom.png",
-                                         "../../assets/skyboxes/clouds_front.png",
-                                         "../../assets/skyboxes/clouds_back.png"));
+  render.setCubemap(Raz::Cubemap::create(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/clouds_front.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
 }
 
 inline void loadLakeSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap::create("../../assets/skyboxes/lake_right.png",
-                                         "../../assets/skyboxes/lake_left.png",
-                                         "../../assets/skyboxes/lake_top.png",
-                                         "../../assets/skyboxes/lake_bottom.png",
-                                         "../../assets/skyboxes/lake_front.png",
-                                         "../../assets/skyboxes/lake_back.png"));
+  render.setCubemap(Raz::Cubemap::create(RAZ_ROOT + "assets/skyboxes/lake_right.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/lake_left.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/lake_top.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/lake_bottom.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/lake_front.png"s,
+                                         RAZ_ROOT + "assets/skyboxes/lake_back.png"s));
 }
 
 int main() {
