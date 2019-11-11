@@ -32,7 +32,7 @@ public:
   Texture(Texture&& texture) noexcept;
 
   unsigned int getIndex() const { return m_index; }
-  const ImagePtr& getImage() const { return m_image; }
+  const Image& getImage() const { return m_image; }
 
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
@@ -48,7 +48,7 @@ public:
   /// Saves the texture on disk.
   /// \param filePath Path to where to save the texture.
   /// \param flipVertically Flip vertically the texture when saving.
-  void save(const std::string& filePath, bool flipVertically = false) const { m_image->save(filePath, flipVertically); }
+  void save(const std::string& filePath, bool flipVertically = false) const { m_image.save(filePath, flipVertically); }
   /// Binds the texture.
   void bind() const;
   /// Unbinds the texture.
@@ -65,7 +65,7 @@ private:
   void makePlainColored(const Vec3b& color) const;
 
   unsigned int m_index {};
-  ImagePtr m_image {};
+  Image m_image {};
 };
 
 } // namespace Raz

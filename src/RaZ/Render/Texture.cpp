@@ -9,6 +9,8 @@ Texture::Texture() {
 }
 
 Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace) : Texture() {
+  m_image.m_colorspace = colorspace;
+
   bind();
 
   if (colorspace != ImageColorspace::DEPTH) {
@@ -54,9 +56,9 @@ TexturePtr Texture::recoverTexture(TexturePreset preset) {
 }
 
 void Texture::load(const std::string& filePath, bool flipVertically) {
-  m_image = Image::create(filePath, flipVertically);
+  m_image.read(filePath, flipVertically);
 
-  if (!m_image->isEmpty()) {
+  if (!m_image.isEmpty()) {
     bind();
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::REPEAT);
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::REPEAT);
@@ -64,19 +66,19 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR_MIPMAP_LINEAR);
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
 
-    if (m_image->getColorspace() == ImageColorspace::GRAY || m_image->getColorspace() == ImageColorspace::GRAY_ALPHA) {
+    if (m_image.getColorspace() == ImageColorspace::GRAY || m_image.getColorspace() == ImageColorspace::GRAY_ALPHA) {
       const std::array<int, 4> swizzle = { GL_RED,
                                            GL_RED,
                                            GL_RED,
-                                           (m_image->getColorspace() == ImageColorspace::GRAY ? GL_ONE : GL_GREEN) };
+                                           (m_image.getColorspace() == ImageColorspace::GRAY ? GL_ONE : GL_GREEN) };
       Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_RGBA, swizzle.data());
     }
 
     // Default internal format is the image's own colorspace; modified if the image is a floating point one
-    auto colorFormat = static_cast<TextureInternalFormat>(m_image->getColorspace());
+    auto colorFormat = static_cast<TextureInternalFormat>(m_image.getColorspace());
 
-    if (m_image->getDataType() == ImageDataType::FLOAT) {
-      switch (m_image->getColorspace()) {
+    if (m_image.getDataType() == ImageDataType::FLOAT) {
+      switch (m_image.getColorspace()) {
         case ImageColorspace::GRAY:
           colorFormat = TextureInternalFormat::RED16F;
           break;
@@ -102,15 +104,14 @@ void Texture::load(const std::string& filePath, bool flipVertically) {
     Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                               0,
                               colorFormat,
-                              m_image->getWidth(),
-                              m_image->getHeight(),
-                              static_cast<TextureFormat>(m_image->getColorspace()),
-                              (m_image->getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
-                              m_image->getDataPtr());
+                              m_image.getWidth(),
+                              m_image.getHeight(),
+                              static_cast<TextureFormat>(m_image.getColorspace()),
+                              (m_image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
+                              m_image.getDataPtr());
     Renderer::generateMipmap(TextureType::TEXTURE_2D);
     unbind();
   } else { // Image not found, deleting it & defaulting texture to pure white
-    m_image.reset();
     makePlainColored(Vec3b(static_cast<uint8_t>(TexturePreset::WHITE)));
   }
 }

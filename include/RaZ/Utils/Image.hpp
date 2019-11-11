@@ -106,6 +106,8 @@ enum class ImageColorspace : unsigned int {
 
 /// Image class, handling images of different formats.
 class Image {
+  friend class Texture;
+
 public:
   Image() = default;
   Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
