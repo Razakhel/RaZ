@@ -155,6 +155,56 @@ enum class ShaderStatus : unsigned int {
   COMPILE = 35713 // GL_COMPILE_STATUS
 };
 
+enum class FramebufferType : unsigned int {
+  READ_FRAMEBUFFER = 36008, // GL_READ_FRAMEBUFFER
+  DRAW_FRAMEBUFFER = 36009, // GL_DRAW_FRAMEBUFFER
+  FRAMEBUFFER      = 36160  // GL_FRAMEBUFFER
+};
+
+enum class FramebufferStatus : unsigned int {
+  COMPLETE                      = 36053, // GL_FRAMEBUFFER_COMPLETE
+  UNDEFINED                     = 33305, // GL_FRAMEBUFFER_UNDEFINED
+  INCOMPLETE_ATTACHMENT         = 36054, // GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT
+  INCOMPLETE_MISSING_ATTACHMENT = 36055, // GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
+  INCOMPLETE_DRAW_BUFFER        = 36059, // GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
+  INCOMPLETE_READ_BUFFER        = 36060, // GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
+  UNSUPPORTED                   = 36061, // GL_FRAMEBUFFER_UNSUPPORTED
+  INCOMPLETE_MULTISAMPLE        = 36182, // GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
+  INCOMPLETE_LAYER_TARGETS      = 36264  // GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS
+};
+
+enum class FramebufferAttachment : unsigned int {
+  DEPTH         = 36096, // GL_DEPTH_ATTACHMENT
+  STENCIL       = 36128, // GL_STENCIL_ATTACHMENT
+  DEPTH_STENCIL = 33306, // GL_DEPTH_STENCIL_ATTACHMENT
+
+  COLOR0 = 36064, // GL_COLOR_ATTACHMENT0
+  COLOR1 = 36065, // GL_COLOR_ATTACHMENT1
+  COLOR2 = 36066, // GL_COLOR_ATTACHMENT2
+  COLOR3 = 36067, // GL_COLOR_ATTACHMENT3
+  COLOR4 = 36068, // GL_COLOR_ATTACHMENT4
+  COLOR5 = 36069, // GL_COLOR_ATTACHMENT5
+  COLOR6 = 36070, // GL_COLOR_ATTACHMENT6
+  COLOR7 = 36071  // GL_COLOR_ATTACHMENT7
+};
+
+enum class DrawBuffer : unsigned int {
+  NONE        = 0,     // GL_NONE
+  FRONT_LEFT  = 1024,  // GL_FRONT_LEFT
+  FRONT_RIGHT = 1025,  // GL_FRONT_RIGHT
+  BACK_LEFT   = 1026,  // GL_BACK_LEFT
+  BACK_RIGHT  = 1027,  // GL_BACK_RIGHT
+
+  COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0),
+  COLOR_ATTACHMENT1 = static_cast<unsigned int>(FramebufferAttachment::COLOR1),
+  COLOR_ATTACHMENT2 = static_cast<unsigned int>(FramebufferAttachment::COLOR2),
+  COLOR_ATTACHMENT3 = static_cast<unsigned int>(FramebufferAttachment::COLOR3),
+  COLOR_ATTACHMENT4 = static_cast<unsigned int>(FramebufferAttachment::COLOR4),
+  COLOR_ATTACHMENT5 = static_cast<unsigned int>(FramebufferAttachment::COLOR5),
+  COLOR_ATTACHMENT6 = static_cast<unsigned int>(FramebufferAttachment::COLOR6),
+  COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)
+};
+
 class Renderer {
 public:
   Renderer() = delete;
@@ -303,6 +353,13 @@ public:
   static void generateFramebuffers(int count, unsigned int* indices);
   template <std::size_t N> static void generateFramebuffers(unsigned int (&indices)[N]) { generateFramebuffers(N, indices); }
   static void generateFramebuffer(unsigned int& index) { generateFramebuffers(1, &index); }
+  static FramebufferStatus getFramebufferStatus(FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static bool isFramebufferComplete() { return getFramebufferStatus() == FramebufferStatus::COMPLETE; }
+  static void setFramebufferTexture2D(FramebufferAttachment attachment,
+                                      TextureType textureType, unsigned int textureIndex, int mipmapLevel,
+                                      FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static void setDrawBuffers(unsigned int count, const DrawBuffer* buffers);
+  template <std::size_t N> static void setDrawBuffers(DrawBuffer (&buffers)[N]) { setDrawBuffers(N, buffers); }
   static void bindFramebuffer(unsigned int index);
   static void unbindFramebuffer() { bindFramebuffer(0); }
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);

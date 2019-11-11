@@ -663,6 +663,44 @@ void Renderer::generateFramebuffers(int count, unsigned int* indices) {
 #endif
 }
 
+FramebufferStatus Renderer::getFramebufferStatus(FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  unsigned int status = glCheckFramebufferStatus(static_cast<unsigned int>(type));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+
+  return static_cast<FramebufferStatus>(status);
+}
+
+void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
+                                       TextureType textureType, unsigned int textureIndex, int mipmapLevel,
+                                       FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glFramebufferTexture2D(static_cast<unsigned int>(type),
+                         static_cast<unsigned int>(attachment),
+                         static_cast<unsigned int>(textureType),
+                         textureIndex,
+                         mipmapLevel);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDrawBuffers(count, reinterpret_cast<const unsigned int*>(buffers));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
 void Renderer::bindFramebuffer(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
