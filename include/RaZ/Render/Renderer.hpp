@@ -70,6 +70,18 @@ enum class BufferType : unsigned int {
   UNIFORM_BUFFER = 35345  // GL_UNIFORM_BUFFER
 };
 
+enum class BufferDataUsage : unsigned int {
+  STREAM_DRAW  = 35040, // GL_STREAM_DRAW
+  STREAM_READ  = 35041, // GL_STREAM_READ
+  STREAM_COPY  = 35042, // GL_STREAM_COPY
+  STATIC_DRAW  = 35044, // GL_STATIC_DRAW
+  STATIC_READ  = 35045, // GL_STATIC_READ
+  STATIC_COPY  = 35046, // GL_STATIC_COPY
+  DYNAMIC_DRAW = 35048, // GL_DYNAMIC_DRAW
+  DYNAMIC_READ = 35049, // GL_DYNAMIC_READ
+  DYNAMIC_COPY = 35050, // GL_DYNAMIC_COPY
+};
+
 enum class TextureType : unsigned int {
   TEXTURE_2D    = 3553,  // GL_TEXTURE_2D
   CUBEMAP       = 34067, // GL_TEXTURE_CUBE_MAP
@@ -230,8 +242,10 @@ public:
   static void bindBuffer(BufferType type, unsigned int index);
   static void unbindBuffer(BufferType type) { bindBuffer(type, 0); }
   static void bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex);
-  static void sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data);
-  template <typename T> static void sendBufferSubData(BufferType type, ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
+  static void bindBufferRange(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex, std::ptrdiff_t offset, std::ptrdiff_t size);
+  static void sendBufferData(BufferType type, std::ptrdiff_t size, const void* data, BufferDataUsage usage);
+  static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::ptrdiff_t dataSize, const void* data);
+  template <typename T> static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
   static void deleteBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteBuffers(unsigned int (&indices)[N]) { deleteBuffers(N, indices); }
   static void deleteBuffer(unsigned int& index) { deleteBuffers(1, &index); }

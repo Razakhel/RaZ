@@ -173,7 +173,27 @@ void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsign
 #endif
 }
 
-void Renderer::sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data) {
+void Renderer::bindBufferRange(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex, std::ptrdiff_t offset, std::ptrdiff_t size) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindBufferRange(static_cast<unsigned int>(type), bindingIndex, bufferIndex, offset, size);
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendBufferData(BufferType type, std::ptrdiff_t size, const void* data, BufferDataUsage usage) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBufferData(static_cast<unsigned int>(type), size, data, static_cast<unsigned int>(usage));
+
+#if !defined(NDEBUG)
+  checkErrors();
+#endif
+}
+
+void Renderer::sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::ptrdiff_t dataSize, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glBufferSubData(static_cast<unsigned int>(type), offset, dataSize, data);
