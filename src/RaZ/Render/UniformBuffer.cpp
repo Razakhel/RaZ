@@ -9,8 +9,8 @@ UniformBuffer::UniformBuffer() {
 
 UniformBuffer::UniformBuffer(unsigned int size, unsigned int bindingIndex) : UniformBuffer() {
   bind();
-  glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);
-  glBindBufferRange(GL_UNIFORM_BUFFER, bindingIndex, m_index, 0, size);
+  Renderer::bindBufferRange(BufferType::UNIFORM_BUFFER, bindingIndex, m_index, 0, size);
+  Renderer::sendBufferData(BufferType::UNIFORM_BUFFER, size, nullptr, BufferDataUsage::STATIC_DRAW);
   unbind();
 }
 
