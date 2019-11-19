@@ -50,4 +50,4 @@ else ()
     target_compile_options(GLEW PRIVATE -w)
 endif ()
 
-target_link_libraries(GLEW PRIVATE ${GLEW_LINKER_FLAGS})
+target_link_libraries(GLEW PUBLIC ${GLEW_LINKER_FLAGS})

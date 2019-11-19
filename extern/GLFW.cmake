@@ -126,4 +126,4 @@ else ()
     target_compile_options(GLFW PRIVATE -w)
 endif ()
 
-target_link_libraries(GLFW PRIVATE ${GLFW_LINKER_FLAGS})
+target_link_libraries(GLFW PUBLIC ${GLFW_LINKER_FLAGS})
