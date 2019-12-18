@@ -156,7 +156,7 @@ Vec3f Triangle::computeNormal() const {
   const Vec3f firstEdge  = m_secondPos - m_firstPos;
   const Vec3f secondEdge = m_thirdPos - m_firstPos;
 
-  return firstEdge.cross(secondEdge);
+  return firstEdge.cross(secondEdge).normalize();
 }
 
 void Triangle::makeCounterClockwise(const Vec3f& normal) {
