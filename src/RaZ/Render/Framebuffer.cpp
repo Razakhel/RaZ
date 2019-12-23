@@ -41,7 +41,7 @@ VertexShader Framebuffer::recoverVertexShader() {
 }
 
 void Framebuffer::addDepthBuffer(unsigned int width, unsigned int height) {
-  assert("Error: There can be only one depth buffer in a Framebuffer." && hasDepthBuffer());
+  assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
 
   m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH);
   mapBuffers();
@@ -107,8 +107,8 @@ void Framebuffer::display(const ShaderProgram& program) const {
   Renderer::activateTexture(0);
   m_depthBuffer->bind();
 
-  for (std::size_t bufferIndex = 1; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
-    Renderer::activateTexture(static_cast<unsigned int>(bufferIndex));
+  for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
+    Renderer::activateTexture(static_cast<unsigned int>(bufferIndex + 1));
     m_colorBuffers[bufferIndex]->bind();
   }
 
