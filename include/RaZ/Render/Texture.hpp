@@ -26,8 +26,9 @@ class Texture {
 public:
   Texture();
   explicit Texture(uint8_t value) : Texture() { makePlainColored(Vec3b(value)); }
-  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
-  explicit Texture(const std::string& fileName, bool flipVertically = false) : Texture() { load(fileName, flipVertically); }
+  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB, bool createMipmaps = true);
+  explicit Texture(const std::string& fileName, bool flipVertically = false, bool createMipmaps = true)
+    : Texture() { load(fileName, flipVertically, createMipmaps); }
   Texture(const Texture&) = delete;
   Texture(Texture&& texture) noexcept;
 
@@ -44,7 +45,8 @@ public:
   /// Reads the texture in memory & loads it onto the graphics card.
   /// \param filePath Path to the texture to load.
   /// \param flipVertically Flip vertically the texture when loading.
-  void load(const std::string& filePath, bool flipVertically = false);
+  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
+  void load(const std::string& filePath, bool flipVertically = false, bool createMipmaps = true);
   /// Saves the texture on disk.
   /// \param filePath Path to where to save the texture.
   /// \param flipVertically Flip vertically the texture when saving.

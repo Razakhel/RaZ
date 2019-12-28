@@ -43,7 +43,7 @@ VertexShader Framebuffer::recoverVertexShader() {
 void Framebuffer::addDepthBuffer(unsigned int width, unsigned int height) {
   assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
 
-  m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH);
+  m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH, false);
   mapBuffers();
 }
 
@@ -53,7 +53,7 @@ void Framebuffer::addColorBuffer(unsigned int width, unsigned int height, ImageC
     return;
   }
 
-  m_colorBuffers.emplace_back(Texture::create(width, height, colorspace));
+  m_colorBuffers.emplace_back(Texture::create(width, height, colorspace, false));
   mapBuffers();
 }
 
@@ -119,7 +119,7 @@ void Framebuffer::resize(unsigned int width, unsigned int height) {
   m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH);
 
   for (TexturePtr& colorBuffer : m_colorBuffers)
-    colorBuffer = Texture::create(width, height, colorBuffer->getImage().getColorspace());
+    colorBuffer = Texture::create(width, height, colorBuffer->getImage().getColorspace(), false);
 
   mapBuffers();
 }
