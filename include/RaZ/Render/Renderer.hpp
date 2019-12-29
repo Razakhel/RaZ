@@ -3,6 +3,7 @@
 #ifndef RAZ_RENDERER_HPP
 #define RAZ_RENDERER_HPP
 
+#include <bitset>
 #include <cstddef>
 #include <string>
 
@@ -217,6 +218,26 @@ enum class DrawBuffer : unsigned int {
   COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)
 };
 
+enum class ErrorCode : unsigned int {
+  INVALID_ENUM                  = 1280, // GL_INVALID_ENUM
+  INVALID_VALUE                 = 1281, // GL_INVALID_VALUE
+  INVALID_OPERATION             = 1282, // GL_INVALID_OPERATION
+  STACK_OVERFLOW                = 1283, // GL_STACK_OVERFLOW
+  STACK_UNDERFLOW               = 1284, // GL_STACK_UNDERFLOW
+  OUT_OF_MEMORY                 = 1285, // GL_OUT_OF_MEMORY
+  INVALID_FRAMEBUFFER_OPERATION = 1286, // GL_INVALID_FRAMEBUFFER_OPERATION
+#ifdef RAZ_USE_GL4
+  CONTEXT_LOST                  = 1287, // GL_CONTEXT_LOST
+#endif
+  NONE                          = 0     // GL_NO_ERROR
+};
+
+#ifdef RAZ_USE_GL4
+using ErrorCodes = std::bitset<8>;
+#else
+using ErrorCodes = std::bitset<7>;
+#endif
+
 class Renderer {
 public:
   Renderer() = delete;
@@ -379,7 +400,8 @@ public:
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
-  static void checkErrors();
+  static ErrorCodes recoverErrors();
+  static void printErrors();
 
   Renderer& operator=(const Renderer&) = delete;
   Renderer& operator=(Renderer&&) noexcept = delete;

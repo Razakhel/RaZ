@@ -60,6 +60,9 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
     case GL_STACK_OVERFLOW:                return "Stack overflow";
     case GL_STACK_UNDERFLOW:               return "Stack underflow";
     case GL_OUT_OF_MEMORY:                 return "Not enough memory left (Out of memory)";
+#ifdef RAZ_USE_GL4
+    case GL_CONTEXT_LOST:                  return "OpenGL context has been lost due to a graphics card reset (Context lost)";
+#endif
     case GL_NO_ERROR:                      return "No error";
     default:                               return "Unknown error";
   }
@@ -87,7 +90,7 @@ void Renderer::enable(Capability capability) {
   glEnable(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -97,7 +100,7 @@ void Renderer::disable(Capability capability) {
   glDisable(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -107,7 +110,7 @@ bool Renderer::isEnabled(Capability capability) {
   const bool isEnabled = glIsEnabled(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return isEnabled;
@@ -119,7 +122,7 @@ void Renderer::setDepthFunction(DepthFunction func) {
   glDepthFunc(static_cast<unsigned int>(func));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -129,7 +132,7 @@ void Renderer::setFaceCulling(FaceCulling cull) {
   glCullFace(static_cast<unsigned int>(cull));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -139,7 +142,7 @@ void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureForm
   glReadPixels(0, 0, static_cast<int>(width), static_cast<int>(height), static_cast<unsigned int>(format), static_cast<unsigned int>(dataType), data);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -149,7 +152,7 @@ void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
   glGenBuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -159,7 +162,7 @@ void Renderer::bindBuffer(BufferType type, unsigned int index) {
   glBindBuffer(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -169,7 +172,7 @@ void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsign
   glBindBufferBase(static_cast<unsigned int>(type), bindingIndex, bufferIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -179,7 +182,7 @@ void Renderer::bindBufferRange(BufferType type, unsigned int bindingIndex, unsig
   glBindBufferRange(static_cast<unsigned int>(type), bindingIndex, bufferIndex, offset, size);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -189,7 +192,7 @@ void Renderer::sendBufferData(BufferType type, std::ptrdiff_t size, const void* 
   glBufferData(static_cast<unsigned int>(type), size, data, static_cast<unsigned int>(usage));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -199,7 +202,7 @@ void Renderer::sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::pt
   glBufferSubData(static_cast<unsigned int>(type), offset, dataSize, data);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -209,7 +212,7 @@ void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
   glDeleteBuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -219,7 +222,7 @@ void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
   glGenTextures(static_cast<int>(count), indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -229,7 +232,7 @@ void Renderer::activateTexture(unsigned int index) {
   glActiveTexture(GL_TEXTURE0 + index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -239,7 +242,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, int val
   glTexParameteri(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -249,7 +252,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, float v
   glTexParameterf(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -259,7 +262,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const i
   glTexParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -269,7 +272,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
   glTexParameterfv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -280,7 +283,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameteri(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -290,7 +293,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameterf(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -300,7 +303,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -310,7 +313,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 #endif
@@ -334,7 +337,7 @@ void Renderer::sendImageData2D(TextureType type,
                data);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -344,7 +347,7 @@ void Renderer::generateMipmap(TextureType type) {
   glGenerateMipmap(static_cast<unsigned int>(type));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -355,7 +358,7 @@ void Renderer::generateMipmap(unsigned int textureIndex) {
   glGenerateTextureMipmap(textureIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 #endif
@@ -366,7 +369,7 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
   glBindTexture(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -376,7 +379,7 @@ void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
   glDeleteTextures(static_cast<int>(count), indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -386,7 +389,7 @@ void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsi
   glViewport(xOrigin, yOrigin, static_cast<int>(width), static_cast<int>(height));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -396,7 +399,7 @@ unsigned int Renderer::createProgram() {
   const unsigned int programIndex = glCreateProgram();
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return programIndex;
@@ -409,7 +412,7 @@ int Renderer::getProgramStatus(unsigned int index, ProgramStatus status) {
   glGetProgramiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return res;
@@ -421,7 +424,7 @@ bool Renderer::isProgramLinked(unsigned int index) {
   const bool isLinked = getProgramStatus(index, ProgramStatus::LINK);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return isLinked;
@@ -440,7 +443,7 @@ void Renderer::linkProgram(unsigned int index) {
   }
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -450,7 +453,7 @@ void Renderer::useProgram(unsigned int index) {
   glUseProgram(index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -460,7 +463,7 @@ void Renderer::deleteProgram(unsigned int index) {
   glDeleteProgram(index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -470,7 +473,7 @@ unsigned int Renderer::createShader(ShaderType type) {
   const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return shaderIndex;
@@ -483,7 +486,7 @@ int Renderer::getShaderStatus(unsigned int index, ShaderStatus status) {
   glGetShaderiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return res;
@@ -495,7 +498,7 @@ bool Renderer::isShaderCompiled(unsigned int index) {
   const bool isCompiled = getShaderStatus(index, ShaderStatus::COMPILE);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return isCompiled;
@@ -507,7 +510,7 @@ void Renderer::sendShaderSource(unsigned int index, const char* source, int leng
   glShaderSource(index, 1, &source, &length);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -524,7 +527,7 @@ void Renderer::compileShader(unsigned int index) {
   }
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -534,7 +537,7 @@ void Renderer::attachShader(unsigned int programIndex, unsigned int shaderIndex)
   glAttachShader(programIndex, shaderIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -544,7 +547,7 @@ void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex)
   glDetachShader(programIndex, shaderIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -554,7 +557,7 @@ void Renderer::deleteShader(unsigned int index) {
   glDeleteShader(index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -564,7 +567,7 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   const int location = glGetUniformLocation(programIndex, uniformName);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 
   if (location == -1)
     std::cerr << "Warning: Uniform '" << uniformName << "' unrecognized." << std::endl;
@@ -579,7 +582,7 @@ void Renderer::sendUniform(int uniformIndex, int value) {
   glUniform1i(uniformIndex, value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -589,7 +592,7 @@ void Renderer::sendUniform(int uniformIndex, unsigned int value) {
   glUniform1ui(uniformIndex, value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -599,7 +602,7 @@ void Renderer::sendUniform(int uniformIndex, float value) {
   glUniform1f(uniformIndex, value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -609,7 +612,7 @@ void Renderer::sendUniformVector1(int uniformIndex, const float* values, int cou
   glUniform1fv(uniformIndex, count, values);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -619,7 +622,7 @@ void Renderer::sendUniformVector2(int uniformIndex, const float* values, int cou
   glUniform2fv(uniformIndex, count, values);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -629,7 +632,7 @@ void Renderer::sendUniformVector3(int uniformIndex, const float* values, int cou
   glUniform3fv(uniformIndex, count, values);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -639,7 +642,7 @@ void Renderer::sendUniformVector4(int uniformIndex, const float* values, int cou
   glUniform4fv(uniformIndex, count, values);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -649,7 +652,7 @@ void Renderer::sendUniformMatrix2x2(int uniformIndex, const float* values, int c
   glUniformMatrix2fv(uniformIndex, count, transpose, values);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -659,7 +662,7 @@ void Renderer::sendUniformMatrix3x3(int uniformIndex, const float* values, int c
   glUniformMatrix3fv(uniformIndex, count, transpose, values);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -669,7 +672,7 @@ void Renderer::sendUniformMatrix4x4(int uniformIndex, const float* values, int c
   glUniformMatrix4fv(uniformIndex, count, transpose, values);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -679,17 +682,17 @@ void Renderer::generateFramebuffers(int count, unsigned int* indices) {
   glGenFramebuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
 FramebufferStatus Renderer::getFramebufferStatus(FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  unsigned int status = glCheckFramebufferStatus(static_cast<unsigned int>(type));
+  const unsigned int status = glCheckFramebufferStatus(static_cast<unsigned int>(type));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return static_cast<FramebufferStatus>(status);
@@ -707,7 +710,7 @@ void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
                          mipmapLevel);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -717,7 +720,7 @@ void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
   glDrawBuffers(count, reinterpret_cast<const unsigned int*>(buffers));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -727,7 +730,7 @@ void Renderer::bindFramebuffer(unsigned int index) {
   glBindFramebuffer(GL_FRAMEBUFFER, index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -737,18 +740,42 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
   glDeleteFramebuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
-void Renderer::checkErrors() {
+ErrorCodes Renderer::recoverErrors() {
+  ErrorCodes errorCodes;
+
   while (true) {
     const unsigned int errorCode = glGetError();
 
     if (errorCode == GL_NO_ERROR)
       break;
 
-    std::cerr << "OpenGL error - " << recoverGlErrorStr(errorCode) << " (code " << errorCode << ")\n";
+    const unsigned int errorCodeIndex = errorCode - static_cast<unsigned int>(ErrorCode::INVALID_ENUM);
+
+    // An error code cannot be returned twice in a row; if it is, the error checking should be stopped
+    if (errorCodes[errorCodeIndex])
+      break;
+
+    errorCodes[errorCodeIndex] = true;
+  }
+
+  return errorCodes;
+}
+
+void Renderer::printErrors() {
+  const ErrorCodes errorCodes = recoverErrors();
+
+  if (errorCodes.none())
+    return;
+
+  for (uint8_t errorIndex = 0; errorIndex < static_cast<uint8_t>(errorCodes.size()); ++errorIndex) {
+    if (errorCodes[errorIndex]) {
+      const unsigned int errorValue = errorIndex + static_cast<unsigned int>(ErrorCode::INVALID_ENUM);
+      std::cerr << "OpenGL error - " << recoverGlErrorStr(errorValue) << " (code " << errorValue << ")\n";
+    }
   }
 
   std::cerr << std::flush;
@@ -760,7 +787,7 @@ void Renderer::clear(unsigned int mask) {
   glClear(mask);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 

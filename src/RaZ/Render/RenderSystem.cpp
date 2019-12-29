@@ -108,7 +108,7 @@ bool RenderSystem::update(float deltaTime) {
     m_cubemap->draw(camera);
 
 #if !defined(NDEBUG)
-  Renderer::checkErrors();
+  Renderer::printErrors();
 #endif
 
   if (m_window)
