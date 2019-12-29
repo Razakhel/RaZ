@@ -55,10 +55,7 @@ VertexBuffer::~VertexBuffer() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
-  glDeleteBuffers(1, &m_index);
-
-  // This currently goes on an infinite error-printing loop
-  //Renderer::deleteBuffer(m_index);
+  Renderer::deleteBuffer(m_index);
 }
 
 IndexBuffer::IndexBuffer() {
@@ -90,10 +87,7 @@ IndexBuffer::~IndexBuffer() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
-  glDeleteBuffers(1, &m_index);
-
-  // This currently goes on an infinite error-printing loop
-  //Renderer::deleteBuffer(m_index);
+  Renderer::deleteBuffer(m_index);
 }
 
 } // namespace Raz

@@ -142,10 +142,7 @@ Texture::~Texture() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
-  glDeleteTextures(1, &m_index);
-
-  // This currently goes on an infinite error-printing loop
-  //Renderer::deleteTexture(m_index);
+  Renderer::deleteTexture(m_index);
 }
 
 void Texture::makePlainColored(const Vec3b& color) const {
