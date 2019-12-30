@@ -42,6 +42,12 @@ enum class Capability : unsigned int {
   DEBUG_OUTPUT_SYNCHRONOUS = 33346  // GL_DEBUG_OUTPUT_SYNCHRONOUS
 };
 
+enum class MaskType : unsigned int {
+  COLOR   = 16384, // GL_COLOR_BUFFER_BIT
+  DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
+  STENCIL = 1024   // GL_STENCIL_BUFFER_BIT
+};
+
 enum class DepthFunction : unsigned int {
   NEVER         = 512, // GL_NEVER
   EQUAL         = 514, // GL_EQUAL
@@ -53,16 +59,16 @@ enum class DepthFunction : unsigned int {
   ALWAYS        = 519  // GL_ALWAYS
 };
 
-enum class FaceCulling : unsigned int {
+enum class FaceOrientation : unsigned int {
   FRONT      = 1028, // GL_FRONT
   BACK       = 1029, // GL_BACK
   FRONT_BACK = 1032  // GL_FRONT_AND_BACK
 };
 
-enum class MaskType : unsigned int {
-  COLOR   = 16384, // GL_COLOR_BUFFER_BIT
-  DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
-  STENCIL = 1024   // GL_STENCIL_BUFFER_BIT
+enum class PolygonMode : unsigned int {
+  POINT = 6912, // GL_POINT
+  LINE  = 6913, // GL_LINE
+  FILL  = 6914  // GL_FILL
 };
 
 enum class BufferType : unsigned int {
@@ -255,7 +261,8 @@ public:
                                                                           | static_cast<unsigned int>(type2)
                                                                           | static_cast<unsigned int>(type3)); }
   static void setDepthFunction(DepthFunction func);
-  static void setFaceCulling(FaceCulling cull);
+  static void setFaceCulling(FaceOrientation orientation);
+  static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
   static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }

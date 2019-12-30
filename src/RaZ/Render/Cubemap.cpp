@@ -136,7 +136,7 @@ void Cubemap::unbind() const {
 
 void Cubemap::draw(const Camera& camera) const {
   Renderer::setDepthFunction(DepthFunction::LESS_EQUAL);
-  Renderer::setFaceCulling(FaceCulling::FRONT);
+  Renderer::setFaceCulling(FaceOrientation::FRONT);
 
   m_program.use();
 
@@ -148,7 +148,7 @@ void Cubemap::draw(const Camera& camera) const {
 
   Mesh::drawUnitCube();
 
-  Renderer::setFaceCulling(FaceCulling::BACK);
+  Renderer::setFaceCulling(FaceOrientation::BACK);
   Renderer::setDepthFunction(DepthFunction::LESS);
 }
 
