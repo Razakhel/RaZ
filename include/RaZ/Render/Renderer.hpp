@@ -396,14 +396,14 @@ public:
   template <std::size_t N> static void generateFramebuffers(unsigned int (&indices)[N]) { generateFramebuffers(N, indices); }
   static void generateFramebuffer(unsigned int& index) { generateFramebuffers(1, &index); }
   static FramebufferStatus getFramebufferStatus(FramebufferType type = FramebufferType::FRAMEBUFFER);
-  static bool isFramebufferComplete() { return getFramebufferStatus() == FramebufferStatus::COMPLETE; }
+  static bool isFramebufferComplete(FramebufferType type = FramebufferType::FRAMEBUFFER) { return getFramebufferStatus(type) == FramebufferStatus::COMPLETE; }
   static void setFramebufferTexture2D(FramebufferAttachment attachment,
                                       TextureType textureType, unsigned int textureIndex, int mipmapLevel,
                                       FramebufferType type = FramebufferType::FRAMEBUFFER);
   static void setDrawBuffers(unsigned int count, const DrawBuffer* buffers);
   template <std::size_t N> static void setDrawBuffers(DrawBuffer (&buffers)[N]) { setDrawBuffers(N, buffers); }
-  static void bindFramebuffer(unsigned int index);
-  static void unbindFramebuffer() { bindFramebuffer(0); }
+  static void bindFramebuffer(unsigned int index, FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static void unbindFramebuffer(FramebufferType type = FramebufferType::FRAMEBUFFER) { bindFramebuffer(0, type); }
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }

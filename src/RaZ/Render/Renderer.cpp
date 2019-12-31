@@ -734,10 +734,10 @@ void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
 #endif
 }
 
-void Renderer::bindFramebuffer(unsigned int index) {
+void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glBindFramebuffer(GL_FRAMEBUFFER, index);
+  glBindFramebuffer(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
   printErrors();
