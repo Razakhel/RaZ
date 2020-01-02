@@ -79,8 +79,8 @@ if (RAZ_COMPILER_GCC)
         -Wredundant-decls
         -Wstrict-aliasing
         -Wstrict-null-sentinel
-        -Wswitch-default
-        -Wswitch-enum
+        #-Wsuggest-final-methods
+        #-Wsuggest-final-types
         -Wtrampolines
         -Wundef
         -Wuninitialized
@@ -90,6 +90,7 @@ if (RAZ_COMPILER_GCC)
         -Wvla
         -Wzero-as-null-pointer-constant
 
+        -Wno-comment
         -Wno-format-nonliteral
     )
 
@@ -103,7 +104,6 @@ if (RAZ_COMPILER_GCC)
             -Warray-bounds=2
             -Wformat-signedness
             -Wsized-deallocation
-            -Wsuggest-override
         )
     endif ()
 
@@ -128,7 +128,7 @@ if (RAZ_COMPILER_GCC)
             -Walloca
             -Walloc-zero
             -Wformat-overflow
-            -Wshadow=compatible-local
+            -Wshadow
         )
     endif ()
 
@@ -169,12 +169,14 @@ elseif (RAZ_COMPILER_CLANG)
         -Wno-documentation
         -Wno-documentation-unknown-command
         -Wno-exit-time-destructors
+        -Wno-format-nonliteral
         -Wno-global-constructors
         -Wno-mismatched-tags
         -Wno-missing-braces
         -Wno-padded
         -Wno-reserved-id-macro
-        -Wno-shadow
+        -Wno-sign-conversion
+        -Wno-switch-enum
         -Wno-weak-vtables
     )
 
