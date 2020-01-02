@@ -19,6 +19,25 @@ public:
   Mesh() : m_submeshes(1) {}
   explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
   Mesh(const Plane& plane, float width, float depth, RenderMode renderMode = RenderMode::TRIANGLE);
+  /// Creates a mesh from a Sphere.
+  ///
+  ///          /-----------\
+  ///        / / / / | / \ / \
+  ///      /-------------------\
+  ///     |/ | / | / | / | / | /|
+  ///     |---------------------| < latitude/height
+  ///     |/ | / | / | / | / | /|
+  ///      \-------------------/
+  ///        \ / \ / | / / / /
+  ///          \-----^-----/
+  ///                |
+  ///                longitude/width
+  ///
+  /// \param sphere Sphere to create the mesh with.
+  /// \param widthCount Amount of vertical lines to be created (longitude).
+  /// \param heightCount Amount of horizontal lines to be created (latitude).
+  /// \param renderMode Mode in which to render the created mesh.
+  explicit Mesh(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const Triangle& triangle, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const Quad& quad, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const AABB& box, RenderMode renderMode = RenderMode::TRIANGLE);
@@ -31,6 +50,7 @@ public:
   std::size_t recoverTriangleCount() const;
 
   static void drawUnitPlane(const Vec3f& normal = Axis::Y);
+  static void drawUnitSphere();
   static void drawUnitQuad();
   static void drawUnitCube();
 

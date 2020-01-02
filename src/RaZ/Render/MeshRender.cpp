@@ -26,6 +26,12 @@ void Mesh::drawUnitPlane(const Vec3f& normal) {
   planeMesh.draw();
 }
 
+void Mesh::drawUnitSphere() {
+  static const Mesh sphereMesh(Sphere(Vec3f(0.f), 1.f), 10, 10);
+
+  sphereMesh.draw();
+}
+
 void Mesh::drawUnitQuad() {
   static const Mesh quadMesh(Quad(Vec3f({ -1.f,  1.f, 0.f }),
                                   Vec3f({  1.f,  1.f, 0.f }),

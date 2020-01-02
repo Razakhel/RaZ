@@ -1,3 +1,4 @@
+#include "RaZ/Math/Constants.hpp"
 #include "RaZ/Render/Mesh.hpp"
 
 namespace Raz {
@@ -48,6 +49,82 @@ Mesh::Mesh(const Plane& plane, float width, float depth, RenderMode renderMode) 
   indices[3] = 2;
   indices[4] = 0;
   indices[5] = 3;
+
+  setRenderMode(renderMode);
+  load();
+}
+
+Mesh::Mesh(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount, RenderMode renderMode) : Mesh() {
+  // Algorithm based on the standard/UV sphere presented here: http://www.songho.ca/opengl/gl_sphere.html
+
+  std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
+  vertices.reserve((heightCount + 1) * (widthCount + 1));
+
+  const float widthStep  = 2 * PI<float> / static_cast<float>(widthCount);
+  const float heightStep = PI<float> / static_cast<float>(heightCount);
+  const float invLength  = 1.f / sphere.getRadius();
+
+  for (unsigned int heightIndex = 0; heightIndex <= heightCount; ++heightIndex) {
+    const float heightAngle = PI<float> / 2 - static_cast<float>(heightIndex) * heightStep;
+
+    const float xz = sphere.getRadius() * std::cos(heightAngle);
+    const float y  = sphere.getRadius() * std::sin(heightAngle);
+
+    for (unsigned int widthIndex = 0; widthIndex <= widthCount; ++widthIndex) {
+      const float widthAngle = static_cast<float>(widthIndex) * widthStep;
+
+      const float x = xz * std::cos(widthAngle);
+      const float z = xz * std::sin(widthAngle);
+
+      Vertex vert;
+      vert.position  = Vec3f({ x, y, z });
+      vert.texcoords = Vec2f({ static_cast<float>(widthIndex) / static_cast<float>(widthCount),
+                               static_cast<float>(heightIndex) / static_cast<float>(heightCount) });
+      vert.normal    = Vec3f({ x * invLength, y * invLength, z * invLength });
+      vert.tangent   = Vec3f({ vert.normal[1], vert.normal[0], vert.normal[2] }); // TODO: how does this give seemingly accurate results in basic cases?
+
+      vertices.emplace_back(vert);
+    }
+  }
+
+  std::vector<unsigned int>& indices = m_submeshes.front().getTriangleIndices();
+  indices.reserve(widthCount * 6 + (heightCount - 2) * widthCount * 6);
+
+  // Upper circle
+  for (unsigned int widthIndex = 0; widthIndex < widthCount; ++widthIndex) {
+    const unsigned int widthStride = widthCount + widthIndex;
+
+    indices.push_back(widthIndex + 1);
+    indices.push_back(widthStride + 1);
+    indices.push_back(widthStride + 2);
+  }
+
+  for (unsigned int heightIndex = 1; heightIndex < heightCount - 1; ++heightIndex) {
+    unsigned int curHeightStride  = heightIndex * (widthCount + 1);
+    unsigned int nextHeightStride = curHeightStride + widthCount + 1;
+
+    for (unsigned int widthIndex = 0; widthIndex < widthCount; ++widthIndex, ++curHeightStride, ++nextHeightStride) {
+      indices.push_back(curHeightStride);
+      indices.push_back(nextHeightStride);
+      indices.push_back(curHeightStride + 1);
+
+      indices.push_back(curHeightStride + 1);
+      indices.push_back(nextHeightStride);
+      indices.push_back(nextHeightStride + 1);
+    }
+  }
+
+  // Lower circle
+  {
+    unsigned int curHeightStride  = (heightCount - 1) * (widthCount + 1);
+    unsigned int nextHeightStride = curHeightStride + widthCount + 1;
+
+    for (unsigned int widthIndex = 0; widthIndex < widthCount; ++widthIndex, ++curHeightStride, ++nextHeightStride) {
+      indices.push_back(curHeightStride);
+      indices.push_back(nextHeightStride);
+      indices.push_back(curHeightStride + 1);
+    }
+  }
 
   setRenderMode(renderMode);
   load();
