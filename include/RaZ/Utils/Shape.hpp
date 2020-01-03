@@ -19,6 +19,9 @@ class OBB;
 
 class Shape : public Component {
 public:
+  Shape(const Shape&) = default;
+  Shape(Shape&&) noexcept = default;
+
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is contained by the shape, false otherwise.
@@ -58,11 +61,18 @@ public:
   /// Computes the shape's centroid.
   /// \return Computed centroid.
   virtual Vec3f computeCentroid() const = 0;
+
+  Shape& operator=(const Shape&) = default;
+  Shape& operator=(Shape&&) noexcept = default;
+
+protected:
+  Shape() = default;
 };
 
 /// Line segment defined by its two extremities' positions.
 class Line : public Shape {
 public:
+  Line() = default;
   Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
 
   const Vec3f& getBeginPos() const { return m_beginPos; }
@@ -125,6 +135,7 @@ private:
 /// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
 class Plane : public Shape {
 public:
+  Plane() = default;
   explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_distance{ distance }, m_normal{ normal } {}
   explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_distance{ position.computeLength() }, m_normal{ normal } {}
   Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint)
@@ -183,6 +194,7 @@ private:
 /// Sphere defined by its center position and a radius.
 class Sphere : public Shape {
 public:
+  Sphere() = default;
   Sphere(const Vec3f& centerPos, float radius) : m_centerPos{ centerPos }, m_radius{ radius } {}
 
   const Vec3f& getCenter() const { return m_centerPos; }
@@ -237,6 +249,7 @@ private:
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
 class Triangle : public Shape {
 public:
+  Triangle() = default;
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
     : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
@@ -304,6 +317,7 @@ private:
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.
 class Quad : public Shape {
 public:
+  Quad() = default;
   Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos)
     : m_leftTopPos{ leftTopPos }, m_rightTopPos{ rightTopPos }, m_rightBottomPos{ rightBottomPos }, m_leftBottomPos{ leftBottomPos } {}
 
@@ -389,6 +403,7 @@ private:
 /// As such, rightTopFront designs the point in [ +X; +Y; +Z ], and leftBottomBack designs the point in [ -X; -Y; -Z ].
 class AABB : public Shape {
 public:
+  AABB() = default;
   AABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos)
     : m_rightTopFrontPos{ rightTopFrontPos }, m_leftBottomBackPos{ leftBottomBackPos } {}
 
@@ -505,6 +520,7 @@ private:
 ///
 class OBB : public Shape {
 public:
+  OBB() = default;
   OBB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos, const Mat3f& rotation = Mat3f::identity())
       : m_aabb(rightTopFrontPos, leftBottomBackPos), m_rotation{ rotation } {}
   explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
@@ -573,7 +589,7 @@ public:
   Vec3f computeHalfExtents() const { return m_aabb.computeHalfExtents() * m_rotation; }
 
 private:
-  AABB m_aabb;
+  AABB m_aabb {};
   Mat3f m_rotation {};
   Mat3f m_invRotation {};
 };
