@@ -4,13 +4,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 enable_testing()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(
-        RAZ_TESTS_COMPILER_FLAGS
+set(
+    RAZ_TESTS_COMPILER_FLAGS
 
-        -Wno-float-equal
-    )
-endif ()
+    ${RAZ_COMPILER_FLAGS}
+)
 
 set(
     TESTS_SRC
