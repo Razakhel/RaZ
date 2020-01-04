@@ -4,6 +4,7 @@
 #define RAZ_SUBMESH_HPP
 
 #include "RaZ/Render/GraphicObjects.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 #include <functional>
 #include <memory>
@@ -31,12 +32,16 @@ public:
   const std::vector<unsigned int>& getTriangleIndices() const { return m_ibo.getTriangleIndices(); }
   std::vector<unsigned int>& getTriangleIndices() { return m_ibo.getTriangleIndices(); }
   std::size_t getTriangleIndexCount() const { return getTriangleIndices().size(); }
+  const AABB& getBoundingBox() const { return m_boundingBox; }
   RenderMode getRenderMode() const { return m_renderMode; }
   std::size_t getMaterialIndex() const { return m_materialIndex; }
 
   void setRenderMode(RenderMode renderMode);
   void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
 
+  /// Computes & updates the submesh's bounding box.
+  /// \return Submesh's bounding box.
+  const AABB& computeBoundingBox();
   /// Loads the submesh's data (vertices & indices) onto the graphics card.
   void load() const;
   /// Draws the submesh in the scene.
@@ -52,6 +57,8 @@ private:
   VertexArray m_vao {};
   VertexBuffer m_vbo {};
   IndexBuffer m_ibo {};
+  AABB m_boundingBox {};
+
   RenderMode m_renderMode = RenderMode::TRIANGLE;
   std::function<void(const Submesh&)> m_renderFunc {};
 

@@ -349,4 +349,24 @@ Mesh::Mesh(const AABB& box, RenderMode renderMode) : Mesh() {
   load();
 }
 
+const AABB& Mesh::computeBoundingBox() {
+  Vec3f maxPos;
+  Vec3f minPos;
+
+  for (Submesh& submesh : m_submeshes) {
+    const AABB& boundingBox = submesh.computeBoundingBox();
+
+    maxPos[0] = std::max(maxPos[0], boundingBox.getRightTopFrontPos()[0]);
+    maxPos[1] = std::max(maxPos[1], boundingBox.getRightTopFrontPos()[1]);
+    maxPos[2] = std::max(maxPos[2], boundingBox.getRightTopFrontPos()[2]);
+
+    minPos[0] = std::min(minPos[0], boundingBox.getLeftBottomBackPos()[0]);
+    minPos[1] = std::min(minPos[1], boundingBox.getLeftBottomBackPos()[1]);
+    minPos[2] = std::min(minPos[2], boundingBox.getLeftBottomBackPos()[2]);
+  }
+
+  m_boundingBox = AABB(maxPos, minPos);
+  return m_boundingBox;
+}
+
 } // namespace Raz

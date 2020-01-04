@@ -37,6 +37,24 @@ void Submesh::setRenderMode(RenderMode renderMode) {
   loadIndices();
 }
 
+const AABB& Submesh::computeBoundingBox() {
+  Vec3f maxPos;
+  Vec3f minPos;
+
+  for (const Vertex& vert : m_vbo.getVertices()) {
+    maxPos[0] = std::max(maxPos[0], vert.position[0]);
+    maxPos[1] = std::max(maxPos[1], vert.position[1]);
+    maxPos[2] = std::max(maxPos[2], vert.position[2]);
+
+    minPos[0] = std::min(minPos[0], vert.position[0]);
+    minPos[1] = std::min(minPos[1], vert.position[1]);
+    minPos[2] = std::min(minPos[2], vert.position[2]);
+  }
+
+  m_boundingBox = AABB(maxPos, minPos);
+  return m_boundingBox;
+}
+
 void Submesh::load() const {
   loadVertices();
   loadIndices();

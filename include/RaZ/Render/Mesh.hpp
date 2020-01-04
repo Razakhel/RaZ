@@ -46,6 +46,7 @@ public:
   std::vector<Submesh>& getSubmeshes() { return m_submeshes; }
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
+  const AABB& getBoundingBox() const { return m_boundingBox; }
   std::size_t recoverVertexCount() const;
   std::size_t recoverTriangleCount() const;
 
@@ -59,6 +60,9 @@ public:
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(Submesh submesh = Submesh()) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
+  /// Computes & updates the mesh's bounding box by computing the submeshes' ones.
+  /// \return Mesh's bounding box.
+  const AABB& computeBoundingBox();
   void load() const;
   void load(const ShaderProgram& program) const;
   void draw() const;
@@ -76,6 +80,7 @@ private:
 
   std::vector<Submesh> m_submeshes {};
   std::vector<MaterialPtr> m_materials {};
+  AABB m_boundingBox {};
 };
 
 } // namespace Raz
