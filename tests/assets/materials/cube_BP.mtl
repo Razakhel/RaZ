@@ -1,0 +1,12 @@
+newmtl cube_BP
+  Kd 1.00 1.00 1.00
+  Ka 0.67 0.67 0.67
+  Ks 0.33 0.33 0.33
+  Ke 0.00 0.00 0.00
+
+  map_Kd ../textures/RGBRA.png
+  map_Ka ../textures/BBBB.png
+  map_Ks ../textures/1001.png
+  map_Ke ../textures/RRRR.png
+  map_d ../textures/1111.png
+  map_bump ../textures/0000.png
