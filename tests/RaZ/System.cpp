@@ -16,10 +16,6 @@ public:
 TEST_CASE("System basic") {
   TestSystem testSystem {};
 
-  // Window created to setup the OpenGL context, which Raz::Mesh needs to be instantiated
-  // TODO: this window should not be created anymore when renderer will be externalized
-  Raz::Window window(1, 1);
-
   Raz::EntityPtr mesh = Raz::Entity::create(0);
   mesh->addComponent<Raz::Mesh>();
 

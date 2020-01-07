@@ -4,10 +4,6 @@
 #include "RaZ/Utils/Window.hpp"
 
 TEST_CASE("Vertex shader basic") {
-// Window created to setup the OpenGL context, which Raz::Shader needs to be instantiated
-// TODO: this window should not be created anymore when renderer will be externalized
-  const Raz::Window window(1, 1);
-
   const std::string vertSource = R"(
     #version 330 core
 
@@ -23,10 +19,6 @@ TEST_CASE("Vertex shader basic") {
 }
 
 TEST_CASE("Fragment shader basic") {
-// Window created to setup the OpenGL context, which Raz::Shader needs to be instantiated
-// TODO: this window should not be created anymore when renderer will be externalized
-  const Raz::Window window(1, 1);
-
   const std::string fragSource = R"(
     #version 330 core
 
@@ -44,10 +36,6 @@ TEST_CASE("Fragment shader basic") {
 }
 
 TEST_CASE("Vertex shader imported") {
-// Window created to setup the OpenGL context, which Raz::Shader needs to be instantiated
-// TODO: this window should not be created anymore when renderer will be externalized
-  const Raz::Window window(1, 1);
-
   const Raz::VertexShader vertShader(RAZ_TESTS_ROOT + "../shaders/vert.glsl"s);
 
   vertShader.compile();
@@ -55,10 +43,6 @@ TEST_CASE("Vertex shader imported") {
 }
 
 TEST_CASE("Fragment shader imported") {
-// Window created to setup the OpenGL context, which Raz::Shader needs to be instantiated
-// TODO: this window should not be created anymore when renderer will be externalized
-  const Raz::Window window(1, 1);
-
   const Raz::FragmentShader fragShader(RAZ_TESTS_ROOT + "../shaders/lambert.glsl"s);
 
   fragShader.compile();
