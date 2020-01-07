@@ -56,6 +56,8 @@ public:
   /// \return Reference to the moved quaternion.
   Quaternion& operator=(Quaternion&&) noexcept = default;
 
+  Quaternion<T>& operator*=(const Quaternion<T>& right);
+
 private:
   T m_real {};
   Vec3<T> m_complexes {};
