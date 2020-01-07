@@ -72,6 +72,13 @@ Mat4<T> Quaternion<T>::computeMatrix() const {
 }
 
 template <typename T>
+Quaternion<T> Quaternion<T>::operator*(const Quaternion<T>& right) const {
+  Quaternion<T> left = *this;
+  left *= right;
+  return left;
+}
+
+template <typename T>
 Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& right) {
   Quaternion<T> left = *this;
 

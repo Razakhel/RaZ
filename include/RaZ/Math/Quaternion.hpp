@@ -56,6 +56,7 @@ public:
   /// \return Reference to the moved quaternion.
   Quaternion& operator=(Quaternion&&) noexcept = default;
 
+  Quaternion<T> operator*(const Quaternion<T>& right) const;
   Quaternion<T>& operator*=(const Quaternion<T>& right);
 
 private:
