@@ -23,6 +23,9 @@ public:
   Quaternion(const Quaternion&) = default;
   Quaternion(Quaternion&&) noexcept = default;
 
+  /// Return a quaternion representing an identity transform
+  static Quaternion<T> identity() { return Quaternion<T>(1.f, 0.f, 0.f, 0.f); }
+
   /// Computes the norm of the quaternion.
   /// Calculating the actual norm requires a square root operation to be involved, which is expensive.
   /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredNorm().
