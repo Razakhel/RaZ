@@ -3,4 +3,4 @@ newmtl cube_CT
   norm ../textures/BBBB.png
   map_Pm ../textures/1111.png
   map_Pr ../textures/0000.png
-  map_Ka ../texture/1001.png
+  map_Ka ../textures/1001.png
