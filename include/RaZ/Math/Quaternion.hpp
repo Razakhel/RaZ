@@ -59,9 +59,17 @@ public:
   /// Default move assignment operator.
   /// \return Reference to the moved quaternion.
   Quaternion& operator=(Quaternion&&) noexcept = default;
-
-  Quaternion<T> operator*(const Quaternion<T>& right) const;
-  Quaternion<T>& operator*=(const Quaternion<T>& right);
+  /// Quaternions multiplication.
+  /// \param right Quaternion to be multiplied by.
+  /// \return Result of the multiplied quaternions.
+  Quaternion operator*(const Quaternion& right) const;
+  /// Quaternions multiplication.
+  /// \param right Quaternion to be multiplied by.
+  /// \return Reference to the modified original quaternion.
+  Quaternion& operator*=(const Quaternion& right);
+  /// Matrix conversion operator; computes the rotation matrix represented by the quaternion.
+  /// \return Rotation matrix.
+  operator Mat4<T>() const { return computeMatrix(); }
 
 private:
   T m_real {};

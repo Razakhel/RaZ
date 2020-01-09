@@ -80,12 +80,27 @@ Quaternion<T> Quaternion<T>::operator*(const Quaternion<T>& right) const {
 
 template <typename T>
 Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& right) {
-  Quaternion<T> left = *this;
+  const Quaternion<T> left = *this;
 
-  m_real         = left.m_real * right.m_real - left.m_complexes[0] * right.m_complexes[0] - left.m_complexes[1] * right.m_complexes[1] - left.m_complexes[2] * right.m_complexes[2];
-  m_complexes[0] = left.m_real * right.m_complexes[0] + left.m_complexes[0] * right.m_real + left.m_complexes[1] * right.m_complexes[2] - left.m_complexes[2] * right.m_complexes[1];
-  m_complexes[1] = left.m_real * right.m_complexes[1] + left.m_complexes[1] * right.m_real + left.m_complexes[2] * right.m_complexes[0] - left.m_complexes[0] * right.m_complexes[2];
-  m_complexes[2] = left.m_real * right.m_complexes[2] + left.m_complexes[2] * right.m_real + left.m_complexes[0] * right.m_complexes[1] - left.m_complexes[1] * right.m_complexes[0];
+  m_real = left.m_real * right.m_real
+         - left.m_complexes[0] * right.m_complexes[0]
+         - left.m_complexes[1] * right.m_complexes[1]
+         - left.m_complexes[2] * right.m_complexes[2];
+
+  m_complexes[0] = left.m_real * right.m_complexes[0]
+                 + left.m_complexes[0] * right.m_real
+                 + left.m_complexes[1] * right.m_complexes[2]
+                 - left.m_complexes[2] * right.m_complexes[1];
+
+  m_complexes[1] = left.m_real * right.m_complexes[1]
+                 + left.m_complexes[1] * right.m_real
+                 + left.m_complexes[2] * right.m_complexes[0]
+                 - left.m_complexes[0] * right.m_complexes[2];
+
+  m_complexes[2] = left.m_real * right.m_complexes[2]
+                 + left.m_complexes[2] * right.m_real
+                 + left.m_complexes[0] * right.m_complexes[1]
+                 - left.m_complexes[1] * right.m_complexes[0];
 
   return *this;
 }
