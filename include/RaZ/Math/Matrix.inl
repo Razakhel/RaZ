@@ -1,7 +1,7 @@
+#include "RaZ/Utils/FloatUtils.hpp"
+
 #include <algorithm>
 #include <cassert>
-
-#include "RaZ/Utils/FloatUtils.hpp"
 
 namespace Raz {
 
@@ -435,16 +435,10 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator/=(float val) {
 
 template <typename T, std::size_t W, std::size_t H>
 bool Matrix<T, W, H>::operator==(const Matrix<T, W, H>& mat) const {
-  if constexpr (std::is_floating_point_v<T>) {
-    for (std::size_t i = 0; i < W * H; ++i) {
-      if (!FloatUtils::areNearlyEqual(m_data[i], mat.getData()[i]))
-        return false;
-    }
-
-    return true;
-  } else {
+  if constexpr (std::is_floating_point_v<T>)
+    return FloatUtils::areNearlyEqual(*this, mat);
+  else
     return std::equal(m_data.cbegin(), m_data.cend(), mat.getData().cbegin());
-  }
 }
 
 template <typename T, std::size_t W, std::size_t H>
