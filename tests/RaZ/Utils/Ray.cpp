@@ -20,7 +20,13 @@ const Raz::Ray ray3(Raz::Vec3f({ 1.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, -1.f, 0.f 
 } // namespace
 
 TEST_CASE("Ray-point intersection") {
-  CHECK(ray1.intersects(ray1.getOrigin()));
+  Raz::RayHit hit;
+
+  CHECK(ray1.intersects(ray1.getOrigin(), &hit));
+
+  CHECK(hit.position == ray1.getOrigin());
+  CHECK(hit.normal   == Raz::Vec3f(0.f));
+  CHECK(hit.distance == 0.f);
 
   const Raz::Vec3f topPoint({ 0.f, 2.f, 0.f });
   const Raz::Vec3f topRightPoint({ 2.f, 2.f, 0.f });
@@ -31,7 +37,13 @@ TEST_CASE("Ray-point intersection") {
   //        ^
   //        |
   //        x < [ 0; 0 ]
-  CHECK(ray1.intersects(topPoint));
+
+  CHECK(ray1.intersects(topPoint, &hit));
+
+  CHECK(hit.position == topPoint);
+  CHECK(hit.normal   == -ray1.getDirection());
+  CHECK(hit.distance == 2.f);
+
   CHECK_FALSE(ray1.intersects(topRightPoint));
 
   //     topPoint  topRightPoint
@@ -39,9 +51,15 @@ TEST_CASE("Ray-point intersection") {
   //
   //          ^
   //         /
-  //        x < [ 0; 0 ]
+  //        x < [ -1; -1 ]
+
   CHECK_FALSE(ray2.intersects(topPoint));
-  CHECK(ray2.intersects(topRightPoint));
+
+  CHECK(ray2.intersects(topRightPoint, &hit));
+
+  CHECK(hit.position == topRightPoint);
+  CHECK(hit.normal   == -ray2.getDirection());
+  CHECK(hit.distance == Raz::Vec3f({ 3.f, 3.f, 0.f }).computeLength()); // 4.2426405f
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -49,6 +67,7 @@ TEST_CASE("Ray-point intersection") {
   //             x < [ 1; 1 ]
   //            /
   //           v
+
   CHECK_FALSE(ray3.intersects(topPoint));
   CHECK_FALSE(ray3.intersects(topRightPoint));
 }

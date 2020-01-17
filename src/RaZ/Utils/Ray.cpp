@@ -1,3 +1,4 @@
+#include "RaZ/Utils/FloatUtils.hpp"
 #include "RaZ/Utils/Ray.hpp"
 
 namespace Raz {
@@ -29,13 +30,29 @@ bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secon
 
 } // namespace
 
-bool Ray::intersects(const Vec3f& point) const {
-  if (point == m_origin)
+bool Ray::intersects(const Vec3f& point, RayHit* hit) const {
+  if (point == m_origin) {
+    if (hit) {
+      hit->position = point;
+      hit->distance = 0.f;
+    }
+
     return true;
+  }
 
-  const Vec3f pointDir = (point - m_origin).normalize();
+  const Vec3f pointDir       = point - m_origin;
+  const Vec3f normedPointDir = pointDir.normalize();
 
-  return FloatUtils::areNearlyEqual(pointDir.dot(m_direction), 1.f);
+  if (!FloatUtils::areNearlyEqual(normedPointDir.dot(m_direction), 1.f))
+    return false;
+
+  if (hit) {
+    hit->position  = point;
+    hit->normal    = -normedPointDir;
+    hit->distance = pointDir.computeLength();
+  }
+
+  return true;
 }
 
 bool Ray::intersects(const Line&, RayHit*) const {

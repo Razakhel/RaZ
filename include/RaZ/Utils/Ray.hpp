@@ -25,8 +25,9 @@ public:
 
   /// Ray-point intersection check.
   /// \param point Point to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
   /// \return True if the ray intersects the point, false otherwise.
-  bool intersects(const Vec3f& point) const;
+  bool intersects(const Vec3f& point, RayHit* hit = nullptr) const;
   /// Ray-line intersection check.
   /// \param line Line to check if there is an intersection with.
   /// \param hit Ray intersection's information to recover.

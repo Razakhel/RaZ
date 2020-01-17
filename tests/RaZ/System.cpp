@@ -3,7 +3,6 @@
 #include "RaZ/Entity.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/Window.hpp"
 #include "RaZ/System.hpp"
 
 class TestSystem : public Raz::System {
