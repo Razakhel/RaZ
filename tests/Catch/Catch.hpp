@@ -38,13 +38,57 @@ public:
   /// \return Error string to be printed.
   std::string describe() const override {
     std::ostringstream stream;
-    stream.precision(std::numeric_limits<T>::digits10 + 1);
+    stream.precision(std::numeric_limits<T>::digits10 + 2);
     stream << "is not nearly equal to " << m_comparison;
     return stream.str();
   }
 
 private:
   T m_comparison;
+  TolT m_absTol;
+};
+
+/// Custom Catch matcher, which checks for near-equality between floating point vectors' values.
+/// \tparam T Type of the vector to be compared to.
+/// \tparam TolT Tolerance type, which may differ from the value type.
+template <typename T, std::size_t Size, typename TolT = T>
+class IsNearlyEqualToVector : public Catch::MatcherBase<Raz::Vector<T, Size>> {
+  static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualToVector's value type must be floating point.");
+  static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualToVector's tolerance type must be floating point.");
+
+public:
+  /// Creates an instance of a near-equality vector check custom matcher.
+  /// \param comparison Vector to be compared with.
+  /// \param absTol Absolute tolerance to compare the values with.
+  constexpr explicit IsNearlyEqualToVector(const Raz::Vector<T, Size>& comparison, TolT absTol = std::numeric_limits<TolT>::epsilon())
+      : m_comparison{ comparison }, m_absTol{ absTol } {}
+
+  /// Checks if the given vector has nearly equal values compared to the comparison one.
+  /// \param base Base vector to compare to.
+  /// \return True if values are nearly equal to each other, false otherwise.
+  constexpr bool match(const Raz::Vector<T, Size>& base) const override {
+    const_cast<IsNearlyEqualToVector*>(this)->m_base = base;
+
+    return Raz::FloatUtils::areNearlyEqual(m_base, m_comparison, m_absTol);
+  }
+
+  /// Gets the description of the error if the match failed.
+  /// \return Error string to be printed.
+  std::string describe() const override {
+    std::ostringstream stream;
+    stream.precision(std::numeric_limits<T>::digits10 + 2);
+
+    for (std::size_t i = 0; i < Size; ++i) {
+      if (!Raz::FloatUtils::areNearlyEqual(m_base[i], m_comparison[i], m_absTol))
+        stream << "\n\tAt [" << i << "]: " << m_base[i] << " is not nearly equal to " << m_comparison[i];
+    }
+
+    return stream.str();
+  }
+
+private:
+  Raz::Vector<T, Size> m_comparison;
+  Raz::Vector<T, Size> m_base;
   TolT m_absTol;
 };
 
@@ -64,7 +108,7 @@ public:
     : m_comparison{ comparison }, m_absTol{ absTol } {}
 
   /// Checks if the given matrix has nearly equal values compared to the comparison one.
-  /// \param base Base Matrix to compare to.
+  /// \param base Base matrix to compare to.
   /// \return True if values are nearly equal to each other, false otherwise.
   constexpr bool match(const Raz::Matrix<T, W, H>& base) const override {
     const_cast<IsNearlyEqualToMatrix*>(this)->m_base = base;
@@ -76,7 +120,7 @@ public:
   /// \return Error string to be printed.
   std::string describe() const override {
     std::ostringstream stream;
-    stream.precision(std::numeric_limits<T>::digits10 + 1);
+    stream.precision(std::numeric_limits<T>::digits10 + 2);
 
     for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
       const std::size_t finalHeightIndex = heightIndex * W;
