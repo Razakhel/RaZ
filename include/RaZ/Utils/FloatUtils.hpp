@@ -10,6 +10,9 @@
 
 namespace Raz {
 
+template <typename T, std::size_t Size>
+class Vector;
+
 template <typename T, std::size_t W, std::size_t H>
 class Matrix;
 
@@ -31,6 +34,24 @@ inline constexpr bool areNearlyEqual(T val1, T val2, TolT absTol = std::numeric_
   // Could be a better idea to use ULPs checking. May be slower though?
   const T absDiff = std::abs(val1 - val2);
   return (absDiff <= absTol * std::max({ static_cast<T>(1), std::abs(val1), std::abs(val2) }));
+}
+
+/// Checks if two given floating point vectors are nearly equal to each other.
+/// \tparam T Type of both vectors' values to check; must be a floating point type.
+/// \tparam Size Vectors' size.
+/// \tparam TolT Tolerance type, which may differ from value type; must be a floating point type.
+/// \param vec1 First vector to compare.
+/// \param vec2 Second vector to compare.
+/// \param absTol Absolute tolerance to compare the vectors' values with.
+/// \return True if vectors are nearly equal to each other, false otherwise.
+template <typename T, std::size_t Size, typename TolT = T>
+inline constexpr bool areNearlyEqual(const Vector<T, Size>& vec1, const Vector<T, Size>& vec2, TolT absTol = std::numeric_limits<TolT>::epsilon()) {
+  for (std::size_t i = 0; i < Size; ++i) {
+    if (!areNearlyEqual(vec1[i], vec2[i], absTol))
+      return false;
+  }
+
+  return true;
 }
 
 /// Checks if two given floating point matrices are nearly equal to each other.
