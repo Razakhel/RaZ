@@ -365,7 +365,7 @@ const AABB& Mesh::computeBoundingBox() {
     minPos[2] = std::min(minPos[2], boundingBox.getLeftBottomBackPos()[2]);
   }
 
-  m_boundingBox = AABB(maxPos, minPos);
+  m_boundingBox = AABB(minPos, maxPos);
   return m_boundingBox;
 }
 

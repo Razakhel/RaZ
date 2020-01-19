@@ -57,9 +57,9 @@ const Raz::Triangle triangle3(Raz::Vec3f({ 0.f, -1.f, 1.f }), Raz::Vec3f({ -1.5f
 //  2 -> [   3;   3; -5 ]
 //  3 -> [ -10; -10; -5 ]
 
-const Raz::AABB aabb1(Raz::Vec3f(1.f), Raz::Vec3f(-1.f));
-const Raz::AABB aabb2(Raz::Vec3f(5.f), Raz::Vec3f({ 3.f, 3.f, -5.f }));
-const Raz::AABB aabb3(Raz::Vec3f({ -5.f, -5.f, 5.f }), Raz::Vec3f({ -10.f, -10.f, -5.f }));
+const Raz::AABB aabb1(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
+const Raz::AABB aabb2(Raz::Vec3f({ 3.f, 3.f, -5.f }), Raz::Vec3f(5.f));
+const Raz::AABB aabb3(Raz::Vec3f({ -10.f, -10.f, -5.f }), Raz::Vec3f({ -5.f, -5.f, 5.f }));
 
 } // namespace
 

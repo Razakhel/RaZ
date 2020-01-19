@@ -17,7 +17,7 @@ class Quad;
 class AABB;
 class OBB;
 
-class Shape : public Component {
+class Shape {
 public:
   Shape(const Shape&) = default;
   Shape(Shape&&) noexcept = default;
@@ -64,6 +64,8 @@ public:
 
   Shape& operator=(const Shape&) = default;
   Shape& operator=(Shape&&) noexcept = default;
+
+  virtual ~Shape() = default;
 
 protected:
   Shape() = default;
@@ -374,7 +376,7 @@ private:
   Vec3f m_leftBottomPos {};
 };
 
-/// Axis-aligned bounding box defined by its right top front and left bottom back vertices' positions.
+/// Axis-aligned bounding box defined by its left bottom back and right top front vertices' positions.
 ///
 ///          _______________________
 ///         /|                    /|
@@ -400,15 +402,15 @@ private:
 ///               v
 ///               Z
 ///
-/// As such, rightTopFront designs the point in [ +X; +Y; +Z ], and leftBottomBack designs the point in [ -X; -Y; -Z ].
+/// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
 class AABB : public Shape {
 public:
   AABB() = default;
-  AABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos)
-    : m_rightTopFrontPos{ rightTopFrontPos }, m_leftBottomBackPos{ leftBottomBackPos } {}
+  AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos)
+    : m_leftBottomBackPos{ leftBottomBackPos }, m_rightTopFrontPos{ rightTopFrontPos } {}
 
-  const Vec3f& getRightTopFrontPos() const { return m_rightTopFrontPos; }
   const Vec3f& getLeftBottomBackPos() const { return m_leftBottomBackPos; }
+  const Vec3f& getRightTopFrontPos() const { return m_rightTopFrontPos; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -467,11 +469,11 @@ public:
   Vec3f computeHalfExtents() const { return (m_rightTopFrontPos - m_leftBottomBackPos) * 0.5f; }
 
 private:
-  Vec3f m_rightTopFrontPos {};
   Vec3f m_leftBottomBackPos {};
+  Vec3f m_rightTopFrontPos {};
 };
 
-/// Oriented bounding box defined by its right top front and left bottom back vertices' positions, as well as a rotation.
+/// Oriented bounding box defined by its left bottom back and right top front vertices' positions, as well as a rotation.
 ///
 ///          _______________________
 ///         /|                    /|
@@ -497,7 +499,7 @@ private:
 ///               v
 ///               Z
 ///
-/// As such, rightTopFront designs the point in [ +X; +Y; +Z ], and leftBottomBack designs the point in [ -X; -Y; -Z ].
+/// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
 ///
 /// Beyond that, an OBB differs from an AABB in that it contains a rotation giving its orientation.
 ///
@@ -521,12 +523,12 @@ private:
 class OBB : public Shape {
 public:
   OBB() = default;
-  OBB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos, const Mat3f& rotation = Mat3f::identity())
-      : m_aabb(rightTopFrontPos, leftBottomBackPos), m_rotation{ rotation } {}
+  OBB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos, const Mat3f& rotation = Mat3f::identity())
+    : m_aabb(leftBottomBackPos, rightTopFrontPos), m_rotation{ rotation } {}
   explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
 
-  const Vec3f& getRightTopFrontPos() const { return m_aabb.getRightTopFrontPos(); }
   const Vec3f& getLeftBottomBackPos() const { return m_aabb.getLeftBottomBackPos(); }
+  const Vec3f& getRightTopFrontPos() const { return m_aabb.getRightTopFrontPos(); }
   const Mat3f& getRotation() const { return m_rotation; }
 
   void setRotation(const Mat3f& rotation);
