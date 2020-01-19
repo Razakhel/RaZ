@@ -37,7 +37,7 @@ const Raz::Plane plane3(0.5f, Raz::Vec3f({ -1.f, 1.f, 0.f }).normalize());
 //  - triangle2 is standing, parallel to the Y/Z plane (facing the X direction)
 //  - triangle3 is crooked, its head pointing to [ -X; +Y ], slightly below 0
 
-const Raz::Triangle triangle1(Raz::Vec3f({ -3.f, 0.5f, 3.f }), Raz::Vec3f({ 0.f, 0.5f, -6.f }), Raz::Vec3f({ 3.f, 0.5f, 3.f }));
+const Raz::Triangle triangle1(Raz::Vec3f({ -3.f, 0.5f, 3.f }), Raz::Vec3f({ 3.f, 0.5f, 3.f }), Raz::Vec3f({ 0.f, 0.5f, -6.f }));
 const Raz::Triangle triangle2(Raz::Vec3f({ 0.5f, -0.5f, 3.f }), Raz::Vec3f({ 0.5f, -0.5f, -3.f }), Raz::Vec3f({ 0.5f, 3.f, 0.f }));
 const Raz::Triangle triangle3(Raz::Vec3f({ 0.f, -1.f, 1.f }), Raz::Vec3f({ -1.5f, -1.5f, 0.f }), Raz::Vec3f({ 0.f, -1.75f, -1.f }));
 
@@ -122,15 +122,22 @@ TEST_CASE("Plane-plane intersection") {
 }
 
 TEST_CASE("Triangle basic") {
+  // See: https://www.geogebra.org/3d/gszsn33d
+
   CHECK(triangle1.computeCentroid() == Raz::Vec3f({ 0.f, 0.5f, 0.f }));
+  CHECK(triangle1.computeNormal() == Raz::Axis::Y);
+
   CHECK(triangle2.computeCentroid() == Raz::Vec3f({ 0.5f, 0.666666666f, 0.f }));
+  CHECK(triangle2.computeNormal() == Raz::Axis::X);
+
   CHECK(triangle3.computeCentroid() == Raz::Vec3f({ -0.5f, -1.416666666f, 0.f }));
+  CHECK_THAT(triangle3.computeNormal(), IsNearlyEqualToVector(Raz::Vec3f({ 0.077791f, -0.93349177f, 0.35005942f })));
 }
 
 TEST_CASE("Triangle clockwiseness") {
-  CHECK(triangle1.isCounterClockwise(-Raz::Axis::Y));
+  CHECK(triangle1.isCounterClockwise(Raz::Axis::Y));
   CHECK(triangle2.isCounterClockwise(Raz::Axis::X));
-  CHECK(triangle3.isCounterClockwise((-Raz::Axis::X - Raz::Axis::Y).normalize())); // Pointing roughly towards [ -X; -Y ]
+  CHECK(triangle3.isCounterClockwise(-Raz::Axis::Y)); // Pointing roughly towards -Y
 
   // Creating two triangles with the same points but in a different ordering
   Raz::Triangle testTriangle1(Raz::Vec3f({ -1.f, 0.f, 0.f }), Raz::Vec3f({ 0.f, 1.f, 0.f }), Raz::Vec3f({ 1.f, 0.f, 0.f }));
