@@ -159,3 +159,37 @@ TEST_CASE("AABB basic") {
   CHECK(aabb2.computeHalfExtents() == Raz::Vec3f({ 1.f, 1.f, 5.f }));
   CHECK(aabb3.computeHalfExtents() == Raz::Vec3f({ 2.5f, 2.5f, 5.f }));
 }
+
+TEST_CASE("AABB point containment") {
+  // See: https://www.geogebra.org/3d/kwkkt9ry
+
+  CHECK(aabb1.contains(aabb1.computeCentroid()));
+  CHECK(aabb1.contains(aabb1.getLeftBottomBackPos()));
+  CHECK(aabb1.contains(aabb1.getRightTopFrontPos()));
+
+  const Raz::Vec3f point1({ -0.25f, -0.5f, -0.5f }); // Should be contained by aabb1
+  const Raz::Vec3f point2({    4.f,   3.f,   0.f }); // Should be contained by aabb2 (lying on a face)
+  const Raz::Vec3f point3({   -7.f,  -7.f,  -3.f }); // Should be contained by aabb3
+  const Raz::Vec3f point4({ -4.95f,  -6.f,   0.f }); // Should be contained by none (really close to aabb3)
+  const Raz::Vec3f point5({   1.5f,   2.f,   0.f }); // Should be contained by none (between aabb1 & aabb2)
+
+  CHECK(aabb1.contains(point1));
+  CHECK_FALSE(aabb2.contains(point1));
+  CHECK_FALSE(aabb3.contains(point1));
+
+  CHECK_FALSE(aabb1.contains(point2));
+  CHECK(aabb2.contains(point2));
+  CHECK_FALSE(aabb3.contains(point2));
+
+  CHECK_FALSE(aabb1.contains(point3));
+  CHECK_FALSE(aabb2.contains(point3));
+  CHECK(aabb3.contains(point3));
+
+  CHECK_FALSE(aabb1.contains(point4));
+  CHECK_FALSE(aabb2.contains(point4));
+  CHECK_FALSE(aabb3.contains(point4));
+
+  CHECK_FALSE(aabb1.contains(point5));
+  CHECK_FALSE(aabb2.contains(point5));
+  CHECK_FALSE(aabb3.contains(point5));
+}
