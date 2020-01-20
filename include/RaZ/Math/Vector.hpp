@@ -94,7 +94,7 @@ public:
   /// Element-wise vector-value addition operator.
   /// \param val Value to be added.
   /// \return Result of the vector summed with the value.
-  Vector operator+(float val) const;
+  Vector operator+(T val) const;
   /// Element-wise vector-vector substraction operator.
   /// \param vec Vector to be substracted.
   /// \return Result of the substracted vectors.
@@ -102,7 +102,7 @@ public:
   /// Element-wise vector-value substraction operator.
   /// \param val Value to be substracted.
   /// \return Result of the vector substracted by the value.
-  Vector operator-(float val) const;
+  Vector operator-(T val) const;
   /// Element-wise vector-vector multiplication operator.
   /// \param vec Vector to be multiplied by.
   /// \return Result of the multiplied vectors.
@@ -110,7 +110,7 @@ public:
   /// Element-wise vector-value multiplication operator.
   /// \param val Value to be multiplied by.
   /// \return Result of the vector multiplied by the value.
-  Vector operator*(float val) const;
+  Vector operator*(T val) const;
   /// Element-wise vector-vector division operator.
   /// \param vec Vector to be divided by.
   /// \return Result of the summed vectors.
@@ -118,7 +118,7 @@ public:
   /// Element-wise vector-value division operator.
   /// \param val Value to be divided by.
   /// \return Result of the vector divided by the value.
-  Vector operator/(float val) const;
+  Vector operator/(T val) const;
   /// Vector-matrix multiplication operator (assumes the vector to be horizontal).
   /// \param mat Matrix to be multiplied by.
   /// \return Result of the vector-matrix multiplication.
@@ -130,7 +130,7 @@ public:
   /// Element-wise vector-value addition assignment operator.
   /// \param val Value to be added.
   /// \return Reference to the modified original vector.
-  Vector& operator+=(float val);
+  Vector& operator+=(T val);
   /// Element-wise vector-vector substraction assignment operator.
   /// \param vec Vector to be substracted.
   /// \return Reference to the modified original vector.
@@ -138,7 +138,7 @@ public:
   /// Element-wise vector-value substraction assignment operator.
   /// \param val Value to be substracted.
   /// \return Reference to the modified original vector.
-  Vector& operator-=(float val);
+  Vector& operator-=(T val);
   /// Element-wise vector-vector multiplication assignment operator.
   /// \param vec Vector to be multiplied by.
   /// \return Reference to the modified original vector.
@@ -146,7 +146,7 @@ public:
   /// Element-wise vector-value multiplication assignment operator.
   /// \param val Value to be multiplied by.
   /// \return Reference to the modified original vector.
-  Vector& operator*=(float val);
+  Vector& operator*=(T val);
   /// Element-wise vector-vector division assignment operator.
   /// \param vec Vector to be divided by.
   /// \return Reference to the modified original vector.
@@ -154,7 +154,7 @@ public:
   /// Element-wise vector-value division assignment operator.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original vector.
-  Vector& operator/=(float val);
+  Vector& operator/=(T val);
   /// Element fetching operator given its index.
   /// \param index Element's index.
   /// \return Constant reference to the fetched element.

@@ -48,7 +48,7 @@ public:
   Matrix<T, H, W> transpose() const;
   /// Determinant computation.
   /// \return Matrix's determinant.
-  float computeDeterminant() const;
+  T computeDeterminant() const;
   /// Inverse matrix computation.
   /// \return Matrix's inverse.
   Matrix inverse() const;
@@ -74,7 +74,7 @@ public:
   /// Element-wise matrix-value addition operator.
   /// \param val Value to be added.
   /// \return Result of the matrix summed with the value.
-  Matrix operator+(float val) const;
+  Matrix operator+(T val) const;
   /// Element-wise matrix-matrix substraction operator.
   /// \param mat Matrix to be substracted.
   /// \return Result of the substracted matrices.
@@ -82,7 +82,7 @@ public:
   /// Element-wise matrix-value substraction operator.
   /// \param val Value to be substracted.
   /// \return Result of the matrix substracted by the value.
-  Matrix operator-(float val) const;
+  Matrix operator-(T val) const;
   /// Element-wise matrix-matrix multiplication operator.
   /// \param mat Matrix to be multiplied by.
   /// \return Result of the multiplied matrices.
@@ -90,7 +90,7 @@ public:
   /// Element-wise matrix-value multiplication operator.
   /// \param val Value to be multiplied by.
   /// \return Result of the matrix multiplied by the value.
-  Matrix operator*(float val) const;
+  Matrix operator*(T val) const;
   /// Element-wise matrix-matrix division operator.
   /// \param mat Matrix to be divided by.
   /// \return Result of the divided matrices.
@@ -98,7 +98,7 @@ public:
   /// Element-wise matrix-value division operator.
   /// \param val Value to be divided by.
   /// \return Result of the matrix divided by the value.
-  Matrix operator/(float val) const;
+  Matrix operator/(T val) const;
   /// Matrix-vector multiplication operator (assumes the vector to be vertical).
   /// \param vec Vector to be multiplied by.
   /// \return Result of the matrix-vector multiplication.
@@ -116,7 +116,7 @@ public:
   /// Element-wise matrix-value addition assignment operator.
   /// \param val Value to be added.
   /// \return Reference to the modified original matrix.
-  Matrix& operator+=(float val);
+  Matrix& operator+=(T val);
   /// Element-wise matrix-matrix substraction assignment operator.
   /// \param mat Matrix to be substracted.
   /// \return Reference to the modified original matrix.
@@ -124,7 +124,7 @@ public:
   /// Element-wise matrix-value substraction assignment operator.
   /// \param val Value to be substracted.
   /// \return Reference to the modified original matrix.
-  Matrix& operator-=(float val);
+  Matrix& operator-=(T val);
   /// Element-wise matrix-matrix multiplication assignment operator.
   /// \param mat Matrix to be multiplied by.
   /// \return Reference to the modified original matrix.
@@ -132,7 +132,7 @@ public:
   /// Element-wise matrix-value multiplication assignment operator.
   /// \param val Value to be multiplied by.
   /// \return Reference to the modified original matrix.
-  Matrix& operator*=(float val);
+  Matrix& operator*=(T val);
   /// Element-wise matrix-matrix division assignment operator.
   /// \param mat Matrix to be divided by.
   /// \return Reference to the modified original matrix.
@@ -140,7 +140,7 @@ public:
   /// Element-wise matrix-value divions assignment operator.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original matrix.
-  Matrix& operator/=(float val);
+  Matrix& operator/=(T val);
   /// Element fetching operator given width & height indices.
   /// \param widthIndex Width index.
   /// \param heightIndex Height index.

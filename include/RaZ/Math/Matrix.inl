@@ -8,12 +8,12 @@ namespace Raz {
 namespace {
 
 template <typename T>
-float computeMatrixDeterminant(const Mat2<T>& mat) {
+T computeMatrixDeterminant(const Mat2<T>& mat) {
   return (mat.getData()[0] * mat.getData()[3]) - (mat.getData()[2] * mat.getData()[1]);
 }
 
 template <typename T>
-float computeMatrixDeterminant(const Mat3<T>& mat) {
+T computeMatrixDeterminant(const Mat3<T>& mat) {
   const auto leftMatrix = Mat2<T>({{ mat.getData()[4], mat.getData()[5] },
                                    { mat.getData()[7], mat.getData()[8] }});
 
@@ -29,7 +29,7 @@ float computeMatrixDeterminant(const Mat3<T>& mat) {
 }
 
 template <typename T>
-float computeMatrixDeterminant(const Mat4<T>& mat) {
+T computeMatrixDeterminant(const Mat4<T>& mat) {
   const auto leftMatrix = Mat3<T>({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
                                    {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
                                    { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
@@ -53,7 +53,7 @@ float computeMatrixDeterminant(const Mat4<T>& mat) {
 }
 
 template <typename T>
-Mat2<T> computeMatrixInverse(const Mat2<T>& mat, float determinant) {
+Mat2<T> computeMatrixInverse(const Mat2<T>& mat, T determinant) {
   const Mat2<T> res({{  mat.getData()[3], -mat.getData()[1] },
                      { -mat.getData()[2],  mat.getData()[0] }});
 
@@ -61,7 +61,7 @@ Mat2<T> computeMatrixInverse(const Mat2<T>& mat, float determinant) {
 }
 
 template <typename T>
-Mat3<T> computeMatrixInverse(const Mat3<T>& mat, float determinant) {
+Mat3<T> computeMatrixInverse(const Mat3<T>& mat, T determinant) {
   const Mat2<T> topLeft({{ mat.getData()[4], mat.getData()[5] },
                          { mat.getData()[7], mat.getData()[8] }});
   const Mat2<T> topCenter({{ mat.getData()[3], mat.getData()[5] },
@@ -91,7 +91,7 @@ Mat3<T> computeMatrixInverse(const Mat3<T>& mat, float determinant) {
 }
 
 template <typename T>
-Mat4<T> computeMatrixInverse(const Mat4<T>& mat, float determinant) {
+Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T determinant) {
   const Mat3<T> topLeft({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
                          {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
                          { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
@@ -144,25 +144,25 @@ Mat4<T> computeMatrixInverse(const Mat4<T>& mat, float determinant) {
                           { mat.getData()[4], mat.getData()[5],  mat.getData()[6] },
                           { mat.getData()[8], mat.getData()[9], mat.getData()[10] }});
 
-  const float topLeftDeterm        = topLeft.computeDeterminant();
-  const float topCenterLeftDeterm  = topCenterLeft.computeDeterminant();
-  const float topCenterRightDeterm = topCenterRight.computeDeterminant();
-  const float topRightDeterm       = topRight.computeDeterminant();
+  const T topLeftDeterm        = topLeft.computeDeterminant();
+  const T topCenterLeftDeterm  = topCenterLeft.computeDeterminant();
+  const T topCenterRightDeterm = topCenterRight.computeDeterminant();
+  const T topRightDeterm       = topRight.computeDeterminant();
 
-  const float midTopLeftDeterm        = midTopLeft.computeDeterminant();
-  const float midTopCenterLeftDeterm  = midTopCenterLeft.computeDeterminant();
-  const float midTopCenterRightDeterm = midTopCenterRight.computeDeterminant();
-  const float midTopRightDeterm       = midTopRight.computeDeterminant();
+  const T midTopLeftDeterm        = midTopLeft.computeDeterminant();
+  const T midTopCenterLeftDeterm  = midTopCenterLeft.computeDeterminant();
+  const T midTopCenterRightDeterm = midTopCenterRight.computeDeterminant();
+  const T midTopRightDeterm       = midTopRight.computeDeterminant();
 
-  const float midBotLeftDeterm        = midBotLeft.computeDeterminant();
-  const float midBotCenterLeftDeterm  = midBotCenterLeft.computeDeterminant();
-  const float midBotCenterRightDeterm = midBotCenterRight.computeDeterminant();
-  const float midBotRightDeterm       = midBotRight.computeDeterminant();
+  const T midBotLeftDeterm        = midBotLeft.computeDeterminant();
+  const T midBotCenterLeftDeterm  = midBotCenterLeft.computeDeterminant();
+  const T midBotCenterRightDeterm = midBotCenterRight.computeDeterminant();
+  const T midBotRightDeterm       = midBotRight.computeDeterminant();
 
-  const float botLeftDeterm        = botLeft.computeDeterminant();
-  const float botCenterLeftDeterm  = botCenterLeft.computeDeterminant();
-  const float botCenterRightDeterm = botCenterRight.computeDeterminant();
-  const float botRightDeterm       = botRight.computeDeterminant();
+  const T botLeftDeterm        = botLeft.computeDeterminant();
+  const T botCenterLeftDeterm  = botCenterLeft.computeDeterminant();
+  const T botCenterRightDeterm = botCenterRight.computeDeterminant();
+  const T botRightDeterm       = botRight.computeDeterminant();
 
   const Mat4<T> cofactors({{     topLeftDeterm,    -topCenterLeftDeterm,     topCenterRightDeterm,    -topRightDeterm },
                            { -midTopLeftDeterm,  midTopCenterLeftDeterm, -midTopCenterRightDeterm,  midTopRightDeterm },
@@ -251,7 +251,7 @@ Matrix<T, H, W> Matrix<T, W, H>::transpose() const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-float Matrix<T, W, H>::computeDeterminant() const {
+T Matrix<T, W, H>::computeDeterminant() const {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
   return computeMatrixDeterminant(*this);
@@ -297,7 +297,7 @@ Matrix<T, W, H> Matrix<T, W, H>::operator+(const Matrix& mat) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator+(float val) const {
+Matrix<T, W, H> Matrix<T, W, H>::operator+(T val) const {
   Matrix<T, W, H> res = *this;
   res += val;
   return res;
@@ -311,7 +311,7 @@ Matrix<T, W, H> Matrix<T, W, H>::operator-(const Matrix& mat) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator-(float val) const {
+Matrix<T, W, H> Matrix<T, W, H>::operator-(T val) const {
   Matrix<T, W, H> res = *this;
   res -= val;
   return res;
@@ -325,7 +325,7 @@ Matrix<T, W, H> Matrix<T, W, H>::operator%(const Matrix& mat) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator*(float val) const {
+Matrix<T, W, H> Matrix<T, W, H>::operator*(T val) const {
   Matrix<T, W, H> res = *this;
   res *= val;
   return res;
@@ -339,7 +339,7 @@ Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator/(float val) const {
+Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const {
   Matrix<T, W, H> res = *this;
   res /= val;
   return res;
@@ -385,7 +385,7 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator+=(float val) {
+Matrix<T, W, H>& Matrix<T, W, H>::operator+=(T val) {
   for (T& it : m_data)
     it += val;
   return *this;
@@ -399,7 +399,7 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator-=(const Matrix<T, W, H>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator-=(float val) {
+Matrix<T, W, H>& Matrix<T, W, H>::operator-=(T val) {
   for (T& it : m_data)
     it -= val;
   return *this;
@@ -413,7 +413,7 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix<T, W, H>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator*=(float val) {
+Matrix<T, W, H>& Matrix<T, W, H>::operator*=(T val) {
   for (T& it : m_data)
     it *= val;
   return *this;
@@ -427,7 +427,7 @@ Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator/=(float val) {
+Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) {
   for (T& it : m_data)
     it /= val;
   return *this;
