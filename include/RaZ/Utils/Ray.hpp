@@ -18,10 +18,13 @@ struct RayHit {
 /// Ray defined by an origin and a normalized direction.
 class Ray {
 public:
-  Ray(const Vec3f& origin, const Vec3f& direction) : m_origin{ origin }, m_direction{ direction } {}
+  Ray(const Vec3f& origin, const Vec3f& direction) : m_origin{ origin },
+                                                     m_direction{ direction },
+                                                     m_invDirection{ 1.f / direction[0], 1.f / direction[1], 1.f / direction[2] } {}
 
   const Vec3f& getOrigin() const { return m_origin; }
   const Vec3f& getDirection() const { return m_direction; }
+  const Vec3f& getInverseDirection() const { return m_invDirection; }
 
   /// Ray-point intersection check.
   /// \param point Point to check if there is an intersection with.
@@ -67,6 +70,7 @@ public:
 private:
   Vec3f m_origin {};
   Vec3f m_direction {};
+  Vec3f m_invDirection {};
 };
 
 } // namespace Raz
