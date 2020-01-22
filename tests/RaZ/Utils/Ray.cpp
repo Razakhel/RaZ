@@ -129,21 +129,48 @@ TEST_CASE("Ray-triangle intersection") {
   //  - triangle1 is laying flat slightly above 0
   //  - triangle2 is standing, parallel to the Y/Z plane (facing the X direction)
   //  - triangle3 is crooked, its head pointing to [ -X; +Y ], slightly below 0
-  const Raz::Triangle triangle1(Raz::Vec3f({ -3.f, 0.5f, 3.f }), Raz::Vec3f({ 0.f, 0.5f, -3.f }), Raz::Vec3f({ 3.f, 0.5f, 3.f }));
+  const Raz::Triangle triangle1(Raz::Vec3f({ -3.f, 0.5f, 3.f }), Raz::Vec3f({ 3.f, 0.5f, 3.f }), Raz::Vec3f({ 0.f, 0.5f, -6.f }));
   const Raz::Triangle triangle2(Raz::Vec3f({ 0.5f, -0.5f, 3.f }), Raz::Vec3f({ 0.5f, -0.5f, -3.f }), Raz::Vec3f({ 0.5f, 3.f, 0.f }));
   const Raz::Triangle triangle3(Raz::Vec3f({ 0.f, -1.f, 1.f }), Raz::Vec3f({ -1.5f, -1.5f, 0.f }), Raz::Vec3f({ 0.f, -1.75f, -1.f }));
 
-  CHECK(ray1.intersects(triangle1));
-  CHECK(ray2.intersects(triangle1));
-  CHECK(ray3.intersects(triangle1));
+  Raz::RayHit hit;
+
+  CHECK(ray1.intersects(triangle1, &hit));
+  CHECK(hit.position == Raz::Vec3f({ 0.f, 0.5f, 0.f }));
+  CHECK(hit.normal   == -Raz::Axis::Y);
+  CHECK(hit.distance == 0.5f);
+
+  CHECK(ray2.intersects(triangle1, &hit));
+  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.normal   == -Raz::Axis::Y);
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(2.1213205f));
+
+  CHECK(ray3.intersects(triangle1, &hit));
+  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.normal   == Raz::Axis::Y);
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
 
   CHECK_FALSE(ray1.intersects(triangle2));
-  CHECK(ray2.intersects(triangle2));
-  CHECK(ray3.intersects(triangle2));
+
+  CHECK(ray2.intersects(triangle2, &hit));
+  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.normal   == -Raz::Axis::X);
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(2.1213202f));
+
+  CHECK(ray3.intersects(triangle2, &hit));
+  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.normal   == Raz::Axis::X);
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
 
   CHECK_FALSE(ray1.intersects(triangle3));
+
   CHECK_FALSE(ray2.intersects(triangle3));
-  CHECK(ray3.intersects(triangle3));
+
+  CHECK(ray3.intersects(triangle3, &hit));
+  // The second point is almost aligned with the ray; see https://www.geogebra.org/3d/g4pumzwu
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f({ -1.5000002f, -1.5000002f, 0.f })));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f({ -0.077791f, 0.9334918f, -0.3500594f })));
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(3.5355341f));
 }
 
 TEST_CASE("Ray-AABB intersection") {
