@@ -50,8 +50,10 @@ public:
   /// Ray-triangle intersection check.
   /// The intersection is checked by calculating the barycentic coordinates at the intersection point.
   /// \param triangle Triangle to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
+  /// \note The hit normal will always be oriented towards the ray.
   /// \return True if the ray intersects the triangle, false otherwise.
-  bool intersects(const Triangle& triangle) const;
+  bool intersects(const Triangle& triangle, RayHit* hit = nullptr) const;
   /// Ray-quad intersection check.
   /// \param quad Quad to check if there is an intersection with.
   /// \param hit Ray intersection's information to recover.

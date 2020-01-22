@@ -17,7 +17,7 @@ class Quaternion {
   static_assert(std::is_floating_point_v<T>, "Error: Quaternion's type must be floating point.");
 
 public:
-  Quaternion(T w, T x, T y, T z) : m_real { w }, m_complexes({ x, y, z }) {}
+  Quaternion(T w, T x, T y, T z) : m_real{ w }, m_complexes({ x, y, z }) {}
   Quaternion(Radians<T> angle, const Vec3<T>& axis);
   Quaternion(Radians<T> angle, float axisX, float axisY, float axisZ) : Quaternion(angle, Vec3<T>({ axisX, axisY, axisZ })) {}
   Quaternion(const Quaternion&) = default;

@@ -112,7 +112,7 @@ bool Ray::intersects(const Sphere& sphere, RayHit* hit) const {
   return true;
 }
 
-bool Ray::intersects(const Triangle& triangle) const {
+bool Ray::intersects(const Triangle& triangle, RayHit* hit) const {
   const Vec3f firstEdge   = triangle.getSecondPos() - triangle.getFirstPos();
   const Vec3f secondEdge  = triangle.getThirdPos() - triangle.getFirstPos();
   const Vec3f pVec        = m_direction.cross(secondEdge);
@@ -137,7 +137,22 @@ bool Ray::intersects(const Triangle& triangle) const {
 
   const float hitDist = secondEdge.dot(qVec) * invDeterm;
 
-  return (hitDist > 0.f);
+  if (hitDist <= 0.f)
+    return false;
+
+  if (hit) {
+    hit->position = m_origin + m_direction * hitDist;
+
+    const Vec3f normal = firstEdge.cross(secondEdge).normalize();
+
+    // We want the normal facing the ray, not the opposite direction (no culling)
+    // This may not be the ideal behavior; this may change when a real use case will be available
+    hit->normal = (normal.dot(m_direction) > 0.f ? -normal : normal);
+
+    hit->distance = hitDist;
+  }
+
+  return true;
 }
 
 bool Ray::intersects(const Quad&, RayHit*) const {
