@@ -176,9 +176,9 @@ TEST_CASE("Ray-triangle intersection") {
 TEST_CASE("Ray-AABB intersection") {
   //         _______________________
   //        /|                    /|
-  //       / |                   / | / 1 -> [  1;  1; 1 ]
-  //      |---------------------| < {  2 -> [  5;  5; 5 ]
-  //      |  |                  |  | \ 3 -> [ -5; -5; 5 ]
+  //       / |                   / | / 1 -> [ 0.5; 0.5; 0.5 ]
+  //      |---------------------| < {  2 -> [   5;   5;   5 ]
+  //      |  |                  |  | \ 3 -> [  -6;  -5;   5 ]
   //      |  |                  |  |
   //      |  |                  |  |
   //      |  |                  |  |
@@ -186,25 +186,62 @@ TEST_CASE("Ray-AABB intersection") {
   //      |/ ^                  |/
   //      ---|-------------------
   //         |
-  //  1 -> [  -1;  -1; -1 ]
-  //  2 -> [   3;   3; -5 ]
-  //  3 -> [ -10; -10; -5 ]
+  //  1 -> [ -0.5; -0.5; -0.5 ]
+  //  2 -> [    2;    3;   -5 ]
+  //  3 -> [  -10;  -10;   -5 ]
 
-  const Raz::AABB aabb1(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
-  const Raz::AABB aabb2(Raz::Vec3f({ 3.f, 3.f, -5.f }), Raz::Vec3f(5.f));
-  const Raz::AABB aabb3(Raz::Vec3f({ -10.f, -10.f, -5.f }), Raz::Vec3f({ -5.f, -5.f, 5.f }));
+  // See: https://www.geogebra.org/3d/uwrt4ecn
 
-  CHECK(ray1.intersects(aabb1));
-  CHECK(ray2.intersects(aabb1));
-  CHECK(ray3.intersects(aabb1));
+  const Raz::AABB aabb1(Raz::Vec3f(-0.5f), Raz::Vec3f(0.5f));
+  const Raz::AABB aabb2(Raz::Vec3f({ 2.f, 3.f, -5.f }), Raz::Vec3f(5.f));
+  const Raz::AABB aabb3(Raz::Vec3f({ -10.f, -10.f, -5.f }), Raz::Vec3f({ -6.f, -5.f, 5.f }));
+
+  Raz::RayHit hit;
+
+  CHECK(ray1.intersects(aabb1, &hit));
+  // Since the ray is inside the box, the point returned is the intersection behind with a negative distance
+  CHECK(hit.position == Raz::Vec3f({ 0.f, -0.5f, 0.f }));
+  CHECK(hit.normal   == -Raz::Axis::Y);
+  CHECK(hit.distance == -0.5f);
+
+  CHECK(ray2.intersects(aabb1, &hit));
+  CHECK(hit.position == Raz::Vec3f({ -0.5f, -0.5f, 0.f }));
+  CHECK(hit.normal   == (-Raz::Axis::X - Raz::Axis::Y).normalize()); // This is (literally) an edge case, the normal being perfectly diagonal
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
+
+  CHECK(ray3.intersects(aabb1, &hit));
+  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.normal   == (Raz::Axis::X + Raz::Axis::Y).normalize()); // Same edge case, but in the opposite direction
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
 
   CHECK_FALSE(ray1.intersects(aabb2));
-  CHECK(ray2.intersects(aabb2));
+
+  CHECK(ray2.intersects(aabb2, &hit));
+  CHECK(hit.position == Raz::Vec3f({ 3.f, 3.f, 0.f }));
+  CHECK(hit.normal   == -Raz::Axis::Y);
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(5.6568542f));
+
   CHECK_FALSE(ray3.intersects(aabb2));
 
   CHECK_FALSE(ray1.intersects(aabb3));
+
   CHECK_FALSE(ray2.intersects(aabb3));
-  CHECK(ray3.intersects(aabb3));
+
+  CHECK(ray3.intersects(aabb3, &hit));
+  CHECK(hit.position == Raz::Vec3f({ -6.f, -6.f, 0.f }));
+  CHECK(hit.normal   == Raz::Axis::X);
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(9.8994951f));
+
+  // TODO:
+  // A check must be made with a ray's origin lying precisely on a slab
+  // When this happens, with a naive implementation, only NaNs are returned; however, this ray must be considered intersecting the box properly
+  // See: https://tavianator.com/fast-branchless-raybounding-box-intersections-part-2-nans/
+
+  //const Raz::Ray slabRay(Raz::Vec3f({ -0.5f, -0.5f, 0.f }), Raz::Axis::Y);
+  //CHECK(slabRay.intersects(aabb1, &hit));
+  //CHECK(hit.position == slabRay.getOrigin());
+  //CHECK(hit.normal   == -Raz::Axis::Y);
+  //CHECK(hit.distance == 0.f);
 }
 
 TEST_CASE("Point projection") {
