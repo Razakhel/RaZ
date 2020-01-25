@@ -159,27 +159,47 @@ bool Ray::intersects(const Quad&, RayHit*) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Ray::intersects(const AABB& aabb) const {
-  const Vec3f invDir({ 1.f / m_direction[0], 1.f / m_direction[1], 1.f / m_direction[2] });
-  Vec3f minPos = aabb.getLeftBottomBackPos();
-  Vec3f maxPos = aabb.getRightTopFrontPos();
+bool Ray::intersects(const AABB& aabb, RayHit* hit) const {
+  // Branchless algorithm based on Tavianator's:
+  //  - https://tavianator.com/fast-branchless-raybounding-box-intersections/
+  //  - https://tavianator.com/cgit/dimension.git/tree/libdimension/bvh/bvh.c#n196
 
-  if (m_direction[0] < 0.f)
-    std::swap(minPos[0], maxPos[0]);
+  const Vec3f minDist = (aabb.getLeftBottomBackPos() - m_origin) * m_invDirection;
+  const Vec3f maxDist = (aabb.getRightTopFrontPos() - m_origin) * m_invDirection;
 
-  if (m_direction[1] < 0.f)
-    std::swap(minPos[1], maxPos[1]);
+  const float minDistX = std::min(minDist[0], maxDist[0]);
+  const float maxDistX = std::max(minDist[0], maxDist[0]);
 
-  if (m_direction[2] < 0.f)
-    std::swap(minPos[2], maxPos[2]);
+  const float minDistY = std::min(minDist[1], maxDist[1]);
+  const float maxDistY = std::max(minDist[1], maxDist[1]);
 
-  const Vec3f minHitPos = (minPos - m_origin) * invDir;
-  const Vec3f maxHitPos = (maxPos - m_origin) * invDir;
+  const float minDistZ = std::min(minDist[2], maxDist[2]);
+  const float maxDistZ = std::max(minDist[2], maxDist[2]);
 
-  const float minHitDist = std::max(minHitPos[0], std::max(minHitPos[1], std::max(minHitPos[2], 0.f)));
-  const float maxHitDist = std::min(maxHitPos[0], std::min(maxHitPos[1], maxHitPos[2]));
+  const float minHitDist = std::max(minDistX, std::max(minDistY, minDistZ));
+  const float maxHitDist = std::min(maxDistX, std::min(maxDistY, maxDistZ));
 
-  return (minHitDist <= maxHitDist);
+  if (maxHitDist < std::max(minHitDist, 0.f))
+    return false;
+
+  // If reaching here with a negative distance (minHitDist < 0), this means that the ray's origin is inside the box
+  // Currently, in this case, the computed hit position represents the intersection behind the ray
+
+  if (hit) {
+    hit->position = m_origin + m_direction * minHitDist;
+
+    // Normal computing method based on John Novak's: http://blog.johnnovak.net/2016/10/22/the-nim-raytracer-project-part-4-calculating-box-normals/
+    const Vec3f hitDir = (hit->position - aabb.computeCentroid()) / aabb.computeHalfExtents();
+    hit->normal = Vec3f({ std::trunc(hitDir[0]), std::trunc(hitDir[1]), std::trunc(hitDir[2]) }).normalize();
+
+    hit->distance = minHitDist;
+  }
+
+  return true;
+}
+
+bool Ray::intersects(const OBB&, RayHit*) const {
+  throw std::runtime_error("Error: Not implemented yet.");
 }
 
 Vec3f Ray::computeProjection(const Vec3f& point) const {

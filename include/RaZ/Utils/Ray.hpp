@@ -61,8 +61,15 @@ public:
   bool intersects(const Quad& quad, RayHit* hit = nullptr) const;
   /// Ray-AABB intersection check.
   /// \param aabb AABB to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
+  /// \note If returns true with a negative hit distance, the ray is located inside the box & the hit position is the intersection point found behind the ray.
   /// \return True if the ray intersects the AABB, false otherwise.
-  bool intersects(const AABB& aabb) const;
+  bool intersects(const AABB& aabb, RayHit* hit = nullptr) const;
+  /// Ray-OBB intersection check.
+  /// \param obb OBB to check if there is an intersection with.
+  /// \param hit Ray intersection's information to recover.
+  /// \return True if the ray intersects the OBB, false otherwise.
+  bool intersects(const OBB& obb, RayHit* hit = nullptr) const;
   /// Computes the projection of a point (closest point) onto the ray.
   /// The projected point is necessarily located between the ray's origin and towards infinity in the ray's direction.
   /// \param point Point to compute the projection from.
