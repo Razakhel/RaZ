@@ -1,32 +1,32 @@
+#include "RaZ/Utils/FloatUtils.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <limits>
 
-#include "RaZ/Utils/FloatUtils.hpp"
-
 namespace Raz {
 
 template <typename T, std::size_t Size>
-Vector<T, Size>::Vector(const Vector<T, Size + 1>& vec) {
+constexpr Vector<T, Size>::Vector(const Vector<T, Size + 1>& vec) noexcept {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] = vec[i];
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>::Vector(const Vector<T, Size - 1>& vec, T val) {
+constexpr Vector<T, Size>::Vector(const Vector<T, Size - 1>& vec, T val) noexcept {
   for (std::size_t i = 0; i < Size - 1; ++i)
     m_data[i] = vec[i];
   m_data.back() = val;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>::Vector(T val) noexcept {
+constexpr Vector<T, Size>::Vector(T val) noexcept {
   for (T& elt : m_data)
     elt = val;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>::Vector(std::initializer_list<T> list) {
+Vector<T, Size>::Vector(std::initializer_list<T> list) noexcept {
   assert("Error: A Vector cannot be created with less/more values than specified." && Size == list.size());
 
   auto element = list.begin();
@@ -36,7 +36,7 @@ Vector<T, Size>::Vector(std::initializer_list<T> list) {
 }
 
 template <typename T, std::size_t Size>
-T Vector<T, Size>::dot(const Vector& vec) const {
+constexpr T Vector<T, Size>::dot(const Vector& vec) const noexcept {
   T res {};
   for (std::size_t i = 0; i < Size; ++i)
     res += m_data[i] * vec[i];
@@ -44,7 +44,7 @@ T Vector<T, Size>::dot(const Vector& vec) const {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const {
+constexpr Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const noexcept {
   static_assert(Size == 3, "Error: Both vectors must be 3 dimensional to compute a cross product.");
 
   Vector<T, Size> res;
@@ -57,14 +57,14 @@ Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::normalize() const {
+constexpr Vector<T, Size> Vector<T, Size>::normalize() const {
   Vector<T, Size> res = *this;
   res /= computeLength();
   return res;
 }
 
 template <typename T, std::size_t Size>
-std::size_t Vector<T, Size>::hash(std::size_t seed) const {
+constexpr std::size_t Vector<T, Size>::hash(std::size_t seed) const noexcept {
   for (const T& elt : m_data)
     seed ^= std::hash<T>()(elt) + 0x9e3779b9 + (seed << 6u) + (seed >> 2u);
 
@@ -72,56 +72,56 @@ std::size_t Vector<T, Size>::hash(std::size_t seed) const {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator+(const Vector& vec) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator+(const Vector& vec) const noexcept {
   Vector<T, Size> res = *this;
   res += vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator+(T val) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator+(T val) const noexcept {
   Vector<T, Size> res = *this;
   res += val;
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator-(const Vector& vec) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator-(const Vector& vec) const noexcept {
   Vector<T, Size> res = *this;
   res -= vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator-(T val) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator-(T val) const noexcept {
   Vector<T, Size> res = *this;
   res -= val;
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator*(const Vector& vec) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator*(const Vector& vec) const noexcept {
   Vector<T, Size> res = *this;
   res *= vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator*(T val) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator*(T val) const noexcept {
   Vector<T, Size> res = *this;
   res *= val;
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator/(const Vector& vec) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator/(const Vector& vec) const {
   Vector<T, Size> res = *this;
   res /= vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size> Vector<T, Size>::operator/(T val) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator/(T val) const {
   Vector<T, Size> res = *this;
   res /= val;
   return res;
@@ -129,7 +129,7 @@ Vector<T, Size> Vector<T, Size>::operator/(T val) const {
 
 template <typename T, std::size_t Size>
 template <std::size_t H>
-Vector<T, Size> Vector<T, Size>::operator*(const Matrix<T, Size, H>& mat) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator*(const Matrix<T, Size, H>& mat) const noexcept {
   // This multiplication is made assuming the vector to be horizontal
   Vector<T, Size> res {};
 
@@ -142,63 +142,63 @@ Vector<T, Size> Vector<T, Size>::operator*(const Matrix<T, Size, H>& mat) const 
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator+=(const Vector& vec) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator+=(const Vector& vec) noexcept {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] += vec[i];
   return *this;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator+=(T val) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator+=(T val) noexcept {
   for (T& elt : m_data)
     elt += val;
   return *this;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator-=(const Vector& vec) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator-=(const Vector& vec) noexcept {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] -= vec[i];
   return *this;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator-=(T val) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator-=(T val) noexcept {
   for (T& elt : m_data)
     elt -= val;
   return *this;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator*=(const Vector& vec) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator*=(const Vector& vec) noexcept {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] *= vec[i];
   return *this;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator*=(T val) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator*=(T val) noexcept {
   for (T& elt : m_data)
     elt *= val;
   return *this;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] /= vec[i];
   return *this;
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>& Vector<T, Size>::operator/=(T val) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator/=(T val) {
   for (T& elt : m_data)
     elt /= val;
   return *this;
 }
 
 template <typename T, std::size_t Size>
-bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const {
+constexpr bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const noexcept {
   if constexpr (std::is_floating_point_v<T>) {
     return FloatUtils::areNearlyEqual(*this, vec);
   } else {
