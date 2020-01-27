@@ -1,11 +1,12 @@
 #include "RaZ/Utils/FloatUtils.hpp"
 #include "RaZ/Utils/Ray.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 namespace Raz {
 
 namespace {
 
-bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secondHitDist) {
+constexpr bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secondHitDist) {
   const float discriminant = b * b - 4.f * a * c;
 
   if (discriminant < 0.f) {
@@ -53,10 +54,6 @@ bool Ray::intersects(const Vec3f& point, RayHit* hit) const {
   }
 
   return true;
-}
-
-bool Ray::intersects(const Line&, RayHit*) const {
-  throw std::runtime_error("Error: Not implemented yet.");
 }
 
 bool Ray::intersects(const Plane& plane, RayHit* hit) const {
@@ -155,10 +152,6 @@ bool Ray::intersects(const Triangle& triangle, RayHit* hit) const {
   return true;
 }
 
-bool Ray::intersects(const Quad&, RayHit*) const {
-  throw std::runtime_error("Error: Not implemented yet.");
-}
-
 bool Ray::intersects(const AABB& aabb, RayHit* hit) const {
   // Branchless algorithm based on Tavianator's:
   //  - https://tavianator.com/fast-branchless-raybounding-box-intersections/
@@ -196,10 +189,6 @@ bool Ray::intersects(const AABB& aabb, RayHit* hit) const {
   }
 
   return true;
-}
-
-bool Ray::intersects(const OBB&, RayHit*) const {
-  throw std::runtime_error("Error: Not implemented yet.");
 }
 
 Vec3f Ray::computeProjection(const Vec3f& point) const {

@@ -26,14 +26,14 @@ namespace FloatUtils {
 /// \param absTol Absolute tolerance to compare the values with.
 /// \return True if values are nearly equal to each other, false otherwise.
 template <typename T, typename TolT = T>
-inline constexpr bool areNearlyEqual(T val1, T val2, TolT absTol = std::numeric_limits<TolT>::epsilon()) {
+constexpr bool areNearlyEqual(T val1, T val2, TolT absTol = std::numeric_limits<TolT>::epsilon()) noexcept {
   static_assert(std::is_floating_point_v<T>, "Error: Values type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: Tolerance type must be floating point.");
 
   // Using absolute & relative tolerances for floating points types: http://www.realtimecollisiondetection.net/pubs/Tolerances/
   // Could be a better idea to use ULPs checking. May be slower though?
   const T absDiff = std::abs(val1 - val2);
-  return (absDiff <= absTol * std::max({ static_cast<T>(1), std::abs(val1), std::abs(val2) }));
+  return (absDiff <= static_cast<T>(absTol) * std::max(static_cast<T>(1), std::max(std::abs(val1), std::abs(val2))));
 }
 
 /// Checks if two given floating point vectors are nearly equal to each other.
@@ -45,7 +45,7 @@ inline constexpr bool areNearlyEqual(T val1, T val2, TolT absTol = std::numeric_
 /// \param absTol Absolute tolerance to compare the vectors' values with.
 /// \return True if vectors are nearly equal to each other, false otherwise.
 template <typename T, std::size_t Size, typename TolT = T>
-inline constexpr bool areNearlyEqual(const Vector<T, Size>& vec1, const Vector<T, Size>& vec2, TolT absTol = std::numeric_limits<TolT>::epsilon()) {
+constexpr bool areNearlyEqual(const Vector<T, Size>& vec1, const Vector<T, Size>& vec2, TolT absTol = std::numeric_limits<TolT>::epsilon()) noexcept {
   for (std::size_t i = 0; i < Size; ++i) {
     if (!areNearlyEqual(vec1[i], vec2[i], absTol))
       return false;
@@ -64,7 +64,7 @@ inline constexpr bool areNearlyEqual(const Vector<T, Size>& vec1, const Vector<T
 /// \param absTol Absolute tolerance to compare the matrices' values with.
 /// \return True if matrices are nearly equal to each other, false otherwise.
 template <typename T, std::size_t W, std::size_t H, typename TolT = T>
-inline constexpr bool areNearlyEqual(const Matrix<T, W, H>& mat1, const Matrix<T, W, H>& mat2, TolT absTol = std::numeric_limits<TolT>::epsilon()) {
+constexpr bool areNearlyEqual(const Matrix<T, W, H>& mat1, const Matrix<T, W, H>& mat2, TolT absTol = std::numeric_limits<TolT>::epsilon()) noexcept {
   for (std::size_t i = 0; i < W * H; ++i) {
     if (!areNearlyEqual(mat1[i], mat2[i], absTol))
       return false;
