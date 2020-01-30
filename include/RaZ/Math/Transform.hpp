@@ -25,19 +25,19 @@ public:
   bool hasUpdated() const { return m_updated; }
 
   void setPosition(const Vec3f& position);
-  void setPosition(float x, float y, float z) { setPosition(Vec3f({ x, y, z })); }
+  void setPosition(float x, float y, float z) { setPosition(Vec3f(x, y, z)); }
   void setRotation(const Mat4f& rotation);
   void setRotation(Radiansf angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis).computeMatrix()); }
   void setScale(const Vec3f& scale);
   void setScale(float val) { setScale(val, val, val); }
-  void setScale(float x, float y, float z) { setScale(Vec3f({ x, y, z })); }
+  void setScale(float x, float y, float z) { setScale(Vec3f(x, y, z)); }
   void setUpdated(bool updated) { m_updated = updated; }
 
   /// Moves by the given values in relative coordinates (takes rotation into account).
   /// \param x Value of X to be moved by.
   /// \param y Value of Y to be moved by.
   /// \param z Value of Z to be moved by.
-  void move(float x, float y, float z) { move(Vec3f({ x, y, z })); }
+  void move(float x, float y, float z) { move(Vec3f(x, y, z)); }
   /// Moves by the given values in relative coordinates (takes rotation into account).
   /// \param displacement Displacement to be moved by.
   void move(const Vec3f& displacement) { translate(displacement * Mat3f(m_rotation)); }

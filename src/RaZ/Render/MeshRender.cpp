@@ -33,17 +33,17 @@ void Mesh::drawUnitSphere() {
 }
 
 void Mesh::drawUnitQuad() {
-  static const Mesh quadMesh(Quad(Vec3f({ -1.f,  1.f, 0.f }),
-                                  Vec3f({  1.f,  1.f, 0.f }),
-                                  Vec3f({  1.f, -1.f, 0.f }),
-                                  Vec3f({ -1.f, -1.f, 0.f })));
+  static const Mesh quadMesh(Quad(Vec3f(-1.f,  1.f, 0.f),
+                                  Vec3f( 1.f,  1.f, 0.f),
+                                  Vec3f( 1.f, -1.f, 0.f),
+                                  Vec3f(-1.f, -1.f, 0.f)));
 
   quadMesh.draw();
 }
 
 void Mesh::drawUnitCube() {
-  static const Mesh cubeMesh(AABB(Vec3f({ -1.f, -1.f, -1.f }),
-                                  Vec3f({  1.f,  1.f,  1.f })));
+  static const Mesh cubeMesh(AABB(Vec3f(-1.f, -1.f, -1.f),
+                                  Vec3f( 1.f,  1.f,  1.f)));
 
   cubeMesh.draw();
 }

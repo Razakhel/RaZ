@@ -107,10 +107,10 @@ int main() {
   window.enableVerticalSync();
 
   auto& light = world.addEntityWithComponent<Raz::Transform>();
-  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,     // Type
-                                 Raz::Vec3f({ 0.f, -0.2f, 1.f }), // Direction
-                                 1.f,                             // Energy
-                                 Raz::Vec3f(1.f));                // Color (RGB)
+  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
+                                 Raz::Vec3f(0.f, -0.2f, 1.f), // Direction
+                                 1.f,                         // Energy
+                                 Raz::Vec3f(1.f));            // Color (RGB)
 
   auto& mesh      = world.addEntity();
   auto& meshTrans = mesh.addComponent<Raz::Transform>();

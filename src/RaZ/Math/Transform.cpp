@@ -38,7 +38,7 @@ void Transform::rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle) {
   const Quaternionf xQuat(xAngle, Axis::X);
   const Quaternionf yQuat(yAngle, Axis::Y);
   const Quaternionf zQuat(zAngle, Axis::Z);
-  m_rotation = (xQuat.computeMatrix() * yQuat.computeMatrix() * zQuat.computeMatrix()) * m_rotation;
+  m_rotation = (xQuat * yQuat * zQuat).computeMatrix() * m_rotation;
 
   m_updated = true;
 }

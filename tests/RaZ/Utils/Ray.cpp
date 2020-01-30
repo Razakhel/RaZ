@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Utils/Ray.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 namespace {
 
@@ -13,9 +14,9 @@ namespace {
 //          |        |         /         |        /
 //      [ 0; 0 ]     |    [ -1; -1 ]     |       v
 
-const Raz::Ray ray1(Raz::Vec3f({ 0.f, 0.f, 0.f }), Raz::Axis::Y);
-const Raz::Ray ray2(Raz::Vec3f({ -1.f, -1.f, 0.f }), Raz::Vec3f({ 1.f, 1.f, 0.f }).normalize());
-const Raz::Ray ray3(Raz::Vec3f({ 1.f, 1.f, 0.f }), Raz::Vec3f({ -1.f, -1.f, 0.f }).normalize());
+const Raz::Ray ray1(Raz::Vec3f(0.f, 0.f, 0.f), Raz::Axis::Y);
+const Raz::Ray ray2(Raz::Vec3f(-1.f, -1.f, 0.f), Raz::Vec3f(1.f, 1.f, 0.f).normalize());
+const Raz::Ray ray3(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-1.f, -1.f, 0.f).normalize());
 
 } // namespace
 
@@ -28,8 +29,8 @@ TEST_CASE("Ray-point intersection") {
   CHECK(hit.normal   == Raz::Vec3f(0.f));
   CHECK(hit.distance == 0.f);
 
-  const Raz::Vec3f topPoint({ 0.f, 2.f, 0.f });
-  const Raz::Vec3f topRightPoint({ 2.f, 2.f, 0.f });
+  const Raz::Vec3f topPoint(0.f, 2.f, 0.f);
+  const Raz::Vec3f topRightPoint(2.f, 2.f, 0.f);
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -59,7 +60,7 @@ TEST_CASE("Ray-point intersection") {
 
   CHECK(hit.position == topRightPoint);
   CHECK(hit.normal   == -ray2.getDirection());
-  CHECK(hit.distance == Raz::Vec3f({ 3.f, 3.f, 0.f }).computeLength()); // 4.2426405f
+  CHECK(hit.distance == Raz::Vec3f(3.f, 3.f, 0.f).computeLength()); // 4.2426405f
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -83,10 +84,10 @@ TEST_CASE("Ray-plane intersection") {
   //             \      |      v       \    |    /        v     |
   //               \    |   normal          |          normal   |     [ 0; 0.5 ]
 
-  const Raz::Vec3f initPos({ 0.f, 0.5f, 0.f });
-  const Raz::Plane plane1(initPos, Raz::Vec3f({ 1.f, 1.f, 0.f }).normalize());
-  const Raz::Plane plane2(initPos, Raz::Vec3f({ -1.f, -1.f, 0.f }).normalize());
-  const Raz::Plane plane3(initPos, Raz::Vec3f({ 1.f, -1.f, 0.f }).normalize());
+  const Raz::Vec3f initPos(0.f, 0.5f, 0.f);
+  const Raz::Plane plane1(initPos, Raz::Vec3f(1.f, 1.f, 0.f).normalize());
+  const Raz::Plane plane2(initPos, Raz::Vec3f(-1.f, -1.f, 0.f).normalize());
+  const Raz::Plane plane3(initPos, Raz::Vec3f(1.f, -1.f, 0.f).normalize());
   const Raz::Plane plane4(initPos, Raz::Axis::Y);
 
   CHECK_FALSE(ray1.intersects(plane1));
@@ -108,8 +109,8 @@ TEST_CASE("Ray-plane intersection") {
 
 TEST_CASE("Ray-sphere intersection") {
   const Raz::Sphere sphere1(Raz::Vec3f(0.f), 1.f);
-  const Raz::Sphere sphere2(Raz::Vec3f({ 5.f, 10.f, 0.f }), 5.f);
-  const Raz::Sphere sphere3(Raz::Vec3f({ -10.f, -10.f, 0.f }), 1.f);
+  const Raz::Sphere sphere2(Raz::Vec3f(5.f, 10.f, 0.f), 5.f);
+  const Raz::Sphere sphere3(Raz::Vec3f(-10.f, -10.f, 0.f), 1.f);
 
   CHECK(ray1.intersects(sphere1));
   CHECK(ray2.intersects(sphere1));
@@ -129,36 +130,36 @@ TEST_CASE("Ray-triangle intersection") {
   //  - triangle1 is laying flat slightly above 0
   //  - triangle2 is standing, parallel to the Y/Z plane (facing the X direction)
   //  - triangle3 is crooked, its head pointing to [ -X; +Y ], slightly below 0
-  const Raz::Triangle triangle1(Raz::Vec3f({ -3.f, 0.5f, 3.f }), Raz::Vec3f({ 3.f, 0.5f, 3.f }), Raz::Vec3f({ 0.f, 0.5f, -6.f }));
-  const Raz::Triangle triangle2(Raz::Vec3f({ 0.5f, -0.5f, 3.f }), Raz::Vec3f({ 0.5f, -0.5f, -3.f }), Raz::Vec3f({ 0.5f, 3.f, 0.f }));
-  const Raz::Triangle triangle3(Raz::Vec3f({ 0.f, -1.f, 1.f }), Raz::Vec3f({ -1.5f, -1.5f, 0.f }), Raz::Vec3f({ 0.f, -1.75f, -1.f }));
+  const Raz::Triangle triangle1(Raz::Vec3f(-3.f, 0.5f, 3.f), Raz::Vec3f(3.f, 0.5f, 3.f), Raz::Vec3f(0.f, 0.5f, -6.f));
+  const Raz::Triangle triangle2(Raz::Vec3f(0.5f, -0.5f, 3.f), Raz::Vec3f(0.5f, -0.5f, -3.f), Raz::Vec3f(0.5f, 3.f, 0.f));
+  const Raz::Triangle triangle3(Raz::Vec3f(0.f, -1.f, 1.f), Raz::Vec3f(-1.5f, -1.5f, 0.f), Raz::Vec3f(0.f, -1.75f, -1.f));
 
   Raz::RayHit hit;
 
   CHECK(ray1.intersects(triangle1, &hit));
-  CHECK(hit.position == Raz::Vec3f({ 0.f, 0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(0.f, 0.5f, 0.f));
   CHECK(hit.normal   == -Raz::Axis::Y);
   CHECK(hit.distance == 0.5f);
 
   CHECK(ray2.intersects(triangle1, &hit));
-  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(0.5f, 0.5f, 0.f));
   CHECK(hit.normal   == -Raz::Axis::Y);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(2.1213205f));
 
   CHECK(ray3.intersects(triangle1, &hit));
-  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(0.5f, 0.5f, 0.f));
   CHECK(hit.normal   == Raz::Axis::Y);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
 
   CHECK_FALSE(ray1.intersects(triangle2));
 
   CHECK(ray2.intersects(triangle2, &hit));
-  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(0.5f, 0.5f, 0.f));
   CHECK(hit.normal   == -Raz::Axis::X);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(2.1213202f));
 
   CHECK(ray3.intersects(triangle2, &hit));
-  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(0.5f, 0.5f, 0.f));
   CHECK(hit.normal   == Raz::Axis::X);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
 
@@ -168,8 +169,8 @@ TEST_CASE("Ray-triangle intersection") {
 
   CHECK(ray3.intersects(triangle3, &hit));
   // The second point is almost aligned with the ray; see https://www.geogebra.org/3d/g4pumzwu
-  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f({ -1.5000002f, -1.5000002f, 0.f })));
-  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f({ -0.077791f, 0.9334918f, -0.3500594f })));
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(-1.5000002f, -1.5000002f, 0.f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f(-0.077791f, 0.9334918f, -0.3500594f)));
   CHECK_THAT(hit.distance, IsNearlyEqualTo(3.5355341f));
 }
 
@@ -193,31 +194,31 @@ TEST_CASE("Ray-AABB intersection") {
   // See: https://www.geogebra.org/3d/uwrt4ecn
 
   const Raz::AABB aabb1(Raz::Vec3f(-0.5f), Raz::Vec3f(0.5f));
-  const Raz::AABB aabb2(Raz::Vec3f({ 2.f, 3.f, -5.f }), Raz::Vec3f(5.f));
-  const Raz::AABB aabb3(Raz::Vec3f({ -10.f, -10.f, -5.f }), Raz::Vec3f({ -6.f, -5.f, 5.f }));
+  const Raz::AABB aabb2(Raz::Vec3f(2.f, 3.f, -5.f), Raz::Vec3f(5.f));
+  const Raz::AABB aabb3(Raz::Vec3f(-10.f, -10.f, -5.f), Raz::Vec3f(-6.f, -5.f, 5.f));
 
   Raz::RayHit hit;
 
   CHECK(ray1.intersects(aabb1, &hit));
   // Since the ray is inside the box, the point returned is the intersection behind with a negative distance
-  CHECK(hit.position == Raz::Vec3f({ 0.f, -0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(0.f, -0.5f, 0.f));
   CHECK(hit.normal   == -Raz::Axis::Y);
   CHECK(hit.distance == -0.5f);
 
   CHECK(ray2.intersects(aabb1, &hit));
-  CHECK(hit.position == Raz::Vec3f({ -0.5f, -0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(-0.5f, -0.5f, 0.f));
   CHECK(hit.normal   == (-Raz::Axis::X - Raz::Axis::Y).normalize()); // This is (literally) an edge case, the normal being perfectly diagonal
   CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
 
   CHECK(ray3.intersects(aabb1, &hit));
-  CHECK(hit.position == Raz::Vec3f({ 0.5f, 0.5f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(0.5f, 0.5f, 0.f));
   CHECK(hit.normal   == (Raz::Axis::X + Raz::Axis::Y).normalize()); // Same edge case, but in the opposite direction
   CHECK_THAT(hit.distance, IsNearlyEqualTo(0.7071068f));
 
   CHECK_FALSE(ray1.intersects(aabb2));
 
   CHECK(ray2.intersects(aabb2, &hit));
-  CHECK(hit.position == Raz::Vec3f({ 3.f, 3.f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(3.f, 3.f, 0.f));
   CHECK(hit.normal   == -Raz::Axis::Y);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(5.6568542f));
 
@@ -228,7 +229,7 @@ TEST_CASE("Ray-AABB intersection") {
   CHECK_FALSE(ray2.intersects(aabb3));
 
   CHECK(ray3.intersects(aabb3, &hit));
-  CHECK(hit.position == Raz::Vec3f({ -6.f, -6.f, 0.f }));
+  CHECK(hit.position == Raz::Vec3f(-6.f, -6.f, 0.f));
   CHECK(hit.normal   == Raz::Axis::X);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(9.8994951f));
 
@@ -237,7 +238,7 @@ TEST_CASE("Ray-AABB intersection") {
   // When this happens, with a naive implementation, only NaNs are returned; however, this ray must be considered intersecting the box properly
   // See: https://tavianator.com/fast-branchless-raybounding-box-intersections-part-2-nans/
 
-  //const Raz::Ray slabRay(Raz::Vec3f({ -0.5f, -0.5f, 0.f }), Raz::Axis::Y);
+  //const Raz::Ray slabRay(Raz::Vec3f(-0.5f, -0.5f, 0.f), Raz::Axis::Y);
   //CHECK(slabRay.intersects(aabb1, &hit));
   //CHECK(hit.position == slabRay.getOrigin());
   //CHECK(hit.normal   == -Raz::Axis::Y);
@@ -245,8 +246,8 @@ TEST_CASE("Ray-AABB intersection") {
 }
 
 TEST_CASE("Point projection") {
-  const Raz::Vec3f topPoint({ 0.f, 2.f, 0.f });
-  const Raz::Vec3f topRightPoint({ 2.f, 2.f, 0.f });
+  const Raz::Vec3f topPoint(0.f, 2.f, 0.f);
+  const Raz::Vec3f topRightPoint(2.f, 2.f, 0.f);
 
   //     topPoint  topRightPoint
   //     [ 0; 2 ]    [ 2; 2 ]
@@ -263,7 +264,7 @@ TEST_CASE("Point projection") {
   //          ^
   //         /
   //        x < [ 0; 0 ]
-  CHECK(ray2.computeProjection(topPoint) == Raz::Vec3f({ 1.f, 1.f, 0.f }));
+  CHECK(ray2.computeProjection(topPoint) == Raz::Vec3f(1.f, 1.f, 0.f));
   CHECK(ray2.computeProjection(topRightPoint) == topRightPoint);
 
   //     topPoint  topRightPoint

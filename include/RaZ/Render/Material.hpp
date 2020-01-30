@@ -42,7 +42,7 @@ public:
 
   const TexturePtr& getBaseColorMap() const { return m_baseColorMap; }
 
-  void setBaseColor(float red, float green, float blue) { setBaseColor(Vec3f({ red, green, blue })); }
+  void setBaseColor(float red, float green, float blue) { setBaseColor(Vec3f(red, green, blue)); }
   void setBaseColor(const Vec3f& color) { m_baseColor = color; }
 
   void setBaseColorMap(TexturePtr baseColorMap) { m_baseColorMap = std::move(baseColorMap); }
@@ -88,11 +88,11 @@ public:
 
   void setDiffuse(float red, float green, float blue) { setBaseColor(red, green, blue); }
   void setDiffuse(const Vec3f& color) { setBaseColor(color); }
-  void setAmbient(float red, float green, float blue) { setAmbient(Vec3f({ red, green, blue })); }
+  void setAmbient(float red, float green, float blue) { setAmbient(Vec3f(red, green, blue)); }
   void setAmbient(const Vec3f& val) { m_ambient = val; }
-  void setSpecular(float red, float green, float blue) { setSpecular(Vec3f({ red, green, blue })); }
+  void setSpecular(float red, float green, float blue) { setSpecular(Vec3f(red, green, blue)); }
   void setSpecular(const Vec3f& val) { m_specular = val; }
-  void setEmissive(float red, float green, float blue) { setEmissive(Vec3f({ red, green, blue })); }
+  void setEmissive(float red, float green, float blue) { setEmissive(Vec3f(red, green, blue)); }
   void setEmissive(const Vec3f& val) { m_emissive = val; }
   void setTransparency(float transparency) { m_transparency = transparency; }
 

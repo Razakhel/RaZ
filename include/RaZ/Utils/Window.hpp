@@ -37,7 +37,7 @@ public:
   InputCallbacks& getCallbacks() { return m_callbacks; }
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
-  void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f({ red, green, blue, alpha })); }
+  void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f(red, green, blue, alpha)); }
   void setTitle(const std::string& title) const;
   void setIcon(const Image& img) const;
   void setIcon(const std::string& filePath) const { setIcon(Image(filePath, false)); }
@@ -151,7 +151,7 @@ public:
 private:
   unsigned int m_width {};
   unsigned int m_height {};
-  Vec4f m_clearColor = Vec4f({ 0.15f, 0.15f, 0.15f, 1.f });
+  Vec4f m_clearColor = Vec4f(0.15f, 0.15f, 0.15f, 1.f);
 
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};

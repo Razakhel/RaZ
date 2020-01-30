@@ -6,30 +6,30 @@ namespace Raz {
 Mesh::Mesh(const Plane& plane, float width, float depth, RenderMode renderMode) : Mesh() {
   const float height = (plane.getNormal() * plane.getDistance())[1];
 
-  const Vec3f firstPos({ -width, height, depth });
-  const Vec3f secondPos({ width, height, depth });
-  const Vec3f thirdPos({ width, height, -depth });
-  const Vec3f fourthPos({ -width, height, -depth });
+  const Vec3f firstPos(-width, height, depth);
+  const Vec3f secondPos(width, height, depth);
+  const Vec3f thirdPos(width, height, -depth);
+  const Vec3f fourthPos(-width, height, -depth);
 
   Vertex firstCorner {};
   firstCorner.position  = firstPos;
   firstCorner.normal    = plane.getNormal();
-  firstCorner.texcoords = Vec2f({ 0.f, 0.f });
+  firstCorner.texcoords = Vec2f(0.f, 0.f);
 
   Vertex secondCorner {};
   secondCorner.position  = secondPos;
   secondCorner.normal    = plane.getNormal();
-  secondCorner.texcoords = Vec2f({ 1.f, 0.f });
+  secondCorner.texcoords = Vec2f(1.f, 0.f);
 
   Vertex thirdCorner {};
   thirdCorner.position  = thirdPos;
   thirdCorner.normal    = plane.getNormal();
-  thirdCorner.texcoords = Vec2f({ 1.f, 1.f });
+  thirdCorner.texcoords = Vec2f(1.f, 1.f);
 
   Vertex fourthCorner {};
   fourthCorner.position  = fourthPos;
   fourthCorner.normal    = plane.getNormal();
-  fourthCorner.texcoords = Vec2f({ 0.f, 1.f });
+  fourthCorner.texcoords = Vec2f(0.f, 1.f);
 
   std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
   vertices.resize(4);
@@ -131,28 +131,25 @@ Mesh::Mesh(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount, Rend
 }
 
 Mesh::Mesh(const Triangle& triangle, RenderMode renderMode) : Mesh() {
-  // TODO: check if vertices are defined counterclockwise
-
   const Vec3f& firstPos  = triangle.getFirstPos();
   const Vec3f& secondPos = triangle.getSecondPos();
   const Vec3f& thirdPos  = triangle.getThirdPos();
+  const Vec3f normal     = triangle.computeNormal();
 
   Vertex firstVert {};
   firstVert.position  = firstPos;
-  firstVert.texcoords = Vec2f({ 0.f, 0.f });
+  firstVert.texcoords = Vec2f(0.f, 0.f);
+  firstVert.normal    = normal;
 
   Vertex secondVert {};
   secondVert.position  = secondPos;
-  secondVert.texcoords = Vec2f({ 0.5f, 1.f });
+  secondVert.texcoords = Vec2f(0.5f, 1.f);
+  secondVert.normal   = normal;
 
   Vertex thirdVert {};
   thirdVert.position  = thirdPos;
-  thirdVert.texcoords = Vec2f({ 1.f, 0.f });
-
-  // Computing normals
-  firstVert.normal  = (firstPos - secondPos).cross(firstPos - thirdPos).normalize();
-  secondVert.normal = (secondPos - thirdPos).cross(secondPos - firstPos).normalize();
-  thirdVert.normal  = (thirdPos - firstPos).cross(thirdPos - secondPos).normalize();
+  thirdVert.texcoords = Vec2f(1.f, 0.f);
+  thirdVert.normal    = normal;
 
   std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
   vertices.resize(3);
@@ -180,19 +177,19 @@ Mesh::Mesh(const Quad& quad, RenderMode renderMode) : Mesh() {
 
   Vertex leftTop {};
   leftTop.position  = leftTopPos;
-  leftTop.texcoords = Vec2f({ 0.f, 1.f });
+  leftTop.texcoords = Vec2f(0.f, 1.f);
 
   Vertex rightTop {};
   rightTop.position  = rightTopPos;
-  rightTop.texcoords = Vec2f({ 1.f, 1.f });
+  rightTop.texcoords = Vec2f(1.f, 1.f);
 
   Vertex rightBottom {};
   rightBottom.position  = rightBottomPos;
-  rightBottom.texcoords = Vec2f({ 1.f, 0.f });
+  rightBottom.texcoords = Vec2f(1.f, 0.f);
 
   Vertex leftBottom {};
   leftBottom.position  = leftBottomPos;
-  leftBottom.texcoords = Vec2f({ 0.f, 0.f });
+  leftBottom.texcoords = Vec2f(0.f, 0.f);
 
   // Computing normals
   // TODO: normals should not be computed (or even exist) for simple display quads like a framebuffer
@@ -238,36 +235,36 @@ Mesh::Mesh(const AABB& box, RenderMode renderMode) : Mesh() {
   // TODO: texcoords should not exist for simple display cubes like a skybox
 
   Vertex rightTopBack {};
-  rightTopBack.position  = Vec3f({ rightPos, topPos, backPos });
-  rightTopBack.texcoords = Vec2f({ 0.f, 1.f });
+  rightTopBack.position  = Vec3f(rightPos, topPos, backPos);
+  rightTopBack.texcoords = Vec2f(0.f, 1.f);
 
   Vertex rightTopFront {};
   rightTopFront.position  = rightTopFrontPos;
-  rightTopFront.texcoords = Vec2f({ 1.f, 1.f });
+  rightTopFront.texcoords = Vec2f(1.f, 1.f);
 
   Vertex rightBottomBack {};
-  rightBottomBack.position  = Vec3f({ rightPos, bottomPos, backPos });
-  rightBottomBack.texcoords = Vec2f({ 0.f, 0.f });
+  rightBottomBack.position  = Vec3f(rightPos, bottomPos, backPos);
+  rightBottomBack.texcoords = Vec2f(0.f, 0.f);
 
   Vertex rightBottomFront {};
-  rightBottomFront.position  = Vec3f({ rightPos, bottomPos, frontPos });
-  rightBottomFront.texcoords = Vec2f({ 1.f, 0.f });
+  rightBottomFront.position  = Vec3f(rightPos, bottomPos, frontPos);
+  rightBottomFront.texcoords = Vec2f(1.f, 0.f);
 
   Vertex leftTopBack {};
-  leftTopBack.position  = Vec3f({ leftPos, topPos, backPos });
-  leftTopBack.texcoords = Vec2f({ 1.f, 1.f });
+  leftTopBack.position  = Vec3f(leftPos, topPos, backPos);
+  leftTopBack.texcoords = Vec2f(1.f, 1.f);
 
   Vertex leftTopFront {};
-  leftTopFront.position  = Vec3f({ leftPos, topPos, frontPos });
-  leftTopFront.texcoords = Vec2f({ 0.f, 1.f });
+  leftTopFront.position  = Vec3f(leftPos, topPos, frontPos);
+  leftTopFront.texcoords = Vec2f(0.f, 1.f);
 
   Vertex leftBottomBack {};
   leftBottomBack.position  = leftBottomBackPos;
-  leftBottomBack.texcoords = Vec2f({ 1.f, 0.f });
+  leftBottomBack.texcoords = Vec2f(1.f, 0.f);
 
   Vertex leftBottomFront {};
-  leftBottomFront.position  = Vec3f({ leftPos, bottomPos, frontPos });
-  leftBottomFront.texcoords = Vec2f({ 0.f, 0.f });
+  leftBottomFront.position  = Vec3f(leftPos, bottomPos, frontPos);
+  leftBottomFront.texcoords = Vec2f(0.f, 0.f);
 
   // Computing normals
   // TODO: normals should not be computed (or even exist) for simple display cubes like a skybox

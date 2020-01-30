@@ -237,7 +237,7 @@ Vec3f AABB::computeProjection(const Vec3f& point) const {
   const float closestY = std::max(std::min(point[1], m_rightTopFrontPos[1]), m_leftBottomBackPos[1]);
   const float closestZ = std::max(std::min(point[2], m_rightTopFrontPos[2]), m_leftBottomBackPos[2]);
 
-  return Vec3f({ closestX, closestY, closestZ });
+  return Vec3f(closestX, closestY, closestZ);
 }
 
 // OBB functions

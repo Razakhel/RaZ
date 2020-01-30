@@ -183,7 +183,7 @@ bool Ray::intersects(const AABB& aabb, RayHit* hit) const {
 
     // Normal computing method based on John Novak's: http://blog.johnnovak.net/2016/10/22/the-nim-raytracer-project-part-4-calculating-box-normals/
     const Vec3f hitDir = (hit->position - aabb.computeCentroid()) / aabb.computeHalfExtents();
-    hit->normal = Vec3f({ std::trunc(hitDir[0]), std::trunc(hitDir[1]), std::trunc(hitDir[2]) }).normalize();
+    hit->normal = Vec3f(std::trunc(hitDir[0]), std::trunc(hitDir[1]), std::trunc(hitDir[2])).normalize();
 
     hit->distance = minHitDist;
   }

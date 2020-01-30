@@ -17,7 +17,7 @@ int main() {
   Raz::Entity& camera = renderSystem.getCameraEntity();
   auto& cameraComp    = camera.getComponent<Raz::Camera>();
   auto& cameraTrans   = camera.getComponent<Raz::Transform>();
-  cameraTrans.setPosition(Raz::Vec3f({ 0.f, 0.f, -5.f }));
+  cameraTrans.setPosition(Raz::Vec3f(0.f, 0.f, -5.f));
 
   Raz::Entity& mesh = world.addEntity();
   auto& meshTrans   = mesh.addComponent<Raz::Transform>();
@@ -34,11 +34,11 @@ int main() {
   /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT, // Type
                                                    1.f,                   // Energy
                                                    Raz::Vec3f(1.f));      // Color(RGB)*/
-  auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,   // Type
-                                                   Raz::Vec3f({ 0.f, 0.f, 1.f }), // Direction
-                                                   1.f,                           // Energy
-                                                   Raz::Vec3f(1.f));              // Color (RGB)
-  auto& lightTrans = light.addComponent<Raz::Transform>(Raz::Vec3f({ 0.f, 1.f, 0.f }));
+  auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
+                                                   Raz::Vec3f(0.f, 0.f, 1.f),   // Direction
+                                                   1.f,                         // Energy
+                                                   Raz::Vec3f(1.f));            // Color (RGB)
+  auto& lightTrans = light.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 1.f, 0.f));
 
   window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) { mesh.disable(); },
                         Raz::Input::ONCE,

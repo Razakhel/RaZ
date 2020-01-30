@@ -16,8 +16,8 @@ TEST_CASE("Mesh from Sphere") {
     const Raz::AABB& boundingBox = mesh.computeBoundingBox();
 
     // The bounding box's Z coordinate is not exactly 1/-1, due to the approximation made by the low longitude count
-    CHECK(boundingBox.getRightTopFrontPos() == Raz::Vec3f({ 1.f, 1.f, 0.9510565f }));
-    CHECK(boundingBox.getLeftBottomBackPos() == Raz::Vec3f({ -1.f, -1.f, -0.9510565f }));
+    CHECK(boundingBox.getRightTopFrontPos() == Raz::Vec3f(1.f, 1.f, 0.9510565f));
+    CHECK(boundingBox.getLeftBottomBackPos() == Raz::Vec3f(-1.f, -1.f, -0.9510565f));
   }
 
   // Sphere mesh with 100 splits in latitude/longitude

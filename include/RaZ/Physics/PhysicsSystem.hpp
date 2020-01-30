@@ -18,7 +18,7 @@ public:
   void destroy() override {}
 
 private:
-  Vec3f m_gravity = Vec3f({ 0.f, -9.80665f, 0.f });
+  Vec3f m_gravity = Vec3f(0.f, -9.80665f, 0.f);
 };
 
 } // namespace Raz
