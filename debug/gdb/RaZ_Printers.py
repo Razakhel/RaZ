@@ -43,6 +43,16 @@ class RazMatrixPrinter:
     def display_hint(self):
         return 'array'
 
+# Raz::Degrees<T> or Raz::Radians<T>
+class RazAnglePrinter:
+    def __init__(self, val):
+        self.val   = val
+        self.value = self.val['value']
+
+    def to_string(self):
+        return self.value
+
+
 ##############
 # Dispatcher #
 ##############
@@ -57,6 +67,8 @@ def DispatchFromType(val):
         return RazVectorPrinter(val)
     elif re.match("^Raz::Matrix<.*, \d*, \d*>$", typeStr):
         return RazMatrixPrinter(val)
+    elif re.match("^Raz::(Degrees|Radians)<.*>$", typeStr):
+        return RazAnglePrinter(val)
 
     return None
 
