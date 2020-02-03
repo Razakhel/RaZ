@@ -172,6 +172,10 @@ namespace Literals {
 /// Degrees user-defined literal.
 /// \param val Value in degrees.
 /// \return Degrees object containing the given value.
+constexpr Degreesld operator "" _deg(unsigned long long val) { return Degreesld(static_cast<long double>(val)); }
+/// Degrees user-defined literal.
+/// \param val Value in degrees.
+/// \return Degrees object containing the given value.
 constexpr Degreesld operator "" _deg(long double val) { return Degreesld(val); }
 /// Radians user-defined literal.
 /// \param val Value in radians.
