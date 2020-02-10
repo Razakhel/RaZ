@@ -8,20 +8,20 @@ namespace Raz {
 namespace {
 
 template <typename T>
-T computeMatrixDeterminant(const Mat2<T>& mat) {
+constexpr T computeMatrixDeterminant(const Mat2<T>& mat) noexcept {
   return (mat.getData()[0] * mat.getData()[3]) - (mat.getData()[2] * mat.getData()[1]);
 }
 
 template <typename T>
-T computeMatrixDeterminant(const Mat3<T>& mat) {
-  const auto leftMatrix = Mat2<T>({{ mat.getData()[4], mat.getData()[5] },
-                                   { mat.getData()[7], mat.getData()[8] }});
+constexpr T computeMatrixDeterminant(const Mat3<T>& mat) noexcept {
+  const auto leftMatrix = Mat2<T>(mat.getData()[4], mat.getData()[5],
+                                  mat.getData()[7], mat.getData()[8]);
 
-  const auto centerMatrix = Mat2<T>({{ mat.getData()[3], mat.getData()[5] },
-                                     { mat.getData()[6], mat.getData()[8] }});
+  const auto centerMatrix = Mat2<T>(mat.getData()[3], mat.getData()[5],
+                                    mat.getData()[6], mat.getData()[8]);
 
-  const auto rightMatrix = Mat2<T>({{ mat.getData()[3], mat.getData()[4] },
-                                    { mat.getData()[6], mat.getData()[7] }});
+  const auto rightMatrix = Mat2<T>(mat.getData()[3], mat.getData()[4],
+                                   mat.getData()[6], mat.getData()[7]);
 
   return computeMatrixDeterminant(leftMatrix) * mat.getData()[0]
        - computeMatrixDeterminant(centerMatrix) * mat.getData()[1]
@@ -29,22 +29,22 @@ T computeMatrixDeterminant(const Mat3<T>& mat) {
 }
 
 template <typename T>
-T computeMatrixDeterminant(const Mat4<T>& mat) {
-  const auto leftMatrix = Mat3<T>({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
-                                   {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
-                                   { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
+constexpr T computeMatrixDeterminant(const Mat4<T>& mat) noexcept {
+  const auto leftMatrix = Mat3<T>(mat.getData()[5],  mat.getData()[6],  mat.getData()[7],
+                                  mat.getData()[9],  mat.getData()[10], mat.getData()[11],
+                                  mat.getData()[13], mat.getData()[14], mat.getData()[15]);
 
-  const auto centerLeftMatrix = Mat3<T>({{  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
-                                         {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
-                                         { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
+  const auto centerLeftMatrix = Mat3<T>(mat.getData()[4],  mat.getData()[6],  mat.getData()[7],
+                                        mat.getData()[8],  mat.getData()[10], mat.getData()[11],
+                                        mat.getData()[12], mat.getData()[14], mat.getData()[15]);
 
-  const auto centerRightMatrix = Mat3<T>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
-                                          {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
-                                          { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
+  const auto centerRightMatrix = Mat3<T>(mat.getData()[4],  mat.getData()[5],  mat.getData()[7],
+                                         mat.getData()[8],  mat.getData()[9],  mat.getData()[11],
+                                         mat.getData()[12], mat.getData()[13], mat.getData()[15]);
 
-  const auto rightMatrix = Mat3<T>({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
-                                    {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
-                                    { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+  const auto rightMatrix = Mat3<T>(mat.getData()[4],  mat.getData()[5],  mat.getData()[6],
+                                   mat.getData()[8],  mat.getData()[9],  mat.getData()[10],
+                                   mat.getData()[12], mat.getData()[13], mat.getData()[14]);
 
   return computeMatrixDeterminant(leftMatrix) * mat.getData()[0]
        - computeMatrixDeterminant(centerLeftMatrix) * mat.getData()[1]
@@ -53,96 +53,96 @@ T computeMatrixDeterminant(const Mat4<T>& mat) {
 }
 
 template <typename T>
-Mat2<T> computeMatrixInverse(const Mat2<T>& mat, T determinant) {
-  const Mat2<T> res({{  mat.getData()[3], -mat.getData()[1] },
-                     { -mat.getData()[2],  mat.getData()[0] }});
+constexpr Mat2<T> computeMatrixInverse(const Mat2<T>& mat, T determinant) {
+  const Mat2<T> res( mat.getData()[3], -mat.getData()[1],
+                    -mat.getData()[2],  mat.getData()[0]);
 
   return res / determinant;
 }
 
 template <typename T>
-Mat3<T> computeMatrixInverse(const Mat3<T>& mat, T determinant) {
-  const Mat2<T> topLeft({{ mat.getData()[4], mat.getData()[5] },
-                         { mat.getData()[7], mat.getData()[8] }});
-  const Mat2<T> topCenter({{ mat.getData()[3], mat.getData()[5] },
-                           { mat.getData()[6], mat.getData()[8] }});
-  const Mat2<T> topRight({{ mat.getData()[3], mat.getData()[4] },
-                          { mat.getData()[6], mat.getData()[7] }});
+constexpr Mat3<T> computeMatrixInverse(const Mat3<T>& mat, T determinant) {
+  const Mat2<T> topLeft(mat.getData()[4], mat.getData()[5],
+                        mat.getData()[7], mat.getData()[8]);
+  const Mat2<T> topCenter(mat.getData()[3], mat.getData()[5],
+                          mat.getData()[6], mat.getData()[8]);
+  const Mat2<T> topRight(mat.getData()[3], mat.getData()[4],
+                         mat.getData()[6], mat.getData()[7]);
 
-  const Mat2<T> midLeft({{ mat.getData()[1], mat.getData()[2] },
-                         { mat.getData()[7], mat.getData()[8] }});
-  const Mat2<T> midCenter({{ mat.getData()[0], mat.getData()[2] },
-                           { mat.getData()[6], mat.getData()[8] }});
-  const Mat2<T> midRight({{ mat.getData()[0], mat.getData()[1] },
-                          { mat.getData()[6], mat.getData()[7] }});
+  const Mat2<T> midLeft(mat.getData()[1], mat.getData()[2],
+                        mat.getData()[7], mat.getData()[8]);
+  const Mat2<T> midCenter(mat.getData()[0], mat.getData()[2],
+                          mat.getData()[6], mat.getData()[8]);
+  const Mat2<T> midRight(mat.getData()[0], mat.getData()[1],
+                         mat.getData()[6], mat.getData()[7]);
 
-  const Mat2<T> botLeft({{ mat.getData()[1], mat.getData()[2] },
-                         { mat.getData()[4], mat.getData()[5] }});
-  const Mat2<T> botCenter({{ mat.getData()[0], mat.getData()[2] },
-                           { mat.getData()[3], mat.getData()[5] }});
-  const Mat2<T> botRight({{ mat.getData()[0], mat.getData()[1] },
-                          { mat.getData()[3], mat.getData()[4] }});
+  const Mat2<T> botLeft(mat.getData()[1], mat.getData()[2],
+                        mat.getData()[4], mat.getData()[5]);
+  const Mat2<T> botCenter(mat.getData()[0], mat.getData()[2],
+                          mat.getData()[3], mat.getData()[5]);
+  const Mat2<T> botRight(mat.getData()[0], mat.getData()[1],
+                         mat.getData()[3], mat.getData()[4]);
 
-  const Mat3<T> cofactors({{  topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant() },
-                           { -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant() },
-                           {  botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant() }});
+  const Mat3<T> cofactors( topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant(),
+                          -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant(),
+                           botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant());
 
   return cofactors.transpose() / determinant;
 }
 
 template <typename T>
-Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T determinant) {
-  const Mat3<T> topLeft({{  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
-                         {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
-                         { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
-  const Mat3<T> topCenterLeft({{  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
-                               {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
-                               { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
-  const Mat3<T> topCenterRight({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
-                                {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
-                                { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
-  const Mat3<T> topRight({{  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
-                          {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
-                          { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+constexpr Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T determinant) {
+  const Mat3<T> topLeft(mat.getData()[5],  mat.getData()[6],  mat.getData()[7],
+                        mat.getData()[9],  mat.getData()[10], mat.getData()[11],
+                        mat.getData()[13], mat.getData()[14], mat.getData()[15]);
+  const Mat3<T> topCenterLeft(mat.getData()[4],  mat.getData()[6],  mat.getData()[7],
+                              mat.getData()[8],  mat.getData()[10], mat.getData()[11],
+                              mat.getData()[12], mat.getData()[14], mat.getData()[15]);
+  const Mat3<T> topCenterRight(mat.getData()[4],  mat.getData()[5],  mat.getData()[7],
+                               mat.getData()[8],  mat.getData()[9],  mat.getData()[11],
+                               mat.getData()[12], mat.getData()[13], mat.getData()[15]);
+  const Mat3<T> topRight(mat.getData()[4],  mat.getData()[5],  mat.getData()[6],
+                         mat.getData()[8],  mat.getData()[9],  mat.getData()[10],
+                         mat.getData()[12], mat.getData()[13], mat.getData()[14]);
 
-  const Mat3<T> midTopLeft({{  mat.getData()[1],  mat.getData()[2],  mat.getData()[3] },
-                            {  mat.getData()[9], mat.getData()[10], mat.getData()[11] },
-                            { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
-  const Mat3<T> midTopCenterLeft({{  mat.getData()[0],  mat.getData()[2],  mat.getData()[3] },
-                                  {  mat.getData()[8], mat.getData()[10], mat.getData()[11] },
-                                  { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
-  const Mat3<T> midTopCenterRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[3] },
-                                   {  mat.getData()[8],  mat.getData()[9], mat.getData()[11] },
-                                   { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
-  const Mat3<T> midTopRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[2] },
-                             {  mat.getData()[8],  mat.getData()[9], mat.getData()[10] },
-                             { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+  const Mat3<T> midTopLeft(mat.getData()[1],  mat.getData()[2],  mat.getData()[3],
+                           mat.getData()[9],  mat.getData()[10], mat.getData()[11],
+                           mat.getData()[13], mat.getData()[14], mat.getData()[15]);
+  const Mat3<T> midTopCenterLeft(mat.getData()[0],  mat.getData()[2],  mat.getData()[3],
+                                 mat.getData()[8],  mat.getData()[10], mat.getData()[11],
+                                 mat.getData()[12], mat.getData()[14], mat.getData()[15]);
+  const Mat3<T> midTopCenterRight(mat.getData()[0],  mat.getData()[1],  mat.getData()[3],
+                                  mat.getData()[8],  mat.getData()[9],  mat.getData()[11],
+                                  mat.getData()[12], mat.getData()[13], mat.getData()[15]);
+  const Mat3<T> midTopRight(mat.getData()[0],  mat.getData()[1],  mat.getData()[2],
+                            mat.getData()[8],  mat.getData()[9],  mat.getData()[10],
+                            mat.getData()[12], mat.getData()[13], mat.getData()[14]);
 
-  const Mat3<T> midBotLeft({{  mat.getData()[1],  mat.getData()[2],  mat.getData()[3] },
-                            {  mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
-                            { mat.getData()[13], mat.getData()[14], mat.getData()[15] }});
-  const Mat3<T> midBotCenterLeft({{  mat.getData()[0],  mat.getData()[2],  mat.getData()[3] },
-                                  {  mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
-                                  { mat.getData()[12], mat.getData()[14], mat.getData()[15] }});
-  const Mat3<T> midBotCenterRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[3] },
-                                   {  mat.getData()[4],  mat.getData()[5],  mat.getData()[7] },
-                                   { mat.getData()[12], mat.getData()[13], mat.getData()[15] }});
-  const Mat3<T> midBotRight({{  mat.getData()[0],  mat.getData()[1],  mat.getData()[2] },
-                             {  mat.getData()[4],  mat.getData()[5],  mat.getData()[6] },
-                             { mat.getData()[12], mat.getData()[13], mat.getData()[14] }});
+  const Mat3<T> midBotLeft(mat.getData()[1],  mat.getData()[2],  mat.getData()[3],
+                           mat.getData()[5],  mat.getData()[6],  mat.getData()[7],
+                           mat.getData()[13], mat.getData()[14], mat.getData()[15]);
+  const Mat3<T> midBotCenterLeft(mat.getData()[0],  mat.getData()[2],  mat.getData()[3],
+                                 mat.getData()[4],  mat.getData()[6],  mat.getData()[7],
+                                 mat.getData()[12], mat.getData()[14], mat.getData()[15]);
+  const Mat3<T> midBotCenterRight(mat.getData()[0],  mat.getData()[1],  mat.getData()[3],
+                                  mat.getData()[4],  mat.getData()[5],  mat.getData()[7],
+                                  mat.getData()[12], mat.getData()[13], mat.getData()[15]);
+  const Mat3<T> midBotRight(mat.getData()[0],  mat.getData()[1],  mat.getData()[2],
+                            mat.getData()[4],  mat.getData()[5],  mat.getData()[6],
+                            mat.getData()[12], mat.getData()[13], mat.getData()[14]);
 
-  const Mat3<T> botLeft({{ mat.getData()[1],  mat.getData()[2],  mat.getData()[3] },
-                         { mat.getData()[5],  mat.getData()[6],  mat.getData()[7] },
-                         { mat.getData()[9], mat.getData()[10], mat.getData()[11] }});
-  const Mat3<T> botCenterLeft({{ mat.getData()[0],  mat.getData()[2],  mat.getData()[3] },
-                               { mat.getData()[4],  mat.getData()[6],  mat.getData()[7] },
-                               { mat.getData()[8], mat.getData()[10], mat.getData()[11] }});
-  const Mat3<T> botCenterRight({{ mat.getData()[0], mat.getData()[1],  mat.getData()[3] },
-                                { mat.getData()[4], mat.getData()[5],  mat.getData()[7] },
-                                { mat.getData()[8], mat.getData()[9], mat.getData()[11] }});
-  const Mat3<T> botRight({{ mat.getData()[0], mat.getData()[1],  mat.getData()[2] },
-                          { mat.getData()[4], mat.getData()[5],  mat.getData()[6] },
-                          { mat.getData()[8], mat.getData()[9], mat.getData()[10] }});
+  const Mat3<T> botLeft(mat.getData()[1], mat.getData()[2], mat.getData()[3],
+                        mat.getData()[5], mat.getData()[6], mat.getData()[7],
+                        mat.getData()[9], mat.getData()[10], mat.getData()[11]);
+  const Mat3<T> botCenterLeft(mat.getData()[0], mat.getData()[2],  mat.getData()[3],
+                              mat.getData()[4], mat.getData()[6],  mat.getData()[7],
+                              mat.getData()[8], mat.getData()[10], mat.getData()[11]);
+  const Mat3<T> botCenterRight(mat.getData()[0], mat.getData()[1], mat.getData()[3],
+                               mat.getData()[4], mat.getData()[5], mat.getData()[7],
+                               mat.getData()[8], mat.getData()[9], mat.getData()[11]);
+  const Mat3<T> botRight(mat.getData()[0], mat.getData()[1], mat.getData()[2],
+                         mat.getData()[4], mat.getData()[5], mat.getData()[6],
+                         mat.getData()[8], mat.getData()[9], mat.getData()[10]);
 
   const T topLeftDeterm        = topLeft.computeDeterminant();
   const T topCenterLeftDeterm  = topCenterLeft.computeDeterminant();
@@ -164,10 +164,10 @@ Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T determinant) {
   const T botCenterRightDeterm = botCenterRight.computeDeterminant();
   const T botRightDeterm       = botRight.computeDeterminant();
 
-  const Mat4<T> cofactors({{     topLeftDeterm,    -topCenterLeftDeterm,     topCenterRightDeterm,    -topRightDeterm },
-                           { -midTopLeftDeterm,  midTopCenterLeftDeterm, -midTopCenterRightDeterm,  midTopRightDeterm },
-                           {  midBotLeftDeterm, -midBotCenterLeftDeterm,  midBotCenterRightDeterm, -midBotRightDeterm },
-                           {    -botLeftDeterm,     botCenterLeftDeterm,    -botCenterRightDeterm,     botRightDeterm }});
+  const Mat4<T> cofactors( topLeftDeterm,    -topCenterLeftDeterm,     topCenterRightDeterm,    -topRightDeterm,
+                          -midTopLeftDeterm,  midTopCenterLeftDeterm, -midTopCenterRightDeterm,  midTopRightDeterm,
+                           midBotLeftDeterm, -midBotCenterLeftDeterm,  midBotCenterRightDeterm, -midBotRightDeterm,
+                          -botLeftDeterm,     botCenterLeftDeterm,    -botCenterRightDeterm,     botRightDeterm);
 
   return cofactors.transpose() / determinant;
 }
@@ -175,7 +175,7 @@ Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T determinant) {
 } // namespace
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) {
+constexpr Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) noexcept {
   std::size_t widthStride = 0;
 
   for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
@@ -192,7 +192,7 @@ Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>::Matrix(const Matrix<T, W - 1, H - 1>& mat) {
+constexpr Matrix<T, W, H>::Matrix(const Matrix<T, W - 1, H - 1>& mat) noexcept {
   std::size_t widthStride = 0;
 
   for (std::size_t heightIndex = 0; heightIndex < H - 1; ++heightIndex) {
@@ -211,7 +211,7 @@ Matrix<T, W, H>::Matrix(const Matrix<T, W - 1, H - 1>& mat) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
+Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) noexcept {
   assert("Error: A Matrix cannot be created with less/more values than specified." && H == list.size());
 
   auto row = list.begin();
@@ -227,7 +227,7 @@ Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::identity() {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::identity() noexcept {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
   Matrix<T, W, H> res;
@@ -239,7 +239,7 @@ Matrix<T, W, H> Matrix<T, W, H>::identity() {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, H, W> Matrix<T, W, H>::transpose() const {
+constexpr Matrix<T, H, W> Matrix<T, W, H>::transpose() const noexcept {
   Matrix<T, H, W> res;
 
   for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
@@ -251,21 +251,21 @@ Matrix<T, H, W> Matrix<T, W, H>::transpose() const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-T Matrix<T, W, H>::computeDeterminant() const {
+constexpr T Matrix<T, W, H>::computeDeterminant() const noexcept {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
   return computeMatrixDeterminant(*this);
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::inverse() const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::inverse() const {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
   return computeMatrixInverse(*this, computeMatrixDeterminant(*this));
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Vector<T, W> Matrix<T, W, H>::recoverRow(std::size_t rowIndex) const {
+constexpr Vector<T, W> Matrix<T, W, H>::recoverRow(std::size_t rowIndex) const noexcept {
   assert("Error: Given row index is out of bounds." && rowIndex < H);
 
   Vector<T, W> res {};
@@ -278,7 +278,7 @@ Vector<T, W> Matrix<T, W, H>::recoverRow(std::size_t rowIndex) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Vector<T, H> Matrix<T, W, H>::recoverColumn(std::size_t columnIndex) const {
+constexpr Vector<T, H> Matrix<T, W, H>::recoverColumn(std::size_t columnIndex) const noexcept {
   assert("Error: Given column index is out of bounds." && columnIndex < W);
 
   Vector<T, H> res {};
@@ -290,63 +290,63 @@ Vector<T, H> Matrix<T, W, H>::recoverColumn(std::size_t columnIndex) const {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator+(const Matrix& mat) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator+(const Matrix& mat) const noexcept {
   Matrix<T, W, H> res = *this;
   res += mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator+(T val) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator+(T val) const noexcept {
   Matrix<T, W, H> res = *this;
   res += val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator-(const Matrix& mat) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator-(const Matrix& mat) const noexcept {
   Matrix<T, W, H> res = *this;
   res -= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator-(T val) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator-(T val) const noexcept {
   Matrix<T, W, H> res = *this;
   res -= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator%(const Matrix& mat) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator%(const Matrix& mat) const noexcept {
   Matrix<T, W, H> res = *this;
   res %= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator*(T val) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator*(T val) const noexcept {
   Matrix<T, W, H> res = *this;
   res *= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const {
   Matrix<T, W, H> res = *this;
   res /= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const {
   Matrix<T, W, H> res = *this;
   res /= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Vector<T, H> Matrix<T, W, H>::operator*(const Vector<T, H>& vec) const {
+constexpr Vector<T, H> Matrix<T, W, H>::operator*(const Vector<T, H>& vec) const noexcept {
   // This multiplication is made assuming the vector to be vertical
   Vector<T, H> res {};
 
@@ -360,7 +360,7 @@ Vector<T, H> Matrix<T, W, H>::operator*(const Vector<T, H>& vec) const {
 
 template <typename T, std::size_t W, std::size_t H>
 template <std::size_t WI, std::size_t HI>
-Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const {
+constexpr Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const noexcept {
   static_assert(W == HI, "Error: Input matrix's width must be equal to current matrix's height.");
 
   Matrix<T, H, WI> res {};
@@ -378,63 +378,63 @@ Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const 
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& mat) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] += mat.getData()[i];
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator+=(T val) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator+=(T val) noexcept {
   for (T& it : m_data)
     it += val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator-=(const Matrix<T, W, H>& mat) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator-=(const Matrix<T, W, H>& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] -= mat.getData()[i];
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator-=(T val) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator-=(T val) noexcept {
   for (T& it : m_data)
     it -= val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix<T, W, H>& mat) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix<T, W, H>& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] *= mat.getData()[i];
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator*=(T val) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator*=(T val) noexcept {
   for (T& it : m_data)
     it *= val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] /= mat.getData()[i];
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) {
   for (T& it : m_data)
     it /= val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-bool Matrix<T, W, H>::operator==(const Matrix<T, W, H>& mat) const {
+constexpr bool Matrix<T, W, H>::operator==(const Matrix<T, W, H>& mat) const noexcept {
   if constexpr (std::is_floating_point_v<T>)
     return FloatUtils::areNearlyEqual(*this, mat);
   else

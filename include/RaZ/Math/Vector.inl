@@ -199,11 +199,10 @@ constexpr Vector<T, Size>& Vector<T, Size>::operator/=(T val) {
 
 template <typename T, std::size_t Size>
 constexpr bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const noexcept {
-  if constexpr (std::is_floating_point_v<T>) {
+  if constexpr (std::is_floating_point_v<T>)
     return FloatUtils::areNearlyEqual(*this, vec);
-  } else {
+  else
     return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin());
-  }
 }
 
 template <typename T, std::size_t Size>
