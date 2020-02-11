@@ -65,10 +65,10 @@ constexpr Mat4<T> Quaternion<T>::computeMatrix() const {
   const T yw = (2 * m_complexes[1] * m_real) * invSqNorm;
   const T zw = (2 * m_complexes[2] * m_real) * invSqNorm;
 
-  return Mat4<T>({{ 1 - yy - zz,     xy + zw,     xz - yw, 0 },
-                  {     xy - zw, 1 - xx - zz,     yz + xw, 0 },
-                  {     xz + yw,     yz - xw, 1 - xx - yy, 0 },
-                  {           0,           0,           0, 1 }});
+  return Mat4<T>(1 - yy - zz,       xy + zw,           xz - yw,           static_cast<T>(0),
+                 xy - zw,           1 - xx - zz,       yz + xw,           static_cast<T>(0),
+                 xz + yw,           yz - xw,           1 - xx - yy,       static_cast<T>(0),
+                 static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(1));
 }
 
 template <typename T>

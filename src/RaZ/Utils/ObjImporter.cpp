@@ -27,14 +27,14 @@ inline Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const
 inline TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textureFileName) {
   static std::unordered_map<std::string, TexturePtr> loadedTextures;
 
-  TexturePtr map {};
+  TexturePtr map;
   const auto loadedTexturePos = loadedTextures.find(textureFileName);
 
   if (loadedTexturePos != loadedTextures.cend()) {
     map = loadedTexturePos->second;
   } else {
     const std::string texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
-    map = Texture::create(texturePath, true); // Always flip vertically imported textures, since OpenGL maps them upside down
+    map = Texture::create(texturePath, true); // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
     loadedTextures.emplace(textureFileName, map);
   }
 

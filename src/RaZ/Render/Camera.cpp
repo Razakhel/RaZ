@@ -37,10 +37,10 @@ const Mat4f& Camera::computeLookAt(const Vec3f& position) {
   const Vec3f xAxis = zAxis.cross(m_upAxis).normalize();
   const Vec3f yAxis = xAxis.cross(zAxis);
 
-  m_viewMat = Mat4f({{             xAxis[0],             yAxis[0],           -zAxis[0], 0.f },
-                     {             xAxis[1],             yAxis[1],           -zAxis[1], 0.f },
-                     {             xAxis[2],             yAxis[2],           -zAxis[2], 0.f },
-                     { xAxis.dot(-position), yAxis.dot(-position), zAxis.dot(position), 1.f }});
+  m_viewMat = Mat4f(xAxis[0],             yAxis[0],             -zAxis[0],            0.f,
+                    xAxis[1],             yAxis[1],             -zAxis[1],            0.f,
+                    xAxis[2],             yAxis[2],             -zAxis[2],            0.f,
+                    xAxis.dot(-position), yAxis.dot(-position),  zAxis.dot(position), 1.f);
 
   return m_viewMat;
 }
@@ -56,10 +56,10 @@ const Mat4f& Camera::computePerspectiveMatrix() {
   const float planeMult      = m_farPlane * m_nearPlane;
   const float fovRatio       = m_frameRatio * halfFovTangent;
 
-  m_projMat = Mat4f({{ 1 / fovRatio,                0.f,                    0.f, 0.f },
-                     {          0.f, 1 / halfFovTangent,                    0.f, 0.f },
-                     {          0.f,                0.f, m_farPlane / planeDist, 1.f },
-                     {          0.f,                0.f, -planeMult / planeDist, 0.f }});
+  m_projMat = Mat4f(1.f / fovRatio, 0.f,                   0.f,                    0.f,
+                    0.f,            1.f / halfFovTangent,  0.f,                    0.f,
+                    0.f,            0.f,                   m_farPlane / planeDist, 1.f,
+                    0.f,            0.f,                  -planeMult / planeDist,  0.f);
 
   return m_projMat;
 }
@@ -69,10 +69,10 @@ const Mat4f& Camera::computeOrthographicMatrix(float right, float left, float to
   const float yDist = top - bottom;
   const float zDist = far - near;
 
-  m_projMat = Mat4f({{ 2.f / xDist,         0.f,          0.f, -(right + left) / xDist },
-                     {         0.f, 2.f / yDist,          0.f, -(top + bottom) / yDist },
-                     {         0.f,         0.f, -2.f / zDist,   -(far + near) / zDist },
-                     {         0.f,         0.f,          0.f,                     1.f }});
+  m_projMat = Mat4f(2.f / xDist, 0.f,          0.f,         -(right + left) / xDist,
+                    0.f,         2.f / yDist,  0.f,         -(top + bottom) / yDist,
+                    0.f,         0.f,         -2.f / zDist, -(far + near) / zDist,
+                    0.f,         0.f,          0.f,          1.f);
 
   return m_projMat;
 }

@@ -61,16 +61,16 @@ TEST_CASE("Vector/vector operations") {
 }
 
 TEST_CASE("Vector/matrix operations") {
-  const Raz::Mat3f mat3({{ 4.12f,  25.1f, 30.7842f },
-                         { 3.04f,    5.f,   -64.5f },
-                         {  -1.f, -7.54f,    8.41f }});
+  const Raz::Mat3f mat3( 4.12f,  25.1f,  30.7842f,
+                         3.04f,  5.f,   -64.5f,
+                        -1.f,   -7.54f,  8.41f);
   CHECK((vec31 * mat3) == Raz::Vec3f(139.9076f, 283.22804f, -2603.755904f));
   CHECK((vec32 * mat3) == Raz::Vec3f(2367.9282f, 13'777.980'66f, 13'672.408'332f));
 
-  const Raz::Mat4f mat4({{  -3.2f, 53.032f,  832.451f,   74.2f },
-                         { 10.01f,   3.15f,   -91.41f, 187.46f },
-                         {   -6.f,  -7.78f,      90.f,    38.f },
-                         {  123.f,  -74.8f, 147.0001f,  748.6f }});
+  const Raz::Mat4f mat4(-3.2f,    53.032f,  832.451f,  74.2f,
+                         10.01f,  3.15f,   -91.41f,    187.46f,
+                        -6.f,    -7.78f,    90.f,      38.f,
+                         123.f,  -74.8f,    147.0001f, 748.6f);
   CHECK((vec41 * mat4) == Raz::Vec4f(103'945.47f, -58878.67074f, 194'661.130'682f, 640'796.664f));
   CHECK((vec42 * mat4) == Raz::Vec4f(8307.0695f, -5354.92518f, 29032.48321f, 58115.061f));
 
