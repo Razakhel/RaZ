@@ -79,7 +79,7 @@ public:
   /// Computes the unique hash of the vector.
   /// \param seed Value to use as a hash seed.
   /// \return Vector's hash.
-  constexpr std::size_t hash(std::size_t seed) const noexcept;
+  constexpr std::size_t hash(std::size_t seed = 0) const noexcept;
 
   /// Default copy assignment operator.
   /// \return Reference to the copied vector.
@@ -222,6 +222,12 @@ constexpr Vec3f Z(0.f, 0.f, 1.f);
 }
 
 } // namespace Raz
+
+// Specializing std::hash for Vector
+template <typename T, std::size_t Size>
+struct std::hash<Raz::Vector<T, Size>> {
+  constexpr std::size_t operator()(const Raz::Vector<T, Size>& vec) const noexcept { return vec.hash(); }
+};
 
 #include "RaZ/Math/Vector.inl"
 

@@ -65,8 +65,10 @@ constexpr Vector<T, Size> Vector<T, Size>::normalize() const {
 
 template <typename T, std::size_t Size>
 constexpr std::size_t Vector<T, Size>::hash(std::size_t seed) const noexcept {
+  std::hash<T> hasher {};
+
   for (const T& elt : m_data)
-    seed ^= std::hash<T>()(elt) + 0x9e3779b9 + (seed << 6u) + (seed >> 2u);
+    seed ^= hasher(elt) + 0x9e3779b9 + (seed << 6u) + (seed >> 2u);
 
   return seed;
 }

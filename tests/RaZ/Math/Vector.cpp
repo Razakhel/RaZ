@@ -39,12 +39,31 @@ TEST_CASE("Vector near-equality") {
 }
 
 TEST_CASE("Vector/scalar operations") {
+  CHECK((vec31 + 3.5f) == Raz::Vec3f(6.68f, 45.5f, 4.374f));
+  CHECK((vec32 - 74.42f) == Raz::Vec3f(466.99f, -27.17f, -68.099f));
+
   CHECK((vec31 * 3.f) == Raz::Vec3f(9.54f, 126.f, 2.622f));
   CHECK((vec31 * 4.152f) == Raz::Vec3f(13.20336f, 174.384f, 3.628848f));
 
   CHECK((vec41 * 7.5f) == Raz::Vec4f(633.525f, 15.f, 0.0075f, 6353.4f));
   CHECK((vec41 * 8.0002f) == Raz::Vec4f(675.776894f, 16.0004f, 0.0080002f, 6777.129424f));
   CHECK((vec41 * 0.f) == Raz::Vec4f(0.f, 0.f, 0.f, 0.f));
+
+  CHECK((vec31 / 2.f) == Raz::Vec3f(1.59f, 21.f, 0.437f));
+  CHECK((vec42 / 7.32f) == Raz::Vec4f(1.777322404f, 0.0204918f, 11.58469945f, 9.83606557f));
+
+  // If IEEE 754 is supported, check that division by 0 behaves as expected
+  if constexpr (std::numeric_limits<float>::is_iec559) {
+    const Raz::Vec3f vecInf = vec31 / 0.f;
+    CHECK(vecInf[0] == std::numeric_limits<float>::infinity());
+    CHECK(vecInf[1] == std::numeric_limits<float>::infinity());
+    CHECK(vecInf[2] == std::numeric_limits<float>::infinity());
+
+    const Raz::Vec3f vecNaN = Raz::Vec3f(0.f) / 0.f;
+    CHECK(std::isnan(vecNaN[0]));
+    CHECK(std::isnan(vecNaN[1]));
+    CHECK(std::isnan(vecNaN[2]));
+  }
 }
 
 TEST_CASE("Vector/vector operations") {
@@ -94,4 +113,32 @@ TEST_CASE("Vector manipulations") {
   CHECK(Raz::Vec3f(1.f, -1.f, 0.f).reflect(Raz::Vec3f(0.f, 1.f, 0.f)) == Raz::Vec3f(1.f, 1.f, 0.f));
   CHECK(vec31.reflect(Raz::Vec3f(0.f, 1.f, 0.f)) == Raz::Vec3f(3.18f, -42.f, 0.874f));
   CHECK(vec31.reflect(vec32) == Raz::Vec3f(-4'019'108.859'878'28f, -350'714.439'453f, -46'922.543'011'268f));
+}
+
+TEST_CASE("Vector hash") {
+  CHECK(vec31.hash() != vec32.hash());
+  CHECK(vec41.hash() != vec42.hash());
+
+  constexpr Raz::Vec3f vec31Swizzled(vec31[2], vec31[0], vec31[1]);
+  CHECK(vec31.hash() != vec31Swizzled.hash());
+
+  constexpr Raz::Vec3f vec31Epsilon = vec31 + std::numeric_limits<float>::epsilon();
+  CHECK(vec31.hash() != vec31Epsilon.hash());
+
+  // Checking that it behaves as expected when used in a hashmap
+  std::unordered_map<Raz::Vec3f, int> map;
+  map.emplace(vec31, 1);
+  map.emplace(vec31Swizzled, 2);
+  map.emplace(vec31Epsilon, 3);
+  map.emplace(vec32, 4);
+
+  CHECK(map.size() == 4);
+
+  CHECK(map.find(vec31)->second == 1);
+  CHECK(map.find(vec31Swizzled)->second == 2);
+  CHECK(map.find(vec31Epsilon)->second == 3);
+  CHECK(map.find(vec32)->second == 4);
+
+  map.erase(vec31Epsilon);
+  CHECK(map.find(vec31Epsilon) == map.cend());
 }
