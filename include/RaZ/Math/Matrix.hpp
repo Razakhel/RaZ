@@ -32,7 +32,7 @@ public:
   template <typename... Args,
       typename = std::enable_if_t<sizeof...(Args) == W * H>, // There can't be more or less values than width * height
       typename = std::enable_if_t<(std::is_same_v<T, std::decay_t<Args>> && ...)>> // Given values must be of the same type
-  explicit constexpr Matrix(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
+  constexpr explicit Matrix(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
   Matrix(std::initializer_list<std::initializer_list<T>> list) noexcept;
   constexpr Matrix(const Matrix&) noexcept = default;
   constexpr Matrix(Matrix&&) noexcept = default;

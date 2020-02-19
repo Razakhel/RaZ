@@ -27,13 +27,13 @@ template <typename T, std::size_t Size>
 class Vector {
 public:
   constexpr Vector() noexcept = default;
-  explicit constexpr Vector(const Vector<T, Size + 1>& vec) noexcept;
+  constexpr explicit Vector(const Vector<T, Size + 1>& vec) noexcept;
   constexpr Vector(const Vector<T, Size - 1>& vec, T val) noexcept;
-  explicit constexpr Vector(T val) noexcept;
+  constexpr explicit Vector(T val) noexcept;
   template <typename... Args,
             typename = std::enable_if_t<sizeof...(Args) == Size>, // There can't be more or less values than Size
             typename = std::enable_if_t<(std::is_same_v<T, std::decay_t<Args>> && ...)>> // Given values must be of the same type
- explicit constexpr Vector(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
+  constexpr explicit Vector(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
   Vector(std::initializer_list<T> list) noexcept;
   constexpr Vector(const Vector&) noexcept = default;
   constexpr Vector(Vector&&) noexcept = default;

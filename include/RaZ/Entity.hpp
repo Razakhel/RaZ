@@ -3,12 +3,12 @@
 #ifndef RAZ_ENTITY_HPP
 #define RAZ_ENTITY_HPP
 
+#include "RaZ/Component.hpp"
+#include "RaZ/Utils/Bitset.hpp"
+
 #include <memory>
 #include <type_traits>
 #include <vector>
-
-#include "RaZ/Component.hpp"
-#include "RaZ/Utils/Bitset.hpp"
 
 namespace Raz {
 

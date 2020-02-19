@@ -1,10 +1,10 @@
-#include <cassert>
-#include <fstream>
-#include <iostream>
-
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
+
+#include <cassert>
+#include <fstream>
+#include <iostream>
 
 namespace Raz {
 

@@ -1,8 +1,8 @@
-#include <fstream>
-
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
+
+#include <fstream>
 
 namespace Raz {
 

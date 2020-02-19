@@ -1,6 +1,6 @@
-#include <fstream>
-
 #include "RaZ/Render/Mesh.hpp"
+
+#include <fstream>
 
 namespace Raz {
 

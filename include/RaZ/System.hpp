@@ -3,10 +3,10 @@
 #ifndef RAZ_SYSTEM_HPP
 #define RAZ_SYSTEM_HPP
 
-#include <vector>
-
 #include "RaZ/Entity.hpp"
 #include "RaZ/Utils/Bitset.hpp"
+
+#include <vector>
 
 namespace Raz {
 

@@ -1,10 +1,10 @@
-#include <array>
-#include <fstream>
-#include <iostream>
-
 #include "png/png.h"
 #include "png/zlib.h"
 #include "RaZ/Utils/Image.hpp"
+
+#include <array>
+#include <fstream>
+#include <iostream>
 
 namespace Raz {
 

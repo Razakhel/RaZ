@@ -3,8 +3,6 @@
 #ifndef RAZ_LIGHT_HPP
 #define RAZ_LIGHT_HPP
 
-#include <memory>
-
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Math/Transform.hpp"
 

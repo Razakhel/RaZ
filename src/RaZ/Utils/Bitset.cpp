@@ -1,6 +1,6 @@
-#include <algorithm>
-
 #include "RaZ/Utils/Bitset.hpp"
+
+#include <algorithm>
 
 namespace Raz {
 

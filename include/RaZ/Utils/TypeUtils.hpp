@@ -7,6 +7,9 @@
 
 namespace Raz::TypeUtils {
 
+/// Recovers a string of the given type's name at compile-time.
+/// \tparam T Type to recover the name of.
+/// \return String representing the type's name.
 template <typename T>
 constexpr std::string_view getTypeStr() noexcept {
 #if defined(__clang__)
