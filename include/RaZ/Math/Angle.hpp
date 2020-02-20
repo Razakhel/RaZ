@@ -18,7 +18,7 @@ struct Degrees {
   static_assert(std::is_floating_point_v<T>, "Error: Degrees' type must be floating point.");
 
   constexpr explicit Degrees(T val) : value{ val } {}
-  constexpr explicit Degrees(Radians<T> rad) : value{ rad.value * 180 / PI<T> } {}
+  constexpr explicit Degrees(Radians<T> rad) : value{ rad.value * 180 / Pi<T> } {}
   constexpr Degrees(const Degrees&) = default;
   constexpr Degrees(Degrees&&) noexcept = default;
 
@@ -96,7 +96,7 @@ struct Radians {
   static_assert(std::is_floating_point_v<T>, "Error: Radians' type must be floating point.");
 
   constexpr explicit Radians(T val) : value{ val } {}
-  constexpr explicit Radians(Degrees<T> deg) : value{ deg.value * PI<T> / 180 } {}
+  constexpr explicit Radians(Degrees<T> deg) : value{ deg.value * Pi<T> / 180 } {}
   Radians(const Radians&) = default;
   Radians(Radians&&) noexcept = default;
 

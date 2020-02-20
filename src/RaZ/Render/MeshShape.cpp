@@ -60,12 +60,12 @@ Mesh::Mesh(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount, Rend
   std::vector<Vertex>& vertices = m_submeshes.front().getVertices();
   vertices.reserve((heightCount + 1) * (widthCount + 1));
 
-  const float widthStep  = 2 * PI<float> / static_cast<float>(widthCount);
-  const float heightStep = PI<float> / static_cast<float>(heightCount);
+  const float widthStep  = 2 * Pi<float> / static_cast<float>(widthCount);
+  const float heightStep = Pi<float> / static_cast<float>(heightCount);
   const float invLength  = 1.f / sphere.getRadius();
 
   for (unsigned int heightIndex = 0; heightIndex <= heightCount; ++heightIndex) {
-    const float heightAngle = PI<float> / 2 - static_cast<float>(heightIndex) * heightStep;
+    const float heightAngle = Pi<float> / 2 - static_cast<float>(heightIndex) * heightStep;
 
     const float xz = sphere.getRadius() * std::cos(heightAngle);
     const float y  = sphere.getRadius() * std::sin(heightAngle);
@@ -77,11 +77,11 @@ Mesh::Mesh(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount, Rend
       const float z = xz * std::sin(widthAngle);
 
       Vertex vert;
-      vert.position  = Vec3f({ x, y, z });
-      vert.texcoords = Vec2f({ static_cast<float>(widthIndex) / static_cast<float>(widthCount),
-                               static_cast<float>(heightIndex) / static_cast<float>(heightCount) });
-      vert.normal    = Vec3f({ x * invLength, y * invLength, z * invLength });
-      vert.tangent   = Vec3f({ vert.normal[1], vert.normal[0], vert.normal[2] }); // TODO: how does this give seemingly accurate results in basic cases?
+      vert.position  = Vec3f(x, y, z);
+      vert.texcoords = Vec2f(static_cast<float>(widthIndex) / static_cast<float>(widthCount),
+                             static_cast<float>(heightIndex) / static_cast<float>(heightCount));
+      vert.normal    = Vec3f(x * invLength, y * invLength, z * invLength);
+      vert.tangent   = Vec3f(vert.normal[1], vert.normal[0], vert.normal[2]); // TODO: how does this give seemingly accurate results in basic cases?
 
       vertices.emplace_back(vert);
     }

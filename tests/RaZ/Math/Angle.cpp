@@ -8,17 +8,17 @@ TEST_CASE("Degrees to Radians") {
   constexpr Raz::Degreesf deg180(180.f);
   constexpr Raz::Degreesf deg360(360.f);
 
-  CHECK_THAT(Raz::Radiansf(deg45).value,  IsNearlyEqualTo(Raz::PI<float> / 4));
-  CHECK_THAT(Raz::Radiansf(deg90).value,  IsNearlyEqualTo(Raz::PI<float> / 2));
-  CHECK_THAT(Raz::Radiansf(deg180).value, IsNearlyEqualTo(Raz::PI<float>));
-  CHECK_THAT(Raz::Radiansf(deg360).value, IsNearlyEqualTo(Raz::PI<float> * 2));
+  CHECK_THAT(Raz::Radiansf(deg45).value,  IsNearlyEqualTo(Raz::Pi<float> / 4));
+  CHECK_THAT(Raz::Radiansf(deg90).value,  IsNearlyEqualTo(Raz::Pi<float> / 2));
+  CHECK_THAT(Raz::Radiansf(deg180).value, IsNearlyEqualTo(Raz::Pi<float>));
+  CHECK_THAT(Raz::Radiansf(deg360).value, IsNearlyEqualTo(Raz::Pi<float> * 2));
 }
 
 TEST_CASE("Radians to Degrees") {
-  constexpr Raz::Radiansf radFourthPi(Raz::PI<float> / 4);
-  constexpr Raz::Radiansf radHalfPi(Raz::PI<float> / 2);
-  constexpr Raz::Radiansf radPi(Raz::PI<float>);
-  constexpr Raz::Radiansf radDoublePi(Raz::PI<float> * 2);
+  constexpr Raz::Radiansf radFourthPi(Raz::Pi<float> / 4);
+  constexpr Raz::Radiansf radHalfPi(Raz::Pi<float> / 2);
+  constexpr Raz::Radiansf radPi(Raz::Pi<float>);
+  constexpr Raz::Radiansf radDoublePi(Raz::Pi<float> * 2);
 
   CHECK_THAT(Raz::Degreesf(radFourthPi).value, IsNearlyEqualTo(45.f));
   CHECK_THAT(Raz::Degreesf(radHalfPi).value,   IsNearlyEqualTo(90.f));
@@ -54,7 +54,7 @@ TEST_CASE("Angle operators") {
   CHECK_THAT(radToDegFloat.value, IsNearlyEqualTo(180.f));
 
   constexpr Raz::Radiansf degToRadFloat = degTest;
-  CHECK_THAT(degToRadFloat.value, IsNearlyEqualTo(Raz::PI<float>));
+  CHECK_THAT(degToRadFloat.value, IsNearlyEqualTo(Raz::Pi<float>));
 
   // Mathematical operators
   // Degrees
@@ -85,29 +85,29 @@ TEST_CASE("Angle operators") {
   CHECK(degDiv == degTest);
 
   // Radians
-  auto radAdd = radTest + Raz::PI<float>;
+  auto radAdd = radTest + Raz::Pi<float>;
   // Checking that mathematical operations keeps the original angle type (no implicit cast to the value type)
   CHECK(std::is_same_v<std::decay_t<decltype(radTest)>, std::decay_t<decltype(radAdd)>>);
   // A float epsilon must be specified for the test to pass
   // long double's epsilon is too precise, so we need to compare with a value of the type we made an operation with
-  CHECK_THAT(radAdd.value, IsNearlyEqualTo(Raz::PI<long double> * 2, std::numeric_limits<float>::epsilon()));
+  CHECK_THAT(radAdd.value, IsNearlyEqualTo(Raz::Pi<long double> * 2, std::numeric_limits<float>::epsilon()));
 
-  auto radSub = radTest - Raz::PI<float>;
+  auto radSub = radTest - Raz::Pi<float>;
   CHECK(std::is_same_v<std::decay_t<decltype(radTest)>, std::decay_t<decltype(radSub)>>);
   CHECK_THAT(radSub.value, IsNearlyEqualTo(0.0L, std::numeric_limits<float>::epsilon()));
 
   auto radMul = radTest * 2.f;
   CHECK(std::is_same_v<std::decay_t<decltype(radTest)>, std::decay_t<decltype(radMul)>>);
-  CHECK_THAT(radMul.value, IsNearlyEqualTo(Raz::PI<long double> * 2, std::numeric_limits<float>::epsilon()));
+  CHECK_THAT(radMul.value, IsNearlyEqualTo(Raz::Pi<long double> * 2, std::numeric_limits<float>::epsilon()));
 
   auto radDiv = radTest / 2.f;
   CHECK(std::is_same_v<std::decay_t<decltype(radTest)>, std::decay_t<decltype(radDiv)>>);
-  CHECK_THAT(radDiv.value, IsNearlyEqualTo(Raz::PI<long double> / 2, std::numeric_limits<float>::epsilon()));
+  CHECK_THAT(radDiv.value, IsNearlyEqualTo(Raz::Pi<long double> / 2, std::numeric_limits<float>::epsilon()));
 
-  radAdd -= Raz::PI<float>;
+  radAdd -= Raz::Pi<float>;
   CHECK(radAdd == radTest);
 
-  radSub += Raz::PI<float>;
+  radSub += Raz::Pi<float>;
   CHECK(radSub == radTest);
 
   radMul /= 2.f;
