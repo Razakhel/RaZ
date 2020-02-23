@@ -3,36 +3,59 @@ language: cpp
 services:
     - docker
 
-os:
-    - linux
+os: linux
 
 jobs:
     include:
-        - name: "RaZ - GCC"
+        # Linux
+
+        - name: "RaZ - Linux GCC"
+          os: linux
           env:
-            - CXX_COMPILER=g++
             - C_COMPILER=gcc
+            - CXX_COMPILER=g++
             - BUILD_TESTS=false
             - COVERAGE=false
 
-        - name: "RaZ - Clang"
+        - name: "RaZ - Linux Clang"
+          os: linux
           env:
-            - CXX_COMPILER=clang++
             - C_COMPILER=clang
+            - CXX_COMPILER=clang++
             - BUILD_TESTS=false
             - COVERAGE=false
 
-        - name: "RaZ - GCC + Tests"
+        - name: "RaZ - Linux GCC + Tests"
+          os: linux
           env:
-            - CXX_COMPILER=g++
             - C_COMPILER=gcc
+            - CXX_COMPILER=g++
             - BUILD_TESTS=true
             - COVERAGE=true
 
-        - name: "RaZ - Clang + Tests"
+        - name: "RaZ - Linux Clang + Tests"
+          os: linux
           env:
-            - CXX_COMPILER=clang++
             - C_COMPILER=clang
+            - CXX_COMPILER=clang++
+            - BUILD_TESTS=true
+            - COVERAGE=false
+
+        # macOS
+
+        - name: "RaZ - macOS Clang"
+          os: osx
+          env:
+            - C_COMPILER=clang
+            - CXX_COMPILER=clang++
+            - BUILD_TESTS=false
+            - COVERAGE=false
+
+        - name: "RaZ - macOS Clang + Tests"
+          os: osx
+          env:
+            - C_COMPILER=clang
+            - CXX_COMPILER=clang++
             - BUILD_TESTS=true
             - COVERAGE=false
 
@@ -41,31 +64,49 @@ git:
     depth: false
 
 install:
-    - docker build -t raz .
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        docker build -t raz .;
+      fi
 
 script:
+    # Linux
+
     # Run Docker, build RaZ, launch unit tests if asked, and generate code coverage details & upload them to Coveralls if asked
     # Xvfb allows to run a program in headless mode (without a screen); this allows GLFW to be initialized properly
-    - docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
-        bash -c "
-            mkdir build && cd build &&
-            cmake -G \"Unix Makefiles\" -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
-                                        -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-                                        -DRAZ_USE_FBX=true .. &&
-            make -j4 &&
-            pwd && find . &&
-            if [[ ${BUILD_TESTS} == true ]]; then
-                cd tests/ &&
-                xvfb-run -a --server-args='-screen 0 1280x720x16' ./RaZ_Tests &&
-                cd ..;
-            fi &&
-            if [[ ${COVERAGE} == true ]]; then
-                lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
-                lcov -r coverage.info '/usr/*' -o coverage.info &&
-                lcov -l coverage.info &&
-                coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info;
-            fi
-        "
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+        docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
+            bash -c "
+                mkdir build && cd build &&
+                cmake -G \"Unix Makefiles\" -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
+                                            -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+                                            -DRAZ_USE_FBX=true .. &&
+                make -j4 &&
+                pwd && find . &&
+                if [[ ${BUILD_TESTS} == true ]]; then
+                    xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests;
+                fi &&
+                if [[ ${COVERAGE} == true ]]; then
+                    lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
+                    lcov -r coverage.info '/usr/*' -o coverage.info &&
+                    lcov -l coverage.info &&
+                    coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info;
+                fi
+            ";
+      fi
+
+    # macOS
+
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        mkdir build && cd build &&
+        cmake -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
+              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+              -DRAZ_USE_FBX=false .. &&
+        make -j4 &&
+        pwd && find . &&
+        if [[ ${BUILD_TESTS} == true ]]; then
+            ./tests/RaZ_Tests;
+        fi;
+      fi
 
 #webhooks:
 #    urls:
