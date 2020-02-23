@@ -1,10 +1,10 @@
 <h1 align="center">
     <img alt="RaZ logo" src="https://i.imgur.com/rwGGcpr.png" />
-    <br />
+    <br/>
     RaZ
 </h1>
 
-<h4 align="center">Modern &amp; multiplatform 3D engine in C++17</h4>
+<h4 align="center">Modern &amp; multiplatform 3D game engine in C++17</h4>
 
 ---
 
@@ -22,9 +22,9 @@
 
 Written in modern C++ (17), ECS driven, it is primarily developed for learning purposes. It is intended to be as optimized as possible, while trying to stay as modular as it can.
 
-This library is available for Linux and Windows. It is also supposed to run on macOS, but since I don't own a Mac I can't say for sure.
+The engine is available under Linux and Windows. It is also supposed to run on macOS, although not officially supported yet.
 
-If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/wiki)!
+If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/wiki). For the documentation, [look over here](http://razakhel.github.io/RaZ/doc/)!
 
 ### Gallery
 
@@ -36,26 +36,9 @@ More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples
 
 ## Features
 
-| Objectives                                                                  | Implemented                          |
-| :-------------------------------------------------------------------------: | :----------------------------------: |
-| Mesh loading (OBJ/FBX/OFF...)                                               | **Yes** (OBJ/FBX/OFF)                |
-| Texture loading (JPEG/PNG/TGA/BMP/BPG)                                      | **Yes** (PNG/TGA)                    |
-| Vector: operations, dot, cross, normalization, length/magnitude calculation | **Yes**                              |
-| Matrix: operations, transposition, determinant computation, inversion       | **Yes**                              |
-| Camera &amp; transformations                                                | **Yes** (rotation with quaternions)  |
-| Lighting                                                                    | **Yes** (point/directional lights)   |
-| Materials &amp; textures                                                    | **Yes** (multi-textures functional)  |
-| Deferred rendering                                                          | **Yes** (modularization in progress) |
-| Screen-Space Ambient Occlusion (SSAO)                                       | _On standby_                         |
-| Screen-Space Reflections (SSR)                                              | _On standby_                         |
-| Normal mapping                                                              | **Yes**                              |
-| PBR rendering                                                               | **Yes** (Cook-Torrance model)        |
-| Image Based Lighting (IBL)                                                  | No                                   |
-| Shadow mapping                                                              | No                                   |
-| Bloom                                                                       | No                                   |
-
-## 
-
-## In the future...
-
-To be honest, keeping it as a "simple" 3D engine was what I expected, but I wouldn't say no to working on another features aside from the rendering. Thus, it is not excluded _at all_ to evolve into a game engine, when I'll have more time.
+| Module        | Features                                                                                                                                                                                                                                                         |
+| :-----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Math**      | - Vectors<br/>- Matrices<br/>- Quaternions<br/>- Angles (degrees/radians)<br/>- Transformations (translation, rotation, scale)                                                                                                                                   |
+| **Rendering** | - OpenGL 3.3 or 4.6 (Vulkan planned)<br/>- Standard (Blinn-Phong) & PBR (Cook-Torrance) material models<br/>- Camera (perspective/orthographic)<br/>- Light sources (point & directional)<br/>- Cubemap<br/>- Normal mapping<br/>- Render passes _[in progress]_ |
+| **Physics**   | - Shapes (line, plane, sphere, triangle, quad, AABB, OBB)<br/>- Shape/shape collision checks _[in progress]_<br/>- Ray/shape intersection checks _[in progress]_<br/>- Rigid body simulation _[in progress]_                                                     |
+| **Misc**      | - Meshes (OBJ import/export, FBX import, OFF import)<br/>- Images (PNG import/export, TGA import, HDR import _[in progress]_)<br/>- Windowing (window, overlay, keyboard/mouse inputs with custom callbacks)                                                     |

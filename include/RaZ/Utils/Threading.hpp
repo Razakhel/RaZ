@@ -49,8 +49,9 @@ unsigned int getSystemThreadCount();
 inline void sleep(uint64_t milliseconds) { std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds)); }
 
 /// Calls a function asynchronously, to be executed without blocking the calling thread.
-/// \tparam T Return type of the given function.
+/// \tparam Func Function to be called.
 /// \tparam Args Types of the arguments to be forwarded to the given function.
+/// \tparam ResultType Return type of the given function.
 /// \param action Action to be performed asynchronously.
 /// \param args Arguments to be forwarded to the given function.
 /// \return A std::future holding the future result of the process.

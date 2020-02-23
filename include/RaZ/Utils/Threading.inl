@@ -1,3 +1,4 @@
+#include <cassert>
 #include <vector>
 
 namespace Raz::Threading {

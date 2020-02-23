@@ -1,14 +1,12 @@
 language: cpp
 
-sudo: required
-
 services:
     - docker
 
 os:
     - linux
 
-matrix:
+jobs:
     include:
         - name: "RaZ - GCC"
           env:
