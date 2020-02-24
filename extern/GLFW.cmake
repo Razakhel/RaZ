@@ -52,11 +52,20 @@ elseif (APPLE)
         glfw/src/glx*
         glfw/src/linux*
         glfw/src/mir*
-        glfw/src/posix*
+        glfw/src/posix_time.*
         glfw/src/wgl*
         glfw/src/win32*
         glfw/src/wl*
         glfw/src/x11*
+    )
+
+    set(
+        GLFW_LINKER_FLAGS
+
+        "-framework OpenGL"
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreVideo"
     )
 elseif (UNIX)
     set(
