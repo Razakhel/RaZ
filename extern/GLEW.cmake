@@ -22,6 +22,14 @@ if (WIN32 OR CYGWIN)
 
         opengl32
     )
+elseif (APPLE)
+    find_package(OpenGL REQUIRED)
+
+    set(
+        GLEW_LINKER_FLAGS
+
+        OpenGL::GL
+    )
 endif ()
 
 # Building GLEW
