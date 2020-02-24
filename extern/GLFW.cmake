@@ -20,14 +20,14 @@ if (WIN32 OR CYGWIN)
         GLOB
         GLFW_UNUSED_FILES
 
+        glfw/src/*.m
         glfw/src/cocoa*
-        glfw/src/x11*
-        glfw/src/wl*
-        glfw/src/mir*
         glfw/src/glx*
         glfw/src/linux*
+        glfw/src/mir*
         glfw/src/posix*
-        glfw/src/*.m
+        glfw/src/wl*
+        glfw/src/x11*
     )
 
     if (CYGWIN)
@@ -48,12 +48,15 @@ elseif (APPLE)
         GLOB
         GLFW_UNUSED_FILES
 
-        glfw/src/win32*
-        glfw/src/x11*
-        glfw/src/wl*
-        glfw/src/mir*
+        glfw/src/egl*
         glfw/src/glx*
         glfw/src/linux*
+        glfw/src/mir*
+        glfw/src/posix*
+        glfw/src/wgl*
+        glfw/src/win32*
+        glfw/src/wl*
+        glfw/src/x11*
     )
 elseif (UNIX)
     set(
@@ -67,12 +70,12 @@ elseif (UNIX)
         GLOB
         GLFW_UNUSED_FILES
 
+        glfw/src/*.m
         glfw/src/cocoa*
+        glfw/src/mir*
+        glfw/src/wgl*
         glfw/src/win32*
         glfw/src/wl*
-        glfw/src/wgl*
-        glfw/src/mir*
-        glfw/src/*.m
     )
 
     set(
