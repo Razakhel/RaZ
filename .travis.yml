@@ -81,6 +81,11 @@ install:
         docker build -t raz .;
       fi
 
+before_script:
+    - export DISPLAY=:99.0
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1280x720x16; echo ok )& fi
+    - sleep 3 # Gives Xvfb some time to start
+
 script:
     # Linux
 

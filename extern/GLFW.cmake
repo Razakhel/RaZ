@@ -41,7 +41,6 @@ elseif (APPLE)
         -D_GLFW_COCOA
         -D_GLFW_USE_CHDIR
         -D_GLFW_USE_MENUBAR
-        -D_GLFW_USE_RETINA
     )
 
     file(
