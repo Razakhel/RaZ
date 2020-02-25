@@ -5,9 +5,14 @@ services:
 
 os: linux
 
+# The BADGE environment variable is used to distinguish badges to display
+# Without it, the build would be marked failing regardless of the platform
+
 jobs:
     include:
-        # Linux
+        #########
+        # Linux #
+        #########
 
         - name: "RaZ - Linux GCC"
           os: linux
@@ -16,6 +21,7 @@ jobs:
             - CXX_COMPILER=g++
             - BUILD_TESTS=false
             - COVERAGE=false
+            - BADGE=linux
 
         - name: "RaZ - Linux Clang"
           os: linux
@@ -24,6 +30,7 @@ jobs:
             - CXX_COMPILER=clang++
             - BUILD_TESTS=false
             - COVERAGE=false
+            - BADGE=linux
 
         - name: "RaZ - Linux GCC + Tests"
           os: linux
@@ -32,6 +39,7 @@ jobs:
             - CXX_COMPILER=g++
             - BUILD_TESTS=true
             - COVERAGE=true
+            - BADGE=linux
 
         - name: "RaZ - Linux Clang + Tests"
           os: linux
@@ -40,8 +48,11 @@ jobs:
             - CXX_COMPILER=clang++
             - BUILD_TESTS=true
             - COVERAGE=false
+            - BADGE=linux
 
-        # macOS
+        #########
+        # macOS #
+        #########
 
         - name: "RaZ - macOS Clang"
           os: osx
@@ -50,6 +61,7 @@ jobs:
             - CXX_COMPILER=clang++
             - BUILD_TESTS=false
             - COVERAGE=false
+            - BADGE=osx
 
         - name: "RaZ - macOS Clang + Tests"
           os: osx
@@ -58,6 +70,7 @@ jobs:
             - CXX_COMPILER=clang++
             - BUILD_TESTS=true
             - COVERAGE=false
+            - BADGE=osx
 
 # Disabling depth to fetch only the latest commit
 git:
