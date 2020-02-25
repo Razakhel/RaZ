@@ -4,6 +4,8 @@
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/FloatUtils.hpp"
 
+#include <unordered_map>
+
 namespace {
 
 // Declaring vectors to be tested
