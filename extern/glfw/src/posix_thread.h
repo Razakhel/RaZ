@@ -25,20 +25,27 @@
 //
 //========================================================================
 
-#define _GLFW_PLATFORM_LIBRARY_TIMER_STATE _GLFWtimerPOSIX posix
+#include <pthread.h>
 
-#include <stdint.h>
+#define _GLFW_PLATFORM_TLS_STATE    _GLFWtlsPOSIX   posix
+#define _GLFW_PLATFORM_MUTEX_STATE  _GLFWmutexPOSIX posix
 
 
-// POSIX-specific global timer data
+// POSIX-specific thread local storage data
 //
-typedef struct _GLFWtimerPOSIX
+typedef struct _GLFWtlsPOSIX
 {
-    GLFWbool    monotonic;
-    uint64_t    frequency;
+    GLFWbool        allocated;
+    pthread_key_t   key;
 
-} _GLFWtimerPOSIX;
+} _GLFWtlsPOSIX;
 
+// POSIX-specific mutex data
+//
+typedef struct _GLFWmutexPOSIX
+{
+    GLFWbool        allocated;
+    pthread_mutex_t handle;
 
-void _glfwInitTimerPOSIX(void);
+} _GLFWmutexPOSIX;
 

@@ -6,8 +6,6 @@ project(GLFW)
 
 set(CMAKE_C_STANDARD 11)
 
-aux_source_directory(glfw/src GLFW_FILES)
-
 # Defining preprocessor macros and selecting files to be removed
 if (WIN32 OR CYGWIN)
     set(
@@ -16,18 +14,13 @@ if (WIN32 OR CYGWIN)
         -D_GLFW_WIN32
     )
 
-    file(
-        GLOB
-        GLFW_UNUSED_FILES
+    set(
+        GLFW_PLATFORM_FILES
 
-        glfw/src/*.m
-        glfw/src/cocoa*
-        glfw/src/glx*
-        glfw/src/linux*
-        glfw/src/mir*
-        glfw/src/posix*
-        glfw/src/wl*
-        glfw/src/x11*
+        glfw/src/egl*
+        glfw/src/osmesa*
+        glfw/src/wgl*
+        glfw/src/win32*
     )
 
     if (CYGWIN)
@@ -43,19 +36,14 @@ elseif (APPLE)
         -D_GLFW_USE_MENUBAR
     )
 
-    file(
-        GLOB
-        GLFW_UNUSED_FILES
+    set(
+        GLFW_PLATFORM_FILES
 
+        glfw/src/cocoa*
         glfw/src/egl*
-        glfw/src/glx*
-        glfw/src/linux*
-        glfw/src/mir*
-        glfw/src/posix_time.*
-        glfw/src/wgl*
-        glfw/src/win32*
-        glfw/src/wl*
-        glfw/src/x11*
+        glfw/src/nsgl*
+        glfw/src/osmesa*
+        glfw/src/posix_thread*
     )
 
     set(
@@ -67,23 +55,47 @@ elseif (APPLE)
         "-framework CoreVideo"
     )
 elseif (UNIX)
+    option(GLFW_USE_WAYLAND "Use Wayland instead of X11" OFF)
+
+    if (GLFW_USE_WAYLAND)
+        # Using Wayland
+        set(
+            GLFW_DEFINITIONS
+
+            -D_GLFW_WAYLAND
+        )
+
+        set(
+            GLFW_PLATFORM_FILES
+
+            glfw/src/wl*
+        )
+    else ()
+        # Using X11
+        set(
+            GLFW_DEFINITIONS
+
+            -D_GLFW_X11
+        )
+
+        set(
+            GLFW_PLATFORM_FILES
+
+            glfw/src/glx*
+            glfw/src/x11*
+        )
+    endif ()
+
+
     set(
-        GLFW_DEFINITIONS
+        GLFW_PLATFORM_FILES
 
-        -D_GLFW_X11
-        -D_GLFW_HAS_XF86VM
-    )
-
-    file(
-        GLOB
-        GLFW_UNUSED_FILES
-
-        glfw/src/*.m
-        glfw/src/cocoa*
-        glfw/src/mir*
-        glfw/src/wgl*
-        glfw/src/win32*
-        glfw/src/wl*
+        ${GLFW_PLATFORM_FILES}
+        glfw/src/egl*
+        glfw/src/linux*
+        glfw/src/osmesa*
+        glfw/src/posix*
+        glfw/src/xkb*
     )
 
     set(
@@ -100,19 +112,20 @@ elseif (UNIX)
     )
 endif ()
 
-# Adding recursively every file we want to compile
 file(
     GLOB
     GLFW_SRC
 
-    ${GLFW_FILES}
-)
+    # Common files
+    glfw/src/context.c
+    glfw/src/init.c
+    glfw/src/input.c
+    glfw/src/monitor.c
+    glfw/src/vulkan.c
+    glfw/src/window.c
 
-list(
-    REMOVE_ITEM
-    GLFW_SRC
-
-    ${GLFW_UNUSED_FILES}
+    # Platform-specific files
+    ${GLFW_PLATFORM_FILES}
 )
 
 # Building GLFW

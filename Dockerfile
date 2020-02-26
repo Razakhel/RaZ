@@ -12,7 +12,7 @@ FROM ubuntu:19.10
 # Downloading coveralls-lcov to upload coverage to Coveralls
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        libglew-dev libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+        libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev \
         cmake make gcc-8 g++-8 clang-7 lcov \
         doxygen python-pydot python-pydot-ng \
         wget \
