@@ -1,7 +1,6 @@
 //========================================================================
-// GLFW 3.3 POSIX - www.glfw.org
+// GLFW 3.3 - www.glfw.org
 //------------------------------------------------------------------------
-// Copyright (c) 2002-2006 Marcus Geelnard
 // Copyright (c) 2006-2017 Camilla Löwy <elmindreda@glfw.org>
 //
 // This software is provided 'as-is', without any express or implied
@@ -25,20 +24,8 @@
 //
 //========================================================================
 
-#define _GLFW_PLATFORM_LIBRARY_TIMER_STATE _GLFWtimerPOSIX posix
+#define _GLFW_PLATFORM_JOYSTICK_STATE         struct { int dummyJoystick; }
+#define _GLFW_PLATFORM_LIBRARY_JOYSTICK_STATE struct { int dummyLibraryJoystick; }
 
-#include <stdint.h>
-
-
-// POSIX-specific global timer data
-//
-typedef struct _GLFWtimerPOSIX
-{
-    GLFWbool    monotonic;
-    uint64_t    frequency;
-
-} _GLFWtimerPOSIX;
-
-
-void _glfwInitTimerPOSIX(void);
+#define _GLFW_PLATFORM_MAPPING_NAME ""
 
