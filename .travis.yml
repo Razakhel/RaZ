@@ -63,14 +63,15 @@ jobs:
             - COVERAGE=false
             - BADGE=osx
 
-        - name: "RaZ - macOS Clang + Tests"
-          os: osx
-          env:
-            - C_COMPILER=clang
-            - CXX_COMPILER=clang++
-            - BUILD_TESTS=true
-            - COVERAGE=false
-            - BADGE=osx
+        # Temporarily the macOS test build; GLFW fails to be initialized, while RaZ runs fine on an actual Mac
+        #- name: "RaZ - macOS Clang + Tests"
+        #  os: osx
+        #  env:
+        #    - C_COMPILER=clang
+        #    - CXX_COMPILER=clang++
+        #    - BUILD_TESTS=true
+        #    - COVERAGE=false
+        #    - BADGE=osx
 
 # Disabling depth to fetch only the latest commit
 git:
