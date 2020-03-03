@@ -6,6 +6,7 @@
 #include "RaZ/Component.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Utils/Ray.hpp"
 
 namespace Raz {
 
@@ -54,6 +55,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   virtual bool intersects(const OBB& obb) const = 0;
+  /// Ray-shape intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the shape, false otherwise.
+  virtual bool intersects(const Ray& ray, RayHit* hit) const = 0;
   /// Computes the projection of a point (closest point) onto the shape.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the shape.
@@ -112,6 +118,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-line intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the line, false otherwise.
+  bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
   /// Computes the projection of a point (closest point) onto the line.
   /// The projected point is necessarily located on the line.
   /// \param point Point to compute the projection from.
@@ -179,6 +190,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-plane intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the plane, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the plane.
   /// The projected point is necessarily located on the plane.
   /// \param point Point to compute the projection from.
@@ -234,6 +250,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-sphere intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the sphere, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the sphere.
   /// The projected point may be inside the sphere itself or on its surface.
   /// \param point Point to compute the projection from.
@@ -291,6 +312,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-triangle intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the triangle, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the triangle.
   /// The projected point is necessarily located on the triangle's surface.
   /// \param point Point to compute the projection from.
@@ -360,6 +386,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-quad intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the quad, false otherwise.
+  bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
   /// Computes the projection of a point (closest point) onto the quad.
   /// The projected point is necessarily located on the quad's surface.
   /// \param point Point to compute the projection from.
@@ -444,6 +475,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-AABB intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the AABB, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the AABB.
   /// The projected point may be inside the AABB itself or on its surface.
   /// \param point Point to compute the projection from.
@@ -565,6 +601,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both OBBs intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-OBB intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the OBB, false otherwise.
+  bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
   /// Computes the projection of a point (closest point) onto the OBB.
   /// The projected point may be inside the AABB itself or on its surface.
   /// \param point Point to compute the projection from.
