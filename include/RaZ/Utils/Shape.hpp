@@ -78,7 +78,7 @@ protected:
 };
 
 /// Line segment defined by its two extremities' positions.
-class Line : public Shape {
+class Line final : public Shape {
 public:
   Line() = default;
   Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
@@ -146,7 +146,7 @@ private:
 };
 
 /// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
-class Plane : public Shape {
+class Plane final : public Shape {
 public:
   Plane() = default;
   explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_distance{ distance }, m_normal{ normal } {}
@@ -210,7 +210,7 @@ private:
 };
 
 /// Sphere defined by its center position and a radius.
-class Sphere : public Shape {
+class Sphere final : public Shape {
 public:
   Sphere() = default;
   Sphere(const Vec3f& centerPos, float radius) : m_centerPos{ centerPos }, m_radius{ radius } {}
@@ -270,7 +270,7 @@ private:
 };
 
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
-class Triangle : public Shape {
+class Triangle final : public Shape {
 public:
   Triangle() = default;
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
@@ -343,7 +343,7 @@ private:
 };
 
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.
-class Quad : public Shape {
+class Quad final : public Shape {
 public:
   Quad() = default;
   Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos)
@@ -434,7 +434,7 @@ private:
 ///               Z
 ///
 /// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
-class AABB : public Shape {
+class AABB final : public Shape {
 public:
   AABB() = default;
   AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos)
@@ -556,7 +556,7 @@ private:
 ///                  \    /              \  /
 ///                    \/-----------------/
 ///
-class OBB : public Shape {
+class OBB final : public Shape {
 public:
   OBB() = default;
   OBB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos, const Mat3f& rotation = Mat3f::identity())
