@@ -37,8 +37,29 @@ bool Line::intersects(const Quad&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Line::intersects(const AABB&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Line::intersects(const AABB& aabb) const {
+  const Ray lineRay(m_beginPos, (m_endPos - m_beginPos).normalize());
+  RayHit hit;
+
+  if (!lineRay.intersects(aabb, &hit))
+    return false;
+
+  // Some implementations check for the hit distance to be positive or 0. However, since our ray-AABB intersection check returns true
+  //  with a negative distance when the ray's origin is inside the box, this check would be meaningless
+  // Actually, if reaching here, none of the potential cases should require to check that the hit distance is non-negative
+
+  // In certain cases, it's even harmful to do so. Given a line segment defined by points A & B, one being in a box & the other outside:
+  //
+  // ----------
+  // |        |
+  // |   A x-----x B
+  // |        |
+  // ----------
+  //
+  // Depending on the order of the points, the result would not be symmetrical: B->A would return a positive distance, telling there's an
+  //  intersection, and A->B a negative distance, telling there's none
+
+  return (hit.distance * hit.distance <= computeSquaredLength());
 }
 
 bool Line::intersects(const OBB&) const {
