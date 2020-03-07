@@ -36,7 +36,9 @@ Window::Window(unsigned int width, unsigned int height,
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 #endif
 
-#if defined(RAZ_USE_GL4)
+#if defined(RAZ_USE_VULKAN)
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+#elif defined(RAZ_USE_GL4)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 #else

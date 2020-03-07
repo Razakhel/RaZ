@@ -4,6 +4,7 @@
 #define RAZ_TEXTURE_HPP
 
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Utils/EnumUtils.hpp"
 #include "RaZ/Utils/Image.hpp"
 
 #include <memory>
