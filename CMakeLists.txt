@@ -328,10 +328,82 @@ if (RAZ_FORCE_DEBUG_LOG)
     target_compile_definitions(RaZ PUBLIC RAZ_FORCE_DEBUG_LOG)
 endif ()
 
-# OpenGL version
-option(RAZ_USE_GL4 "Use OpenGL 4" OFF)
+# Choosing a rendering API
+option(RAZ_USE_GL4 "Use OpenGL 4.5 for rendering" OFF)
 if (RAZ_USE_GL4)
-    target_compile_definitions(RaZ PRIVATE RAZ_USE_GL4)
+    if (RAZ_USE_VULKAN) # If Vulkan has also been asked to be used, don't do anything
+        message(WARNING "[RaZ] Warning: Both Vulkan & OpenGL 4 have been defined to be used; only Vulkan will be.")
+    else ()
+        message(STATUS "[RaZ] Using OpenGL 4.5")
+        target_compile_definitions(RaZ PRIVATE RAZ_USE_GL4)
+    endif ()
+endif ()
+
+option(RAZ_USE_VULKAN "Use Vulkan for rendering" OFF)
+if (RAZ_USE_VULKAN)
+    if (RAZ_USE_GL4) # If GL4 has also been asked to be used, ignore it
+        message(WARNING "[RaZ] Warning: Both Vulkan & OpenGL 4 have been defined to be used; only Vulkan will be.")
+    endif ()
+
+    # Recovering Vulkan SDK's location
+    if (RAZ_PLATFORM_WINDOWS)
+        set(VULKAN_SDK_ROOT "$ENV{VK_SDK_PATH}")
+    else ()
+        # TODO
+    endif ()
+
+    if (VULKAN_SDK_ROOT)
+        # Including & linking the Vulkan SDK
+        if (RAZ_PLATFORM_WINDOWS)
+            string(REPLACE "\\" "/" VULKAN_SDK_ROOT ${VULKAN_SDK_ROOT})
+            set(VULKAN_SDK_INCLUDE "${VULKAN_SDK_ROOT}/Include")
+            set(VULKAN_SDK_LIB_DIR "${VULKAN_SDK_ROOT}/Lib")
+            set(VULKAN_SDK_LIB "${VULKAN_SDK_LIB_DIR}/vulkan-1.lib")
+        else ()
+            set(VULKAN_SDK_INCLUDE "${VULKAN_SDK_ROOT}/x86_64/include")
+            set(VULKAN_SDK_LIB_DIR "${VULKAN_SDK_ROOT}/x86_64/lib")
+            set(VULKAN_SDK_LIB "${VULKAN_SDK_LIB_DIR}/vulkan")
+        endif ()
+
+        message(STATUS "[RaZ] Using Vulkan")
+        message(DEBUG "  - Root path: ${VULKAN_SDK_ROOT}")
+        message(DEBUG "  - Include: ${VULKAN_SDK_INCLUDE}")
+        message(DEBUG "  - Lib folder: ${VULKAN_SDK_LIB_DIR}")
+        message(DEBUG "  - Library: ${VULKAN_SDK_LIB}")
+
+        if (EXISTS "${VULKAN_SDK_INCLUDE}/vulkan/vulkan.h" AND EXISTS "${VULKAN_SDK_LIB}")
+            target_include_directories(RaZ PUBLIC "${VULKAN_SDK_INCLUDE}")
+            target_link_libraries(RaZ PUBLIC "${VULKAN_SDK_LIB}")
+
+            target_compile_definitions(RaZ PUBLIC RAZ_USE_VULKAN)
+        else ()
+            # If either header or lib not found, send an error
+            set(VULKAN_SDK_ROOT "" CACHE PATH "Path to your Vulkan SDK installation")
+            message(SEND_ERROR "[RaZ] Error: Vulkan SDK not found, please specify its path manually.")
+        endif ()
+    else()
+        # If SDK not found, send an error
+        set(VULKAN_SDK_ROOT "" CACHE PATH "Path to your Vulkan SDK installation")
+        message(SEND_ERROR "[RaZ] Error: Vulkan SDK not found, please specify its path manually.")
+    endif ()
+
+    # Removing GL-specific files
+    list(
+        REMOVE_ITEM
+        RAZ_FILES
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/RendererGL.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/RendererGL.hpp
+    )
+else ()
+    # Removing Vk-specific files
+    list(
+        REMOVE_ITEM
+        RAZ_FILES
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/RendererVk.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/RendererVk.hpp
+    )
 endif ()
 
 target_link_libraries(RaZ PRIVATE ${RAZ_LINKER_FLAGS})
