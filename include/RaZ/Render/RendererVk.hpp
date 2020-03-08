@@ -11,26 +11,27 @@
 #include <memory>
 #include <string>
 
+struct GLFWwindow;
+
 namespace Raz {
 
 // TODO: temporary GL enums to allow compilation
 
 enum class Capability : unsigned int {
-  CULL                     = 2884, // GL_CULL_FACE
-  DEPTH_TEST               = 2929, // GL_DEPTH_TEST
-  DEBUG_OUTPUT_SYNCHRONOUS = 33346 // GL_DEBUG_OUTPUT_SYNCHRONOUS
+  CULL       = 2884, // GL_CULL_FACE
+  DEPTH_TEST = 2929  // GL_DEPTH_TEST
 };
 
 enum class MaskType : unsigned int {
-  COLOR   = 16384, // GL_COLOR_BUFFER_BIT
-  DEPTH   = 256    // GL_DEPTH_BUFFER_BIT
+  COLOR = 16384, // GL_COLOR_BUFFER_BIT
+  DEPTH = 256    // GL_DEPTH_BUFFER_BIT
 };
 MAKE_ENUM_FLAG(MaskType)
 
 enum class DepthFunction : unsigned int {
-  EQUAL         = 514, // GL_EQUAL
-  LESS          = 513, // GL_LESS
-  LESS_EQUAL    = 515  // GL_LEQUAL
+  EQUAL      = 514, // GL_EQUAL
+  LESS       = 513, // GL_LESS
+  LESS_EQUAL = 515  // GL_LEQUAL
 };
 
 enum class FaceOrientation : unsigned int {
@@ -134,7 +135,7 @@ public:
   Renderer(const Renderer&) = delete;
   Renderer(Renderer&&) noexcept = delete;
 
-  static void initialize();
+  static void initialize(GLFWwindow* windowHandle = nullptr);
   static bool isInitialized() { return s_isInitialized; }
 
   // TODO: temporary GL functions to allow compilation
@@ -211,6 +212,11 @@ private:
   static inline bool s_isInitialized = false;
 
   static inline VkInstance m_instance {};
+  static inline VkSurfaceKHR m_surface {};
+  static inline VkPhysicalDevice m_physicalDevice {};
+  static inline VkDevice m_logicalDevice {};
+  static inline VkQueue m_graphicsQueue {};
+  static inline VkQueue m_presentationQueue {};
 #if !defined(NDEBUG)
   static inline VkDebugUtilsMessengerEXT m_debugMessenger {};
 #endif
