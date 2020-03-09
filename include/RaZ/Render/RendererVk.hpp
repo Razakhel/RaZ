@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <vector>
 
 struct GLFWwindow;
 
@@ -38,6 +39,11 @@ enum class FaceOrientation : unsigned int {
   FRONT      = 1028, // GL_FRONT
   BACK       = 1029, // GL_BACK
   FRONT_BACK = 1032  // GL_FRONT_AND_BACK
+};
+
+enum class PolygonMode : unsigned int {
+  LINE  = 6913, // GL_LINE
+  FILL  = 6914  // GL_FILL
 };
 
 enum class BufferType : unsigned int {
@@ -148,6 +154,7 @@ public:
   static void clear(MaskType, MaskType) {}
   static void setDepthFunction(DepthFunction) {}
   static void setFaceCulling(FaceOrientation) {}
+  static void setPolygonMode(FaceOrientation, PolygonMode) {}
   static void recoverFrame(unsigned int, unsigned int, TextureFormat, TextureDataType, void*) {}
   static void generateBuffer(unsigned int&) {}
   static void bindBuffer(BufferType, unsigned int) {}
@@ -216,7 +223,11 @@ private:
   static inline VkPhysicalDevice m_physicalDevice {};
   static inline VkDevice m_logicalDevice {};
   static inline VkQueue m_graphicsQueue {};
-  static inline VkQueue m_presentationQueue {};
+  static inline VkQueue m_presentQueue {};
+  static inline VkSwapchainKHR m_swapchain {};
+  static inline std::vector<VkImage> m_swapchainImages {};
+  static inline VkFormat m_swapchainImageFormat {};
+  static inline VkExtent2D m_swapchainExtent {};
 #if !defined(NDEBUG)
   static inline VkDebugUtilsMessengerEXT m_debugMessenger {};
 #endif
