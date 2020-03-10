@@ -228,6 +228,7 @@ private:
   static inline std::vector<VkImage> m_swapchainImages {};
   static inline VkFormat m_swapchainImageFormat {};
   static inline VkExtent2D m_swapchainExtent {};
+  static inline std::vector<VkImageView> m_swapchainImageViews {};
 #if !defined(NDEBUG)
   static inline VkDebugUtilsMessengerEXT m_debugMessenger {};
 #endif

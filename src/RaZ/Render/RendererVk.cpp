@@ -471,6 +471,33 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   m_swapchainImageFormat = surfaceFormat.format;
   m_swapchainExtent      = extent;
 
+  /////////////////
+  // Image views //
+  /////////////////
+
+  m_swapchainImageViews.resize(m_swapchainImages.size());
+
+  for (std::size_t i = 0; i < m_swapchainImages.size(); ++i) {
+    VkImageViewCreateInfo imageViewCreateInfo {};
+    imageViewCreateInfo.sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    imageViewCreateInfo.image        = m_swapchainImages[i];
+    imageViewCreateInfo.viewType     = VK_IMAGE_VIEW_TYPE_2D;
+    imageViewCreateInfo.format       = m_swapchainImageFormat;
+    imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+    imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+    imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+    imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+    imageViewCreateInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+    imageViewCreateInfo.subresourceRange.baseMipLevel   = 0;
+    imageViewCreateInfo.subresourceRange.levelCount     = 1;
+    imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
+    imageViewCreateInfo.subresourceRange.layerCount     = 1;
+
+    if (vkCreateImageView(m_logicalDevice, &imageViewCreateInfo, nullptr, &m_swapchainImageViews[i]) != VK_SUCCESS)
+      throw std::runtime_error("Error: Failed to create an image view.");
+  }
+
   s_isInitialized = true;
 }
 
@@ -478,6 +505,9 @@ void Renderer::destroy() {
 #if !defined(NDEBUG)
   destroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
 #endif
+
+  for (VkImageView imageView : m_swapchainImageViews)
+    vkDestroyImageView(m_logicalDevice, imageView, nullptr);
 
   vkDestroySwapchainKHR(m_logicalDevice, m_swapchain, nullptr);
   vkDestroyDevice(m_logicalDevice, nullptr);
