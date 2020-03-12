@@ -376,6 +376,47 @@ if (RAZ_USE_VULKAN)
             target_link_libraries(RaZ PUBLIC "${VULKAN_SDK_LIB}")
 
             target_compile_definitions(RaZ PUBLIC RAZ_USE_VULKAN)
+
+            #######################
+            # Shaders compilation #
+            #######################
+
+            set(SHADERS_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
+
+            # Recovering shaders
+            file(
+                GLOB_RECURSE
+                RAZ_SHADERS
+
+                ${SHADERS_ROOT}/*_vk.vert # Vertex shader
+                ${SHADERS_ROOT}/*_vk.tesc # Tesselation control shader
+                ${SHADERS_ROOT}/*_vk.tese # Tesselation evaluation shader
+                ${SHADERS_ROOT}/*_vk.geom # Geometry shader
+                ${SHADERS_ROOT}/*_vk.frag # Fragment shader
+                ${SHADERS_ROOT}/*_vk.comp # Compute shader
+            )
+
+            # Compiling all shaders found
+            foreach (SHADER_INPUT_PATH ${RAZ_SHADERS})
+                get_filename_component(SHADER_FILENAME ${SHADER_INPUT_PATH} NAME) # Stripping the path from the prepending folders, keeping only the file's name
+                string(REPLACE "." ";" SHADER_FILE_PARTS ${SHADER_FILENAME})
+
+                list(GET SHADER_FILE_PARTS 0 SHADER_NAME)
+                list(GET SHADER_FILE_PARTS 1 SHADER_EXT)
+
+                set(SHADER_OUTPUT_PATH "${SHADERS_ROOT}/${SHADER_NAME}_${SHADER_EXT}.spv")
+
+                add_custom_command(
+                    OUTPUT "${SHADER_OUTPUT_PATH}"
+                    COMMAND ${VULKAN_SDK_ROOT}/bin/glslc ${SHADER_INPUT_PATH} -o ${SHADER_OUTPUT_PATH}
+                    DEPENDS "${SHADER_INPUT_PATH}"
+                    WORKING_DIRECTORY "${SHADERS_ROOT}"
+                    COMMENT "Compiling shader ${SHADER_FILENAME} to SPIR-V"
+                    VERBATIM
+                )
+
+                target_sources(RaZ PRIVATE "${SHADER_OUTPUT_PATH}")
+            endforeach ()
         else ()
             # If either header or lib not found, send an error
             set(VULKAN_SDK_ROOT "" CACHE PATH "Path to your Vulkan SDK installation")

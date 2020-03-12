@@ -22,6 +22,9 @@
 *.out
 *.app
 
+# Compiled SPIR-V shaders
+*.spv
+
 # Build folders
 *build*/
 
