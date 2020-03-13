@@ -335,6 +335,7 @@ bool Window::run(float deltaTime) {
     m_overlay->render();
 #endif
 
+#if !defined(RAZ_USE_VULKAN)
   glfwSwapBuffers(m_windowHandle);
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
@@ -342,6 +343,8 @@ bool Window::run(float deltaTime) {
 #endif
 
   Renderer::clearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
+#endif
+
   Renderer::clear(MaskType::COLOR | MaskType::DEPTH);
 
   return true;

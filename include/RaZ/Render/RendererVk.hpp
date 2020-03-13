@@ -7,6 +7,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include <array>
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -35,15 +36,16 @@ enum class DepthFunction : unsigned int {
   LESS_EQUAL = 515  // GL_LEQUAL
 };
 
-enum class FaceOrientation : unsigned int {
-  FRONT      = 1028, // GL_FRONT
-  BACK       = 1029, // GL_BACK
-  FRONT_BACK = 1032  // GL_FRONT_AND_BACK
+enum class FaceOrientation : uint32_t {
+  FRONT      = 1, // VK_CULL_MODE_FRONT_BIT
+  BACK       = 2, // VK_CULL_MODE_BACK_BIT
+  FRONT_BACK = 3  // VK_CULL_MODE_FRONT_AND_BACK
 };
 
-enum class PolygonMode : unsigned int {
-  LINE  = 6913, // GL_LINE
-  FILL  = 6914  // GL_FILL
+enum class PolygonMode : uint32_t {
+  POINT = 2, // VK_POLYGON_MODE_POINT
+  LINE  = 1, // VK_POLYGON_MODE_LINE
+  FILL  = 0  // VK_POLYGON_MODE_FILL
 };
 
 enum class BufferType : unsigned int {
@@ -207,6 +209,7 @@ public:
   static void setDrawBuffers(unsigned int, const DrawBuffer*) {}
   static void deleteFramebuffer(unsigned int&) {}
   static void printErrors() {}
+  static void drawFrame();
   /// Destroys the renderer, deallocating Vulkan resources.
   static void destroy();
 
@@ -216,19 +219,37 @@ public:
   ~Renderer() = delete;
 
 private:
+  static constexpr int MaxFramesInFlight = 2;
+
   static inline bool s_isInitialized = false;
 
   static inline VkInstance m_instance {};
   static inline VkSurfaceKHR m_surface {};
+  static inline GLFWwindow* m_windowHandle {};
   static inline VkPhysicalDevice m_physicalDevice {};
   static inline VkDevice m_logicalDevice {};
   static inline VkQueue m_graphicsQueue {};
   static inline VkQueue m_presentQueue {};
+
   static inline VkSwapchainKHR m_swapchain {};
   static inline std::vector<VkImage> m_swapchainImages {};
   static inline VkFormat m_swapchainImageFormat {};
   static inline VkExtent2D m_swapchainExtent {};
   static inline std::vector<VkImageView> m_swapchainImageViews {};
+
+  static inline VkRenderPass m_renderPass {};
+  static inline VkPipelineLayout m_pipelineLayout {};
+  static inline VkPipeline m_graphicsPipeline {};
+  static inline std::vector<VkFramebuffer> m_swapchainFramebuffers {};
+  static inline VkCommandPool m_commandPool {};
+  static inline std::vector<VkCommandBuffer> m_commandBuffers {};
+
+  static inline std::array<VkSemaphore, MaxFramesInFlight> m_imageAvailableSemaphores {};
+  static inline std::array<VkSemaphore, MaxFramesInFlight> m_renderFinishedSemaphores {};
+  static inline std::array<VkFence, MaxFramesInFlight> m_inFlightFences {};
+  static inline std::vector<VkFence> m_imagesInFlight {};
+  static inline std::size_t m_currentFrameIndex = 0;
+
 #if !defined(NDEBUG)
   static inline VkDebugUtilsMessengerEXT m_debugMessenger {};
 #endif
