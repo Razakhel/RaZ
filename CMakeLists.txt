@@ -345,38 +345,72 @@ if (RAZ_USE_VULKAN)
         message(WARNING "[RaZ] Warning: Both Vulkan & OpenGL 4 have been defined to be used; only Vulkan will be.")
     endif ()
 
-    # Recovering Vulkan SDK's location
-    if (RAZ_PLATFORM_WINDOWS)
-        set(VULKAN_SDK_ROOT "$ENV{VK_SDK_PATH}")
-    else ()
-        # TODO
+    ##############
+    # Vulkan SDK #
+    ##############
+
+    if (NOT VULKAN_SDK_ROOT)
+        # Vulkan SDK path not set, trying to find it automatically
+
+        find_package(Vulkan)
+
+        if (VULKAN_FOUND)
+            # find_package() found Vulkan
+
+            set(VULKAN_SDK_INCLUDE "${Vulkan_INCLUDE_DIRS}")
+            set(VULKAN_SDK_LIB "${Vulkan_LIBRARIES}")
+
+            set(GLSLC_EXECUTABLE glslc) # glslc is assumed to be available from the path... Kind of a long shot under Windows
+        endif ()
     endif ()
 
-    if (VULKAN_SDK_ROOT)
-        # Including & linking the Vulkan SDK
-        if (RAZ_PLATFORM_WINDOWS)
-            string(REPLACE "\\" "/" VULKAN_SDK_ROOT ${VULKAN_SDK_ROOT})
-            set(VULKAN_SDK_INCLUDE "${VULKAN_SDK_ROOT}/Include")
-            set(VULKAN_SDK_LIB_DIR "${VULKAN_SDK_ROOT}/Lib")
-            set(VULKAN_SDK_LIB "${VULKAN_SDK_LIB_DIR}/vulkan-1.lib")
-        else ()
-            set(VULKAN_SDK_INCLUDE "${VULKAN_SDK_ROOT}/x86_64/include")
-            set(VULKAN_SDK_LIB_DIR "${VULKAN_SDK_ROOT}/x86_64/lib")
-            set(VULKAN_SDK_LIB "${VULKAN_SDK_LIB_DIR}/vulkan")
+    if (NOT VULKAN_FOUND)
+        # If not found automatically by find_package(), try another way
+
+        if (NOT VULKAN_SDK_ROOT AND RAZ_PLATFORM_WINDOWS)
+            # If under Windows with the path not manually set, try to locate it from the environment variable
+            set(VULKAN_SDK_ROOT "$ENV{VK_SDK_PATH}")
         endif ()
 
+        if (VULKAN_SDK_ROOT)
+            # SDK path has been defined
+
+            if (RAZ_PLATFORM_WINDOWS)
+                string(REPLACE "\\" "/" VULKAN_SDK_ROOT ${VULKAN_SDK_ROOT})
+                set(VULKAN_SDK_INCLUDE "${VULKAN_SDK_ROOT}/Include")
+                set(VULKAN_SDK_LIB "${VULKAN_SDK_ROOT}/Lib/vulkan-1.lib")
+            else ()
+                set(VULKAN_SDK_INCLUDE "${VULKAN_SDK_ROOT}/x86_64/include")
+                set(VULKAN_SDK_LIB "${VULKAN_SDK_ROOT}/x86_64/lib/vulkan")
+            endif ()
+
+            find_program(GLSLC_EXECUTABLE glslc HINTS "${VULKAN_SDK_ROOT}/bin")
+
+            if (EXISTS "${VULKAN_SDK_INCLUDE}/vulkan/vulkan.h" AND EXISTS "${VULKAN_SDK_LIB}")
+                set(VULKAN_FOUND ON)
+            endif ()
+        endif ()
+    endif ()
+
+    if (VULKAN_FOUND)
         message(STATUS "[RaZ] Using Vulkan")
-        message(DEBUG "  - Root path: ${VULKAN_SDK_ROOT}")
+        if (VULKAN_SDK_ROOT)
+            message(DEBUG "  - Root path: ${VULKAN_SDK_ROOT}")
+        endif ()
         message(DEBUG "  - Include: ${VULKAN_SDK_INCLUDE}")
-        message(DEBUG "  - Lib folder: ${VULKAN_SDK_LIB_DIR}")
         message(DEBUG "  - Library: ${VULKAN_SDK_LIB}")
+        if (GLSLC_EXECUTABLE)
+            message(DEBUG "  - GLSLC executable: ${GLSLC_EXECUTABLE}")
+        endif ()
 
-        if (EXISTS "${VULKAN_SDK_INCLUDE}/vulkan/vulkan.h" AND EXISTS "${VULKAN_SDK_LIB}")
-            target_include_directories(RaZ PUBLIC "${VULKAN_SDK_INCLUDE}")
-            target_link_libraries(RaZ PUBLIC "${VULKAN_SDK_LIB}")
+        # Including & linking the Vulkan SDK
 
-            target_compile_definitions(RaZ PUBLIC RAZ_USE_VULKAN)
+        target_include_directories(RaZ PUBLIC "${VULKAN_SDK_INCLUDE}")
+        target_link_libraries(RaZ PUBLIC "${VULKAN_SDK_LIB}")
 
+        target_compile_definitions(RaZ PUBLIC RAZ_USE_VULKAN)
+
+        if (GLSLC_EXECUTABLE)
             #######################
             # Shaders compilation #
             #######################
@@ -398,7 +432,7 @@ if (RAZ_USE_VULKAN)
 
             # Compiling all shaders found
             foreach (SHADER_INPUT_PATH ${RAZ_SHADERS})
-                get_filename_component(SHADER_FILENAME ${SHADER_INPUT_PATH} NAME) # Stripping the path from the prepending folders, keeping only the file's name
+                get_filename_component(SHADER_FILENAME ${SHADER_INPUT_PATH} NAME) # Stripping the path from the prepending folders, keeping the file's name
                 string(REPLACE "." ";" SHADER_FILE_PARTS ${SHADER_FILENAME})
 
                 list(GET SHADER_FILE_PARTS 0 SHADER_NAME)
@@ -408,7 +442,7 @@ if (RAZ_USE_VULKAN)
 
                 add_custom_command(
                     OUTPUT "${SHADER_OUTPUT_PATH}"
-                    COMMAND ${VULKAN_SDK_ROOT}/bin/glslc ${SHADER_INPUT_PATH} -o ${SHADER_OUTPUT_PATH}
+                    COMMAND ${GLSLC_EXECUTABLE} ${SHADER_INPUT_PATH} -o ${SHADER_OUTPUT_PATH}
                     DEPENDS "${SHADER_INPUT_PATH}"
                     WORKING_DIRECTORY "${SHADERS_ROOT}"
                     COMMENT "Compiling shader ${SHADER_FILENAME} to SPIR-V"
@@ -418,24 +452,26 @@ if (RAZ_USE_VULKAN)
                 target_sources(RaZ PRIVATE "${SHADER_OUTPUT_PATH}")
             endforeach ()
         else ()
-            # If either header or lib not found, send an error
-            set(VULKAN_SDK_ROOT "" CACHE PATH "Path to your Vulkan SDK installation")
-            message(SEND_ERROR "[RaZ] Error: Vulkan SDK not found, please specify its path manually.")
+            # GLSLC executable not found, send a warning
+
+            set(GLSLC_EXECUTABLE "" CACHE PATH "Path to your GLSLC executable")
+            message(WARNING "[RaZ] Warning: GLSLC executable not found. To compile shaders into SPIR-V, please specify its path manually.")
         endif ()
-    else()
-        # If SDK not found, send an error
+
+        # Removing GL-specific files
+        list(
+            REMOVE_ITEM
+            RAZ_FILES
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/RendererGL.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/RendererGL.hpp
+        )
+    else ()
+        # Neither method has found a match, send an error
+
         set(VULKAN_SDK_ROOT "" CACHE PATH "Path to your Vulkan SDK installation")
-        message(SEND_ERROR "[RaZ] Error: Vulkan SDK not found, please specify its path manually.")
+        message(SEND_ERROR "[RaZ] Error: Vulkan SDK not found, please specify its installation path manually.")
     endif ()
-
-    # Removing GL-specific files
-    list(
-        REMOVE_ITEM
-        RAZ_FILES
-
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/RendererGL.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/RendererGL.hpp
-    )
 else ()
     # Removing Vk-specific files
     list(
