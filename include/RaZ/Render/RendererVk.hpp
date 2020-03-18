@@ -209,6 +209,7 @@ public:
   static void setDrawBuffers(unsigned int, const DrawBuffer*) {}
   static void deleteFramebuffer(unsigned int&) {}
   static void printErrors() {}
+  static void recreateSwapchain();
   static void drawFrame();
   /// Destroys the renderer, deallocating Vulkan resources.
   static void destroy();
