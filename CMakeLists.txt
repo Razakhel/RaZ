@@ -22,27 +22,27 @@ endif ()
 
 if (MSVC)
     set(RAZ_COMPILER_MSVC ON)
-    target_compile_definitions(RaZ PUBLIC -DRAZ_COMPILER_MSVC)
+    target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_MSVC)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(RAZ_COMPILER_CLANG ON)
-    target_compile_definitions(RaZ PUBLIC -DRAZ_COMPILER_CLANG)
+    target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_CLANG)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(RAZ_COMPILER_GCC ON)
-    target_compile_definitions(RaZ PUBLIC -DRAZ_COMPILER_GCC)
+    target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_GCC)
 endif ()
 
 if (WIN32 OR CYGWIN)
     set(RAZ_PLATFORM_WINDOWS ON)
-    target_compile_definitions(RaZ PUBLIC -DRAZ_PLATFORM_WINDOWS)
+    target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_WINDOWS)
 elseif (APPLE)
     set(RAZ_PLATFORM_MAC ON)
-    target_compile_definitions(RaZ PUBLIC -DRAZ_PLATFORM_MAC)
+    target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_MAC)
 elseif (UNIX)
     set(RAZ_PLATFORM_LINUX ON)
-    target_compile_definitions(RaZ PUBLIC -DRAZ_PLATFORM_LINUX)
+    target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_LINUX)
 endif ()
 
-target_compile_definitions(RaZ PUBLIC -DRAZ_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
+target_compile_definitions(RaZ PUBLIC RAZ_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
 
 ########################
 # RaZ - Compiler flags #
@@ -275,7 +275,7 @@ if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_GCC AND NOT MINGW) # FBX SDK unavailable f
             target_compile_definitions(RaZ PUBLIC ${FBX_DEFINITIONS})
             target_include_directories(RaZ PUBLIC "${FBX_INCLUDE}")
 
-            message("--- FBX SDK linked")
+            message(STATUS "[RaZ] FBX SDK linked (${FBX_LIB})")
         endif ()
     endif ()
 endif ()

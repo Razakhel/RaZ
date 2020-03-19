@@ -116,6 +116,16 @@ bool Renderer::isEnabled(Capability capability) {
   return isEnabled;
 }
 
+void Renderer::clearColor(float red, float green, float blue, float alpha) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glClearColor(red, green, blue, alpha);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
 void Renderer::setDepthFunction(DepthFunction func) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

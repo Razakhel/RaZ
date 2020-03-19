@@ -22,7 +22,7 @@
 
 Written in modern C++ (17), ECS driven, it is primarily developed for learning purposes. It is intended to be as optimized as possible, while trying to stay as modular as it can.
 
-The engine is available under Linux and Windows. It is also supposed to run on macOS, although not officially supported yet.
+The engine is available under Windows, Linux & macOS.
 
 If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/wiki). For the documentation, [look over here](http://razakhel.github.io/RaZ/doc/)!
 
