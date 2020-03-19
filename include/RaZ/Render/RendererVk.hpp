@@ -251,6 +251,8 @@ private:
   static inline std::vector<VkFence> m_imagesInFlight {};
   static inline std::size_t m_currentFrameIndex = 0;
 
+  static inline bool m_framebufferResized = false;
+
 #if !defined(NDEBUG)
   static inline VkDebugUtilsMessengerEXT m_debugMessenger {};
 #endif

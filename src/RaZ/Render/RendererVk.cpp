@@ -910,6 +910,16 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
 }
 
 void Renderer::recreateSwapchain() {
+  // If the window is minimized, pausing the application to wait for the window to be on screen again
+  int width {};
+  int height {};
+  glfwGetFramebufferSize(m_windowHandle, &width, &height);
+
+  while (width == 0 || height == 0) {
+    glfwGetFramebufferSize(m_windowHandle, &width, &height);
+    glfwWaitEvents();
+  }
+
   vkDeviceWaitIdle(m_logicalDevice);
 
   createSwapchain(m_physicalDevice, m_surface, m_windowHandle, m_logicalDevice, m_swapchain, m_swapchainImages, m_swapchainImageFormat, m_swapchainExtent);
@@ -924,12 +934,19 @@ void Renderer::drawFrame() {
   vkWaitForFences(m_logicalDevice, 1, &m_inFlightFences[m_currentFrameIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
   uint32_t imageIndex;
-  vkAcquireNextImageKHR(m_logicalDevice,
-                        m_swapchain,
-                        std::numeric_limits<uint64_t>::max(),
-                        m_imageAvailableSemaphores[m_currentFrameIndex],
-                        VK_NULL_HANDLE,
-                        &imageIndex);
+  const VkResult imageResult = vkAcquireNextImageKHR(m_logicalDevice,
+                                                     m_swapchain,
+                                                     std::numeric_limits<uint64_t>::max(),
+                                                     m_imageAvailableSemaphores[m_currentFrameIndex],
+                                                     VK_NULL_HANDLE,
+                                                     &imageIndex);
+
+  if (imageResult == VK_ERROR_OUT_OF_DATE_KHR) {
+    recreateSwapchain();
+    return;
+  } else if (imageResult != VK_SUCCESS && imageResult != VK_SUBOPTIMAL_KHR) {
+    throw std::runtime_error("Error: Failed to acquire a swapchain image.");
+  }
 
   if (m_imagesInFlight[imageIndex] != VK_NULL_HANDLE)
     vkWaitForFences(m_logicalDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
@@ -966,7 +983,14 @@ void Renderer::drawFrame() {
   presentInfo.pImageIndices  = &imageIndex;
   presentInfo.pResults       = nullptr;
 
-  vkQueuePresentKHR(m_presentQueue, &presentInfo);
+  const VkResult presentResult = vkQueuePresentKHR(m_presentQueue, &presentInfo);
+
+  if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR || m_framebufferResized) {
+    m_framebufferResized = false;
+    recreateSwapchain();
+  } else if (presentResult != VK_SUCCESS) {
+    throw std::runtime_error("Error: Failed to present a swapchain image.");
+  }
 
   m_currentFrameIndex = (m_currentFrameIndex + 1) % MaxFramesInFlight;
 }
