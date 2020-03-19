@@ -419,6 +419,8 @@ public:
 
 private:
   static void clear(unsigned int mask);
+  static constexpr uint8_t recoverErrorCodeIndex(ErrorCode code) { return static_cast<uint8_t>(static_cast<unsigned int>(code)
+                                                                                             - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)); }
 
   static inline bool s_isInitialized = false;
 };

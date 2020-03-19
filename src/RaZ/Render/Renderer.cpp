@@ -750,7 +750,12 @@ void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
   glBindFramebuffer(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
-  printErrors();
+  const ErrorCodes errorCodes = recoverErrors();
+
+  if (errorCodes[recoverErrorCodeIndex(ErrorCode::INVALID_OPERATION)])
+    std::cerr << "Renderer::bindFramebuffer - Bound object is not a valid framebuffer.\n";
+
+  std::cerr << std::flush;
 #endif
 }
 
@@ -773,7 +778,7 @@ ErrorCodes Renderer::recoverErrors() {
     if (errorCode == GL_NO_ERROR)
       break;
 
-    const unsigned int errorCodeIndex = errorCode - static_cast<unsigned int>(ErrorCode::INVALID_ENUM);
+    const uint8_t errorCodeIndex = recoverErrorCodeIndex(static_cast<ErrorCode>(errorCode));
 
     // An error code cannot be returned twice in a row; if it is, the error checking should be stopped
     if (errorCodes[errorCodeIndex])
