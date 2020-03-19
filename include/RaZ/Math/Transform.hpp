@@ -11,7 +11,7 @@
 namespace Raz {
 
 /// Transform class which handles 3D transformations (translation/rotation/scale).
-class Transform : public Component {
+class Transform final : public Component {
 public:
   explicit Transform(const Vec3f& position = Vec3f(0.f), const Mat4f& rotation = Mat4f::identity(), const Vec3f& scale = Vec3f(1.f))
     : m_position{ position }, m_rotation{ rotation }, m_scale{ scale } {}

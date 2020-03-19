@@ -8,7 +8,7 @@
 
 namespace Raz {
 
-class PhysicsSystem : public System {
+class PhysicsSystem final : public System {
 public:
   PhysicsSystem();
 

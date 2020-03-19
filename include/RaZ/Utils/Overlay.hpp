@@ -86,7 +86,7 @@ private:
     std::string m_label {};
   };
 
-  class OverlayLabel : public OverlayElement {
+  class OverlayLabel final : public OverlayElement {
     friend Overlay;
 
   public:
@@ -98,7 +98,7 @@ private:
     static OverlayLabelPtr create(Args&&... args) { return std::make_unique<OverlayLabel>(std::forward<Args>(args)...); }
   };
 
-  class OverlayButton : public OverlayElement {
+  class OverlayButton final : public OverlayElement {
     friend Overlay;
 
   public:
@@ -113,7 +113,7 @@ private:
     std::function<void()> m_actionClick {};
   };
 
-  class OverlayCheckbox : public OverlayElement {
+  class OverlayCheckbox final : public OverlayElement {
     friend Overlay;
 
   public:
@@ -131,7 +131,7 @@ private:
     bool m_isChecked {};
   };
 
-  class OverlayTextbox : public OverlayElement {
+  class OverlayTextbox final : public OverlayElement {
     friend Overlay;
 
   public:
@@ -147,7 +147,7 @@ private:
     std::function<void(const std::string&)> m_callback {};
   };
 
-  class OverlaySeparator : public OverlayElement {
+  class OverlaySeparator final : public OverlayElement {
   public:
     OverlayElementType getType() const override { return OverlayElementType::SEPARATOR; }
 
@@ -155,7 +155,7 @@ private:
     static OverlaySeparatorPtr create(Args&&... args) { return std::make_unique<OverlaySeparator>(std::forward<Args>(args)...); }
   };
 
-  class OverlayFrameTime : public OverlayElement {
+  class OverlayFrameTime final : public OverlayElement {
   public:
     explicit OverlayFrameTime(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
 
@@ -165,7 +165,7 @@ private:
     static OverlayFrameTimePtr create(Args&&... args) { return std::make_unique<OverlayFrameTime>(std::forward<Args>(args)...); }
   };
 
-  class OverlayFpsCounter : public OverlayElement {
+  class OverlayFpsCounter final : public OverlayElement {
   public:
     explicit OverlayFpsCounter(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
 

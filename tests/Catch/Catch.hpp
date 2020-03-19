@@ -16,7 +16,7 @@ using namespace std::literals;
 /// \tparam T Type of the value to be compared to.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, typename TolT = T>
-class IsNearlyEqualTo : public Catch::MatcherBase<T> {
+class IsNearlyEqualTo final : public Catch::MatcherBase<T> {
   static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualTo's value type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualTo's tolerance type must be floating point.");
 
@@ -52,7 +52,7 @@ private:
 /// \tparam T Type of the vector to be compared to.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, std::size_t Size, typename TolT = T>
-class IsNearlyEqualToVector : public Catch::MatcherBase<Raz::Vector<T, Size>> {
+class IsNearlyEqualToVector final : public Catch::MatcherBase<Raz::Vector<T, Size>> {
   static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualToVector's value type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualToVector's tolerance type must be floating point.");
 
@@ -96,7 +96,7 @@ private:
 /// \tparam T Type of the matrix to be compared to.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, std::size_t W, std::size_t H, typename TolT = T>
-class IsNearlyEqualToMatrix : public Catch::MatcherBase<Raz::Matrix<T, W, H>> {
+class IsNearlyEqualToMatrix final : public Catch::MatcherBase<Raz::Matrix<T, W, H>> {
   static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualToMatrix's value type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualToMatrix's tolerance type must be floating point.");
 

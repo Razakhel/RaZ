@@ -16,7 +16,7 @@
 namespace Raz {
 
 /// RenderSystem class, handling the rendering part.
-class RenderSystem : public System {
+class RenderSystem final : public System {
 public:
   /// Creates a render system, initializing its inner data.
   RenderSystem() { initialize(); }

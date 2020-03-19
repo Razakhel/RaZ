@@ -67,7 +67,7 @@ protected:
   TexturePtr m_baseColorMap = Texture::recoverTexture(TexturePreset::WHITE);
 };
 
-class MaterialBlinnPhong : public Material {
+class MaterialBlinnPhong final : public Material {
 public:
   MaterialBlinnPhong() = default;
   explicit MaterialBlinnPhong(TexturePtr diffuseMap) : Material(std::move(diffuseMap)) {}
@@ -130,7 +130,7 @@ private:
   TexturePtr m_bumpMap         = Texture::recoverTexture(TexturePreset::WHITE);
 };
 
-class MaterialCookTorrance : public Material {
+class MaterialCookTorrance final : public Material {
 public:
   MaterialCookTorrance() = default;
   explicit MaterialCookTorrance(TexturePtr albedoMap) : Material(std::move(albedoMap)) {}

@@ -8,7 +8,7 @@
 
 namespace Raz {
 
-class RigidBody : public Component {
+class RigidBody final : public Component {
 public:
   /// Creates a rigid body with given mass & bounciness.
   /// \param mass Mass of the rigid body. 0 represents an infinite mass.

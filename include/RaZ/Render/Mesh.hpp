@@ -13,7 +13,7 @@
 
 namespace Raz {
 
-class Mesh : public Component {
+class Mesh final : public Component {
 public:
   Mesh() : m_submeshes(1) {}
   explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }

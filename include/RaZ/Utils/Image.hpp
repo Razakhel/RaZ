@@ -53,7 +53,7 @@ struct ImageData {
 };
 
 /// ImageData in bytes.
-struct ImageDataB : public ImageData {
+struct ImageDataB final : public ImageData {
   ImageDataType getDataType() const override { return ImageDataType::BYTE; }
   const void* getDataPtr() const override { return data.data(); }
   void* getDataPtr() override { return data.data(); }
@@ -75,7 +75,7 @@ struct ImageDataB : public ImageData {
 };
 
 /// ImageData in floating point values (for High Dynamic Range (HDR) images).
-struct ImageDataF : public ImageData {
+struct ImageDataF final : public ImageData {
   ImageDataType getDataType() const override { return ImageDataType::FLOAT; }
   const void* getDataPtr() const override { return data.data(); }
   void* getDataPtr() override { return data.data(); }
