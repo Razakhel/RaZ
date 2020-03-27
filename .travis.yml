@@ -98,7 +98,8 @@ script:
                 mkdir build && cd build &&
                 cmake -G \"Unix Makefiles\" -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
                                             -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-                                            -DRAZ_USE_FBX=true .. &&
+                                            -DRAZ_USE_FBX=true -DENABLE_DEBUG_INFO=true .. &&
+                cmake --build . --target RaZ_PrintDebugInfo &&
                 make -j4 &&
                 pwd && find . &&
                 if [[ ${BUILD_TESTS} == true ]]; then
@@ -119,7 +120,8 @@ script:
         mkdir build && cd build &&
         cmake -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
               -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-              -DRAZ_USE_FBX=false .. &&
+              -DRAZ_USE_FBX=false -DENABLE_DEBUG_INFO=true .. &&
+        cmake --build . --target RaZ_PrintDebugInfo &&
         make -j4 &&
         pwd && find . &&
         if [[ ${BUILD_TESTS} == true ]]; then
