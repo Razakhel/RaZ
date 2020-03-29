@@ -8,8 +8,8 @@ std::future<ResultType> launchAsync(Func action, Args&&... args) {
   return std::async(std::move(action), std::forward<Args>(args)...);
 }
 
-template <typename ContainerType>
-void parallelize(const ContainerType& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount) {
+template <typename ContainerType, typename Func, typename>
+void parallelize(const ContainerType& collection, Func&& action, std::size_t threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
   std::vector<std::thread> threads(std::min(threadCount, std::size(collection)));
@@ -35,8 +35,8 @@ void parallelize(const ContainerType& collection, const std::function<void(Index
     thread.join();
 }
 
-template <typename ContainerType>
-void parallelize(ContainerType& collection, const std::function<void(IterRange<std::common_type_t<ContainerType>>)>& action, std::size_t threadCount) {
+template <typename ContainerType, typename Func, typename>
+void parallelize(ContainerType& collection, Func&& action, std::size_t threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
   std::vector<std::thread> threads(std::min(threadCount, std::size(collection)));

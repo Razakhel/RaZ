@@ -4,7 +4,7 @@
 
 namespace Raz::Threading {
 
-unsigned int getSystemThreadCount() {
+unsigned int getSystemThreadCount() noexcept {
   const unsigned int threadCount = std::thread::hardware_concurrency();
   return std::max(threadCount, 1u); // threadCount is 0 if undefined; returning 1 thread available in this case
 }

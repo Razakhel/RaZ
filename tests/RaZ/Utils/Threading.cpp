@@ -23,7 +23,7 @@ std::size_t computeSum(const std::vector<int>& values) {
 }
 
 void indexParallelIncrementation(std::vector<int>& values) {
-  Raz::Threading::parallelize(values, [&values] (Raz::Threading::IndexRange range) {
+  Raz::Threading::parallelize(values, [&values] (Raz::Threading::IndexRange range) noexcept {
     for (std::size_t i = range.beginIndex; i < range.endIndex; ++i)
       ++values[i];
   }, 4);

@@ -42,7 +42,7 @@ private:
 /// Gets the number of concurrent threads available to the system.
 /// This number doesn't necessarily represent the CPU's actual number of threads.
 /// \return Number of threads available.
-unsigned int getSystemThreadCount();
+unsigned int getSystemThreadCount() noexcept;
 
 /// Pauses the current thread for the specified amount of time.
 /// \param milliseconds Pause duration in milliseconds.
@@ -70,8 +70,8 @@ void parallelize(const std::function<void()>& action, std::size_t threadCount = 
 /// \param collection Collection to iterate over on multiple threads.
 /// \param action Action to be performed by each thread, giving an index range as boundaries.
 /// \param threadCount Amount of threads to start an instance on.
-template <typename ContainerType>
-void parallelize(const ContainerType& collection, const std::function<void(IndexRange)>& action, std::size_t threadCount = getSystemThreadCount());
+template <typename ContainerType, typename Func, typename = std::enable_if_t<std::is_constructible_v<std::function<void(IndexRange)>, Func>>>
+void parallelize(const ContainerType& collection, Func&& action, std::size_t threadCount = getSystemThreadCount());
 
 /// Calls a function in parallel on a given number of separate threads of execution.
 /// The collection is automatically splitted by iterator ranges, giving a separate start/end range to each thread.
@@ -80,10 +80,10 @@ void parallelize(const ContainerType& collection, const std::function<void(Index
 /// \param collection Collection to iterate over on multiple threads.
 /// \param action Action to be performed by each thread, giving an iterator range as boundaries.
 /// \param threadCount Amount of threads to start an instance on.
-template <typename ContainerType>
-void parallelize(ContainerType& collection,
-                 const std::function<void(IterRange<std::common_type_t<ContainerType>>)>& action,
-                 std::size_t threadCount = getSystemThreadCount());
+template <typename ContainerType,
+          typename Func,
+          typename = std::enable_if_t<std::is_constructible_v<std::function<void(IterRange<std::common_type_t<ContainerType>>)>, Func>>>
+void parallelize(ContainerType& collection, Func&& action, std::size_t threadCount = getSystemThreadCount());
 
 } // namespace Raz::Threading
 
