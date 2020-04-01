@@ -20,7 +20,7 @@ namespace {
 ///////////////////////
 
 constexpr std::array<const char*, 1> validationLayers = {
-  "VK_LAYER_KHRONOS_validation" // VK_LAYER_LUNARG_standard_validation
+  "VK_LAYER_KHRONOS_validation"
 };
 
 inline bool checkValidationLayersSupport() {
@@ -545,10 +545,10 @@ inline void createGraphicsPipeline(VkDevice logicalDevice,
   colorBlending.logicOp           = VK_LOGIC_OP_COPY;
   colorBlending.attachmentCount   = 1;
   colorBlending.pAttachments      = &colorBlendAttachment;
-  colorBlending.blendConstants[0] = 0.0f;
-  colorBlending.blendConstants[1] = 0.0f;
-  colorBlending.blendConstants[2] = 0.0f;
-  colorBlending.blendConstants[3] = 0.0f;
+  colorBlending.blendConstants[0] = 0.f;
+  colorBlending.blendConstants[1] = 0.f;
+  colorBlending.blendConstants[2] = 0.f;
+  colorBlending.blendConstants[3] = 0.f;
 
   VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
   pipelineLayoutInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -611,6 +611,22 @@ inline void createFramebuffers(std::vector<VkFramebuffer>& swapchainFramebuffers
     if (vkCreateFramebuffer(logicalDevice, &framebufferInfo, nullptr, &swapchainFramebuffers[i]) != VK_SUCCESS)
       throw std::runtime_error("Error: Failed to create a framebuffer.");
   }
+}
+
+/////////////
+// Buffers //
+/////////////
+
+inline uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, MemoryProperty properties) {
+  VkPhysicalDeviceMemoryProperties memProperties;
+  vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+  for (uint32_t i = 0; i < memProperties.memoryTypeCount; ++i) {
+    if ((typeFilter & (1u << i)) && ((memProperties.memoryTypes[i].propertyFlags & static_cast<uint32_t>(properties)) == static_cast<uint32_t>(properties)))
+      return i;
+  }
+
+  throw std::runtime_error("Error: Failed to find a suitable memory type.");
 }
 
 /////////////////////
@@ -806,7 +822,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Recovering the necessary queues
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
   const std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
-  const float queuePriority = 1.0f;
+  const float queuePriority = 1.f;
 
   for (uint32_t queueFamily : uniqueQueueFamilies) {
     VkDeviceQueueCreateInfo queueCreateInfo {};
@@ -907,6 +923,36 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   }
 
   s_isInitialized = true;
+}
+
+void Renderer::createBuffer(VkBuffer& buffer,
+                            VkDeviceMemory& bufferMemory,
+                            BufferUsage usageFlags,
+                            MemoryProperty propertyFlags,
+                            VkPhysicalDevice physicalDevice,
+                            VkDevice logicalDevice,
+                            std::size_t bufferSize) {
+  VkBufferCreateInfo bufferInfo {};
+  bufferInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+  bufferInfo.size        = bufferSize;
+  bufferInfo.usage       = static_cast<uint32_t>(usageFlags);
+  bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+  if (vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a buffer.");
+
+  VkMemoryRequirements memRequirements;
+  vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
+
+  VkMemoryAllocateInfo allocInfo {};
+  allocInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  allocInfo.allocationSize  = memRequirements.size;
+  allocInfo.memoryTypeIndex = findMemoryType(physicalDevice, memRequirements.memoryTypeBits, propertyFlags);
+
+  if (vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to allocate a buffer's memory.");
+
+  vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0);
 }
 
 void Renderer::recreateSwapchain() {

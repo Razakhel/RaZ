@@ -17,6 +17,45 @@ struct GLFWwindow;
 
 namespace Raz {
 
+enum class CullingMode : uint32_t {
+  NONE       = 0 /* VK_CULL_MODE_NONE           */, ///< No triangle culling (shows everything).
+  FRONT      = 1 /* VK_CULL_MODE_FRONT_BIT      */, ///< Cull front-facing triangles.
+  BACK       = 2 /* VK_CULL_MODE_BACK_BIT       */, ///< Cull back-facing triangles.
+  FRONT_BACK = 3 /* VK_CULL_MODE_FRONT_AND_BACK */  ///< Cull both front- & back-facing triangles (discards everything).
+};
+
+enum class BufferUsage : uint32_t {
+  TRANSFER_SRC               = 1      /* VK_BUFFER_USAGE_TRANSFER_SRC_BIT                          */, ///< Memory transfer source buffer.
+  TRANSFER_DST               = 2      /* VK_BUFFER_USAGE_TRANSFER_DST_BIT                          */, ///< Memory transfer destination buffer.
+  UNIFORM_TEXEL_BUFFER       = 4      /* VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT                  */, ///< Uniform texel buffer.
+  STORAGE_TEXEL_BUFFER       = 8      /* VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT                  */, ///< Storage texel buffer.
+  UNIFORM_BUFFER             = 16     /* VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT                        */, ///< Uniform buffer.
+  STORAGE_BUFFER             = 32     /* VK_BUFFER_USAGE_STORAGE_BUFFER_BIT                        */, ///< Storage buffer.
+  INDEX_BUFFER               = 64     /* VK_BUFFER_USAGE_INDEX_BUFFER_BIT                          */, ///< Index buffer.
+  VERTEX_BUFFER              = 128    /* VK_BUFFER_USAGE_VERTEX_BUFFER_BIT                         */, ///< Vertex buffer.
+  INDIRECT_BUFFER            = 256    /* VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT                       */, ///< Indirect buffer.
+  SHADER_DEVICE_ADDRESS      = 131072 /* VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT                 */, ///<
+  TRANSFORM_FEEDBACK         = 2048   /* VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_BUFFER_BIT_EXT         */, ///<
+  TRANSFORM_FEEDBACK_COUNTER = 4096   /* VK_BUFFER_USAGE_TRANSFORM_FEEDBACK_COUNTER_BUFFER_BIT_EXT */, ///<
+  CONDITIONAL_RENDERING      = 512    /* VK_BUFFER_USAGE_CONDITIONAL_RENDERING_BIT_EXT             */, ///<
+  RAY_TRACING                = 1024   /* VK_BUFFER_USAGE_RAY_TRACING_BIT_KHR                       */  ///<
+};
+
+MAKE_ENUM_FLAG(BufferUsage)
+
+enum class MemoryProperty : uint32_t {
+  DEVICE_LOCAL        = 1   /* VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT        */, ///<
+  HOST_VISIBLE        = 2   /* VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT        */, ///<
+  HOST_COHERENT       = 4   /* VK_MEMORY_PROPERTY_HOST_COHERENT_BIT       */, ///<
+  HOST_CACHED         = 8   /* VK_MEMORY_PROPERTY_HOST_CACHED_BIT         */, ///<
+  LAZILY_ALLOCATED    = 16  /* VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT    */, ///<
+  PROTECTED           = 32  /* VK_MEMORY_PROPERTY_PROTECTED_BIT           */, ///<
+  DEVICE_COHERENT_AMD = 64  /* VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD */, ///<
+  DEVICE_UNCACHED_AMD = 128 /* VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD */  ///<
+};
+
+MAKE_ENUM_FLAG(MemoryProperty)
+
 // TODO: temporary GL enums to allow compilation
 
 enum class Capability : unsigned int {
@@ -34,12 +73,6 @@ enum class DepthFunction : unsigned int {
   EQUAL      = 514, // GL_EQUAL
   LESS       = 513, // GL_LESS
   LESS_EQUAL = 515  // GL_LEQUAL
-};
-
-enum class FaceOrientation : uint32_t {
-  FRONT      = 1, // VK_CULL_MODE_FRONT_BIT
-  BACK       = 2, // VK_CULL_MODE_BACK_BIT
-  FRONT_BACK = 3  // VK_CULL_MODE_FRONT_AND_BACK
 };
 
 enum class PolygonMode : uint32_t {
@@ -146,6 +179,19 @@ public:
   static void initialize(GLFWwindow* windowHandle = nullptr);
   static bool isInitialized() { return s_isInitialized; }
 
+  static void createBuffer(VkBuffer& buffer,
+                           VkDeviceMemory& bufferMemory,
+                           BufferUsage usageFlags,
+                           MemoryProperty propertyFlags,
+                           VkPhysicalDevice physicalDevice,
+                           VkDevice logicalDevice,
+                           std::size_t bufferSize);
+
+  static void recreateSwapchain();
+  static void drawFrame();
+  /// Destroys the renderer, deallocating Vulkan resources.
+  static void destroy();
+
   // TODO: temporary GL functions to allow compilation
 
   static void enable(Capability) {}
@@ -155,8 +201,8 @@ public:
   static void clear(MaskType) {}
   static void clear(MaskType, MaskType) {}
   static void setDepthFunction(DepthFunction) {}
-  static void setFaceCulling(FaceOrientation) {}
-  static void setPolygonMode(FaceOrientation, PolygonMode) {}
+  static void setFaceCulling(CullingMode) {}
+  static void setPolygonMode(CullingMode, PolygonMode) {}
   static void recoverFrame(unsigned int, unsigned int, TextureFormat, TextureDataType, void*) {}
   static void generateBuffer(unsigned int&) {}
   static void bindBuffer(BufferType, unsigned int) {}
@@ -209,10 +255,6 @@ public:
   static void setDrawBuffers(unsigned int, const DrawBuffer*) {}
   static void deleteFramebuffer(unsigned int&) {}
   static void printErrors() {}
-  static void recreateSwapchain();
-  static void drawFrame();
-  /// Destroys the renderer, deallocating Vulkan resources.
-  static void destroy();
 
   Renderer& operator=(const Renderer&) = delete;
   Renderer& operator=(Renderer&&) noexcept = delete;

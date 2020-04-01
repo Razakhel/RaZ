@@ -13,10 +13,10 @@
 namespace Raz {
 
 enum class Capability : unsigned int {
-  CULL           = 2884,  // GL_CULL_FACE
-  DITHER         = 3024,  // GL_DITHER
-  BLEND          = 3042,  // GL_BLEND
-  COLOR_LOGIC_OP = 3058,  // GL_COLOR_LOGIC_OP
+  CULL           = 2884, // GL_CULL_FACE
+  DITHER         = 3024, // GL_DITHER
+  BLEND          = 3042, // GL_BLEND
+  COLOR_LOGIC_OP = 3058, // GL_COLOR_LOGIC_OP
 
   DEPTH_CLAMP  = 34383, // GL_DEPTH_CLAMP
   DEPTH_TEST   = 2929,  // GL_DEPTH_TEST
@@ -92,7 +92,7 @@ enum class DepthFunction : unsigned int {
   ALWAYS        = 519  // GL_ALWAYS
 };
 
-enum class FaceOrientation : unsigned int {
+enum class CullingMode : unsigned int {
   FRONT      = 1028, // GL_FRONT
   BACK       = 1029, // GL_BACK
   FRONT_BACK = 1032  // GL_FRONT_AND_BACK
@@ -469,9 +469,9 @@ public:
   static void clearColor(float values[4]) { clearColor(values[0], values[1], values[2], values[3]); }
   static void clear(MaskType mask);
   static void setDepthFunction(DepthFunction func);
-  static void setFaceCulling(FaceOrientation orientation);
+  static void setFaceCulling(CullingMode cullMode);
 #if !defined(USE_OPENGL_ES)
-  static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
+  static void setPolygonMode(CullingMode cullMode, PolygonMode polyMode);
 #endif
   static void setPixelStorage(PixelStorage storage, unsigned int value);
   static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
