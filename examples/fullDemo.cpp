@@ -32,7 +32,7 @@ int main() {
   bool isWireframe = false;
   window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
     isWireframe = !isWireframe;
-    Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
+    Raz::Renderer::setPolygonMode(Raz::CullingMode::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
   }, Raz::Input::ONCE);
 #endif
 

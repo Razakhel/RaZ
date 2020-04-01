@@ -217,19 +217,19 @@ void Renderer::setDepthFunction(DepthFunction func) {
   printConditionalErrors();
 }
 
-void Renderer::setFaceCulling(FaceOrientation orientation) {
+void Renderer::setFaceCulling(CullingMode cullMode) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glCullFace(static_cast<unsigned int>(orientation));
+  glCullFace(static_cast<unsigned int>(cullMode));
 
   printConditionalErrors();
 }
 
 #if !defined(USE_OPENGL_ES)
-void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
+void Renderer::setPolygonMode(CullingMode cullMode, PolygonMode polyMode) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glPolygonMode(static_cast<unsigned int>(orientation), static_cast<unsigned int>(mode));
+  glPolygonMode(static_cast<unsigned int>(cullMode), static_cast<unsigned int>(polyMode));
 
   printConditionalErrors();
 }
