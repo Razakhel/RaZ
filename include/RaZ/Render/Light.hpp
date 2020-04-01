@@ -14,7 +14,7 @@ enum class LightType {
   SPOT
 };
 
-class Light : public Component {
+class Light final : public Component {
 public:
   Light(LightType type, float energy, const Vec3f& color = Vec3f(1.f))
     : m_type{ type }, m_energy{ energy }, m_color{ color } {}
