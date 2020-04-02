@@ -54,10 +54,16 @@ struct Vertex {
   Vec3f color;
 };
 
-constexpr std::array<Vertex, 3> vertices = {
-  Vertex { Vec3f { 0.f,   -0.5f, 0.f }, Vec3f { 1.f, 0.f, 0.f } },
-  Vertex { Vec3f { 0.5f,   0.5f, 0.f }, Vec3f { 0.f, 1.f, 0.f } },
-  Vertex { Vec3f { -0.5f,  0.5f, 0.f }, Vec3f { 0.f, 0.f, 1.f } }
+constexpr std::array<Vertex, 4> vertices = {
+  Vertex { Vec3f { -0.5f, -0.5f, 0.f }, Vec3f { 1.f, 0.f, 0.f } },
+  Vertex { Vec3f {  0.5f, -0.5f, 0.f }, Vec3f { 0.f, 1.f, 0.f } },
+  Vertex { Vec3f {  0.5f,  0.5f, 0.f }, Vec3f { 0.f, 0.f, 1.f } },
+  Vertex { Vec3f { -0.5f,  0.5f, 0.f }, Vec3f { 1.f, 1.f, 1.f } }
+};
+
+constexpr std::array<uint32_t, 6> indices = {
+  0, 1, 2,
+  2, 3, 0
 };
 
 ///////////////////////
@@ -180,7 +186,7 @@ struct QueueFamilyIndices {
 };
 
 inline QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface) {
-  QueueFamilyIndices indices;
+  QueueFamilyIndices queueIndices;
 
   uint32_t queueFamilyCount = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -190,20 +196,20 @@ inline QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKH
 
   for (std::size_t queueIndex = 0; queueIndex < queueFamilies.size(); ++queueIndex) {
     if (queueFamilies[queueIndex].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      indices.graphicsFamily = static_cast<uint32_t>(queueIndex);
+      queueIndices.graphicsFamily = static_cast<uint32_t>(queueIndex);
 
       VkBool32 presentSupport = false;
       vkGetPhysicalDeviceSurfaceSupportKHR(device, static_cast<uint32_t>(queueIndex), surface, &presentSupport);
 
       if (presentSupport)
-        indices.presentFamily = static_cast<uint32_t>(queueIndex);
+        queueIndices.presentFamily = static_cast<uint32_t>(queueIndex);
 
-      if (indices.isComplete())
+      if (queueIndices.isComplete())
         break;
     }
   }
 
-  return indices;
+  return queueIndices;
 }
 
 ///////////////
@@ -327,10 +333,10 @@ inline void createSwapchain(VkPhysicalDevice physicalDevice,
   swapchainCreateInfo.imageArrayLayers = 1;
   swapchainCreateInfo.imageUsage       = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-  const QueueFamilyIndices indices = findQueueFamilies(physicalDevice, surface);
-  const std::array<uint32_t, 2> queueFamilyIndices = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+  const QueueFamilyIndices queueIndices = findQueueFamilies(physicalDevice, surface);
+  const std::array<uint32_t, 2> queueFamilyIndices = { queueIndices.graphicsFamily.value(), queueIndices.presentFamily.value() };
 
-  if (indices.graphicsFamily != indices.presentFamily) {
+  if (queueIndices.graphicsFamily != queueIndices.presentFamily) {
     swapchainCreateInfo.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
     swapchainCreateInfo.queueFamilyIndexCount = 2;
     swapchainCreateInfo.pQueueFamilyIndices   = queueFamilyIndices.data();
@@ -371,8 +377,8 @@ inline bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface) {
 
   // TODO: pick the best device
 
-  const QueueFamilyIndices indices  = findQueueFamilies(device, surface);
-  const bool areExtensionsSupported = checkDeviceExtensionSupport(device);
+  const QueueFamilyIndices queueIndices = findQueueFamilies(device, surface);
+  const bool areExtensionsSupported     = checkDeviceExtensionSupport(device);
 
   bool isSwapchainSupported = false;
   if (areExtensionsSupported) {
@@ -380,7 +386,7 @@ inline bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface) {
     isSwapchainSupported = !swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty();
   }
 
-  return indices.isComplete() && areExtensionsSupported && isSwapchainSupported;
+  return queueIndices.isComplete() && areExtensionsSupported && isSwapchainSupported;
 }
 
 /////////////
@@ -731,6 +737,7 @@ inline void createVertexBuffer(VkBuffer& vertexBuffer,
 
   VkBuffer stagingBuffer {};
   VkDeviceMemory stagingBufferMemory {};
+
   Renderer::createBuffer(stagingBuffer,
                          stagingBufferMemory,
                          BufferUsage::TRANSFER_SRC,
@@ -758,6 +765,48 @@ inline void createVertexBuffer(VkBuffer& vertexBuffer,
   vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
 }
 
+//////////////////
+// Index buffer //
+//////////////////
+
+inline void createIndexBuffer(VkBuffer& indexBuffer,
+                              VkDeviceMemory& indexBufferMemory,
+                              VkDevice logicalDevice,
+                              VkPhysicalDevice physicalDevice,
+                              VkCommandPool commandPool,
+                              VkQueue graphicsQueue) {
+  constexpr std::size_t bufferSize = sizeof(indices.front()) * indices.size();
+
+  VkBuffer stagingBuffer {};
+  VkDeviceMemory stagingBufferMemory {};
+
+  Renderer::createBuffer(stagingBuffer,
+                         stagingBufferMemory,
+                         BufferUsage::TRANSFER_SRC,
+                         MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
+                         physicalDevice,
+                         logicalDevice,
+                         bufferSize);
+
+  void* data;
+  vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+  std::memcpy(data, indices.data(), bufferSize);
+  vkUnmapMemory(logicalDevice, stagingBufferMemory);
+
+  Renderer::createBuffer(indexBuffer,
+                         indexBufferMemory,
+                         BufferUsage::TRANSFER_DST | BufferUsage::INDEX_BUFFER,
+                         MemoryProperty::DEVICE_LOCAL,
+                         physicalDevice,
+                         logicalDevice,
+                         bufferSize);
+
+  copyBuffer(stagingBuffer, indexBuffer, bufferSize, commandPool, logicalDevice, graphicsQueue);
+
+  vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
+  vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
+}
+
 /////////////////////
 // Command buffers //
 /////////////////////
@@ -769,7 +818,8 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
                                  VkRenderPass renderPass,
                                  VkExtent2D swapchainExtent,
                                  VkPipeline graphicsPipeline,
-                                 VkBuffer vertexBuffer) {
+                                 VkBuffer vertexBuffer,
+                                 VkBuffer indexBuffer) {
   commandBuffers.resize(swapchainFramebuffers.size());
 
   VkCommandBufferAllocateInfo allocInfo {};
@@ -802,15 +852,17 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
     renderPassInfo.pClearValues    = &clearColor;
 
     vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+    {
+      vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-    vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+      const std::array<VkBuffer, 1> vertexBuffers = { vertexBuffer };
+      const std::array<VkDeviceSize, 1> offsets = { 0 };
+      vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers.data(), offsets.data());
 
-    const std::array<VkBuffer, 1> vertexBuffers = { vertexBuffer };
-    const std::array<VkDeviceSize, 1> offsets = { 0 };
-    vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers.data(), offsets.data());
+      vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
-    vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
-
+      vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+    }
     vkCmdEndRenderPass(commandBuffers[i]);
 
     if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS)
@@ -952,11 +1004,11 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Logical device //
   ////////////////////
 
-  const QueueFamilyIndices indices = findQueueFamilies(m_physicalDevice, m_surface);
+  const QueueFamilyIndices queueIndices = findQueueFamilies(m_physicalDevice, m_surface);
 
   // Recovering the necessary queues
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-  const std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+  const std::set<uint32_t> uniqueQueueFamilies = { queueIndices.graphicsFamily.value(), queueIndices.presentFamily.value() };
   const float queuePriority = 1.f;
 
   for (uint32_t queueFamily : uniqueQueueFamilies) {
@@ -986,8 +1038,8 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
     throw std::runtime_error("Error: Failed to create the logical device.");
 
   // Recovering our queues
-  vkGetDeviceQueue(m_logicalDevice, indices.graphicsFamily.value(), 0, &m_graphicsQueue);
-  vkGetDeviceQueue(m_logicalDevice, indices.presentFamily.value(), 0, &m_presentQueue);
+  vkGetDeviceQueue(m_logicalDevice, queueIndices.graphicsFamily.value(), 0, &m_graphicsQueue);
+  vkGetDeviceQueue(m_logicalDevice, queueIndices.presentFamily.value(), 0, &m_presentQueue);
 
   ///////////////
   // Swapchain //
@@ -1023,13 +1075,19 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Command pool //
   //////////////////
 
-  Renderer::createCommandPool(m_commandPool, CommandPoolOption::TRANSIENT, indices.graphicsFamily.value(), m_logicalDevice);
+  Renderer::createCommandPool(m_commandPool, CommandPoolOption::TRANSIENT, queueIndices.graphicsFamily.value(), m_logicalDevice);
 
   ///////////////////
   // Vertex buffer //
   ///////////////////
 
   createVertexBuffer(m_vertexBuffer, m_vertexBufferMemory, m_logicalDevice, m_physicalDevice, m_commandPool, m_graphicsQueue);
+
+  //////////////////
+  // Index buffer //
+  //////////////////
+
+  createIndexBuffer(m_indexBuffer, m_indexBufferMemory, m_logicalDevice, m_physicalDevice, m_commandPool, m_graphicsQueue);
 
   /////////////////////
   // Command buffers //
@@ -1042,7 +1100,8 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
                        m_renderPass,
                        m_swapchainExtent,
                        m_graphicsPipeline,
-                       m_vertexBuffer);
+                       m_vertexBuffer,
+                       m_indexBuffer);
 
   ////////////////
   // Semaphores //
@@ -1132,7 +1191,8 @@ void Renderer::recreateSwapchain() {
                        m_renderPass,
                        m_swapchainExtent,
                        m_graphicsPipeline,
-                       m_vertexBuffer);
+                       m_vertexBuffer,
+                       m_indexBuffer);
 }
 
 void Renderer::drawFrame() {
@@ -1222,6 +1282,9 @@ void Renderer::destroy() {
     vkDestroySemaphore(m_logicalDevice, m_imageAvailableSemaphores[i], nullptr);
     vkDestroyFence(m_logicalDevice, m_inFlightFences[i], nullptr);
   }
+
+  vkDestroyBuffer(m_logicalDevice, m_indexBuffer, nullptr);
+  vkFreeMemory(m_logicalDevice, m_indexBufferMemory, nullptr);
 
   vkDestroyBuffer(m_logicalDevice, m_vertexBuffer, nullptr);
   vkFreeMemory(m_logicalDevice, m_vertexBufferMemory, nullptr);

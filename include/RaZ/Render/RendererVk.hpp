@@ -293,6 +293,8 @@ private:
   static inline VkCommandPool m_commandPool {};
   static inline VkBuffer m_vertexBuffer {};
   static inline VkDeviceMemory m_vertexBufferMemory {};
+  static inline VkBuffer m_indexBuffer {};
+  static inline VkDeviceMemory m_indexBufferMemory {};
   static inline std::vector<VkCommandBuffer> m_commandBuffers {};
 
   static inline std::array<VkSemaphore, MaxFramesInFlight> m_imageAvailableSemaphores {};
