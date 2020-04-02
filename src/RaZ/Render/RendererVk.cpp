@@ -15,6 +15,51 @@ namespace Raz {
 
 namespace {
 
+struct Vec3f {
+  float x {};
+  float y {};
+  float z {};
+};
+
+struct Vertex {
+  static VkVertexInputBindingDescription getBindingDescription() {
+    VkVertexInputBindingDescription bindingDescription {};
+
+    bindingDescription.binding   = 0;
+    bindingDescription.stride    = sizeof(Vertex);
+    bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    return bindingDescription;
+  }
+
+  static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions() {
+    std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions {};
+
+    // Position
+    attributeDescriptions[0].binding  = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format   = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[0].offset   = 0; // offsetof(Vertex, position)
+
+    // Color
+    attributeDescriptions[1].binding  = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format   = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[1].offset   = sizeof(Vertex::position); // offsetof(Vertex, color)
+
+    return attributeDescriptions;
+  }
+
+  Vec3f position;
+  Vec3f color;
+};
+
+constexpr std::array<Vertex, 3> vertices = {
+  Vertex { Vec3f { 0.f,   -0.5f, 0.f }, Vec3f { 1.f, 0.f, 0.f } },
+  Vertex { Vec3f { 0.5f,   0.5f, 0.f }, Vec3f { 0.f, 1.f, 0.f } },
+  Vertex { Vec3f { -0.5f,  0.5f, 0.f }, Vec3f { 0.f, 0.f, 1.f } }
+};
+
 ///////////////////////
 // Validation layers //
 ///////////////////////
@@ -476,12 +521,15 @@ inline void createGraphicsPipeline(VkDevice logicalDevice,
 
   const std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = { vertShaderStageInfo, fragShaderStageInfo };
 
+  const VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
+  const std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = Vertex::getAttributeDescriptions();
+
   VkPipelineVertexInputStateCreateInfo vertexInputInfo {};
   vertexInputInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-  vertexInputInfo.vertexBindingDescriptionCount   = 0;
-  vertexInputInfo.pVertexBindingDescriptions      = nullptr;
-  vertexInputInfo.vertexAttributeDescriptionCount = 0;
-  vertexInputInfo.pVertexAttributeDescriptions    = nullptr;
+  vertexInputInfo.vertexBindingDescriptionCount   = 1;
+  vertexInputInfo.pVertexBindingDescriptions      = &bindingDescription;
+  vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+  vertexInputInfo.pVertexAttributeDescriptions    = attributeDescriptions.data();
 
   VkPipelineInputAssemblyStateCreateInfo inputAssembly {};
   inputAssembly.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -617,6 +665,46 @@ inline void createFramebuffers(std::vector<VkFramebuffer>& swapchainFramebuffers
 // Buffers //
 /////////////
 
+inline void copyBuffer(VkBuffer srcBuffer,
+                       VkBuffer dstBuffer,
+                       VkDeviceSize bufferSize,
+                       VkCommandPool commandPool,
+                       VkDevice logicalDevice,
+                       VkQueue graphicsQueue) {
+  VkCommandBufferAllocateInfo allocInfo {};
+  allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocInfo.commandPool        = commandPool;
+  allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocInfo.commandBufferCount = 1;
+
+  VkCommandBuffer commandBuffer;
+  vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
+
+  VkCommandBufferBeginInfo beginInfo {};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+  VkBufferCopy copyRegion {};
+  copyRegion.srcOffset = 0;
+  copyRegion.dstOffset = 0;
+  copyRegion.size      = bufferSize;
+  vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+  vkEndCommandBuffer(commandBuffer);
+
+  VkSubmitInfo submitInfo {};
+  submitInfo.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers    = &commandBuffer;
+
+  vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+  vkQueueWaitIdle(graphicsQueue);
+
+  vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
+}
+
 inline uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, MemoryProperty properties) {
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -629,6 +717,47 @@ inline uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFil
   throw std::runtime_error("Error: Failed to find a suitable memory type.");
 }
 
+///////////////////
+// Vertex buffer //
+///////////////////
+
+inline void createVertexBuffer(VkBuffer& vertexBuffer,
+                               VkDeviceMemory& vertexBufferMemory,
+                               VkDevice logicalDevice,
+                               VkPhysicalDevice physicalDevice,
+                               VkCommandPool commandPool,
+                               VkQueue graphicsQueue) {
+  constexpr std::size_t bufferSize = sizeof(vertices.front()) * vertices.size();
+
+  VkBuffer stagingBuffer {};
+  VkDeviceMemory stagingBufferMemory {};
+  Renderer::createBuffer(stagingBuffer,
+                         stagingBufferMemory,
+                         BufferUsage::TRANSFER_SRC,
+                         MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
+                         physicalDevice,
+                         logicalDevice,
+                         bufferSize);
+
+  void* data;
+  vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+  std::memcpy(data, vertices.data(), bufferSize);
+  vkUnmapMemory(logicalDevice, stagingBufferMemory);
+
+  Renderer::createBuffer(vertexBuffer,
+                         vertexBufferMemory,
+                         BufferUsage::TRANSFER_DST | BufferUsage::VERTEX_BUFFER,
+                         MemoryProperty::DEVICE_LOCAL,
+                         physicalDevice,
+                         logicalDevice,
+                         bufferSize);
+
+  copyBuffer(stagingBuffer, vertexBuffer, bufferSize, commandPool, logicalDevice, graphicsQueue);
+
+  vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
+  vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
+}
+
 /////////////////////
 // Command buffers //
 /////////////////////
@@ -639,7 +768,8 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
                                  VkDevice logicalDevice,
                                  VkRenderPass renderPass,
                                  VkExtent2D swapchainExtent,
-                                 VkPipeline graphicsPipeline) {
+                                 VkPipeline graphicsPipeline,
+                                 VkBuffer vertexBuffer) {
   commandBuffers.resize(swapchainFramebuffers.size());
 
   VkCommandBufferAllocateInfo allocInfo {};
@@ -674,7 +804,12 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
     vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
-    vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+
+    const std::array<VkBuffer, 1> vertexBuffers = { vertexBuffer };
+    const std::array<VkDeviceSize, 1> offsets = { 0 };
+    vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers.data(), offsets.data());
+
+    vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
 
     vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -890,14 +1025,24 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
 
   Renderer::createCommandPool(m_commandPool, CommandPoolOption::TRANSIENT, indices.graphicsFamily.value(), m_logicalDevice);
 
-  if (vkCreateCommandPool(m_logicalDevice, &poolInfo, nullptr, &m_commandPool) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create the command pool.");
+  ///////////////////
+  // Vertex buffer //
+  ///////////////////
+
+  createVertexBuffer(m_vertexBuffer, m_vertexBufferMemory, m_logicalDevice, m_physicalDevice, m_commandPool, m_graphicsQueue);
 
   /////////////////////
   // Command buffers //
   /////////////////////
 
-  createCommandBuffers(m_commandBuffers, m_swapchainFramebuffers, m_commandPool, m_logicalDevice, m_renderPass, m_swapchainExtent, m_graphicsPipeline);
+  createCommandBuffers(m_commandBuffers,
+                       m_swapchainFramebuffers,
+                       m_commandPool,
+                       m_logicalDevice,
+                       m_renderPass,
+                       m_swapchainExtent,
+                       m_graphicsPipeline,
+                       m_vertexBuffer);
 
   ////////////////
   // Semaphores //
@@ -980,7 +1125,14 @@ void Renderer::recreateSwapchain() {
   createRenderPass(m_swapchainImageFormat, m_logicalDevice, m_renderPass);
   createGraphicsPipeline(m_logicalDevice, m_swapchainExtent, m_pipelineLayout, m_renderPass, m_graphicsPipeline);
   createFramebuffers(m_swapchainFramebuffers, m_swapchainImageViews, m_renderPass, m_swapchainExtent, m_logicalDevice);
-  createCommandBuffers(m_commandBuffers, m_swapchainFramebuffers, m_commandPool, m_logicalDevice, m_renderPass, m_swapchainExtent, m_graphicsPipeline);
+  createCommandBuffers(m_commandBuffers,
+                       m_swapchainFramebuffers,
+                       m_commandPool,
+                       m_logicalDevice,
+                       m_renderPass,
+                       m_swapchainExtent,
+                       m_graphicsPipeline,
+                       m_vertexBuffer);
 }
 
 void Renderer::drawFrame() {
@@ -1070,6 +1222,9 @@ void Renderer::destroy() {
     vkDestroySemaphore(m_logicalDevice, m_imageAvailableSemaphores[i], nullptr);
     vkDestroyFence(m_logicalDevice, m_inFlightFences[i], nullptr);
   }
+
+  vkDestroyBuffer(m_logicalDevice, m_vertexBuffer, nullptr);
+  vkFreeMemory(m_logicalDevice, m_vertexBufferMemory, nullptr);
 
   vkDestroyCommandPool(m_logicalDevice, m_commandPool, nullptr);
 
