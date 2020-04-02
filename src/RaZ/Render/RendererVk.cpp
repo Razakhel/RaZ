@@ -888,10 +888,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Command pool //
   //////////////////
 
-  VkCommandPoolCreateInfo poolInfo {};
-  poolInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-  poolInfo.queueFamilyIndex = indices.graphicsFamily.value();
-  poolInfo.flags            = 0;
+  Renderer::createCommandPool(m_commandPool, CommandPoolOption::TRANSIENT, indices.graphicsFamily.value(), m_logicalDevice);
 
   if (vkCreateCommandPool(m_logicalDevice, &poolInfo, nullptr, &m_commandPool) != VK_SUCCESS)
     throw std::runtime_error("Error: Failed to create the command pool.");
@@ -923,6 +920,16 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   }
 
   s_isInitialized = true;
+}
+
+void Renderer::createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice) {
+  VkCommandPoolCreateInfo commandPoolInfo {};
+  commandPoolInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+  commandPoolInfo.flags            = static_cast<uint32_t>(options);
+  commandPoolInfo.queueFamilyIndex = queueFamilyIndex;
+
+  if (vkCreateCommandPool(logicalDevice, &commandPoolInfo, nullptr, &commandPool) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a command pool.");
 }
 
 void Renderer::createBuffer(VkBuffer& buffer,

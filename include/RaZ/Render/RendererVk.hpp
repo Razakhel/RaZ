@@ -24,6 +24,13 @@ enum class CullingMode : uint32_t {
   FRONT_BACK = 3 /* VK_CULL_MODE_FRONT_AND_BACK */  ///< Cull both front- & back-facing triangles (discards everything).
 };
 
+enum class CommandPoolOption : uint32_t {
+  TRANSIENT            = 1 /* VK_COMMAND_POOL_CREATE_TRANSIENT_BIT            */, ///<
+  RESET_COMMAND_BUFFER = 2 /* VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT */, ///<
+  PROTECTED            = 4 /* VK_COMMAND_POOL_CREATE_PROTECTED_BIT            */  ///<
+};
+MAKE_ENUM_FLAG(CommandPoolOption)
+
 enum class BufferUsage : uint32_t {
   TRANSFER_SRC               = 1      /* VK_BUFFER_USAGE_TRANSFER_SRC_BIT                          */, ///< Memory transfer source buffer.
   TRANSFER_DST               = 2      /* VK_BUFFER_USAGE_TRANSFER_DST_BIT                          */, ///< Memory transfer destination buffer.
@@ -40,7 +47,6 @@ enum class BufferUsage : uint32_t {
   CONDITIONAL_RENDERING      = 512    /* VK_BUFFER_USAGE_CONDITIONAL_RENDERING_BIT_EXT             */, ///<
   RAY_TRACING                = 1024   /* VK_BUFFER_USAGE_RAY_TRACING_BIT_KHR                       */  ///<
 };
-
 MAKE_ENUM_FLAG(BufferUsage)
 
 enum class MemoryProperty : uint32_t {
@@ -53,7 +59,6 @@ enum class MemoryProperty : uint32_t {
   DEVICE_COHERENT_AMD = 64  /* VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD */, ///<
   DEVICE_UNCACHED_AMD = 128 /* VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD */  ///<
 };
-
 MAKE_ENUM_FLAG(MemoryProperty)
 
 // TODO: temporary GL enums to allow compilation
@@ -179,6 +184,7 @@ public:
   static void initialize(GLFWwindow* windowHandle = nullptr);
   static bool isInitialized() { return s_isInitialized; }
 
+  static void createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,
                            BufferUsage usageFlags,
