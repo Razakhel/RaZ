@@ -287,6 +287,7 @@ private:
   static inline std::vector<VkImageView> m_swapchainImageViews {};
 
   static inline VkRenderPass m_renderPass {};
+  static inline VkDescriptorSetLayout m_descriptorSetLayout {};
   static inline VkPipelineLayout m_pipelineLayout {};
   static inline VkPipeline m_graphicsPipeline {};
   static inline std::vector<VkFramebuffer> m_swapchainFramebuffers {};
@@ -295,6 +296,10 @@ private:
   static inline VkDeviceMemory m_vertexBufferMemory {};
   static inline VkBuffer m_indexBuffer {};
   static inline VkDeviceMemory m_indexBufferMemory {};
+  static inline std::vector<VkBuffer> m_uniformBuffers {};
+  static inline std::vector<VkDeviceMemory> m_uniformBuffersMemory {};
+  static inline VkDescriptorPool m_descriptorPool {};
+  static inline std::vector<VkDescriptorSet> m_descriptorSets {};
   static inline std::vector<VkCommandBuffer> m_commandBuffers {};
 
   static inline std::array<VkSemaphore, MaxFramesInFlight> m_imageAvailableSemaphores {};
