@@ -24,6 +24,26 @@ enum class CullingMode : uint32_t {
   FRONT_BACK = 3 /* VK_CULL_MODE_FRONT_AND_BACK */  ///< Cull both front- & back-facing triangles (discards everything).
 };
 
+enum class ShaderStage : uint32_t {
+   VERTEX                  = 1          /* VK_SHADER_STAGE_VERTEX_BIT                  */, ///< Vertex shader stage.
+   TESSELLATION_CONTROL    = 2          /* VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT    */, ///< Tesselation control shader stage.
+   TESSELLATION_EVALUATION = 4          /* VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT */, ///< Tesselation evualuation shader stage.
+   GEOMETRY                = 8          /* VK_SHADER_STAGE_GEOMETRY_BIT                */, ///< Geometry shader stage.
+   FRAGMENT                = 16         /* VK_SHADER_STAGE_FRAGMENT_BIT                */, ///< Fragment shader stage.
+   COMPUTE                 = 32         /* VK_SHADER_STAGE_COMPUTE_BIT                 */, ///< Compute shader stage.
+   ALL_GRAPHICS            = 31         /* VK_SHADER_STAGE_ALL_GRAPHICS                */, ///< All graphic shader stages.
+   ALL                     = 2147483647 /* VK_SHADER_STAGE_ALL                         */, ///< All shader stages.
+   RAYGEN                  = 256        /* VK_SHADER_STAGE_RAYGEN_BIT_KHR              */, ///< Raygen shader stage.
+   ANY_HIT                 = 512        /* VK_SHADER_STAGE_ANY_HIT_BIT_KHR             */, ///< Any hit shader stage.
+   CLOSEST_HIT             = 1024       /* VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR         */, ///< Closest hit shader stage.
+   MISS                    = 2048       /* VK_SHADER_STAGE_MISS_BIT_KHR                */, ///< Miss shader stage.
+   INTERSECTION            = 4096       /* VK_SHADER_STAGE_INTERSECTION_BIT_KHR        */, ///< Intersection shader stage.
+   CALLABLE                = 8192       /* VK_SHADER_STAGE_CALLABLE_BIT_KHR            */, ///< Callable shader stage.
+   TASK_NV                 = 64         /* VK_SHADER_STAGE_TASK_BIT_NV                 */, ///< Task shader stage (NVidia specific).
+   MESH_NV                 = 128        /* VK_SHADER_STAGE_MESH_BIT_NV                 */  ///< Mesh shader stage (NVidia specific).
+};
+MAKE_ENUM_FLAG(ShaderStage)
+
 enum class CommandPoolOption : uint32_t {
   TRANSIENT            = 1 /* VK_COMMAND_POOL_CREATE_TRANSIENT_BIT            */, ///<
   RESET_COMMAND_BUFFER = 2 /* VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT */, ///<
@@ -60,6 +80,22 @@ enum class MemoryProperty : uint32_t {
   DEVICE_UNCACHED_AMD = 128 /* VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD */  ///<
 };
 MAKE_ENUM_FLAG(MemoryProperty)
+
+enum class DescriptorType : uint32_t {
+   SAMPLER                  = 0          /* VK_DESCRIPTOR_TYPE_SAMPLER                    */, ///<
+   COMBINED_IMAGE_SAMPLER   = 1          /* VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER     */, ///<
+   SAMPLED_IMAGE            = 2          /* VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE              */, ///<
+   STORAGE_IMAGE            = 3          /* VK_DESCRIPTOR_TYPE_STORAGE_IMAGE              */, ///<
+   UNIFORM_TEXEL_BUFFER     = 4          /* VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER       */, ///<
+   STORAGE_TEXEL_BUFFER     = 5          /* VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER       */, ///<
+   UNIFORM_BUFFER           = 6          /* VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER             */, ///<
+   STORAGE_BUFFER           = 7          /* VK_DESCRIPTOR_TYPE_STORAGE_BUFFER             */, ///<
+   UNIFORM_BUFFER_DYNAMIC   = 8          /* VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC     */, ///<
+   STORAGE_BUFFER_DYNAMIC   = 9          /* VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC     */, ///<
+   INPUT_ATTACHMENT         = 10         /* VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT           */, ///<
+   INLINE_UNIFORM_BLOCK_EXT = 1000138000 /* VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT   */, ///<
+   ACCELERATION_STRUCTURE   = 1000165000 /* VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR */  ///<
+};
 
 // TODO: temporary GL enums to allow compilation
 
@@ -184,6 +220,10 @@ public:
   static void initialize(GLFWwindow* windowHandle = nullptr);
   static bool isInitialized() { return s_isInitialized; }
 
+  static void createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLayout,
+                                        DescriptorType descriptorType,
+                                        ShaderStage shaderStageFlags,
+                                        VkDevice logicalDevice);
   static void createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,

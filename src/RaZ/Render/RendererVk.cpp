@@ -503,27 +503,6 @@ inline void createRenderPass(VkFormat swapchainImageFormat, VkDevice logicalDevi
     throw std::runtime_error("Error: Failed to create a render pass.");
 }
 
-////////////////////
-// Descriptor set //
-////////////////////
-
-inline void createDescriptorSetLayout(VkDevice logicalDevice, VkDescriptorSetLayout& descriptorSetLayout) {
-  VkDescriptorSetLayoutBinding uboLayoutBinding {};
-  uboLayoutBinding.binding            = 0;
-  uboLayoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-  uboLayoutBinding.descriptorCount    = 1;
-  uboLayoutBinding.stageFlags         = VK_SHADER_STAGE_VERTEX_BIT;
-  uboLayoutBinding.pImmutableSamplers = nullptr;
-
-  VkDescriptorSetLayoutCreateInfo layoutInfo {};
-  layoutInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-  layoutInfo.bindingCount = 1;
-  layoutInfo.pBindings    = &uboLayoutBinding;
-
-  if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create a descriptor set layout.");
-}
-
 //////////////
 // Pipeline //
 //////////////
@@ -1082,7 +1061,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Descriptor set //
   ////////////////////
 
-  createDescriptorSetLayout(m_logicalDevice, m_descriptorSetLayout);
+  Renderer::createDescriptorSetLayout(m_descriptorSetLayout, DescriptorType::UNIFORM_BUFFER, ShaderStage::VERTEX, m_logicalDevice);
 
   //////////////
   // Pipeline //
@@ -1177,10 +1156,30 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   s_isInitialized = true;
 }
 
+void Renderer::createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLayout,
+                                         DescriptorType descriptorType,
+                                         ShaderStage shaderStageFlags,
+                                         VkDevice logicalDevice) {
+  VkDescriptorSetLayoutBinding layoutBinding {};
+  layoutBinding.binding            = 0;
+  layoutBinding.descriptorType     = static_cast<VkDescriptorType>(descriptorType);
+  layoutBinding.descriptorCount    = 1;
+  layoutBinding.stageFlags         = static_cast<VkShaderStageFlags>(shaderStageFlags);
+  layoutBinding.pImmutableSamplers = nullptr;
+
+  VkDescriptorSetLayoutCreateInfo layoutInfo {};
+  layoutInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+  layoutInfo.bindingCount = 1;
+  layoutInfo.pBindings    = &layoutBinding;
+
+  if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a descriptor set layout.");
+}
+
 void Renderer::createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice) {
   VkCommandPoolCreateInfo commandPoolInfo {};
   commandPoolInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-  commandPoolInfo.flags            = static_cast<uint32_t>(options);
+  commandPoolInfo.flags            = static_cast<VkCommandPoolCreateFlags>(options);
   commandPoolInfo.queueFamilyIndex = queueFamilyIndex;
 
   if (vkCreateCommandPool(logicalDevice, &commandPoolInfo, nullptr, &commandPool) != VK_SUCCESS)
