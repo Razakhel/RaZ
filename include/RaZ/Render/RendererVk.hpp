@@ -189,14 +189,23 @@ public:
                            VkDeviceMemory& bufferMemory,
                            BufferUsage usageFlags,
                            MemoryProperty propertyFlags,
+                           std::size_t bufferSize,
                            VkPhysicalDevice physicalDevice,
-                           VkDevice logicalDevice,
-                           std::size_t bufferSize);
+                           VkDevice logicalDevice);
+  static void createStagedBuffer(VkBuffer& buffer,
+                                 VkDeviceMemory& bufferMemory,
+                                 BufferUsage bufferType,
+                                 const void* bufferData,
+                                 std::size_t bufferSize,
+                                 VkPhysicalDevice physicalDevice,
+                                 VkDevice logicalDevice,
+                                 VkQueue queue,
+                                 VkCommandPool commandPool);
   static void copyBuffer(VkBuffer srcBuffer,
                          VkBuffer dstBuffer,
                          VkDeviceSize bufferSize,
-                         VkQueue queue,
                          VkDevice logicalDevice,
+                         VkQueue queue,
                          VkCommandPool commandPool);
 
   static void recreateSwapchain();

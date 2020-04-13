@@ -710,90 +710,6 @@ inline uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFil
   throw std::runtime_error("Error: Failed to find a suitable memory type.");
 }
 
-///////////////////
-// Vertex buffer //
-///////////////////
-
-inline void createVertexBuffer(VkBuffer& vertexBuffer,
-                               VkDeviceMemory& vertexBufferMemory,
-                               VkDevice logicalDevice,
-                               VkPhysicalDevice physicalDevice,
-                               VkCommandPool commandPool,
-                               VkQueue graphicsQueue) {
-  constexpr std::size_t bufferSize = sizeof(vertices.front()) * vertices.size();
-
-  VkBuffer stagingBuffer {};
-  VkDeviceMemory stagingBufferMemory {};
-
-  Renderer::createBuffer(stagingBuffer,
-                         stagingBufferMemory,
-                         BufferUsage::TRANSFER_SRC,
-                         MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
-                         physicalDevice,
-                         logicalDevice,
-                         bufferSize);
-
-  void* data;
-  vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
-  std::memcpy(data, vertices.data(), bufferSize);
-  vkUnmapMemory(logicalDevice, stagingBufferMemory);
-
-  Renderer::createBuffer(vertexBuffer,
-                         vertexBufferMemory,
-                         BufferUsage::TRANSFER_DST | BufferUsage::VERTEX_BUFFER,
-                         MemoryProperty::DEVICE_LOCAL,
-                         physicalDevice,
-                         logicalDevice,
-                         bufferSize);
-
-  Renderer::copyBuffer(stagingBuffer, vertexBuffer, bufferSize, graphicsQueue, logicalDevice, commandPool);
-
-  vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
-  vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
-}
-
-//////////////////
-// Index buffer //
-//////////////////
-
-inline void createIndexBuffer(VkBuffer& indexBuffer,
-                              VkDeviceMemory& indexBufferMemory,
-                              VkDevice logicalDevice,
-                              VkPhysicalDevice physicalDevice,
-                              VkCommandPool commandPool,
-                              VkQueue graphicsQueue) {
-  constexpr std::size_t bufferSize = sizeof(indices.front()) * indices.size();
-
-  VkBuffer stagingBuffer {};
-  VkDeviceMemory stagingBufferMemory {};
-
-  Renderer::createBuffer(stagingBuffer,
-                         stagingBufferMemory,
-                         BufferUsage::TRANSFER_SRC,
-                         MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
-                         physicalDevice,
-                         logicalDevice,
-                         bufferSize);
-
-  void* data;
-  vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
-  std::memcpy(data, indices.data(), bufferSize);
-  vkUnmapMemory(logicalDevice, stagingBufferMemory);
-
-  Renderer::createBuffer(indexBuffer,
-                         indexBufferMemory,
-                         BufferUsage::TRANSFER_DST | BufferUsage::INDEX_BUFFER,
-                         MemoryProperty::DEVICE_LOCAL,
-                         physicalDevice,
-                         logicalDevice,
-                         bufferSize);
-
-  Renderer::copyBuffer(stagingBuffer, indexBuffer, bufferSize, graphicsQueue, logicalDevice, commandPool);
-
-  vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
-  vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
-}
-
 /////////////////////
 // Uniform buffers //
 /////////////////////
@@ -813,9 +729,9 @@ inline void createUniformBuffers(std::vector<VkBuffer>& uniformBuffers,
                            uniformBuffersMemory[i],
                            BufferUsage::UNIFORM_BUFFER,
                            MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
+                           bufferSize,
                            physicalDevice,
-                           logicalDevice,
-                           bufferSize);
+                           logicalDevice);
   }
 }
 
@@ -1190,13 +1106,29 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Vertex buffer //
   ///////////////////
 
-  createVertexBuffer(m_vertexBuffer, m_vertexBufferMemory, m_logicalDevice, m_physicalDevice, m_commandPool, m_graphicsQueue);
+  Renderer::createStagedBuffer(m_vertexBuffer,
+                               m_vertexBufferMemory,
+                               BufferUsage::VERTEX_BUFFER,
+                               vertices.data(),
+                               sizeof(vertices.front()) * vertices.size(),
+                               m_physicalDevice,
+                               m_logicalDevice,
+                               m_graphicsQueue,
+                               m_commandPool);
 
   //////////////////
   // Index buffer //
   //////////////////
 
-  createIndexBuffer(m_indexBuffer, m_indexBufferMemory, m_logicalDevice, m_physicalDevice, m_commandPool, m_graphicsQueue);
+  Renderer::createStagedBuffer(m_indexBuffer,
+                               m_indexBufferMemory,
+                               BufferUsage::INDEX_BUFFER,
+                               indices.data(),
+                               sizeof(indices.front()) * indices.size(),
+                               m_physicalDevice,
+                               m_logicalDevice,
+                               m_graphicsQueue,
+                               m_commandPool);
 
   /////////////////////
   // Uniform buffers //
@@ -1259,9 +1191,9 @@ void Renderer::createBuffer(VkBuffer& buffer,
                             VkDeviceMemory& bufferMemory,
                             BufferUsage usageFlags,
                             MemoryProperty propertyFlags,
+                            std::size_t bufferSize,
                             VkPhysicalDevice physicalDevice,
-                            VkDevice logicalDevice,
-                            std::size_t bufferSize) {
+                            VkDevice logicalDevice) {
   VkBufferCreateInfo bufferInfo {};
   bufferInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
   bufferInfo.size        = bufferSize;
@@ -1285,11 +1217,50 @@ void Renderer::createBuffer(VkBuffer& buffer,
   vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0);
 }
 
+void Renderer::createStagedBuffer(VkBuffer& buffer,
+                                  VkDeviceMemory& bufferMemory,
+                                  BufferUsage bufferType,
+                                  const void* bufferData,
+                                  std::size_t bufferSize,
+                                  VkPhysicalDevice physicalDevice,
+                                  VkDevice logicalDevice,
+                                  VkQueue queue,
+                                  VkCommandPool commandPool) {
+  VkBuffer stagingBuffer {};
+  VkDeviceMemory stagingBufferMemory {};
+
+  Renderer::createBuffer(stagingBuffer,
+                         stagingBufferMemory,
+                         BufferUsage::TRANSFER_SRC,
+                         MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
+                         bufferSize,
+                         physicalDevice,
+                         logicalDevice);
+
+  void* data;
+  vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+  std::memcpy(data, bufferData, bufferSize);
+  vkUnmapMemory(logicalDevice, stagingBufferMemory);
+
+  Renderer::createBuffer(buffer,
+                         bufferMemory,
+                         BufferUsage::TRANSFER_DST | bufferType,
+                         MemoryProperty::DEVICE_LOCAL,
+                         bufferSize,
+                         physicalDevice,
+                         logicalDevice);
+
+  Renderer::copyBuffer(stagingBuffer, buffer, bufferSize, logicalDevice, queue, commandPool);
+
+  vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
+  vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
+}
+
 void Renderer::copyBuffer(VkBuffer srcBuffer,
                           VkBuffer dstBuffer,
                           VkDeviceSize bufferSize,
-                          VkQueue queue,
                           VkDevice logicalDevice,
+                          VkQueue queue,
                           VkCommandPool commandPool) {
   VkCommandBufferAllocateInfo allocInfo {};
   allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
