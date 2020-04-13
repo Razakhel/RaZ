@@ -192,6 +192,12 @@ public:
                            VkPhysicalDevice physicalDevice,
                            VkDevice logicalDevice,
                            std::size_t bufferSize);
+  static void copyBuffer(VkBuffer srcBuffer,
+                         VkBuffer dstBuffer,
+                         VkDeviceSize bufferSize,
+                         VkQueue queue,
+                         VkDevice logicalDevice,
+                         VkCommandPool commandPool);
 
   static void recreateSwapchain();
   static void drawFrame();
