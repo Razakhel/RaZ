@@ -698,46 +698,6 @@ inline void createFramebuffers(std::vector<VkFramebuffer>& swapchainFramebuffers
 // Buffers //
 /////////////
 
-inline void copyBuffer(VkBuffer srcBuffer,
-                       VkBuffer dstBuffer,
-                       VkDeviceSize bufferSize,
-                       VkCommandPool commandPool,
-                       VkDevice logicalDevice,
-                       VkQueue graphicsQueue) {
-  VkCommandBufferAllocateInfo allocInfo {};
-  allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-  allocInfo.commandPool        = commandPool;
-  allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  allocInfo.commandBufferCount = 1;
-
-  VkCommandBuffer commandBuffer;
-  vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
-
-  VkCommandBufferBeginInfo beginInfo {};
-  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-  vkBeginCommandBuffer(commandBuffer, &beginInfo);
-
-  VkBufferCopy copyRegion {};
-  copyRegion.srcOffset = 0;
-  copyRegion.dstOffset = 0;
-  copyRegion.size      = bufferSize;
-  vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-
-  vkEndCommandBuffer(commandBuffer);
-
-  VkSubmitInfo submitInfo {};
-  submitInfo.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-  submitInfo.commandBufferCount = 1;
-  submitInfo.pCommandBuffers    = &commandBuffer;
-
-  vkQueueSubmit(graphicsQueue, 1, &submitInfo, nullptr);
-  vkQueueWaitIdle(graphicsQueue);
-
-  vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
-}
-
 inline uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, MemoryProperty properties) {
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -786,7 +746,7 @@ inline void createVertexBuffer(VkBuffer& vertexBuffer,
                          logicalDevice,
                          bufferSize);
 
-  copyBuffer(stagingBuffer, vertexBuffer, bufferSize, commandPool, logicalDevice, graphicsQueue);
+  Renderer::copyBuffer(stagingBuffer, vertexBuffer, bufferSize, graphicsQueue, logicalDevice, commandPool);
 
   vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
   vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
@@ -828,7 +788,7 @@ inline void createIndexBuffer(VkBuffer& indexBuffer,
                          logicalDevice,
                          bufferSize);
 
-  copyBuffer(stagingBuffer, indexBuffer, bufferSize, commandPool, logicalDevice, graphicsQueue);
+  Renderer::copyBuffer(stagingBuffer, indexBuffer, bufferSize, graphicsQueue, logicalDevice, commandPool);
 
   vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
   vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
@@ -962,7 +922,7 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
   allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
   if (vkAllocateCommandBuffers(logicalDevice, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to allocate the command buffers.");
+    throw std::runtime_error("Error: Failed to allocate command buffers.");
 
   for (std::size_t i = 0; i < commandBuffers.size(); ++i) {
     VkCommandBufferBeginInfo beginInfo {};
@@ -1323,6 +1283,46 @@ void Renderer::createBuffer(VkBuffer& buffer,
     throw std::runtime_error("Error: Failed to allocate a buffer's memory.");
 
   vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0);
+}
+
+void Renderer::copyBuffer(VkBuffer srcBuffer,
+                          VkBuffer dstBuffer,
+                          VkDeviceSize bufferSize,
+                          VkQueue queue,
+                          VkDevice logicalDevice,
+                          VkCommandPool commandPool) {
+  VkCommandBufferAllocateInfo allocInfo {};
+  allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocInfo.commandPool        = commandPool;
+  allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocInfo.commandBufferCount = 1;
+
+  VkCommandBuffer commandBuffer;
+  vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
+
+  VkCommandBufferBeginInfo beginInfo {};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+  VkBufferCopy copyRegion {};
+  copyRegion.srcOffset = 0;
+  copyRegion.dstOffset = 0;
+  copyRegion.size      = bufferSize;
+  vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+  vkEndCommandBuffer(commandBuffer);
+
+  VkSubmitInfo submitInfo {};
+  submitInfo.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+  submitInfo.commandBufferCount = 1;
+  submitInfo.pCommandBuffers    = &commandBuffer;
+
+  vkQueueSubmit(queue, 1, &submitInfo, nullptr);
+  vkQueueWaitIdle(queue);
+
+  vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
 }
 
 void Renderer::recreateSwapchain() {
