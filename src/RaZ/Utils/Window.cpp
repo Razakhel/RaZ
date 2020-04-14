@@ -75,10 +75,10 @@ Window::Window(unsigned int width, unsigned int height,
   Renderer::initialize(m_windowHandle);
 #else
   glfwMakeContextCurrent(m_windowHandle); // Making context current is only necessary with OpenGL
-  Renderer::initialize();
-#endif
 
+  Renderer::initialize();
   Renderer::enable(Capability::DEPTH_TEST);
+#endif
 
   glfwSetWindowUserPointer(m_windowHandle, this);
 
@@ -108,13 +108,18 @@ void Window::resize(unsigned int width, unsigned int height) {
 }
 
 void Window::enableFaceCulling(bool value) const {
+#if !defined(RAZ_USE_VULKAN)
   if (value)
     Renderer::enable(Capability::CULL);
   else
     Renderer::disable(Capability::CULL);
+#else
+  std::cerr << "Warning: Face culling can't be set with Vulkan." << std::endl;
+#endif
 }
 
 bool Window::recoverVerticalSyncState() const {
+#if !defined(RAZ_USE_VULKAN)
 #if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT())
     return static_cast<bool>(wglGetSwapIntervalEXT());
@@ -131,9 +136,14 @@ bool Window::recoverVerticalSyncState() const {
 
   Logger::warn("Vertical synchronization unsupported.");
   return false;
+#else
+  std::cerr << "Warning: Vertical synchronization's state is not recoverable with Vulkan." << std::endl;
+  return true;
+#endif
 }
 
 void Window::enableVerticalSync([[maybe_unused]] bool value) const {
+#if !defined(RAZ_USE_VULKAN)
 #if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT()) {
     wglSwapIntervalEXT(static_cast<int>(value));
@@ -150,6 +160,9 @@ void Window::enableVerticalSync([[maybe_unused]] bool value) const {
 #endif
 
   Logger::warn("Vertical synchronization unsupported.");
+#else
+  Logger::warn("Vertical synchronization's state can't be set with Vulkan.");
+#endif
 }
 
 void Window::changeCursorState(Cursor::State state) const {
@@ -343,9 +356,8 @@ bool Window::run(float deltaTime) {
 #endif
 
   Renderer::clearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
-#endif
-
   Renderer::clear(MaskType::COLOR | MaskType::DEPTH);
+#endif
 
   return true;
 }

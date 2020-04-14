@@ -99,11 +99,6 @@ enum class DescriptorType : uint32_t {
 
 // TODO: temporary GL enums to allow compilation
 
-enum class Capability : unsigned int {
-  CULL       = 2884, // GL_CULL_FACE
-  DEPTH_TEST = 2929  // GL_DEPTH_TEST
-};
-
 enum class MaskType : unsigned int {
   COLOR = 16384, // GL_COLOR_BUFFER_BIT
   DEPTH = 256    // GL_DEPTH_BUFFER_BIT
@@ -256,8 +251,6 @@ public:
 
   // TODO: temporary GL functions to allow compilation
 
-  static void enable(Capability) {}
-  static void disable(Capability) {}
   static unsigned int getCurrentProgram() { return 0; }
   static void clearColor(float, float, float, float) {}
   static void clear(MaskType) {}

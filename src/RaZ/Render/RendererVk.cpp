@@ -1436,6 +1436,7 @@ void Renderer::destroy() {
   vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
   vkDestroyInstance(m_instance, nullptr);
 
+  m_windowHandle = nullptr;
   s_isInitialized = false;
 }
 
