@@ -714,21 +714,6 @@ inline void createUniformBuffers(std::vector<VkBuffer>& uniformBuffers,
   }
 }
 
-inline void createDescriptorPool(uint32_t descriptorCount, VkDevice logicalDevice, VkDescriptorPool& descriptorPool) {
-  VkDescriptorPoolSize poolSize {};
-  poolSize.type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-  poolSize.descriptorCount = descriptorCount;
-
-  VkDescriptorPoolCreateInfo poolInfo {};
-  poolInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-  poolInfo.maxSets       = descriptorCount;
-  poolInfo.poolSizeCount = 1;
-  poolInfo.pPoolSizes    = &poolSize;
-
-  if (vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create a descriptor pool.");
-}
-
 inline void createDescriptorSets(std::size_t descriptorCount,
                                  VkDescriptorSetLayout descriptorSetLayout,
                                  VkDescriptorPool descriptorPool,
@@ -1114,7 +1099,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   /////////////////////
 
   createUniformBuffers(m_uniformBuffers, m_uniformBuffersMemory, m_swapchainImages.size(), m_physicalDevice, m_logicalDevice);
-  createDescriptorPool(static_cast<uint32_t>(m_swapchainImages.size()), m_logicalDevice, m_descriptorPool);
+  Renderer::createDescriptorPool(m_descriptorPool, DescriptorType::UNIFORM_BUFFER, static_cast<uint32_t>(m_swapchainImages.size()), m_logicalDevice);
   createDescriptorSets(m_swapchainImages.size(), m_descriptorSetLayout, m_descriptorPool, m_descriptorSets, m_logicalDevice, m_uniformBuffers);
 
   /////////////////////
@@ -1295,6 +1280,21 @@ void Renderer::copyBuffer(VkBuffer srcBuffer,
   vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer);
 }
 
+void Renderer::createDescriptorPool(VkDescriptorPool& descriptorPool, DescriptorType descriptorType, uint32_t descriptorCount, VkDevice logicalDevice) {
+  VkDescriptorPoolSize poolSize {};
+  poolSize.type            = static_cast<VkDescriptorType>(descriptorType);
+  poolSize.descriptorCount = descriptorCount;
+
+  VkDescriptorPoolCreateInfo poolInfo {};
+  poolInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+  poolInfo.maxSets       = descriptorCount;
+  poolInfo.poolSizeCount = 1;
+  poolInfo.pPoolSizes    = &poolSize;
+
+  if (vkCreateDescriptorPool(logicalDevice, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a descriptor pool.");
+}
+
 void Renderer::recreateSwapchain() {
   // If the window is minimized, pausing the application to wait for the window to be on screen again
   int width {};
@@ -1314,7 +1314,7 @@ void Renderer::recreateSwapchain() {
   createGraphicsPipeline(m_logicalDevice, m_swapchainExtent, m_descriptorSetLayout, m_pipelineLayout, m_renderPass, m_graphicsPipeline);
   createFramebuffers(m_swapchainFramebuffers, m_swapchainImageViews, m_renderPass, m_swapchainExtent, m_logicalDevice);
   createUniformBuffers(m_uniformBuffers, m_uniformBuffersMemory, m_swapchainImages.size(), m_physicalDevice, m_logicalDevice);
-  createDescriptorPool(static_cast<uint32_t>(m_swapchainImages.size()), m_logicalDevice, m_descriptorPool);
+  Renderer::createDescriptorPool(m_descriptorPool, DescriptorType::UNIFORM_BUFFER, static_cast<uint32_t>(m_swapchainImages.size()), m_logicalDevice);
   createDescriptorSets(m_swapchainImages.size(), m_descriptorSetLayout, m_descriptorPool, m_descriptorSets, m_logicalDevice, m_uniformBuffers);
   createCommandBuffers(m_commandBuffers,
                        m_swapchainFramebuffers,
