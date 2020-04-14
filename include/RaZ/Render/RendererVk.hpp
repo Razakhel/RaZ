@@ -247,6 +247,7 @@ public:
                          VkDevice logicalDevice,
                          VkQueue queue,
                          VkCommandPool commandPool);
+  static void createDescriptorPool(VkDescriptorPool& descriptorPool, DescriptorType descriptorType, uint32_t descriptorCount, VkDevice logicalDevice);
 
   static void recreateSwapchain();
   static void drawFrame();
