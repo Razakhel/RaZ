@@ -358,7 +358,7 @@ inline void createSwapchain(VkPhysicalDevice physicalDevice,
   swapchainCreateInfo.oldSwapchain   = nullptr;
 
   if (vkCreateSwapchainKHR(logicalDevice, &swapchainCreateInfo, nullptr, &swapchain) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create the swapchain.");
+    throw std::runtime_error("Error: Failed to create a swapchain.");
 
   vkGetSwapchainImagesKHR(logicalDevice, swapchain, &imageCount, nullptr);
 
@@ -600,15 +600,7 @@ inline void createGraphicsPipeline(VkDevice logicalDevice,
   colorBlending.blendConstants[2] = 0.f;
   colorBlending.blendConstants[3] = 0.f;
 
-  VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
-  pipelineLayoutInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-  pipelineLayoutInfo.setLayoutCount         = 1;
-  pipelineLayoutInfo.pSetLayouts            = &descriptorSetLayout;
-  pipelineLayoutInfo.pushConstantRangeCount = 0;
-  pipelineLayoutInfo.pPushConstantRanges    = nullptr;
-
-  if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create the pipeline layout.");
+  Renderer::createPipelineLayout(pipelineLayout, { descriptorSetLayout }, {}, logicalDevice);
 
   VkGraphicsPipelineCreateInfo pipelineInfo {};
   pipelineInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -629,10 +621,10 @@ inline void createGraphicsPipeline(VkDevice logicalDevice,
   pipelineInfo.basePipelineIndex   = -1;
 
   if (vkCreateGraphicsPipelines(logicalDevice, nullptr, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create the graphics pipeline.");
+    throw std::runtime_error("Error: Failed to create a graphics pipeline.");
 
-  vkDestroyShaderModule(logicalDevice, fragShaderModule, nullptr);
-  vkDestroyShaderModule(logicalDevice, vertShaderModule, nullptr);
+  Renderer::destroyShaderModule(fragShaderModule, logicalDevice);
+  Renderer::destroyShaderModule(vertShaderModule, logicalDevice);
 }
 
 //////////////////
@@ -912,7 +904,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
 #endif
 
   if (vkCreateInstance(&instanceCreateInfo, nullptr, &m_instance) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create the Vulkan instance.");
+    throw std::runtime_error("Error: Failed to create a Vulkan instance.");
 
   ////////////////////
   // Debug Callback //
@@ -930,7 +922,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
     m_windowHandle = windowHandle;
 
     if (glfwCreateWindowSurface(m_instance, m_windowHandle, nullptr, &m_surface) != VK_SUCCESS)
-      throw std::runtime_error("Error: Failed to create the window surface.");
+      throw std::runtime_error("Error: Failed to create a window surface.");
   }
 
   ////////////////
@@ -1008,7 +1000,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
 #endif
 
   if (vkCreateDevice(m_physicalDevice, &deviceCreateInfo, nullptr, &m_logicalDevice) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create the logical device.");
+    throw std::runtime_error("Error: Failed to create a logical device.");
 
   // Recovering our queues
   vkGetDeviceQueue(m_logicalDevice, queueIndices.graphicsFamily.value(), 0, &m_graphicsQueue);
@@ -1125,7 +1117,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
     if (vkCreateSemaphore(m_logicalDevice, &semaphoreInfo, nullptr, &m_imageAvailableSemaphores[i]) != VK_SUCCESS
       || vkCreateSemaphore(m_logicalDevice, &semaphoreInfo, nullptr, &m_renderFinishedSemaphores[i]) != VK_SUCCESS
       || vkCreateFence(m_logicalDevice, &fenceInfo, nullptr, &m_inFlightFences[i]) != VK_SUCCESS)
-      throw std::runtime_error("Error: Failed to create the synchronization objects.");
+      throw std::runtime_error("Error: Failed to create a synchronization objects.");
   }
 
   s_isInitialized = true;
@@ -1159,6 +1151,39 @@ void Renderer::createShaderModule(VkShaderModule& shaderModule, std::size_t shad
 
   if (vkCreateShaderModule(logicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
     throw std::runtime_error("Error: Failed to create a shader module.");
+}
+
+void Renderer::destroyShaderModule(VkShaderModule shaderModule, VkDevice logicalDevice) {
+  vkDestroyShaderModule(logicalDevice, shaderModule, nullptr);
+}
+
+void Renderer::createPipelineLayout(VkPipelineLayout& pipelineLayout,
+                                    uint32_t descriptorSetLayoutCount,
+                                    const VkDescriptorSetLayout* descriptorSetLayouts,
+                                    uint32_t pushConstantRangeCount,
+                                    const VkPushConstantRange* pushConstantRanges,
+                                    VkDevice logicalDevice) {
+  VkPipelineLayoutCreateInfo pipelineLayoutInfo {};
+  pipelineLayoutInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+  pipelineLayoutInfo.setLayoutCount         = descriptorSetLayoutCount;
+  pipelineLayoutInfo.pSetLayouts            = descriptorSetLayouts;
+  pipelineLayoutInfo.pushConstantRangeCount = pushConstantRangeCount;
+  pipelineLayoutInfo.pPushConstantRanges    = pushConstantRanges;
+
+  if (vkCreatePipelineLayout(logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a pipeline layout.");
+}
+
+void Renderer::createPipelineLayout(VkPipelineLayout& pipelineLayout,
+                                    std::initializer_list<VkDescriptorSetLayout> descriptorSetLayouts,
+                                    std::initializer_list<VkPushConstantRange> pushConstantRanges,
+                                    VkDevice logicalDevice) {
+  createPipelineLayout(pipelineLayout,
+                       static_cast<uint32_t>(descriptorSetLayouts.size()),
+                       descriptorSetLayouts.begin(),
+                       static_cast<uint32_t>(pushConstantRanges.size()),
+                       pushConstantRanges.begin(),
+                       logicalDevice);
 }
 
 void Renderer::createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice) {
@@ -1371,7 +1396,7 @@ void Renderer::drawFrame() {
   vkResetFences(m_logicalDevice, 1, &m_inFlightFences[m_currentFrameIndex]);
 
   if (vkQueueSubmit(m_graphicsQueue, 1, &submitInfo, m_inFlightFences[m_currentFrameIndex]) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to submit the draw command buffer.");
+    throw std::runtime_error("Error: Failed to submit a draw command buffer.");
 
   VkPresentInfoKHR presentInfo {};
   presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
