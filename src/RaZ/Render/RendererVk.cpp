@@ -80,7 +80,7 @@ constexpr std::array<const char*, 1> validationLayers = {
 };
 
 inline bool checkValidationLayersSupport() {
-  uint32_t layerCount;
+  uint32_t layerCount {};
   vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
   std::vector<VkLayerProperties> availableLayers(layerCount);
@@ -167,7 +167,7 @@ inline void setupDebugMessenger(VkInstance instance, VkDebugUtilsMessengerEXT& d
 
 inline std::vector<const char*> getRequiredExtensions() {
   uint32_t glfwExtensionCount = 0;
-  const char** glfwExtensions;
+  const char** glfwExtensions {};
   glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
   std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
@@ -226,7 +226,7 @@ constexpr std::array<const char*, 1> deviceExtensions = {
 };
 
 inline bool checkDeviceExtensionSupport(VkPhysicalDevice device) {
-  uint32_t extensionCount;
+  uint32_t extensionCount {};
   vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
   std::vector<VkExtensionProperties> availableExtensions(extensionCount);
@@ -290,7 +290,7 @@ inline SwapchainSupportDetails querySwapchainSupport(VkPhysicalDevice device, Vk
 
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
-  uint32_t formatCount;
+  uint32_t formatCount {};
   vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
 
   if (formatCount != 0) {
@@ -298,7 +298,7 @@ inline SwapchainSupportDetails querySwapchainSupport(VkPhysicalDevice device, Vk
     vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
   }
 
-  uint32_t presentModeCount;
+  uint32_t presentModeCount {};
   vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
 
   if (presentModeCount != 0) {
@@ -413,19 +413,6 @@ inline std::vector<char> readFile(const std::string& filePath) {
   return bytes;
 }
 
-inline VkShaderModule createShaderModule(VkDevice logicalDevice, const std::vector<char>& codeStr) {
-  VkShaderModuleCreateInfo createInfo {};
-  createInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-  createInfo.codeSize = codeStr.size();
-  createInfo.pCode    = reinterpret_cast<const uint32_t*>(codeStr.data());
-
-  VkShaderModule shaderModule;
-  if (vkCreateShaderModule(logicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create a shader module.");
-
-  return shaderModule;
-}
-
 /////////////////
 // Image views //
 /////////////////
@@ -516,8 +503,11 @@ inline void createGraphicsPipeline(VkDevice logicalDevice,
   const std::vector<char> vertShaderCode = readFile(RAZ_ROOT + "shaders/triangle_vk_vert.spv"s);
   const std::vector<char> fragShaderCode = readFile(RAZ_ROOT + "shaders/triangle_vk_frag.spv"s);
 
-  VkShaderModule vertShaderModule = createShaderModule(logicalDevice, vertShaderCode);
-  VkShaderModule fragShaderModule = createShaderModule(logicalDevice, fragShaderCode);
+  VkShaderModule vertShaderModule {};
+  Renderer::createShaderModule(vertShaderModule, vertShaderCode.size(), vertShaderCode.data(), logicalDevice);
+
+  VkShaderModule fragShaderModule {};
+  Renderer::createShaderModule(fragShaderModule, fragShaderCode.size(), fragShaderCode.data(), logicalDevice);
 
   VkPipelineShaderStageCreateInfo vertShaderStageInfo {};
   vertShaderStageInfo.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -772,7 +762,7 @@ inline void updateUniformBuffer(VkExtent2D swapchainExtent,
   matrices.view       = camera.computeLookAt(Vec3f(0.f, 2.f, 2.f));
   matrices.projection = camera.computePerspectiveMatrix();
 
-  void* data;
+  void* data {};
   vkMapMemory(logicalDevice, uniformBuffersMemory[currentImageIndex], 0, sizeof(UniformMatrices), 0, &data);
   std::memcpy(data, &matrices, sizeof(UniformMatrices));
   vkUnmapMemory(logicalDevice, uniformBuffersMemory[currentImageIndex]);
@@ -820,7 +810,7 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
     renderPassInfo.renderArea.offset = { 0, 0 };
     renderPassInfo.renderArea.extent = swapchainExtent;
 
-    const VkClearValue clearColor  = { 0.f, 0.f, 0.f, 1.f };
+    const VkClearValue clearColor  = { 0.15f, 0.15f, 0.15f, 1.f };
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues    = &clearColor;
 
@@ -1161,6 +1151,16 @@ void Renderer::createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLay
     throw std::runtime_error("Error: Failed to create a descriptor set layout.");
 }
 
+void Renderer::createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice) {
+  VkShaderModuleCreateInfo createInfo {};
+  createInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+  createInfo.codeSize = shaderCodeSize;
+  createInfo.pCode    = reinterpret_cast<const uint32_t*>(shaderCodeStr);
+
+  if (vkCreateShaderModule(logicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a shader module.");
+}
+
 void Renderer::createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice) {
   VkCommandPoolCreateInfo commandPoolInfo {};
   commandPoolInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -1221,7 +1221,7 @@ void Renderer::createStagedBuffer(VkBuffer& buffer,
                          physicalDevice,
                          logicalDevice);
 
-  void* data;
+  void* data {};
   vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
   std::memcpy(data, bufferData, bufferSize);
   vkUnmapMemory(logicalDevice, stagingBufferMemory);
@@ -1252,7 +1252,7 @@ void Renderer::copyBuffer(VkBuffer srcBuffer,
   allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
   allocInfo.commandBufferCount = 1;
 
-  VkCommandBuffer commandBuffer;
+  VkCommandBuffer commandBuffer {};
   vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
 
   VkCommandBufferBeginInfo beginInfo {};
@@ -1332,7 +1332,7 @@ void Renderer::recreateSwapchain() {
 void Renderer::drawFrame() {
   vkWaitForFences(m_logicalDevice, 1, &m_inFlightFences[m_currentFrameIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
-  uint32_t imageIndex;
+  uint32_t imageIndex {};
   const VkResult imageResult = vkAcquireNextImageKHR(m_logicalDevice,
                                                      m_swapchain,
                                                      std::numeric_limits<uint64_t>::max(),

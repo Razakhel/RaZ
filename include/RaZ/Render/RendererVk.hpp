@@ -219,6 +219,7 @@ public:
                                         DescriptorType descriptorType,
                                         ShaderStage shaderStageFlags,
                                         VkDevice logicalDevice);
+  static void createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice);
   static void createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,
