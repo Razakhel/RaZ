@@ -9,6 +9,7 @@
 
 #include <array>
 #include <cstddef>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <vector>
@@ -220,6 +221,17 @@ public:
                                         ShaderStage shaderStageFlags,
                                         VkDevice logicalDevice);
   static void createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice);
+  static void destroyShaderModule(VkShaderModule shaderModule, VkDevice logicalDevice);
+  static void createPipelineLayout(VkPipelineLayout& pipelineLayout,
+                                   uint32_t descriptorSetLayoutCount,
+                                   const VkDescriptorSetLayout* descriptorSetLayouts,
+                                   uint32_t pushConstantRangeCount,
+                                   const VkPushConstantRange* pushConstantRanges,
+                                   VkDevice logicalDevice);
+  static void createPipelineLayout(VkPipelineLayout& pipelineLayout,
+                                   std::initializer_list<VkDescriptorSetLayout> descriptorSetLayouts,
+                                   std::initializer_list<VkPushConstantRange> pushConstantRanges,
+                                   VkDevice logicalDevice);
   static void createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,
