@@ -424,24 +424,20 @@ inline void createImageViews(std::vector<VkImageView>& swapchainImageViews,
   swapchainImageViews.resize(swapchainImages.size());
 
   for (std::size_t i = 0; i < swapchainImages.size(); ++i) {
-    VkImageViewCreateInfo imageViewCreateInfo {};
-    imageViewCreateInfo.sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-    imageViewCreateInfo.image        = swapchainImages[i];
-    imageViewCreateInfo.viewType     = VK_IMAGE_VIEW_TYPE_2D;
-    imageViewCreateInfo.format       = swapchainImageFormat;
-    imageViewCreateInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-    imageViewCreateInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-    imageViewCreateInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-    imageViewCreateInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-
-    imageViewCreateInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
-    imageViewCreateInfo.subresourceRange.baseMipLevel   = 0;
-    imageViewCreateInfo.subresourceRange.levelCount     = 1;
-    imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-    imageViewCreateInfo.subresourceRange.layerCount     = 1;
-
-    if (vkCreateImageView(logicalDevice, &imageViewCreateInfo, nullptr, &swapchainImageViews[i]) != VK_SUCCESS)
-      throw std::runtime_error("Error: Failed to create an image view.");
+    Renderer::createImageView(swapchainImageViews[i],
+                              swapchainImages[i],
+                              ImageViewType::IMAGE_2D,
+                              swapchainImageFormat,
+                              ComponentSwizzle::IDENTITY,
+                              ComponentSwizzle::IDENTITY,
+                              ComponentSwizzle::IDENTITY,
+                              ComponentSwizzle::IDENTITY,
+                              ImageAspect::COLOR,
+                              0,
+                              1,
+                              0,
+                              1,
+                              logicalDevice);
   }
 }
 
@@ -1141,6 +1137,40 @@ void Renderer::createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLay
 
   if (vkCreateDescriptorSetLayout(logicalDevice, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
     throw std::runtime_error("Error: Failed to create a descriptor set layout.");
+}
+
+void Renderer::createImageView(VkImageView& imageView,
+                               VkImage image,
+                               ImageViewType imageViewType,
+                               VkFormat imageFormat,
+                               ComponentSwizzle redComp,
+                               ComponentSwizzle greenComp,
+                               ComponentSwizzle blueComp,
+                               ComponentSwizzle alphaComp,
+                               ImageAspect imageAspect,
+                               uint32_t firstMipLevel,
+                               uint32_t mipLevelCount,
+                               uint32_t firstArrayLayer,
+                               uint32_t arrayLayerCount,
+                               VkDevice logicalDevice) {
+  VkImageViewCreateInfo imageViewCreateInfo {};
+  imageViewCreateInfo.sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  imageViewCreateInfo.image        = image;
+  imageViewCreateInfo.viewType     = static_cast<VkImageViewType>(imageViewType);
+  imageViewCreateInfo.format       = imageFormat;
+  imageViewCreateInfo.components.r = static_cast<VkComponentSwizzle>(redComp);
+  imageViewCreateInfo.components.g = static_cast<VkComponentSwizzle>(greenComp);
+  imageViewCreateInfo.components.b = static_cast<VkComponentSwizzle>(blueComp);
+  imageViewCreateInfo.components.a = static_cast<VkComponentSwizzle>(alphaComp);
+
+  imageViewCreateInfo.subresourceRange.aspectMask     = static_cast<VkImageAspectFlags>(imageAspect);
+  imageViewCreateInfo.subresourceRange.baseMipLevel   = firstMipLevel;
+  imageViewCreateInfo.subresourceRange.levelCount     = mipLevelCount;
+  imageViewCreateInfo.subresourceRange.baseArrayLayer = firstArrayLayer;
+  imageViewCreateInfo.subresourceRange.layerCount     = arrayLayerCount;
+
+  if (vkCreateImageView(logicalDevice, &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create an image view.");
 }
 
 void Renderer::createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice) {

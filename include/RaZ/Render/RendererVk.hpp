@@ -45,6 +45,41 @@ enum class ShaderStage : uint32_t {
 };
 MAKE_ENUM_FLAG(ShaderStage)
 
+enum class ImageViewType : uint32_t {
+   IMAGE_1D   = 0 /* VK_IMAGE_VIEW_TYPE_1D         */, ///< One-dimensional image.
+   IMAGE_2D   = 1 /* VK_IMAGE_VIEW_TYPE_2D         */, ///< Two-dimensional image.
+   IMAGE_3D   = 2 /* VK_IMAGE_VIEW_TYPE_3D         */, ///< Three-dimensional image.
+   CUBE       = 3 /* VK_IMAGE_VIEW_TYPE_CUBE       */, ///< Cubic image.
+   ARRAY_1D   = 4 /* VK_IMAGE_VIEW_TYPE_1D_ARRAY   */, ///< One-dimensional array image.
+   ARRAY_2D   = 5 /* VK_IMAGE_VIEW_TYPE_2D_ARRAY   */, ///< Two-dimensional array image.
+   CUBE_ARRAY = 6 /* VK_IMAGE_VIEW_TYPE_CUBE_ARRAY */  ///< Cubic array image.
+};
+
+enum class ComponentSwizzle : uint32_t {
+   IDENTITY = 0 /* VK_COMPONENT_SWIZZLE_IDENTITY */, ///<
+   ZERO     = 1 /* VK_COMPONENT_SWIZZLE_ZERO     */, ///<
+   ONE      = 2 /* VK_COMPONENT_SWIZZLE_ONE      */, ///<
+   RED      = 3 /* VK_COMPONENT_SWIZZLE_R        */, ///<
+   GREEN    = 4 /* VK_COMPONENT_SWIZZLE_G        */, ///<
+   BLUE     = 5 /* VK_COMPONENT_SWIZZLE_B        */, ///<
+   ALPHA    = 6 /* VK_COMPONENT_SWIZZLE_A        */  ///<
+};
+
+enum class ImageAspect : uint32_t {
+   COLOR          = 1    /* VK_IMAGE_ASPECT_COLOR_BIT              */, ///<
+   DEPTH          = 2    /* VK_IMAGE_ASPECT_DEPTH_BIT              */, ///<
+   STENCIL        = 4    /* VK_IMAGE_ASPECT_STENCIL_BIT            */, ///<
+   METADATA       = 8    /* VK_IMAGE_ASPECT_METADATA_BIT           */, ///<
+   PLANE_0        = 16   /* VK_IMAGE_ASPECT_PLANE_0_BIT            */, ///<
+   PLANE_1        = 32   /* VK_IMAGE_ASPECT_PLANE_1_BIT            */, ///<
+   PLANE_2        = 64   /* VK_IMAGE_ASPECT_PLANE_2_BIT            */, ///<
+   MEMORY_PLANE_0 = 128  /* VK_IMAGE_ASPECT_PLANE_0_BIT_KHR        */, ///<
+   MEMORY_PLANE_1 = 256  /* VK_IMAGE_ASPECT_PLANE_1_BIT_KHR        */, ///<
+   MEMORY_PLANE_2 = 512  /* VK_IMAGE_ASPECT_PLANE_2_BIT_KHR        */, ///<
+   MEMORY_PLANE_3 = 1024 /* VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT */  ///<
+};
+MAKE_ENUM_FLAG(ImageAspect)
+
 enum class CommandPoolOption : uint32_t {
   TRANSIENT            = 1 /* VK_COMMAND_POOL_CREATE_TRANSIENT_BIT            */, ///<
   RESET_COMMAND_BUFFER = 2 /* VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT */, ///<
@@ -220,6 +255,20 @@ public:
                                         DescriptorType descriptorType,
                                         ShaderStage shaderStageFlags,
                                         VkDevice logicalDevice);
+  static void createImageView(VkImageView& imageView,
+                              VkImage image,
+                              ImageViewType imageViewType,
+                              VkFormat imageFormat,
+                              ComponentSwizzle redComp,
+                              ComponentSwizzle greenComp,
+                              ComponentSwizzle blueComp,
+                              ComponentSwizzle alphaComp,
+                              ImageAspect imageAspect,
+                              uint32_t firstMipLevel,
+                              uint32_t mipLevelCount,
+                              uint32_t firstArrayLayer,
+                              uint32_t arrayLayerCount,
+                              VkDevice logicalDevice);
   static void createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice);
   static void destroyShaderModule(VkShaderModule shaderModule, VkDevice logicalDevice);
   static void createPipelineLayout(VkPipelineLayout& pipelineLayout,
