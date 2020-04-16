@@ -26,57 +26,57 @@ enum class CullingMode : uint32_t {
 };
 
 enum class ShaderStage : uint32_t {
-   VERTEX                  = 1          /* VK_SHADER_STAGE_VERTEX_BIT                  */, ///< Vertex shader stage.
-   TESSELLATION_CONTROL    = 2          /* VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT    */, ///< Tesselation control shader stage.
-   TESSELLATION_EVALUATION = 4          /* VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT */, ///< Tesselation evualuation shader stage.
-   GEOMETRY                = 8          /* VK_SHADER_STAGE_GEOMETRY_BIT                */, ///< Geometry shader stage.
-   FRAGMENT                = 16         /* VK_SHADER_STAGE_FRAGMENT_BIT                */, ///< Fragment shader stage.
-   COMPUTE                 = 32         /* VK_SHADER_STAGE_COMPUTE_BIT                 */, ///< Compute shader stage.
-   ALL_GRAPHICS            = 31         /* VK_SHADER_STAGE_ALL_GRAPHICS                */, ///< All graphic shader stages.
-   ALL                     = 2147483647 /* VK_SHADER_STAGE_ALL                         */, ///< All shader stages.
-   RAYGEN                  = 256        /* VK_SHADER_STAGE_RAYGEN_BIT_KHR              */, ///< Raygen shader stage.
-   ANY_HIT                 = 512        /* VK_SHADER_STAGE_ANY_HIT_BIT_KHR             */, ///< Any hit shader stage.
-   CLOSEST_HIT             = 1024       /* VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR         */, ///< Closest hit shader stage.
-   MISS                    = 2048       /* VK_SHADER_STAGE_MISS_BIT_KHR                */, ///< Miss shader stage.
-   INTERSECTION            = 4096       /* VK_SHADER_STAGE_INTERSECTION_BIT_KHR        */, ///< Intersection shader stage.
-   CALLABLE                = 8192       /* VK_SHADER_STAGE_CALLABLE_BIT_KHR            */, ///< Callable shader stage.
-   TASK_NV                 = 64         /* VK_SHADER_STAGE_TASK_BIT_NV                 */, ///< Task shader stage (NVidia specific).
-   MESH_NV                 = 128        /* VK_SHADER_STAGE_MESH_BIT_NV                 */  ///< Mesh shader stage (NVidia specific).
+  VERTEX                  = 1          /* VK_SHADER_STAGE_VERTEX_BIT                  */, ///< Vertex shader stage.
+  TESSELLATION_CONTROL    = 2          /* VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT    */, ///< Tesselation control shader stage.
+  TESSELLATION_EVALUATION = 4          /* VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT */, ///< Tesselation evualuation shader stage.
+  GEOMETRY                = 8          /* VK_SHADER_STAGE_GEOMETRY_BIT                */, ///< Geometry shader stage.
+  FRAGMENT                = 16         /* VK_SHADER_STAGE_FRAGMENT_BIT                */, ///< Fragment shader stage.
+  COMPUTE                 = 32         /* VK_SHADER_STAGE_COMPUTE_BIT                 */, ///< Compute shader stage.
+  ALL_GRAPHICS            = 31         /* VK_SHADER_STAGE_ALL_GRAPHICS                */, ///< All graphic shader stages.
+  ALL                     = 2147483647 /* VK_SHADER_STAGE_ALL                         */, ///< All shader stages.
+  RAYGEN                  = 256        /* VK_SHADER_STAGE_RAYGEN_BIT_KHR              */, ///< Raygen shader stage.
+  ANY_HIT                 = 512        /* VK_SHADER_STAGE_ANY_HIT_BIT_KHR             */, ///< Any hit shader stage.
+  CLOSEST_HIT             = 1024       /* VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR         */, ///< Closest hit shader stage.
+  MISS                    = 2048       /* VK_SHADER_STAGE_MISS_BIT_KHR                */, ///< Miss shader stage.
+  INTERSECTION            = 4096       /* VK_SHADER_STAGE_INTERSECTION_BIT_KHR        */, ///< Intersection shader stage.
+  CALLABLE                = 8192       /* VK_SHADER_STAGE_CALLABLE_BIT_KHR            */, ///< Callable shader stage.
+  TASK_NV                 = 64         /* VK_SHADER_STAGE_TASK_BIT_NV                 */, ///< Task shader stage (NVidia specific).
+  MESH_NV                 = 128        /* VK_SHADER_STAGE_MESH_BIT_NV                 */  ///< Mesh shader stage (NVidia specific).
 };
 MAKE_ENUM_FLAG(ShaderStage)
 
 enum class ImageViewType : uint32_t {
-   IMAGE_1D   = 0 /* VK_IMAGE_VIEW_TYPE_1D         */, ///< One-dimensional image.
-   IMAGE_2D   = 1 /* VK_IMAGE_VIEW_TYPE_2D         */, ///< Two-dimensional image.
-   IMAGE_3D   = 2 /* VK_IMAGE_VIEW_TYPE_3D         */, ///< Three-dimensional image.
-   CUBE       = 3 /* VK_IMAGE_VIEW_TYPE_CUBE       */, ///< Cubic image.
-   ARRAY_1D   = 4 /* VK_IMAGE_VIEW_TYPE_1D_ARRAY   */, ///< One-dimensional array image.
-   ARRAY_2D   = 5 /* VK_IMAGE_VIEW_TYPE_2D_ARRAY   */, ///< Two-dimensional array image.
-   CUBE_ARRAY = 6 /* VK_IMAGE_VIEW_TYPE_CUBE_ARRAY */  ///< Cubic array image.
+  IMAGE_1D   = 0 /* VK_IMAGE_VIEW_TYPE_1D         */, ///< One-dimensional image view.
+  IMAGE_2D   = 1 /* VK_IMAGE_VIEW_TYPE_2D         */, ///< Two-dimensional image view.
+  IMAGE_3D   = 2 /* VK_IMAGE_VIEW_TYPE_3D         */, ///< Three-dimensional image view.
+  CUBE       = 3 /* VK_IMAGE_VIEW_TYPE_CUBE       */, ///< Cubic image view.
+  ARRAY_1D   = 4 /* VK_IMAGE_VIEW_TYPE_1D_ARRAY   */, ///< One-dimensional array image view.
+  ARRAY_2D   = 5 /* VK_IMAGE_VIEW_TYPE_2D_ARRAY   */, ///< Two-dimensional array image view.
+  CUBE_ARRAY = 6 /* VK_IMAGE_VIEW_TYPE_CUBE_ARRAY */  ///< Cubic array image view.
 };
 
 enum class ComponentSwizzle : uint32_t {
-   IDENTITY = 0 /* VK_COMPONENT_SWIZZLE_IDENTITY */, ///<
-   ZERO     = 1 /* VK_COMPONENT_SWIZZLE_ZERO     */, ///<
-   ONE      = 2 /* VK_COMPONENT_SWIZZLE_ONE      */, ///<
-   RED      = 3 /* VK_COMPONENT_SWIZZLE_R        */, ///<
-   GREEN    = 4 /* VK_COMPONENT_SWIZZLE_G        */, ///<
-   BLUE     = 5 /* VK_COMPONENT_SWIZZLE_B        */, ///<
-   ALPHA    = 6 /* VK_COMPONENT_SWIZZLE_A        */  ///<
+  IDENTITY = 0 /* VK_COMPONENT_SWIZZLE_IDENTITY */, ///<
+  ZERO     = 1 /* VK_COMPONENT_SWIZZLE_ZERO     */, ///<
+  ONE      = 2 /* VK_COMPONENT_SWIZZLE_ONE      */, ///<
+  RED      = 3 /* VK_COMPONENT_SWIZZLE_R        */, ///<
+  GREEN    = 4 /* VK_COMPONENT_SWIZZLE_G        */, ///<
+  BLUE     = 5 /* VK_COMPONENT_SWIZZLE_B        */, ///<
+  ALPHA    = 6 /* VK_COMPONENT_SWIZZLE_A        */  ///<
 };
 
 enum class ImageAspect : uint32_t {
-   COLOR          = 1    /* VK_IMAGE_ASPECT_COLOR_BIT              */, ///<
-   DEPTH          = 2    /* VK_IMAGE_ASPECT_DEPTH_BIT              */, ///<
-   STENCIL        = 4    /* VK_IMAGE_ASPECT_STENCIL_BIT            */, ///<
-   METADATA       = 8    /* VK_IMAGE_ASPECT_METADATA_BIT           */, ///<
-   PLANE_0        = 16   /* VK_IMAGE_ASPECT_PLANE_0_BIT            */, ///<
-   PLANE_1        = 32   /* VK_IMAGE_ASPECT_PLANE_1_BIT            */, ///<
-   PLANE_2        = 64   /* VK_IMAGE_ASPECT_PLANE_2_BIT            */, ///<
-   MEMORY_PLANE_0 = 128  /* VK_IMAGE_ASPECT_PLANE_0_BIT_KHR        */, ///<
-   MEMORY_PLANE_1 = 256  /* VK_IMAGE_ASPECT_PLANE_1_BIT_KHR        */, ///<
-   MEMORY_PLANE_2 = 512  /* VK_IMAGE_ASPECT_PLANE_2_BIT_KHR        */, ///<
-   MEMORY_PLANE_3 = 1024 /* VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT */  ///<
+  COLOR          = 1    /* VK_IMAGE_ASPECT_COLOR_BIT              */, ///<
+  DEPTH          = 2    /* VK_IMAGE_ASPECT_DEPTH_BIT              */, ///<
+  STENCIL        = 4    /* VK_IMAGE_ASPECT_STENCIL_BIT            */, ///<
+  METADATA       = 8    /* VK_IMAGE_ASPECT_METADATA_BIT           */, ///<
+  PLANE_0        = 16   /* VK_IMAGE_ASPECT_PLANE_0_BIT            */, ///<
+  PLANE_1        = 32   /* VK_IMAGE_ASPECT_PLANE_1_BIT            */, ///<
+  PLANE_2        = 64   /* VK_IMAGE_ASPECT_PLANE_2_BIT            */, ///<
+  MEMORY_PLANE_0 = 128  /* VK_IMAGE_ASPECT_PLANE_0_BIT_KHR        */, ///<
+  MEMORY_PLANE_1 = 256  /* VK_IMAGE_ASPECT_PLANE_1_BIT_KHR        */, ///<
+  MEMORY_PLANE_2 = 512  /* VK_IMAGE_ASPECT_PLANE_2_BIT_KHR        */, ///<
+  MEMORY_PLANE_3 = 1024 /* VK_IMAGE_ASPECT_MEMORY_PLANE_3_BIT_EXT */  ///<
 };
 MAKE_ENUM_FLAG(ImageAspect)
 
@@ -86,6 +86,69 @@ enum class CommandPoolOption : uint32_t {
   PROTECTED            = 4 /* VK_COMMAND_POOL_CREATE_PROTECTED_BIT            */  ///<
 };
 MAKE_ENUM_FLAG(CommandPoolOption)
+
+enum class ImageType : uint32_t {
+  IMAGE_1D = 0 /* VK_IMAGE_TYPE_1D */, ///< One-dimensional image.
+  IMAGE_2D = 1 /* VK_IMAGE_TYPE_2D */, ///< Two-dimensional image.
+  IMAGE_3D = 2 /* VK_IMAGE_TYPE_3D */  ///< Three-dimensional image.
+};
+
+enum class SampleCount : uint32_t {
+  ONE        = 1  /* VK_SAMPLE_COUNT_1_BIT  */, ///< One sample per pixel.
+  TWO        = 2  /* VK_SAMPLE_COUNT_2_BIT  */, ///< Two samples per pixel.
+  FOUR       = 4  /* VK_SAMPLE_COUNT_4_BIT  */, ///< Four samples per pixel.
+  EIGHT      = 8  /* VK_SAMPLE_COUNT_8_BIT  */, ///< Eight samples per pixel.
+  SIXTEEN    = 16 /* VK_SAMPLE_COUNT_16_BIT */, ///< Sixteen samples per pixel.
+  THIRTY_TWO = 32 /* VK_SAMPLE_COUNT_32_BIT */, ///< Thirty-two samples per pixel.
+  SIXTY_FOUR = 64 /* VK_SAMPLE_COUNT_64_BIT */  ///< Sixty-four samples per pixel.
+};
+
+enum class ImageTiling : uint32_t {
+  OPTIMAL             = 0          /* VK_IMAGE_TILING_OPTIMAL                 */, ///<
+  LINEAR              = 1          /* VK_IMAGE_TILING_LINEAR                  */, ///<
+  DRM_FORMAT_MODIFIER = 1000158000 /* VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT */  ///<
+};
+
+enum class ImageUsage : uint32_t {
+  TRANSFER_SRC             = 1   /* VK_IMAGE_USAGE_TRANSFER_SRC_BIT             */, ///< Transfer command source.
+  TRANSFER_DST             = 2   /* VK_IMAGE_USAGE_TRANSFER_DST_BIT             */, ///< Transfer command destination.
+  SAMPLED                  = 4   /* VK_IMAGE_USAGE_SAMPLED_BIT                  */, ///< Sampled (in shaders).
+  STORAGE                  = 8   /* VK_IMAGE_USAGE_STORAGE_BIT                  */, ///< Storage.
+  COLOR_ATTACHMENT         = 16  /* VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT         */, ///< Color attachment.
+  DEPTH_STENCIL_ATTACHMENT = 32  /* VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT */, ///< Depth & stencil attachment.
+  TRANSIENT_ATTACHMENT     = 64  /* VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT     */, ///< Transient attachment.
+  INPUT_ATTACHMENT         = 128 /* VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT         */, ///< Input attachment.
+  SHADING_RATE_IMAGE_NV    = 256 /* VK_IMAGE_USAGE_SHADING_RATE_IMAGE_BIT_NV    */, ///< Shading rate (NVidia specific).
+  FRAGMENT_DENSITY_MAP     = 512 /* VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT */  ///< Fragment density map.
+};
+MAKE_ENUM_FLAG(ImageUsage)
+
+enum class SharingMode : uint32_t {
+  EXCLUSIVE  = 0 /* VK_SHARING_MODE_EXCLUSIVE  */, ///< Exclusive sharing mode.
+  CONCURRENT = 1 /* VK_SHARING_MODE_CONCURRENT */  ///< Concurrent sharing mode.
+};
+
+enum class ImageLayout : uint32_t {
+  UNDEFINED                          = 0          /* VK_IMAGE_LAYOUT_UNDEFINED                                  */, ///< Undefined.
+  GENERAL                            = 1          /* VK_IMAGE_LAYOUT_GENERAL                                    */, ///< General.
+  COLOR_ATTACHMENT                   = 2          /* VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL                   */, ///< Color attachment.
+  DEPTH_STENCIL_ATTACHMENT           = 3          /* VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL           */, ///< Depth & stencil attachment.
+  DEPTH_STENCIL_READ_ONLY            = 4          /* VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL            */, ///< Read-only depth & read-only stencil.
+  SHADER_READ_ONLY                   = 5          /* VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL                   */, ///< Read-only shader.
+  TRANSFER_SRC                       = 6          /* VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL                       */, ///< Transfer command source.
+  TRANSFER_DST                       = 7          /* VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL                       */, ///< Transfer command destination.
+  PREINITIALIZED                     = 8          /* VK_IMAGE_LAYOUT_PREINITIALIZED                             */, ///< Preinitialized.
+  DEPTH_READ_ONLY_STENCIL_ATTACHMENT = 1000117000 /* VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL */, ///< Read-only depth & stencil.
+  DEPTH_ATTACHMENT_STENCIL_READ_ONLY = 1000117001 /* VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL */, ///< Depth & read-only stencil.
+  DEPTH_ATTACHMENT                   = 1000241000 /* VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL                   */, ///< Depth attachment.
+  DEPTH_READ_ONLY                    = 1000241001 /* VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_OPTIMAL                    */, ///< Read-only depth attachment.
+  STENCIL_ATTACHMENT                 = 1000241002 /* VK_IMAGE_LAYOUT_STENCIL_ATTACHMENT_OPTIMAL                 */, ///< Stencil attachment.
+  STENCIL_READ_ONLY                  = 1000241003 /* VK_IMAGE_LAYOUT_STENCIL_READ_ONLY_OPTIMAL                  */, ///< Read-only stencil attachment.
+  PRESENT_SRC                        = 1000001002 /* VK_IMAGE_LAYOUT_PRESENT_SRC_KHR                            */, ///< Source presentation.
+  SHARED_PRESENT                     = 1000111000 /* VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR                         */, ///< Shared presentation.
+  SHADING_RATE                       = 1000164003 /* VK_IMAGE_LAYOUT_SHADING_RATE_OPTIMAL_NV                    */, ///< Shading rate.
+  FRAGMENT_DENSITY_MAP               = 1000218000 /* VK_IMAGE_LAYOUT_FRAGMENT_DENSITY_MAP_OPTIMAL_EXT           */  ///< Fragment density map.
+};
 
 enum class BufferUsage : uint32_t {
   TRANSFER_SRC               = 1      /* VK_BUFFER_USAGE_TRANSFER_SRC_BIT                          */, ///< Memory transfer source buffer.
@@ -118,19 +181,19 @@ enum class MemoryProperty : uint32_t {
 MAKE_ENUM_FLAG(MemoryProperty)
 
 enum class DescriptorType : uint32_t {
-   SAMPLER                  = 0          /* VK_DESCRIPTOR_TYPE_SAMPLER                    */, ///<
-   COMBINED_IMAGE_SAMPLER   = 1          /* VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER     */, ///<
-   SAMPLED_IMAGE            = 2          /* VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE              */, ///<
-   STORAGE_IMAGE            = 3          /* VK_DESCRIPTOR_TYPE_STORAGE_IMAGE              */, ///<
-   UNIFORM_TEXEL_BUFFER     = 4          /* VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER       */, ///<
-   STORAGE_TEXEL_BUFFER     = 5          /* VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER       */, ///<
-   UNIFORM_BUFFER           = 6          /* VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER             */, ///<
-   STORAGE_BUFFER           = 7          /* VK_DESCRIPTOR_TYPE_STORAGE_BUFFER             */, ///<
-   UNIFORM_BUFFER_DYNAMIC   = 8          /* VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC     */, ///<
-   STORAGE_BUFFER_DYNAMIC   = 9          /* VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC     */, ///<
-   INPUT_ATTACHMENT         = 10         /* VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT           */, ///<
-   INLINE_UNIFORM_BLOCK_EXT = 1000138000 /* VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT   */, ///<
-   ACCELERATION_STRUCTURE   = 1000165000 /* VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR */  ///<
+  SAMPLER                  = 0          /* VK_DESCRIPTOR_TYPE_SAMPLER                    */, ///<
+  COMBINED_IMAGE_SAMPLER   = 1          /* VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER     */, ///<
+  SAMPLED_IMAGE            = 2          /* VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE              */, ///<
+  STORAGE_IMAGE            = 3          /* VK_DESCRIPTOR_TYPE_STORAGE_IMAGE              */, ///<
+  UNIFORM_TEXEL_BUFFER     = 4          /* VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER       */, ///<
+  STORAGE_TEXEL_BUFFER     = 5          /* VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER       */, ///<
+  UNIFORM_BUFFER           = 6          /* VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER             */, ///<
+  STORAGE_BUFFER           = 7          /* VK_DESCRIPTOR_TYPE_STORAGE_BUFFER             */, ///<
+  UNIFORM_BUFFER_DYNAMIC   = 8          /* VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC     */, ///<
+  STORAGE_BUFFER_DYNAMIC   = 9          /* VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC     */, ///<
+  INPUT_ATTACHMENT         = 10         /* VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT           */, ///<
+  INLINE_UNIFORM_BLOCK_EXT = 1000138000 /* VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT   */, ///<
+  ACCELERATION_STRUCTURE   = 1000165000 /* VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR */  ///<
 };
 
 // TODO: temporary GL enums to allow compilation
@@ -282,6 +345,21 @@ public:
                                    std::initializer_list<VkPushConstantRange> pushConstantRanges,
                                    VkDevice logicalDevice);
   static void createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice);
+  static void createImage(VkImage& image,
+                          VkDeviceMemory& imageMemory,
+                          ImageType imgType,
+                          uint32_t imgWidth,
+                          uint32_t imgHeight,
+                          uint32_t imgDepth,
+                          uint32_t mipLevelCount,
+                          uint32_t arrayLayerCount,
+                          SampleCount sampleCount,
+                          ImageTiling imgTiling,
+                          ImageUsage imgUsage,
+                          SharingMode sharingMode,
+                          ImageLayout initialLayout,
+                          VkPhysicalDevice physicalDevice,
+                          VkDevice logicalDevice);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,
                            BufferUsage usageFlags,
