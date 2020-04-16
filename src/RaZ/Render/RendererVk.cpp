@@ -655,7 +655,7 @@ inline void createFramebuffers(std::vector<VkFramebuffer>& swapchainFramebuffers
 // Buffers //
 /////////////
 
-inline uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, MemoryProperty properties) {
+inline uint32_t findMemoryType(MemoryProperty properties, uint32_t typeFilter, VkPhysicalDevice physicalDevice) {
   VkPhysicalDeviceMemoryProperties memProperties;
   vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
@@ -1226,6 +1226,57 @@ void Renderer::createCommandPool(VkCommandPool& commandPool, CommandPoolOption o
     throw std::runtime_error("Error: Failed to create a command pool.");
 }
 
+void Renderer::createImage(VkImage& image,
+                           VkDeviceMemory& imageMemory,
+                           ImageType imgType,
+                           uint32_t imgWidth,
+                           uint32_t imgHeight,
+                           uint32_t imgDepth,
+                           uint32_t mipLevelCount,
+                           uint32_t arrayLayerCount,
+                           SampleCount sampleCount,
+                           ImageTiling imgTiling,
+                           ImageUsage imgUsage,
+                           SharingMode sharingMode,
+                           ImageLayout initialLayout,
+                           VkPhysicalDevice physicalDevice,
+                           VkDevice logicalDevice) {
+  assert("Error: A 1D image must have both an height and a depth of 1." && (imgType != ImageType::IMAGE_1D || (imgHeight == 1 && imgDepth == 1)));
+  assert("Error: A 2D image must have a depth of 1." && (imgType != ImageType::IMAGE_2D || imgDepth == 1));
+
+  VkImageCreateInfo imageInfo {};
+  imageInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+  imageInfo.flags         = 0;
+  imageInfo.imageType     = static_cast<VkImageType>(imgType);
+  imageInfo.format        = VK_FORMAT_R8G8B8A8_SRGB;
+  imageInfo.extent.width  = imgWidth;
+  imageInfo.extent.height = imgHeight;
+  imageInfo.extent.depth  = imgDepth;
+  imageInfo.mipLevels     = mipLevelCount;
+  imageInfo.arrayLayers   = arrayLayerCount;
+  imageInfo.samples       = static_cast<VkSampleCountFlagBits>(sampleCount);
+  imageInfo.tiling        = static_cast<VkImageTiling>(imgTiling);
+  imageInfo.usage         = static_cast<VkImageUsageFlags>(imgUsage);
+  imageInfo.sharingMode   = static_cast<VkSharingMode>(sharingMode);
+  imageInfo.initialLayout = static_cast<VkImageLayout>(initialLayout);
+
+  if (vkCreateImage(logicalDevice, &imageInfo, nullptr, &image) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create an image.");
+
+  VkMemoryRequirements memRequirements;
+  vkGetImageMemoryRequirements(logicalDevice, image, &memRequirements);
+
+  VkMemoryAllocateInfo allocInfo {};
+  allocInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+  allocInfo.allocationSize  = memRequirements.size;
+  allocInfo.memoryTypeIndex = findMemoryType(MemoryProperty::DEVICE_LOCAL, memRequirements.memoryTypeBits, physicalDevice);
+
+  if (vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to allocate image memory.");
+
+  vkBindImageMemory(logicalDevice, image, imageMemory, 0);
+}
+
 void Renderer::createBuffer(VkBuffer& buffer,
                             VkDeviceMemory& bufferMemory,
                             BufferUsage usageFlags,
@@ -1248,7 +1299,7 @@ void Renderer::createBuffer(VkBuffer& buffer,
   VkMemoryAllocateInfo allocInfo {};
   allocInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   allocInfo.allocationSize  = memRequirements.size;
-  allocInfo.memoryTypeIndex = findMemoryType(physicalDevice, memRequirements.memoryTypeBits, propertyFlags);
+  allocInfo.memoryTypeIndex = findMemoryType(propertyFlags, memRequirements.memoryTypeBits, physicalDevice);
 
   if (vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
     throw std::runtime_error("Error: Failed to allocate a buffer's memory.");
