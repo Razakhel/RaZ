@@ -180,6 +180,18 @@ enum class MemoryProperty : uint32_t {
 };
 MAKE_ENUM_FLAG(MemoryProperty)
 
+enum class CommandBufferLevel : uint32_t {
+  PRIMARY   = 0 /* VK_COMMAND_BUFFER_LEVEL_PRIMARY   */, ///<
+  SECONDARY = 1 /* VK_COMMAND_BUFFER_LEVEL_SECONDARY */  ///<
+};
+
+enum class CommandBufferUsage : uint32_t {
+  ONE_TIME_SUBMIT      = 1 /* VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT      */, ///<
+  RENDER_PASS_CONTINUE = 2 /* VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT */, ///<
+  SIMULTANEOUS_USE     = 4 /* VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT     */  ///<
+};
+MAKE_ENUM_FLAG(CommandBufferUsage)
+
 enum class DescriptorType : uint32_t {
   SAMPLER                  = 0          /* VK_DESCRIPTOR_TYPE_SAMPLER                    */, ///<
   COMBINED_IMAGE_SAMPLER   = 1          /* VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER     */, ///<
@@ -379,9 +391,15 @@ public:
   static void copyBuffer(VkBuffer srcBuffer,
                          VkBuffer dstBuffer,
                          VkDeviceSize bufferSize,
-                         VkDevice logicalDevice,
+                         VkCommandPool commandPool,
                          VkQueue queue,
-                         VkCommandPool commandPool);
+                         VkDevice logicalDevice);
+  static void beginCommandBuffer(VkCommandBuffer& commandBuffer,
+                                 VkCommandPool commandPool,
+                                 CommandBufferLevel commandBufferLevel,
+                                 CommandBufferUsage commandBufferUsage,
+                                 VkDevice logicalDevice);
+  static void endCommandBuffer(VkCommandBuffer& commandBuffer, VkQueue queue, VkCommandPool commandPool, VkDevice logicalDevice);
   static void createDescriptorPool(VkDescriptorPool& descriptorPool, DescriptorType descriptorType, uint32_t descriptorCount, VkDevice logicalDevice);
 
   static void recreateSwapchain();
