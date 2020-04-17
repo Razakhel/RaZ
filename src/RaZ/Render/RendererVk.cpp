@@ -1340,7 +1340,7 @@ void Renderer::createStagedBuffer(VkBuffer& buffer,
                          physicalDevice,
                          logicalDevice);
 
-  Renderer::copyBuffer(stagingBuffer, buffer, bufferSize, logicalDevice, queue, commandPool);
+  Renderer::copyBuffer(stagingBuffer, buffer, bufferSize, commandPool, queue, logicalDevice);
 
   vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
   vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
@@ -1349,23 +1349,11 @@ void Renderer::createStagedBuffer(VkBuffer& buffer,
 void Renderer::copyBuffer(VkBuffer srcBuffer,
                           VkBuffer dstBuffer,
                           VkDeviceSize bufferSize,
-                          VkDevice logicalDevice,
+                          VkCommandPool commandPool,
                           VkQueue queue,
-                          VkCommandPool commandPool) {
-  VkCommandBufferAllocateInfo allocInfo {};
-  allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-  allocInfo.commandPool        = commandPool;
-  allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  allocInfo.commandBufferCount = 1;
-
+                          VkDevice logicalDevice) {
   VkCommandBuffer commandBuffer {};
-  vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
-
-  VkCommandBufferBeginInfo beginInfo {};
-  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-  beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+  Renderer::beginCommandBuffer(commandBuffer, commandPool, CommandBufferLevel::PRIMARY, CommandBufferUsage::ONE_TIME_SUBMIT, logicalDevice);
 
   VkBufferCopy copyRegion {};
   copyRegion.srcOffset = 0;
@@ -1373,6 +1361,30 @@ void Renderer::copyBuffer(VkBuffer srcBuffer,
   copyRegion.size      = bufferSize;
   vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
+  Renderer::endCommandBuffer(commandBuffer, queue, commandPool, logicalDevice);
+}
+
+void Renderer::beginCommandBuffer(VkCommandBuffer& commandBuffer,
+                                  VkCommandPool commandPool,
+                                  CommandBufferLevel commandBufferLevel,
+                                  CommandBufferUsage commandBufferUsage,
+                                  VkDevice logicalDevice) {
+  VkCommandBufferAllocateInfo allocInfo {};
+  allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  allocInfo.commandPool        = commandPool;
+  allocInfo.level              = static_cast<VkCommandBufferLevel>(commandBufferLevel);
+  allocInfo.commandBufferCount = 1;
+
+  vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
+
+  VkCommandBufferBeginInfo beginInfo {};
+  beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+  beginInfo.flags = static_cast<VkCommandBufferUsageFlags>(commandBufferUsage);
+
+  vkBeginCommandBuffer(commandBuffer, &beginInfo);
+}
+
+void Renderer::endCommandBuffer(VkCommandBuffer& commandBuffer, VkQueue queue, VkCommandPool commandPool, VkDevice logicalDevice) {
   vkEndCommandBuffer(commandBuffer);
 
   VkSubmitInfo submitInfo {};
