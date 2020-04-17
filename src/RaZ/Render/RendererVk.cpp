@@ -441,51 +441,6 @@ inline void createImageViews(std::vector<VkImageView>& swapchainImageViews,
   }
 }
 
-/////////////////
-// Render pass //
-/////////////////
-
-inline void createRenderPass(VkFormat swapchainImageFormat, VkDevice logicalDevice, VkRenderPass& renderPass) {
-  VkAttachmentDescription colorAttachment {};
-  colorAttachment.format         = swapchainImageFormat;
-  colorAttachment.samples        = VK_SAMPLE_COUNT_1_BIT;
-  colorAttachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
-  colorAttachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
-  colorAttachment.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-  colorAttachment.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
-  colorAttachment.finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-  VkAttachmentReference colorAttachmentRef {};
-  colorAttachmentRef.attachment = 0;
-  colorAttachmentRef.layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-  VkSubpassDescription subpass {};
-  subpass.pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS;
-  subpass.colorAttachmentCount = 1;
-  subpass.pColorAttachments    = &colorAttachmentRef;
-
-  VkSubpassDependency dependency {};
-  dependency.srcSubpass    = VK_SUBPASS_EXTERNAL;
-  dependency.dstSubpass    = 0;
-  dependency.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-  dependency.srcAccessMask = 0;
-  dependency.dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-  dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-
-  VkRenderPassCreateInfo renderPassInfo {};
-  renderPassInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-  renderPassInfo.attachmentCount = 1;
-  renderPassInfo.pAttachments    = &colorAttachment;
-  renderPassInfo.subpassCount    = 1;
-  renderPassInfo.pSubpasses      = &subpass;
-  renderPassInfo.dependencyCount = 1;
-  renderPassInfo.pDependencies   = &dependency;
-
-  if (vkCreateRenderPass(logicalDevice, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create a render pass.");
-}
-
 //////////////
 // Pipeline //
 //////////////
@@ -1020,7 +975,24 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Render pass //
   /////////////////
 
-  createRenderPass(m_swapchainImageFormat, m_logicalDevice, m_renderPass);
+  Renderer::createRenderPass(m_renderPass,
+                             m_swapchainImageFormat,
+                             SampleCount::ONE,
+                             AttachmentLoadOp::CLEAR,
+                             AttachmentStoreOp::STORE,
+                             AttachmentLoadOp::DONT_CARE,
+                             AttachmentStoreOp::DONT_CARE,
+                             ImageLayout::UNDEFINED,
+                             ImageLayout::PRESENT_SRC,
+                             ImageLayout::COLOR_ATTACHMENT,
+                             PipelineBindPoint::GRAPHICS,
+                             VK_SUBPASS_EXTERNAL,
+                             0,
+                             PipelineStage::COLOR_ATTACHMENT_OUTPUT,
+                             PipelineStage::COLOR_ATTACHMENT_OUTPUT,
+                             {},
+                             Access::COLOR_ATTACHMENT_READ | Access::COLOR_ATTACHMENT_WRITE,
+                             m_logicalDevice);
 
   ////////////////////
   // Descriptor set //
@@ -1126,6 +1098,64 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   }
 
   s_isInitialized = true;
+}
+
+void Renderer::createRenderPass(VkRenderPass& renderPass,
+                                VkFormat swapchainImageFormat,
+                                SampleCount sampleCount,
+                                AttachmentLoadOp colorDepthLoadOp,
+                                AttachmentStoreOp colorDepthStoreOp,
+                                AttachmentLoadOp stencilLoadOp,
+                                AttachmentStoreOp stencilStoreOp,
+                                ImageLayout initialLayout,
+                                ImageLayout finalLayout,
+                                ImageLayout referenceLayout,
+                                PipelineBindPoint bindPoint,
+                                uint32_t srcSubpass,
+                                uint32_t dstSubpass,
+                                PipelineStage srcStage,
+                                PipelineStage dstStage,
+                                Access srcAccess,
+                                Access dstAccess,
+                                VkDevice logicalDevice) {
+  VkAttachmentDescription attachment {};
+  attachment.format         = swapchainImageFormat;
+  attachment.samples        = static_cast<VkSampleCountFlagBits>(sampleCount);
+  attachment.loadOp         = static_cast<VkAttachmentLoadOp>(colorDepthLoadOp);
+  attachment.storeOp        = static_cast<VkAttachmentStoreOp>(colorDepthStoreOp);
+  attachment.stencilLoadOp  = static_cast<VkAttachmentLoadOp>(stencilLoadOp);
+  attachment.stencilStoreOp = static_cast<VkAttachmentStoreOp>(stencilStoreOp);
+  attachment.initialLayout  = static_cast<VkImageLayout>(initialLayout);
+  attachment.finalLayout    = static_cast<VkImageLayout>(finalLayout);
+
+  VkAttachmentReference attachmentRef {};
+  attachmentRef.attachment = 0;
+  attachmentRef.layout     = static_cast<VkImageLayout>(referenceLayout);
+
+  VkSubpassDescription subpass {};
+  subpass.pipelineBindPoint    = static_cast<VkPipelineBindPoint>(bindPoint);
+  subpass.colorAttachmentCount = 1;
+  subpass.pColorAttachments    = &attachmentRef;
+
+  VkSubpassDependency dependency {};
+  dependency.srcSubpass    = srcSubpass;
+  dependency.dstSubpass    = dstSubpass;
+  dependency.srcStageMask  = static_cast<VkPipelineStageFlags>(srcStage);
+  dependency.dstStageMask  = static_cast<VkPipelineStageFlags>(dstStage);
+  dependency.srcAccessMask = static_cast<VkAccessFlags>(srcAccess);
+  dependency.dstAccessMask = static_cast<VkAccessFlags>(dstAccess);
+
+  VkRenderPassCreateInfo renderPassInfo {};
+  renderPassInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  renderPassInfo.attachmentCount = 1;
+  renderPassInfo.pAttachments    = &attachment;
+  renderPassInfo.subpassCount    = 1;
+  renderPassInfo.pSubpasses      = &subpass;
+  renderPassInfo.dependencyCount = 1;
+  renderPassInfo.pDependencies   = &dependency;
+
+  if (vkCreateRenderPass(logicalDevice, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a render pass.");
 }
 
 void Renderer::createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLayout,
@@ -1437,7 +1467,24 @@ void Renderer::recreateSwapchain() {
 
   createSwapchain(m_physicalDevice, m_surface, m_windowHandle, m_logicalDevice, m_swapchain, m_swapchainImages, m_swapchainImageFormat, m_swapchainExtent);
   createImageViews(m_swapchainImageViews, m_swapchainImages, m_swapchainImageFormat, m_logicalDevice);
-  createRenderPass(m_swapchainImageFormat, m_logicalDevice, m_renderPass);
+  Renderer::createRenderPass(m_renderPass,
+                             m_swapchainImageFormat,
+                             SampleCount::ONE,
+                             AttachmentLoadOp::CLEAR,
+                             AttachmentStoreOp::STORE,
+                             AttachmentLoadOp::DONT_CARE,
+                             AttachmentStoreOp::DONT_CARE,
+                             ImageLayout::UNDEFINED,
+                             ImageLayout::PRESENT_SRC,
+                             ImageLayout::COLOR_ATTACHMENT,
+                             PipelineBindPoint::GRAPHICS,
+                             VK_SUBPASS_EXTERNAL,
+                             0,
+                             PipelineStage::COLOR_ATTACHMENT_OUTPUT,
+                             PipelineStage::COLOR_ATTACHMENT_OUTPUT,
+                             {},
+                             Access::COLOR_ATTACHMENT_READ | Access::COLOR_ATTACHMENT_WRITE,
+                             m_logicalDevice);
   createGraphicsPipeline(m_graphicsPipeline,
                          m_pipelineLayout,
                          RAZ_ROOT + "shaders/triangle_vk_vert.spv"s,

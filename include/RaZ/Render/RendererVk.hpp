@@ -180,6 +180,85 @@ enum class MemoryProperty : uint32_t {
 };
 MAKE_ENUM_FLAG(MemoryProperty)
 
+enum class AttachmentLoadOp : uint32_t {
+  LOAD      = 0 /* VK_ATTACHMENT_LOAD_OP_LOAD      */, ///<
+  CLEAR     = 1 /* VK_ATTACHMENT_LOAD_OP_CLEAR     */, ///<
+  DONT_CARE = 2 /* VK_ATTACHMENT_LOAD_OP_DONT_CARE */  ///<
+};
+
+enum class AttachmentStoreOp : uint32_t {
+  STORE     = 0 /* VK_ATTACHMENT_STORE_OP_STORE     */, ///<
+  DONT_CARE = 1 /* VK_ATTACHMENT_STORE_OP_DONT_CARE */  ///<
+};
+
+enum class PipelineBindPoint : uint32_t {
+  GRAPHICS    = 0          /* VK_PIPELINE_BIND_POINT_GRAPHICS        */, ///<
+  COMPUTE     = 1          /* VK_PIPELINE_BIND_POINT_COMPUTE         */, ///<
+  RAY_TRACING = 1000165000 /* VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR */  ///<
+};
+
+enum class PipelineStage : uint32_t {
+  TOP_OF_PIPE                    = 1        /* VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT                      */, ///<
+  DRAW_INDIRECT                  = 2        /* VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT                    */, ///<
+  VERTEX_INPUT                   = 4        /* VK_PIPELINE_STAGE_VERTEX_INPUT_BIT                     */, ///<
+  VERTEX_SHADER                  = 8        /* VK_PIPELINE_STAGE_VERTEX_SHADER_BIT                    */, ///<
+  TESSELLATION_CONTROL_SHADER    = 16       /* VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT      */, ///<
+  TESSELLATION_EVALUATION_SHADER = 32       /* VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT   */, ///<
+  GEOMETRY_SHADER                = 64       /* VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT                  */, ///<
+  FRAGMENT_SHADER                = 128      /* VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT                  */, ///<
+  EARLY_FRAGMENT_TESTS           = 256      /* VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT             */, ///<
+  LATE_FRAGMENT_TESTS            = 512      /* VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT              */, ///<
+  COLOR_ATTACHMENT_OUTPUT        = 1024     /* VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT          */, ///<
+  COMPUTE_SHADER                 = 2048     /* VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT                   */, ///<
+  TRANSFER                       = 4096     /* VK_PIPELINE_STAGE_TRANSFER_BIT                         */, ///<
+  BOTTOM_OF_PIPE                 = 8192     /* VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT                   */, ///<
+  HOST                           = 16384    /* VK_PIPELINE_STAGE_HOST_BIT                             */, ///<
+  ALL_GRAPHICS                   = 32768    /* VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT                     */, ///<
+  ALL_COMMANDS                   = 65536    /* VK_PIPELINE_STAGE_ALL_COMMANDS_BIT                     */, ///<
+  TRANSFORM_FEEDBACK             = 16777216 /* VK_PIPELINE_STAGE_TRANSFORM_FEEDBACK_BIT_EXT           */, ///<
+  CONDITIONAL_RENDERING          = 262144   /* VK_PIPELINE_STAGE_CONDITIONAL_RENDERING_BIT_EXT        */, ///<
+  RAY_TRACING_SHADER             = 2097152  /* VK_PIPELINE_STAGE_RAY_TRACING_SHADER_BIT_KHR           */, ///<
+  ACCELERATION_STRUCTURE_BUILD   = 33554432 /* VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR */, ///<
+  SHADING_RATE_IMAGE_NV          = 4194304  /* VK_PIPELINE_STAGE_SHADING_RATE_IMAGE_BIT_NV            */, ///<
+  TASK_SHADER_NV                 = 524288   /* VK_PIPELINE_STAGE_TASK_SHADER_BIT_NV                   */, ///<
+  MESH_SHADER_NV                 = 1048576  /* VK_PIPELINE_STAGE_MESH_SHADER_BIT_NV                   */, ///<
+  FRAGMENT_DENSITY_PROCESS       = 8388608  /* VK_PIPELINE_STAGE_FRAGMENT_DENSITY_PROCESS_BIT_EXT     */, ///<
+  COMMAND_PREPROCESS_NV          = 131072   /* VK_PIPELINE_STAGE_COMMAND_PREPROCESS_BIT_NV            */  ///<
+};
+MAKE_ENUM_FLAG(PipelineStage)
+
+enum class Access : uint32_t {
+  INDIRECT_COMMAND_READ             = 1         /* VK_ACCESS_INDIRECT_COMMAND_READ_BIT                 */, ///<
+  INDEX_READ                        = 2         /* VK_ACCESS_INDEX_READ_BIT                            */, ///<
+  VERTEX_ATTRIBUTE_READ             = 4         /* VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT                 */, ///<
+  UNIFORM_READ                      = 8         /* VK_ACCESS_UNIFORM_READ_BIT                          */, ///<
+  INPUT_ATTACHMENT_READ             = 16        /* VK_ACCESS_INPUT_ATTACHMENT_READ_BIT                 */, ///<
+  SHADER_READ                       = 32        /* VK_ACCESS_SHADER_READ_BIT                           */, ///<
+  SHADER_WRITE                      = 64        /* VK_ACCESS_SHADER_WRITE_BIT                          */, ///<
+  COLOR_ATTACHMENT_READ             = 128       /* VK_ACCESS_COLOR_ATTACHMENT_READ_BIT                 */, ///<
+  COLOR_ATTACHMENT_WRITE            = 256       /* VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT                */, ///<
+  DEPTH_STENCIL_ATTACHMENT_READ     = 512       /* VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT         */, ///<
+  DEPTH_STENCIL_ATTACHMENT_WRITE    = 1024      /* VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT        */, ///<
+  TRANSFER_READ                     = 2048      /* VK_ACCESS_TRANSFER_READ_BIT                         */, ///<
+  TRANSFER_WRITE                    = 4096      /* VK_ACCESS_TRANSFER_WRITE_BIT                        */, ///<
+  HOST_READ                         = 8192      /* VK_ACCESS_HOST_READ_BIT                             */, ///<
+  HOST_WRITE                        = 16384     /* VK_ACCESS_HOST_WRITE_BIT                            */, ///<
+  MEMORY_READ                       = 32768     /* VK_ACCESS_MEMORY_READ_BIT                           */, ///<
+  MEMORY_WRITE                      = 65536     /* VK_ACCESS_MEMORY_WRITE_BIT                          */, ///<
+  TRANSFORM_FEEDBACK_WRITE          = 33554432  /* VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT          */, ///<
+  TRANSFORM_FEEDBACK_COUNTER_READ   = 67108864  /* VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT   */, ///<
+  TRANSFORM_FEEDBACK_COUNTER_WRITE  = 134217728 /* VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT  */, ///<
+  CONDITIONAL_RENDERING_READ        = 1048576   /* VK_ACCESS_CONDITIONAL_RENDERING_READ_BIT_EXT        */, ///<
+  COLOR_ATTACHMENT_READ_NONCOHERENT = 524288    /* VK_ACCESS_COLOR_ATTACHMENT_READ_NONCOHERENT_BIT_EXT */, ///<
+  ACCELERATION_STRUCTURE_READ       = 2097152   /* VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR       */, ///<
+  ACCELERATION_STRUCTURE_WRITE      = 4194304   /* VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR      */, ///<
+  SHADING_RATE_IMAGE_READ_NV        = 8388608   /* VK_ACCESS_SHADING_RATE_IMAGE_READ_BIT_NV            */, ///<
+  FRAGMENT_DENSITY_MAP_READ         = 16777216  /* VK_ACCESS_FRAGMENT_DENSITY_MAP_READ_BIT_EXT         */, ///<
+  COMMAND_PREPROCESS_READ_NV        = 131072    /* VK_ACCESS_COMMAND_PREPROCESS_READ_BIT_NV            */, ///<
+  COMMAND_PREPROCESS_WRITE_NV       = 262144    /* VK_ACCESS_COMMAND_PREPROCESS_WRITE_BIT_NV           */  ///<
+};
+MAKE_ENUM_FLAG(Access)
+
 enum class CommandBufferLevel : uint32_t {
   PRIMARY   = 0 /* VK_COMMAND_BUFFER_LEVEL_PRIMARY   */, ///<
   SECONDARY = 1 /* VK_COMMAND_BUFFER_LEVEL_SECONDARY */  ///<
@@ -326,6 +405,24 @@ public:
   static void initialize(GLFWwindow* windowHandle = nullptr);
   static bool isInitialized() { return s_isInitialized; }
 
+  static void createRenderPass(VkRenderPass& renderPass,
+                               VkFormat swapchainImageFormat,
+                               SampleCount sampleCount,
+                               AttachmentLoadOp colorDepthLoadOp,
+                               AttachmentStoreOp colorDepthStoreOp,
+                               AttachmentLoadOp stencilLoadOp,
+                               AttachmentStoreOp stencilStoreOp,
+                               ImageLayout initialLayout,
+                               ImageLayout finalLayout,
+                               ImageLayout referenceLayout,
+                               PipelineBindPoint bindPoint,
+                               uint32_t srcSubpass,
+                               uint32_t dstSubpass,
+                               PipelineStage srcStage,
+                               PipelineStage dstStage,
+                               Access srcAccess,
+                               Access dstAccess,
+                               VkDevice logicalDevice);
   static void createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLayout,
                                         DescriptorType descriptorType,
                                         ShaderStage shaderStageFlags,
