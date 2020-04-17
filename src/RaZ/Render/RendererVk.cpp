@@ -490,14 +490,16 @@ inline void createRenderPass(VkFormat swapchainImageFormat, VkDevice logicalDevi
 // Pipeline //
 //////////////
 
-inline void createGraphicsPipeline(VkDevice logicalDevice,
+inline void createGraphicsPipeline(VkPipeline& graphicsPipeline,
+                                   VkPipelineLayout& pipelineLayout,
+                                   const std::string& vertexShaderPath,
+                                   const std::string& fragmentShaderPath,
                                    VkExtent2D swapchainExtent,
                                    VkDescriptorSetLayout descriptorSetLayout,
-                                   VkPipelineLayout& pipelineLayout,
                                    VkRenderPass renderPass,
-                                   VkPipeline& graphicsPipeline) {
-  const std::vector<char> vertShaderCode = readFile(RAZ_ROOT + "shaders/triangle_vk_vert.spv"s);
-  const std::vector<char> fragShaderCode = readFile(RAZ_ROOT + "shaders/triangle_vk_frag.spv"s);
+                                   VkDevice logicalDevice) {
+  const std::vector<char> vertShaderCode = readFile(vertexShaderPath);
+  const std::vector<char> fragShaderCode = readFile(fragmentShaderPath);
 
   VkShaderModule vertShaderModule {};
   Renderer::createShaderModule(vertShaderModule, vertShaderCode.size(), vertShaderCode.data(), logicalDevice);
@@ -1030,7 +1032,14 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Pipeline //
   //////////////
 
-  createGraphicsPipeline(m_logicalDevice, m_swapchainExtent, m_descriptorSetLayout, m_pipelineLayout, m_renderPass, m_graphicsPipeline);
+  createGraphicsPipeline(m_graphicsPipeline,
+                         m_pipelineLayout,
+                         RAZ_ROOT + "shaders/triangle_vk_vert.spv"s,
+                         RAZ_ROOT + "shaders/triangle_vk_frag.spv"s,
+                         m_swapchainExtent,
+                         m_descriptorSetLayout,
+                         m_renderPass,
+                         m_logicalDevice);
 
   //////////////////
   // Framebuffers //
@@ -1429,7 +1438,14 @@ void Renderer::recreateSwapchain() {
   createSwapchain(m_physicalDevice, m_surface, m_windowHandle, m_logicalDevice, m_swapchain, m_swapchainImages, m_swapchainImageFormat, m_swapchainExtent);
   createImageViews(m_swapchainImageViews, m_swapchainImages, m_swapchainImageFormat, m_logicalDevice);
   createRenderPass(m_swapchainImageFormat, m_logicalDevice, m_renderPass);
-  createGraphicsPipeline(m_logicalDevice, m_swapchainExtent, m_descriptorSetLayout, m_pipelineLayout, m_renderPass, m_graphicsPipeline);
+  createGraphicsPipeline(m_graphicsPipeline,
+                         m_pipelineLayout,
+                         RAZ_ROOT + "shaders/triangle_vk_vert.spv"s,
+                         RAZ_ROOT + "shaders/triangle_vk_frag.spv"s,
+                         m_swapchainExtent,
+                         m_descriptorSetLayout,
+                         m_renderPass,
+                         m_logicalDevice);
   createFramebuffers(m_swapchainFramebuffers, m_swapchainImageViews, m_renderPass, m_swapchainExtent, m_logicalDevice);
   createUniformBuffers(m_uniformBuffers, m_uniformBuffersMemory, m_swapchainImages.size(), m_physicalDevice, m_logicalDevice);
   Renderer::createDescriptorPool(m_descriptorPool, DescriptorType::UNIFORM_BUFFER, static_cast<uint32_t>(m_swapchainImages.size()), m_logicalDevice);
