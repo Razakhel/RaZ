@@ -469,6 +469,7 @@ public:
                           ImageLayout initialLayout,
                           VkPhysicalDevice physicalDevice,
                           VkDevice logicalDevice);
+  static void destroyImage(VkImage image, VkDeviceMemory imageMemory, VkDevice logicalDevice);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,
                            BufferUsage usageFlags,
@@ -491,6 +492,7 @@ public:
                          VkCommandPool commandPool,
                          VkQueue queue,
                          VkDevice logicalDevice);
+  static void destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory, VkDevice logicalDevice);
   static void beginCommandBuffer(VkCommandBuffer& commandBuffer,
                                  VkCommandPool commandPool,
                                  CommandBufferLevel commandBufferLevel,
