@@ -797,10 +797,8 @@ inline void destroySwapchain(VkDevice logicalDevice,
 
   vkDestroyDescriptorPool(logicalDevice, descriptorPool, nullptr);
 
-  for (std::size_t i = 0; i < uniformBuffers.size(); ++i) {
-    vkDestroyBuffer(logicalDevice, uniformBuffers[i], nullptr);
-    vkFreeMemory(logicalDevice, uniformBuffersMemory[i], nullptr);
-  }
+  for (std::size_t i = 0; i < uniformBuffers.size(); ++i)
+    Renderer::destroyBuffer(uniformBuffers[i], uniformBuffersMemory[i], logicalDevice);
 
   vkDestroyPipeline(logicalDevice, graphicsPipeline, nullptr);
   vkDestroyPipelineLayout(logicalDevice, pipelineLayout, nullptr);
@@ -1316,6 +1314,11 @@ void Renderer::createImage(VkImage& image,
   vkBindImageMemory(logicalDevice, image, imageMemory, 0);
 }
 
+void Renderer::destroyImage(VkImage image, VkDeviceMemory imageMemory, VkDevice logicalDevice) {
+  vkDestroyImage(logicalDevice, image, nullptr);
+  vkFreeMemory(logicalDevice, imageMemory, nullptr);
+}
+
 void Renderer::createBuffer(VkBuffer& buffer,
                             VkDeviceMemory& bufferMemory,
                             BufferUsage usageFlags,
@@ -1381,8 +1384,7 @@ void Renderer::createStagedBuffer(VkBuffer& buffer,
 
   Renderer::copyBuffer(stagingBuffer, buffer, bufferSize, commandPool, queue, logicalDevice);
 
-  vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr);
-  vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
+  Renderer::destroyBuffer(stagingBuffer, stagingBufferMemory, logicalDevice);
 }
 
 void Renderer::copyBuffer(VkBuffer srcBuffer,
@@ -1401,6 +1403,11 @@ void Renderer::copyBuffer(VkBuffer srcBuffer,
   vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
   Renderer::endCommandBuffer(commandBuffer, queue, commandPool, logicalDevice);
+}
+
+void Renderer::destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory, VkDevice logicalDevice) {
+  vkDestroyBuffer(logicalDevice, buffer, nullptr);
+  vkFreeMemory(logicalDevice, bufferMemory, nullptr);
 }
 
 void Renderer::beginCommandBuffer(VkCommandBuffer& commandBuffer,
@@ -1605,11 +1612,8 @@ void Renderer::destroy() {
     vkDestroyFence(m_logicalDevice, m_inFlightFences[i], nullptr);
   }
 
-  vkDestroyBuffer(m_logicalDevice, m_indexBuffer, nullptr);
-  vkFreeMemory(m_logicalDevice, m_indexBufferMemory, nullptr);
-
-  vkDestroyBuffer(m_logicalDevice, m_vertexBuffer, nullptr);
-  vkFreeMemory(m_logicalDevice, m_vertexBufferMemory, nullptr);
+  Renderer::destroyBuffer(m_indexBuffer, m_indexBufferMemory, m_logicalDevice);
+  Renderer::destroyBuffer(m_vertexBuffer, m_vertexBufferMemory, m_logicalDevice);
 
   vkDestroyCommandPool(m_logicalDevice, m_commandPool, nullptr);
 
