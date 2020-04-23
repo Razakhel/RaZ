@@ -1405,6 +1405,47 @@ void Renderer::copyBuffer(VkBuffer srcBuffer,
   Renderer::endCommandBuffer(commandBuffer, queue, commandPool, logicalDevice);
 }
 
+void Renderer::copyBuffer(VkBuffer srcBuffer,
+                          VkImage dstImage,
+                          ImageAspect imgAspect,
+                          uint32_t imgWidth,
+                          uint32_t imgHeight,
+                          uint32_t imgDepth,
+                          ImageLayout imgLayout,
+                          VkCommandPool commandPool,
+                          VkQueue queue,
+                          VkDevice logicalDevice) {
+  VkCommandBuffer commandBuffer {};
+  Renderer::beginCommandBuffer(commandBuffer, commandPool, CommandBufferLevel::PRIMARY, CommandBufferUsage::ONE_TIME_SUBMIT, logicalDevice);
+
+  VkBufferImageCopy region {};
+  region.bufferOffset      = 0;
+  region.bufferRowLength   = 0;
+  region.bufferImageHeight = 0;
+
+  region.imageSubresource.aspectMask     = static_cast<VkImageAspectFlags>(imgAspect);
+  region.imageSubresource.mipLevel       = 0;
+  region.imageSubresource.baseArrayLayer = 0;
+  region.imageSubresource.layerCount     = 1;
+
+  region.imageOffset.x = 0;
+  region.imageOffset.y = 0;
+  region.imageOffset.z = 0;
+
+  region.imageExtent.width  = imgWidth;
+  region.imageExtent.height = imgHeight;
+  region.imageExtent.depth  = imgDepth;
+
+  vkCmdCopyBufferToImage(commandBuffer,
+                         srcBuffer,
+                         dstImage,
+                         static_cast<VkImageLayout>(imgLayout),
+                         1,
+                         &region);
+
+  Renderer::endCommandBuffer(commandBuffer, queue, commandPool, logicalDevice);
+}
+
 void Renderer::destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory, VkDevice logicalDevice) {
   vkDestroyBuffer(logicalDevice, buffer, nullptr);
   vkFreeMemory(logicalDevice, bufferMemory, nullptr);
