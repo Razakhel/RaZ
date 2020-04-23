@@ -492,6 +492,16 @@ public:
                          VkCommandPool commandPool,
                          VkQueue queue,
                          VkDevice logicalDevice);
+  static void copyBuffer(VkBuffer srcBuffer,
+                         VkImage dstImage,
+                         ImageAspect imgAspect,
+                         uint32_t imgWidth,
+                         uint32_t imgHeight,
+                         uint32_t imgDepth,
+                         ImageLayout imgLayout,
+                         VkCommandPool commandPool,
+                         VkQueue queue,
+                         VkDevice logicalDevice);
   static void destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory, VkDevice logicalDevice);
   static void beginCommandBuffer(VkCommandBuffer& commandBuffer,
                                  VkCommandPool commandPool,
