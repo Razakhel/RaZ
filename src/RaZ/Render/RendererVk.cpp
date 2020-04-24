@@ -382,16 +382,18 @@ inline bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface) {
 
   // TODO: pick the best device
 
-  const QueueFamilyIndices queueIndices = findQueueFamilies(device, surface);
-  const bool areExtensionsSupported     = checkDeviceExtensionSupport(device);
+  if (!deviceFeatures.samplerAnisotropy)
+    return false;
 
-  bool isSwapchainSupported = false;
-  if (areExtensionsSupported) {
-    const SwapchainSupportDetails swapchainSupport = querySwapchainSupport(device, surface);
-    isSwapchainSupported = !swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty();
-  }
+  if (!findQueueFamilies(device, surface).isComplete())
+    return false;
 
-  return queueIndices.isComplete() && areExtensionsSupported && isSwapchainSupported;
+  if (!checkDeviceExtensionSupport(device))
+    return false;
+
+  const SwapchainSupportDetails swapchainSupport = querySwapchainSupport(device, surface);
+
+  return (!swapchainSupport.formats.empty() && !swapchainSupport.presentModes.empty());
 }
 
 /////////////
@@ -805,7 +807,7 @@ inline void destroySwapchain(VkDevice logicalDevice,
   vkDestroyRenderPass(logicalDevice, m_renderPass, nullptr);
 
   for (VkImageView imageView : swapchainImageViews)
-    vkDestroyImageView(logicalDevice, imageView, nullptr);
+    Renderer::destroyImageView(imageView, logicalDevice);
 
   vkDestroySwapchainKHR(logicalDevice, swapchain, nullptr);
 }
@@ -937,6 +939,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   }
 
   VkPhysicalDeviceFeatures deviceFeatures {};
+  deviceFeatures.samplerAnisotropy = true;
 
   VkDeviceCreateInfo deviceCreateInfo {};
   deviceCreateInfo.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -1176,40 +1179,6 @@ void Renderer::createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLay
     throw std::runtime_error("Error: Failed to create a descriptor set layout.");
 }
 
-void Renderer::createImageView(VkImageView& imageView,
-                               VkImage image,
-                               ImageViewType imageViewType,
-                               VkFormat imageFormat,
-                               ComponentSwizzle redComp,
-                               ComponentSwizzle greenComp,
-                               ComponentSwizzle blueComp,
-                               ComponentSwizzle alphaComp,
-                               ImageAspect imageAspect,
-                               uint32_t firstMipLevel,
-                               uint32_t mipLevelCount,
-                               uint32_t firstArrayLayer,
-                               uint32_t arrayLayerCount,
-                               VkDevice logicalDevice) {
-  VkImageViewCreateInfo imageViewCreateInfo {};
-  imageViewCreateInfo.sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-  imageViewCreateInfo.image        = image;
-  imageViewCreateInfo.viewType     = static_cast<VkImageViewType>(imageViewType);
-  imageViewCreateInfo.format       = imageFormat;
-  imageViewCreateInfo.components.r = static_cast<VkComponentSwizzle>(redComp);
-  imageViewCreateInfo.components.g = static_cast<VkComponentSwizzle>(greenComp);
-  imageViewCreateInfo.components.b = static_cast<VkComponentSwizzle>(blueComp);
-  imageViewCreateInfo.components.a = static_cast<VkComponentSwizzle>(alphaComp);
-
-  imageViewCreateInfo.subresourceRange.aspectMask     = static_cast<VkImageAspectFlags>(imageAspect);
-  imageViewCreateInfo.subresourceRange.baseMipLevel   = firstMipLevel;
-  imageViewCreateInfo.subresourceRange.levelCount     = mipLevelCount;
-  imageViewCreateInfo.subresourceRange.baseArrayLayer = firstArrayLayer;
-  imageViewCreateInfo.subresourceRange.layerCount     = arrayLayerCount;
-
-  if (vkCreateImageView(logicalDevice, &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS)
-    throw std::runtime_error("Error: Failed to create an image view.");
-}
-
 void Renderer::createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice) {
   VkShaderModuleCreateInfo createInfo {};
   createInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -1317,6 +1286,87 @@ void Renderer::createImage(VkImage& image,
 void Renderer::destroyImage(VkImage image, VkDeviceMemory imageMemory, VkDevice logicalDevice) {
   vkDestroyImage(logicalDevice, image, nullptr);
   vkFreeMemory(logicalDevice, imageMemory, nullptr);
+}
+
+void Renderer::createImageView(VkImageView& imageView,
+                               VkImage image,
+                               ImageViewType imageViewType,
+                               VkFormat imageFormat,
+                               ComponentSwizzle redComp,
+                               ComponentSwizzle greenComp,
+                               ComponentSwizzle blueComp,
+                               ComponentSwizzle alphaComp,
+                               ImageAspect imageAspect,
+                               uint32_t firstMipLevel,
+                               uint32_t mipLevelCount,
+                               uint32_t firstArrayLayer,
+                               uint32_t arrayLayerCount,
+                               VkDevice logicalDevice) {
+  VkImageViewCreateInfo imageViewCreateInfo {};
+  imageViewCreateInfo.sType        = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  imageViewCreateInfo.image        = image;
+  imageViewCreateInfo.viewType     = static_cast<VkImageViewType>(imageViewType);
+  imageViewCreateInfo.format       = imageFormat;
+  imageViewCreateInfo.components.r = static_cast<VkComponentSwizzle>(redComp);
+  imageViewCreateInfo.components.g = static_cast<VkComponentSwizzle>(greenComp);
+  imageViewCreateInfo.components.b = static_cast<VkComponentSwizzle>(blueComp);
+  imageViewCreateInfo.components.a = static_cast<VkComponentSwizzle>(alphaComp);
+
+  imageViewCreateInfo.subresourceRange.aspectMask     = static_cast<VkImageAspectFlags>(imageAspect);
+  imageViewCreateInfo.subresourceRange.baseMipLevel   = firstMipLevel;
+  imageViewCreateInfo.subresourceRange.levelCount     = mipLevelCount;
+  imageViewCreateInfo.subresourceRange.baseArrayLayer = firstArrayLayer;
+  imageViewCreateInfo.subresourceRange.layerCount     = arrayLayerCount;
+
+  if (vkCreateImageView(logicalDevice, &imageViewCreateInfo, nullptr, &imageView) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create an image view.");
+}
+
+void Renderer::destroyImageView(VkImageView imageView, VkDevice logicalDevice) {
+  vkDestroyImageView(logicalDevice, imageView, nullptr);
+}
+
+void Renderer::createSampler(VkSampler& sampler,
+                             TextureFilter magnifyFilter,
+                             TextureFilter minifyFilter,
+                             SamplerMipmapMode mipmapMode,
+                             SamplerAddressMode addressModeU,
+                             SamplerAddressMode addressModeV,
+                             SamplerAddressMode addressModeW,
+                             float mipmapLodBias,
+                             bool enableAnisotropy,
+                             float maxAnisotropy,
+                             bool enableComparison,
+                             ComparisonOperation comparisonOp,
+                             float mipmapMinLod,
+                             float mipmapMaxLod,
+                             BorderColor borderColor,
+                             bool unnormalizedCoordinates,
+                             VkDevice logicalDevice) {
+  VkSamplerCreateInfo samplerInfo {};
+  samplerInfo.sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+  samplerInfo.magFilter               = static_cast<VkFilter>(magnifyFilter);
+  samplerInfo.minFilter               = static_cast<VkFilter>(minifyFilter);
+  samplerInfo.mipmapMode              = static_cast<VkSamplerMipmapMode>(mipmapMode);
+  samplerInfo.addressModeU            = static_cast<VkSamplerAddressMode>(addressModeU);
+  samplerInfo.addressModeV            = static_cast<VkSamplerAddressMode>(addressModeV);
+  samplerInfo.addressModeW            = static_cast<VkSamplerAddressMode>(addressModeW);
+  samplerInfo.mipLodBias              = mipmapLodBias;
+  samplerInfo.anisotropyEnable        = enableAnisotropy;
+  samplerInfo.maxAnisotropy           = maxAnisotropy;
+  samplerInfo.compareEnable           = enableComparison;
+  samplerInfo.compareOp               = static_cast<VkCompareOp>(comparisonOp);
+  samplerInfo.minLod                  = mipmapMinLod;
+  samplerInfo.maxLod                  = mipmapMaxLod;
+  samplerInfo.borderColor             = static_cast<VkBorderColor>(borderColor);
+  samplerInfo.unnormalizedCoordinates = unnormalizedCoordinates;
+
+  if (vkCreateSampler(logicalDevice, &samplerInfo, nullptr, &sampler) != VK_SUCCESS)
+    throw std::runtime_error("Error: Failed to create a sampler.");
+}
+
+void Renderer::destroySampler(VkSampler sampler, VkDevice logicalDevice) {
+  vkDestroySampler(logicalDevice, sampler, nullptr);
 }
 
 void Renderer::createBuffer(VkBuffer& buffer,
