@@ -150,6 +150,45 @@ enum class ImageLayout : uint32_t {
   FRAGMENT_DENSITY_MAP               = 1000218000 /* VK_IMAGE_LAYOUT_FRAGMENT_DENSITY_MAP_OPTIMAL_EXT           */  ///< Fragment density map.
 };
 
+enum class TextureFilter : uint32_t {
+  NEAREST = 0          /* VK_FILTER_NEAREST   */, ///<
+  LINEAR  = 1          /* VK_FILTER_LINEAR    */, ///<
+  CUBIC   = 1000015000 /* VK_FILTER_CUBIC_IMG */  ///<
+};
+
+enum class SamplerMipmapMode : uint32_t {
+  NEAREST = 0 /* VK_SAMPLER_MIPMAP_MODE_NEAREST */, ///<
+  LINEAR  = 1 /* VK_SAMPLER_MIPMAP_MODE_LINEAR  */  ///<
+};
+
+enum class SamplerAddressMode : uint32_t {
+  REPEAT               = 0 /* VK_SAMPLER_ADDRESS_MODE_REPEAT               */, ///<
+  MIRRORED_REPEAT      = 1 /* VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT      */, ///<
+  CLAMP_TO_EDGE        = 2 /* VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE        */, ///<
+  CLAMP_TO_BORDER      = 3 /* VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER      */, ///<
+  MIRROR_CLAMP_TO_EDGE = 4 /* VK_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_EDGE */  ///<
+};
+
+enum class ComparisonOperation : uint32_t {
+  NEVER            = 0 /* VK_COMPARE_OP_NEVER            */, ///<
+  LESS             = 1 /* VK_COMPARE_OP_LESS             */, ///<
+  EQUAL            = 2 /* VK_COMPARE_OP_EQUAL            */, ///<
+  LESS_OR_EQUAL    = 3 /* VK_COMPARE_OP_LESS_OR_EQUAL    */, ///<
+  GREATER          = 4 /* VK_COMPARE_OP_GREATER          */, ///<
+  NOT_EQUAL        = 5 /* VK_COMPARE_OP_NOT_EQUAL        */, ///<
+  GREATER_OR_EQUAL = 6 /* VK_COMPARE_OP_GREATER_OR_EQUAL */, ///<
+  ALWAYS           = 7 /* VK_COMPARE_OP_ALWAYS           */  ///<
+};
+
+enum class BorderColor : uint32_t {
+  FLOAT_TRANSPARENT_BLACK = 0 /* VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK */, ///<
+  INT_TRANSPARENT_BLACK   = 1 /* VK_BORDER_COLOR_INT_TRANSPARENT_BLACK   */, ///<
+  FLOAT_OPAQUE_BLACK      = 2 /* VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK      */, ///<
+  INT_OPAQUE_BLACK        = 3 /* VK_BORDER_COLOR_INT_OPAQUE_BLACK        */, ///<
+  FLOAT_OPAQUE_WHITE      = 4 /* VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE      */, ///<
+  INT_OPAQUE_WHITE        = 5 /* VK_BORDER_COLOR_INT_OPAQUE_WHITE        */  ///<
+};
+
 enum class BufferUsage : uint32_t {
   TRANSFER_SRC               = 1      /* VK_BUFFER_USAGE_TRANSFER_SRC_BIT                          */, ///< Memory transfer source buffer.
   TRANSFER_DST               = 2      /* VK_BUFFER_USAGE_TRANSFER_DST_BIT                          */, ///< Memory transfer destination buffer.
@@ -427,20 +466,6 @@ public:
                                         DescriptorType descriptorType,
                                         ShaderStage shaderStageFlags,
                                         VkDevice logicalDevice);
-  static void createImageView(VkImageView& imageView,
-                              VkImage image,
-                              ImageViewType imageViewType,
-                              VkFormat imageFormat,
-                              ComponentSwizzle redComp,
-                              ComponentSwizzle greenComp,
-                              ComponentSwizzle blueComp,
-                              ComponentSwizzle alphaComp,
-                              ImageAspect imageAspect,
-                              uint32_t firstMipLevel,
-                              uint32_t mipLevelCount,
-                              uint32_t firstArrayLayer,
-                              uint32_t arrayLayerCount,
-                              VkDevice logicalDevice);
   static void createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice);
   static void destroyShaderModule(VkShaderModule shaderModule, VkDevice logicalDevice);
   static void createPipelineLayout(VkPipelineLayout& pipelineLayout,
@@ -470,6 +495,39 @@ public:
                           VkPhysicalDevice physicalDevice,
                           VkDevice logicalDevice);
   static void destroyImage(VkImage image, VkDeviceMemory imageMemory, VkDevice logicalDevice);
+  static void createImageView(VkImageView& imageView,
+                              VkImage image,
+                              ImageViewType imageViewType,
+                              VkFormat imageFormat,
+                              ComponentSwizzle redComp,
+                              ComponentSwizzle greenComp,
+                              ComponentSwizzle blueComp,
+                              ComponentSwizzle alphaComp,
+                              ImageAspect imageAspect,
+                              uint32_t firstMipLevel,
+                              uint32_t mipLevelCount,
+                              uint32_t firstArrayLayer,
+                              uint32_t arrayLayerCount,
+                              VkDevice logicalDevice);
+  static void destroyImageView(VkImageView imageView, VkDevice logicalDevice);
+  static void createSampler(VkSampler& sampler,
+                            TextureFilter magnifyFilter,
+                            TextureFilter minifyFilter,
+                            SamplerMipmapMode mipmapMode,
+                            SamplerAddressMode addressModeU,
+                            SamplerAddressMode addressModeV,
+                            SamplerAddressMode addressModeW,
+                            float mipmapLodBias,
+                            bool enableAnisotropy,
+                            float maxAnisotropy,
+                            bool enableComparison,
+                            ComparisonOperation comparisonOp,
+                            float mipmapMinLod,
+                            float mipmapMaxLod,
+                            BorderColor borderColor,
+                            bool unnormalizedCoordinates,
+                            VkDevice logicalDevice);
+  static void destroySampler(VkSampler sampler, VkDevice logicalDevice);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,
                            BufferUsage usageFlags,
