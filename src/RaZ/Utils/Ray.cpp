@@ -118,7 +118,7 @@ bool Ray::intersects(const Triangle& triangle, RayHit* hit) const {
   if (FloatUtils::areNearlyEqual(std::abs(determinant), 0.f))
     return false;
 
-  const float invDeterm = 1 / determinant;
+  const float invDeterm = 1.f / determinant;
 
   const Vec3f invPlaneDir    = m_origin - triangle.getFirstPos();
   const float firstBaryCoord = invPlaneDir.dot(pVec) * invDeterm;

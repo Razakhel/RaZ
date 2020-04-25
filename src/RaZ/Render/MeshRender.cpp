@@ -27,7 +27,7 @@ void Mesh::drawUnitPlane(const Vec3f& normal) {
 }
 
 void Mesh::drawUnitSphere() {
-  static const Mesh sphereMesh(Sphere(Vec3f(0.f), 1.f), 10, 10);
+  static const Mesh sphereMesh(Sphere(Vec3f(0.f), 1.f), 10, SphereMeshType::UV);
 
   sphereMesh.draw();
 }

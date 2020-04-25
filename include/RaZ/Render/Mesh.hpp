@@ -13,30 +13,22 @@
 
 namespace Raz {
 
+enum class SphereMeshType {
+  UV = 0, ///< [UV sphere](https://en.wikipedia.org/wiki/UV_mapping).
+  ICO     ///< [Icosphere/convex icosahedron](https://en.wikipedia.org/wiki/Geodesic_polyhedron).
+};
+
 class Mesh final : public Component {
 public:
   Mesh() : m_submeshes(1) {}
   explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
   Mesh(const Plane& plane, float width, float depth, RenderMode renderMode = RenderMode::TRIANGLE);
   /// Creates a mesh from a Sphere.
-  ///
-  ///          /-----------\
-  ///        / / / / | / \ / \
-  ///      /-------------------\
-  ///     |/ | / | / | / | / | /|
-  ///     |---------------------| < latitude/height
-  ///     |/ | / | / | / | / | /|
-  ///      \-------------------/
-  ///        \ / \ / | / / / /
-  ///          \-----^-----/
-  ///                |
-  ///                longitude/width
-  ///
   /// \param sphere Sphere to create the mesh with.
-  /// \param widthCount Amount of vertical lines to be created (longitude).
-  /// \param heightCount Amount of horizontal lines to be created (latitude).
+  /// \param subdivCount Amount of subdivisions (for an UV sphere, represents both the amount of vertical & horizontal lines to be created).
+  /// \param type Type of the sphere mesh to create.
   /// \param renderMode Mode in which to render the created mesh.
-  explicit Mesh(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount, RenderMode renderMode = RenderMode::TRIANGLE);
+  explicit Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const Triangle& triangle, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const Quad& quad, RenderMode renderMode = RenderMode::TRIANGLE);
   explicit Mesh(const AABB& box, RenderMode renderMode = RenderMode::TRIANGLE);
@@ -69,6 +61,29 @@ public:
   void save(const std::string& filePath) const;
 
 private:
+  /// Creates an UV sphere mesh from a Sphere.
+  ///
+  ///          /-----------\
+  ///        / / / / | / \ / \
+  ///      /-------------------\
+  ///     |/ | / | / | / | / | /|
+  ///     |---------------------| < latitude/height
+  ///     |/ | / | / | / | / | /|
+  ///      \-------------------/
+  ///        \ / \ / | / / / /
+  ///          \-----^-----/
+  ///                |
+  ///                longitude/width
+  ///
+  /// \param sphere Sphere to create the mesh with.
+  /// \param widthCount Amount of vertical lines to be created (longitude).
+  /// \param heightCount Amount of horizontal lines to be created (latitude).
+  void createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount);
+  /// Creates an icosphere mesh from a Sphere.
+  /// \param sphere Sphere to create the mesh with.
+  /// \param subdivCount Amount of subdivisions to apply to the mesh.
+  void createIcosphere(const Sphere& sphere, uint32_t subdivCount);
+
   void importObj(std::ifstream& file, const std::string& filePath);
   void importOff(std::ifstream& file);
 #if defined(FBX_ENABLED)

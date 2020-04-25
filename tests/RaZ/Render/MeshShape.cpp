@@ -2,12 +2,12 @@
 
 #include "RaZ/Render/Mesh.hpp"
 
-TEST_CASE("Mesh from Sphere") {
+TEST_CASE("UV sphere mesh from Sphere") {
   const Raz::Sphere sphere(Raz::Vec3f(0.f), 1.f);
 
   // Sphere mesh with 10 splits in latitude/longitude
   {
-    Raz::Mesh mesh(sphere, 10, 10);
+    Raz::Mesh mesh(sphere, 10, Raz::SphereMeshType::UV);
 
     CHECK(mesh.getSubmeshes().size() == 1);
     CHECK(mesh.recoverVertexCount() == 121);
@@ -22,7 +22,7 @@ TEST_CASE("Mesh from Sphere") {
 
   // Sphere mesh with 100 splits in latitude/longitude
   {
-    Raz::Mesh mesh(sphere, 100, 100);
+    Raz::Mesh mesh(sphere, 100, Raz::SphereMeshType::UV);
 
     CHECK(mesh.getSubmeshes().size() == 1);
     CHECK(mesh.recoverVertexCount() == 10201);
