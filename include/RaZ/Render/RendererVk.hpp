@@ -266,7 +266,7 @@ enum class PipelineStage : uint32_t {
 };
 MAKE_ENUM_FLAG(PipelineStage)
 
-enum class Access : uint32_t {
+enum class MemoryAccess : uint32_t {
   INDIRECT_COMMAND_READ             = 1         /* VK_ACCESS_INDIRECT_COMMAND_READ_BIT                 */, ///<
   INDEX_READ                        = 2         /* VK_ACCESS_INDEX_READ_BIT                            */, ///<
   VERTEX_ATTRIBUTE_READ             = 4         /* VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT                 */, ///<
@@ -296,7 +296,7 @@ enum class Access : uint32_t {
   COMMAND_PREPROCESS_READ_NV        = 131072    /* VK_ACCESS_COMMAND_PREPROCESS_READ_BIT_NV            */, ///<
   COMMAND_PREPROCESS_WRITE_NV       = 262144    /* VK_ACCESS_COMMAND_PREPROCESS_WRITE_BIT_NV           */  ///<
 };
-MAKE_ENUM_FLAG(Access)
+MAKE_ENUM_FLAG(MemoryAccess)
 
 enum class CommandBufferLevel : uint32_t {
   PRIMARY   = 0 /* VK_COMMAND_BUFFER_LEVEL_PRIMARY   */, ///<
@@ -459,12 +459,11 @@ public:
                                uint32_t dstSubpass,
                                PipelineStage srcStage,
                                PipelineStage dstStage,
-                               Access srcAccess,
-                               Access dstAccess,
+                               MemoryAccess srcAccess,
+                               MemoryAccess dstAccess,
                                VkDevice logicalDevice);
   static void createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLayout,
-                                        DescriptorType descriptorType,
-                                        ShaderStage shaderStageFlags,
+                                        std::initializer_list<VkDescriptorSetLayoutBinding> layoutBindings,
                                         VkDevice logicalDevice);
   static void createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice);
   static void destroyShaderModule(VkShaderModule shaderModule, VkDevice logicalDevice);
@@ -567,7 +566,10 @@ public:
                                  CommandBufferUsage commandBufferUsage,
                                  VkDevice logicalDevice);
   static void endCommandBuffer(VkCommandBuffer& commandBuffer, VkQueue queue, VkCommandPool commandPool, VkDevice logicalDevice);
-  static void createDescriptorPool(VkDescriptorPool& descriptorPool, DescriptorType descriptorType, uint32_t descriptorCount, VkDevice logicalDevice);
+  static void createDescriptorPool(VkDescriptorPool& descriptorPool,
+                                   uint32_t maxSetCount,
+                                   std::initializer_list<VkDescriptorPoolSize> poolSizes,
+                                   VkDevice logicalDevice);
 
   static void recreateSwapchain();
   static void drawFrame();
@@ -666,6 +668,11 @@ private:
   static inline VkPipeline m_graphicsPipeline {};
   static inline std::vector<VkFramebuffer> m_swapchainFramebuffers {};
   static inline VkCommandPool m_commandPool {};
+
+  static inline VkImage m_textureImage {};
+  static inline VkDeviceMemory m_textureMemory {};
+  static inline VkImageView m_textureImageView {};
+  static inline VkSampler m_textureSampler {};
   static inline VkBuffer m_vertexBuffer {};
   static inline VkDeviceMemory m_vertexBufferMemory {};
   static inline VkBuffer m_indexBuffer {};
