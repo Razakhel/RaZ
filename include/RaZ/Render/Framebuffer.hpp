@@ -18,14 +18,23 @@ public:
   Framebuffer(const Framebuffer&) = delete;
   Framebuffer(Framebuffer&& fbo) noexcept;
 
-  const TexturePtr& getDepthBuffer() const { return m_depthBuffer; }
-  const TexturePtr& getColorBuffer() const { return m_colorBuffer; }
-  const TexturePtr& getNormalBuffer() const { return m_normalBuffer; }
+  bool hasDepthBuffer() const { return (m_depthBuffer != nullptr); }
+  const Texture& getDepthBuffer() const { assert("Error: Framebuffer doesn't contain a depth buffer." && m_depthBuffer); return *m_depthBuffer; }
+  const std::vector<TexturePtr>& getColorBuffers() const { return m_colorBuffers; }
 
-  /// Assigns a basic vertex shader to the given program, to display the framebuffer.
-  /// \param program Shader program to assign the vertex shader to.
-  static void assignVertexShader(ShaderProgram& program);
+  /// Gives a basic vertex shader, to display the framebuffer.
+  /// \return Basic display vertex shader.
+  static VertexShader recoverVertexShader();
 
+  /// Adds a depth buffer. There can be only one depth buffer in a single framebuffer.
+  /// \param width Width of the depth buffer to be added.
+  /// \param height Height of the depth buffer to be added.
+  void addDepthBuffer(unsigned int width, unsigned int height);
+  /// Adds a color buffer to the framebuffer.
+  /// \param width Width of the color buffer to be added.
+  /// \param height Height of the color buffer to be added.
+  /// \param colorspace Colorspace of the color buffer to be added. Passing ImageColorspace::DEPTH is equivalent to calling addDepthBuffer().
+  void addColorBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace);
   /// Initializes the buffers uniforms' indices to be bound later.
   /// \param program Shader program to which to send the uniforms.
   void initBuffers(const ShaderProgram& program) const;
@@ -50,9 +59,8 @@ public:
 
 private:
   unsigned int m_index {};
-  TexturePtr m_depthBuffer  = Texture::create(0, 0, ImageColorspace::DEPTH);
-  TexturePtr m_colorBuffer  = Texture::create(0, 0, ImageColorspace::RGBA);
-  TexturePtr m_normalBuffer = Texture::create(0, 0, ImageColorspace::RGB);
+  TexturePtr m_depthBuffer;
+  std::vector<TexturePtr> m_colorBuffers;
 };
 
 } // namespace Raz

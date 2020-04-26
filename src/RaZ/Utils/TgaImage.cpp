@@ -1,8 +1,8 @@
+#include "RaZ/Utils/Image.hpp"
+
 #include <array>
 #include <fstream>
 #include <sstream>
-
-#include "RaZ/Utils/Image.hpp"
 
 namespace Raz {
 

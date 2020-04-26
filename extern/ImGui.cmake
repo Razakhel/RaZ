@@ -23,11 +23,7 @@ if (NOT RAZ_USE_GLFW AND NOT RAZ_USE_EMSCRIPTEN)
 endif ()
 
 # Building ImGui
-if (RAZ_BUILD_STATIC)
-    add_library(ImGui STATIC ${IMGUI_SRC})
-else ()
-    add_library(ImGui SHARED ${IMGUI_SRC})
-endif ()
+add_library(ImGui OBJECT ${IMGUI_SRC})
 
 target_include_directories(
     ImGui

@@ -3,12 +3,12 @@
 #ifndef RAZ_APPLICATION_HPP
 #define RAZ_APPLICATION_HPP
 
-#include <chrono>
-
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Utils/Window.hpp"
 #include "RaZ/World.hpp"
+
+#include <chrono>
 
 namespace Raz {
 
@@ -23,7 +23,7 @@ public:
   /// Adds a World into the Application.
   /// \param world World to be added.
   /// \return Reference to the newly added World.
-  World& addWorld(World&& world);
+  World& addWorld(World world);
   /// Runs the application.
   void run();
   /// Runs the application and call the given callable between each cycle.

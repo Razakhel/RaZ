@@ -6,6 +6,7 @@
 #include "RaZ/Component.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Utils/Ray.hpp"
 
 namespace Raz {
 
@@ -17,8 +18,11 @@ class Quad;
 class AABB;
 class OBB;
 
-class Shape : public Component {
+class Shape {
 public:
+  Shape(const Shape&) = default;
+  Shape(Shape&&) noexcept = default;
+
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is contained by the shape, false otherwise.
@@ -51,6 +55,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   virtual bool intersects(const OBB& obb) const = 0;
+  /// Ray-shape intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the shape, false otherwise.
+  virtual bool intersects(const Ray& ray, RayHit* hit) const = 0;
   /// Computes the projection of a point (closest point) onto the shape.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the shape.
@@ -58,11 +67,20 @@ public:
   /// Computes the shape's centroid.
   /// \return Computed centroid.
   virtual Vec3f computeCentroid() const = 0;
+
+  Shape& operator=(const Shape&) = default;
+  Shape& operator=(Shape&&) noexcept = default;
+
+  virtual ~Shape() = default;
+
+protected:
+  Shape() = default;
 };
 
 /// Line segment defined by its two extremities' positions.
-class Line : public Shape {
+class Line final : public Shape {
 public:
+  Line() = default;
   Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
 
   const Vec3f& getBeginPos() const { return m_beginPos; }
@@ -100,6 +118,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-line intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the line, false otherwise.
+  bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
   /// Computes the projection of a point (closest point) onto the line.
   /// The projected point is necessarily located on the line.
   /// \param point Point to compute the projection from.
@@ -123,8 +146,9 @@ private:
 };
 
 /// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
-class Plane : public Shape {
+class Plane final : public Shape {
 public:
+  Plane() = default;
   explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_distance{ distance }, m_normal{ normal } {}
   explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_distance{ position.computeLength() }, m_normal{ normal } {}
   Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint)
@@ -166,6 +190,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-plane intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the plane, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the plane.
   /// The projected point is necessarily located on the plane.
   /// \param point Point to compute the projection from.
@@ -181,8 +210,9 @@ private:
 };
 
 /// Sphere defined by its center position and a radius.
-class Sphere : public Shape {
+class Sphere final : public Shape {
 public:
+  Sphere() = default;
   Sphere(const Vec3f& centerPos, float radius) : m_centerPos{ centerPos }, m_radius{ radius } {}
 
   const Vec3f& getCenter() const { return m_centerPos; }
@@ -220,6 +250,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-sphere intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the sphere, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the sphere.
   /// The projected point may be inside the sphere itself or on its surface.
   /// \param point Point to compute the projection from.
@@ -235,8 +270,9 @@ private:
 };
 
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
-class Triangle : public Shape {
+class Triangle final : public Shape {
 public:
+  Triangle() = default;
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
     : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
@@ -276,6 +312,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-triangle intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the triangle, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the triangle.
   /// The projected point is necessarily located on the triangle's surface.
   /// \param point Point to compute the projection from.
@@ -302,8 +343,9 @@ private:
 };
 
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.
-class Quad : public Shape {
+class Quad final : public Shape {
 public:
+  Quad() = default;
   Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos)
     : m_leftTopPos{ leftTopPos }, m_rightTopPos{ rightTopPos }, m_rightBottomPos{ rightBottomPos }, m_leftBottomPos{ leftBottomPos } {}
 
@@ -344,6 +386,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-quad intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the quad, false otherwise.
+  bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
   /// Computes the projection of a point (closest point) onto the quad.
   /// The projected point is necessarily located on the quad's surface.
   /// \param point Point to compute the projection from.
@@ -360,7 +407,7 @@ private:
   Vec3f m_leftBottomPos {};
 };
 
-/// Axis-aligned bounding box defined by its right top front and left bottom back vertices' positions.
+/// Axis-aligned bounding box defined by its left bottom back and right top front vertices' positions.
 ///
 ///          _______________________
 ///         /|                    /|
@@ -386,14 +433,15 @@ private:
 ///               v
 ///               Z
 ///
-/// As such, rightTopFront designs the point in [ +X; +Y; +Z ], and leftBottomBack designs the point in [ -X; -Y; -Z ].
-class AABB : public Shape {
+/// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
+class AABB final : public Shape {
 public:
-  AABB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos)
-    : m_rightTopFrontPos{ rightTopFrontPos }, m_leftBottomBackPos{ leftBottomBackPos } {}
+  AABB() = default;
+  AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos)
+    : m_leftBottomBackPos{ leftBottomBackPos }, m_rightTopFrontPos{ rightTopFrontPos } {}
 
-  const Vec3f& getRightTopFrontPos() const { return m_rightTopFrontPos; }
   const Vec3f& getLeftBottomBackPos() const { return m_leftBottomBackPos; }
+  const Vec3f& getRightTopFrontPos() const { return m_rightTopFrontPos; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -427,6 +475,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-AABB intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the AABB, false otherwise.
+  bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Computes the projection of a point (closest point) onto the AABB.
   /// The projected point may be inside the AABB itself or on its surface.
   /// \param point Point to compute the projection from.
@@ -452,11 +505,11 @@ public:
   Vec3f computeHalfExtents() const { return (m_rightTopFrontPos - m_leftBottomBackPos) * 0.5f; }
 
 private:
-  Vec3f m_rightTopFrontPos {};
   Vec3f m_leftBottomBackPos {};
+  Vec3f m_rightTopFrontPos {};
 };
 
-/// Oriented bounding box defined by its right top front and left bottom back vertices' positions, as well as a rotation.
+/// Oriented bounding box defined by its left bottom back and right top front vertices' positions, as well as a rotation.
 ///
 ///          _______________________
 ///         /|                    /|
@@ -482,7 +535,7 @@ private:
 ///               v
 ///               Z
 ///
-/// As such, rightTopFront designs the point in [ +X; +Y; +Z ], and leftBottomBack designs the point in [ -X; -Y; -Z ].
+/// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
 ///
 /// Beyond that, an OBB differs from an AABB in that it contains a rotation giving its orientation.
 ///
@@ -503,14 +556,15 @@ private:
 ///                  \    /              \  /
 ///                    \/-----------------/
 ///
-class OBB : public Shape {
+class OBB final : public Shape {
 public:
-  OBB(const Vec3f& rightTopFrontPos, const Vec3f& leftBottomBackPos, const Mat3f& rotation = Mat3f::identity())
-      : m_aabb(rightTopFrontPos, leftBottomBackPos), m_rotation{ rotation } {}
+  OBB() = default;
+  OBB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos, const Mat3f& rotation = Mat3f::identity())
+    : m_aabb(leftBottomBackPos, rightTopFrontPos), m_rotation{ rotation } {}
   explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
 
-  const Vec3f& getRightTopFrontPos() const { return m_aabb.getRightTopFrontPos(); }
   const Vec3f& getLeftBottomBackPos() const { return m_aabb.getLeftBottomBackPos(); }
+  const Vec3f& getRightTopFrontPos() const { return m_aabb.getRightTopFrontPos(); }
   const Mat3f& getRotation() const { return m_rotation; }
 
   void setRotation(const Mat3f& rotation);
@@ -547,6 +601,11 @@ public:
   /// \param obb OBB to check if there is an intersection with.
   /// \return True if both OBBs intersect each other, false otherwise.
   bool intersects(const OBB& obb) const override;
+  /// Ray-OBB intersection check.
+  /// \param ray Ray to check if there is an intersection with.
+  /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
+  /// \return True if the ray intersects the OBB, false otherwise.
+  bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
   /// Computes the projection of a point (closest point) onto the OBB.
   /// The projected point may be inside the AABB itself or on its surface.
   /// \param point Point to compute the projection from.
@@ -573,7 +632,7 @@ public:
   Vec3f computeHalfExtents() const { return m_aabb.computeHalfExtents() * m_rotation; }
 
 private:
-  AABB m_aabb;
+  AABB m_aabb {};
   Mat3f m_rotation {};
   Mat3f m_invRotation {};
 };

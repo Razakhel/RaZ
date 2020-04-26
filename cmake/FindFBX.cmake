@@ -77,7 +77,7 @@ endif ()
 
 if (FBX_FOUND)
     set(
-        FBX_DEFS
+        FBX_DEFINITIONS
 
         -DFBX_ENABLED
         -DFBXSDK_SHARED

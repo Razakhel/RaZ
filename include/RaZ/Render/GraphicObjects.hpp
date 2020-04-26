@@ -3,9 +3,9 @@
 #ifndef RAZ_GRAPHICOBJECTS_HPP
 #define RAZ_GRAPHICOBJECTS_HPP
 
-#include <vector>
-
 #include "RaZ/Math/Vector.hpp"
+
+#include <vector>
 
 namespace Raz {
 

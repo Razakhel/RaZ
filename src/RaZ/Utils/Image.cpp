@@ -1,10 +1,10 @@
-#include <cassert>
-#include <fstream>
-#include <iostream>
-
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
+
+#include <cassert>
+#include <fstream>
+#include <iostream>
 
 namespace Raz {
 
@@ -20,9 +20,7 @@ bool ImageDataF::operator==(const ImageData& imgData) const {
   return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataF*>(&imgData)->data.cbegin());
 }
 
-Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace) : m_width{ width },
-                                                                                    m_height{ height },
-                                                                                    m_colorspace{ colorspace } {
+Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace) : m_width{ width }, m_height{ height }, m_colorspace{ colorspace } {
   switch (colorspace) {
     case ImageColorspace::DEPTH:
     case ImageColorspace::GRAY:
@@ -45,10 +43,19 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
 
   m_bitDepth = 8;
 
-  ImageDataBPtr imgData = ImageDataB::create();
-  imgData->data.resize(width * height * m_channelCount);
+  const std::size_t imageDataSize = width * height * m_channelCount;
 
-  m_data = std::move(imgData);
+  if (colorspace == ImageColorspace::DEPTH) {
+    ImageDataFPtr imgData = ImageDataF::create();
+    imgData->data.resize(imageDataSize);
+
+    m_data = std::move(imgData);
+  } else {
+    ImageDataBPtr imgData = ImageDataB::create();
+    imgData->data.resize(imageDataSize);
+
+    m_data = std::move(imgData);
+  }
 }
 
 void Image::read(const std::string& filePath, bool flipVertically) {

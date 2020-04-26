@@ -28,6 +28,9 @@ protected:
   Component(const Component&) = default;
   Component(Component&&) noexcept = default;
 
+  Component& operator=(const Component&) = default;
+  Component& operator=(Component&&) noexcept = default;
+
 private:
   static inline std::size_t m_maxId = 0;
 };

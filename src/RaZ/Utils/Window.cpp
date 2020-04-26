@@ -1,12 +1,10 @@
-#include <iostream>
-
 #include "GL/glew.h"
-#if defined(_WIN32)
-#if defined(_MSC_VER)
+#if defined(RAZ_PLATFORM_WINDOWS)
+#if defined(RAZ_COMPILER_MSVC)
 #define NOMINMAX
 #endif
 #include "GL/wglew.h"
-#elif defined(__gnu_linux__)
+#elif defined(RAZ_PLATFORM_LINUX)
 #include "GL/glxew.h"
 #endif
 #include "GLFW/glfw3.h"
@@ -16,13 +14,13 @@
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/html5.h>
 #endif
+#include <iostream>
 
 namespace Raz {
 
-Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t AASampleCount) : m_width{ width },
-                                                                                                           m_height{ height } {
-  glfwSetErrorCallback([] (int error, const char* description) {
-    std::cerr << "GLFW error " << error << ": " << description << std::endl;
+Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
+  glfwSetErrorCallback([] (int errorCode, const char* description) {
+    std::cerr << "GLFW error " << errorCode << ": " << description << std::endl;
   });
 
   if (!glfwInit())
@@ -37,11 +35,15 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 #endif
 
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-  glfwWindowHint(GLFW_SAMPLES, AASampleCount);
+  glfwWindowHint(GLFW_RESIZABLE, false);
+  glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
 
-#if defined(__APPLE__) // Setting the OpenGL forward compatibility is required on macOS
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#if defined(RAZ_CONFIG_DEBUG)
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+#endif
+
+#if defined(RAZ_PLATFORM_MAC) // Setting the OpenGL forward compatibility is required on macOS
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 #endif
 
   m_window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
@@ -73,6 +75,13 @@ void Window::setIcon(const Image& img) const {
   glfwSetWindowIcon(m_window, 1, &icon);
 }
 
+void Window::resize(unsigned int width, unsigned int height) {
+  m_width  = width;
+  m_height = height;
+
+  glfwSetWindowSize(m_window, static_cast<int>(width), static_cast<int>(height));
+}
+
 void Window::enableFaceCulling(bool value) const {
   if (value)
     Renderer::enable(Capability::CULL);
@@ -81,10 +90,10 @@ void Window::enableFaceCulling(bool value) const {
 }
 
 bool Window::recoverVerticalSyncState() const {
-#if defined(_WIN32)
+#if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT())
     return static_cast<bool>(wglGetSwapIntervalEXT());
-#elif defined(__gnu_linux__)
+#elif defined(RAZ_PLATFORM_LINUX)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
     unsigned int interval;
     glXQueryDrawable(glXGetCurrentDisplay(), glXGetCurrentDrawable(), GLX_SWAP_INTERVAL_EXT, &interval);
@@ -98,12 +107,12 @@ bool Window::recoverVerticalSyncState() const {
 }
 
 void Window::enableVerticalSync(bool value) const {
-#if defined(_WIN32)
+#if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT()) {
     wglSwapIntervalEXT(static_cast<int>(value));
     return;
   }
-#elif defined(__gnu_linux__)
+#elif defined(RAZ_PLATFORM_LINUX)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
     glXSwapIntervalEXT(glXGetCurrentDisplay(), glXGetCurrentDrawable(), value);
     glXSwapIntervalMESA(static_cast<unsigned int>(value));
@@ -275,17 +284,18 @@ bool Window::run(float deltaTime) {
   emscripten_webgl_commit_frame();
 #endif
 
-  glClearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
+  Renderer::clearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
   Renderer::clear(MaskType::COLOR, MaskType::DEPTH);
 
   return true;
 }
 
 Vec2f Window::recoverMousePosition() const {
-  double xPos {}, yPos {};
+  double xPos {};
+  double yPos {};
   glfwGetCursorPos(m_window, &xPos, &yPos);
 
-  return Vec2f({ static_cast<float>(xPos), static_cast<float>(yPos) });
+  return Vec2f(static_cast<float>(xPos), static_cast<float>(yPos));
 }
 
 void Window::setShouldClose() const {

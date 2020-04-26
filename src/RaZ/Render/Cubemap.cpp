@@ -1,4 +1,3 @@
-#include "GL/glew.h"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/Renderer.hpp"
@@ -177,8 +176,8 @@ void Cubemap::unbind() const {
 }
 
 void Cubemap::draw(const Camera& camera) const {
-  glDepthFunc(GL_LEQUAL);
-  glCullFace(GL_FRONT);
+  Renderer::setDepthFunction(DepthFunction::LESS_EQUAL);
+  Renderer::setFaceCulling(FaceOrientation::FRONT);
 
   m_program.use();
 
@@ -190,8 +189,8 @@ void Cubemap::draw(const Camera& camera) const {
 
   Mesh::drawUnitCube();
 
-  glCullFace(GL_BACK);
-  glDepthFunc(GL_LESS);
+  Renderer::setFaceCulling(FaceOrientation::BACK);
+  Renderer::setDepthFunction(DepthFunction::LESS);
 }
 
 } // namespace Raz

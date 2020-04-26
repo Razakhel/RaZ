@@ -13,6 +13,9 @@
 
 namespace Raz {
 
+class Window;
+using WindowPtr = std::unique_ptr<Window>;
+
 using KeyboardCallbacks    = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
 using MouseButtonCallbacks = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
 using MouseScrollCallback  = std::function<void(double, double)>;
@@ -23,7 +26,9 @@ using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks,
 /// Graphical window to render the scenes on, with input custom actions.
 class Window {
 public:
-  Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t AASampleCount = 1);
+  Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t antiAliasingSampleCount = 1);
+  Window(const Window&) = delete;
+  Window(Window&&) = default;
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -32,11 +37,18 @@ public:
   InputCallbacks& getCallbacks() { return m_callbacks; }
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
-  void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f({ red, green, blue, alpha })); }
+  void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f(red, green, blue, alpha)); }
   void setTitle(const std::string& title) const;
   void setIcon(const Image& img) const;
   void setIcon(const std::string& filePath) const { setIcon(Image(filePath, false)); }
 
+  template <typename... Args>
+  static WindowPtr create(Args&&... args) { return std::make_unique<Window>(std::forward<Args>(args)...); }
+
+  /// Resizes the window.
+  /// \param width New window width.
+  /// \param height New window height.
+  void resize(unsigned int width, unsigned int height);
   /// Changes the face culling's state.
   /// Enables or disables face culling according to the given parameter.
   /// \param value Value to apply.
@@ -131,12 +143,16 @@ public:
   /// Closes the window.
   void close();
 
+  Window& operator=(const Window&) = delete;
+  Window& operator=(Window&&) = default;
+
   ~Window() { close(); }
 
 private:
   unsigned int m_width {};
   unsigned int m_height {};
-  Vec4f m_clearColor = Vec4f({ 0.15f, 0.15f, 0.15f, 1.f });
+  Vec4f m_clearColor = Vec4f(0.15f, 0.15f, 0.15f, 1.f);
+
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
   OverlayPtr m_overlay {};

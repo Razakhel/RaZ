@@ -3,7 +3,7 @@
 namespace Raz {
 
 Entity& World::addEntity(bool enabled) {
-  m_entities.push_back(Entity::create(m_maxEntityIndex++, enabled));
+  m_entities.emplace_back(Entity::create(m_maxEntityIndex++, enabled));
 
   m_activeEntityCount += enabled;
 

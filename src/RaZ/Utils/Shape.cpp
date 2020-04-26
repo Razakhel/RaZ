@@ -37,8 +37,29 @@ bool Line::intersects(const Quad&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-bool Line::intersects(const AABB&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+bool Line::intersects(const AABB& aabb) const {
+  const Ray lineRay(m_beginPos, (m_endPos - m_beginPos).normalize());
+  RayHit hit;
+
+  if (!lineRay.intersects(aabb, &hit))
+    return false;
+
+  // Some implementations check for the hit distance to be positive or 0. However, since our ray-AABB intersection check returns true
+  //  with a negative distance when the ray's origin is inside the box, this check would be meaningless
+  // Actually, if reaching here, none of the potential cases should require to check that the hit distance is non-negative
+
+  // In certain cases, it's even harmful to do so. Given a line segment defined by points A & B, one being in a box & the other outside:
+  //
+  // ----------
+  // |        |
+  // |   A x-----x B
+  // |        |
+  // ----------
+  //
+  // Depending on the order of the points, the result would not be symmetrical: B->A would return a positive distance, telling there's an
+  //  intersection, and A->B a negative distance, telling there's none
+
+  return (hit.distance * hit.distance <= computeSquaredLength());
 }
 
 bool Line::intersects(const OBB&) const {
@@ -156,7 +177,7 @@ Vec3f Triangle::computeNormal() const {
   const Vec3f firstEdge  = m_secondPos - m_firstPos;
   const Vec3f secondEdge = m_thirdPos - m_firstPos;
 
-  return firstEdge.cross(secondEdge);
+  return firstEdge.cross(secondEdge).normalize();
 }
 
 void Triangle::makeCounterClockwise(const Vec3f& normal) {
@@ -237,7 +258,7 @@ Vec3f AABB::computeProjection(const Vec3f& point) const {
   const float closestY = std::max(std::min(point[1], m_rightTopFrontPos[1]), m_leftBottomBackPos[1]);
   const float closestZ = std::max(std::min(point[2], m_rightTopFrontPos[2]), m_leftBottomBackPos[2]);
 
-  return Vec3f({ closestX, closestY, closestZ });
+  return Vec3f(closestX, closestY, closestZ);
 }
 
 // OBB functions

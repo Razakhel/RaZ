@@ -14,10 +14,10 @@ bool PhysicsSystem::update(float deltaTime) {
       auto& rigidBody = entity->getComponent<RigidBody>();
       rigidBody.applyForces(m_gravity);
 
-      const Vec3f acceleration = rigidBody.getForces() * (1.f / rigidBody.getMass());
+      const Vec3f acceleration = rigidBody.getForces() * rigidBody.getInvMass();
       const Vec3f oldVelocity  = rigidBody.getVelocity();
 
-      const Vec3f velocity = oldVelocity * rigidBody.getFriction() + acceleration * deltaTime;
+      const Vec3f velocity = oldVelocity * m_friction + acceleration * deltaTime;
       rigidBody.setVelocity(velocity);
 
       entity->getComponent<Transform>().translate((oldVelocity + velocity) * 0.5f * deltaTime);

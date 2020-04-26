@@ -24,8 +24,8 @@ void Overlay::addLabel(std::string label) {
   m_elements.emplace_back(OverlayLabel::create(std::move(label)));
 }
 
-void Overlay::addButton(std::string label, std::function<void()> action) {
-  m_elements.emplace_back(OverlayButton::create(std::move(label), std::move(action)));
+void Overlay::addButton(std::string label, std::function<void()> actionClick) {
+  m_elements.emplace_back(OverlayButton::create(std::move(label), std::move(actionClick)));
 }
 
 void Overlay::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
@@ -34,7 +34,7 @@ void Overlay::addCheckbox(std::string label, std::function<void()> actionOn, std
 
 void Overlay::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
   m_elements.emplace_back(OverlayTextbox::create(std::move(label), std::move(callback)));
-  static_cast<OverlayTextbox&>(*m_elements.back()).text.reserve(64);
+  static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
 }
 
 void Overlay::addSeparator() {
@@ -61,15 +61,15 @@ void Overlay::render() {
   for (auto& element : m_elements) {
     switch (element->getType()) {
       case OverlayElementType::LABEL:
-        ImGui::TextUnformatted(element->label.c_str());
+        ImGui::TextUnformatted(element->m_label.c_str());
         break;
 
       case OverlayElementType::BUTTON:
       {
         const auto& button = static_cast<OverlayButton&>(*element);
 
-        if (ImGui::Button(button.label.c_str()))
-          button.action();
+        if (ImGui::Button(button.m_label.c_str()))
+          button.m_actionClick();
 
         break;
       }
@@ -77,15 +77,15 @@ void Overlay::render() {
       case OverlayElementType::CHECKBOX:
       {
         auto& checkbox = static_cast<OverlayCheckbox&>(*element);
-        const bool prevValue = checkbox.isChecked;
+        const bool prevValue = checkbox.m_isChecked;
 
-        ImGui::Checkbox(checkbox.label.c_str(), &checkbox.isChecked);
+        ImGui::Checkbox(checkbox.m_label.c_str(), &checkbox.m_isChecked);
 
-        if (checkbox.isChecked != prevValue) {
-          if (checkbox.isChecked)
-            checkbox.actionOn();
+        if (checkbox.m_isChecked != prevValue) {
+          if (checkbox.m_isChecked)
+            checkbox.m_actionOn();
           else
-            checkbox.actionOff();
+            checkbox.m_actionOff();
         }
 
         break;
@@ -96,19 +96,19 @@ void Overlay::render() {
         static auto callback = [] (ImGuiTextEditCallbackData* data) {
           auto& textbox = *static_cast<OverlayTextbox*>(data->UserData);
 
-          textbox.text += static_cast<char>(data->EventChar);
+          textbox.m_text += static_cast<char>(data->EventChar);
 
-          if (textbox.callback)
-            textbox.callback(textbox.text);
+          if (textbox.m_callback)
+            textbox.m_callback(textbox.m_text);
 
           return 0;
         };
 
         auto& textbox = static_cast<OverlayTextbox&>(*element);
 
-        ImGui::InputText(textbox.label.c_str(),
-                         textbox.text.data(),
-                         textbox.text.capacity(),
+        ImGui::InputText(textbox.m_label.c_str(),
+                         textbox.m_text.data(),
+                         textbox.m_text.capacity(),
                          ImGuiInputTextFlags_CallbackCharFilter,
                          callback,
                          &textbox);
@@ -121,11 +121,11 @@ void Overlay::render() {
         break;
 
       case OverlayElementType::FRAME_TIME:
-        ImGui::Text(element->label.c_str(), static_cast<double>(1000.f / ImGui::GetIO().Framerate));
+        ImGui::Text(element->m_label.c_str(), static_cast<double>(1000.f / ImGui::GetIO().Framerate));
         break;
 
       case OverlayElementType::FPS_COUNTER:
-        ImGui::Text(element->label.c_str(), static_cast<double>(ImGui::GetIO().Framerate));
+        ImGui::Text(element->m_label.c_str(), static_cast<double>(ImGui::GetIO().Framerate));
         break;
 
       default:

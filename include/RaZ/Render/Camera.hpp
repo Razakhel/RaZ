@@ -24,7 +24,7 @@ enum class ProjectionType : uint8_t {
 };
 
 /// Camera class, simulating a point of view for a scene to be rendered from.
-class Camera : public Component {
+class Camera final : public Component {
 public:
   Camera() = default;
   Camera(unsigned int frameWidth, unsigned int frameHeight,

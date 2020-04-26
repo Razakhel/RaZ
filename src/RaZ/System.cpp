@@ -12,13 +12,13 @@ bool System::containsEntity(const EntityPtr& entity) {
 }
 
 void System::linkEntity(const EntityPtr& entity) {
-  m_entities.push_back(entity.get());
+  m_entities.emplace_back(entity.get());
 }
 
 void System::unlinkEntity(const EntityPtr& entity) {
   for (std::size_t entityIndex = 0; entityIndex < m_entities.size(); ++entityIndex) {
     if (m_entities[entityIndex]->getId() == entity->getId()) {
-      m_entities.erase(m_entities.begin() + entityIndex);
+      m_entities.erase(m_entities.begin() + static_cast<std::ptrdiff_t>(entityIndex));
       break;
     }
   }

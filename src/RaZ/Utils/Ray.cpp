@@ -1,10 +1,12 @@
+#include "RaZ/Utils/FloatUtils.hpp"
 #include "RaZ/Utils/Ray.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 namespace Raz {
 
 namespace {
 
-bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secondHitDist) {
+constexpr bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secondHitDist) {
   const float discriminant = b * b - 4.f * a * c;
 
   if (discriminant < 0.f) {
@@ -29,17 +31,29 @@ bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secon
 
 } // namespace
 
-bool Ray::intersects(const Vec3f& point) const {
-  if (point == m_origin)
+bool Ray::intersects(const Vec3f& point, RayHit* hit) const {
+  if (point == m_origin) {
+    if (hit) {
+      hit->position = point;
+      hit->distance = 0.f;
+    }
+
     return true;
+  }
 
-  const Vec3f pointDir = (point - m_origin).normalize();
+  const Vec3f pointDir       = point - m_origin;
+  const Vec3f normedPointDir = pointDir.normalize();
 
-  return FloatUtils::areNearlyEqual(pointDir.dot(m_direction), 1.f);
-}
+  if (!FloatUtils::areNearlyEqual(normedPointDir.dot(m_direction), 1.f))
+    return false;
 
-bool Ray::intersects(const Line&, RayHit*) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+  if (hit) {
+    hit->position  = point;
+    hit->normal    = -normedPointDir;
+    hit->distance = pointDir.computeLength();
+  }
+
+  return true;
 }
 
 bool Ray::intersects(const Plane& plane, RayHit* hit) const {
@@ -95,7 +109,7 @@ bool Ray::intersects(const Sphere& sphere, RayHit* hit) const {
   return true;
 }
 
-bool Ray::intersects(const Triangle& triangle) const {
+bool Ray::intersects(const Triangle& triangle, RayHit* hit) const {
   const Vec3f firstEdge   = triangle.getSecondPos() - triangle.getFirstPos();
   const Vec3f secondEdge  = triangle.getThirdPos() - triangle.getFirstPos();
   const Vec3f pVec        = m_direction.cross(secondEdge);
@@ -104,7 +118,7 @@ bool Ray::intersects(const Triangle& triangle) const {
   if (FloatUtils::areNearlyEqual(std::abs(determinant), 0.f))
     return false;
 
-  const float invDeterm = 1 / determinant;
+  const float invDeterm = 1.f / determinant;
 
   const Vec3f invPlaneDir    = m_origin - triangle.getFirstPos();
   const float firstBaryCoord = invPlaneDir.dot(pVec) * invDeterm;
@@ -120,34 +134,61 @@ bool Ray::intersects(const Triangle& triangle) const {
 
   const float hitDist = secondEdge.dot(qVec) * invDeterm;
 
-  return (hitDist > 0.f);
+  if (hitDist <= 0.f)
+    return false;
+
+  if (hit) {
+    hit->position = m_origin + m_direction * hitDist;
+
+    const Vec3f normal = firstEdge.cross(secondEdge).normalize();
+
+    // We want the normal facing the ray, not the opposite direction (no culling)
+    // This may not be the ideal behavior; this may change when a real use case will be available
+    hit->normal = (normal.dot(m_direction) > 0.f ? -normal : normal);
+
+    hit->distance = hitDist;
+  }
+
+  return true;
 }
 
-bool Ray::intersects(const Quad&, RayHit*) const {
-  throw std::runtime_error("Error: Not implemented yet.");
-}
+bool Ray::intersects(const AABB& aabb, RayHit* hit) const {
+  // Branchless algorithm based on Tavianator's:
+  //  - https://tavianator.com/fast-branchless-raybounding-box-intersections/
+  //  - https://tavianator.com/cgit/dimension.git/tree/libdimension/bvh/bvh.c#n196
 
-bool Ray::intersects(const AABB& aabb) const {
-  const Vec3f invDir({ 1.f / m_direction[0], 1.f / m_direction[1], 1.f / m_direction[2] });
-  Vec3f minPos = aabb.getLeftBottomBackPos();
-  Vec3f maxPos = aabb.getRightTopFrontPos();
+  const Vec3f minDist = (aabb.getLeftBottomBackPos() - m_origin) * m_invDirection;
+  const Vec3f maxDist = (aabb.getRightTopFrontPos() - m_origin) * m_invDirection;
 
-  if (m_direction[0] < 0.f)
-    std::swap(minPos[0], maxPos[0]);
+  const float minDistX = std::min(minDist[0], maxDist[0]);
+  const float maxDistX = std::max(minDist[0], maxDist[0]);
 
-  if (m_direction[1] < 0.f)
-    std::swap(minPos[1], maxPos[1]);
+  const float minDistY = std::min(minDist[1], maxDist[1]);
+  const float maxDistY = std::max(minDist[1], maxDist[1]);
 
-  if (m_direction[2] < 0.f)
-    std::swap(minPos[2], maxPos[2]);
+  const float minDistZ = std::min(minDist[2], maxDist[2]);
+  const float maxDistZ = std::max(minDist[2], maxDist[2]);
 
-  const Vec3f minHitPos = (minPos - m_origin) * invDir;
-  const Vec3f maxHitPos = (maxPos - m_origin) * invDir;
+  const float minHitDist = std::max(minDistX, std::max(minDistY, minDistZ));
+  const float maxHitDist = std::min(maxDistX, std::min(maxDistY, maxDistZ));
 
-  const float minHitDist = std::max(minHitPos[0], std::max(minHitPos[1], std::max(minHitPos[2], 0.f)));
-  const float maxHitDist = std::min(maxHitPos[0], std::min(maxHitPos[1], maxHitPos[2]));
+  if (maxHitDist < std::max(minHitDist, 0.f))
+    return false;
 
-  return (minHitDist <= maxHitDist);
+  // If reaching here with a negative distance (minHitDist < 0), this means that the ray's origin is inside the box
+  // Currently, in this case, the computed hit position represents the intersection behind the ray
+
+  if (hit) {
+    hit->position = m_origin + m_direction * minHitDist;
+
+    // Normal computing method based on John Novak's: http://blog.johnnovak.net/2016/10/22/the-nim-raytracer-project-part-4-calculating-box-normals/
+    const Vec3f hitDir = (hit->position - aabb.computeCentroid()) / aabb.computeHalfExtents();
+    hit->normal = Vec3f(std::trunc(hitDir[0]), std::trunc(hitDir[1]), std::trunc(hitDir[2])).normalize();
+
+    hit->distance = minHitDist;
+  }
+
+  return true;
 }
 
 Vec3f Ray::computeProjection(const Vec3f& point) const {

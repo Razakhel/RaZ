@@ -1,7 +1,3 @@
-#include <array>
-#include <fstream>
-#include <iostream>
-
 #if defined(__EMSCRIPTEN__)
 #include <png.h>
 #include <zlib.h>
@@ -11,6 +7,10 @@
 #endif
 
 #include "RaZ/Utils/Image.hpp"
+
+#include <array>
+#include <fstream>
+#include <iostream>
 
 namespace Raz {
 
@@ -125,7 +125,7 @@ void Image::savePng(std::ofstream& file, bool flipVertically) const {
   if (!infoStruct)
     throw std::runtime_error("Error: Couldn't initialize PNG info struct");
 
-  uint32_t colorType {};
+  int colorType {};
   switch (m_colorspace) {
     case ImageColorspace::GRAY:
     case ImageColorspace::DEPTH:
@@ -167,14 +167,30 @@ void Image::savePng(std::ofstream& file, bool flipVertically) const {
 
   png_set_write_fn(writeStruct, &file, [] (png_structp pngWritePtr, png_bytep data, png_size_t length) {
     png_voidp outPtr = png_get_io_ptr(pngWritePtr);
-    static_cast<std::ostream*>(outPtr)->write(reinterpret_cast<const char*>(data), length);
+    static_cast<std::ostream*>(outPtr)->write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(length));
   }, nullptr);
   png_write_info(writeStruct, infoStruct);
 
-  const auto dataPtr = static_cast<const uint8_t*>(m_data->getDataPtr());
+  const std::size_t pixelIndexBase = m_width * m_channelCount;
 
-  for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex)
-    png_write_row(writeStruct, &dataPtr[m_width * m_channelCount * (flipVertically ? m_height - 1 - heightIndex : heightIndex)]);
+  if (m_data->getDataType() == ImageDataType::FLOAT) {
+    // Manually converting floating-point pixels to standard byte ones
+    const std::vector<float>& pixels = static_cast<ImageDataF*>(m_data.get())->data;
+    std::vector<uint8_t> rgbPixels(pixels.size());
+
+    for (std::size_t i = 0; i < pixels.size(); ++i)
+      rgbPixels[i] = static_cast<uint8_t>(pixels[i] * 255);
+
+    const uint8_t* dataPtr = rgbPixels.data();
+
+    for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex)
+      png_write_row(writeStruct, &dataPtr[pixelIndexBase * (flipVertically ? m_height - 1 - heightIndex : heightIndex)]);
+  } else {
+    const auto dataPtr = static_cast<const uint8_t*>(m_data->getDataPtr());
+
+    for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex)
+      png_write_row(writeStruct, &dataPtr[pixelIndexBase * (flipVertically ? m_height - 1 - heightIndex : heightIndex)]);
+  }
 
   png_write_end(writeStruct, infoStruct);
   png_destroy_write_struct(&writeStruct, &infoStruct);

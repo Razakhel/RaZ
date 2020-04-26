@@ -21,7 +21,7 @@ TEST_CASE("Image manual creation") {
 }
 
 TEST_CASE("Image imported PNG") {
-  const Raz::Image img("../../tests/assets/images/defaultTest.png");
+  const Raz::Image img(RAZ_TESTS_ROOT + "assets/images/defaultTest.png"s);
 
   CHECK(img.getWidth() == 2);
   CHECK(img.getHeight() == 2);
@@ -49,7 +49,7 @@ TEST_CASE("Image imported PNG") {
   CHECK(*(static_cast<const uint8_t*>(img.getDataPtr()) + 14) == 191);
   CHECK(*(static_cast<const uint8_t*>(img.getDataPtr()) + 15) == 255);
 
-  const Raz::Image imgFlipped("../../tests/assets/images/defaultTest.png", true);
+  const Raz::Image imgFlipped(RAZ_TESTS_ROOT + "assets/images/defaultTest.png"s, true);
 
   CHECK(imgFlipped != img);
 
@@ -75,7 +75,7 @@ TEST_CASE("Image imported PNG") {
 }
 
 TEST_CASE("Image imported TGA") {
-  const Raz::Image img("../../tests/assets/images/defaultTest.tga");
+  const Raz::Image img(RAZ_TESTS_ROOT + "assets/images/defaultTest.tga"s);
 
   CHECK(img.getWidth() == 2);
   CHECK(img.getHeight() == 2);
@@ -100,7 +100,7 @@ TEST_CASE("Image imported TGA") {
   CHECK(*(static_cast<const uint8_t*>(img.getDataPtr()) + 11) == 191);
 
   // Checking that the same image with a vertical flip has correct values
-  const Raz::Image imgFlipped("../../tests/assets/images/defaultTest.tga", true);
+  const Raz::Image imgFlipped(RAZ_TESTS_ROOT + "assets/images/defaultTest.tga"s, true);
 
   CHECK(imgFlipped != img);
 

@@ -3,6 +3,7 @@
 #ifndef RAZ_RENDERER_HPP
 #define RAZ_RENDERER_HPP
 
+#include <bitset>
 #include <cstddef>
 #include <string>
 
@@ -47,10 +48,45 @@ enum class MaskType : unsigned int {
   STENCIL = 1024   // GL_STENCIL_BUFFER_BIT
 };
 
+enum class DepthFunction : unsigned int {
+  NEVER         = 512, // GL_NEVER
+  EQUAL         = 514, // GL_EQUAL
+  NOT_EQUAL     = 517, // GL_NOTEQUAL
+  LESS          = 513, // GL_LESS
+  LESS_EQUAL    = 515, // GL_LEQUAL
+  GREATER       = 516, // GL_GREATER
+  GREATER_EQUAL = 518, // GL_GEQUAL
+  ALWAYS        = 519  // GL_ALWAYS
+};
+
+enum class FaceOrientation : unsigned int {
+  FRONT      = 1028, // GL_FRONT
+  BACK       = 1029, // GL_BACK
+  FRONT_BACK = 1032  // GL_FRONT_AND_BACK
+};
+
+enum class PolygonMode : unsigned int {
+  POINT = 6912, // GL_POINT
+  LINE  = 6913, // GL_LINE
+  FILL  = 6914  // GL_FILL
+};
+
 enum class BufferType : unsigned int {
   ARRAY_BUFFER   = 34962, // GL_ARRAY_BUFFER
   ELEMENT_BUFFER = 34963, // GL_ELEMENT_ARRAY_BUFFER
   UNIFORM_BUFFER = 35345  // GL_UNIFORM_BUFFER
+};
+
+enum class BufferDataUsage : unsigned int {
+  STREAM_DRAW  = 35040, // GL_STREAM_DRAW
+  STREAM_READ  = 35041, // GL_STREAM_READ
+  STREAM_COPY  = 35042, // GL_STREAM_COPY
+  STATIC_DRAW  = 35044, // GL_STATIC_DRAW
+  STATIC_READ  = 35045, // GL_STATIC_READ
+  STATIC_COPY  = 35046, // GL_STATIC_COPY
+  DYNAMIC_DRAW = 35048, // GL_DYNAMIC_DRAW
+  DYNAMIC_READ = 35049, // GL_DYNAMIC_READ
+  DYNAMIC_COPY = 35050, // GL_DYNAMIC_COPY
 };
 
 enum class TextureType : unsigned int {
@@ -86,6 +122,8 @@ enum class TextureParamValue : unsigned int {
 
 enum class TextureFormat : unsigned int {
   RED           = 6403,  // GL_RED
+  GREEN         = 6404,  // GL_GREEN
+  BLUE          = 6405,  // GL_BLUE
   RG            = 33319, // GL_RG
   RGB           = 6407,  // GL_RGB
   BGR           = 32992, // GL_BGR
@@ -93,6 +131,7 @@ enum class TextureFormat : unsigned int {
   BGRA          = 32993, // GL_BGRA
   SRGB          = 35904, // GL_SRGB
   DEPTH         = 6402,  // GL_DEPTH_COMPONENT
+  STENCIL       = 6401,  // GL_STENCIL_INDEX
   DEPTH_STENCIL = 34041  // GL_DEPTH_STENCIL
 };
 
@@ -135,6 +174,76 @@ enum class ShaderStatus : unsigned int {
   COMPILE = 35713 // GL_COMPILE_STATUS
 };
 
+enum class FramebufferType : unsigned int {
+  READ_FRAMEBUFFER = 36008, // GL_READ_FRAMEBUFFER
+  DRAW_FRAMEBUFFER = 36009, // GL_DRAW_FRAMEBUFFER
+  FRAMEBUFFER      = 36160  // GL_FRAMEBUFFER
+};
+
+enum class FramebufferStatus : unsigned int {
+  COMPLETE                      = 36053, // GL_FRAMEBUFFER_COMPLETE
+  UNDEFINED                     = 33305, // GL_FRAMEBUFFER_UNDEFINED
+  INCOMPLETE_ATTACHMENT         = 36054, // GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT
+  INCOMPLETE_MISSING_ATTACHMENT = 36055, // GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
+  INCOMPLETE_DRAW_BUFFER        = 36059, // GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
+  INCOMPLETE_READ_BUFFER        = 36060, // GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
+  UNSUPPORTED                   = 36061, // GL_FRAMEBUFFER_UNSUPPORTED
+  INCOMPLETE_MULTISAMPLE        = 36182, // GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
+  INCOMPLETE_LAYER_TARGETS      = 36264  // GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS
+};
+
+enum class FramebufferAttachment : unsigned int {
+  DEPTH         = 36096, // GL_DEPTH_ATTACHMENT
+  STENCIL       = 36128, // GL_STENCIL_ATTACHMENT
+  DEPTH_STENCIL = 33306, // GL_DEPTH_STENCIL_ATTACHMENT
+
+  COLOR0 = 36064, // GL_COLOR_ATTACHMENT0
+  COLOR1 = 36065, // GL_COLOR_ATTACHMENT1
+  COLOR2 = 36066, // GL_COLOR_ATTACHMENT2
+  COLOR3 = 36067, // GL_COLOR_ATTACHMENT3
+  COLOR4 = 36068, // GL_COLOR_ATTACHMENT4
+  COLOR5 = 36069, // GL_COLOR_ATTACHMENT5
+  COLOR6 = 36070, // GL_COLOR_ATTACHMENT6
+  COLOR7 = 36071  // GL_COLOR_ATTACHMENT7
+};
+
+enum class DrawBuffer : unsigned int {
+  NONE        = 0,     // GL_NONE
+  FRONT_LEFT  = 1024,  // GL_FRONT_LEFT
+  FRONT_RIGHT = 1025,  // GL_FRONT_RIGHT
+  BACK_LEFT   = 1026,  // GL_BACK_LEFT
+  BACK_RIGHT  = 1027,  // GL_BACK_RIGHT
+
+  COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0),
+  COLOR_ATTACHMENT1 = static_cast<unsigned int>(FramebufferAttachment::COLOR1),
+  COLOR_ATTACHMENT2 = static_cast<unsigned int>(FramebufferAttachment::COLOR2),
+  COLOR_ATTACHMENT3 = static_cast<unsigned int>(FramebufferAttachment::COLOR3),
+  COLOR_ATTACHMENT4 = static_cast<unsigned int>(FramebufferAttachment::COLOR4),
+  COLOR_ATTACHMENT5 = static_cast<unsigned int>(FramebufferAttachment::COLOR5),
+  COLOR_ATTACHMENT6 = static_cast<unsigned int>(FramebufferAttachment::COLOR6),
+  COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)
+};
+
+enum class ErrorCode : unsigned int {
+  INVALID_ENUM                  = 1280, // GL_INVALID_ENUM
+  INVALID_VALUE                 = 1281, // GL_INVALID_VALUE
+  INVALID_OPERATION             = 1282, // GL_INVALID_OPERATION
+  STACK_OVERFLOW                = 1283, // GL_STACK_OVERFLOW
+  STACK_UNDERFLOW               = 1284, // GL_STACK_UNDERFLOW
+  OUT_OF_MEMORY                 = 1285, // GL_OUT_OF_MEMORY
+  INVALID_FRAMEBUFFER_OPERATION = 1286, // GL_INVALID_FRAMEBUFFER_OPERATION
+#ifdef RAZ_USE_GL4
+  CONTEXT_LOST                  = 1287, // GL_CONTEXT_LOST
+#endif
+  NONE                          = 0     // GL_NO_ERROR
+};
+
+#ifdef RAZ_USE_GL4
+using ErrorCodes = std::bitset<8>;
+#else
+using ErrorCodes = std::bitset<7>;
+#endif
+
 class Renderer {
 public:
   Renderer() = delete;
@@ -146,19 +255,27 @@ public:
   static void enable(Capability capability);
   static void disable(Capability capability);
   static bool isEnabled(Capability capability);
+  static void clearColor(float red, float green, float blue, float alpha);
+  static void clearColor(float values[4]) { clearColor(values[0], values[1], values[2], values[3]); }
   static void clear(MaskType type) { clear(static_cast<unsigned int>(type)); }
   static void clear(MaskType type1, MaskType type2) { clear(static_cast<unsigned int>(type1) | static_cast<unsigned int>(type2)); }
   static void clear(MaskType type1, MaskType type2, MaskType type3) { clear(static_cast<unsigned int>(type1)
                                                                           | static_cast<unsigned int>(type2)
                                                                           | static_cast<unsigned int>(type3)); }
+  static void setDepthFunction(DepthFunction func);
+  static void setFaceCulling(FaceOrientation orientation);
+  static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
+  static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }
   static void generateBuffer(unsigned int& index) { generateBuffers(1, &index); }
   static void bindBuffer(BufferType type, unsigned int index);
   static void unbindBuffer(BufferType type) { bindBuffer(type, 0); }
   static void bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex);
-  static void sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data);
-  template <typename T> static void sendBufferSubData(BufferType type, ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
+  static void bindBufferRange(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex, std::ptrdiff_t offset, std::ptrdiff_t size);
+  static void sendBufferData(BufferType type, std::ptrdiff_t size, const void* data, BufferDataUsage usage);
+  static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::ptrdiff_t dataSize, const void* data);
+  template <typename T> static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
   static void deleteBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteBuffers(unsigned int (&indices)[N]) { deleteBuffers(N, indices); }
   static void deleteBuffer(unsigned int& index) { deleteBuffers(1, &index); }
@@ -221,16 +338,79 @@ public:
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
+  /// Gets the uniform's location (ID) corresponding to the given name.
+  /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).
+  /// \param programIndex Index of the shader program to which is bound the uniform.
+  /// \param uniformName Name of the uniform to recover the location from.
+  /// \return Location (ID) of the uniform.
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
-  static void generateFramebuffers(unsigned int count, unsigned int* indices);
+  /// Sends an integer as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param value Integer to be sent.
+  static void sendUniform(int uniformIndex, int value);
+  /// Sends an unsigned integer as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param value Unsigned integer to be sent.
+  static void sendUniform(int uniformIndex, unsigned int value);
+  /// Sends a floating-point value as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param value Floating-point value to be sent.
+  static void sendUniform(int uniformIndex, float value);
+  /// Sends a floating-point 1D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector1(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 2D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector2(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 3D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector3(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 4D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector4(int uniformIndex, const float* values, int count = 1);
+  /// Sends a floating-point 2x2 matrix as uniform.
+  /// \param uniformIndex Index of the uniform to send the matrix's data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of matrices to be sent.
+  /// \param transpose Defines whether the matrix should be transposed when sent; false if sending it as column-major, true if row-major.
+  static void sendUniformMatrix2x2(int uniformIndex, const float* values, int count = 1, bool transpose = false);
+  /// Sends a floating-point 3x3 matrix as uniform.
+  /// \param uniformIndex Index of the uniform to send the matrix's data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of matrices to be sent.
+  /// \param transpose Defines whether the matrix should be transposed when sent; false if sending it as column-major, true if row-major.
+  static void sendUniformMatrix3x3(int uniformIndex, const float* values, int count = 1, bool transpose = false);
+  /// Sends a floating-point 4x4 matrix as uniform.
+  /// \param uniformIndex Index of the uniform to send the matrix's data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of matrices to be sent.
+  /// \param transpose Defines whether the matrix should be transposed when sent; false if sending it as column-major, true if row-major.
+  static void sendUniformMatrix4x4(int uniformIndex, const float* values, int count = 1, bool transpose = false);
+  static void generateFramebuffers(int count, unsigned int* indices);
   template <std::size_t N> static void generateFramebuffers(unsigned int (&indices)[N]) { generateFramebuffers(N, indices); }
   static void generateFramebuffer(unsigned int& index) { generateFramebuffers(1, &index); }
-  static void bindFramebuffer(unsigned int index);
-  static void unbindFramebuffer() { bindFramebuffer(0); }
+  static FramebufferStatus getFramebufferStatus(FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static bool isFramebufferComplete(FramebufferType type = FramebufferType::FRAMEBUFFER) { return getFramebufferStatus(type) == FramebufferStatus::COMPLETE; }
+  static void setFramebufferTexture2D(FramebufferAttachment attachment,
+                                      TextureType textureType, unsigned int textureIndex, int mipmapLevel,
+                                      FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static void setDrawBuffers(unsigned int count, const DrawBuffer* buffers);
+  template <std::size_t N> static void setDrawBuffers(DrawBuffer (&buffers)[N]) { setDrawBuffers(N, buffers); }
+  static void bindFramebuffer(unsigned int index, FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static void unbindFramebuffer(FramebufferType type = FramebufferType::FRAMEBUFFER) { bindFramebuffer(0, type); }
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
-  static void checkErrors();
+  static ErrorCodes recoverErrors();
+  static void printErrors();
 
   Renderer& operator=(const Renderer&) = delete;
   Renderer& operator=(Renderer&&) noexcept = delete;
@@ -239,6 +419,8 @@ public:
 
 private:
   static void clear(unsigned int mask);
+  static constexpr uint8_t recoverErrorCodeIndex(ErrorCode code) { return static_cast<uint8_t>(static_cast<unsigned int>(code)
+                                                                                             - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)); }
 
   static inline bool s_isInitialized = false;
 };

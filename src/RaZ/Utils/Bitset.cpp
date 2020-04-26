@@ -1,11 +1,11 @@
-#include <algorithm>
-
 #include "RaZ/Utils/Bitset.hpp"
+
+#include <algorithm>
 
 namespace Raz {
 
 bool Bitset::isEmpty() const {
-  for (auto&& bit : m_bits) {
+  for (bool bit : m_bits) {
     if (bit)
       return false;
   }
@@ -23,7 +23,7 @@ void Bitset::setBit(std::size_t position, bool value) {
 Bitset Bitset::operator~() const {
   Bitset res = *this;
 
-  for (auto&& bit : res.getBits())
+  for (auto bit : res.getBits())
     bit = !bit;
 
   return res;

@@ -1,9 +1,9 @@
+#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
+
 #include <fbxsdk.h>
 #include <fstream>
 #include <iostream>
-
-#include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
 
 namespace Raz {
 
@@ -90,7 +90,7 @@ void Mesh::importFbx(const std::string& filePath) {
     std::vector<unsigned int>& indices = submesh.getTriangleIndices();
 
     // Process recovered data
-    indices.reserve(static_cast<std::size_t>(fbxMesh->GetPolygonCount() * 3));
+    indices.reserve(static_cast<std::size_t>(fbxMesh->GetPolygonCount()) * 3);
 
     for (int polyIndex = 0; polyIndex < fbxMesh->GetPolygonCount(); ++polyIndex) {
       indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));

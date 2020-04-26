@@ -3,10 +3,10 @@
 #ifndef RAZ_SYSTEM_HPP
 #define RAZ_SYSTEM_HPP
 
-#include <vector>
-
 #include "RaZ/Entity.hpp"
 #include "RaZ/Utils/Bitset.hpp"
+
+#include <vector>
 
 namespace Raz {
 
@@ -16,6 +16,9 @@ using SystemPtr = std::unique_ptr<System>;
 /// System class representing a base System to be inherited.
 class System {
 public:
+  System(const System&) = delete;
+  System(System&&) noexcept = delete;
+
   const Bitset& getAcceptedComponents() const { return m_acceptedComponents; }
 
   /// Gets the ID of the given system.
@@ -42,6 +45,9 @@ public:
   virtual bool update(float deltaTime) = 0;
   /// Destroys the system.
   virtual void destroy() {}
+
+  System& operator=(const System&) = delete;
+  System& operator=(System&&) noexcept = delete;
 
   virtual ~System() = default;
 

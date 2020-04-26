@@ -4,11 +4,20 @@ set(CMAKE_CXX_STANDARD 17)
 
 enable_testing()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+set(
+    RAZ_TESTS_COMPILER_FLAGS
+
+    ${RAZ_COMPILER_FLAGS}
+)
+
+if (RAZ_COMPILER_CLANG)
     set(
         RAZ_TESTS_COMPILER_FLAGS
 
-        -Wno-float-equal
+        ${RAZ_COMPILER_FLAGS}
+        -Wno-double-promotion # [long] double/float operations are voluntarily made
+        -Wno-float-equal # Floating-point strict equality checks are voluntarily made
+        -Wno-header-hygiene # The namespace std::literals is imported in the Catch.hpp custom header
     )
 endif ()
 
@@ -41,6 +50,9 @@ target_include_directories(
     "${CMAKE_CURRENT_SOURCE_DIR}/Catch"
     "${CMAKE_HOME_DIRECTORY}/extern"
 )
+
+# Adding a definition for the tests root path, so that it can be used in tests instead of full relative paths
+target_compile_definitions(RaZ_Tests PRIVATE -DRAZ_TESTS_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
 
 # Disabling some warnings in tests
 target_compile_options(RaZ_Tests PRIVATE ${RAZ_TESTS_COMPILER_FLAGS})

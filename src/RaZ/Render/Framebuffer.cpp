@@ -1,8 +1,7 @@
-#include <iostream>
-
-#include "GL/glew.h"
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/Renderer.hpp"
+
+#include <iostream>
 
 namespace Raz {
 
@@ -11,19 +10,18 @@ Framebuffer::Framebuffer() {
 }
 
 Framebuffer::Framebuffer(ShaderProgram& program) : Framebuffer() {
-  assignVertexShader(program);
+  program.setVertexShader(recoverVertexShader());
   initBuffers(program);
 }
 
 Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
-  : m_index{ std::exchange(fbo.m_index, GL_INVALID_INDEX) },
+  : m_index{ std::exchange(fbo.m_index, std::numeric_limits<unsigned int>::max()) },
     m_depthBuffer{ std::move(fbo.m_depthBuffer) },
-    m_colorBuffer{ std::move(fbo.m_colorBuffer) },
-    m_normalBuffer{ std::move(fbo.m_normalBuffer) } {
+    m_colorBuffers{ std::move(fbo.m_colorBuffers) } {
   mapBuffers();
 }
 
-void Framebuffer::assignVertexShader(ShaderProgram& program) {
+VertexShader Framebuffer::recoverVertexShader() {
   static const std::string vertSource = R"(
     #version 330 core
 
@@ -39,7 +37,24 @@ void Framebuffer::assignVertexShader(ShaderProgram& program) {
     }
   )";
 
-  program.setVertexShader(VertexShader::loadFromSource(vertSource));
+  return VertexShader::loadFromSource(vertSource);
+}
+
+void Framebuffer::addDepthBuffer(unsigned int width, unsigned int height) {
+  assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
+
+  m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH, false);
+  mapBuffers();
+}
+
+void Framebuffer::addColorBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace) {
+  if (colorspace == ImageColorspace::DEPTH) {
+    addDepthBuffer(width, height);
+    return;
+  }
+
+  m_colorBuffers.emplace_back(Texture::create(width, height, colorspace, false));
+  mapBuffers();
 }
 
 void Framebuffer::initBuffers(const ShaderProgram& program) const {
@@ -54,17 +69,22 @@ void Framebuffer::initBuffers(const ShaderProgram& program) const {
 }
 
 void Framebuffer::mapBuffers() const {
-  constexpr std::array<GLenum, 2> colorBuffers = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-
   bind();
 
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer->getIndex(), 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[0], GL_TEXTURE_2D, m_colorBuffer->getIndex(), 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, colorBuffers[1], GL_TEXTURE_2D, m_normalBuffer->getIndex(), 0);
+  Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, TextureType::TEXTURE_2D, m_depthBuffer->getIndex(), 0);
 
-  glDrawBuffers(static_cast<int>(colorBuffers.size()), colorBuffers.data());
+  std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size());
 
-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+  for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
+    std::size_t colorBuffer = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0) + bufferIndex;
+
+    Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorBuffer), TextureType::TEXTURE_2D, m_colorBuffers[bufferIndex]->getIndex(), 0);
+    drawBuffers[bufferIndex] = static_cast<DrawBuffer>(colorBuffer);
+  }
+
+  Renderer::setDrawBuffers(static_cast<unsigned int>(drawBuffers.size()), drawBuffers.data());
+
+  if (!Renderer::isFramebufferComplete())
     std::cerr << "Error: Framebuffer is not complete." << std::endl;
 
   unbind();
@@ -87,19 +107,19 @@ void Framebuffer::display(const ShaderProgram& program) const {
   Renderer::activateTexture(0);
   m_depthBuffer->bind();
 
-  Renderer::activateTexture(1);
-  m_colorBuffer->bind();
-
-  Renderer::activateTexture(2);
-  m_normalBuffer->bind();
+  for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
+    Renderer::activateTexture(static_cast<unsigned int>(bufferIndex + 1));
+    m_colorBuffers[bufferIndex]->bind();
+  }
 
   Mesh::drawUnitQuad();
 }
 
 void Framebuffer::resize(unsigned int width, unsigned int height) {
-  m_depthBuffer  = Texture::create(width, height, ImageColorspace::DEPTH);
-  m_colorBuffer  = Texture::create(width, height, ImageColorspace::RGBA);
-  m_normalBuffer = Texture::create(width, height, ImageColorspace::RGB);
+  m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH);
+
+  for (TexturePtr& colorBuffer : m_colorBuffers)
+    colorBuffer = Texture::create(width, height, colorBuffer->getImage().getColorspace(), false);
 
   mapBuffers();
 }
@@ -107,8 +127,7 @@ void Framebuffer::resize(unsigned int width, unsigned int height) {
 Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
   std::swap(m_index, fbo.m_index);
   m_depthBuffer  = std::move(fbo.m_depthBuffer);
-  m_colorBuffer  = std::move(fbo.m_colorBuffer);
-  m_normalBuffer = std::move(fbo.m_normalBuffer);
+  m_colorBuffers = std::move(fbo.m_colorBuffers);
 
   mapBuffers();
 
@@ -116,7 +135,7 @@ Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
 }
 
 Framebuffer::~Framebuffer() {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   Renderer::deleteFramebuffer(m_index);

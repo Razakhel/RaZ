@@ -60,6 +60,9 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
     case GL_STACK_OVERFLOW:                return "Stack overflow";
     case GL_STACK_UNDERFLOW:               return "Stack underflow";
     case GL_OUT_OF_MEMORY:                 return "Not enough memory left (Out of memory)";
+#ifdef RAZ_USE_GL4
+    case GL_CONTEXT_LOST:                  return "OpenGL context has been lost due to a graphics card reset (Context lost)";
+#endif
     case GL_NO_ERROR:                      return "No error";
     default:                               return "Unknown error";
   }
@@ -70,15 +73,16 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
 void Renderer::initialize() {
   glewExperimental = GL_TRUE;
 
-#if !defined(__APPLE__) && defined(RAZ_USE_GL4) // Setting the debug message callback provokes a crash on macOS
-  glDebugMessageCallback(&callbackDebugLog, nullptr);
-  enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
-#endif
-
-  if (glewInit() != GLEW_OK)
+  if (glewInit() != GLEW_OK) {
     std::cerr << "Error: Failed to initialize GLEW." << std::endl;
-  else
+  } else {
     s_isInitialized = true;
+
+#if !defined(RAZ_PLATFORM_MAC) && defined(RAZ_USE_GL4) // Setting the debug message callback provokes a crash on macOS
+    glDebugMessageCallback(&callbackDebugLog, nullptr);
+    enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
+  }
 }
 
 void Renderer::enable(Capability capability) {
@@ -87,7 +91,7 @@ void Renderer::enable(Capability capability) {
   glEnable(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -97,7 +101,7 @@ void Renderer::disable(Capability capability) {
   glDisable(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -107,10 +111,60 @@ bool Renderer::isEnabled(Capability capability) {
   const bool isEnabled = glIsEnabled(static_cast<unsigned int>(capability));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return isEnabled;
+}
+
+void Renderer::clearColor(float red, float green, float blue, float alpha) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glClearColor(red, green, blue, alpha);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::setDepthFunction(DepthFunction func) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDepthFunc(static_cast<unsigned int>(func));
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::setFaceCulling(FaceOrientation orientation) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glCullFace(static_cast<unsigned int>(orientation));
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glPolygonMode(static_cast<unsigned int>(orientation), static_cast<unsigned int>(mode));
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glReadPixels(0, 0, static_cast<int>(width), static_cast<int>(height), static_cast<unsigned int>(format), static_cast<unsigned int>(dataType), data);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
 }
 
 void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
@@ -119,7 +173,7 @@ void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
   glGenBuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -129,7 +183,7 @@ void Renderer::bindBuffer(BufferType type, unsigned int index) {
   glBindBuffer(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -139,17 +193,37 @@ void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsign
   glBindBufferBase(static_cast<unsigned int>(type), bindingIndex, bufferIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
-void Renderer::sendBufferSubData(BufferType type, ptrdiff_t offset, ptrdiff_t dataSize, const void* data) {
+void Renderer::bindBufferRange(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex, std::ptrdiff_t offset, std::ptrdiff_t size) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindBufferRange(static_cast<unsigned int>(type), bindingIndex, bufferIndex, offset, size);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendBufferData(BufferType type, std::ptrdiff_t size, const void* data, BufferDataUsage usage) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBufferData(static_cast<unsigned int>(type), size, data, static_cast<unsigned int>(usage));
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::ptrdiff_t dataSize, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glBufferSubData(static_cast<unsigned int>(type), offset, dataSize, data);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -159,7 +233,7 @@ void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
   glDeleteBuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -169,7 +243,7 @@ void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
   glGenTextures(static_cast<int>(count), indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -179,7 +253,7 @@ void Renderer::activateTexture(unsigned int index) {
   glActiveTexture(GL_TEXTURE0 + index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -189,7 +263,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, int val
   glTexParameteri(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -199,7 +273,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, float v
   glTexParameterf(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -209,7 +283,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const i
   glTexParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -219,7 +293,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
   glTexParameterfv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -230,7 +304,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameteri(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -240,7 +314,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameterf(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -250,7 +324,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -260,7 +334,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), value);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 #endif
@@ -284,7 +358,7 @@ void Renderer::sendImageData2D(TextureType type,
                data);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -294,7 +368,7 @@ void Renderer::generateMipmap(TextureType type) {
   glGenerateMipmap(static_cast<unsigned int>(type));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -305,7 +379,7 @@ void Renderer::generateMipmap(unsigned int textureIndex) {
   glGenerateTextureMipmap(textureIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 #endif
@@ -316,7 +390,7 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
   glBindTexture(static_cast<unsigned int>(type), index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -326,7 +400,7 @@ void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
   glDeleteTextures(static_cast<int>(count), indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -336,7 +410,7 @@ void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsi
   glViewport(xOrigin, yOrigin, static_cast<int>(width), static_cast<int>(height));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -346,7 +420,7 @@ unsigned int Renderer::createProgram() {
   const unsigned int programIndex = glCreateProgram();
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return programIndex;
@@ -359,7 +433,7 @@ int Renderer::getProgramStatus(unsigned int index, ProgramStatus status) {
   glGetProgramiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return res;
@@ -371,7 +445,7 @@ bool Renderer::isProgramLinked(unsigned int index) {
   const bool isLinked = getProgramStatus(index, ProgramStatus::LINK);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return isLinked;
@@ -390,7 +464,7 @@ void Renderer::linkProgram(unsigned int index) {
   }
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -400,7 +474,7 @@ void Renderer::useProgram(unsigned int index) {
   glUseProgram(index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -410,7 +484,7 @@ void Renderer::deleteProgram(unsigned int index) {
   glDeleteProgram(index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -420,7 +494,7 @@ unsigned int Renderer::createShader(ShaderType type) {
   const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return shaderIndex;
@@ -433,7 +507,7 @@ int Renderer::getShaderStatus(unsigned int index, ShaderStatus status) {
   glGetShaderiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return res;
@@ -445,7 +519,7 @@ bool Renderer::isShaderCompiled(unsigned int index) {
   const bool isCompiled = getShaderStatus(index, ShaderStatus::COMPILE);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 
   return isCompiled;
@@ -457,7 +531,7 @@ void Renderer::sendShaderSource(unsigned int index, const char* source, int leng
   glShaderSource(index, 1, &source, &length);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -474,7 +548,7 @@ void Renderer::compileShader(unsigned int index) {
   }
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -484,7 +558,7 @@ void Renderer::attachShader(unsigned int programIndex, unsigned int shaderIndex)
   glAttachShader(programIndex, shaderIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -494,7 +568,7 @@ void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex)
   glDetachShader(programIndex, shaderIndex);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -504,7 +578,7 @@ void Renderer::deleteShader(unsigned int index) {
   glDeleteShader(index);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
@@ -514,7 +588,7 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   const int location = glGetUniformLocation(programIndex, uniformName);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 
   if (location == -1)
     std::cerr << "Warning: Uniform '" << uniformName << "' unrecognized." << std::endl;
@@ -523,23 +597,166 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   return location;
 }
 
-void Renderer::generateFramebuffers(unsigned int count, unsigned int* indices) {
+void Renderer::sendUniform(int uniformIndex, int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1i(uniformIndex, value);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniform(int uniformIndex, unsigned int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1ui(uniformIndex, value);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniform(int uniformIndex, float value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1f(uniformIndex, value);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniformVector1(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniformVector2(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform2fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniformVector3(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform3fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniformVector4(int uniformIndex, const float* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform4fv(uniformIndex, count, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniformMatrix2x2(int uniformIndex, const float* values, int count, bool transpose) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniformMatrix2fv(uniformIndex, count, transpose, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniformMatrix3x3(int uniformIndex, const float* values, int count, bool transpose) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniformMatrix3fv(uniformIndex, count, transpose, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::sendUniformMatrix4x4(int uniformIndex, const float* values, int count, bool transpose) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniformMatrix4fv(uniformIndex, count, transpose, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::generateFramebuffers(int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glGenFramebuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
-void Renderer::bindFramebuffer(unsigned int index) {
+FramebufferStatus Renderer::getFramebufferStatus(FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glBindFramebuffer(GL_FRAMEBUFFER, index);
+  const unsigned int status = glCheckFramebufferStatus(static_cast<unsigned int>(type));
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
+#endif
+
+  return static_cast<FramebufferStatus>(status);
+}
+
+void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
+                                       TextureType textureType, unsigned int textureIndex, int mipmapLevel,
+                                       FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glFramebufferTexture2D(static_cast<unsigned int>(type),
+                         static_cast<unsigned int>(attachment),
+                         static_cast<unsigned int>(textureType),
+                         textureIndex,
+                         mipmapLevel);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDrawBuffers(count, reinterpret_cast<const unsigned int*>(buffers));
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindFramebuffer(static_cast<unsigned int>(type), index);
+
+#if !defined(NDEBUG)
+  const ErrorCodes errorCodes = recoverErrors();
+
+  if (errorCodes[recoverErrorCodeIndex(ErrorCode::INVALID_OPERATION)])
+    std::cerr << "Renderer::bindFramebuffer - Bound object is not a valid framebuffer.\n";
+
+  std::cerr << std::flush;
 #endif
 }
 
@@ -549,19 +766,43 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
   glDeleteFramebuffers(count, indices);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 
-void Renderer::checkErrors() {
+ErrorCodes Renderer::recoverErrors() {
+  ErrorCodes errorCodes;
+
   while (true) {
     const unsigned int errorCode = glGetError();
 
     if (errorCode == GL_NO_ERROR)
       break;
 
-    std::cerr << "OpenGL error - " << recoverGlErrorStr(errorCode) << " (code " << errorCode << ")\n";
-  };
+    const uint8_t errorCodeIndex = recoverErrorCodeIndex(static_cast<ErrorCode>(errorCode));
+
+    // An error code cannot be returned twice in a row; if it is, the error checking should be stopped
+    if (errorCodes[errorCodeIndex])
+      break;
+
+    errorCodes[errorCodeIndex] = true;
+  }
+
+  return errorCodes;
+}
+
+void Renderer::printErrors() {
+  const ErrorCodes errorCodes = recoverErrors();
+
+  if (errorCodes.none())
+    return;
+
+  for (uint8_t errorIndex = 0; errorIndex < static_cast<uint8_t>(errorCodes.size()); ++errorIndex) {
+    if (errorCodes[errorIndex]) {
+      const unsigned int errorValue = errorIndex + static_cast<unsigned int>(ErrorCode::INVALID_ENUM);
+      std::cerr << "OpenGL error - " << recoverGlErrorStr(errorValue) << " (code " << errorValue << ")\n";
+    }
+  }
 
   std::cerr << std::flush;
 }
@@ -572,7 +813,7 @@ void Renderer::clear(unsigned int mask) {
   glClear(mask);
 
 #if !defined(NDEBUG)
-  checkErrors();
+  printErrors();
 #endif
 }
 

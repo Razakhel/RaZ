@@ -9,13 +9,13 @@ UniformBuffer::UniformBuffer() {
 
 UniformBuffer::UniformBuffer(unsigned int size, unsigned int bindingIndex) : UniformBuffer() {
   bind();
-  glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);
-  glBindBufferRange(GL_UNIFORM_BUFFER, bindingIndex, m_index, 0, size);
+  Renderer::bindBufferRange(BufferType::UNIFORM_BUFFER, bindingIndex, m_index, 0, size);
+  Renderer::sendBufferData(BufferType::UNIFORM_BUFFER, size, nullptr, BufferDataUsage::STATIC_DRAW);
   unbind();
 }
 
 UniformBuffer::UniformBuffer(UniformBuffer&& ubo) noexcept
-  : m_index{ std::exchange(ubo.m_index, GL_INVALID_INDEX) } {}
+  : m_index{ std::exchange(ubo.m_index, std::numeric_limits<unsigned int>::max()) } {}
 
 void UniformBuffer::bindUniformBlock(const ShaderProgram& program, unsigned int uboIndex, unsigned int bindingIndex) const {
   glUniformBlockBinding(program.getIndex(), uboIndex, bindingIndex);
@@ -44,7 +44,7 @@ UniformBuffer& UniformBuffer::operator=(UniformBuffer&& ubo) noexcept {
 }
 
 UniformBuffer::~UniformBuffer() {
-  if (m_index == GL_INVALID_INDEX)
+  if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   Renderer::deleteBuffer(m_index);

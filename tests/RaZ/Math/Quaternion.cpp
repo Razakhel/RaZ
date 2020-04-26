@@ -24,18 +24,48 @@ TEST_CASE("Quaternion norm computation") {
 }
 
 TEST_CASE("Quaternion matrix computation") {
-  CHECK(quat1.computeMatrix() == Raz::Mat4f({{ 1.f,           0.f,          0.f, 0.f },
-                                             { 0.f,   0.98480773f, 0.173648179f, 0.f },
-                                             { 0.f, -0.173648179f,  0.98480773f, 0.f },
-                                             { 0.f,           0.f,          0.f, 1.f }}));
+  CHECK_THAT(quat1.computeMatrix(), IsNearlyEqualToMatrix(Raz::Mat4f(1.f,  0.f,          0.f,          0.f,
+                                                                     0.f,  0.98480773f,  0.173648179f, 0.f,
+                                                                     0.f, -0.173648179f, 0.98480773f,  0.f,
+                                                                     0.f,  0.f,          0.f,          1.f)));
 
-  CHECK(quat2.computeMatrix() == Raz::Mat4f({{ -0.870967627f,   0.193548396f,   0.45161289f, 0.f },
-                                             {  -0.45161289f,  -0.677419245f, -0.580645144f, 0.f },
-                                             {  0.193548396f,  -0.709677398f,  0.677419424f, 0.f },
-                                             {           0.f,            0.f,           0.f, 1.f }}));
+  CHECK_THAT(quat2.computeMatrix(), IsNearlyEqualToMatrix(Raz::Mat4f(-0.870967627f,  0.193548396f,  0.45161289f,  0.f,
+                                                                     -0.45161289f,  -0.677419245f, -0.580645144f, 0.f,
+                                                                      0.193548396f, -0.709677398f,  0.677419424f, 0.f,
+                                                                      0.f,           0.f,           0.f,          1.f)));
 
-  CHECK(quat3.computeMatrix() == Raz::Mat4f({{  -0.933333397f, -0.133333355f,  0.333333343f, 0.f },
-                                             {  -0.133333325f, -0.733333409f, -0.666666687f, 0.f },
-                                             {   0.333333343f, -0.666666687f,  0.666666627f, 0.f },
-                                             {            0.f,           0.f,           0.f, 1.f }}));
+  CHECK_THAT(quat3.computeMatrix(), IsNearlyEqualToMatrix(Raz::Mat4f(-0.933333397f, -0.133333355f,  0.333333343f, 0.f,
+                                                                     -0.133333325f, -0.733333409f, -0.666666687f, 0.f,
+                                                                      0.333333343f, -0.666666687f,  0.666666627f, 0.f,
+                                                                      0.f,           0.f,           0.f,          1.f)));
+}
+
+TEST_CASE("Quaternion multiplication") {
+  const Raz::Quaternionf unitQuat = Raz::Quaternionf::identity();
+  const Raz::Mat4f unitQuatMat    = unitQuat.computeMatrix();
+
+  const Raz::Quaternionf squareUnitQuat = unitQuat * unitQuat;
+  CHECK(squareUnitQuat.computeMatrix() == unitQuatMat);
+
+  const Raz::Quaternionf quatRotX(45.0_deg, Raz::Axis::X);
+  const Raz::Quaternionf multRotX = quatRotX * quatRotX.conjugate();
+  CHECK(multRotX.computeMatrix() == unitQuatMat);
+
+  const Raz::Quaternionf quatRotY(45.0_deg, Raz::Axis::Y);
+  const Raz::Quaternionf multRotY = quatRotY * quatRotY.conjugate();
+  CHECK(multRotY.computeMatrix() == unitQuatMat);
+
+  const Raz::Quaternionf quatRotZ(45.0_deg, Raz::Axis::Z);
+  const Raz::Quaternionf multRotZ = quatRotZ * quatRotZ.conjugate();
+  CHECK(multRotZ.computeMatrix() == unitQuatMat);
+
+  const Raz::Quaternionf quat12 = quat1 * quat2;
+
+  // Results taken from Wolfram Alpha: https://tinyurl.com/rxavw82
+
+  CHECK_THAT(quat12.computeNorm(), IsNearlyEqualTo(3.9370039f));
+  CHECK_THAT(quat12.computeMatrix(), IsNearlyEqualToMatrix(Raz::Mat4f(-0.870968f,   0.1121862f,  0.4783612f, 0.f,
+                                                                      -0.451613f,  -0.5663f,    -0.6894565f, 0.f,
+                                                                       0.1935484f, -0.8165285f,  0.5438936f, 0.f,
+                                                                       0.f,         0.f,         0.f,        1.f)));
 }
