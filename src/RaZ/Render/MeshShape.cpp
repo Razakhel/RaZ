@@ -396,63 +396,63 @@ void Mesh::createIcosphere(const Sphere& sphere, uint32_t /* subdivCount */) {
 
   constexpr float invFactor = 1.f / (Pi<float> * 2);
 
-  vertices[0].position  = Vec3f(-radius, goldenRadius, 0.f);
-  vertices[0].normal    = vertices[0].position.normalize();
+  vertices[0].normal    = Vec3f(-radius, goldenRadius, 0.f).normalize();
+  vertices[0].position  = vertices[0].normal * radius;
   vertices[0].tangent   = Vec3f(vertices[0].normal[1], vertices[0].normal[0], vertices[0].normal[2]);
   vertices[0].texcoords = Vec2f(std::atan2(vertices[0].normal[0], vertices[0].normal[2]) * invFactor + 0.5f, vertices[0].normal[1] * 0.5f + 0.5f);
 
-  vertices[1].position  = Vec3f(radius, goldenRadius, 0.f);
-  vertices[1].normal    = vertices[1].position.normalize();
+  vertices[1].normal    = Vec3f(radius, goldenRadius, 0.f).normalize();
+  vertices[1].position  = vertices[1].normal * radius;
   vertices[1].tangent   = Vec3f(vertices[1].normal[1], vertices[1].normal[0], vertices[1].normal[2]);
   vertices[1].texcoords = Vec2f(std::atan2(vertices[1].normal[0], vertices[1].normal[2]) * invFactor + 0.5f, vertices[1].normal[1] * 0.5f + 0.5f);
 
-  vertices[2].position  = Vec3f(-radius, -goldenRadius, 0.f);
-  vertices[2].normal    = vertices[2].position.normalize();
+  vertices[2].normal    = Vec3f(-radius, -goldenRadius, 0.f).normalize();
+  vertices[2].position  = vertices[2].normal * radius;
   vertices[2].tangent   = Vec3f(vertices[2].normal[1], vertices[2].normal[0], vertices[2].normal[2]);
   vertices[2].texcoords = Vec2f(std::atan2(vertices[2].normal[0], vertices[2].normal[2]) * invFactor + 0.5f, vertices[2].normal[1] * 0.5f + 0.5f);
 
-  vertices[3].position  = Vec3f(radius, -goldenRadius, 0.f);
-  vertices[3].normal    = vertices[3].position.normalize();
+  vertices[3].normal    = Vec3f(radius, -goldenRadius, 0.f).normalize();
+  vertices[3].position  = vertices[3].normal * radius;
   vertices[3].tangent   = Vec3f(vertices[3].normal[1], vertices[3].normal[0], vertices[3].normal[2]);
   vertices[3].texcoords = Vec2f(std::atan2(vertices[3].normal[0], vertices[3].normal[2]) * invFactor + 0.5f, vertices[3].normal[1] * 0.5f + 0.5f);
 
-  vertices[4].position  = Vec3f(0.f, -radius, goldenRadius);
-  vertices[4].normal    = vertices[4].position.normalize();
+  vertices[4].normal    = Vec3f(0.f, -radius, goldenRadius).normalize();
+  vertices[4].position  = vertices[4].normal * radius;
   vertices[4].tangent   = Vec3f(vertices[4].normal[1], vertices[4].normal[0], vertices[4].normal[2]);
   vertices[4].texcoords = Vec2f(std::atan2(vertices[4].normal[0], vertices[4].normal[2]) * invFactor + 0.5f, vertices[4].normal[1] * 0.5f + 0.5f);
 
-  vertices[5].position  = Vec3f(0.f, radius, goldenRadius);
-  vertices[5].normal    = vertices[5].position.normalize();
+  vertices[5].normal    = Vec3f(0.f, radius, goldenRadius).normalize();
+  vertices[5].position  = vertices[5].normal * radius;
   vertices[5].tangent   = Vec3f(vertices[5].normal[1], vertices[5].normal[0], vertices[5].normal[2]);
   vertices[5].texcoords = Vec2f(std::atan2(vertices[5].normal[0], vertices[5].normal[2]) * invFactor + 0.5f, vertices[5].normal[1] * 0.5f + 0.5f);
 
-  vertices[6].position  = Vec3f(0.f, -radius, -goldenRadius);
-  vertices[6].normal    = vertices[6].position.normalize();
+  vertices[6].normal    = Vec3f(0.f, -radius, -goldenRadius).normalize();
+  vertices[6].position  = vertices[6].normal * radius;
   vertices[6].tangent   = Vec3f(vertices[6].normal[1], vertices[6].normal[0], vertices[6].normal[2]);
   vertices[6].texcoords = Vec2f(std::atan2(vertices[6].normal[0], vertices[6].normal[2]) * invFactor + 0.5f, vertices[6].normal[1] * 0.5f + 0.5f);
 
-  vertices[7].position  = Vec3f(0.f, radius, -goldenRadius);
-  vertices[7].normal    = vertices[7].position.normalize();
+  vertices[7].normal    = Vec3f(0.f, radius, -goldenRadius).normalize();
+  vertices[7].position  = vertices[7].normal * radius;
   vertices[7].tangent   = Vec3f(vertices[7].normal[1], vertices[7].normal[0], vertices[7].normal[2]);
   vertices[7].texcoords = Vec2f(std::atan2(vertices[7].normal[0], vertices[7].normal[2]) * invFactor + 0.5f, vertices[7].normal[1] * 0.5f + 0.5f);
 
-  vertices[8].position  = Vec3f(goldenRadius, 0.f, -radius);
-  vertices[8].normal    = vertices[8].position.normalize();
+  vertices[8].normal    = Vec3f(goldenRadius, 0.f, -radius).normalize();
+  vertices[8].position  = vertices[8].normal * radius;
   vertices[8].tangent   = Vec3f(vertices[8].normal[1], vertices[8].normal[0], vertices[8].normal[2]);
   vertices[8].texcoords = Vec2f(std::atan2(vertices[8].normal[0], vertices[8].normal[2]) * invFactor + 0.5f, vertices[8].normal[1] * 0.5f + 0.5f);
 
-  vertices[9].position  = Vec3f(goldenRadius, 0.f, radius);
-  vertices[9].normal    = vertices[9].position.normalize();
+  vertices[9].normal    = Vec3f(goldenRadius, 0.f, radius).normalize();
+  vertices[9].position  = vertices[9].normal * radius;
   vertices[9].tangent   = Vec3f(vertices[9].normal[1], vertices[9].normal[0], vertices[9].normal[2]);
   vertices[9].texcoords = Vec2f(std::atan2(vertices[9].normal[0], vertices[9].normal[2]) * invFactor + 0.5f, vertices[9].normal[1] * 0.5f + 0.5f);
 
-  vertices[10].position  = Vec3f(-goldenRadius, 0.f, -radius);
-  vertices[10].normal    = vertices[10].position.normalize();
+  vertices[10].normal    = Vec3f(-goldenRadius, 0.f, -radius).normalize();
+  vertices[10].position  = vertices[10].normal * radius;
   vertices[10].tangent   = Vec3f(vertices[10].normal[1], vertices[10].normal[0], vertices[10].normal[2]);
   vertices[10].texcoords = Vec2f(std::atan2(vertices[10].normal[0], vertices[10].normal[2]) * invFactor + 0.5f, vertices[10].normal[1] * 0.5f + 0.5f);
 
-  vertices[11].position  = Vec3f(-goldenRadius, 0.f, radius);
-  vertices[11].normal    = vertices[11].position.normalize();
+  vertices[11].normal    = Vec3f(-goldenRadius, 0.f, radius).normalize();
+  vertices[11].position  = vertices[11].normal * radius;
   vertices[11].tangent   = Vec3f(vertices[11].normal[1], vertices[11].normal[0], vertices[11].normal[2]);
   vertices[11].texcoords = Vec2f(std::atan2(vertices[11].normal[0], vertices[11].normal[2]) * invFactor + 0.5f, vertices[11].normal[1] * 0.5f + 0.5f);
 
