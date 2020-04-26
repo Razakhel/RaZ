@@ -107,7 +107,7 @@ bool RenderSystem::update(float deltaTime) {
   if (m_cubemap)
     m_cubemap->draw(camera);
 
-#if !defined(NDEBUG)
+#if defined(RAZ_CONFIG_DEBUG)
   Renderer::printErrors();
 #endif
 

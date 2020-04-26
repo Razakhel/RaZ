@@ -73,9 +73,9 @@ jobs:
         #    - COVERAGE=false
         #    - BADGE=osx
 
-# Disabling depth to fetch only the latest commit
+# Fetching only the latest commit
 git:
-    depth: false
+    depth: 1
 
 install:
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then

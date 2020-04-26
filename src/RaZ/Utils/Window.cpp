@@ -16,8 +16,8 @@
 namespace Raz {
 
 Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
-  glfwSetErrorCallback([] (int error, const char* description) {
-    std::cerr << "GLFW error " << error << ": " << description << std::endl;
+  glfwSetErrorCallback([] (int errorCode, const char* description) {
+    std::cerr << "GLFW error " << errorCode << ": " << description << std::endl;
   });
 
   if (!glfwInit())
@@ -35,7 +35,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glfwWindowHint(GLFW_RESIZABLE, false);
   glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
 
-#if !defined(NDEBUG)
+#if defined(RAZ_CONFIG_DEBUG)
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
 
