@@ -288,8 +288,8 @@ Mesh::Mesh(const AABB& box, RenderMode renderMode) : Mesh() {
 }
 
 const AABB& Mesh::computeBoundingBox() {
-  Vec3f maxPos;
-  Vec3f minPos;
+  Vec3f maxPos(std::numeric_limits<float>::lowest());
+  Vec3f minPos(std::numeric_limits<float>::max());
 
   for (Submesh& submesh : m_submeshes) {
     const AABB& boundingBox = submesh.computeBoundingBox();
@@ -316,6 +316,7 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
   const float widthStep  = 2 * Pi<float> / static_cast<float>(widthCount);
   const float heightStep = Pi<float> / static_cast<float>(heightCount);
   const float invLength  = 1.f / sphere.getRadius();
+  const Vec3f center     = sphere.getCenter();
 
   for (unsigned int heightIndex = 0; heightIndex <= heightCount; ++heightIndex) {
     const float heightAngle = Pi<float> / 2 - static_cast<float>(heightIndex) * heightStep;
@@ -330,7 +331,7 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
       const float z = xz * std::sin(widthAngle);
 
       Vertex vert;
-      vert.position  = Vec3f(x, y, z);
+      vert.position  = Vec3f(x + center[0], y + center[1], z + center[2]);
       vert.texcoords = Vec2f(static_cast<float>(widthIndex) / static_cast<float>(widthCount),
                              static_cast<float>(heightIndex) / static_cast<float>(heightCount));
       vert.normal    = Vec3f(x * invLength, y * invLength, z * invLength);

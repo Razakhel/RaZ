@@ -38,8 +38,8 @@ void Submesh::setRenderMode(RenderMode renderMode) {
 }
 
 const AABB& Submesh::computeBoundingBox() {
-  Vec3f maxPos;
-  Vec3f minPos;
+  Vec3f maxPos(std::numeric_limits<float>::lowest());
+  Vec3f minPos(std::numeric_limits<float>::max());
 
   for (const Vertex& vert : m_vbo.getVertices()) {
     maxPos[0] = std::max(maxPos[0], vert.position[0]);
