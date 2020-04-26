@@ -17,7 +17,7 @@ void Application::run(F&& callback) {
   }, &emCallback, 0, 1);
 #else
   while (runOnce()) {
-    std::forward<F>(callback)();
+    callback();
   }
 #endif
 }
