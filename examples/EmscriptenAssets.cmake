@@ -43,6 +43,7 @@ target_link_options(RaZ_MinDemo PRIVATE
 )
 
 set(RaZ_ShowcaseDemo_assets
+    # Skyboxes
     assets/skyboxes/clouds_right.png
     assets/skyboxes/clouds_top.png
     assets/skyboxes/clouds_front.png
@@ -57,7 +58,7 @@ set(RaZ_ShowcaseDemo_assets
     assets/skyboxes/lake_bottom.png
     assets/skyboxes/lake_back.png
 
-
+    # Shield mesh
     assets/meshes/shield.obj
     assets/materials/shield.mtl
     assets/textures/shield_albedo.png
@@ -66,7 +67,7 @@ set(RaZ_ShowcaseDemo_assets
     assets/textures/shield_roughness.png
     assets/textures/shield_ao.png
 
-
+    # Crytek Sponza mesh
     assets/meshes/crytek_sponza.obj
     assets/materials/crytek_sponza.mtl
 
@@ -132,7 +133,7 @@ set(RaZ_ShowcaseDemo_assets
 
     assets/textures/sponza_roof_diff.png
 
-
+    # Ball mesh
     assets/meshes/ball.obj
     assets/materials/test.mtl
 
@@ -141,6 +142,7 @@ set(RaZ_ShowcaseDemo_assets
     assets/textures/rustediron_metallic.png
     assets/textures/rustediron_roughness.png
 
+    # Cerberus mesh
     assets/meshes/cerberus.obj
     assets/materials/cerberus.mtl
 
