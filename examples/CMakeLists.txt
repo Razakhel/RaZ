@@ -15,6 +15,8 @@ if (RAZ_USE_EMSCRIPTEN)
     set_target_properties(RaZ_FullDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_MinDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_ShowcaseDemo PROPERTIES SUFFIX ".html")
+
+    include(EmscriptenAssets.cmake)
 endif ()
 
 

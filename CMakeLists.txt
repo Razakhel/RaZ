@@ -8,6 +8,12 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Detect whether Emscripten is being used
 if (CMAKE_CXX_COMPILER MATCHES "/em\\+\\+(-[a-zA-Z0-9.])?$")
   set(RAZ_USE_EMSCRIPTEN true)
+  set(CMAKE_AR "${CMAKE_C_COMPILER}")
+  set(CMAKE_STATIC_LIBRARY_SUFFIX ".bc")
+  set(CMAKE_C_CREATE_STATIC_LIBRARY "<CMAKE_AR> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+  set(CMAKE_CXX_CREATE_STATIC_LIBRARY "<CMAKE_AR> -o <TARGET> <LINK_FLAGS> <OBJECTS>")
+else ()
+  set(RAZ_USE_EMSCRIPTEN false)
 endif ()
 
 ########################
