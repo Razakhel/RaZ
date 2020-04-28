@@ -3,6 +3,7 @@ FROM ubuntu:19.10
 # Updating packages' repo & installing only the needed packages:
 #   - GL & X11 as needed graphical dependencies
 #   - CMake, Make, GCC & Clang to build RaZ, and lcov to output code coverage
+#   - xz-utils to uncompress Emscripten
 #   - Doxygen & Dot to generate the documentation
 #   - Wget to download the FBX SDK
 #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
@@ -14,6 +15,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev \
         cmake make gcc-8 g++-8 clang-7 lcov \
+        xz-utils \
         doxygen python-pydot python-pydot-ng \
         wget \
         xvfb \
@@ -26,6 +28,10 @@ RUN apt-get update && \
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-8 && \
     update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-8 60 && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-7 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-7
+
+# Downloading & installing Emscripten, to build RaZ in WebAssembly
+RUN git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && \
+    ./emsdk install latest && ./emsdk activate latest
 
 # Installing the FBX SDK
 # The installation asks for software user agreement (send 'yes'), then afterwards if the README file should be opened (send 'n')

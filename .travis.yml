@@ -50,6 +50,19 @@ jobs:
             - COVERAGE=false
             - BADGE=linux
 
+        ##############
+        # Emscripten #
+        ##############
+
+        - name: "RaZ - Emscripten"
+          os: linux
+          env:
+            - C_COMPILER=emcc
+            - CXX_COMPILER=emcc
+            - BUILD_TESTS=false
+            - COVERAGE=false
+            - BADGE=linux
+
         #########
         # macOS #
         #########
@@ -88,11 +101,13 @@ before_script:
     - sleep 3 # Gives Xvfb some time to start
 
 script:
-    # Linux
+    #########
+    # Linux #
+    #########
 
     # Run Docker, build RaZ, launch unit tests if asked, and generate code coverage details & upload them to Coveralls if asked
     # Xvfb allows to run a program in headless mode (without a screen); this allows GLFW to be initialized properly
-    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ ${CXX_COMPILER} != "emcc" ]; then
         docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
             bash -c "
                 mkdir build && cd build &&
@@ -114,7 +129,27 @@ script:
             ";
       fi
 
-    # macOS
+    ##############
+    # Emscripten #
+    ##############
+
+    - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ ${CXX_COMPILER} = "emcc" ]; then
+        docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
+            bash -c "
+                source /emsdk/emsdk_env.sh &&
+                mkdir build && cd build &&
+                emcmake cmake -DCMAKE_BUILD_TYPE=Release \
+                              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+                              -DRAZ_USE_FBX=true -DENABLE_DEBUG_INFO=true .. &&
+                cmake --build . --target RaZ_PrintDebugInfo &&
+                make -j4 &&
+                pwd && find .
+            ";
+      fi
+
+    #########
+    # macOS #
+    #########
 
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         mkdir build && cd build &&
