@@ -4,11 +4,13 @@
 #define RAZ_THREADING_HPP
 
 // std::thread is not available on MinGW with Win32 threads
-#if !defined(__MINGW32__) || defined(_GLIBCXX_HAS_GTHREADS)
+#if defined(__MINGW32__) && !defined(_GLIBCXX_HAS_GTHREADS)
+#pragma message("Warning: Threads are not available with your compiler; check that you're using POSIX threads and not Win32 ones.")
+#else
 #define RAZ_THREADS_AVAILABLE
 #endif
 
-#ifdef RAZ_THREADS_AVAILABLE
+#if defined(RAZ_THREADS_AVAILABLE)
 
 #include <functional>
 #include <future>
@@ -89,8 +91,6 @@ void parallelize(ContainerType& collection, Func&& action, std::size_t threadCou
 
 #include "Threading.inl"
 
-#else
-#pragma message("Warning: Threads are not available with your compiler; check that you're using POSIX threads and not Win32 ones.")
 #endif // RAZ_THREADS_AVAILABLE
 
 #endif // RAZ_THREADING_HPP
