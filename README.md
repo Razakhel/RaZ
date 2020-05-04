@@ -8,9 +8,45 @@
 
 ---
 
-| <img alt="Linux build" src="https://www.screenconnect.com/Images/LogoLinux.png" align="center" height="30" width="30" /><br />Linux                    | <img alt="Windows build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg/414px-Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg.png" align="center" height="30" width="30" /><br />Windows | <img alt="macOS build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/245px-Apple_logo_black.svg.png" align="center" height="30" width="30" /><br />macOS |
-| :----------------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-| [![Linux build status](http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=linux)](https://travis-ci.com/Razakhel/RaZ) | No CI yet                                                                                                                                                                                                                                                                  | [![macOS build status](http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=osx)](https://travis-ci.com/Razakhel/RaZ)                                           |
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                <img alt="Linux build" src="https://www.screenconnect.com/Images/LogoLinux.png" align="center" height="30" width="30" /><br />
+                Linux
+            </th>
+            <th>
+                <img alt="Windows build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg/414px-Windows_logo_-_2012_%28dark_blue%2C_lines_thinner%29.svg.png" align="center" height="30" width="30" /><br />
+                Windows
+            </th>
+            <th>
+                <img alt="macOS build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/245px-Apple_logo_black.svg.png" align="center" height="30" width="25" /><br />
+                macOS
+            </th>
+            <th>
+                <img alt="WASM build" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/WebAssembly_Logo.png/150px-WebAssembly_Logo.png" align="center" height="30" width="30" /><br />
+                WebAssembly
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th align="center">Compilation</th>
+            <td align="center"><a alt="Linux build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=linux" /></a></td>
+            <td align="center">No CI yet</td>
+            <td align="center"><a alt="macOS build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=osx" /></a></td>
+            <td align="center"><a alt="WASM build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=wasm" /></a></td>
+        </tr>
+        <tr>
+            <th align="center">Unit tests</th>
+            <td align="center"><a alt="Linux tests build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=linux_tests" /></a></td>
+            <td align="center">No CI yet</td>
+            <td align="center">No CI yet</td>
+            <td align="center">N/A</td>
+        </tr>
+    </tbody>
+</table>
 
 | <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy | <img alt="Coveralls" src="https://avatars3.githubusercontent.com/ml/318?s=140&v=4" align="center" height="30" width="30" /><br />Coveralls |
 | :------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
@@ -22,7 +58,7 @@
 
 Written in modern C++ (17), ECS driven, it is primarily developed for learning purposes. It is intended to be as optimized as possible, while trying to stay as modular as it can.
 
-The engine is available under Windows, Linux & macOS.
+The engine is available under Windows, Linux & macOS; it can also run in a web browser through [WebAssembly](https://webassembly.org/) (using [Emscripten](https://emscripten.org/)).
 
 If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/wiki). For the documentation, [look over here](http://razakhel.github.io/RaZ/doc/)!
 
@@ -36,9 +72,9 @@ More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples
 
 ## Features
 
-| Module        | Features                                                                                                                                                                                                                                                         |
-| :-----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Math**      | - Vectors<br/>- Matrices<br/>- Quaternions<br/>- Angles (degrees/radians)<br/>- Transformations (translation, rotation, scale)                                                                                                                                   |
-| **Rendering** | - OpenGL 3.3 or 4.6 (Vulkan planned)<br/>- Standard (Blinn-Phong) & PBR (Cook-Torrance) material models<br/>- Camera (perspective/orthographic)<br/>- Light sources (point & directional)<br/>- Cubemap<br/>- Normal mapping<br/>- Render passes _[in progress]_ |
-| **Physics**   | - Shapes (line, plane, sphere, triangle, quad, AABB, OBB)<br/>- Shape/shape collision checks _[in progress]_<br/>- Ray/shape intersection checks _[in progress]_<br/>- Rigid body simulation _[in progress]_                                                     |
-| **Misc**      | - Meshes (OBJ import/export, FBX import, OFF import)<br/>- Images (PNG import/export, TGA import, HDR import _[in progress]_)<br/>- Windowing (window, overlay, keyboard/mouse inputs with custom callbacks)                                                     |
+| Module        | Features                                                                                                                                                                                                                                                                       |
+| :-----------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Math**      | - Vectors<br/>- Matrices<br/>- Quaternions<br/>- Angles (degrees/radians)<br/>- Transformations (translation, rotation, scale)                                                                                                                                                 |
+| **Rendering** | - OpenGL (3.3 or 4.6)<br/>- Vulkan _(in progress)_<br/>- Standard (Blinn-Phong) & PBR (Cook-Torrance) material models<br/>- Camera (perspective/orthographic)<br/>- Light sources (point & directional)<br/>- Cubemap<br/>- Normal mapping<br/>- Render passes _(in progress)_ |
+| **Physics**   | - Shapes (line, plane, sphere, triangle, quad, AABB, OBB)<br/>- Shape/shape collision checks _(in progress)_<br/>- Ray/shape intersection checks _(in progress)_<br/>- Rigid body simulation _(in progress)_                                                                   |
+| **Misc**      | - Meshes (OBJ import/export, FBX import, OFF import)<br/>- Images (PNG import/export, TGA import, HDR import _(in progress)_)<br/>- Windowing (window, overlay, keyboard/mouse inputs with custom callbacks)                                                                   |

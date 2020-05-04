@@ -39,7 +39,7 @@ jobs:
             - CXX_COMPILER=g++
             - BUILD_TESTS=true
             - COVERAGE=true
-            - BADGE=linux
+            - BADGE=linux_tests
 
         - name: "RaZ - Linux Clang + Tests"
           os: linux
@@ -48,7 +48,7 @@ jobs:
             - CXX_COMPILER=clang++
             - BUILD_TESTS=true
             - COVERAGE=false
-            - BADGE=linux
+            - BADGE=linux_tests
 
         ##############
         # Emscripten #
@@ -61,7 +61,7 @@ jobs:
             - CXX_COMPILER=emcc
             - BUILD_TESTS=false
             - COVERAGE=false
-            - BADGE=linux
+            - BADGE=wasm
 
         #########
         # macOS #
@@ -76,7 +76,7 @@ jobs:
             - COVERAGE=false
             - BADGE=osx
 
-        # Temporarily the macOS test build; GLFW fails to be initialized, while RaZ runs fine on an actual Mac
+        # Temporarily deactivated the macOS test build; GLFW fails to be initialized, while RaZ runs fine on an actual Mac
         #- name: "RaZ - macOS Clang + Tests"
         #  os: osx
         #  env:
@@ -84,7 +84,7 @@ jobs:
         #    - CXX_COMPILER=clang++
         #    - BUILD_TESTS=true
         #    - COVERAGE=false
-        #    - BADGE=osx
+        #    - BADGE=osx_tests
 
 # Fetching only the latest commit
 git:
