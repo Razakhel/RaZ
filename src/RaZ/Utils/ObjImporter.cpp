@@ -288,6 +288,10 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
     }
   }
 
+  const auto posCount  = static_cast<int64_t>(positions.size());
+  const auto texCount  = static_cast<int64_t>(texcoords.size());
+  const auto normCount = static_cast<int64_t>(normals.size());
+
   std::map<std::array<std::size_t, 3>, unsigned int> indicesMap;
 
   for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
@@ -301,37 +305,37 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
 
       // First vertex informations
       int64_t tempIndex = posIndices[submeshIndex][partIndex];
-      vertIndices[0][0] = (tempIndex < 0 ? tempIndex + positions.size() : tempIndex - 1ul);
+      vertIndices[0][0] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + posCount) : static_cast<std::size_t>(tempIndex - 1));
 
       tempIndex = texcoordsIndices[submeshIndex][partIndex];
-      vertIndices[0][1] = (tempIndex < 0 ? tempIndex + texcoords.size() : tempIndex - 1ul);
+      vertIndices[0][1] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + texCount) : static_cast<std::size_t>(tempIndex - 1));
 
       tempIndex = normalsIndices[submeshIndex][partIndex];
-      vertIndices[0][2] = (tempIndex < 0 ? tempIndex + normals.size() : tempIndex - 1ul);
+      vertIndices[0][2] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + normCount) : static_cast<std::size_t>(tempIndex - 1));
 
       ++partIndex;
 
       // Second vertex informations
       tempIndex = posIndices[submeshIndex][partIndex];
-      vertIndices[1][0] = (tempIndex < 0 ? tempIndex + positions.size() : tempIndex - 1ul);
+      vertIndices[1][0] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + posCount) : static_cast<std::size_t>(tempIndex - 1));
 
       tempIndex = texcoordsIndices[submeshIndex][partIndex];
-      vertIndices[1][1] = (tempIndex < 0 ? tempIndex + texcoords.size() : tempIndex - 1ul);
+      vertIndices[1][1] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + texCount) : static_cast<std::size_t>(tempIndex - 1));
 
       tempIndex = normalsIndices[submeshIndex][partIndex];
-      vertIndices[1][2] = (tempIndex < 0 ? tempIndex + normals.size() : tempIndex - 1ul);
+      vertIndices[1][2] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + normCount) : static_cast<std::size_t>(tempIndex - 1));
 
       ++partIndex;
 
       // Third vertex informations
       tempIndex = posIndices[submeshIndex][partIndex];
-      vertIndices[2][0] = (tempIndex < 0 ? tempIndex + positions.size() : tempIndex - 1ul);
+      vertIndices[2][0] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + posCount) : static_cast<std::size_t>(tempIndex - 1));
 
       tempIndex = texcoordsIndices[submeshIndex][partIndex];
-      vertIndices[2][1] = (tempIndex < 0 ? tempIndex + texcoords.size() : tempIndex - 1ul);
+      vertIndices[2][1] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + texCount) : static_cast<std::size_t>(tempIndex - 1));
 
       tempIndex = normalsIndices[submeshIndex][partIndex];
-      vertIndices[2][2] = (tempIndex < 0 ? tempIndex + normals.size() : tempIndex - 1ul);
+      vertIndices[2][2] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + normCount) : static_cast<std::size_t>(tempIndex - 1));
 
       const std::array<Vec3f, 3> facePositions = { positions[vertIndices[0][0]],
                                                    positions[vertIndices[1][0]],
