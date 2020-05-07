@@ -48,6 +48,9 @@ private:
   TolT m_absTol;
 };
 
+template <typename T, typename TolT>
+IsNearlyEqualTo(T, TolT) -> IsNearlyEqualTo<T, TolT>;
+
 /// Custom Catch matcher, which checks for near-equality between floating point vectors' values.
 /// \tparam T Type of the vector to be compared to.
 /// \tparam TolT Tolerance type, which may differ from the value type.
@@ -91,6 +94,9 @@ private:
   Raz::Vector<T, Size> m_base;
   TolT m_absTol;
 };
+
+template <typename T, std::size_t Size, typename TolT>
+IsNearlyEqualToVector(Raz::Vector<T, Size>, TolT) -> IsNearlyEqualToVector<T, Size, TolT>;
 
 /// Custom Catch matcher, which checks for near-equality between floating point matrices' values.
 /// \tparam T Type of the matrix to be compared to.
@@ -141,5 +147,8 @@ private:
   Raz::Matrix<T, W, H> m_base;
   TolT m_absTol;
 };
+
+template <typename T, std::size_t W, std::size_t H, typename TolT>
+IsNearlyEqualToMatrix(Raz::Matrix<T, W, H>, TolT) -> IsNearlyEqualToMatrix<T, W, H, TolT>;
 
 #endif // RAZ_CATCH_HPP
