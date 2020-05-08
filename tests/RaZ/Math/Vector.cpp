@@ -17,6 +17,16 @@ constexpr Raz::Vec4f vec42(13.01f, 0.15f, 84.8f, 72.f);
 
 } // namespace
 
+TEST_CASE("Vector deduction guides") {
+  constexpr Raz::Vector vec2i(1, 2);
+  constexpr Raz::Vector vec3f(1.f, 2.f, 3.f);
+  constexpr Raz::Vector vec4u(1u, 2u, 3u, 4u);
+
+  CHECK(std::is_same_v<std::decay_t<decltype(vec2i)>, Raz::Vec2i>);
+  CHECK(std::is_same_v<std::decay_t<decltype(vec3f)>, Raz::Vec3f>);
+  CHECK(std::is_same_v<std::decay_t<decltype(vec4u)>, Raz::Vec4u>);
+}
+
 TEST_CASE("Vector near-equality") {
   CHECK_FALSE(vec31 == vec32);
 

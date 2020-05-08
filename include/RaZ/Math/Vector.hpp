@@ -34,6 +34,7 @@ public:
             typename = std::enable_if_t<sizeof...(Args) == Size>, // There can't be more or less values than Size
             typename = std::enable_if_t<(std::is_same_v<T, std::decay_t<Args>> && ...)>> // Given values must be of the same type
   constexpr explicit Vector(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
+  [[deprecated("Vector(std::initializer_list) is deprecated; use Vector(Args...) instead.")]]
   Vector(std::initializer_list<T> list) noexcept;
   constexpr Vector(const Vector&) noexcept = default;
   constexpr Vector(Vector&&) noexcept = default;
@@ -175,7 +176,7 @@ public:
   /// \param vec Vector to be compared with.
   /// \return True if vectors are [nearly] equal, else otherwise.
   constexpr bool operator==(const Vector& vec) const noexcept;
-  /// Vector unequality comparison operator.
+  /// Vector inequality comparison operator.
   /// Uses a near-equality check on floating types to take floating-point errors into account.
   /// \param vec Vector to be compared with.
   /// \return True if vectors are different, else otherwise.
@@ -189,6 +190,12 @@ private:
   std::array<T, Size> m_data {};
 };
 
+// Deduction guide, to automatically deduce the vector's type & size from the given arguments
+template <typename T, typename... Args>
+Vector(T&&, Args&&... args) -> Vector<std::decay_t<T>, sizeof...(args) + 1>;
+
+// Aliases
+
 template <typename T> using Vec2 = Vector<T, 2>;
 template <typename T> using Vec3 = Vector<T, 3>;
 template <typename T> using Vec4 = Vector<T, 4>;
@@ -201,9 +208,9 @@ using Vec2i = Vec2<int>;
 using Vec3i = Vec3<int>;
 using Vec4i = Vec4<int>;
 
-using Vec2ul = Vec2<uint32_t>;
-using Vec3ul = Vec3<uint32_t>;
-using Vec4ul = Vec4<uint32_t>;
+using Vec2u = Vec2<uint32_t>;
+using Vec3u = Vec3<uint32_t>;
+using Vec4u = Vec4<uint32_t>;
 
 using Vec2f = Vec2<float>;
 using Vec3f = Vec3<float>;
@@ -219,7 +226,7 @@ constexpr Vec3f X(1.f, 0.f, 0.f);
 constexpr Vec3f Y(0.f, 1.f, 0.f);
 constexpr Vec3f Z(0.f, 0.f, 1.f);
 
-}
+} // namespace Axis
 
 } // namespace Raz
 

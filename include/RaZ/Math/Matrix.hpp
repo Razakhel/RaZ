@@ -33,6 +33,7 @@ public:
       typename = std::enable_if_t<sizeof...(Args) == W * H>, // There can't be more or less values than width * height
       typename = std::enable_if_t<(std::is_same_v<T, std::decay_t<Args>> && ...)>> // Given values must be of the same type
   constexpr explicit Matrix(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
+  [[deprecated("Matrix(std::initializer_list<std::initializer_list>) is deprecated; use Matrix(Args...) instead.")]]
   Matrix(std::initializer_list<std::initializer_list<T>> list) noexcept;
   constexpr Matrix(const Matrix&) noexcept = default;
   constexpr Matrix(Matrix&&) noexcept = default;
@@ -163,7 +164,7 @@ public:
   /// \param mat Matrix to be compared with.
   /// \return True if matrices are [nearly] equal, else otherwise.
   constexpr bool operator==(const Matrix& mat) const noexcept;
-  /// Matrix unequality comparison operator.
+  /// Matrix inequality comparison operator.
   /// Uses a near-equality check on floating types to take floating-point errors into account.
   /// \param mat Matrix to be compared with.
   /// \return True if matrices are different, else otherwise.
@@ -177,6 +178,8 @@ private:
   std::array<T, W * H> m_data {};
 };
 
+// Aliases
+
 template <typename T> using Mat2 = Matrix<T, 2, 2>;
 template <typename T> using Mat3 = Matrix<T, 3, 3>;
 template <typename T> using Mat4 = Matrix<T, 4, 4>;
@@ -189,9 +192,9 @@ using Mat2i = Mat2<int>;
 using Mat3i = Mat3<int>;
 using Mat4i = Mat4<int>;
 
-using Mat2ul = Mat2<unsigned long>;
-using Mat3ul = Mat3<unsigned long>;
-using Mat4ul = Mat4<unsigned long>;
+using Mat2u = Mat2<uint32_t>;
+using Mat3u = Mat3<uint32_t>;
+using Mat4u = Mat4<uint32_t>;
 
 using Mat2f = Mat2<float>;
 using Mat3f = Mat3<float>;
