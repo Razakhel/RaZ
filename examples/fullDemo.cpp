@@ -44,12 +44,14 @@ int main() {
                         Raz::Input::ONCE,
                         [&mesh] () { mesh.enable(); });
 
+#if !defined(USE_OPENGL_ES)
   // Allow wireframe toggling
   bool isWireframe = false;
   window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
     isWireframe = !isWireframe;
     Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
   }, Raz::Input::ONCE);
+#endif
 
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
 

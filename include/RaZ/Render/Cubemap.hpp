@@ -39,7 +39,7 @@ public:
   /// \param backTexturePath Path to the texture located on the back of the cube.
   void load(const std::string& rightTexturePath, const std::string& leftTexturePath,
             const std::string& topTexturePath, const std::string& bottomTexturePath,
-            const std::string& frontTexturePath, const std::string& backTexturePath);
+            const std::string& frontTexturePath, const std::string& backTexturePath) const;
   /// Sends the view-projection matrix onto the graphics card.
   /// \param viewProjMat View-projection matrix to be sent.
   void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_viewProjUbo.sendData(viewProjMat, 0); }

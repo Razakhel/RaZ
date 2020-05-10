@@ -30,8 +30,8 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60 --slave /us
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-7 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-7
 
 # Downloading & installing Emscripten, to build RaZ in WebAssembly
-RUN git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && \
-    ./emsdk install latest && ./emsdk activate latest
+RUN git clone https://github.com/emscripten-core/emsdk.git && \
+    ./emsdk/emsdk install latest && ./emsdk/emsdk activate latest
 
 # Installing the FBX SDK
 # The installation asks for software user agreement (send 'yes'), then afterwards if the README file should be opened (send 'n')

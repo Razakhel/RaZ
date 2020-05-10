@@ -95,7 +95,7 @@ Cubemap::Cubemap() {
 
 void Cubemap::load(const std::string& rightTexturePath, const std::string& leftTexturePath,
                    const std::string& topTexturePath, const std::string& bottomTexturePath,
-                   const std::string& frontTexturePath, const std::string& backTexturePath) {
+                   const std::string& frontTexturePath, const std::string& backTexturePath) const {
   bind();
 
   Image img(rightTexturePath);

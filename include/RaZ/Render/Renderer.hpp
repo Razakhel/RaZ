@@ -264,7 +264,9 @@ public:
                                                                           | static_cast<unsigned int>(type3)); }
   static void setDepthFunction(DepthFunction func);
   static void setFaceCulling(FaceOrientation orientation);
+#if !defined(USE_OPENGL_ES) // glPolygonMode is not available with OpenGL ES
   static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
+#endif
   static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }
