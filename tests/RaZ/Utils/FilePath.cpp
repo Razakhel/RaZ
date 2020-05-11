@@ -4,8 +4,6 @@
 
 #include <fstream>
 
-#if defined(RAZ_FILESYSTEM_AVAILABLE)
-
 namespace {
 
 const std::string fileName = "ͳεs†_fílè_测试.τxt";
@@ -23,7 +21,7 @@ TEST_CASE("FilePath constructors") {
 }
 
 TEST_CASE("FilePath open special chars") {
-  std::ifstream file(filePath.getPath());
+  std::ifstream file(filePath.getPathStr());
 
   REQUIRE(file.is_open());
 
@@ -38,11 +36,11 @@ TEST_CASE("FilePath save special chars") {
   const Raz::FilePath path(fileName);
 
   {
-    std::ofstream file(path.getPath());
+    std::ofstream file(path.getPathStr());
     file << "НΣļlõ ωθяŁĐ!";
   }
 
-  std::ifstream file(path.getPath());
+  std::ifstream file(path.getPathStr());
 
   REQUIRE(file.is_open());
 
@@ -51,5 +49,3 @@ TEST_CASE("FilePath save special chars") {
 
   CHECK(fileContent == "НΣļlõ ωθяŁĐ!");
 }
-
-#endif
