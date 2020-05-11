@@ -13,7 +13,8 @@ Overlay::Overlay(GLFWwindow* window) {
   ImGui::StyleColorsDark();
 
   ImGui_ImplGlfw_InitForOpenGL(window, true);
-#if !defined(__EMSCRIPTEN__)
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ImGui_ImplOpenGL3_Init("#version 330 core");
 #else
   ImGui_ImplOpenGL3_Init("#version 300 es");
@@ -134,11 +135,13 @@ void Overlay::render() {
   }
 
   ImGui::Render();
+
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 Overlay::~Overlay() {
   ImGui_ImplOpenGL3_Shutdown();
+
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
 }

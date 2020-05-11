@@ -1,8 +1,5 @@
 #include "GL/glew.h"
 #if defined(RAZ_PLATFORM_WINDOWS)
-#if defined(RAZ_COMPILER_MSVC)
-#define NOMINMAX
-#endif
 #include "GL/wglew.h"
 #elif defined(RAZ_PLATFORM_LINUX)
 #include "GL/glxew.h"
@@ -11,7 +8,7 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Window.hpp"
 
-#if defined(__EMSCRIPTEN__)
+#if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten/html5.h>
 #endif
 
@@ -27,17 +24,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   if (!glfwInit())
     throw std::runtime_error("Error: Failed to initialize GLFW");
 
-#ifdef RAZ_USE_GL4
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-#else
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-#endif
-
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_RESIZABLE, false);
-  glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
 
 #if defined(RAZ_CONFIG_DEBUG)
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
@@ -47,6 +34,17 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 #endif
 
+#if defined(RAZ_USE_GL4)
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+#else
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#endif
+
+  glfwWindowHint(GLFW_RESIZABLE, false);
+  glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
+
   m_window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
   if (!m_window) {
     close();
@@ -55,14 +53,12 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 
   glfwMakeContextCurrent(m_window);
 
-  glViewport(0, 0, static_cast<int>(width), static_cast<int>(height));
-
   Renderer::initialize();
+  Renderer::enable(Capability::DEPTH_TEST);
 
   glfwSetWindowUserPointer(m_window, this);
 
   enableFaceCulling();
-  Renderer::enable(Capability::DEPTH_TEST);
 }
 
 void Window::setTitle(const std::string& title) const {
@@ -107,7 +103,7 @@ bool Window::recoverVerticalSyncState() const {
   return false;
 }
 
-void Window::enableVerticalSync(bool value) const {
+void Window::enableVerticalSync([[maybe_unused]] bool value) const {
 #if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT()) {
     wglSwapIntervalEXT(static_cast<int>(value));
@@ -155,7 +151,7 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
 void Window::updateCallbacks() const {
   // Keyboard inputs
   if (!std::get<0>(m_callbacks).empty()) {
-    glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /*scancode*/, int action, int /*mode*/) {
+    glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /* scancode */, int action, int /* mode */) {
       InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
       const auto& keyCallbacks = std::get<0>(callbacks);
 
@@ -281,7 +277,7 @@ bool Window::run(float deltaTime) {
 
   glfwSwapBuffers(m_window);
 
-#if defined(__EMSCRIPTEN__)
+#if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_webgl_commit_frame();
 #endif
 

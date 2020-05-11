@@ -1,6 +1,6 @@
 #include "RaZ/Application.hpp"
 
-#ifdef __EMSCRIPTEN__
+#if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten.h>
 #endif
 
@@ -14,7 +14,7 @@ World& Application::addWorld(World world) {
 }
 
 void Application::run() {
-#ifdef __EMSCRIPTEN__
+#if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_set_main_loop_arg([] (void* instance) {
     static_cast<decltype(this)>(instance)->runOnce();
   }, this, 0, 1);

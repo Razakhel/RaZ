@@ -8,7 +8,7 @@ namespace Raz {
 Cubemap::Cubemap() {
   Renderer::generateTexture(m_index);
 
-#if !defined(__EMSCRIPTEN__)
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   const std::string vertSource = R"(
     #version 330 core
 

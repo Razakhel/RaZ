@@ -1,4 +1,4 @@
-#if defined(__EMSCRIPTEN__)
+#if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <png.h>
 #include <zlib.h>
 #else

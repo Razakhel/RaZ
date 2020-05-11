@@ -1,4 +1,4 @@
-#ifdef __EMSCRIPTEN__
+#if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten.h>
 #endif
 
@@ -6,7 +6,7 @@ namespace Raz {
 
 template <typename F>
 void Application::run(F&& callback) {
-#ifdef __EMSCRIPTEN__
+#if defined(RAZ_PLATFORM_EMSCRIPTEN)
   auto emCallback = [callback = std::forward<F>(callback), this] {
     runOnce();
     callback();
@@ -16,9 +16,8 @@ void Application::run(F&& callback) {
     (*static_cast<decltype(&emCallback)>(lambda))();
   }, &emCallback, 0, 1);
 #else
-  while (runOnce()) {
+  while (runOnce())
     callback();
-  }
 #endif
 }
 
