@@ -36,27 +36,47 @@ else ()
     set(RAZ_USE_EMSCRIPTEN OFF)
 endif ()
 
-if (MSVC)
+if (MSVC AND NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Finding exclusively MSVC, not clang-cl
+    set(RAZ_COMPILER "MSVC")
     set(RAZ_COMPILER_MSVC ON)
     target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_MSVC)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if (MSVC)
+        # Using clang-cl, for which both MSVC & Clang are found
+        set(RAZ_COMPILER "Clang-cl")
+        set(RAZ_COMPILER_CLANG_CL ON)
+    else ()
+        set(RAZ_COMPILER "Clang")
+    endif ()
+
     set(RAZ_COMPILER_CLANG ON)
     target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_CLANG)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(RAZ_COMPILER "GCC")
     set(RAZ_COMPILER_GCC ON)
     target_compile_definitions(RaZ PUBLIC RAZ_COMPILER_GCC)
 endif ()
 
 if (WIN32 OR CYGWIN)
+    set(RAZ_PLATFORM "Windows")
     set(RAZ_PLATFORM_WINDOWS ON)
     target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_WINDOWS)
+
+    if (CYGWIN)
+        set(RAZ_PLATFORM "${RAZ_PLATFORM} (Cygwin)")
+        set(RAZ_PLATFORM_CYGWIN ON)
+        target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_CYGWIN)
+    endif ()
 elseif (APPLE)
+    set(RAZ_PLATFORM "macOS")
     set(RAZ_PLATFORM_MAC ON)
     target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_MAC)
 elseif (RAZ_USE_EMSCRIPTEN)
+    set(RAZ_PLATFORM "Emscripten")
     set(RAZ_PLATFORM_EMSCRIPTEN ON)
     target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_EMSCRIPTEN USE_OPENGL_ES)
 elseif (UNIX)
+    set(RAZ_PLATFORM "Linux")
     set(RAZ_PLATFORM_LINUX ON)
     target_compile_definitions(RaZ PUBLIC RAZ_PLATFORM_LINUX)
 endif ()
@@ -108,16 +128,16 @@ if (ENABLE_DEBUG_INFO)
         ${CMAKE_COMMAND} -E echo "####################" &&
         ${CMAKE_COMMAND} -E echo "" &&
 
-        ${CMAKE_COMMAND} -E echo "--- Platform" &&
-        ${CMAKE_COMMAND} -E echo "  Name:    ${CMAKE_SYSTEM_NAME}" &&
-        ${CMAKE_COMMAND} -E echo "  Release: ${PLATFORM_RELEASE}" &&
-        ${CMAKE_COMMAND} -E echo "  Version: ${PLATFORM_VERSION}" &&
+        ${CMAKE_COMMAND} -E echo "--- Platform (found ${RAZ_PLATFORM})" &&
+        ${CMAKE_COMMAND} -E echo "  Name:     ${CMAKE_SYSTEM_NAME}" &&
+        ${CMAKE_COMMAND} -E echo "  Release:  ${PLATFORM_RELEASE}" &&
+        ${CMAKE_COMMAND} -E echo "  Version:  ${PLATFORM_VERSION}" &&
         ${CMAKE_COMMAND} -E echo "" &&
 
-        ${CMAKE_COMMAND} -E echo "--- Compiler" &&
-        ${CMAKE_COMMAND} -E echo "  ID:      ${CMAKE_CXX_COMPILER_ID}" &&
-        ${CMAKE_COMMAND} -E echo "  Version: ${CMAKE_CXX_COMPILER_VERSION}" &&
-        ${CMAKE_COMMAND} -E echo "  Path:    ${CMAKE_CXX_COMPILER}" &&
+        ${CMAKE_COMMAND} -E echo "--- Compiler (found ${RAZ_COMPILER})" &&
+        ${CMAKE_COMMAND} -E echo "  ID:       ${CMAKE_CXX_COMPILER_ID}" &&
+        ${CMAKE_COMMAND} -E echo "  Version:  ${CMAKE_CXX_COMPILER_VERSION}" &&
+        ${CMAKE_COMMAND} -E echo "  Path:     ${CMAKE_CXX_COMPILER}" &&
         ${CMAKE_COMMAND} -E echo "" &&
 
         ${CMAKE_COMMAND} -E echo "--- Configuration" &&
@@ -253,8 +273,6 @@ elseif (RAZ_COMPILER_CLANG)
     set(
         RAZ_COMPILER_FLAGS
 
-        -pedantic
-        -pedantic-errors
         -Weverything
 
         -Wno-c++98-compat
@@ -273,6 +291,27 @@ elseif (RAZ_COMPILER_CLANG)
         -Wno-switch-enum
         -Wno-weak-vtables
     )
+
+    if (RAZ_COMPILER_CLANG_CL)
+        set(
+            RAZ_COMPILER_FLAGS
+
+            ${RAZ_COMPILER_FLAGS}
+            # Disabling warnings triggered in externals
+            -Wno-language-extension-token
+            -Wno-nonportable-system-include-path
+            -Wno-zero-as-null-pointer-constant
+        )
+    else ()
+        set(
+            RAZ_COMPILER_FLAGS
+
+            ${RAZ_COMPILER_FLAGS}
+            # Other warning flags not recognized by clang-cl
+            -pedantic
+            -pedantic-errors
+        )
+    endif ()
 
     if (RAZ_USE_EMSCRIPTEN)
         set(
@@ -311,7 +350,6 @@ elseif (RAZ_COMPILER_MSVC)
         RAZ_COMPILER_FLAGS
 
         /W4
-        /permissive-
     )
 
     # To automatically export all the classes & functions
@@ -321,6 +359,25 @@ elseif (RAZ_COMPILER_MSVC)
     # TODO: if possible, this should be done per target, not globally
     string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif ()
+
+if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
+    set(
+        RAZ_COMPILER_FLAGS
+
+        ${RAZ_COMPILER_FLAGS}
+        /permissive-
+        /EHsc # Enabling exceptions
+    )
+
+    target_compile_definitions(
+        RaZ
+
+        PRIVATE
+
+        NOMINMAX # Preventing definitions of min & max macros
+        _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING # Ignoring std::codecvt deprecation warnings
+    )
 endif ()
 
 ######################
