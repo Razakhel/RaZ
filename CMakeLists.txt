@@ -349,7 +349,36 @@ elseif (RAZ_COMPILER_MSVC)
     set(
         RAZ_COMPILER_FLAGS
 
-        /W4
+        /Wall
+
+        /wd4061 # Enum value in a switch not explicitly handled by a case label
+        /wd4571 # SEH exceptions aren't caught since Visual C++ 7.1
+        /wd5045 # Spectre mitigation
+
+        # Warnings triggered by the FBX SDK
+        /wd4266 # No override available (function is hidden)
+        /wd4619 # Unknown warning number
+        /wd4625 # Copy constructor implicitly deleted
+        /wd4626 # Copy assignment operator implicitly deleted
+
+        # Warnings triggered by Catch
+        /wd4365 # Signed/unsigned mismatch (implicit conversion)
+        /wd4388 # Signed/unsigned mismatch (equality comparison)
+        /wd4583 # Destructor not implicitly called
+        /wd4623 # Default constructor implicitly deleted
+        /wd4868 # Evaluation order not guaranteed in braced initializing list
+        /wd5204 # Class with virtual functions but no virtual destructor
+
+        # Warnings triggered by MSVC's standard library
+        /wd4355 # 'this' used in base member initializing list
+        /wd4514 # Unreferenced inline function has been removed
+        /wd4548 # Expression before comma has no effect
+        /wd4668 # Preprocessor macro not defined
+        /wd4710 # Function not inlined
+        /wd4820 # Added padding to members
+        /wd5026 # Move constructor implicitly deleted
+        /wd5027 # Move assignment operator implicitly deleted
+        /wd5039 # Pointer/ref to a potentially throwing function passed to an 'extern "C"' function (with -EHc)
     )
 
     # To automatically export all the classes & functions
