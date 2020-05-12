@@ -21,27 +21,26 @@ public:
   Light(LightType type, const Vec3f& direction, float energy, const Vec3f& color = Vec3f(1.f))
     : m_type{ type }, m_direction{ direction }, m_energy{ energy }, m_color{ color } {}
   Light(LightType type, const Vec3f& direction, float energy, float angle, const Vec3f& color = Vec3f(1.f))
-    : m_type{ type }, m_direction{ direction }, m_energy{ energy }, m_angle{ angle }, m_color{ color } {}
+    : m_type{ type }, m_direction{ direction }, m_energy{ energy }, m_color{ color }, m_angle{ angle } {}
 
   LightType getType() const { return m_type; }
   const Vec3f& getDirection() const { return m_direction; }
-  Vec3f& getDirection() { return m_direction; }
-  const Vec3f& getColor() const { return m_color; }
-  Vec3f& getColor() { return m_color; }
   float getEnergy() const { return m_energy; }
+  const Vec3f& getColor() const { return m_color; }
   float getAngle() const { return m_angle; }
 
   void setType(LightType type) { m_type = type; }
   void setDirection(const Vec3f& direction) { m_direction = direction; }
   void setEnergy(float energy) { m_energy = energy; }
+  void setColor(const Vec3f& color) { m_color = color; }
   void setAngle(float angle) { m_angle = angle; }
 
 private:
   LightType m_type {};
   Vec3f m_direction {};
   float m_energy = 1.f;
-  float m_angle  = 0.f;
   Vec3f m_color {};
+  float m_angle  = 0.f;
 };
 
 } // namespace Raz

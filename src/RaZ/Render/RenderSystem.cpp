@@ -144,8 +144,8 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
   const std::string strBase = "uniLights[" + std::to_string(lightIndex) + "].";
 
   const std::string posStr    = strBase + "position";
-  const std::string colorStr  = strBase + "color";
   const std::string energyStr = strBase + "energy";
+  const std::string colorStr  = strBase + "color";
   const std::string angleStr  = strBase + "angle";
 
   const auto& lightComp = entity->getComponent<Light>();
@@ -157,8 +157,8 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
   }
 
   geometryProgram.sendUniform(posStr,    homogeneousPos);
-  geometryProgram.sendUniform(colorStr,  lightComp.getColor());
   geometryProgram.sendUniform(energyStr, lightComp.getEnergy());
+  geometryProgram.sendUniform(colorStr,  lightComp.getColor());
   geometryProgram.sendUniform(angleStr,  lightComp.getAngle());
 }
 

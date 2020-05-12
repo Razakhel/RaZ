@@ -1,10 +1,14 @@
 #version 300 es
 
+precision highp float;
+precision highp int;
+
 #define MAX_LIGHT_COUNT 10
 
 struct Light {
   vec4 position;
   vec3 direction;
+  float energy;
   vec3 color;
   float angle;
 };

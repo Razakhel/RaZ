@@ -5,8 +5,8 @@
 struct Light {
   vec4 position;
   vec3 direction;
-  vec3 color;
   float energy;
+  vec3 color;
   float angle;
 };
 

@@ -1,16 +1,16 @@
 #version 300 es
 
-#define MAX_LIGHT_COUNT 10
-#define PI 3.1415926535897932384626433832795
-
 precision highp float;
 precision highp int;
+
+#define MAX_LIGHT_COUNT 10
+#define PI 3.1415926535897932384626433832795
 
 struct Light {
   vec4 position;
   vec3 direction;
-  vec3 color;
   float energy;
+  vec3 color;
   float angle;
 };
 
