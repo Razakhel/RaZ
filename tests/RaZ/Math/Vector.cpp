@@ -53,9 +53,11 @@ TEST_CASE("Vector near-equality") {
 TEST_CASE("Vector/scalar operations") {
   CHECK((vec31 + 3.5f) == Raz::Vec3f(6.68f, 45.5f, 4.374f));
   CHECK((vec32 - 74.42f) == Raz::Vec3f(466.99f, -27.17f, -68.099f));
+  CHECK((vec31 + 8.2f) == (8.2f + vec31));
 
   CHECK((vec31 * 3.f) == Raz::Vec3f(9.54f, 126.f, 2.622f));
   CHECK((vec31 * 4.152f) == Raz::Vec3f(13.20336f, 174.384f, 3.628848f));
+  CHECK((vec31 * 6.31f) == (6.31f * vec31));
 
   CHECK((vec41 * 7.5f) == Raz::Vec4f(633.525f, 15.f, 0.0075f, 6353.4f));
   CHECK((vec41 * 8.0002f) == Raz::Vec4f(675.776894f, 16.0004f, 0.0080002f, 6777.129424f));
@@ -128,14 +130,17 @@ TEST_CASE("Vector manipulations") {
 }
 
 TEST_CASE("Vector hash") {
-  CHECK(vec31.hash() != vec32.hash());
-  CHECK(vec41.hash() != vec42.hash());
+  CHECK(vec31.hash() == vec31.hash());
+  CHECK_FALSE(vec31.hash() == vec32.hash());
+
+  CHECK(vec41.hash() == vec41.hash());
+  CHECK_FALSE(vec41.hash() == vec42.hash());
 
   constexpr Raz::Vec3f vec31Swizzled(vec31[2], vec31[0], vec31[1]);
-  CHECK(vec31.hash() != vec31Swizzled.hash());
+  CHECK_FALSE(vec31.hash() == vec31Swizzled.hash());
 
   constexpr Raz::Vec3f vec31Epsilon = vec31 + std::numeric_limits<float>::epsilon();
-  CHECK(vec31.hash() != vec31Epsilon.hash());
+  CHECK_FALSE(vec31.hash() == vec31Epsilon.hash());
 
   // Checking that it behaves as expected when used in a hashmap
   std::unordered_map<Raz::Vec3f, int> map;
@@ -153,4 +158,39 @@ TEST_CASE("Vector hash") {
 
   map.erase(vec31Epsilon);
   CHECK(map.find(vec31Epsilon) == map.cend());
+}
+
+TEST_CASE("Vector strict equality") {
+  CHECK(vec31.strictlyEquals(vec31));
+  CHECK(vec41.strictlyEquals(vec41));
+
+  CHECK(std::equal_to<Raz::Vec3f>()(vec31, vec31));
+  CHECK(std::equal_to<Raz::Vec4f>()(vec41, vec41));
+
+  constexpr Raz::Vec3f vec31Swizzled(vec31[2], vec31[0], vec31[1]);
+  CHECK_FALSE(vec31.strictlyEquals(vec31Swizzled));
+  CHECK_FALSE(std::equal_to<Raz::Vec3f>()(vec31, vec31Swizzled));
+
+  constexpr Raz::Vec3f vec31Epsilon = vec31 + std::numeric_limits<float>::epsilon();
+  CHECK(vec31 == vec31Epsilon);
+  CHECK_FALSE(vec31.strictlyEquals(vec31Epsilon));
+  CHECK_FALSE(std::equal_to<Raz::Vec3f>()(vec31, vec31Epsilon));
+
+  constexpr std::array<Raz::Vec3f, 3> vectors = { vec31Swizzled, vec31Epsilon, vec31 };
+
+  // When using a simple find(), which uses operator==, vec31Epsilon is found instead of vec31
+  const auto foundIter = std::find(vectors.cbegin(), vectors.cend(), vec31);
+  CHECK_FALSE(std::distance(vectors.cbegin(), foundIter) == 2);
+
+  // To search for a specific element, find_if() must be used with a strict equality check
+  const auto foundIfIter = std::find_if(vectors.cbegin(), vectors.cend(), [&] (const Raz::Vec3f& compVec) { return vec31.strictlyEquals(compVec); });
+  CHECK(std::distance(vectors.cbegin(), foundIfIter) == 2);
+
+  constexpr std::array<Raz::Vec3f, 3> swappedVectors = { vec31Swizzled, vec31, vec31Epsilon };
+
+  // Trying to compare for equality fails with a simple std::equal on the vectors
+  CHECK(std::equal(vectors.cbegin(), vectors.cend(), swappedVectors.cbegin()));
+
+  // When using the std::equal_to specialization, vectors are properly found to be unequal to each other
+  CHECK_FALSE(std::equal(vectors.cbegin(), vectors.cend(), swappedVectors.cbegin(), std::equal_to<Raz::Vec3f>()));
 }

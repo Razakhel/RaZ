@@ -64,6 +64,16 @@ constexpr Vector<T, Size> Vector<T, Size>::normalize() const {
 }
 
 template <typename T, std::size_t Size>
+constexpr bool Vector<T, Size>::strictlyEquals(const Vector<T, Size>& vec) const noexcept {
+  for (std::size_t i = 0; i < Size; ++i) {
+    if (m_data[i] != vec[i])
+      return false;
+  }
+
+  return true;
+}
+
+template <typename T, std::size_t Size>
 constexpr std::size_t Vector<T, Size>::hash(std::size_t seed) const noexcept {
   std::hash<T> hasher {};
 

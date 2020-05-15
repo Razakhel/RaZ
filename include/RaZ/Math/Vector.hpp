@@ -77,6 +77,10 @@ public:
   /// This calculation does not involve a square root; it is then to be preferred over computeLength() for faster operations.
   /// \return Vector's squared length.
   constexpr float computeSquaredLength() const noexcept { return dot(*this); }
+  /// Checks for strict equality between the current vector & the given one.
+  /// \param vec Vector to be compared with.
+  /// \return True if vectors are strictly equal to each other, false otherwise.
+  constexpr bool strictlyEquals(const Vector& vec) const noexcept;
   /// Computes the unique hash of the vector.
   /// \param seed Value to use as a hash seed.
   /// \return Vector's hash.
@@ -190,6 +194,24 @@ private:
   std::array<T, Size> m_data {};
 };
 
+/// Element-wise value-vector addition operator (of the form val + vec).
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+/// \param val Value to be added to the vectors's element.
+/// \param vec Vector to be additioned.
+/// \return Additioned vector.
+template <typename T, std::size_t Size>
+constexpr Vector<T, Size> operator+(T val, const Vector<T, Size>& vec) noexcept { return vec + val; }
+
+/// Element-wise value-vector multiplication operator (of the form val * vec).
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+/// \param val Value to be multiplied by the vectors's element.
+/// \param vec Vector to be multiplied.
+/// \return Multiplied vector.
+template <typename T, std::size_t Size>
+constexpr Vector<T, Size> operator*(T val, const Vector<T, Size>& vec) noexcept { return vec * val; }
+
 // Deduction guide, to automatically deduce the vector's type & size from the given arguments
 template <typename T, typename... Args>
 Vector(T&&, Args&&... args) -> Vector<std::decay_t<T>, sizeof...(args) + 1>;
@@ -230,10 +252,29 @@ constexpr Vec3f Z(0.f, 0.f, 1.f);
 
 } // namespace Raz
 
-// Specializing std::hash for Vector
+/// Specialization of std::hash for Vector.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
 template <typename T, std::size_t Size>
 struct std::hash<Raz::Vector<T, Size>> {
+  /// Computes the hash of the given vector.
+  /// \param vec Vector to compute the hash of.
+  /// \return Vector's hash value.
   constexpr std::size_t operator()(const Raz::Vector<T, Size>& vec) const noexcept { return vec.hash(); }
+};
+
+/// Specialization of std::equal_to for Vector. This performs a strict equality check.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+template <typename T, std::size_t Size>
+struct std::equal_to<Raz::Vector<T, Size>> {
+  /// Checks that the two given vectors are strictly equal to each other.
+  /// \param vec1 First vector to be compared.
+  /// \param vec2 Second vector to be compared.
+  /// \return True if vectors are strictly equal to each other, false otherwise.
+  constexpr bool operator()(const Raz::Vector<T, Size>& vec1, const Raz::Vector<T, Size>& vec2) const noexcept {
+    return vec1.strictlyEquals(vec2);
+  }
 };
 
 #include "RaZ/Math/Vector.inl"
