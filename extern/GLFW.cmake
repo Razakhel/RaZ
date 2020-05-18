@@ -15,7 +15,7 @@ if (WIN32 OR CYGWIN)
     )
 
     set(
-        GLFW_PLATFORM_FILES
+        GLFW_PLATFORM_SRC
 
         glfw/src/egl*
         glfw/src/osmesa*
@@ -37,7 +37,7 @@ elseif (APPLE)
     )
 
     set(
-        GLFW_PLATFORM_FILES
+        GLFW_PLATFORM_SRC
 
         glfw/src/cocoa*
         glfw/src/egl*
@@ -66,7 +66,7 @@ elseif (UNIX)
         )
 
         set(
-            GLFW_PLATFORM_FILES
+            GLFW_PLATFORM_SRC
 
             glfw/src/wl*
         )
@@ -79,7 +79,7 @@ elseif (UNIX)
         )
 
         set(
-            GLFW_PLATFORM_FILES
+            GLFW_PLATFORM_SRC
 
             glfw/src/glx*
             glfw/src/x11*
@@ -88,9 +88,9 @@ elseif (UNIX)
 
 
     set(
-        GLFW_PLATFORM_FILES
+        GLFW_PLATFORM_SRC
 
-        ${GLFW_PLATFORM_FILES}
+        ${GLFW_PLATFORM_SRC}
         glfw/src/egl*
         glfw/src/linux*
         glfw/src/osmesa*
@@ -114,7 +114,7 @@ endif ()
 
 file(
     GLOB
-    GLFW_SRC
+    GLFW_FILES
 
     # Common files
     glfw/src/context.c
@@ -125,11 +125,11 @@ file(
     glfw/src/window.c
 
     # Platform-specific files
-    ${GLFW_PLATFORM_FILES}
+    ${GLFW_PLATFORM_SRC}
 )
 
 # Building GLFW
-add_library(GLFW OBJECT ${GLFW_SRC})
+add_library(GLFW OBJECT ${GLFW_FILES})
 
 target_include_directories(
     GLFW

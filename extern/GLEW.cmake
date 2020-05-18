@@ -6,8 +6,6 @@ project(GLEW)
 
 set(CMAKE_C_STANDARD 11)
 
-aux_source_directory(glew/src GLEW_SRC)
-
 # Defining preprocessor macros
 if (WIN32 OR CYGWIN)
     set(
@@ -32,8 +30,22 @@ elseif (APPLE)
     )
 endif ()
 
+set(
+    GLEW_SRC
+
+    glew/src/*.c
+    glew/include/GL/*.h
+)
+
+file(
+    GLOB
+    GLEW_FILES
+
+    ${GLEW_SRC}
+)
+
 # Building GLEW
-add_library(GLEW OBJECT ${GLEW_SRC})
+add_library(GLEW OBJECT ${GLEW_FILES})
 
 if (CYGWIN)
     # Cygwin voluntarily removes the _WIN32 definition, which GLEW requires here

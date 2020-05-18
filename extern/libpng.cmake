@@ -6,10 +6,22 @@ project(libpng)
 
 set(CMAKE_C_STANDARD 11)
 
-aux_source_directory(png PNG_SRC)
+set(
+    PNG_SRC
+
+    png/*.c
+    png/*.h
+)
+
+file(
+    GLOB
+    PNG_FILES
+
+    ${PNG_SRC}
+)
 
 # Building libpng
-add_library(libpng OBJECT ${PNG_SRC})
+add_library(libpng OBJECT ${PNG_FILES})
 
 target_include_directories(libpng SYSTEM PUBLIC png)
 
