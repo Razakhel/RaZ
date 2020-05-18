@@ -19,7 +19,6 @@ if (RAZ_USE_EMSCRIPTEN)
     include(EmscriptenAssets.cmake)
 endif ()
 
-
 # If FBX SDK used with MSVC, copy the DLL into the examples/ folder to link it properly
 if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)
     set(DLL_COPY_COMMAND ${CMAKE_COMMAND} -E copy "${FBX_CONFIG_DLL}" "${CMAKE_BINARY_DIR}/examples/${FBX_LIB_NAME}.dll")

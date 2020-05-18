@@ -3,6 +3,8 @@
 #ifndef RAZ_RENDERER_HPP
 #define RAZ_RENDERER_HPP
 
+#include "RaZ/Utils/EnumUtils.hpp"
+
 #include <bitset>
 #include <cstddef>
 #include <string>
@@ -47,6 +49,7 @@ enum class MaskType : unsigned int {
   DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
   STENCIL = 1024   // GL_STENCIL_BUFFER_BIT
 };
+MAKE_ENUM_FLAG(MaskType)
 
 enum class DepthFunction : unsigned int {
   NEVER         = 512, // GL_NEVER
@@ -257,11 +260,7 @@ public:
   static bool isEnabled(Capability capability);
   static void clearColor(float red, float green, float blue, float alpha);
   static void clearColor(float values[4]) { clearColor(values[0], values[1], values[2], values[3]); }
-  static void clear(MaskType type) { clear(static_cast<unsigned int>(type)); }
-  static void clear(MaskType type1, MaskType type2) { clear(static_cast<unsigned int>(type1) | static_cast<unsigned int>(type2)); }
-  static void clear(MaskType type1, MaskType type2, MaskType type3) { clear(static_cast<unsigned int>(type1)
-                                                                          | static_cast<unsigned int>(type2)
-                                                                          | static_cast<unsigned int>(type3)); }
+  static void clear(MaskType mask);
   static void setDepthFunction(DepthFunction func);
   static void setFaceCulling(FaceOrientation orientation);
 #if !defined(USE_OPENGL_ES) // glPolygonMode is not available with OpenGL ES
@@ -420,7 +419,6 @@ public:
   ~Renderer() = delete;
 
 private:
-  static void clear(unsigned int mask);
   static constexpr uint8_t recoverErrorCodeIndex(ErrorCode code) { return static_cast<uint8_t>(static_cast<unsigned int>(code)
                                                                                              - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)); }
 

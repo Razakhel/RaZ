@@ -16,7 +16,7 @@ public:
   constexpr explicit RigidBody(float mass, float bounciness) noexcept : m_mass{ mass },
                                                                         m_invMass{ (mass != 0.f ? 1.f / mass : 0.f) },
                                                                         m_bounciness{ bounciness } {
-    assert("Error: Bounciness' value must be between 0 & 1." && (bounciness >= 0.f && bounciness <= 1.f));
+    assert("Error: Bounciness value must be between 0 & 1." && (bounciness >= 0.f && bounciness <= 1.f));
   }
 
   constexpr float getMass() const noexcept { return m_mass; }

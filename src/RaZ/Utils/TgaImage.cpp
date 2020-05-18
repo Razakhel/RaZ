@@ -16,7 +16,7 @@ void Image::readTga(std::ifstream& file, bool flipVertically) {
 
   // Colormap (0 - no colormap, 1 - colormap)
   file.read(reinterpret_cast<char*>(bytes.data()), 1);
-  const bool hasColormap = bytes[0];
+  const bool hasColormap = (bytes[0] == 1);
 
   // Image type
   bool runLengthEncoding = false;

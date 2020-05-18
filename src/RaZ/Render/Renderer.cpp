@@ -108,7 +108,7 @@ void Renderer::disable(Capability capability) {
 bool Renderer::isEnabled(Capability capability) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  const bool isEnabled = glIsEnabled(static_cast<unsigned int>(capability));
+  const bool isEnabled = (glIsEnabled(static_cast<unsigned int>(capability)) == GL_TRUE);
 
 #if !defined(NDEBUG)
   printErrors();
@@ -121,6 +121,16 @@ void Renderer::clearColor(float red, float green, float blue, float alpha) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glClearColor(red, green, blue, alpha);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::clear(MaskType mask) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glClear(static_cast<unsigned int>(mask));
 
 #if !defined(NDEBUG)
   printErrors();
@@ -431,7 +441,7 @@ unsigned int Renderer::createProgram() {
 int Renderer::getProgramStatus(unsigned int index, ProgramStatus status) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  int res;
+  int res {};
   glGetProgramiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
@@ -444,7 +454,7 @@ int Renderer::getProgramStatus(unsigned int index, ProgramStatus status) {
 bool Renderer::isProgramLinked(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  const bool isLinked = getProgramStatus(index, ProgramStatus::LINK);
+  const bool isLinked = (getProgramStatus(index, ProgramStatus::LINK) == GL_TRUE);
 
 #if !defined(NDEBUG)
   printErrors();
@@ -505,7 +515,7 @@ unsigned int Renderer::createShader(ShaderType type) {
 int Renderer::getShaderStatus(unsigned int index, ShaderStatus status) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  int res;
+  int res {};
   glGetShaderiv(index, static_cast<unsigned int>(status), &res);
 
 #if !defined(NDEBUG)
@@ -518,7 +528,7 @@ int Renderer::getShaderStatus(unsigned int index, ShaderStatus status) {
 bool Renderer::isShaderCompiled(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  const bool isCompiled = getShaderStatus(index, ShaderStatus::COMPILE);
+  const bool isCompiled = (getShaderStatus(index, ShaderStatus::COMPILE) == GL_TRUE);
 
 #if !defined(NDEBUG)
   printErrors();
@@ -807,16 +817,6 @@ void Renderer::printErrors() {
   }
 
   std::cerr << std::flush;
-}
-
-void Renderer::clear(unsigned int mask) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-
-  glClear(mask);
-
-#if !defined(NDEBUG)
-  printErrors();
-#endif
 }
 
 } // namespace Raz
