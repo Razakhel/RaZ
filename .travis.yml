@@ -69,6 +69,7 @@ jobs:
 
         - name: "RaZ - macOS Clang"
           os: osx
+          osx_image: xcode11.4
           env:
             - C_COMPILER=clang
             - CXX_COMPILER=clang++
@@ -79,6 +80,7 @@ jobs:
         # Temporarily deactivated the macOS test build; GLFW fails to be initialized, while RaZ runs fine on an actual Mac
         #- name: "RaZ - macOS Clang + Tests"
         #  os: osx
+        #  osx_image: xcode11.4
         #  env:
         #    - C_COMPILER=clang
         #    - CXX_COMPILER=clang++
