@@ -377,6 +377,7 @@ elseif (RAZ_COMPILER_MSVC)
         /wd4548 # Expression before comma has no effect
         /wd4668 # Preprocessor macro not defined
         /wd4710 # Function not inlined
+        /wd4774 # Format string is not a string literal
         /wd4820 # Added padding to members
         /wd5026 # Move constructor implicitly deleted
         /wd5027 # Move assignment operator implicitly deleted

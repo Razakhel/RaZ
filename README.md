@@ -34,7 +34,7 @@
         <tr>
             <th align="center">Compilation</th>
             <td align="center"><a alt="Linux build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=linux" /></a></td>
-            <td align="center">No CI yet</td>
+            <td align="center"><a alt="Windows build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=windows" /></a></td>
             <td align="center"><a alt="macOS build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=osx" /></a></td>
             <td align="center"><a alt="WASM build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=wasm" /></a></td>
         </tr>

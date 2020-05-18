@@ -4,6 +4,7 @@ services:
     - docker
 
 os: linux
+dist: xenial
 
 # The BADGE environment variable is used to distinguish badges to display
 # Without it, the build would be marked failing regardless of the platform
@@ -50,18 +51,28 @@ jobs:
             - COVERAGE=false
             - BADGE=linux_tests
 
-        ##############
-        # Emscripten #
-        ##############
+        ###########
+        # Windows #
+        ###########
 
-        - name: "RaZ - Emscripten"
-          os: linux
+        - name: "RaZ - Windows MSVC"
+          os: windows
           env:
-            - C_COMPILER=emcc
-            - CXX_COMPILER=emcc
+            - C_COMPILER=cl
+            - CXX_COMPILER=cl
             - BUILD_TESTS=false
             - COVERAGE=false
-            - BADGE=wasm
+            - BADGE=windows
+
+        # Temporarily deactivated the Windows test build; Windows Server Core seems not being able to use graphical functionalities (opengl32.dll is missing)
+        #- name: "RaZ - Windows MSVC + Tests"
+        #  os: windows
+        #  env:
+        #    - C_COMPILER=cl
+        #    - CXX_COMPILER=cl
+        #    - BUILD_TESTS=true
+        #    - COVERAGE=false
+        #    - BADGE=windows_tests
 
         #########
         # macOS #
@@ -77,7 +88,7 @@ jobs:
             - COVERAGE=false
             - BADGE=osx
 
-        # Temporarily deactivated the macOS test build; GLFW fails to be initialized, while RaZ runs fine on an actual Mac
+        # Temporarily deactivated the macOS test build; GLFW fails to be initialized (failed to find a suitable pixel format)
         #- name: "RaZ - macOS Clang + Tests"
         #  os: osx
         #  osx_image: xcode11.4
@@ -87,6 +98,19 @@ jobs:
         #    - BUILD_TESTS=true
         #    - COVERAGE=false
         #    - BADGE=osx_tests
+
+        ##############
+        # Emscripten #
+        ##############
+
+        - name: "RaZ - Emscripten"
+          os: linux
+          env:
+            - C_COMPILER=emcc
+            - CXX_COMPILER=emcc
+            - BUILD_TESTS=false
+            - COVERAGE=false
+            - BADGE=wasm
 
 # Fetching only the latest commit
 git:
@@ -98,9 +122,10 @@ install:
       fi
 
 before_script:
-    - export DISPLAY=:99.0
+    # Under macOS, starting Xvfb & giving it some time to start
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then export DISPLAY=:99.0; fi
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1280x720x16; echo ok )& fi
-    - sleep 3 # Gives Xvfb some time to start
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sleep 3; fi
 
 script:
     #########
@@ -131,22 +156,21 @@ script:
             ";
       fi
 
-    ##############
-    # Emscripten #
-    ##############
+    ###########
+    # Windows #
+    ###########
 
-    - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ ${CXX_COMPILER} = "emcc" ]; then
-        docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
-            bash -c "
-                source /emsdk/emsdk_env.sh &&
-                mkdir build && cd build &&
-                emcmake cmake -DCMAKE_BUILD_TYPE=Release \
-                              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-                              -DRAZ_USE_FBX=true -DENABLE_DEBUG_INFO=true .. &&
-                cmake --build . --target RaZ_PrintDebugInfo &&
-                make -j4 &&
-                pwd && find .
-            ";
+    - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+        mkdir build && cd build &&
+        cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Debug \
+              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+              -DRAZ_USE_FBX=false -DENABLE_DEBUG_INFO=true .. &&
+        cmake --build . --target RaZ_PrintDebugInfo &&
+        cmake --build . -j 4 &&
+        pwd && find . &&
+        if [[ ${BUILD_TESTS} == true ]]; then
+            ./tests/Debug/RaZ_Tests.exe;
+        fi;
       fi
 
     #########
@@ -164,6 +188,24 @@ script:
         if [[ ${BUILD_TESTS} == true ]]; then
             ./tests/RaZ_Tests;
         fi;
+      fi
+
+    ##############
+    # Emscripten #
+    ##############
+
+    - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ ${CXX_COMPILER} = "emcc" ]; then
+        docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
+            bash -c "
+                source /emsdk/emsdk_env.sh &&
+                mkdir build && cd build &&
+                emcmake cmake -DCMAKE_BUILD_TYPE=Release \
+                              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+                              -DRAZ_USE_FBX=true -DENABLE_DEBUG_INFO=true .. &&
+                cmake --build . --target RaZ_PrintDebugInfo &&
+                make -j4 &&
+                pwd && find .
+            ";
       fi
 
 #webhooks:
