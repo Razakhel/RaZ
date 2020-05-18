@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(RaZ)
 
-set(CMAKE_CXX_STANDARD 17)
-
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # If the build type hasn't been specified, defaulting it to Release
 if (NOT CMAKE_BUILD_TYPE)
@@ -20,6 +18,9 @@ if (RAZ_BUILD_STATIC)
 else ()
     add_library(RaZ SHARED)
 endif ()
+
+# Using C++17
+target_compile_features(RaZ PRIVATE cxx_std_17)
 
 ##########################
 # RaZ - Useful variables #
@@ -281,6 +282,7 @@ elseif (RAZ_COMPILER_CLANG)
         -Wno-documentation
         -Wno-documentation-unknown-command
         -Wno-exit-time-destructors
+        -Wno-float-equal
         -Wno-format-nonliteral
         -Wno-global-constructors
         -Wno-mismatched-tags
@@ -396,6 +398,13 @@ if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
 
         ${RAZ_COMPILER_FLAGS}
         /permissive-
+    )
+
+    target_compile_options(
+        RaZ
+
+        PUBLIC
+
         /EHsc # Enabling exceptions
     )
 
