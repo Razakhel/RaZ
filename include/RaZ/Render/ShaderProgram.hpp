@@ -8,6 +8,7 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -17,20 +18,20 @@ namespace Raz {
 class ShaderProgram {
 public:
   ShaderProgram();
-  ShaderProgram(VertexShader vertShader, FragmentShader fragShader)
+  ShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader)
     : ShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
-  ShaderProgram(VertexShader vertShader, FragmentShader fragShader, GeometryShader geomShader)
-    : ShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader), std::move(geomShader)); }
+  ShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader)
+    : ShaderProgram() { setShaders(std::move(vertShader), std::move(geomShader), std::move(fragShader)); }
   ShaderProgram(const ShaderProgram&) = delete;
   ShaderProgram(ShaderProgram&& program) noexcept;
 
   unsigned int getIndex() const { return m_index; }
 
   void setVertexShader(VertexShader&& vertShader);
-  void setFragmentShader(FragmentShader&& fragShader);
   void setGeometryShader(GeometryShader&& geomShader);
+  void setFragmentShader(FragmentShader&& fragShader);
   void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader);
-  void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader);
+  void setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader);
 
   /// Loads all the shaders contained by the program.
   void loadShaders() const;
@@ -128,10 +129,10 @@ public:
   void sendUniform(const std::string& uniformName, const Mat4f& mat) const { sendUniform(recoverUniformLocation(uniformName), mat); }
   /// Destroys the vertex shader, detaching it from the program & deleting it.
   void destroyVertexShader();
-  /// Destroys the fragment shader, detaching it from the program & deleting it.
-  void destroyFragmentShader();
   /// Destroys the geometry shader (if any), detaching it from the program & deleting it.
   void destroyGeometryShader();
+  /// Destroys the fragment shader, detaching it from the program & deleting it.
+  void destroyFragmentShader();
 
   ShaderProgram& operator=(const ShaderProgram&) = delete;
   ShaderProgram& operator=(ShaderProgram&& program) noexcept;
@@ -142,8 +143,8 @@ private:
   unsigned int m_index {};
 
   VertexShader m_vertShader {};
+  std::optional<GeometryShader> m_geomShader {};
   FragmentShader m_fragShader {};
-  std::unique_ptr<GeometryShader> m_geomShader {};
 
   std::unordered_map<std::string, int> m_uniforms {};
 };
