@@ -73,7 +73,45 @@ TEST_CASE("Matrix resize") {
                                                      0.f,     0.f,     0.f,    1.f));
 }
 
-TEST_CASE("Matrix row/column") {
+TEST_CASE("Matrix from vectors") {
+  constexpr Raz::Matrix<float, 3, 4> testMat(Raz::Vec3f( 1.f,  2.f,  3.f),
+                                             Raz::Vec3f( 4.f,  5.f,  6.f),
+                                             Raz::Vec3f( 7.f,  8.f,  9.f),
+                                             Raz::Vec3f(10.f, 11.f, 12.f));
+  CHECK(testMat == Raz::Matrix<float, 3, 4>( 1.f,  2.f,  3.f,
+                                             4.f,  5.f,  6.f,
+                                             7.f,  8.f,  9.f,
+                                            10.f, 11.f, 12.f));
+
+  constexpr Raz::Mat3f testMat31(mat31.recoverRow(0), mat31.recoverRow(1), mat31.recoverRow(2));
+  CHECK(testMat31 == mat31);
+
+  constexpr Raz::Mat4f testMat41(mat41.recoverColumn(0), mat41.recoverColumn(1), mat41.recoverColumn(2), mat41.recoverColumn(3));
+  CHECK(testMat41 == mat41.transpose());
+}
+
+TEST_CASE("Matrix elements fetching") {
+  //                   height:
+  //      [ 0, 1, 2 ] <- 0
+  //      [ 3, 4, 5 ] <- 1
+  //      [ 6, 7, 8 ] <- 2
+  //        ^  ^  ^
+  // width: 0  1  2
+  CHECK(mat31.getElement(1, 1) == mat31[4]);
+  CHECK(mat31.getElement(2, 1) == mat31[5]);
+  CHECK(mat31.getElement(2, 2) == mat31[8]);
+
+  //                         height:
+  //     [  0,  1,  2,  3 ] <- 0
+  //     [  4,  5,  6,  7 ] <- 1
+  //     [  8,  9, 10, 11 ] <- 2
+  //     [ 12, 13, 14, 15 ] <- 3
+  //        ^   ^   ^   ^
+  // width: 0   1   2   3
+  CHECK(mat41.getElement(0, 0) == mat41[0]);
+  CHECK(mat41.getElement(1, 2) == mat41[9]);
+  CHECK(mat41.getElement(3, 3) == mat41[15]);
+
   CHECK(mat31.recoverRow(0) == Raz::Vec3f(4.12f,  25.1f, 30.7842f));
   CHECK(mat42.recoverRow(2) == Raz::Vec4f(-8.12f, 38.24f, 62.f, 43.12f));
 

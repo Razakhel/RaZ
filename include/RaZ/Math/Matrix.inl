@@ -211,6 +211,23 @@ constexpr Matrix<T, W, H>::Matrix(const Matrix<T, W - 1, H - 1>& mat) noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
+template <typename... Args>
+constexpr Matrix<T, W, H>::Matrix(T val, Args&&... args) noexcept : m_data{ std::move(val), std::forward<Args>(args)... } {
+  static_assert(sizeof...(Args) == W * H - 1, "Error: A Matrix can't be constructed with more or less values than it can hold.");
+  static_assert((std::is_same_v<T, std::decay_t<Args>> && ...), "Error: A Matrix can only be constructed from values of the same type as its inner one.");
+}
+
+template <typename T, std::size_t W, std::size_t H>
+template <typename... Vecs>
+constexpr Matrix<T, W, H>::Matrix(const Vector<T, W>& vec, Vecs&&... vecs) noexcept {
+  static_assert(sizeof...(Vecs) == H - 1, "Error: A Matrix can't be constructed with more or less vectors than it can hold.");
+  static_assert((std::is_same_v<Vector<T, W>, std::decay_t<Vecs>> && ...),
+                "Error: A Matrix can only be constructed from vectors of the same inner type as its own.");
+
+  setRows(vec, std::forward<Vecs>(vecs)...);
+}
+
+template <typename T, std::size_t W, std::size_t H>
 Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) noexcept {
   assert("Error: A Matrix cannot be created with less/more values than specified." && H == list.size());
 
@@ -468,6 +485,20 @@ std::ostream& operator<<(std::ostream& stream, const Matrix<T, W, H>& mat) {
   stream << " ]]";
 
   return stream;
+}
+
+template <typename T, std::size_t W, std::size_t H>
+template <typename Vec, typename... Vecs>
+constexpr void Matrix<T, W, H>::setRows(Vec&& vec, Vecs&&... args) noexcept {
+  static_assert(std::is_same_v<std::decay_t<Vec>, Vector<T, W>>, "Error: Rows must all be vectors of the same type & size.");
+
+  constexpr std::size_t firstIndex = W * (H - sizeof...(args) - 1);
+
+  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex)
+    m_data[firstIndex + widthIndex] = vec[widthIndex];
+
+  if constexpr (sizeof...(args) > 0)
+    setRows(std::forward<Vecs>(args)...);
 }
 
 } // namespace Raz
