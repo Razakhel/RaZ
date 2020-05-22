@@ -81,7 +81,7 @@ public:
   /// \param vec Vector to be compared with.
   /// \return True if vectors are strictly equal to each other, false otherwise.
   constexpr bool strictlyEquals(const Vector& vec) const noexcept;
-  /// Computes the unique hash of the vector.
+  /// Computes the unique hash of the current vector.
   /// \param seed Value to use as a hash seed.
   /// \return Vector's hash.
   constexpr std::size_t hash(std::size_t seed = 0) const noexcept;

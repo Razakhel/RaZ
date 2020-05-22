@@ -65,12 +65,7 @@ constexpr Vector<T, Size> Vector<T, Size>::normalize() const {
 
 template <typename T, std::size_t Size>
 constexpr bool Vector<T, Size>::strictlyEquals(const Vector<T, Size>& vec) const noexcept {
-  for (std::size_t i = 0; i < Size; ++i) {
-    if (m_data[i] != vec[i])
-      return false;
-  }
-
-  return true;
+  return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin());
 }
 
 template <typename T, std::size_t Size>
@@ -214,7 +209,7 @@ constexpr bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const noe
   if constexpr (std::is_floating_point_v<T>)
     return FloatUtils::areNearlyEqual(*this, vec);
   else
-    return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin());
+    return strictlyEquals(vec);
 }
 
 template <typename T, std::size_t Size>

@@ -24,32 +24,6 @@ constexpr Raz::Mat4f mat42( 5.5f,    98.14f, -8.24f,  42.f,
 
 } // namespace
 
-TEST_CASE("Matrix near-equality") {
-  CHECK_FALSE(mat31 == mat32);
-
-  const Raz::Mat2f baseMat = Raz::Mat2f::identity();
-  Raz::Mat2f compMat = baseMat;
-
-  CHECK(baseMat[0] == compMat[0]); // Copied, strict equality
-  CHECK(baseMat[1] == compMat[1]);
-  CHECK(baseMat[2] == compMat[2]);
-  CHECK(baseMat[3] == compMat[3]);
-
-  compMat += 0.0000001f; // Adding a tiny offset
-
-  CHECK_FALSE(baseMat[0] == compMat[0]); // Values not strictly equal
-  CHECK_FALSE(baseMat[1] == compMat[1]);
-  CHECK_FALSE(baseMat[2] == compMat[2]);
-  CHECK_FALSE(baseMat[3] == compMat[3]);
-
-  CHECK_THAT(baseMat[0], IsNearlyEqualTo(compMat[0])); // Near-equality components check
-  CHECK_THAT(baseMat[1], IsNearlyEqualTo(compMat[1]));
-  CHECK_THAT(baseMat[2], IsNearlyEqualTo(compMat[2]));
-  CHECK_THAT(baseMat[3], IsNearlyEqualTo(compMat[3]));
-
-  CHECK(baseMat == compMat); // Matrix::operator== does a near-equality check on floating point types
-}
-
 TEST_CASE("Matrix resize") {
   const Raz::Mat3f truncatedMat(mat41);
   const Raz::Mat4f expandedMat(truncatedMat);
@@ -188,4 +162,96 @@ TEST_CASE("Matrix/vector operations") {
   const Raz::Vec4f vec4(84.47f, 2.f, 0.001f, 847.12f);
   CHECK((mat41 * vec4) == Raz::Vec4f(62692.896451f, 159652.86849f, 31668.27f, 644394.3890001f));
   CHECK((mat42 * vec4) == Raz::Vec4f(36239.89676f, 45725.116745f, 35918.46f, 30679.27964f));
+}
+
+TEST_CASE("Matrix hash") {
+  CHECK(mat31.hash() == mat31.hash());
+  CHECK_FALSE(mat31.hash() == mat32.hash());
+
+  CHECK(mat41.hash() == mat41.hash());
+  CHECK_FALSE(mat41.hash() == mat42.hash());
+
+  constexpr Raz::Mat3f mat31Swizzled(mat31.recoverRow(2), mat31.recoverRow(0), mat31.recoverRow(1));
+  CHECK_FALSE(mat31.hash() == mat31Swizzled.hash());
+
+  constexpr Raz::Mat3f mat31Epsilon = mat31 + std::numeric_limits<float>::epsilon();
+  CHECK_FALSE(mat31.hash() == mat31Epsilon.hash());
+
+  // Checking that it behaves as expected when used in a hashmap
+  std::unordered_map<Raz::Mat3f, int> map;
+  map.try_emplace(mat31, 1);
+  map.try_emplace(mat31Swizzled, 2);
+  map.try_emplace(mat31Epsilon, 3);
+  map.try_emplace(mat32, 4);
+
+  CHECK(map.size() == 4);
+
+  CHECK(map.find(mat31)->second == 1);
+  CHECK(map.find(mat31Swizzled)->second == 2);
+  CHECK(map.find(mat31Epsilon)->second == 3);
+  CHECK(map.find(mat32)->second == 4);
+
+  map.erase(mat31Epsilon);
+  CHECK(map.find(mat31Epsilon) == map.cend());
+}
+
+TEST_CASE("Matrix near-equality") {
+  CHECK_FALSE(mat31 == mat32);
+
+  const Raz::Mat2f baseMat = Raz::Mat2f::identity();
+  Raz::Mat2f compMat = baseMat;
+
+  CHECK(baseMat[0] == compMat[0]); // Copied, strict equality
+  CHECK(baseMat[1] == compMat[1]);
+  CHECK(baseMat[2] == compMat[2]);
+  CHECK(baseMat[3] == compMat[3]);
+
+  compMat += 0.0000001f; // Adding a tiny offset
+
+  CHECK_FALSE(baseMat[0] == compMat[0]); // Values not strictly equal
+  CHECK_FALSE(baseMat[1] == compMat[1]);
+  CHECK_FALSE(baseMat[2] == compMat[2]);
+  CHECK_FALSE(baseMat[3] == compMat[3]);
+
+  CHECK_THAT(baseMat[0], IsNearlyEqualTo(compMat[0])); // Near-equality components check
+  CHECK_THAT(baseMat[1], IsNearlyEqualTo(compMat[1]));
+  CHECK_THAT(baseMat[2], IsNearlyEqualTo(compMat[2]));
+  CHECK_THAT(baseMat[3], IsNearlyEqualTo(compMat[3]));
+
+  CHECK(baseMat == compMat); // Matrix::operator== does a near-equality check on floating point types
+}
+
+TEST_CASE("Matrix strict equality") {
+  CHECK(mat31.strictlyEquals(mat31));
+  CHECK(mat41.strictlyEquals(mat41));
+
+  CHECK(std::equal_to<Raz::Mat3f>()(mat31, mat31));
+  CHECK(std::equal_to<Raz::Mat4f>()(mat41, mat41));
+
+  constexpr Raz::Mat3f mat31Swizzled(mat31.recoverRow(2), mat31.recoverRow(0), mat31.recoverRow(1));
+  CHECK_FALSE(mat31.strictlyEquals(mat31Swizzled));
+  CHECK_FALSE(std::equal_to<Raz::Mat3f>()(mat31, mat31Swizzled));
+
+  constexpr Raz::Mat3f mat31Epsilon = mat31 + std::numeric_limits<float>::epsilon();
+  CHECK(mat31 == mat31Epsilon); // Near-equality check
+  CHECK_FALSE(mat31.strictlyEquals(mat31Epsilon)); // Strict-equality checks
+  CHECK_FALSE(std::equal_to<Raz::Mat3f>()(mat31, mat31Epsilon));
+
+  constexpr std::array<Raz::Mat3f, 3> matrices = { mat31Swizzled, mat31Epsilon, mat31 };
+
+  // When using a simple find(), which uses operator==, mat31Epsilon is found instead of mat31
+  const auto foundIter = std::find(matrices.cbegin(), matrices.cend(), mat31);
+  CHECK_FALSE(std::distance(matrices.cbegin(), foundIter) == 2);
+
+  // To search for a specific element, find_if() must be used with a strict equality check
+  const auto foundIfIter = std::find_if(matrices.cbegin(), matrices.cend(), [&] (const Raz::Mat3f& compMat) { return mat31.strictlyEquals(compMat); });
+  CHECK(std::distance(matrices.cbegin(), foundIfIter) == 2);
+
+  constexpr std::array<Raz::Mat3f, 3> swappedMatrices = { mat31Swizzled, mat31, mat31Epsilon };
+
+  // Trying to compare for equality fails with a simple std::equal on the matrices
+  CHECK(std::equal(matrices.cbegin(), matrices.cend(), swappedMatrices.cbegin()));
+
+  // When using the std::equal_to specialization, matrices are properly found to be unequal to each other
+  CHECK_FALSE(std::equal(matrices.cbegin(), matrices.cend(), swappedMatrices.cbegin(), std::equal_to<Raz::Mat3f>()));
 }

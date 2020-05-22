@@ -85,6 +85,14 @@ public:
   /// \param columnIndex Index of the column to recover.
   /// \return Vector containing the column elements.
   constexpr Vector<T, H> recoverColumn(std::size_t columnIndex) const noexcept;
+  /// Checks for strict equality between the current matrix & the given one.
+  /// \param mat Matrix to be compared with.
+  /// \return True if matrices are strictly equal to each other, false otherwise.
+  constexpr bool strictlyEquals(const Matrix& mat) const noexcept;
+  /// Computes the unique hash of the current matrix.
+  /// \param seed Value to use as a hash seed.
+  /// \return Matrix's hash.
+  constexpr std::size_t hash(std::size_t seed = 0) const noexcept;
 
   /// Default copy assignment operator.
   /// \return Reference to the copied matrix.
@@ -223,6 +231,33 @@ using Mat3d = Mat3<double>;
 using Mat4d = Mat4<double>;
 
 } // namespace Raz
+
+/// Specialization of std::hash for Matrix.
+/// \tparam T Type of the matrix's data.
+/// \tparam W Matrix's width.
+/// \tparam H Matrix's height.
+template <typename T, std::size_t W, std::size_t H>
+struct std::hash<Raz::Matrix<T, W, H>> {
+  /// Computes the hash of the given matrix.
+  /// \param mat Matrix to compute the hash of.
+  /// \return Matrix's hash value.
+  constexpr std::size_t operator()(const Raz::Matrix<T, W, H>& mat) const noexcept { return mat.hash(); }
+};
+
+/// Specialization of std::equal_to for Matrix. This performs a strict equality check.
+/// \tparam T Type of the matrix's data.
+/// \tparam W Matrix's width.
+/// \tparam H Matrix's height.
+template <typename T, std::size_t W, std::size_t H>
+struct std::equal_to<Raz::Matrix<T, W, H>> {
+  /// Checks that the two given matrices are strictly equal to each other.
+  /// \param mat1 First matrix to be compared.
+  /// \param mat2 Second matrix to be compared.
+  /// \return True if matrices are strictly equal to each other, false otherwise.
+  constexpr bool operator()(const Raz::Matrix<T, W, H>& mat1, const Raz::Matrix<T, W, H>& mat2) const noexcept {
+    return mat1.strictlyEquals(mat2);
+  }
+};
 
 #include "RaZ/Math/Matrix.inl"
 

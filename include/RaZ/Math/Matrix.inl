@@ -307,6 +307,21 @@ constexpr Vector<T, H> Matrix<T, W, H>::recoverColumn(std::size_t columnIndex) c
 }
 
 template <typename T, std::size_t W, std::size_t H>
+constexpr bool Matrix<T, W, H>::strictlyEquals(const Matrix<T, W, H>& mat) const noexcept {
+  return std::equal(m_data.cbegin(), m_data.cend(), mat.getData().cbegin());
+}
+
+template <typename T, std::size_t W, std::size_t H>
+constexpr std::size_t Matrix<T, W, H>::hash(std::size_t seed) const noexcept {
+  std::hash<T> hasher {};
+
+  for (const T& elt : m_data)
+    seed ^= hasher(elt) + 0x9e3779b9 + (seed << 6u) + (seed >> 2u);
+
+  return seed;
+}
+
+template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator+(const Matrix& mat) const noexcept {
   Matrix<T, W, H> res = *this;
   res += mat;
@@ -455,7 +470,7 @@ constexpr bool Matrix<T, W, H>::operator==(const Matrix<T, W, H>& mat) const noe
   if constexpr (std::is_floating_point_v<T>)
     return FloatUtils::areNearlyEqual(*this, mat);
   else
-    return std::equal(m_data.cbegin(), m_data.cend(), mat.getData().cbegin());
+    return strictlyEquals(mat);
 }
 
 template <typename T, std::size_t W, std::size_t H>

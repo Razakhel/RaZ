@@ -27,29 +27,6 @@ TEST_CASE("Vector deduction guides") {
   CHECK(std::is_same_v<std::decay_t<decltype(vec4u)>, Raz::Vec4u>);
 }
 
-TEST_CASE("Vector near-equality") {
-  CHECK_FALSE(vec31 == vec32);
-
-  constexpr Raz::Vec3f baseVec(1.f);
-  Raz::Vec3f compVec = baseVec;
-
-  CHECK(baseVec[0] == compVec[0]); // Copied, strict equality
-  CHECK(baseVec[1] == compVec[1]);
-  CHECK(baseVec[2] == compVec[2]);
-
-  compVec += 0.0000001f; // Adding a tiny offset
-
-  CHECK_FALSE(baseVec[0] == compVec[0]); // Values not strictly equal
-  CHECK_FALSE(baseVec[1] == compVec[1]);
-  CHECK_FALSE(baseVec[2] == compVec[2]);
-
-  CHECK_THAT(baseVec[0], IsNearlyEqualTo(compVec[0])); // Near-equality components check
-  CHECK_THAT(baseVec[1], IsNearlyEqualTo(compVec[1]));
-  CHECK_THAT(baseVec[2], IsNearlyEqualTo(compVec[2]));
-
-  CHECK(baseVec == compVec); // Vector::operator== does a near-equality check on floating point types
-}
-
 TEST_CASE("Vector/scalar operations") {
   CHECK((vec31 + 3.5f) == Raz::Vec3f(6.68f, 45.5f, 4.374f));
   CHECK((vec32 - 74.42f) == Raz::Vec3f(466.99f, -27.17f, -68.099f));
@@ -144,10 +121,10 @@ TEST_CASE("Vector hash") {
 
   // Checking that it behaves as expected when used in a hashmap
   std::unordered_map<Raz::Vec3f, int> map;
-  map.emplace(vec31, 1);
-  map.emplace(vec31Swizzled, 2);
-  map.emplace(vec31Epsilon, 3);
-  map.emplace(vec32, 4);
+  map.try_emplace(vec31, 1);
+  map.try_emplace(vec31Swizzled, 2);
+  map.try_emplace(vec31Epsilon, 3);
+  map.try_emplace(vec32, 4);
 
   CHECK(map.size() == 4);
 
@@ -158,6 +135,29 @@ TEST_CASE("Vector hash") {
 
   map.erase(vec31Epsilon);
   CHECK(map.find(vec31Epsilon) == map.cend());
+}
+
+TEST_CASE("Vector near-equality") {
+  CHECK_FALSE(vec31 == vec32);
+
+  constexpr Raz::Vec3f baseVec(1.f);
+  Raz::Vec3f compVec = baseVec;
+
+  CHECK(baseVec[0] == compVec[0]); // Copied, strict equality
+  CHECK(baseVec[1] == compVec[1]);
+  CHECK(baseVec[2] == compVec[2]);
+
+  compVec += 0.0000001f; // Adding a tiny offset
+
+  CHECK_FALSE(baseVec[0] == compVec[0]); // Values not strictly equal
+  CHECK_FALSE(baseVec[1] == compVec[1]);
+  CHECK_FALSE(baseVec[2] == compVec[2]);
+
+  CHECK_THAT(baseVec[0], IsNearlyEqualTo(compVec[0])); // Near-equality components check
+  CHECK_THAT(baseVec[1], IsNearlyEqualTo(compVec[1]));
+  CHECK_THAT(baseVec[2], IsNearlyEqualTo(compVec[2]));
+
+  CHECK(baseVec == compVec); // Vector::operator== does a near-equality check on floating point types
 }
 
 TEST_CASE("Vector strict equality") {
@@ -172,8 +172,8 @@ TEST_CASE("Vector strict equality") {
   CHECK_FALSE(std::equal_to<Raz::Vec3f>()(vec31, vec31Swizzled));
 
   constexpr Raz::Vec3f vec31Epsilon = vec31 + std::numeric_limits<float>::epsilon();
-  CHECK(vec31 == vec31Epsilon);
-  CHECK_FALSE(vec31.strictlyEquals(vec31Epsilon));
+  CHECK(vec31 == vec31Epsilon); // Near-equality check
+  CHECK_FALSE(vec31.strictlyEquals(vec31Epsilon)); // Strict-equality checks
   CHECK_FALSE(std::equal_to<Raz::Vec3f>()(vec31, vec31Epsilon));
 
   constexpr std::array<Raz::Vec3f, 3> vectors = { vec31Swizzled, vec31Epsilon, vec31 };
