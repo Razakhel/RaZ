@@ -374,6 +374,20 @@ void Renderer::sendImageData2D(TextureType type,
 #endif
 }
 
+void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetTexImage(static_cast<unsigned int>(type),
+                static_cast<int>(mipmapLevel),
+                static_cast<unsigned int>(format),
+                static_cast<unsigned int>(dataType),
+                data);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
 void Renderer::generateMipmap(TextureType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

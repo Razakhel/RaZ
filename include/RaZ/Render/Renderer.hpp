@@ -312,6 +312,7 @@ public:
                               unsigned int width, unsigned int height,
                               TextureFormat format,
                               TextureDataType dataType, const void* data);
+  static void recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data);
   /// Generate mipmaps (levels of detail) of the currently bound texture.
   /// \param type Type of the texture to generate mipmaps from.
   static void generateMipmap(TextureType type);
