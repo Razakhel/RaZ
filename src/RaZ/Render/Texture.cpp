@@ -8,6 +8,14 @@ Texture::Texture() {
   Renderer::generateTexture(m_index);
 }
 
+Texture::Texture(ColorPreset preset) : Texture() {
+  const auto red   = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::RED) >> 16u);
+  const auto green = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::GREEN) >> 8u);
+  const auto blue  = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::BLUE));
+
+  makePlainColored(Vec3b(red, green, blue));
+}
+
 Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, bool createMipmaps) : Texture() {
   m_image.m_colorspace = colorspace;
 
@@ -48,21 +56,12 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
 Texture::Texture(Texture&& texture) noexcept
   : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) }, m_image{ std::move(texture.m_image) } {}
 
-TexturePtr Texture::recoverTexture(TexturePreset preset) {
-  static const std::array<TexturePtr, static_cast<std::size_t>(TexturePreset::PRESET_COUNT)> texturePresets = {
-    create(static_cast<uint8_t>(0)),  // BLACK
-    create(static_cast<uint8_t>(255)) // WHITE
-  };
-
-  return texturePresets[static_cast<std::size_t>(preset)];
-}
-
 void Texture::load(const std::string& filePath, bool flipVertically, bool createMipmaps) {
   m_image.read(filePath, flipVertically);
 
   if (m_image.isEmpty()) {
     // Image not found, defaulting texture to pure white
-    makePlainColored(Vec3b(static_cast<uint8_t>(TexturePreset::WHITE)));
+    makePlainColored(Vec3b(255));
     return;
   }
 

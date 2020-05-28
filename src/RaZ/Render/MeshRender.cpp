@@ -63,14 +63,14 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
       materialCT->setBaseColor(newMaterial->getBaseColor());
       materialCT->setMetallicFactor(newMaterial->getMetallicFactor());
       materialCT->setRoughnessFactor(roughnessFactor);
-      materialCT->setAlbedoMap(Texture::recoverTexture(TexturePreset::WHITE));
+      materialCT->setAlbedoMap(Texture::create(ColorPreset::WHITE));
     } else {
       auto materialBP = static_cast<MaterialBlinnPhong*>(material.get());
       const float specular = newMaterial->getMetallicFactor() * (1.f - roughnessFactor);
 
       materialBP->setDiffuse(newMaterial->getBaseColor());
       materialBP->setSpecular(Vec3f(specular));
-      materialBP->setDiffuseMap(Texture::recoverTexture(TexturePreset::WHITE));
+      materialBP->setDiffuseMap(Texture::create(ColorPreset::WHITE));
     }
   }
 }

@@ -13,18 +13,18 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
 
   mtlFile << "# MTL file created with RaZ - https://github.com/Razakhel/RaZ\n";
 
-  const std::string mtlFileName = FileUtils::extractFileNameFromPath(mtlFilePath, false);
-  const auto defaultTexture = Texture::recoverTexture(TexturePreset::WHITE);
+  const std::string mtlFileName   = FileUtils::extractFileNameFromPath(mtlFilePath, false);
+  const TexturePtr defaultTexture = Texture::create(ColorPreset::WHITE);
 
   for (std::size_t matIndex = 0; matIndex < materials.size(); ++matIndex) {
-    const MaterialPtr& material = materials[matIndex];
+    const MaterialPtr& material    = materials[matIndex];
     const std::string materialName = mtlFileName + '_' + std::to_string(matIndex);
 
     mtlFile << "\nnewmtl " << materialName << '\n';
     mtlFile << "\tKd " << material->getBaseColor()[0] << ' ' << material->getBaseColor()[1] << ' ' << material->getBaseColor()[2] << '\n';
 
     if (material->getType() == MaterialType::COOK_TORRANCE) {
-      const auto matCT = static_cast<MaterialCookTorrance*>(material.get());
+      const auto* matCT = static_cast<MaterialCookTorrance*>(material.get());
 
       mtlFile << "\tPm " << matCT->getMetallicFactor() << '\n';
       mtlFile << "\tPr " << matCT->getRoughnessFactor() << '\n';
@@ -64,7 +64,7 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
         matCT->getAmbientOcclusionMap()->save(ambOccMapPath, true);
       }
     } else {
-      const auto matBP = static_cast<MaterialBlinnPhong*>(material.get());
+      const auto* matBP = static_cast<MaterialBlinnPhong*>(material.get());
 
       mtlFile << "\tKa " << matBP->getAmbient()[0] << ' ' << matBP->getAmbient()[1] << ' ' << matBP->getAmbient()[2] << '\n';
       mtlFile << "\tKs " << matBP->getSpecular()[0] << ' ' << matBP->getSpecular()[1] << ' ' << matBP->getSpecular()[2] << '\n';

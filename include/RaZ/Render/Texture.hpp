@@ -11,12 +11,17 @@
 
 namespace Raz {
 
-enum class TexturePreset : uint8_t {
-  BLACK = 0,
-  WHITE,
-
-  PRESET_COUNT
+enum class ColorPreset : uint32_t {
+  BLACK   = 0x000000,
+  RED     = 0xFF0000,
+  GREEN   = 0x00FF00,
+  BLUE    = 0x0000FF,
+  YELLOW  = RED | GREEN,
+  CYAN    = GREEN | BLUE,
+  MAGENTA = RED | BLUE,
+  WHITE   = RED | GREEN | BLUE
 };
+MAKE_ENUM_FLAG(ColorPreset)
 
 class Texture;
 using TexturePtr = std::shared_ptr<Texture>;
@@ -25,7 +30,12 @@ using TexturePtr = std::shared_ptr<Texture>;
 class Texture {
 public:
   Texture();
-  explicit Texture(uint8_t value) : Texture() { makePlainColored(Vec3b(value)); }
+  /// Constructs an 1x1 plain colored texture.
+  /// \param value Color value to create the texture with.
+  explicit Texture(const Vec3b& value) : Texture() { makePlainColored(value); }
+  /// Constructs an 1x1 plain colored texture.
+  /// \param preset Color preset to create the texture with.
+  explicit Texture(ColorPreset preset);
   Texture(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB, bool createMipmaps = true);
   explicit Texture(const std::string& fileName, bool flipVertically = false, bool createMipmaps = true)
     : Texture() { load(fileName, flipVertically, createMipmaps); }
@@ -38,10 +48,6 @@ public:
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
 
-  /// Gets a texture based on a given preset.
-  /// \param preset Preset of the texture to get.
-  /// \return Recovered texture.
-  static TexturePtr recoverTexture(TexturePreset preset);
   /// Reads the texture in memory & loads it onto the graphics card.
   /// \param filePath Path to the texture to load.
   /// \param flipVertically Flip vertically the texture when loading.
@@ -63,6 +69,7 @@ public:
 
 private:
   /// Fills the texture with a single pixel (creates a single-colored 1x1 texture).
+  /// \note This only allocates & fills memory on the graphics card; the image member's data is left untouched.
   /// \param color Color to fill the texture with.
   void makePlainColored(const Vec3b& color) const;
 
