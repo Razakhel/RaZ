@@ -123,6 +123,20 @@ enum class TextureParamValue : unsigned int {
   CLAMP_TO_EDGE          = 33071  // GL_CLAMP_TO_EDGE
 };
 
+enum class TextureAttribute : unsigned int {
+  WIDTH                 = 4096,  // GL_TEXTURE_WIDTH
+  HEIGHT                = 4097,  // GL_TEXTURE_HEIGHT
+  DEPTH                 = 32881, // GL_TEXTURE_DEPTH
+  INTERNAL_FORMAT       = 4099,  // GL_TEXTURE_INTERNAL_FORMAT
+  RED_SIZE              = 32860, // GL_TEXTURE_RED_SIZE
+  GREEN_SIZE            = 32861, // GL_TEXTURE_GREEN_SIZE
+  BLUE_SIZE             = 32862, // GL_TEXTURE_BLUE_SIZE
+  ALPHA_SIZE            = 32863, // GL_TEXTURE_ALPHA_SIZE
+  DEPTH_SIZE            = 34890, // GL_TEXTURE_DEPTH_SIZE
+  COMPRESSED            = 34465, // GL_TEXTURE_COMPRESSED
+  COMPRESSED_IMAGE_SIZE = 34464  // GL_TEXTURE_COMPRESSED_IMAGE_SIZE
+};
+
 enum class TextureFormat : unsigned int {
   RED           = 6403,  // GL_RED
   GREEN         = 6404,  // GL_GREEN
@@ -286,14 +300,14 @@ public:
   static void activateTexture(unsigned int index);
   static void setTextureParameter(TextureType type, TextureParam param, int value);
   static void setTextureParameter(TextureType type, TextureParam param, float value);
-  static void setTextureParameter(TextureType type, TextureParam param, const int* value);
-  static void setTextureParameter(TextureType type, TextureParam param, const float* value);
+  static void setTextureParameter(TextureType type, TextureParam param, const int* values);
+  static void setTextureParameter(TextureType type, TextureParam param, const float* values);
   static void setTextureParameter(TextureType type, TextureParam param, TextureParamValue value) { setTextureParameter(type, param, static_cast<int>(value)); }
 #ifdef RAZ_USE_GL4
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, int value);
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, float value);
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const int* value);
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const float* value);
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values);
+  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values);
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param,
                                                                                                                                 static_cast<int>(value)); }
 #endif
@@ -312,6 +326,12 @@ public:
                               unsigned int width, unsigned int height,
                               TextureFormat format,
                               TextureDataType dataType, const void* data);
+  static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values);
+  static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, float* values);
+  static int recoverTextureWidth(TextureType type, unsigned int mipmapLevel = 0);
+  static int recoverTextureHeight(TextureType type, unsigned int mipmapLevel = 0);
+  static int recoverTextureDepth(TextureType type, unsigned int mipmapLevel = 0);
+  static TextureInternalFormat recoverTextureInternalFormat(TextureType type, unsigned int mipmapLevel = 0);
   static void recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data);
   /// Generate mipmaps (levels of detail) of the currently bound texture.
   /// \param type Type of the texture to generate mipmaps from.

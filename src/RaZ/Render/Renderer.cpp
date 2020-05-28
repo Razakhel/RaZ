@@ -289,20 +289,20 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, float v
 #endif
 }
 
-void Renderer::setTextureParameter(TextureType type, TextureParam param, const int* value) {
+void Renderer::setTextureParameter(TextureType type, TextureParam param, const int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glTexParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
+  glTexParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), values);
 
 #if !defined(NDEBUG)
   printErrors();
 #endif
 }
 
-void Renderer::setTextureParameter(TextureType type, TextureParam param, const float* value) {
+void Renderer::setTextureParameter(TextureType type, TextureParam param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glTexParameterfv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
+  glTexParameterfv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), values);
 
 #if !defined(NDEBUG)
   printErrors();
@@ -330,20 +330,20 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 #endif
 }
 
-void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const int* value) {
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), value);
+  glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), values);
 
 #if !defined(NDEBUG)
   printErrors();
 #endif
 }
 
-void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const float* value) {
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), value);
+  glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), values);
 
 #if !defined(NDEBUG)
   printErrors();
@@ -372,6 +372,54 @@ void Renderer::sendImageData2D(TextureType type,
 #if !defined(NDEBUG)
   printErrors();
 #endif
+}
+
+void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetTexLevelParameteriv(static_cast<unsigned int>(type), static_cast<int>(mipmapLevel), static_cast<unsigned int>(attribute), values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, float* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetTexLevelParameterfv(static_cast<unsigned int>(type), static_cast<int>(mipmapLevel), static_cast<unsigned int>(attribute), values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+int Renderer::recoverTextureWidth(TextureType type, unsigned int mipmapLevel) {
+  int width {};
+  recoverTextureAttribute(type, mipmapLevel, TextureAttribute::WIDTH, &width);
+
+  return width;
+}
+
+int Renderer::recoverTextureHeight(TextureType type, unsigned int mipmapLevel) {
+  int height {};
+  recoverTextureAttribute(type, mipmapLevel, TextureAttribute::HEIGHT, &height);
+
+  return height;
+}
+
+int Renderer::recoverTextureDepth(TextureType type, unsigned int mipmapLevel) {
+  int depth {};
+  recoverTextureAttribute(type, mipmapLevel, TextureAttribute::DEPTH, &depth);
+
+  return depth;
+}
+
+TextureInternalFormat Renderer::recoverTextureInternalFormat(TextureType type, unsigned int mipmapLevel) {
+  int format {};
+  recoverTextureAttribute(type, mipmapLevel, TextureAttribute::INTERNAL_FORMAT, &format);
+
+  return static_cast<TextureInternalFormat>(format);
 }
 
 void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data) {
