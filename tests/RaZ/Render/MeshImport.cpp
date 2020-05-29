@@ -38,6 +38,8 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
 
   // Diffuse map
   {
+    CHECK(material.getDiffuseMap()->getBindingIndex() == 0);
+
     REQUIRE_FALSE(material.getDiffuseMap()->getImage().isEmpty());
 
     CHECK(material.getDiffuseMap()->getImage().getColorspace() == Raz::ImageColorspace::RGBA);
@@ -79,6 +81,8 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
 
   // Ambient map
   {
+    CHECK(material.getAmbientMap()->getBindingIndex() == 1);
+
     REQUIRE_FALSE(material.getAmbientMap()->getImage().isEmpty());
 
     CHECK(material.getAmbientMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
@@ -114,6 +118,8 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
 
   // Specular map
   {
+    CHECK(material.getSpecularMap()->getBindingIndex() == 2);
+
     REQUIRE_FALSE(material.getSpecularMap()->getImage().isEmpty());
 
     CHECK(material.getSpecularMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
@@ -138,6 +144,8 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
 
   // Emissive map
   {
+    CHECK(material.getEmissiveMap()->getBindingIndex() == 3);
+
     REQUIRE_FALSE(material.getEmissiveMap()->getImage().isEmpty());
 
     CHECK(material.getEmissiveMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
@@ -173,6 +181,8 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
 
   // Transparency map
   {
+    CHECK(material.getTransparencyMap()->getBindingIndex() == 4);
+
     REQUIRE_FALSE(material.getTransparencyMap()->getImage().isEmpty());
 
     CHECK(material.getTransparencyMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
@@ -197,6 +207,8 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
 
   // Bump map
   {
+    CHECK(material.getBumpMap()->getBindingIndex() == 5);
+
     REQUIRE_FALSE(material.getBumpMap()->getImage().isEmpty());
 
     CHECK(material.getBumpMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
@@ -245,6 +257,8 @@ TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
 
   // Albedo map
   {
+    CHECK(material.getAlbedoMap()->getBindingIndex() == 0);
+
     REQUIRE_FALSE(material.getAlbedoMap()->getImage().isEmpty());
 
     CHECK(material.getAlbedoMap()->getImage().getColorspace() == Raz::ImageColorspace::RGBA);
@@ -286,6 +300,8 @@ TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
 
   // Normal map
   {
+    CHECK(material.getNormalMap()->getBindingIndex() == 1);
+
     REQUIRE_FALSE(material.getNormalMap()->getImage().isEmpty());
 
     CHECK(material.getNormalMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
@@ -321,6 +337,8 @@ TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
 
   // Metallic map
   {
+    CHECK(material.getMetallicMap()->getBindingIndex() == 2);
+
     REQUIRE_FALSE(material.getMetallicMap()->getImage().isEmpty());
 
     CHECK(material.getMetallicMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
@@ -345,6 +363,8 @@ TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
 
   // Roughness map
   {
+    CHECK(material.getRoughnessMap()->getBindingIndex() == 3);
+
     REQUIRE_FALSE(material.getRoughnessMap()->getImage().isEmpty());
 
     CHECK(material.getRoughnessMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
@@ -369,6 +389,8 @@ TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
 
   // Ambient occlusion map
   {
+    CHECK(material.getAmbientOcclusionMap()->getBindingIndex() == 4);
+
     REQUIRE_FALSE(material.getAmbientOcclusionMap()->getImage().isEmpty());
 
     CHECK(material.getAmbientOcclusionMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);

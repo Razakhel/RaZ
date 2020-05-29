@@ -5,7 +5,7 @@
 TEST_CASE("Texture move") {
   const Raz::Image refImg(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
 
-  Raz::Texture texture(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
+  Raz::Texture texture(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s, 42);
   const unsigned int textureIndex = texture.getIndex();
 
   // Move ctor
@@ -14,16 +14,19 @@ TEST_CASE("Texture move") {
 
   // The new texture has the same values as the original one
   CHECK(movedTextureCtor.getIndex() == textureIndex);
+  CHECK(movedTextureCtor.getBindingIndex() == 42);
   CHECK_FALSE(movedTextureCtor.getImage().isEmpty());
   CHECK(movedTextureCtor.getImage() == refImg);
 
   // The moved texture is now invalid
   CHECK(texture.getIndex() == std::numeric_limits<unsigned int>::max());
+  CHECK(texture.getBindingIndex() == std::numeric_limits<int>::max());
   CHECK(texture.getImage().isEmpty());
 
   // Move assignment operator
 
   Raz::Texture movedTextureOp;
+  movedTextureOp.setBindingIndex(255);
 
   const unsigned int movedTextureOpIndex = movedTextureOp.getIndex();
 
@@ -31,17 +34,21 @@ TEST_CASE("Texture move") {
 
   // The new texture has the same values as the previous one
   CHECK(movedTextureOp.getIndex() == textureIndex);
+  CHECK(movedTextureOp.getBindingIndex() == 42);
   CHECK_FALSE(movedTextureOp.getImage().isEmpty());
   CHECK(movedTextureOp.getImage() == refImg);
 
   // After being moved, the values are swapped: the moved-from texture now has the previous moved-to's values
+  // The moved-from image is however always directly moved, thus invalidated
   CHECK(movedTextureCtor.getIndex() == movedTextureOpIndex);
+  CHECK(movedTextureCtor.getBindingIndex() == 255);
   CHECK(movedTextureCtor.getImage().isEmpty());
 }
 
 TEST_CASE("Texture presets") {
-  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::WHITE);
+  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::WHITE, 42);
 
+  CHECK(whiteTexture->getBindingIndex() == 42);
   CHECK(whiteTexture->getImage().isEmpty()); // The image's data is untouched, no allocation is made
 
   // Recovering the texture's data (1 RGB pixel -> 3 values)
@@ -66,4 +73,5 @@ TEST_CASE("Texture presets") {
 
   CHECK_FALSE(whiteTexture2.get() == whiteTexture.get());
   CHECK_FALSE(whiteTexture2->getIndex() == whiteTexture->getIndex());
+  CHECK(whiteTexture2->getBindingIndex() == std::numeric_limits<int>::max());
 }

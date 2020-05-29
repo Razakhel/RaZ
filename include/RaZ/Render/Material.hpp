@@ -47,7 +47,7 @@ public:
 
   void setBaseColorMap(TexturePtr baseColorMap) { m_baseColorMap = std::move(baseColorMap); }
 
-  void loadBaseColorMap(const std::string& fileName, bool flipVertically = true) { m_baseColorMap = Texture::create(fileName, flipVertically); }
+  void loadBaseColorMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
 
   static MaterialCookTorrancePtr recoverMaterial(MaterialPreset preset, float roughnessFactor);
   virtual MaterialPtr clone() const = 0;
@@ -71,7 +71,8 @@ class MaterialBlinnPhong final : public Material {
 public:
   MaterialBlinnPhong() = default;
   explicit MaterialBlinnPhong(TexturePtr diffuseMap) : Material(std::move(diffuseMap)) {}
-  explicit MaterialBlinnPhong(const std::string& fileName, bool flipVertically = true) : MaterialBlinnPhong(Texture::create(fileName, flipVertically)) {}
+  explicit MaterialBlinnPhong(const std::string& fileName, int bindingIndex, bool flipVertically = true)
+    : MaterialBlinnPhong(Texture::create(fileName, bindingIndex, flipVertically)) {}
 
   MaterialType getType() const override { return MaterialType::BLINN_PHONG; }
   const Vec3f& getAmbient() const { return m_ambient; }
@@ -106,12 +107,12 @@ public:
   template <typename... Args>
   static MaterialBlinnPhongPtr create(Args&&... args) { return std::make_unique<MaterialBlinnPhong>(std::forward<Args>(args)...); }
 
-  void loadDiffuseMap(const std::string& fileName, bool flipVertically = true) { loadBaseColorMap(fileName, flipVertically); }
-  void loadAmbientMap(const std::string& fileName, bool flipVertically = true) { m_ambientMap = Texture::create(fileName, flipVertically); }
-  void loadSpecularMap(const std::string& fileName, bool flipVertically = true) { m_specularMap = Texture::create(fileName, flipVertically); }
-  void loadEmissiveMap(const std::string& fileName, bool flipVertically = true) { m_emissiveMap = Texture::create(fileName, flipVertically); }
-  void loadTransparencyMap(const std::string& fileName, bool flipVertically = true) { m_transparencyMap = Texture::create(fileName, flipVertically); }
-  void loadBumpMap(const std::string& fileName, bool flipVertically = true) { m_bumpMap = Texture::create(fileName, flipVertically); }
+  void loadDiffuseMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadAmbientMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadSpecularMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadEmissiveMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadTransparencyMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadBumpMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
 
   MaterialPtr clone() const override { return MaterialBlinnPhong::create(*this); }
   void initTextures(const ShaderProgram& program) const override;
@@ -134,7 +135,8 @@ class MaterialCookTorrance final : public Material {
 public:
   MaterialCookTorrance() = default;
   explicit MaterialCookTorrance(TexturePtr albedoMap) : Material(std::move(albedoMap)) {}
-  explicit MaterialCookTorrance(const std::string& fileName, bool flipVertically = true) : MaterialCookTorrance(Texture::create(fileName, flipVertically)) {}
+  explicit MaterialCookTorrance(const std::string& fileName, int bindingIndex, bool flipVertically = true)
+    : MaterialCookTorrance(Texture::create(fileName, bindingIndex, flipVertically)) {}
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
     : m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } { setBaseColor(baseColor); }
 
@@ -160,11 +162,11 @@ public:
   template <typename... Args>
   static MaterialCookTorrancePtr create(Args&&... args) { return std::make_unique<MaterialCookTorrance>(std::forward<Args>(args)...); }
 
-  void loadAlbedoMap(const std::string& fileName, bool flipVertically = true) { loadBaseColorMap(fileName, flipVertically); }
-  void loadNormalMap(const std::string& fileName, bool flipVertically = true) { m_normalMap = Texture::create(fileName, flipVertically); }
-  void loadMetallicMap(const std::string& fileName, bool flipVertically = true) { m_metallicMap = Texture::create(fileName, flipVertically); }
-  void loadRoughnessMap(const std::string& fileName, bool flipVertically = true) { m_roughnessMap = Texture::create(fileName, flipVertically); }
-  void loadAmbientOcclusionMap(const std::string& fileName, bool flipVertically = true) { m_ambientOcclusionMap = Texture::create(fileName, flipVertically); }
+  void loadAlbedoMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadNormalMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadMetallicMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadRoughnessMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
+  void loadAmbientOcclusionMap(const std::string& fileName, int bindingIndex, bool flipVertically = true);
 
   MaterialPtr clone() const override { return MaterialCookTorrance::create(*this); }
   void initTextures(const ShaderProgram& program) const override;

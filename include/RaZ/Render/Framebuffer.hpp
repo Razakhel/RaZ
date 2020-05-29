@@ -26,15 +26,20 @@ public:
   /// \return Basic display vertex shader.
   static VertexShader recoverVertexShader();
 
+  /// Adds an existing buffer texture.
+  /// \param texture Buffer texture to be added.
+  void addBuffer(TexturePtr texture);
   /// Adds a depth buffer. There can be only one depth buffer in a single framebuffer.
   /// \param width Width of the depth buffer to be added.
   /// \param height Height of the depth buffer to be added.
-  void addDepthBuffer(unsigned int width, unsigned int height);
-  /// Adds a color buffer to the framebuffer.
+  /// \param bindingIndex Index of the texture's binding point.
+  void addDepthBuffer(unsigned int width, unsigned int height, int bindingIndex);
+  /// Adds a color buffer.
   /// \param width Width of the color buffer to be added.
   /// \param height Height of the color buffer to be added.
+  /// \param bindingIndex Index of the texture's binding point.
   /// \param colorspace Colorspace of the color buffer to be added. Passing ImageColorspace::DEPTH is equivalent to calling addDepthBuffer().
-  void addColorBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace);
+  void addColorBuffer(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace);
   /// Initializes the buffers uniforms' indices to be bound later.
   /// \param program Shader program to which to send the uniforms.
   void initBuffers(const ShaderProgram& program) const;
@@ -59,8 +64,8 @@ public:
 
 private:
   unsigned int m_index {};
-  TexturePtr m_depthBuffer;
-  std::vector<TexturePtr> m_colorBuffers;
+  TexturePtr m_depthBuffer {};
+  std::vector<TexturePtr> m_colorBuffers {};
 };
 
 } // namespace Raz

@@ -30,7 +30,7 @@ public:
 protected:
   Shader() = default;
 
-  void loadSource(const std::string& source);
+  void loadSource(const std::string& source) const;
 
   unsigned int m_index {};
   std::string m_path {};

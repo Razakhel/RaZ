@@ -40,30 +40,35 @@ VertexShader Framebuffer::recoverVertexShader() {
   return VertexShader::loadFromSource(vertSource);
 }
 
-void Framebuffer::addDepthBuffer(unsigned int width, unsigned int height) {
-  assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
+void Framebuffer::addBuffer(TexturePtr texture) {
+  if (texture->getImage().getColorspace() == ImageColorspace::DEPTH) {
+    assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
 
-  m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH, false);
+    m_depthBuffer = std::move(texture);
+  } else {
+    // Adding the color buffer only if it doesn't exist yet
+    if (std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture) == m_colorBuffers.cend())
+      m_colorBuffers.emplace_back(std::move(texture));
+  }
+
   mapBuffers();
 }
 
-void Framebuffer::addColorBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace) {
-  if (colorspace == ImageColorspace::DEPTH) {
-    addDepthBuffer(width, height);
-    return;
-  }
+void Framebuffer::addDepthBuffer(unsigned int width, unsigned int height, int bindingIndex) {
+  addBuffer(Texture::create(width, height, bindingIndex, ImageColorspace::DEPTH, false));
+}
 
-  m_colorBuffers.emplace_back(Texture::create(width, height, colorspace, false));
-  mapBuffers();
+void Framebuffer::addColorBuffer(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace) {
+  addBuffer(Texture::create(width, height, bindingIndex, colorspace, false));
 }
 
 void Framebuffer::initBuffers(const ShaderProgram& program) const {
   bind();
 
   program.use();
-  program.sendUniform("uniSceneBuffers.depth",  0);
-  program.sendUniform("uniSceneBuffers.color",  1);
-  program.sendUniform("uniSceneBuffers.normal", 2);
+  program.sendUniform("uniSceneBuffers.depth",  m_depthBuffer->getBindingIndex());
+  program.sendUniform("uniSceneBuffers.color",  m_colorBuffers[0]->getBindingIndex());
+  program.sendUniform("uniSceneBuffers.normal", m_colorBuffers[1]->getBindingIndex());
 
   unbind();
 }
@@ -76,7 +81,8 @@ void Framebuffer::mapBuffers() const {
   std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size());
 
   for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
-    std::size_t colorBuffer = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0) + bufferIndex;
+    const std::size_t colorBuffer = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0)
+                                  + static_cast<unsigned int>(m_colorBuffers[bufferIndex]->getBindingIndex());
 
     Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorBuffer), TextureType::TEXTURE_2D, m_colorBuffers[bufferIndex]->getIndex(), 0);
     drawBuffers[bufferIndex] = static_cast<DrawBuffer>(colorBuffer);
@@ -104,22 +110,22 @@ void Framebuffer::display(const ShaderProgram& program) const {
 
   program.use();
 
-  Renderer::activateTexture(0);
+  m_depthBuffer->activate();
   m_depthBuffer->bind();
 
-  for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
-    Renderer::activateTexture(static_cast<unsigned int>(bufferIndex + 1));
-    m_colorBuffers[bufferIndex]->bind();
+  for (const TexturePtr& colorBuffer : m_colorBuffers) {
+    colorBuffer->activate();
+    colorBuffer->bind();
   }
 
   Mesh::drawUnitQuad();
 }
 
 void Framebuffer::resize(unsigned int width, unsigned int height) {
-  m_depthBuffer = Texture::create(width, height, ImageColorspace::DEPTH);
+  m_depthBuffer = Texture::create(width, height, m_depthBuffer->getBindingIndex(), ImageColorspace::DEPTH);
 
   for (TexturePtr& colorBuffer : m_colorBuffers)
-    colorBuffer = Texture::create(width, height, colorBuffer->getImage().getColorspace(), false);
+    colorBuffer = Texture::create(width, height, colorBuffer->getBindingIndex(), colorBuffer->getImage().getColorspace(), false);
 
   mapBuffers();
 }

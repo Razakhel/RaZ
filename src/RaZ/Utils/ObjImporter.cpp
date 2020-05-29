@@ -9,8 +9,8 @@ namespace Raz {
 
 namespace {
 
-inline Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
-                            const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
+constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
+                               const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
   const Vec3f firstEdge = secondPos - firstPos;
   const Vec3f secondEdge = thirdPos - firstPos;
 
@@ -24,7 +24,7 @@ inline Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const
   return tangent;
 }
 
-inline TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textureFileName) {
+inline TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textureFileName, int bindingIndex = 0) {
   static std::unordered_map<std::string, TexturePtr> loadedTextures;
 
   TexturePtr map;
@@ -34,16 +34,16 @@ inline TexturePtr loadTexture(const std::string& mtlFilePath, const std::string&
     map = loadedTexturePos->second;
   } else {
     const std::string texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
-    map = Texture::create(texturePath, true); // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
+    map = Texture::create(texturePath, bindingIndex, true); // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
     loadedTextures.emplace(textureFileName, map);
   }
 
   return map;
 }
 
-void importMtl(const std::string& mtlFilePath,
-               std::vector<MaterialPtr>& materials,
-               std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
+inline void importMtl(const std::string& mtlFilePath,
+                      std::vector<MaterialPtr>& materials,
+                      std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
   auto blinnPhongMaterial   = MaterialBlinnPhong::create();
@@ -51,6 +51,27 @@ void importMtl(const std::string& mtlFilePath,
 
   bool isBlinnPhongMaterial   = false;
   bool isCookTorranceMaterial = false;
+
+  auto addLocalMaterial = [&blinnPhongMaterial, &cookTorranceMaterial, &materials] (bool isCookTorrance) {
+    if (isCookTorrance) {
+      cookTorranceMaterial->getAlbedoMap()->setBindingIndex(0);
+      cookTorranceMaterial->getNormalMap()->setBindingIndex(1);
+      cookTorranceMaterial->getMetallicMap()->setBindingIndex(2);
+      cookTorranceMaterial->getRoughnessMap()->setBindingIndex(3);
+      cookTorranceMaterial->getAmbientOcclusionMap()->setBindingIndex(4);
+
+      materials.emplace_back(std::move(cookTorranceMaterial));
+    } else {
+      blinnPhongMaterial->getDiffuseMap()->setBindingIndex(0);
+      blinnPhongMaterial->getAmbientMap()->setBindingIndex(1);
+      blinnPhongMaterial->getSpecularMap()->setBindingIndex(2);
+      blinnPhongMaterial->getEmissiveMap()->setBindingIndex(3);
+      blinnPhongMaterial->getTransparencyMap()->setBindingIndex(4);
+      blinnPhongMaterial->getBumpMap()->setBindingIndex(5);
+
+      materials.emplace_back(std::move(blinnPhongMaterial));
+    }
+  };
 
   if (file) {
     while (!file.eof()) {
@@ -82,13 +103,13 @@ void importMtl(const std::string& mtlFilePath,
         const TexturePtr& map = loadTexture(mtlFilePath, nextValue);
 
         if (tag[4] == 'K') {                           // Standard maps
-          if (tag[5] == 'a') {                         // Ambient/ambient occlusion map [map_Ka]
-            blinnPhongMaterial->setAmbientMap(map);
-            cookTorranceMaterial->setAmbientOcclusionMap(map);
-          } else if (tag[5] == 'd') {                  // Diffuse/albedo map [map_Kd]
+          if (tag[5] == 'd') {                         // Diffuse/albedo map [map_Kd]
             blinnPhongMaterial->setDiffuseMap(map);
             cookTorranceMaterial->setAlbedoMap(map);
-          } else if (tag[5] == 's') {                  // Specular map [map_Ks]
+          } else if (tag[5] == 'a') {                  // Ambient/ambient occlusion map [map_Ka]
+            blinnPhongMaterial->setAmbientMap(map);
+            cookTorranceMaterial->setAmbientOcclusionMap(map);
+          } else if (tag[5] == 's') {                   // Specular map [map_Ks]
             blinnPhongMaterial->setSpecularMap(map);
             isBlinnPhongMaterial = true;
           } else if (tag[5] == 'e') {                  // Emissive map [map_Ke]
@@ -121,21 +142,18 @@ void importMtl(const std::string& mtlFilePath,
           isBlinnPhongMaterial = true;
         }*/
       }  else if (tag[0] == 'b') {                     // Bump map (alias) [bump]
-        blinnPhongMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue));
+        blinnPhongMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue, 5));
         isBlinnPhongMaterial = true;
       } else if (tag[0] == 'n') {
         if (tag[1] == 'o') {                           // Normal map [norm]
-          cookTorranceMaterial->setNormalMap(loadTexture(mtlFilePath, nextValue));
+          cookTorranceMaterial->setNormalMap(loadTexture(mtlFilePath, nextValue, 1));
         } else if (tag[1] == 'e') {                    // New material [newmtl]
           materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
 
           if (!isBlinnPhongMaterial && !isCookTorranceMaterial)
             continue;
 
-          if (isCookTorranceMaterial)
-            materials.emplace_back(std::move(cookTorranceMaterial));
-          else
-            materials.emplace_back(std::move(blinnPhongMaterial));
+          addLocalMaterial(isCookTorranceMaterial);
 
           blinnPhongMaterial   = MaterialBlinnPhong::create();
           cookTorranceMaterial = MaterialCookTorrance::create();
@@ -151,10 +169,7 @@ void importMtl(const std::string& mtlFilePath,
     throw std::runtime_error("Error: Couldn't open the file '" + mtlFilePath + "'");
   }
 
-  if (isCookTorranceMaterial)
-    materials.emplace_back(std::move(cookTorranceMaterial));
-  else
-    materials.emplace_back(std::move(blinnPhongMaterial));
+  addLocalMaterial(isCookTorranceMaterial);
 }
 
 } // namespace

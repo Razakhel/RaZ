@@ -2,6 +2,7 @@
 #include "RaZ/Render/Shader.hpp"
 
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <vector>
 
@@ -41,7 +42,7 @@ bool Shader::isCompiled() const {
   return Renderer::isShaderCompiled(m_index);
 }
 
-void Shader::loadSource(const std::string& source) {
+void Shader::loadSource(const std::string& source) const {
   Renderer::sendShaderSource(m_index, source);
 }
 

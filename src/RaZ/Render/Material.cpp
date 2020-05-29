@@ -3,6 +3,10 @@
 
 namespace Raz {
 
+void Material::loadBaseColorMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_baseColorMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
 MaterialCookTorrancePtr Material::recoverMaterial(MaterialPreset preset, float roughnessFactor) {
   static constexpr std::array<std::pair<Vec3f, float>, static_cast<std::size_t>(MaterialPreset::PRESET_COUNT)> materialPresetParams = {
       std::pair<Vec3f, float>(Vec3f(0.02f), 0.f), // CHARCOAL
@@ -27,6 +31,30 @@ MaterialCookTorrancePtr Material::recoverMaterial(MaterialPreset preset, float r
   return MaterialCookTorrance::create(materialParams.first, materialParams.second, roughnessFactor);
 }
 
+void MaterialBlinnPhong::loadDiffuseMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  loadBaseColorMap(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialBlinnPhong::loadAmbientMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_ambientMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialBlinnPhong::loadSpecularMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_specularMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialBlinnPhong::loadEmissiveMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_emissiveMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialBlinnPhong::loadTransparencyMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_transparencyMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialBlinnPhong::loadBumpMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_bumpMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
 void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
   static const std::string locationBase = "uniMaterial.";
 
@@ -37,12 +65,12 @@ void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
   static const std::string transparencyMapLocation = locationBase + "transparencyMap";
   static const std::string bumpMapLocation         = locationBase + "bumpMap";
 
-  program.sendUniform(diffuseMapLocation,      0);
-  program.sendUniform(ambientMapLocation,      1);
-  program.sendUniform(specularMapLocation,     2);
-  program.sendUniform(emissiveMapLocation,     3);
-  program.sendUniform(transparencyMapLocation, 4);
-  program.sendUniform(bumpMapLocation,         5);
+  program.sendUniform(diffuseMapLocation,      m_baseColorMap->getBindingIndex());
+  program.sendUniform(ambientMapLocation,      m_ambientMap->getBindingIndex());
+  program.sendUniform(specularMapLocation,     m_specularMap->getBindingIndex());
+  program.sendUniform(emissiveMapLocation,     m_emissiveMap->getBindingIndex());
+  program.sendUniform(transparencyMapLocation, m_transparencyMap->getBindingIndex());
+  program.sendUniform(bumpMapLocation,         m_bumpMap->getBindingIndex());
 }
 
 void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
@@ -60,23 +88,43 @@ void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
   program.sendUniform(emissiveLocation,     m_emissive);
   program.sendUniform(transparencyLocation, m_transparency);
 
-  Renderer::activateTexture(0);
+  m_baseColorMap->activate();
   m_baseColorMap->bind();
 
-  Renderer::activateTexture(1);
+  m_ambientMap->activate();
   m_ambientMap->bind();
 
-  Renderer::activateTexture(2);
+  m_specularMap->activate();
   m_specularMap->bind();
 
-  Renderer::activateTexture(3);
+  m_emissiveMap->activate();
   m_emissiveMap->bind();
 
-  Renderer::activateTexture(4);
+  m_transparencyMap->activate();
   m_transparencyMap->bind();
 
-  Renderer::activateTexture(5);
+  m_bumpMap->activate();
   m_bumpMap->bind();
+}
+
+void MaterialCookTorrance::loadAlbedoMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  loadBaseColorMap(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialCookTorrance::loadNormalMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_normalMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialCookTorrance::loadMetallicMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_metallicMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialCookTorrance::loadRoughnessMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_roughnessMap = Texture::create(fileName, bindingIndex, flipVertically);
+}
+
+void MaterialCookTorrance::loadAmbientOcclusionMap(const std::string& fileName, int bindingIndex, bool flipVertically) {
+  m_ambientOcclusionMap = Texture::create(fileName, bindingIndex, flipVertically);
 }
 
 void MaterialCookTorrance::initTextures(const ShaderProgram& program) const {
@@ -88,11 +136,11 @@ void MaterialCookTorrance::initTextures(const ShaderProgram& program) const {
   static const std::string roughnessMapLocation        = locationBase + "roughnessMap";
   static const std::string ambientOcclusionMapLocation = locationBase + "ambientOcclusionMap";
 
-  program.sendUniform(albedoMapLocation,           0);
-  program.sendUniform(normalMapLocation,           1);
-  program.sendUniform(metallicMapLocation,         2);
-  program.sendUniform(roughnessMapLocation,        3);
-  program.sendUniform(ambientOcclusionMapLocation, 4);
+  program.sendUniform(albedoMapLocation,           m_baseColorMap->getBindingIndex());
+  program.sendUniform(normalMapLocation,           m_normalMap->getBindingIndex());
+  program.sendUniform(metallicMapLocation,         m_metallicMap->getBindingIndex());
+  program.sendUniform(roughnessMapLocation,        m_roughnessMap->getBindingIndex());
+  program.sendUniform(ambientOcclusionMapLocation, m_ambientOcclusionMap->getBindingIndex());
 }
 
 void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
@@ -106,19 +154,19 @@ void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
   program.sendUniform(metallicFactorLocation,  m_metallicFactor);
   program.sendUniform(roughnessFactorLocation, m_roughnessFactor);
 
-  Renderer::activateTexture(0);
+  m_baseColorMap->activate();
   m_baseColorMap->bind();
 
-  Renderer::activateTexture(1);
+  m_normalMap->activate();
   m_normalMap->bind();
 
-  Renderer::activateTexture(2);
+  m_metallicMap->activate();
   m_metallicMap->bind();
 
-  Renderer::activateTexture(3);
+  m_roughnessMap->activate();
   m_roughnessMap->bind();
 
-  Renderer::activateTexture(4);
+  m_ambientOcclusionMap->activate();
   m_ambientOcclusionMap->bind();
 }
 

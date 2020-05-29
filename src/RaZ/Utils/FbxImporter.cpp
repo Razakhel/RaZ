@@ -25,7 +25,7 @@ void Mesh::importFbx(const std::string& filePath) {
 
   // Recovering geometry
   for (int meshIndex = 0; meshIndex < scene->GetGeometryCount(); ++meshIndex) {
-    const auto fbxMesh = static_cast<FbxMesh*>(scene->GetGeometry(meshIndex));
+    auto* fbxMesh = static_cast<FbxMesh*>(scene->GetGeometry(meshIndex));
     Submesh submesh;
 
     ////////////
@@ -152,26 +152,26 @@ void Mesh::importFbx(const std::string& filePath) {
     // Recovering textures
     const std::string texturePath = FileUtils::extractPathToFile(filePath);
 
-    const auto ambientTexture = static_cast<FbxFileTexture*>(ambient.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
-    if (ambientTexture)
-      material->loadAmbientMap(texturePath + ambientTexture->GetRelativeFileName());
-
-    const auto diffuseTexture = static_cast<FbxFileTexture*>(diffuse.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    const auto* diffuseTexture = static_cast<FbxFileTexture*>(diffuse.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
     if (diffuseTexture)
-      material->loadDiffuseMap(texturePath + diffuseTexture->GetRelativeFileName());
+      material->loadDiffuseMap(texturePath + diffuseTexture->GetRelativeFileName(), 0);
 
-    const auto specularTexture = static_cast<FbxFileTexture*>(specular.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    const auto* ambientTexture = static_cast<FbxFileTexture*>(ambient.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    if (ambientTexture)
+      material->loadAmbientMap(texturePath + ambientTexture->GetRelativeFileName(), 1);
+
+    const auto* specularTexture = static_cast<FbxFileTexture*>(specular.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
     if (specularTexture)
-      material->loadSpecularMap(texturePath + specularTexture->GetRelativeFileName());
+      material->loadSpecularMap(texturePath + specularTexture->GetRelativeFileName(), 2);
 
-    const auto emissiveTexture = static_cast<FbxFileTexture*>(emissive.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    const auto* emissiveTexture = static_cast<FbxFileTexture*>(emissive.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
     if (emissiveTexture)
-      material->loadEmissiveMap(texturePath + emissiveTexture->GetRelativeFileName());
+      material->loadEmissiveMap(texturePath + emissiveTexture->GetRelativeFileName(), 3);
 
     // Normal map not yet handled for standard materials
     /*const auto normMapProp = fbxMaterial->FindProperty(FbxSurfaceMaterial::sNormalMap);
     if (normMapProp.IsValid()) {
-      const auto normalMap = static_cast<FbxFileTexture*>(normMapProp.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+      const auto* normalMap = static_cast<FbxFileTexture*>(normMapProp.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
       if (normalMap)
         material->loadNormalMap(texturePath + normalMap->GetRelativeFileName());
     }*/

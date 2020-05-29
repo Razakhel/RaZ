@@ -8,7 +8,7 @@ Texture::Texture() {
   Renderer::generateTexture(m_index);
 }
 
-Texture::Texture(ColorPreset preset) : Texture() {
+Texture::Texture(ColorPreset preset, int bindingIndex) : Texture(bindingIndex) {
   const auto red   = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::RED) >> 16u);
   const auto green = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::GREEN) >> 8u);
   const auto blue  = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::BLUE));
@@ -16,7 +16,7 @@ Texture::Texture(ColorPreset preset) : Texture() {
   makePlainColored(Vec3b(red, green, blue));
 }
 
-Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, bool createMipmaps) : Texture() {
+Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, bool createMipmaps) : Texture(bindingIndex) {
   m_image.m_colorspace = colorspace;
 
   bind();
@@ -54,7 +54,9 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
 }
 
 Texture::Texture(Texture&& texture) noexcept
-  : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) }, m_image{ std::move(texture.m_image) } {}
+  : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) },
+    m_bindingIndex{ std::exchange(texture.m_bindingIndex, std::numeric_limits<int>::max()) },
+    m_image{ std::move(texture.m_image) } {}
 
 void Texture::load(const std::string& filePath, bool flipVertically, bool createMipmaps) {
   m_image.read(filePath, flipVertically);
@@ -122,6 +124,12 @@ void Texture::load(const std::string& filePath, bool flipVertically, bool create
   unbind();
 }
 
+void Texture::activate() const {
+  assert("Error: The texture trying to be activated has an invalid binding index." && m_bindingIndex != std::numeric_limits<int>::max());
+
+  Renderer::activateTexture(static_cast<unsigned int>(m_bindingIndex));
+}
+
 void Texture::bind() const {
   Renderer::bindTexture(TextureType::TEXTURE_2D, m_index);
 }
@@ -132,6 +140,7 @@ void Texture::unbind() const {
 
 Texture& Texture::operator=(Texture&& texture) noexcept {
   std::swap(m_index, texture.m_index);
+  std::swap(m_bindingIndex, texture.m_bindingIndex);
   m_image = std::move(texture.m_image);
 
   return *this;

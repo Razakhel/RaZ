@@ -51,12 +51,14 @@ protected:
   Framebuffer m_framebuffer {};
 };
 
-class GeometryPass : public RenderPass {
+/// Geometry render pass, rendering the base scene.
+class GeometryPass final : public RenderPass {
 public:
   GeometryPass(unsigned int width, unsigned int height, VertexShader vertShader, FragmentShader fragShader);
 };
 
-class SSRPass : public RenderPass {
+/// Screen-Space Reflections render pass, producing real-time reflections in screen-space.
+class SSRPass final : public RenderPass {
 public:
   SSRPass(unsigned int width, unsigned int height, FragmentShader fragShader);
 };
