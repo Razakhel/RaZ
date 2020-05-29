@@ -1,0 +1,69 @@
+#include "Catch.hpp"
+
+#include "RaZ/Render/Texture.hpp"
+
+TEST_CASE("Texture move") {
+  const Raz::Image refImg(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
+
+  Raz::Texture texture(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
+  const unsigned int textureIndex = texture.getIndex();
+
+  // Move ctor
+
+  Raz::Texture movedTextureCtor(std::move(texture));
+
+  // The new texture has the same values as the original one
+  CHECK(movedTextureCtor.getIndex() == textureIndex);
+  CHECK_FALSE(movedTextureCtor.getImage().isEmpty());
+  CHECK(movedTextureCtor.getImage() == refImg);
+
+  // The moved texture is now invalid
+  CHECK(texture.getIndex() == std::numeric_limits<unsigned int>::max());
+  CHECK(texture.getImage().isEmpty());
+
+  // Move assignment operator
+
+  Raz::Texture movedTextureOp;
+
+  const unsigned int movedTextureOpIndex = movedTextureOp.getIndex();
+
+  movedTextureOp = std::move(movedTextureCtor);
+
+  // The new texture has the same values as the previous one
+  CHECK(movedTextureOp.getIndex() == textureIndex);
+  CHECK_FALSE(movedTextureOp.getImage().isEmpty());
+  CHECK(movedTextureOp.getImage() == refImg);
+
+  // After being moved, the values are swapped: the moved-from texture now has the previous moved-to's values
+  CHECK(movedTextureCtor.getIndex() == movedTextureOpIndex);
+  CHECK(movedTextureCtor.getImage().isEmpty());
+}
+
+TEST_CASE("Texture presets") {
+  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::WHITE);
+
+  CHECK(whiteTexture->getImage().isEmpty()); // The image's data is untouched, no allocation is made
+
+  // Recovering the texture's data (1 RGB pixel -> 3 values)
+  std::array<uint8_t, 3> textureData {};
+
+  whiteTexture->bind();
+
+  CHECK(Raz::Renderer::recoverTextureWidth(Raz::TextureType::TEXTURE_2D) == 1);
+  CHECK(Raz::Renderer::recoverTextureHeight(Raz::TextureType::TEXTURE_2D) == 1);
+  CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_2D) == Raz::TextureInternalFormat::RGB);
+
+  Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_2D, 0, Raz::TextureFormat::RGB, Raz::TextureDataType::UBYTE, textureData.data());
+
+  whiteTexture->unbind();
+
+  CHECK(textureData[0] == 255);
+  CHECK(textureData[1] == 255);
+  CHECK(textureData[2] == 255);
+
+  // Creating another texture from the same preset gives a different one; both aren't linked
+  const Raz::TexturePtr whiteTexture2 = Raz::Texture::create(Raz::ColorPreset::WHITE);
+
+  CHECK_FALSE(whiteTexture2.get() == whiteTexture.get());
+  CHECK_FALSE(whiteTexture2->getIndex() == whiteTexture->getIndex());
+}
