@@ -1,7 +1,7 @@
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/Renderer.hpp"
-#include "RaZ/Render/Texture.hpp"
+#include "RaZ/Utils/Image.hpp"
 
 namespace Raz {
 
@@ -42,7 +42,7 @@ Cubemap::Cubemap() {
     }
   )";
 #else
-  // version must be on first line
+  // The version must be on first line
   const std::string vertSource = R"(#version 300 es
 
     precision highp float;
@@ -64,7 +64,6 @@ Cubemap::Cubemap() {
     }
   )";
 
-  // version must be on first line
   const std::string fragSource = R"(#version 300 es
 
     precision highp float;
@@ -92,6 +91,11 @@ Cubemap::Cubemap() {
   m_viewProjUbo.bindUniformBlock(m_program, "uboCubemapMatrix", 1);
   m_viewProjUbo.bindBufferBase(1);
 }
+
+Cubemap::Cubemap(Cubemap&& cubemap) noexcept
+  : m_index{ std::exchange(cubemap.m_index, std::numeric_limits<unsigned int>::max()) },
+    m_program{ std::move(cubemap.m_program) },
+    m_viewProjUbo{ std::move(cubemap.m_viewProjUbo) } {}
 
 void Cubemap::load(const std::string& rightTexturePath, const std::string& leftTexturePath,
                    const std::string& topTexturePath, const std::string& bottomTexturePath,
@@ -191,6 +195,21 @@ void Cubemap::draw(const Camera& camera) const {
 
   Renderer::setFaceCulling(FaceOrientation::BACK);
   Renderer::setDepthFunction(DepthFunction::LESS);
+}
+
+Cubemap& Cubemap::operator=(Cubemap&& cubemap) noexcept {
+  std::swap(m_index, cubemap.m_index);
+  m_program = std::move(cubemap.m_program);
+  m_viewProjUbo = std::move(cubemap.m_viewProjUbo);
+
+  return *this;
+}
+
+Cubemap::~Cubemap() {
+  if (m_index == std::numeric_limits<unsigned int>::max())
+    return;
+
+  Renderer::deleteTexture(m_index);
 }
 
 } // namespace Raz

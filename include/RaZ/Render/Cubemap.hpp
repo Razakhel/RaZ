@@ -6,7 +6,6 @@
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
-#include "RaZ/Utils/Image.hpp"
 
 #include <memory>
 #include <string>
@@ -24,7 +23,10 @@ public:
                    const std::string& topTexturePath, const std::string& bottomTexturePath,
                    const std::string& frontTexturePath, const std::string& backTexturePath)
     : Cubemap() { load(rightTexturePath, leftTexturePath, topTexturePath, bottomTexturePath, frontTexturePath, backTexturePath); }
+  Cubemap(const Cubemap&) = delete;
+  Cubemap(Cubemap&& cubemap) noexcept;
 
+  unsigned int getIndex() const { return m_index; }
   const ShaderProgram& getProgram() const { return m_program; }
 
   template <typename... Args>
@@ -50,6 +52,11 @@ public:
   /// Draws the cubemap around the scene.
   /// \param camera Camera component from which will be taken the view & projection matrices.
   void draw(const Camera& camera) const;
+
+  Cubemap& operator=(const Cubemap&) = delete;
+  Cubemap& operator=(Cubemap&& cubemap) noexcept;
+
+  ~Cubemap();
 
 private:
   unsigned int m_index {};

@@ -6,6 +6,7 @@ TEST_CASE("Texture move") {
   const Raz::Image refImg(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
 
   Raz::Texture texture(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s, 42);
+
   const unsigned int textureIndex = texture.getIndex();
 
   // Move ctor
