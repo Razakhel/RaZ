@@ -74,6 +74,25 @@ enum class PolygonMode : unsigned int {
   FILL  = 6914  // GL_FILL
 };
 
+enum class PixelStorage : unsigned int {
+  UNPACK_SWAP_BYTES   = 3312,  // GL_UNPACK_SWAP_BYTES
+  UNPACK_LSB_FIRST    = 3313,  // GL_UNPACK_LSB_FIRST
+  UNPACK_ROW_LENGTH   = 3314,  // GL_UNPACK_ROW_LENGTH
+  UNPACK_SKIP_ROWS    = 3315,  // GL_UNPACK_SKIP_ROWS
+  UNPACK_SKIP_PIXELS  = 3316,  // GL_UNPACK_SKIP_PIXELS
+  UNPACK_SKIP_IMAGES  = 32877, // GL_PACK_SKIP_IMAGES
+  UNPACK_IMAGE_HEIGHT = 32878, // GL_PACK_IMAGE_HEIGHT
+  UNPACK_ALIGNMENT    = 3317,  // GL_UNPACK_ALIGNMENT
+  PACK_SWAP_BYTES     = 3328,  // GL_PACK_SWAP_BYTES
+  PACK_LSB_FIRST      = 3329,  // GL_PACK_LSB_FIRST
+  PACK_ROW_LENGTH     = 3330,  // GL_PACK_ROW_LENGTH
+  PACK_SKIP_ROWS      = 3331,  // GL_PACK_SKIP_ROWS
+  PACK_SKIP_PIXELS    = 3332,  // GL_PACK_SKIP_PIXELS
+  PACK_SKIP_IMAGES    = 32875, // GL_PACK_SKIP_IMAGES
+  PACK_IMAGE_HEIGHT   = 32876, // GL_PACK_IMAGE_HEIGHT
+  PACK_ALIGNMENT      = 3333   // GL_PACK_ALIGNMENT
+};
+
 enum class BufferType : unsigned int {
   ARRAY_BUFFER   = 34962, // GL_ARRAY_BUFFER
   ELEMENT_BUFFER = 34963, // GL_ELEMENT_ARRAY_BUFFER
@@ -280,6 +299,7 @@ public:
 #if !defined(USE_OPENGL_ES) // glPolygonMode is not available with OpenGL ES
   static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
 #endif
+  static void setPixelStorage(PixelStorage storage, unsigned int value);
   static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }

@@ -169,6 +169,21 @@ void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
 }
 #endif
 
+void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glPixelStorei(static_cast<unsigned int>(storage), static_cast<int>(value));
+
+#if !defined(NDEBUG)
+  const ErrorCodes errorCodes = Renderer::recoverErrors();
+
+  if (errorCodes[recoverErrorCodeIndex(ErrorCode::INVALID_VALUE)])
+    std::cerr << "Renderer::setPixelStorage - " << value << " is not a valid alignment value. Only 1, 2, 4 & 8 are accepted.\n";
+
+  std::cerr << std::flush;
+#endif
+}
+
 void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
