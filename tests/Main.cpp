@@ -13,5 +13,9 @@ int main(int argc, char* argv[]) {
   // Some tests require an OpenGL context to be instantiated, which is done by the Window
   const Raz::Window window(1, 1);
 
+  // Setting texture [un]pack alignment to 1, so that the elements are aligned on bytes. This allows direct comparison with raw data
+  Raz::Renderer::setPixelStorage(Raz::PixelStorage::PACK_ALIGNMENT, 1);
+  Raz::Renderer::setPixelStorage(Raz::PixelStorage::UNPACK_ALIGNMENT, 1);
+
   return Catch::Session().run(argc, argv);
 }
