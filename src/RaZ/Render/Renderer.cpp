@@ -1,6 +1,7 @@
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 
+#include <array>
 #include <cassert>
 #include <iostream>
 
@@ -515,11 +516,11 @@ unsigned int Renderer::createProgram() {
   return programIndex;
 }
 
-int Renderer::getProgramStatus(unsigned int index, ProgramStatus status) {
+int Renderer::getProgramParameter(unsigned int index, ProgramParameter parameter) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   int res {};
-  glGetProgramiv(index, static_cast<unsigned int>(status), &res);
+  glGetProgramiv(index, static_cast<unsigned int>(parameter), &res);
 
 #if !defined(NDEBUG)
   printErrors();
@@ -531,7 +532,7 @@ int Renderer::getProgramStatus(unsigned int index, ProgramStatus status) {
 bool Renderer::isProgramLinked(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  const bool isLinked = (getProgramStatus(index, ProgramStatus::LINK) == GL_TRUE);
+  const bool isLinked = (getProgramParameter(index, ProgramParameter::LINK_STATUS) == GL_TRUE);
 
 #if !defined(NDEBUG)
   printErrors();
@@ -684,6 +685,45 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
 #endif
 
   return location;
+}
+
+void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int uniformIndex, UniformType& type, std::string& name, int* size) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  int nameLength {};
+  int uniformSize {};
+  unsigned int uniformType {};
+  std::array<char, 256> uniformName {};
+
+  glGetActiveUniform(programIndex, uniformIndex, static_cast<int>(name.size()), &nameLength, &uniformSize, &uniformType, uniformName.data());
+
+  type = static_cast<UniformType>(uniformType);
+
+  name.resize(static_cast<std::size_t>(nameLength));
+  std::copy(uniformName.cbegin(), uniformName.cbegin() + nameLength, name.begin());
+
+  if (size)
+    *size = uniformSize;
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+UniformType Renderer::recoverUniformType(unsigned int programIndex, unsigned int uniformIndex) {
+  UniformType type {};
+  std::string name;
+  recoverUniformInfo(programIndex, uniformIndex, type, name);
+
+  return type;
+}
+
+std::string Renderer::recoverUniformName(unsigned int programIndex, unsigned int uniformIndex) {
+  UniformType type {};
+  std::string name;
+  recoverUniformInfo(programIndex, uniformIndex, type, name);
+
+  return name;
 }
 
 void Renderer::sendUniform(int uniformIndex, int value) {

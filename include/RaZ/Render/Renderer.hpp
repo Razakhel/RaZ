@@ -83,6 +83,7 @@ enum class PixelStorage : unsigned int {
   UNPACK_SKIP_IMAGES  = 32877, // GL_PACK_SKIP_IMAGES
   UNPACK_IMAGE_HEIGHT = 32878, // GL_PACK_IMAGE_HEIGHT
   UNPACK_ALIGNMENT    = 3317,  // GL_UNPACK_ALIGNMENT
+
   PACK_SWAP_BYTES     = 3328,  // GL_PACK_SWAP_BYTES
   PACK_LSB_FIRST      = 3329,  // GL_PACK_LSB_FIRST
   PACK_ROW_LENGTH     = 3330,  // GL_PACK_ROW_LENGTH
@@ -103,9 +104,11 @@ enum class BufferDataUsage : unsigned int {
   STREAM_DRAW  = 35040, // GL_STREAM_DRAW
   STREAM_READ  = 35041, // GL_STREAM_READ
   STREAM_COPY  = 35042, // GL_STREAM_COPY
+
   STATIC_DRAW  = 35044, // GL_STATIC_DRAW
   STATIC_READ  = 35045, // GL_STATIC_READ
   STATIC_COPY  = 35046, // GL_STATIC_COPY
+
   DYNAMIC_DRAW = 35048, // GL_DYNAMIC_DRAW
   DYNAMIC_READ = 35049, // GL_DYNAMIC_READ
   DYNAMIC_COPY = 35050, // GL_DYNAMIC_COPY
@@ -196,8 +199,24 @@ enum class TextureDataType : unsigned int {
   FLOAT = 5126  // GL_FLOAT
 };
 
-enum class ProgramStatus : unsigned int {
-  LINK = 35714 // GL_LINK_STATUS
+enum class ProgramParameter : unsigned int {
+  DELETE_STATUS                         = 35712, // GL_DELETE_STATUS
+  LINK_STATUS                           = 35714, // GL_LINK_STATUS
+  VALIDATE_STATUS                       = 35715, // GL_VALIDATE_STATUS
+  INFO_LOG_LENGTH                       = 35716, // GL_INFO_LOG_LENGTH
+  ATTACHED_SHADERS                      = 35717, // GL_ATTACHED_SHADERS
+  ACTIVE_ATTRIBUTES                     = 35721, // GL_ACTIVE_ATTRIBUTES
+  ACTIVE_ATTRIBUTE_MAX_LENGTH           = 35722, // GL_ACTIVE_ATTRIBUTE_MAX_LENGTH
+  ACTIVE_UNIFORMS                       = 35718, // GL_ACTIVE_UNIFORMS
+  ACTIVE_UNIFORM_MAX_LENGTH             = 35719, // GL_ACTIVE_UNIFORM_MAX_LENGTH
+  ACTIVE_UNIFORM_BLOCKS                 = 35382, // GL_ACTIVE_UNIFORM_BLOCKS
+  ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH  = 35381, // GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH
+  TRANSFORM_FEEDBACK_BUFFER_MODE        = 35967, // GL_TRANSFORM_FEEDBACK_BUFFER_MODE
+  TRANSFORM_FEEDBACK_VARYINGS           = 35971, // GL_TRANSFORM_FEEDBACK_VARYINGS
+  TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH = 35958, // GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH
+  GEOMETRY_VERTICES_OUT                 = 35094, // GL_GEOMETRY_VERTICES_OUT
+  GEOMETRY_INPUT_TYPE                   = 35095, // GL_GEOMETRY_INPUT_TYPE
+  GEOMETRY_OUTPUT_TYPE                  = 35096  // GL_GEOMETRY_OUTPUT_TYPE
 };
 
 enum class ShaderType : unsigned int {
@@ -208,6 +227,96 @@ enum class ShaderType : unsigned int {
 
 enum class ShaderStatus : unsigned int {
   COMPILE = 35713 // GL_COMPILE_STATUS
+};
+
+enum class UniformType : unsigned int {
+  // Primitive types
+  FLOAT  = 5126,  // GL_FLOAT
+#if defined(RAZ_USE_GL4)
+  DOUBLE = 5130,  // GL_DOUBLE
+#endif
+  INT    = 5124,  // GL_INT
+  UINT   = 5125,  // GL_UNSIGNED_INT
+  BOOL   = 35670, // GL_BOOL
+
+  // Vectors
+  VEC2  = 35664, // GL_FLOAT_VEC2
+  VEC3  = 35665, // GL_FLOAT_VEC3
+  VEC4  = 35666, // GL_FLOAT_VEC4
+#if defined(RAZ_USE_GL4)
+  DVEC2 = 36860, // GL_DOUBLE_VEC2
+  DVEC3 = 36861, // GL_DOUBLE_VEC3
+  DVEC4 = 36862, // GL_DOUBLE_VEC4
+#endif
+  IVEC2 = 35667, // GL_INT_VEC2
+  IVEC3 = 35668, // GL_INT_VEC3
+  IVEC4 = 35669, // GL_INT_VEC4
+  UVEC2 = 36294, // GL_UNSIGNED_INT_VEC2
+  UVEC3 = 36295, // GL_UNSIGNED_INT_VEC3
+  UVEC4 = 36296, // GL_UNSIGNED_INT_VEC4
+  BVEC2 = 35671, // GL_BOOL_VEC2
+  BVEC3 = 35672, // GL_BOOL_VEC3
+  BVEC4 = 35673, // GL_BOOL_VEC4
+
+  // Matrices
+  MAT2    = 35674, // GL_FLOAT_MAT2
+  MAT3    = 35675, // GL_FLOAT_MAT3
+  MAT4    = 35676, // GL_FLOAT_MAT4
+  MAT2x3  = 35685, // GL_FLOAT_MAT2x3
+  MAT2x4  = 35686, // GL_FLOAT_MAT2x4
+  MAT3x2  = 35687, // GL_FLOAT_MAT3x2
+  MAT3x4  = 35688, // GL_FLOAT_MAT3x4
+  MAT4x2  = 35689, // GL_FLOAT_MAT4x2
+  MAT4x3  = 35690, // GL_FLOAT_MAT4x3
+#if defined(RAZ_USE_GL4)
+  DMAT2   = 36678, // GL_DOUBLE_MAT2
+  DMAT3   = 36679, // GL_DOUBLE_MAT3
+  DMAT4   = 36680, // GL_DOUBLE_MAT4
+  DMAT2x3 = 36681, // GL_DOUBLE_MAT2x3
+  DMAT2x4 = 36682, // GL_DOUBLE_MAT2x4
+  DMAT3x2 = 36683, // GL_DOUBLE_MAT3x2
+  DMAT3x4 = 36684, // GL_DOUBLE_MAT3x4
+  DMAT4x2 = 36685, // GL_DOUBLE_MAT4x2
+  DMAT4x3 = 36686, // GL_DOUBLE_MAT4x3
+#endif
+
+  // Samplers
+  SAMPLER_1D                                = 35677, // GL_SAMPLER_1D
+  SAMPLER_2D                                = 35678, // GL_SAMPLER_2D
+  SAMPLER_3D                                = 35679, // GL_SAMPLER_3D
+  SAMPLER_CUBE                              = 35680, // GL_SAMPLER_CUBE
+  SAMPLER_1D_SHADOW                         = 35681, // GL_SAMPLER_1D_SHADOW
+  SAMPLER_2D_SHADOW                         = 35682, // GL_SAMPLER_2D_SHADOW
+  SAMPLER_1D_ARRAY                          = 36288, // GL_SAMPLER_1D_ARRAY
+  SAMPLER_2D_ARRAY                          = 36289, // GL_SAMPLER_2D_ARRAY
+  SAMPLER_1D_ARRAY_SHADOW                   = 36291, // GL_SAMPLER_1D_ARRAY_SHADOW
+  SAMPLER_2D_ARRAY_SHADOW                   = 36292, // GL_SAMPLER_2D_ARRAY_SHADOW
+  SAMPLER_2D_MULTISAMPLE                    = 37128, // GL_SAMPLER_2D_MULTISAMPLE
+  SAMPLER_2D_MULTISAMPLE_ARRAY              = 37131, // GL_SAMPLER_2D_MULTISAMPLE_ARRAY
+  SAMPLER_CUBE_SHADOW                       = 36293, // GL_SAMPLER_CUBE_SHADOW
+  SAMPLER_BUFFER                            = 36290, // GL_SAMPLER_BUFFER
+  SAMPLER_2D_RECT                           = 35683, // GL_SAMPLER_2D_RECT
+  SAMPLER_2D_RECT_SHADOW                    = 35684, // GL_SAMPLER_2D_RECT_SHADOW
+  INT_SAMPLER_1D                            = 36297, // GL_INT_SAMPLER_1D
+  INT_SAMPLER_2D                            = 36298, // GL_INT_SAMPLER_2D
+  INT_SAMPLER_3D                            = 36299, // GL_INT_SAMPLER_3D
+  INT_SAMPLER_CUBE                          = 36300, // GL_INT_SAMPLER_CUBE
+  INT_SAMPLER_1D_ARRAY                      = 36302, // GL_INT_SAMPLER_1D_ARRAY
+  INT_SAMPLER_2D_ARRAY                      = 36303, // GL_INT_SAMPLER_2D_ARRAY
+  INT_SAMPLER_2D_MULTISAMPLE                = 37129, // GL_INT_SAMPLER_2D_MULTISAMPLE
+  INT_SAMPLER_2D_MULTISAMPLE_ARRAY          = 37132, // GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY
+  INT_SAMPLER_BUFFER                        = 36304, // GL_INT_SAMPLER_BUFFER
+  INT_SAMPLER_2D_RECT                       = 36301, // GL_INT_SAMPLER_2D_RECT
+  UNSIGNED_INT_SAMPLER_1D                   = 36305, // GL_UNSIGNED_INT_SAMPLER_1D
+  UNSIGNED_INT_SAMPLER_2D                   = 36306, // GL_UNSIGNED_INT_SAMPLER_2D
+  UNSIGNED_INT_SAMPLER_3D                   = 36307, // GL_UNSIGNED_INT_SAMPLER_3D
+  UNSIGNED_INT_SAMPLER_CUBE                 = 36308, // GL_UNSIGNED_INT_SAMPLER_CUBE
+  UNSIGNED_INT_SAMPLER_1D_ARRAY             = 36310, // GL_UNSIGNED_INT_SAMPLER_1D_ARRAY
+  UNSIGNED_INT_SAMPLER_2D_ARRAY             = 36311, // GL_UNSIGNED_INT_SAMPLER_2D_ARRAY
+  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE       = 37130, // GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE
+  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY = 37133, // GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY
+  UNSIGNED_INT_SAMPLER_BUFFER               = 36312, // GL_UNSIGNED_INT_SAMPLER_BUFFER
+  UNSIGNED_INT_SAMPLER_2D_RECT              = 36309  // GL_UNSIGNED_INT_SAMPLER_2D_RECT
 };
 
 enum class FramebufferType : unsigned int {
@@ -366,7 +475,7 @@ public:
   static void deleteTexture(unsigned int& index) { deleteTextures(1, &index); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static unsigned int createProgram();
-  static int getProgramStatus(unsigned int index, ProgramStatus status);
+  static int getProgramParameter(unsigned int index, ProgramParameter parameter);
   static bool isProgramLinked(unsigned int index);
   static void linkProgram(unsigned int index);
   static void useProgram(unsigned int index);
@@ -386,6 +495,15 @@ public:
   /// \param uniformName Name of the uniform to recover the location from.
   /// \return Location (ID) of the uniform.
   static int recoverUniformLocation(unsigned int programIndex, const char* uniformName);
+  /// Gets the uniform's information (type, name & size).
+  /// \param programIndex Index of the program to recover the uniform from.
+  /// \param uniformIndex Index of the uniform to recover. This is NOT the uniform's location, rather the actual index from 0 to the uniform count.
+  /// \param type Type of the uniform to recover.
+  /// \param name Name of the uniform to recover.
+  /// \param size Size of the uniform to recover. Will be 1 for non-array uniforms, greater for arrays.
+  static void recoverUniformInfo(unsigned int programIndex, unsigned int uniformIndex, UniformType& type, std::string& name, int* size = nullptr);
+  static UniformType recoverUniformType(unsigned int programIndex, unsigned int uniformIndex);
+  static std::string recoverUniformName(unsigned int programIndex, unsigned int uniformIndex);
   /// Sends an integer as uniform.
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param value Integer to be sent.
