@@ -44,6 +44,35 @@ enum class Capability : unsigned int {
   DEBUG_OUTPUT_SYNCHRONOUS = 33346  // GL_DEBUG_OUTPUT_SYNCHRONOUS
 };
 
+enum class StateParameter : unsigned int {
+  ACTIVE_TEXTURE                = 34016                                                 /* GL_ACTIVE_TEXTURE                */, ///< Currently active texture.
+  ALIASED_LINE_WIDTH_RANGE      = 33902                                                 /* GL_ALIASED_LINE_WIDTH_RANGE      */, ///<
+  SMOOTH_LINE_WIDTH_RANGE       = 2850                                                  /* GL_SMOOTH_LINE_WIDTH_RANGE       */, ///<
+  SMOOTH_LINE_WIDTH_GRANULARITY = 2851                                                  /* GL_SMOOTH_LINE_WIDTH_GRANULARITY */, ///<
+  ARRAY_BUFFER_BINDING          = 34964                                                 /* GL_ARRAY_BUFFER_BINDING          */, ///<
+  BLEND                         = static_cast<unsigned int>(Capability::BLEND)          /* GL_BLEND                         */, ///< Blending.
+  BLEND_COLOR                   = 32773                                                 /* GL_BLEND_COLOR                   */, ///<
+  BLEND_DST_RGB                 = 32968                                                 /* GL_BLEND_DST_RGB                 */, ///<
+  BLEND_DST_ALPHA               = 32970                                                 /* GL_BLEND_DST_ALPHA               */, ///<
+  BLEND_SRC_RGB                 = 32969                                                 /* GL_BLEND_SRC_RGB                 */, ///<
+  BLEND_SRC_ALPHA               = 32971                                                 /* GL_BLEND_SRC_ALPHA               */, ///<
+  BLEND_EQUATION_RGB            = 32777                                                 /* GL_BLEND_EQUATION_RGB            */, ///<
+  BLEND_EQUATION_ALPHA          = 34877                                                 /* GL_BLEND_EQUATION_ALPHA          */, ///<
+  COLOR_CLEAR_VALUE             = 3106                                                  /* GL_COLOR_CLEAR_VALUE             */, ///< Clear color.
+  COLOR_LOGIC_OP                = static_cast<unsigned int>(Capability::COLOR_LOGIC_OP) /* GL_COLOR_LOGIC_OP                */, ///<
+  COLOR_WRITEMASK               = 3107                                                  /* GL_COLOR_WRITEMASK               */, ///< Color write mask.
+  COMPRESSED_TEXTURE_FORMATS    = 34467                                                 /* GL_COMPRESSED_TEXTURE_FORMATS    */, ///<
+  CULL_FACE                     = static_cast<unsigned int>(Capability::CULL)           /* GL_CULL_FACE                     */, ///< Polygon culling.
+  CURRENT_PROGRAM               = 35725                                                 /* GL_CURRENT_PROGRAM               */, ///< Currently used program.
+  DEPTH_CLEAR_VALUE             = 2931                                                  /* GL_DEPTH_CLEAR_VALUE             */, ///< Depth clear value.
+  DEPTH_FUNC                    = 2932                                                  /* GL_DEPTH_FUNC                    */, ///< Depth function.
+  DEPTH_RANGE                   = 2928                                                  /* GL_DEPTH_RANGE                   */, ///< Depth range.
+  DEPTH_TEST                    = static_cast<unsigned int>(Capability::DEPTH_TEST)     /* GL_DEPTH_TEST                    */, ///< Depth testing.
+  DEPTH_WRITEMASK               = 2930                                                  /* GL_DEPTH_WRITEMASK               */, ///< Depth write mask.
+  DITHER                        = static_cast<unsigned int>(Capability::DITHER)         /* GL_DITHER                        */, ///< Dithering.
+  POINT_SIZE                    = static_cast<unsigned int>(Capability::POINT_SIZE)     /* GL_POINT_SIZE                    */  ///< Point size.
+};
+
 enum class MaskType : unsigned int {
   COLOR   = 16384, // GL_COLOR_BUFFER_BIT
   DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
@@ -400,6 +429,21 @@ public:
   static void enable(Capability capability);
   static void disable(Capability capability);
   static bool isEnabled(Capability capability);
+  static void getParameter(StateParameter parameter, unsigned char* values);
+  static void getParameter(StateParameter parameter, int* values);
+  static void getParameter(StateParameter parameter, int64_t* values);
+  static void getParameter(StateParameter parameter, float* values);
+  static void getParameter(StateParameter parameter, double* values);
+  static void getParameter(StateParameter parameter, unsigned int index, unsigned char* values);
+  static void getParameter(StateParameter parameter, unsigned int index, int* values);
+  static void getParameter(StateParameter parameter, unsigned int index, int64_t* values);
+  /// Gets the active texture's index.
+  /// \note This returns an index starting from 0, not from GL_TEXTURE0.
+  /// \return Index of the currently active texture.
+  static unsigned int getActiveTexture();
+  /// Gets the current program's index.
+  /// \return Index of the currently used program.
+  static unsigned int getCurrentProgram();
   static void clearColor(float red, float green, float blue, float alpha);
   static void clearColor(float values[4]) { clearColor(values[0], values[1], values[2], values[3]); }
   static void clear(MaskType mask);
@@ -578,9 +622,6 @@ public:
   ~Renderer() = delete;
 
 private:
-  static constexpr uint8_t recoverErrorCodeIndex(ErrorCode code) { return static_cast<uint8_t>(static_cast<unsigned int>(code)
-                                                                                             - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)); }
-
   static inline bool s_isInitialized = false;
 };
 

@@ -69,6 +69,10 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
   }
 }
 
+constexpr uint8_t recoverErrorCodeIndex(ErrorCode code) {
+  return (static_cast<uint8_t>(static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)));
+}
+
 } // namespace
 
 void Renderer::initialize() {
@@ -116,6 +120,100 @@ bool Renderer::isEnabled(Capability capability) {
 #endif
 
   return isEnabled;
+}
+
+void Renderer::getParameter(StateParameter parameter, unsigned char* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetBooleanv(static_cast<unsigned int>(parameter), values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::getParameter(StateParameter parameter, int* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetIntegerv(static_cast<unsigned int>(parameter), values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::getParameter(StateParameter parameter, int64_t* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetInteger64v(static_cast<unsigned int>(parameter), values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::getParameter(StateParameter parameter, float* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetFloatv(static_cast<unsigned int>(parameter), values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::getParameter(StateParameter parameter, double* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetDoublev(static_cast<unsigned int>(parameter), values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::getParameter(StateParameter parameter, unsigned int index, unsigned char* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetBooleani_v(static_cast<unsigned int>(parameter), index, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::getParameter(StateParameter parameter, unsigned int index, int* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetIntegeri_v(static_cast<unsigned int>(parameter), index, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+void Renderer::getParameter(StateParameter parameter, unsigned int index, int64_t* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetInteger64i_v(static_cast<unsigned int>(parameter), index, values);
+
+#if !defined(NDEBUG)
+  printErrors();
+#endif
+}
+
+unsigned int Renderer::getActiveTexture() {
+  int texture {};
+  getParameter(StateParameter::ACTIVE_TEXTURE, &texture);
+
+  return static_cast<unsigned int>(texture - GL_TEXTURE0);
+}
+
+unsigned int Renderer::getCurrentProgram() {
+  int program {};
+  getParameter(StateParameter::CURRENT_PROGRAM, &program);
+
+  return static_cast<unsigned int>(program);
 }
 
 void Renderer::clearColor(float red, float green, float blue, float alpha) {
