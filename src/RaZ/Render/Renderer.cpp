@@ -614,29 +614,28 @@ unsigned int Renderer::createProgram() {
   return programIndex;
 }
 
-int Renderer::getProgramParameter(unsigned int index, ProgramParameter parameter) {
+void Renderer::getProgramParameter(unsigned int index, ProgramParameter parameter, int* parameters) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  int res {};
-  glGetProgramiv(index, static_cast<unsigned int>(parameter), &res);
+  glGetProgramiv(index, static_cast<unsigned int>(parameter), parameters);
 
 #if !defined(NDEBUG)
   printErrors();
 #endif
-
-  return res;
 }
 
 bool Renderer::isProgramLinked(unsigned int index) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  int linkStatus {};
+  getProgramParameter(index, ProgramParameter::LINK_STATUS, &linkStatus);
 
-  const bool isLinked = (getProgramParameter(index, ProgramParameter::LINK_STATUS) == GL_TRUE);
+  return (linkStatus == GL_TRUE);
+}
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+unsigned int Renderer::recoverActiveUniformCount(unsigned int index) {
+  int uniformCount {};
+  getProgramParameter(index, ProgramParameter::ACTIVE_UNIFORMS, &uniformCount);
 
-  return isLinked;
+  return static_cast<unsigned int>(uniformCount);
 }
 
 void Renderer::linkProgram(unsigned int index) {

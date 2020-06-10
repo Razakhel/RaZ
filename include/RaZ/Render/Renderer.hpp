@@ -519,8 +519,9 @@ public:
   static void deleteTexture(unsigned int& index) { deleteTextures(1, &index); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static unsigned int createProgram();
-  static int getProgramParameter(unsigned int index, ProgramParameter parameter);
+  static void getProgramParameter(unsigned int index, ProgramParameter parameter, int* parameters);
   static bool isProgramLinked(unsigned int index);
+  static unsigned int recoverActiveUniformCount(unsigned int index);
   static void linkProgram(unsigned int index);
   static void useProgram(unsigned int index);
   static void deleteProgram(unsigned int index);
