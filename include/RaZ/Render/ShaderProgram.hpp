@@ -5,7 +5,6 @@
 
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
-#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
 
 #include <optional>
@@ -44,6 +43,8 @@ public:
   bool isLinked() const;
   /// Tells the graphics card to use the program.
   void use() const;
+  /// Checks if the program is currently defined as used.
+  bool isUsed() const;
   /// Loads & compiles all the shaders contained by the program, then links & uses it.
   void updateShaders() const;
   /// Creates a uniform & registers its location (ID) used by the program.
@@ -58,39 +59,39 @@ public:
   /// Sends an integer as uniform.
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param value Integer to be sent.
-  void sendUniform(int uniformIndex, int value) const { Renderer::sendUniform(uniformIndex, value); }
+  void sendUniform(int uniformIndex, int value) const;
   /// Sends an unsigned integer as uniform.
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param value Unsigned integer to be sent.
-  void sendUniform(int uniformIndex, unsigned int value) const { Renderer::sendUniform(uniformIndex, value); }
+  void sendUniform(int uniformIndex, unsigned int value) const;
   /// Sends a floating-point value as uniform.
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param value Floating-point value to be sent.
-  void sendUniform(int uniformIndex, float value) const { Renderer::sendUniform(uniformIndex, value); }
+  void sendUniform(int uniformIndex, float value) const;
   /// Sends a floating-point 2D vector as uniform.
   /// \param uniformIndex Index of the uniform to send the vector's data to.
   /// \param vec Vector to be sent.
-  void sendUniform(int uniformIndex, const Vec2f& vec) const { Renderer::sendUniformVector2(uniformIndex, vec.getDataPtr()); }
+  void sendUniform(int uniformIndex, const Vec2f& vec) const;
   /// Sends a floating-point 3D vector as uniform.
   /// \param uniformIndex Index of the uniform to send the vector's data to.
   /// \param vec Vector to be sent.
-  void sendUniform(int uniformIndex, const Vec3f& vec) const { Renderer::sendUniformVector3(uniformIndex, vec.getDataPtr()); }
+  void sendUniform(int uniformIndex, const Vec3f& vec) const;
   /// Sends a floating-point 4D vector as uniform.
   /// \param uniformIndex Index of the uniform to send the vector's data to.
   /// \param vec Vector to be sent.
-  void sendUniform(int uniformIndex, const Vec4f& vec) const { Renderer::sendUniformVector4(uniformIndex, vec.getDataPtr()); }
+  void sendUniform(int uniformIndex, const Vec4f& vec) const;
   /// Sends a floating-point 2x2 matrix as uniform.
   /// \param uniformIndex Index of the uniform to send the matrix's data to.
   /// \param mat Matrix to be sent.
-  void sendUniform(int uniformIndex, const Mat2f& mat) const { Renderer::sendUniformMatrix2x2(uniformIndex, mat.getDataPtr()); }
+  void sendUniform(int uniformIndex, const Mat2f& mat) const;
   /// Sends a floating-point 3x3 matrix as uniform.
   /// \param uniformIndex Index of the uniform to send the matrix's data to.
   /// \param mat Matrix to be sent.
-  void sendUniform(int uniformIndex, const Mat3f& mat) const { Renderer::sendUniformMatrix3x3(uniformIndex, mat.getDataPtr()); }
+  void sendUniform(int uniformIndex, const Mat3f& mat) const;
   /// Sends a floating-point 4x4 matrix as uniform.
   /// \param uniformIndex Index of the uniform to send the matrix's data to.
   /// \param mat Matrix to be sent.
-  void sendUniform(int uniformIndex, const Mat4f& mat) const { Renderer::sendUniformMatrix4x4(uniformIndex, mat.getDataPtr()); }
+  void sendUniform(int uniformIndex, const Mat4f& mat) const;
   /// Sends an integer as uniform, which location will be retrieved with its name.
   /// \param uniformName Name of the uniform to retrieve the location from.
   /// \param value Integer to be sent.
