@@ -16,6 +16,7 @@ public:
   unsigned int getIndex() const { return m_index; }
   const std::string& getPath() const { return m_path; }
 
+  bool isValid() const;
   void import(std::string filePath);
   void load() const;
   void compile() const;

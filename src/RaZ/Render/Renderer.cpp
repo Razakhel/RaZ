@@ -680,7 +680,7 @@ void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int unifor
   unsigned int uniformType {};
   std::array<char, 256> uniformName {};
 
-  glGetActiveUniform(programIndex, uniformIndex, static_cast<int>(name.size()), &nameLength, &uniformSize, &uniformType, uniformName.data());
+  glGetActiveUniform(programIndex, uniformIndex, static_cast<int>(uniformName.size()), &nameLength, &uniformSize, &uniformType, uniformName.data());
 
   type = static_cast<UniformType>(uniformType);
 

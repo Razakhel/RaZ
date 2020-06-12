@@ -11,6 +11,10 @@ namespace Raz {
 Shader::Shader(Shader&& shader) noexcept
   : m_index{ std::exchange(shader.m_index, std::numeric_limits<unsigned int>::max()) }, m_path{ std::move(shader.m_path) } {}
 
+bool Shader::isValid() const {
+  return (m_index != std::numeric_limits<unsigned int>::max());
+}
+
 void Shader::import(std::string filePath) {
   m_path = std::move(filePath);
   load();
@@ -47,7 +51,7 @@ void Shader::loadSource(const std::string& source) const {
 }
 
 void Shader::destroy() {
-  if (m_index == std::numeric_limits<unsigned int>::max())
+  if (!isValid())
     return;
 
   Renderer::deleteShader(m_index);

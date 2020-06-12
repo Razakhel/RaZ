@@ -17,16 +17,22 @@ ShaderProgram::ShaderProgram(ShaderProgram&& program) noexcept
 
 void ShaderProgram::setVertexShader(VertexShader&& vertShader) {
   m_vertShader = std::move(vertShader);
+  m_vertShader.compile();
+
   Renderer::attachShader(m_index, m_vertShader.getIndex());
 }
 
 void ShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
   m_geomShader = std::move(geomShader);
+  m_geomShader->compile();
+
   Renderer::attachShader(m_index, m_geomShader->getIndex());
 }
 
 void ShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
   m_fragShader = std::move(fragShader);
+  m_fragShader.compile();
+
   Renderer::attachShader(m_index, m_fragShader.getIndex());
 }
 
@@ -60,6 +66,14 @@ void ShaderProgram::compileShaders() const {
 }
 
 void ShaderProgram::link() const {
+  assert("Error: A shader program needs at least one shader for it to be linked." && (m_vertShader.isValid()
+                                                                                   || (m_geomShader && m_geomShader->isValid())
+                                                                                   || m_fragShader.isValid()));
+  assert("Error: A shader program's vertex shader must be compiled before being linked." && (m_vertShader.isValid() ? m_vertShader.isCompiled() : true));
+  assert("Error: A shader program's geometry shader must be compiled before being linked."
+    && ((m_geomShader && m_geomShader->isValid()) ? m_geomShader->isCompiled() : true));
+  assert("Error: A shader program's fragment shader must be compiled before being linked." && (m_fragShader.isValid() ? m_fragShader.isCompiled() : true));
+
   Renderer::linkProgram(m_index);
 }
 
@@ -68,6 +82,7 @@ bool ShaderProgram::isLinked() const {
 }
 
 void ShaderProgram::use() const {
+  assert("Error: A shader program must be linked before being defined as used." && isLinked());
   Renderer::useProgram(m_index);
 }
 
