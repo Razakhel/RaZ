@@ -36,7 +36,7 @@ in struct MeshInfo {
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
 
-layout (std140) uniform uboCameraMatrices {
+layout(std140) uniform uboCameraMatrices {
   mat4 viewMat;
   mat4 invViewMat;
   mat4 projectionMat;
@@ -47,8 +47,8 @@ layout (std140) uniform uboCameraMatrices {
 
 uniform Material uniMaterial;
 
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec3 bufferNormal;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec3 bufferNormal;
 
 void main() {
   vec3 normal = fragMeshInfo.vertTBNMatrix[2];

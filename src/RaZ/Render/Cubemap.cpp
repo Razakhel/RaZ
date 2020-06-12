@@ -12,9 +12,9 @@ Cubemap::Cubemap() {
   const std::string vertSource = R"(
     #version 330 core
 
-    layout (location = 0) in vec3 vertPosition;
+    layout(location = 0) in vec3 vertPosition;
 
-    layout (std140) uniform uboCubemapMatrix {
+    layout(std140) uniform uboCubemapMatrix {
       mat4 viewProjMat;
     };
 
@@ -35,7 +35,7 @@ Cubemap::Cubemap() {
 
     uniform samplerCube uniSkybox;
 
-    layout (location = 0) out vec4 fragColor;
+    layout(location = 0) out vec4 fragColor;
 
     void main() {
       fragColor = texture(uniSkybox, fragTexcoords);
@@ -48,9 +48,9 @@ Cubemap::Cubemap() {
     precision highp float;
     precision highp int;
 
-    layout (location = 0) in vec3 vertPosition;
+    layout(location = 0) in vec3 vertPosition;
 
-    layout (std140) uniform uboCubemapMatrix {
+    layout(std140) uniform uboCubemapMatrix {
       mat4 viewProjMat;
     };
 
@@ -73,7 +73,7 @@ Cubemap::Cubemap() {
 
     uniform samplerCube uniSkybox;
 
-    layout (location = 0) out vec4 fragColor;
+    layout(location = 0) out vec4 fragColor;
 
     void main() {
       fragColor = texture(uniSkybox, fragTexcoords);

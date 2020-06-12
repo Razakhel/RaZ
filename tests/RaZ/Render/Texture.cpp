@@ -50,7 +50,7 @@ TEST_CASE("Texture presets") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::WHITE, 42);
-  CHECK(Raz::Renderer::recoverErrors().none());
+  CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(whiteTexture->getBindingIndex() == 42);
   CHECK(whiteTexture->getImage().isEmpty()); // The image's data is untouched, no allocation is made
@@ -63,10 +63,10 @@ TEST_CASE("Texture presets") {
   CHECK(Raz::Renderer::recoverTextureWidth(Raz::TextureType::TEXTURE_2D) == 1);
   CHECK(Raz::Renderer::recoverTextureHeight(Raz::TextureType::TEXTURE_2D) == 1);
   CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_2D) == Raz::TextureInternalFormat::RGB);
-  CHECK(Raz::Renderer::recoverErrors().none());
+  CHECK_FALSE(Raz::Renderer::hasErrors());
 
   Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_2D, 0, Raz::TextureFormat::RGB, Raz::TextureDataType::UBYTE, textureData.data());
-  CHECK(Raz::Renderer::recoverErrors().none());
+  CHECK_FALSE(Raz::Renderer::hasErrors());
 
   whiteTexture->unbind();
 
@@ -76,7 +76,7 @@ TEST_CASE("Texture presets") {
 
   // Creating another texture from the same preset gives a different one; both aren't linked
   const Raz::TexturePtr whiteTexture2 = Raz::Texture::create(Raz::ColorPreset::WHITE);
-  CHECK(Raz::Renderer::recoverErrors().none());
+  CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK_FALSE(whiteTexture2.get() == whiteTexture.get());
   CHECK_FALSE(whiteTexture2->getIndex() == whiteTexture->getIndex());

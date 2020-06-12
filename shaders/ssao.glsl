@@ -8,7 +8,7 @@ struct Buffers {
 
 in vec2 fragTexcoords;
 
-layout (std140) uniform uboCameraMatrices {
+layout(std140) uniform uboCameraMatrices {
   mat4 viewMat;
   mat4 invViewMat;
   mat4 projectionMat;
@@ -19,7 +19,7 @@ layout (std140) uniform uboCameraMatrices {
 
 uniform Buffers uniSceneBuffers;
 
-layout (location = 0) out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 const uint ssaoCount    = 32u;
 const float goldenRatio = (2.236f + 1.0f) / 2.0f;

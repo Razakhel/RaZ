@@ -615,6 +615,7 @@ public:
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
   static ErrorCodes recoverErrors();
+  static bool hasErrors() { return recoverErrors().any(); }
   static void printErrors();
 
   Renderer& operator=(const Renderer&) = delete;

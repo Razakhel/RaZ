@@ -35,7 +35,7 @@ in struct MeshInfo {
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
 
-layout (std140) uniform uboCameraMatrices {
+layout(std140) uniform uboCameraMatrices {
   mat4 viewMat;
   mat4 invViewMat;
   mat4 projectionMat;
@@ -46,8 +46,8 @@ layout (std140) uniform uboCameraMatrices {
 
 uniform Material uniMaterial;
 
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec3 bufferNormal;
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec3 bufferNormal;
 
 // Normal Distribution Function: Trowbridge-Reitz GGX
 float computeNormalDistrib(vec3 normal, vec3 halfVec, float roughness) {
