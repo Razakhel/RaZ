@@ -80,21 +80,21 @@ inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 #endif
 
 inline void loadCloudsSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap::create(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/clouds_front.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
+  render.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/clouds_front.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
 }
 
 inline void loadLakeSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap::create(RAZ_ROOT + "assets/skyboxes/lake_right.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/lake_left.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/lake_top.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/lake_bottom.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/lake_front.png"s,
-                                         RAZ_ROOT + "assets/skyboxes/lake_back.png"s));
+  render.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/lake_right.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/lake_left.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/lake_top.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/lake_bottom.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/lake_front.png"s,
+                                 RAZ_ROOT + "assets/skyboxes/lake_back.png"s));
 }
 
 int main() {

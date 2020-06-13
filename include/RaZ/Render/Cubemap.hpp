@@ -12,9 +12,6 @@
 
 namespace Raz {
 
-class Cubemap;
-using CubemapPtr = std::unique_ptr<Cubemap>;
-
 /// Cubemap class representing an environment map surrounding the scene (also known as a skybox).
 class Cubemap {
 public:
@@ -28,9 +25,6 @@ public:
 
   unsigned int getIndex() const { return m_index; }
   const ShaderProgram& getProgram() const { return m_program; }
-
-  template <typename... Args>
-  static CubemapPtr create(Args&&... args) { return std::make_unique<Cubemap>(std::forward<Args>(args)...); }
 
   /// Imports 6 textures and loads them onto the graphics card.
   /// \param rightTexturePath Path to the texture located on the right of the cube.

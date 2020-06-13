@@ -45,7 +45,7 @@ public:
   SSRPass& getSSRPass() { return const_cast<SSRPass&>(static_cast<const RenderSystem*>(this)->getSSRPass()); }
   const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && m_cubemap); return *m_cubemap; }
 
-  void setCubemap(CubemapPtr cubemap) { m_cubemap = std::move(cubemap); }
+  void setCubemap(Cubemap cubemap) { m_cubemap = std::move(cubemap); }
 
   void resizeViewport(unsigned int width, unsigned int height);
   void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
@@ -83,7 +83,7 @@ private:
   std::array<RenderPassPtr, static_cast<std::size_t>(RenderPassType::RENDER_PASS_COUNT)> m_renderPasses {};
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);
 
-  CubemapPtr m_cubemap {};
+  std::optional<Cubemap> m_cubemap {};
 };
 
 } // namespace Raz

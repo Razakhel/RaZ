@@ -26,9 +26,9 @@ int main() {
   meshTrans.scale(0.2f);
   meshTrans.rotate(180.0_deg, Raz::Axis::Y);
 
-  renderSystem.setCubemap(Raz::Cubemap::create(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s, RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
-                                               RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,   RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
-                                               RAZ_ROOT + "assets/skyboxes/clouds_front.png"s, RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
+  renderSystem.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s, RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
+                                       RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,   RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
+                                       RAZ_ROOT + "assets/skyboxes/clouds_front.png"s, RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
 
   Raz::Entity& light = world.addEntity();
   /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT, // Type
