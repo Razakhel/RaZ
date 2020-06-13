@@ -95,9 +95,7 @@ void Renderer::enable(Capability capability) {
 
   glEnable(static_cast<unsigned int>(capability));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::disable(Capability capability) {
@@ -105,9 +103,7 @@ void Renderer::disable(Capability capability) {
 
   glDisable(static_cast<unsigned int>(capability));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 bool Renderer::isEnabled(Capability capability) {
@@ -115,9 +111,7 @@ bool Renderer::isEnabled(Capability capability) {
 
   const bool isEnabled = (glIsEnabled(static_cast<unsigned int>(capability)) == GL_TRUE);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 
   return isEnabled;
 }
@@ -127,9 +121,7 @@ void Renderer::getParameter(StateParameter parameter, unsigned char* values) {
 
   glGetBooleanv(static_cast<unsigned int>(parameter), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::getParameter(StateParameter parameter, int* values) {
@@ -137,9 +129,7 @@ void Renderer::getParameter(StateParameter parameter, int* values) {
 
   glGetIntegerv(static_cast<unsigned int>(parameter), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::getParameter(StateParameter parameter, int64_t* values) {
@@ -147,9 +137,7 @@ void Renderer::getParameter(StateParameter parameter, int64_t* values) {
 
   glGetInteger64v(static_cast<unsigned int>(parameter), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::getParameter(StateParameter parameter, float* values) {
@@ -157,9 +145,7 @@ void Renderer::getParameter(StateParameter parameter, float* values) {
 
   glGetFloatv(static_cast<unsigned int>(parameter), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::getParameter(StateParameter parameter, double* values) {
@@ -167,9 +153,7 @@ void Renderer::getParameter(StateParameter parameter, double* values) {
 
   glGetDoublev(static_cast<unsigned int>(parameter), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::getParameter(StateParameter parameter, unsigned int index, unsigned char* values) {
@@ -177,9 +161,7 @@ void Renderer::getParameter(StateParameter parameter, unsigned int index, unsign
 
   glGetBooleani_v(static_cast<unsigned int>(parameter), index, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::getParameter(StateParameter parameter, unsigned int index, int* values) {
@@ -187,9 +169,7 @@ void Renderer::getParameter(StateParameter parameter, unsigned int index, int* v
 
   glGetIntegeri_v(static_cast<unsigned int>(parameter), index, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::getParameter(StateParameter parameter, unsigned int index, int64_t* values) {
@@ -197,9 +177,7 @@ void Renderer::getParameter(StateParameter parameter, unsigned int index, int64_
 
   glGetInteger64i_v(static_cast<unsigned int>(parameter), index, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 unsigned int Renderer::getActiveTexture() {
@@ -221,9 +199,7 @@ void Renderer::clearColor(float red, float green, float blue, float alpha) {
 
   glClearColor(red, green, blue, alpha);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::clear(MaskType mask) {
@@ -231,9 +207,7 @@ void Renderer::clear(MaskType mask) {
 
   glClear(static_cast<unsigned int>(mask));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setDepthFunction(DepthFunction func) {
@@ -241,9 +215,7 @@ void Renderer::setDepthFunction(DepthFunction func) {
 
   glDepthFunc(static_cast<unsigned int>(func));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setFaceCulling(FaceOrientation orientation) {
@@ -251,9 +223,7 @@ void Renderer::setFaceCulling(FaceOrientation orientation) {
 
   glCullFace(static_cast<unsigned int>(orientation));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 #if !defined(USE_OPENGL_ES)
@@ -262,9 +232,7 @@ void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
 
   glPolygonMode(static_cast<unsigned int>(orientation), static_cast<unsigned int>(mode));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 #endif
 
@@ -273,7 +241,7 @@ void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
 
   glPixelStorei(static_cast<unsigned int>(storage), static_cast<int>(value));
 
-#if !defined(NDEBUG)
+#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
   const ErrorCodes errorCodes = Renderer::recoverErrors();
 
   if (errorCodes[recoverErrorCodeIndex(ErrorCode::INVALID_VALUE)])
@@ -288,9 +256,7 @@ void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureForm
 
   glReadPixels(0, 0, static_cast<int>(width), static_cast<int>(height), static_cast<unsigned int>(format), static_cast<unsigned int>(dataType), data);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
@@ -298,9 +264,7 @@ void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
 
   glGenBuffers(count, indices);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::bindBuffer(BufferType type, unsigned int index) {
@@ -308,9 +272,7 @@ void Renderer::bindBuffer(BufferType type, unsigned int index) {
 
   glBindBuffer(static_cast<unsigned int>(type), index);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex) {
@@ -318,9 +280,7 @@ void Renderer::bindBufferBase(BufferType type, unsigned int bindingIndex, unsign
 
   glBindBufferBase(static_cast<unsigned int>(type), bindingIndex, bufferIndex);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::bindBufferRange(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex, std::ptrdiff_t offset, std::ptrdiff_t size) {
@@ -328,9 +288,7 @@ void Renderer::bindBufferRange(BufferType type, unsigned int bindingIndex, unsig
 
   glBindBufferRange(static_cast<unsigned int>(type), bindingIndex, bufferIndex, offset, size);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendBufferData(BufferType type, std::ptrdiff_t size, const void* data, BufferDataUsage usage) {
@@ -338,9 +296,7 @@ void Renderer::sendBufferData(BufferType type, std::ptrdiff_t size, const void* 
 
   glBufferData(static_cast<unsigned int>(type), size, data, static_cast<unsigned int>(usage));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::ptrdiff_t dataSize, const void* data) {
@@ -348,9 +304,7 @@ void Renderer::sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::pt
 
   glBufferSubData(static_cast<unsigned int>(type), offset, dataSize, data);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
@@ -358,9 +312,7 @@ void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
 
   glDeleteBuffers(count, indices);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
@@ -368,9 +320,7 @@ void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
 
   glGenTextures(static_cast<int>(count), indices);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::activateTexture(unsigned int index) {
@@ -378,9 +328,7 @@ void Renderer::activateTexture(unsigned int index) {
 
   glActiveTexture(GL_TEXTURE0 + index);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setTextureParameter(TextureType type, TextureParam param, int value) {
@@ -388,9 +336,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, int val
 
   glTexParameteri(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setTextureParameter(TextureType type, TextureParam param, float value) {
@@ -398,9 +344,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, float v
 
   glTexParameterf(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setTextureParameter(TextureType type, TextureParam param, const int* values) {
@@ -408,9 +352,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const i
 
   glTexParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setTextureParameter(TextureType type, TextureParam param, const float* values) {
@@ -418,9 +360,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
 
   glTexParameterfv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 #ifdef RAZ_USE_GL4
@@ -429,9 +369,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
   glTextureParameteri(textureIndex, static_cast<unsigned int>(param), value);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, float value) {
@@ -439,9 +377,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
   glTextureParameterf(textureIndex, static_cast<unsigned int>(param), value);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values) {
@@ -449,9 +385,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
   glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values) {
@@ -459,9 +393,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
   glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 #endif
 
@@ -483,9 +415,7 @@ void Renderer::sendImageData2D(TextureType type,
                static_cast<unsigned int>(dataType),
                data);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values) {
@@ -493,9 +423,7 @@ void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLeve
 
   glGetTexLevelParameteriv(static_cast<unsigned int>(type), static_cast<int>(mipmapLevel), static_cast<unsigned int>(attribute), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, float* values) {
@@ -503,9 +431,7 @@ void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLeve
 
   glGetTexLevelParameterfv(static_cast<unsigned int>(type), static_cast<int>(mipmapLevel), static_cast<unsigned int>(attribute), values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 int Renderer::recoverTextureWidth(TextureType type, unsigned int mipmapLevel) {
@@ -545,9 +471,7 @@ void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, Te
                 static_cast<unsigned int>(dataType),
                 data);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::generateMipmap(TextureType type) {
@@ -555,9 +479,7 @@ void Renderer::generateMipmap(TextureType type) {
 
   glGenerateMipmap(static_cast<unsigned int>(type));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 #ifdef RAZ_USE_GL4
@@ -566,9 +488,7 @@ void Renderer::generateMipmap(unsigned int textureIndex) {
 
   glGenerateTextureMipmap(textureIndex);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 #endif
 
@@ -577,9 +497,7 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
 
   glBindTexture(static_cast<unsigned int>(type), index);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
@@ -587,9 +505,7 @@ void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
 
   glDeleteTextures(static_cast<int>(count), indices);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height) {
@@ -597,9 +513,7 @@ void Renderer::resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsi
 
   glViewport(xOrigin, yOrigin, static_cast<int>(width), static_cast<int>(height));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 unsigned int Renderer::createProgram() {
@@ -607,9 +521,7 @@ unsigned int Renderer::createProgram() {
 
   const unsigned int programIndex = glCreateProgram();
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 
   return programIndex;
 }
@@ -619,9 +531,7 @@ void Renderer::getProgramParameter(unsigned int index, ProgramParameter paramete
 
   glGetProgramiv(index, static_cast<unsigned int>(parameter), parameters);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 bool Renderer::isProgramLinked(unsigned int index) {
@@ -650,9 +560,7 @@ void Renderer::linkProgram(unsigned int index) {
     std::cerr << "Error: Shader program link failed (ID " << index << ").\n" << infoLog << std::endl;
   }
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::useProgram(unsigned int index) {
@@ -660,9 +568,7 @@ void Renderer::useProgram(unsigned int index) {
 
   glUseProgram(index);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::deleteProgram(unsigned int index) {
@@ -670,9 +576,7 @@ void Renderer::deleteProgram(unsigned int index) {
 
   glDeleteProgram(index);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 unsigned int Renderer::createShader(ShaderType type) {
@@ -680,9 +584,7 @@ unsigned int Renderer::createShader(ShaderType type) {
 
   const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 
   return shaderIndex;
 }
@@ -693,9 +595,7 @@ int Renderer::getShaderStatus(unsigned int index, ShaderStatus status) {
   int res {};
   glGetShaderiv(index, static_cast<unsigned int>(status), &res);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 
   return res;
 }
@@ -705,9 +605,7 @@ bool Renderer::isShaderCompiled(unsigned int index) {
 
   const bool isCompiled = (getShaderStatus(index, ShaderStatus::COMPILE) == GL_TRUE);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 
   return isCompiled;
 }
@@ -717,9 +615,7 @@ void Renderer::sendShaderSource(unsigned int index, const char* source, int leng
 
   glShaderSource(index, 1, &source, &length);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::compileShader(unsigned int index) {
@@ -734,9 +630,7 @@ void Renderer::compileShader(unsigned int index) {
     std::cerr << "Error: Shader compilation failed (ID " << index << ").\n" << infoLog << std::endl;
   }
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::attachShader(unsigned int programIndex, unsigned int shaderIndex) {
@@ -744,9 +638,7 @@ void Renderer::attachShader(unsigned int programIndex, unsigned int shaderIndex)
 
   glAttachShader(programIndex, shaderIndex);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex) {
@@ -754,9 +646,7 @@ void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex)
 
   glDetachShader(programIndex, shaderIndex);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::deleteShader(unsigned int index) {
@@ -764,9 +654,7 @@ void Renderer::deleteShader(unsigned int index) {
 
   glDeleteShader(index);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 int Renderer::recoverUniformLocation(unsigned int programIndex, const char* uniformName) {
@@ -774,7 +662,7 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
 
   const int location = glGetUniformLocation(programIndex, uniformName);
 
-#if !defined(NDEBUG)
+#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
   printErrors();
 
   if (location == -1)
@@ -802,9 +690,7 @@ void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int unifor
   if (size)
     *size = uniformSize;
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 UniformType Renderer::recoverUniformType(unsigned int programIndex, unsigned int uniformIndex) {
@@ -828,9 +714,7 @@ void Renderer::sendUniform(int uniformIndex, int value) {
 
   glUniform1i(uniformIndex, value);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniform(int uniformIndex, unsigned int value) {
@@ -838,9 +722,7 @@ void Renderer::sendUniform(int uniformIndex, unsigned int value) {
 
   glUniform1ui(uniformIndex, value);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniform(int uniformIndex, float value) {
@@ -848,9 +730,7 @@ void Renderer::sendUniform(int uniformIndex, float value) {
 
   glUniform1f(uniformIndex, value);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniformVector1(int uniformIndex, const float* values, int count) {
@@ -858,9 +738,7 @@ void Renderer::sendUniformVector1(int uniformIndex, const float* values, int cou
 
   glUniform1fv(uniformIndex, count, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniformVector2(int uniformIndex, const float* values, int count) {
@@ -868,9 +746,7 @@ void Renderer::sendUniformVector2(int uniformIndex, const float* values, int cou
 
   glUniform2fv(uniformIndex, count, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniformVector3(int uniformIndex, const float* values, int count) {
@@ -878,9 +754,7 @@ void Renderer::sendUniformVector3(int uniformIndex, const float* values, int cou
 
   glUniform3fv(uniformIndex, count, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniformVector4(int uniformIndex, const float* values, int count) {
@@ -888,9 +762,7 @@ void Renderer::sendUniformVector4(int uniformIndex, const float* values, int cou
 
   glUniform4fv(uniformIndex, count, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniformMatrix2x2(int uniformIndex, const float* values, int count, bool transpose) {
@@ -898,9 +770,7 @@ void Renderer::sendUniformMatrix2x2(int uniformIndex, const float* values, int c
 
   glUniformMatrix2fv(uniformIndex, count, transpose, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniformMatrix3x3(int uniformIndex, const float* values, int count, bool transpose) {
@@ -908,9 +778,7 @@ void Renderer::sendUniformMatrix3x3(int uniformIndex, const float* values, int c
 
   glUniformMatrix3fv(uniformIndex, count, transpose, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::sendUniformMatrix4x4(int uniformIndex, const float* values, int count, bool transpose) {
@@ -918,9 +786,7 @@ void Renderer::sendUniformMatrix4x4(int uniformIndex, const float* values, int c
 
   glUniformMatrix4fv(uniformIndex, count, transpose, values);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::generateFramebuffers(int count, unsigned int* indices) {
@@ -928,9 +794,7 @@ void Renderer::generateFramebuffers(int count, unsigned int* indices) {
 
   glGenFramebuffers(count, indices);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 FramebufferStatus Renderer::getFramebufferStatus(FramebufferType type) {
@@ -938,9 +802,7 @@ FramebufferStatus Renderer::getFramebufferStatus(FramebufferType type) {
 
   const unsigned int status = glCheckFramebufferStatus(static_cast<unsigned int>(type));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 
   return static_cast<FramebufferStatus>(status);
 }
@@ -956,9 +818,7 @@ void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
                          textureIndex,
                          mipmapLevel);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
@@ -966,9 +826,7 @@ void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
 
   glDrawBuffers(count, reinterpret_cast<const unsigned int*>(buffers));
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
@@ -976,7 +834,7 @@ void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
 
   glBindFramebuffer(static_cast<unsigned int>(type), index);
 
-#if !defined(NDEBUG)
+#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
   const ErrorCodes errorCodes = recoverErrors();
 
   if (errorCodes[recoverErrorCodeIndex(ErrorCode::INVALID_OPERATION)])
@@ -991,9 +849,7 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
 
   glDeleteFramebuffers(count, indices);
 
-#if !defined(NDEBUG)
-  printErrors();
-#endif
+  printConditionalErrors();
 }
 
 ErrorCodes Renderer::recoverErrors() {

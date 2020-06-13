@@ -52,7 +52,7 @@ target_include_directories(
 )
 
 # Adding a definition for the tests root path, so that it can be used in tests instead of full relative paths
-target_compile_definitions(RaZ_Tests PRIVATE -DRAZ_TESTS_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
+target_compile_definitions(RaZ_Tests PRIVATE RAZ_TESTS_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
 
 # Disabling some warnings in tests
 target_compile_options(RaZ_Tests PRIVATE ${RAZ_TESTS_COMPILER_FLAGS})

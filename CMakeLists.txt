@@ -511,6 +511,11 @@ target_sources(RaZ PRIVATE ${RAZ_FILES})
 
 target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+option(SKIP_RENDERER_ERRORS "Do not print errors from the Renderer" OFF)
+if (SKIP_RENDERER_ERRORS)
+    target_compile_definitions(RaZ PRIVATE SKIP_RENDERER_ERRORS)
+endif ()
+
 # OpenGL version
 option(RAZ_USE_GL4 "Use OpenGL 4" OFF)
 if (RAZ_USE_GL4)

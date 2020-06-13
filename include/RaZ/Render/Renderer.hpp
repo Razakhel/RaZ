@@ -624,6 +624,13 @@ public:
   ~Renderer() = delete;
 
 private:
+  /// Prints OpenGL errors only in Debug mode and if SKIP_RENDERER_ERRORS hasn't been defined.
+  static void printConditionalErrors() {
+#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
+    printErrors();
+#endif
+  }
+
   static inline bool s_isInitialized = false;
 };
 

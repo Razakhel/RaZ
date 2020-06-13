@@ -20,7 +20,7 @@ public:
   void load() const;
   void compile() const;
   bool isCompiled() const;
-  void destroy() const;
+  void destroy();
 
   Shader& operator=(const Shader&) = delete;
   Shader& operator=(Shader&& shader) noexcept;

@@ -46,11 +46,12 @@ void Shader::loadSource(const std::string& source) const {
   Renderer::sendShaderSource(m_index, source);
 }
 
-void Shader::destroy() const {
+void Shader::destroy() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
   Renderer::deleteShader(m_index);
+  m_index = std::numeric_limits<unsigned int>::max();
 }
 
 Shader& Shader::operator=(Shader&& shader) noexcept {
