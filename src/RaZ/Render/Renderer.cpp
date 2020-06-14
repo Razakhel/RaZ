@@ -69,10 +69,6 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
   }
 }
 
-constexpr uint8_t recoverErrorCodeIndex(ErrorCode code) {
-  return (static_cast<uint8_t>(static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)));
-}
-
 } // namespace
 
 void Renderer::initialize() {
@@ -244,7 +240,7 @@ void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
 #if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
   const ErrorCodes errorCodes = Renderer::recoverErrors();
 
-  if (errorCodes[recoverErrorCodeIndex(ErrorCode::INVALID_VALUE)])
+  if (errorCodes[ErrorCode::INVALID_VALUE])
     std::cerr << "Renderer::setPixelStorage - " << value << " is not a valid alignment value. Only 1, 2, 4 & 8 are accepted.\n";
 
   std::cerr << std::flush;
@@ -690,7 +686,28 @@ void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int unifor
   if (size)
     *size = uniformSize;
 
-  printConditionalErrors();
+#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
+  const ErrorCodes errorCodes = recoverErrors();
+
+  if (errorCodes.isEmpty())
+    return;
+
+  std::cerr << "Renderer::recoverUniformInfo - ";
+
+  if (errorCodes[ErrorCode::INVALID_OPERATION])
+    std::cerr << "Tried to fetch program information from a non-program object.\n";
+
+  if (errorCodes[ErrorCode::INVALID_VALUE]) {
+    const unsigned int uniCount = recoverActiveUniformCount(programIndex);
+
+    if (uniformIndex >= uniCount)
+      std::cerr << "The given uniform index (" << uniformIndex << ") is greater than or equal to the program's active uniform count (" << uniCount << ").\n";
+    else
+      std::cerr << "The given program index has not been created by OpenGL.\n";
+  }
+
+  std::cerr << std::flush;
+#endif
 }
 
 UniformType Renderer::recoverUniformType(unsigned int programIndex, unsigned int uniformIndex) {
@@ -837,7 +854,7 @@ void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
 #if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
   const ErrorCodes errorCodes = recoverErrors();
 
-  if (errorCodes[recoverErrorCodeIndex(ErrorCode::INVALID_OPERATION)])
+  if (errorCodes[ErrorCode::INVALID_OPERATION])
     std::cerr << "Renderer::bindFramebuffer - Bound object is not a valid framebuffer.\n";
 
   std::cerr << std::flush;
@@ -853,6 +870,10 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
 }
 
 ErrorCodes Renderer::recoverErrors() {
+  static constexpr auto recoverErrorCodeIndex = [] (ErrorCode code) -> uint8_t {
+    return (static_cast<uint8_t>(static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)));
+  };
+
   ErrorCodes errorCodes;
 
   while (true) {
@@ -864,10 +885,10 @@ ErrorCodes Renderer::recoverErrors() {
     const uint8_t errorCodeIndex = recoverErrorCodeIndex(static_cast<ErrorCode>(errorCode));
 
     // An error code cannot be returned twice in a row; if it is, the error checking should be stopped
-    if (errorCodes[errorCodeIndex])
+    if (errorCodes.codes[errorCodeIndex])
       break;
 
-    errorCodes[errorCodeIndex] = true;
+    errorCodes.codes[errorCodeIndex] = true;
   }
 
   return errorCodes;
@@ -876,11 +897,11 @@ ErrorCodes Renderer::recoverErrors() {
 void Renderer::printErrors() {
   const ErrorCodes errorCodes = recoverErrors();
 
-  if (errorCodes.none())
+  if (errorCodes.isEmpty())
     return;
 
-  for (uint8_t errorIndex = 0; errorIndex < static_cast<uint8_t>(errorCodes.size()); ++errorIndex) {
-    if (errorCodes[errorIndex]) {
+  for (uint8_t errorIndex = 0; errorIndex < static_cast<uint8_t>(errorCodes.codes.size()); ++errorIndex) {
+    if (errorCodes.codes[errorIndex]) {
       const unsigned int errorValue = errorIndex + static_cast<unsigned int>(ErrorCode::INVALID_ENUM);
       std::cerr << "OpenGL error - " << recoverGlErrorStr(errorValue) << " (code " << errorValue << ")\n";
     }

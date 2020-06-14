@@ -412,11 +412,26 @@ enum class ErrorCode : unsigned int {
   NONE                          = 0     // GL_NO_ERROR
 };
 
+/// ErrorCodes structure, holding codes of errors that may have happened on prior Renderer calls.
+struct ErrorCodes {
+  /// Checks if no error code has been set.
+  /// \return True if no code has been set, false otherwise.
+  bool isEmpty() const { return codes.none(); }
+  /// Checks if the given error code has been set.
+  /// \param code Error code to be checked.
+  /// \return True if the code has been set, false otherwise.
+  constexpr bool get(ErrorCode code) const { return codes[static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)]; }
+  /// Checks if the given error code has been set.
+  /// \param code Error code to be checked.
+  /// \return True if the code has been set, false otherwise.
+  constexpr bool operator[](ErrorCode code) const { return get(code); }
+
 #ifdef RAZ_USE_GL4
-using ErrorCodes = std::bitset<8>;
+  std::bitset<8> codes {};
 #else
-using ErrorCodes = std::bitset<7>;
+  std::bitset<7> codes {};
 #endif
+};
 
 class Renderer {
 public:
@@ -546,6 +561,7 @@ public:
   /// \param type Type of the uniform to recover.
   /// \param name Name of the uniform to recover.
   /// \param size Size of the uniform to recover. Will be 1 for non-array uniforms, greater for arrays.
+  /// \see recoverActiveUniformCount().
   static void recoverUniformInfo(unsigned int programIndex, unsigned int uniformIndex, UniformType& type, std::string& name, int* size = nullptr);
   static UniformType recoverUniformType(unsigned int programIndex, unsigned int uniformIndex);
   static std::string recoverUniformName(unsigned int programIndex, unsigned int uniformIndex);
@@ -615,7 +631,7 @@ public:
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
   static ErrorCodes recoverErrors();
-  static bool hasErrors() { return recoverErrors().any(); }
+  static bool hasErrors() { return !recoverErrors().isEmpty(); }
   static void printErrors();
 
   Renderer& operator=(const Renderer&) = delete;
