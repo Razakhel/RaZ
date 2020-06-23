@@ -66,7 +66,7 @@ std::future<ResultType> launchAsync(Func action, Args&&... args);
 void parallelize(const std::function<void()>& action, std::size_t threadCount = getSystemThreadCount());
 
 /// Calls a function in parallel on a given number of separate threads of execution.
-/// The collection is automatically splitted by indices, giving a separate start/end range to each thread.
+/// The collection is automatically split by indices, giving a separate start/end range to each thread.
 /// \note The container must either be a constant-size C array or have a size() function.
 /// \tparam ContainerType Type of the collection to iterate over.
 /// \param collection Collection to iterate over on multiple threads.
@@ -76,7 +76,7 @@ template <typename ContainerType, typename Func, typename = std::enable_if_t<std
 void parallelize(const ContainerType& collection, Func&& action, std::size_t threadCount = getSystemThreadCount());
 
 /// Calls a function in parallel on a given number of separate threads of execution.
-/// The collection is automatically splitted by iterator ranges, giving a separate start/end range to each thread.
+/// The collection is automatically split by iterator ranges, giving a separate start/end range to each thread.
 /// \note The container must either be a constant-size C array, or have a public ContainerType::iterator type and begin() & size() functions.
 /// \tparam ContainerType Type of the collection to iterate over.
 /// \param collection Collection to iterate over on multiple threads.
