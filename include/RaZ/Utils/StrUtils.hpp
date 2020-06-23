@@ -5,7 +5,11 @@
 
 #include <algorithm>
 #include <cctype>
+#include <codecvt>
+#include <cwctype>
+#include <locale>
 #include <string>
+#include <vector>
 
 namespace Raz::StrUtils {
 
@@ -151,6 +155,36 @@ inline std::vector<std::string> split(std::string text, char delimiter) {
   }
 
   return parts;
+}
+
+/// Converts a wide string to an UTF-8 encoded one.
+/// \param text Wide string to convert.
+/// \return Converted UTF-8 string.
+inline std::string toUtf8(const std::wstring& text) {
+  return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().to_bytes(text);
+}
+
+/// Returns the current UTF-8 encoded string.
+/// \note This does nothing & exists only to avoid using preprocessor switches.
+/// \param text UTF-8 string to be returned.
+/// \return Input UTF-8 string.
+constexpr const std::string& toUtf8(const std::string& text) {
+  return text;
+}
+
+/// Converts an UTF-8 encoded string to a wide one.
+/// \param text UTF-8 string to convert.
+/// \return Converted wide string.
+inline std::wstring toWide(const std::string& text) {
+  return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(text);
+}
+
+/// Returns the current wide string.
+/// \note This does nothing & exists only to avoid using preprocessor switches.
+/// \param text Wide string to be returned.
+/// \return Input wide string.
+constexpr const std::wstring& toWide(const std::wstring& text) {
+  return text;
 }
 
 } // namespace Raz::StrUtils
