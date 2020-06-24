@@ -3,6 +3,7 @@
 #ifndef RAZ_FILEPATH_HPP
 #define RAZ_FILEPATH_HPP
 
+#include <iostream>
 #include <string>
 #include <string_view>
 

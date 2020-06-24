@@ -49,3 +49,67 @@ TEST_CASE("FilePath save special chars") {
 
   CHECK(fileContent == "НΣļlõ ωθяŁĐ!");
 }
+
+TEST_CASE("FilePath concatenation") {
+  const Raz::FilePath testPath = "tèstPâth";
+
+  // operator+(char*)
+  {
+    const char* str = "_chär_";
+
+    std::string concat = str + testPath;
+    CHECK(concat == "_chär_tèstPâth");
+
+    concat = testPath + str;
+    CHECK(concat == "tèstPâth_chär_");
+  }
+
+  // operator+(wchar_t*)
+  {
+    const wchar_t* str = L"_chär_";
+
+    std::wstring concat = str + testPath;
+    CHECK(concat == L"_chär_tèstPâth");
+
+    concat = testPath + str;
+    CHECK(concat == L"tèstPâth_chär_");
+  }
+
+  // operator+(std::string)
+  {
+    const std::string str = "_strïng_";
+
+    std::string concat = str + testPath;
+    CHECK(concat == "_strïng_tèstPâth");
+
+    concat = testPath + str;
+    CHECK(concat == "tèstPâth_strïng_");
+  }
+
+  // operator+(std::wstring)
+  {
+    const std::wstring str = L"_strïng_";
+
+    std::wstring concat = str + testPath;
+    CHECK(concat == L"_strïng_tèstPâth");
+
+    concat = testPath + str;
+    CHECK(concat == L"tèstPâth_strïng_");
+  }
+
+  // operator<<(std::ostream)
+  {
+    std::stringstream stream;
+    stream << testPath;
+
+    CHECK(stream.str() == "tèstPâth");
+  }
+
+  // operator<<(std::wostream)
+  {
+    std::wstringstream stream;
+    stream << testPath;
+
+    CHECK(stream.str() == L"tèstPâth");
+  }
+}
