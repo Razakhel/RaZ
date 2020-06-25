@@ -59,8 +59,8 @@ TEST_CASE("Texture presets") {
   CHECK(whiteTexture->getBindingIndex() == 42);
   CHECK(whiteTexture->getImage().isEmpty()); // The image's data is untouched, no allocation is made
 
-  // Recovering the texture's data (1 RGB pixel -> 3 values)
-  std::array<uint8_t, 3> textureData {};
+#if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES
+  std::array<uint8_t, 3> textureData {}; // Recovering the texture's data (1 RGB pixel -> 3 values)
 
   whiteTexture->bind();
 
@@ -77,6 +77,7 @@ TEST_CASE("Texture presets") {
   CHECK(textureData[0] == 255);
   CHECK(textureData[1] == 255);
   CHECK(textureData[2] == 255);
+#endif
 
   // Creating another texture from the same preset gives a different one; both aren't linked
   const Raz::TexturePtr whiteTexture2 = Raz::Texture::create(Raz::ColorPreset::WHITE);

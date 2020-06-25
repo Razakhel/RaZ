@@ -406,7 +406,7 @@ enum class ErrorCode : unsigned int {
   STACK_UNDERFLOW               = 1284, // GL_STACK_UNDERFLOW
   OUT_OF_MEMORY                 = 1285, // GL_OUT_OF_MEMORY
   INVALID_FRAMEBUFFER_OPERATION = 1286, // GL_INVALID_FRAMEBUFFER_OPERATION
-#ifdef RAZ_USE_GL4
+#if defined(RAZ_USE_GL4)
   CONTEXT_LOST                  = 1287, // GL_CONTEXT_LOST
 #endif
   NONE                          = 0     // GL_NO_ERROR
@@ -426,7 +426,7 @@ struct ErrorCodes {
   /// \return True if the code has been set, false otherwise.
   constexpr bool operator[](ErrorCode code) const { return get(code); }
 
-#ifdef RAZ_USE_GL4
+#if defined(RAZ_USE_GL4)
   std::bitset<8> codes {};
 #else
   std::bitset<7> codes {};
@@ -464,7 +464,7 @@ public:
   static void clear(MaskType mask);
   static void setDepthFunction(DepthFunction func);
   static void setFaceCulling(FaceOrientation orientation);
-#if !defined(USE_OPENGL_ES) // glPolygonMode is not available with OpenGL ES
+#if !defined(USE_OPENGL_ES)
   static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
 #endif
   static void setPixelStorage(PixelStorage storage, unsigned int value);
@@ -491,7 +491,7 @@ public:
   static void setTextureParameter(TextureType type, TextureParam param, const int* values);
   static void setTextureParameter(TextureType type, TextureParam param, const float* values);
   static void setTextureParameter(TextureType type, TextureParam param, TextureParamValue value) { setTextureParameter(type, param, static_cast<int>(value)); }
-#ifdef RAZ_USE_GL4
+#if defined(RAZ_USE_GL4)
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, int value);
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, float value);
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values);
@@ -514,6 +514,7 @@ public:
                               unsigned int width, unsigned int height,
                               TextureFormat format,
                               TextureDataType dataType, const void* data);
+#if !defined(USE_OPENGL_ES)
   static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values);
   static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, float* values);
   static int recoverTextureWidth(TextureType type, unsigned int mipmapLevel = 0);
@@ -521,10 +522,11 @@ public:
   static int recoverTextureDepth(TextureType type, unsigned int mipmapLevel = 0);
   static TextureInternalFormat recoverTextureInternalFormat(TextureType type, unsigned int mipmapLevel = 0);
   static void recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data);
+#endif
   /// Generate mipmaps (levels of detail) of the currently bound texture.
   /// \param type Type of the texture to generate mipmaps from.
   static void generateMipmap(TextureType type);
-#ifdef RAZ_USE_GL4
+#if defined(RAZ_USE_GL4)
   static void generateMipmap(unsigned int textureIndex);
 #endif
   static void bindTexture(TextureType type, unsigned int index);

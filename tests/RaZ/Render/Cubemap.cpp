@@ -56,6 +56,7 @@ TEST_CASE("Cubemap textures") {
                        RAZ_TESTS_ROOT + "assets/textures/BBBB.png"s, RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
+#if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES
   std::vector<uint8_t> textureData {};
 
   cubemap.bind();
@@ -133,4 +134,5 @@ TEST_CASE("Cubemap textures") {
   CHECK(std::equal(textureData.cbegin(), textureData.cend(), static_cast<const uint8_t*>(refImgNegZ.getDataPtr())));
 
   cubemap.unbind();
+#endif
 }

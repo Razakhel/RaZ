@@ -20,7 +20,7 @@ jobs:
           env:
             - C_COMPILER=gcc
             - CXX_COMPILER=g++
-            - BUILD_TESTS=false
+            - RUN_TESTS=false
             - COVERAGE=false
             - BADGE=linux
 
@@ -29,7 +29,7 @@ jobs:
           env:
             - C_COMPILER=clang
             - CXX_COMPILER=clang++
-            - BUILD_TESTS=false
+            - RUN_TESTS=false
             - COVERAGE=false
             - BADGE=linux
 
@@ -38,7 +38,7 @@ jobs:
           env:
             - C_COMPILER=gcc
             - CXX_COMPILER=g++
-            - BUILD_TESTS=true
+            - RUN_TESTS=true
             - COVERAGE=true
             - BADGE=linux_tests
 
@@ -47,7 +47,7 @@ jobs:
           env:
             - C_COMPILER=clang
             - CXX_COMPILER=clang++
-            - BUILD_TESTS=true
+            - RUN_TESTS=true
             - COVERAGE=false
             - BADGE=linux_tests
 
@@ -60,7 +60,7 @@ jobs:
           env:
             - C_COMPILER=cl
             - CXX_COMPILER=cl
-            - BUILD_TESTS=false
+            - RUN_TESTS=false
             - COVERAGE=false
             - BADGE=windows
 
@@ -70,7 +70,7 @@ jobs:
         #  env:
         #    - C_COMPILER=cl
         #    - CXX_COMPILER=cl
-        #    - BUILD_TESTS=true
+        #    - RUN_TESTS=true
         #    - COVERAGE=false
         #    - BADGE=windows_tests
 
@@ -84,7 +84,7 @@ jobs:
           env:
             - C_COMPILER=clang
             - CXX_COMPILER=clang++
-            - BUILD_TESTS=false
+            - RUN_TESTS=false
             - COVERAGE=false
             - BADGE=osx
 
@@ -95,7 +95,7 @@ jobs:
         #  env:
         #    - C_COMPILER=clang
         #    - CXX_COMPILER=clang++
-        #    - BUILD_TESTS=true
+        #    - RUN_TESTS=true
         #    - COVERAGE=false
         #    - BADGE=osx_tests
 
@@ -108,7 +108,7 @@ jobs:
           env:
             - C_COMPILER=emcc
             - CXX_COMPILER=emcc
-            - BUILD_TESTS=false
+            - RUN_TESTS=false
             - COVERAGE=false
             - BADGE=wasm
 
@@ -139,12 +139,12 @@ script:
             bash -c "
                 mkdir build && cd build &&
                 cmake -G \"Unix Makefiles\" -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
-                                            -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-                                            -DRAZ_USE_FBX=true -DSKIP_RENDERER_ERRORS=${BUILD_TESTS} -DENABLE_DEBUG_INFO=true .. &&
+                                            -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${RUN_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+                                            -DRAZ_USE_FBX=true -DSKIP_RENDERER_ERRORS=${RUN_TESTS} -DENABLE_DEBUG_INFO=true .. &&
                 cmake --build . --target RaZ_PrintDebugInfo &&
                 make -j4 &&
                 pwd && find . &&
-                if [[ ${BUILD_TESTS} == true ]]; then
+                if [[ ${RUN_TESTS} == true ]]; then
                     xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests;
                 fi &&
                 if [[ ${COVERAGE} == true ]]; then
@@ -163,12 +163,12 @@ script:
     - if [ "$TRAVIS_OS_NAME" = "windows" ]; then
         mkdir build && cd build &&
         cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Debug \
-              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-              -DRAZ_USE_FBX=false -DSKIP_RENDERER_ERRORS=${BUILD_TESTS} -DENABLE_DEBUG_INFO=true .. &&
+              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=true -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+              -DRAZ_USE_FBX=false -DSKIP_RENDERER_ERRORS=${RUN_TESTS} -DENABLE_DEBUG_INFO=true .. &&
         cmake --build . --target RaZ_PrintDebugInfo &&
         cmake --build . -j 4 &&
         pwd && find . &&
-        if [[ ${BUILD_TESTS} == true ]]; then
+        if [[ ${RUN_TESTS} == true ]]; then
             ./tests/Debug/RaZ_Tests.exe;
         fi;
       fi
@@ -180,12 +180,12 @@ script:
     - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         mkdir build && cd build &&
         cmake -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
-              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-              -DRAZ_USE_FBX=false -DSKIP_RENDERER_ERRORS=${BUILD_TESTS} -DENABLE_DEBUG_INFO=true .. &&
+              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=true -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+              -DRAZ_USE_FBX=false -DSKIP_RENDERER_ERRORS=${RUN_TESTS} -DENABLE_DEBUG_INFO=true .. &&
         cmake --build . --target RaZ_PrintDebugInfo &&
         make -j4 &&
         pwd && find . &&
-        if [[ ${BUILD_TESTS} == true ]]; then
+        if [[ ${RUN_TESTS} == true ]]; then
             ./tests/RaZ_Tests;
         fi;
       fi
@@ -200,8 +200,8 @@ script:
                 source /emsdk/emsdk_env.sh &&
                 mkdir build && cd build &&
                 emcmake cmake -DCMAKE_BUILD_TYPE=Release \
-                              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=${BUILD_TESTS} -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
-                              -DRAZ_USE_FBX=true -DSKIP_RENDERER_ERRORS=${BUILD_TESTS} -DENABLE_DEBUG_INFO=true .. &&
+                              -DRAZ_BUILD_EXAMPLES=true -DRAZ_BUILD_TESTS=true -DRAZ_ENABLE_COVERAGE=${COVERAGE} \
+                              -DRAZ_USE_FBX=true -DSKIP_RENDERER_ERRORS=${RUN_TESTS} -DENABLE_DEBUG_INFO=true .. &&
                 cmake --build . --target RaZ_PrintDebugInfo &&
                 make -j4 &&
                 pwd && find .

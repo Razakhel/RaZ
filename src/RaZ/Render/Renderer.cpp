@@ -414,6 +414,7 @@ void Renderer::sendImageData2D(TextureType type,
   printConditionalErrors();
 }
 
+#if !defined(USE_OPENGL_ES)
 void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -469,6 +470,7 @@ void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, Te
 
   printConditionalErrors();
 }
+#endif
 
 void Renderer::generateMipmap(TextureType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
