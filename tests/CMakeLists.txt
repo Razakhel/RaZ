@@ -1,8 +1,19 @@
 project(RaZ_Tests)
 
-set(CMAKE_CXX_STANDARD 17)
+#######################
+# RaZ Tests - Library #
+#######################
+
+add_executable(RaZ_Tests)
+
+# Using C++17
+target_compile_features(RaZ_Tests PRIVATE cxx_std_17)
 
 enable_testing()
+
+##############################
+# RaZ Tests - Compiler flags #
+##############################
 
 set(
     RAZ_TESTS_COMPILER_FLAGS
@@ -21,8 +32,23 @@ if (RAZ_COMPILER_CLANG)
     )
 endif ()
 
+if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
+    target_compile_definitions(
+        RaZ_Tests
+
+        PRIVATE
+
+        NOMINMAX # Preventing definitions of min & max macros
+        _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING # Ignoring std::codecvt deprecation warnings
+    )
+endif ()
+
+############################
+# RaZ Tests - Source files #
+############################
+
 set(
-    TESTS_SRC
+    RAZ_TESTS_SRC
 
     Main.cpp
 
@@ -36,12 +62,17 @@ set(
 
 file(
     GLOB
-    TESTS_FILES
+    RAZ_TESTS_FILES
 
-    ${TESTS_SRC}
+    ${RAZ_TESTS_SRC}
 )
 
-add_executable(RaZ_Tests ${TESTS_FILES})
+#####################
+# RaZ Tests - Build #
+#####################
+
+target_sources(RaZ_Tests PRIVATE ${RAZ_TESTS_FILES})
+
 target_include_directories(
     RaZ_Tests
 
@@ -54,12 +85,15 @@ target_include_directories(
 # Adding a definition for the tests root path, so that it can be used in tests instead of full relative paths
 target_compile_definitions(RaZ_Tests PRIVATE RAZ_TESTS_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
 
-# Disabling some warnings in tests
 target_compile_options(RaZ_Tests PRIVATE ${RAZ_TESTS_COMPILER_FLAGS})
 
-target_link_libraries(RaZ_Tests RaZ)
+target_link_libraries(RaZ_Tests PUBLIC RaZ)
 
 add_test(RaZ_Tests RaZ_Tests)
+
+###############################
+# RaZ Tests - FBX file format #
+###############################
 
 # If FBX SDK used with MSVC, copy the DLL into the tests/ folder to link it properly
 if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)

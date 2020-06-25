@@ -377,6 +377,7 @@ elseif (RAZ_COMPILER_MSVC)
         /wd4548 # Expression before comma has no effect
         /wd4668 # Preprocessor macro not defined
         /wd4710 # Function not inlined
+        /wd4711 # Function inlined
         /wd4774 # Format string is not a string literal
         /wd4820 # Added padding to members
         /wd5026 # Move constructor implicitly deleted
@@ -398,15 +399,9 @@ if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
         RAZ_COMPILER_FLAGS
 
         ${RAZ_COMPILER_FLAGS}
-        /permissive-
-    )
-
-    target_compile_options(
-        RaZ
-
-        PUBLIC
-
+        /permissive- # Improving standard compliance
         /EHsc # Enabling exceptions
+        /utf-8 # Forcing MSVC to actually handle files as UTF-8
     )
 
     target_compile_definitions(
