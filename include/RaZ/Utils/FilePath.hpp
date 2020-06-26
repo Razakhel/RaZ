@@ -50,9 +50,18 @@ public:
   const StringType& getPath() const noexcept { return m_path; }
   const CharType* getPathStr() const noexcept { return m_path.c_str(); }
 
-  static FilePath recoverExtension(const StringType& filePath);
-  static FilePath recoverFileName(const StringType& filePath, bool keepExtension = true);
-  static FilePath recoverPathToFile(const StringType& filePath);
+  static FilePath recoverPathToFile(const std::string& pathStr);
+  static FilePath recoverPathToFile(const std::wstring& pathStr);
+  static FilePath recoverPathToFile(const std::string_view& pathStr) { return recoverPathToFile(std::string(pathStr)); }
+  static FilePath recoverPathToFile(const std::wstring_view& pathStr) { return recoverPathToFile(std::wstring(pathStr)); }
+  static FilePath recoverFileName(const std::string& pathStr, bool keepExtension = true);
+  static FilePath recoverFileName(const std::wstring& pathStr, bool keepExtension = true);
+  static FilePath recoverFileName(const std::string_view& pathStr, bool keepExtension = true) { return recoverFileName(std::string(pathStr), keepExtension); }
+  static FilePath recoverFileName(const std::wstring_view& pathStr, bool keepExtension = true) { return recoverFileName(std::wstring(pathStr), keepExtension); }
+  static FilePath recoverExtension(const std::string& pathStr);
+  static FilePath recoverExtension(const std::wstring& pathStr);
+  static FilePath recoverExtension(const std::string_view& pathStr) { return recoverExtension(std::string(pathStr)); }
+  static FilePath recoverExtension(const std::wstring_view& pathStr) { return recoverExtension(std::wstring(pathStr)); }
 
   FilePath recoverPathToFile() const { return recoverPathToFile(m_path); }
   FilePath recoverFileName(bool keepExtension = true) const { return recoverFileName(m_path, keepExtension); }
@@ -72,6 +81,18 @@ public:
   std::string operator+(const std::string& pathStr) const { return toUtf8() + pathStr; }
   std::wstring operator+(const std::wstring& pathStr) const { return toWide() + pathStr; }
   FilePath operator+(const FilePath& filePath) const { return m_path + filePath.getPath(); }
+  bool operator==(const char* pathStr) const noexcept { return toUtf8() == pathStr; }
+  bool operator!=(const char* pathStr) const noexcept { return !(*this == pathStr); }
+  bool operator==(const wchar_t* pathStr) const noexcept { return toWide() == pathStr; }
+  bool operator!=(const wchar_t* pathStr) const noexcept { return !(*this == pathStr); }
+  bool operator==(const std::string& pathStr) const noexcept { return toUtf8() == pathStr; }
+  bool operator!=(const std::string& pathStr) const noexcept { return !(*this == pathStr); }
+  bool operator==(const std::wstring& pathStr) const noexcept { return toWide() == pathStr; }
+  bool operator!=(const std::wstring& pathStr) const noexcept { return !(*this == pathStr); }
+  bool operator==(const std::string_view& pathStr) const noexcept { return toUtf8() == pathStr; }
+  bool operator!=(const std::string_view& pathStr) const noexcept { return !(*this == pathStr); }
+  bool operator==(const std::wstring_view& pathStr) const noexcept { return toWide() == pathStr; }
+  bool operator!=(const std::wstring_view& pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const FilePath& filePath) const noexcept { return m_path == filePath.getPath(); }
   bool operator!=(const FilePath& filePath) const noexcept { return !(*this == filePath); }
   explicit operator const StringType&() const noexcept { return m_path; }
