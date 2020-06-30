@@ -1,0 +1,6 @@
+newmtl cube_CT
+  map_Kd ../textures/ŔĜBŖĀ.png
+  norm ../textures/BƁḂɃ.png
+  map_Pm ../textures/₁₁₁₁.png
+  map_Pr ../textures/₀₀₀₀.png
+  map_Ka ../textures/₁₀₀₁.png

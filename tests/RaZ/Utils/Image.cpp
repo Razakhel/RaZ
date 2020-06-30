@@ -22,7 +22,7 @@ TEST_CASE("Image manual creation") {
 }
 
 TEST_CASE("Image imported PNG") {
-  const Raz::Image img(RAZ_TESTS_ROOT + "assets/images/defaultTest.png"s);
+  const Raz::Image img(RAZ_TESTS_ROOT + "assets/images/dëfàùltTêst.png"s);
 
   CHECK(img.getWidth() == 2);
   CHECK(img.getHeight() == 2);
@@ -50,7 +50,7 @@ TEST_CASE("Image imported PNG") {
   CHECK(*(static_cast<const uint8_t*>(img.getDataPtr()) + 14) == 191);
   CHECK(*(static_cast<const uint8_t*>(img.getDataPtr()) + 15) == 255);
 
-  const Raz::Image imgFlipped(RAZ_TESTS_ROOT + "assets/images/defaultTest.png"s, true);
+  const Raz::Image imgFlipped(RAZ_TESTS_ROOT + "assets/images/dëfàùltTêst.png"s, true);
 
   CHECK(imgFlipped != img);
 
@@ -76,7 +76,7 @@ TEST_CASE("Image imported PNG") {
 }
 
 TEST_CASE("Image imported TGA") {
-  const Raz::Image img(RAZ_TESTS_ROOT + "assets/images/defaultTest.tga"s);
+  const Raz::Image img(RAZ_TESTS_ROOT + "assets/images/dëfàùltTêst.tga"s);
 
   CHECK(img.getWidth() == 2);
   CHECK(img.getHeight() == 2);
@@ -101,7 +101,7 @@ TEST_CASE("Image imported TGA") {
   CHECK(*(static_cast<const uint8_t*>(img.getDataPtr()) + 11) == 191);
 
   // Checking that the same image with a vertical flip has correct values
-  const Raz::Image imgFlipped(RAZ_TESTS_ROOT + "assets/images/defaultTest.tga"s, true);
+  const Raz::Image imgFlipped(RAZ_TESTS_ROOT + "assets/images/dëfàùltTêst.tga"s, true);
 
   CHECK(imgFlipped != img);
 
@@ -163,14 +163,14 @@ TEST_CASE("Image exported PNG") {
   *(static_cast<uint8_t*>(img.getDataPtr()) + 18) = 255;
   *(static_cast<uint8_t*>(img.getDataPtr()) + 19) = 255;
 
-  img.save("testExport.png");
+  img.save("téstÊxpørt.png");
 
   // Checking that the reimported image is the same as the original one
-  CHECK(img == Raz::Image("testExport.png"));
+  CHECK(img == Raz::Image("téstÊxpørt.png"));
 
-  img.save("testExportFlipped.png", true);
+  img.save("téstÊxpørtFlipped.png", true);
 
-  const Raz::Image imgFlipped("testExportFlipped.png");
+  const Raz::Image imgFlipped("téstÊxpørtFlipped.png");
 
   // Image imported with a vertical flip, now should be as follows:
   //
@@ -203,8 +203,8 @@ TEST_CASE("Image exported PNG") {
   CHECK(*(static_cast<const uint8_t*>(imgFlipped.getDataPtr()) + 31) == 255);
 
   // Re-flipping the image when saving
-  imgFlipped.save("testExport.png", true);
+  imgFlipped.save("téstÊxpørt.png", true);
 
   // Checking that the re-flipped image is now equal to the original one
-  CHECK(img == Raz::Image("testExport.png"));
+  CHECK(img == Raz::Image("téstÊxpørt.png"));
 }

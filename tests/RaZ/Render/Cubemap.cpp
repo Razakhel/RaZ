@@ -43,18 +43,18 @@ TEST_CASE("Cubemap move") {
 TEST_CASE("Cubemap textures") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::Image refImgPosX(RAZ_TESTS_ROOT + "assets/textures/0000.png"s);
-  const Raz::Image refImgNegX(RAZ_TESTS_ROOT + "assets/textures/1001.png"s);
+  const Raz::Image refImgPosX(RAZ_TESTS_ROOT + "assets/textures/₀₀₀₀.png"s);
+  const Raz::Image refImgNegX(RAZ_TESTS_ROOT + "assets/textures/₁₀₀₁.png"s);
 
-  const Raz::Image refImgPosY(RAZ_TESTS_ROOT + "assets/textures/1111.png"s);
-  const Raz::Image refImgNegY(RAZ_TESTS_ROOT + "assets/textures/RRRR.png"s);
+  const Raz::Image refImgPosY(RAZ_TESTS_ROOT + "assets/textures/₁₁₁₁.png"s);
+  const Raz::Image refImgNegY(RAZ_TESTS_ROOT + "assets/textures/ŔŖȒȐ.png"s);
 
-  const Raz::Image refImgPosZ(RAZ_TESTS_ROOT + "assets/textures/BBBB.png"s);
-  const Raz::Image refImgNegZ(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
+  const Raz::Image refImgPosZ(RAZ_TESTS_ROOT + "assets/textures/BƁḂɃ.png"s);
+  const Raz::Image refImgNegZ(RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s);
 
-  Raz::Cubemap cubemap(RAZ_TESTS_ROOT + "assets/textures/0000.png"s, RAZ_TESTS_ROOT + "assets/textures/1001.png"s,
-                       RAZ_TESTS_ROOT + "assets/textures/1111.png"s, RAZ_TESTS_ROOT + "assets/textures/RRRR.png"s,
-                       RAZ_TESTS_ROOT + "assets/textures/BBBB.png"s, RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
+  Raz::Cubemap cubemap(RAZ_TESTS_ROOT + "assets/textures/₀₀₀₀.png"s, RAZ_TESTS_ROOT + "assets/textures/₁₀₀₁.png"s,
+                       RAZ_TESTS_ROOT + "assets/textures/₁₁₁₁.png"s, RAZ_TESTS_ROOT + "assets/textures/ŔŖȒȐ.png"s,
+                       RAZ_TESTS_ROOT + "assets/textures/BƁḂɃ.png"s, RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES

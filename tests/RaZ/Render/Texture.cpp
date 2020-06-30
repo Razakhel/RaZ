@@ -6,9 +6,9 @@
 TEST_CASE("Texture move") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::Image refImg(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s);
+  const Raz::Image refImg(RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s);
 
-  Raz::Texture texture(RAZ_TESTS_ROOT + "assets/textures/RGBRA.png"s, 42);
+  Raz::Texture texture(RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s, 42);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   const unsigned int textureIndex = texture.getIndex();

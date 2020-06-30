@@ -14,7 +14,7 @@ TEST_CASE("Mesh imported OBJ quad faces") {
 }
 
 TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
-  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "assets/meshes/cube_BP.obj"s);
+  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "assets/meshes/çûbè_BP.obj"s);
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
@@ -234,7 +234,7 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
 }
 
 TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
-  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "assets/meshes/cube_CT.obj"s);
+  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "assets/meshes/çûbè_CT.obj"s);
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
