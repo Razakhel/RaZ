@@ -1,5 +1,6 @@
 #include "Catch.hpp"
 
+#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Image.hpp"
 
 TEST_CASE("Image manual creation") {

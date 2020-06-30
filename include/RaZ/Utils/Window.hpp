@@ -40,7 +40,7 @@ public:
   void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f(red, green, blue, alpha)); }
   void setTitle(const std::string& title) const;
   void setIcon(const Image& img) const;
-  void setIcon(const std::string& filePath) const { setIcon(Image(filePath, false)); }
+  void setIcon(const FilePath& filePath) const { setIcon(Image(filePath, false)); }
 
   template <typename... Args>
   static WindowPtr create(Args&&... args) { return std::make_unique<Window>(std::forward<Args>(args)...); }

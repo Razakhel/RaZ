@@ -1,4 +1,4 @@
-#include "RaZ/Utils/FileUtils.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
@@ -58,11 +58,11 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
   }
 }
 
-void Image::read(const std::string& filePath, bool flipVertically) {
+void Image::read(const FilePath& filePath, bool flipVertically) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
-    const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
+    const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
     if (format == "png")
       readPng(file, flipVertically);
@@ -75,11 +75,11 @@ void Image::read(const std::string& filePath, bool flipVertically) {
   }
 }
 
-void Image::save(const std::string& filePath, bool flipVertically) const {
+void Image::save(const FilePath& filePath, bool flipVertically) const {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
   if (file) {
-    const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
+    const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
     if (format == "png")
       savePng(file, flipVertically);

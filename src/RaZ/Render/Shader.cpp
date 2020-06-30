@@ -1,5 +1,6 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 
 #include <fstream>
 #include <limits>
@@ -15,13 +16,13 @@ bool Shader::isValid() const {
   return (m_index != std::numeric_limits<unsigned int>::max());
 }
 
-void Shader::import(std::string filePath) {
+void Shader::import(FilePath filePath) {
   m_path = std::move(filePath);
   load();
 }
 
 void Shader::load() const {
-  if (m_path.empty()) // Shader imported directly from source, no path available
+  if (m_path.getPath().empty()) // Shader imported directly from source, no path available
     return;
 
   std::ifstream shaderSource(m_path, std::ios::in | std::ios::binary | std::ios::ate);

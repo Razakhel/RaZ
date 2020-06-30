@@ -8,17 +8,18 @@
 #include "RaZ/Render/UniformBuffer.hpp"
 
 #include <memory>
-#include <string>
 
 namespace Raz {
+
+class FilePath;
 
 /// Cubemap class representing an environment map surrounding the scene (also known as a skybox).
 class Cubemap {
 public:
   Cubemap();
-  explicit Cubemap(const std::string& rightTexturePath, const std::string& leftTexturePath,
-                   const std::string& topTexturePath, const std::string& bottomTexturePath,
-                   const std::string& frontTexturePath, const std::string& backTexturePath)
+  explicit Cubemap(const FilePath& rightTexturePath, const FilePath& leftTexturePath,
+                   const FilePath& topTexturePath, const FilePath& bottomTexturePath,
+                   const FilePath& frontTexturePath, const FilePath& backTexturePath)
     : Cubemap() { load(rightTexturePath, leftTexturePath, topTexturePath, bottomTexturePath, frontTexturePath, backTexturePath); }
   Cubemap(const Cubemap&) = delete;
   Cubemap(Cubemap&& cubemap) noexcept;
@@ -33,9 +34,9 @@ public:
   /// \param bottomTexturePath Path to the texture located on the bottom of the cube.
   /// \param frontTexturePath Path to the texture located on the front of the cube.
   /// \param backTexturePath Path to the texture located on the back of the cube.
-  void load(const std::string& rightTexturePath, const std::string& leftTexturePath,
-            const std::string& topTexturePath, const std::string& bottomTexturePath,
-            const std::string& frontTexturePath, const std::string& backTexturePath) const;
+  void load(const FilePath& rightTexturePath, const FilePath& leftTexturePath,
+            const FilePath& topTexturePath, const FilePath& bottomTexturePath,
+            const FilePath& frontTexturePath, const FilePath& backTexturePath) const;
   /// Sends the view-projection matrix onto the graphics card.
   /// \param viewProjMat View-projection matrix to be sent.
   void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_viewProjUbo.sendData(viewProjMat, 0); }

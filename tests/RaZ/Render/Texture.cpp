@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Render/Texture.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 
 TEST_CASE("Texture move") {
   Raz::Renderer::recoverErrors(); // Flushing errors

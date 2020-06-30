@@ -197,7 +197,7 @@ void RenderSystem::updateShaders() const {
   }
 }
 
-void RenderSystem::saveToImage(const std::string& fileName, TextureFormat format) const {
+void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format) const {
   ImageColorspace colorspace = ImageColorspace::RGB;
   TextureDataType dataType   = TextureDataType::UBYTE;
 
@@ -219,7 +219,7 @@ void RenderSystem::saveToImage(const std::string& fileName, TextureFormat format
   Image img(m_sceneWidth, m_sceneHeight, colorspace);
   Renderer::recoverFrame(m_sceneWidth, m_sceneHeight, format, dataType, img.getDataPtr());
 
-  img.save(fileName, true);
+  img.save(filePath, true);
 }
 
 void RenderSystem::initialize() {

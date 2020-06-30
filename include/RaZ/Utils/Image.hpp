@@ -11,6 +11,8 @@
 
 namespace Raz {
 
+class FilePath;
+
 struct ImageData;
 using ImageDataPtr = std::unique_ptr<ImageData>;
 
@@ -111,7 +113,7 @@ class Image {
 public:
   Image() = default;
   Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
-  explicit Image(const std::string& fileName, bool flipVertically = false) { read(fileName, flipVertically); }
+  explicit Image(const FilePath& filePath, bool flipVertically = false) { read(filePath, flipVertically); }
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -128,11 +130,11 @@ public:
   /// Reads the image to memory.
   /// \param filePath Path to the image to read.
   /// \param flipVertically Flip vertically the image when reading.
-  void read(const std::string& filePath, bool flipVertically = false);
+  void read(const FilePath& filePath, bool flipVertically = false);
   /// Saves the image on disk.
   /// \param filePath Path to where to save the image.
   /// \param flipVertically Flip vertically the image when saving.
-  void save(const std::string& filePath, bool flipVertically = false) const;
+  void save(const FilePath& filePath, bool flipVertically = false) const;
 
   /// Checks if the current image is equal to another given one.
   /// Their inner datas must be of the same type.

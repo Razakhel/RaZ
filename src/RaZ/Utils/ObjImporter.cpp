@@ -1,5 +1,5 @@
 #include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 
 #include <fstream>
 #include <map>
@@ -24,24 +24,24 @@ constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, co
   return tangent;
 }
 
-inline TexturePtr loadTexture(const std::string& mtlFilePath, const std::string& textureFileName, int bindingIndex = 0) {
-  static std::unordered_map<std::string, TexturePtr> loadedTextures;
+inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath, int bindingIndex = 0) {
+  static std::unordered_map<FilePath, TexturePtr> loadedTextures;
 
   TexturePtr map;
-  const auto loadedTexturePos = loadedTextures.find(textureFileName);
+  const auto loadedTexturePos = loadedTextures.find(textureFilePath);
 
   if (loadedTexturePos != loadedTextures.cend()) {
     map = loadedTexturePos->second;
   } else {
-    const std::string texturePath = FileUtils::extractPathToFile(mtlFilePath) + textureFileName;
+    const FilePath texturePath = mtlFilePath.recoverPathToFile() + textureFilePath;
     map = Texture::create(texturePath, bindingIndex, true); // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-    loadedTextures.emplace(textureFileName, map);
+    loadedTextures.emplace(textureFilePath, map);
   }
 
   return map;
 }
 
-inline void importMtl(const std::string& mtlFilePath,
+inline void importMtl(const FilePath& mtlFilePath,
                       std::vector<MaterialPtr>& materials,
                       std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
@@ -174,7 +174,7 @@ inline void importMtl(const std::string& mtlFilePath,
 
 } // namespace
 
-void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
+void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
   std::unordered_map<std::string, std::size_t> materialCorrespIndices;
 
   std::vector<Vec3f> positions;
@@ -272,7 +272,7 @@ void Mesh::importObj(std::ifstream& file, const std::string& filePath) {
       std::string mtlFileName;
       file >> mtlFileName;
 
-      const std::string mtlFilePath = FileUtils::extractPathToFile(filePath) + mtlFileName;
+      const std::string mtlFilePath = filePath.recoverPathToFile() + mtlFileName;
 
       importMtl(mtlFilePath, m_materials, materialCorrespIndices);
     } else if (line[0] == 'u') {

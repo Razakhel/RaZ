@@ -7,11 +7,12 @@ namespace Raz {
 void Mesh::importOff(std::ifstream& file) {
   Submesh& submesh = m_submeshes.front();
 
-  std::size_t vertexCount, faceCount;
+  std::size_t vertexCount {};
+  std::size_t faceCount {};
+
   file.ignore(3);
   file >> vertexCount >> faceCount;
   file.ignore(100, '\n');
-
 
   std::vector<Vertex>& vertices = submesh.getVertices();
   vertices.resize(vertexCount * 3);

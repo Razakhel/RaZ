@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 
 TEST_CASE("Mesh imported OBJ quad faces") {
   const Raz::Mesh mesh(RAZ_TESTS_ROOT + "../assets/meshes/ballQuads.obj"s);

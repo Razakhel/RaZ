@@ -1,5 +1,5 @@
 #include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 
 #include <fstream>
 #include <map>
@@ -8,12 +8,12 @@ namespace Raz {
 
 namespace {
 
-void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& materials) {
+void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materials) {
   std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
 
   mtlFile << "# MTL file created with RaZ - https://github.com/Razakhel/RaZ\n";
 
-  const std::string mtlFileName   = FileUtils::extractFileNameFromPath(mtlFilePath, false);
+  const std::string mtlFileName   = mtlFilePath.recoverFileName(false).toUtf8();
   const TexturePtr defaultTexture = Texture::create(ColorPreset::WHITE);
 
   for (std::size_t matIndex = 0; matIndex < materials.size(); ++matIndex) {
@@ -118,12 +118,12 @@ void saveMtl(const std::string& mtlFilePath, const std::vector<MaterialPtr>& mat
 
 } // namespace
 
-void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
+void Mesh::saveObj(std::ofstream& file, const FilePath& filePath) const {
   file << "# OBJ file created with RaZ - https://github.com/Razakhel/RaZ\n\n";
 
   if (!m_materials.empty()) {
-    const auto mtlFileName = FileUtils::extractFileNameFromPath(filePath, false) + ".mtl";
-    const auto mtlFilePath = FileUtils::extractPathToFile(filePath) + mtlFileName;
+    const std::string mtlFileName = filePath.recoverFileName(false) + ".mtl";
+    const FilePath mtlFilePath    = filePath.recoverPathToFile() + mtlFileName;
 
     file << "mtllib " << mtlFilePath << "\n\n";
 
@@ -166,7 +166,7 @@ void Mesh::saveObj(std::ofstream& file, const std::string& filePath) const {
     }
   }
 
-  const std::string fileName = FileUtils::extractFileNameFromPath(filePath, false);
+  const std::string fileName = filePath.recoverFileName(false).toUtf8();
 
   for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
     const Submesh& submesh = m_submeshes[submeshIndex];

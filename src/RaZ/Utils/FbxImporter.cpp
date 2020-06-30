@@ -1,5 +1,5 @@
 #include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 
 #include <fbxsdk.h>
 #include <fstream>
@@ -7,7 +7,7 @@
 
 namespace Raz {
 
-void Mesh::importFbx(const std::string& filePath) {
+void Mesh::importFbx(const FilePath& filePath) {
   FbxManager* manager = FbxManager::Create();
 
   FbxIOSettings* ioSettings = FbxIOSettings::Create(manager, IOSROOT);
@@ -15,9 +15,9 @@ void Mesh::importFbx(const std::string& filePath) {
 
   FbxImporter* importer = FbxImporter::Create(manager, "");
 
-  importer->Initialize(filePath.c_str(), -1, manager->GetIOSettings());
+  importer->Initialize(filePath.toUtf8().c_str(), -1, manager->GetIOSettings());
 
-  FbxScene* scene = FbxScene::Create(manager, FileUtils::extractFileNameFromPath(filePath).c_str());
+  FbxScene* scene = FbxScene::Create(manager, filePath.recoverFileName().toUtf8().c_str());
 
   // Importing the contents of the file into the scene
   importer->Import(scene);
@@ -150,7 +150,7 @@ void Mesh::importFbx(const std::string& filePath) {
       material->setTransparency(static_cast<float>(transparency.Get()));
 
     // Recovering textures
-    const std::string texturePath = FileUtils::extractPathToFile(filePath);
+    const FilePath texturePath = filePath.recoverPathToFile();
 
     const auto* diffuseTexture = static_cast<FbxFileTexture*>(diffuse.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
     if (diffuseTexture)

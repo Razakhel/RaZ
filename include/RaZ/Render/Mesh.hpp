@@ -9,9 +9,10 @@
 #include "RaZ/Utils/Shape.hpp"
 
 #include <memory>
-#include <string>
 
 namespace Raz {
+
+class FilePath;
 
 enum class SphereMeshType {
   UV = 0, ///< [UV sphere](https://en.wikipedia.org/wiki/UV_mapping).
@@ -21,7 +22,7 @@ enum class SphereMeshType {
 class Mesh final : public Component {
 public:
   Mesh() : m_submeshes(1) {}
-  explicit Mesh(const std::string& filePath) : Mesh() { import(filePath); }
+  explicit Mesh(const FilePath& filePath) : Mesh() { import(filePath); }
   Mesh(const Plane& plane, float width, float depth, RenderMode renderMode = RenderMode::TRIANGLE);
   /// Creates a mesh from a Sphere.
   /// \param sphere Sphere to create the mesh with.
@@ -46,7 +47,7 @@ public:
   static void drawUnitQuad();
   static void drawUnitCube();
 
-  void import(const std::string& filePath);
+  void import(const FilePath& filePath);
   void setRenderMode(RenderMode renderMode);
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(Submesh submesh = Submesh()) { m_submeshes.emplace_back(std::move(submesh)); }
@@ -58,7 +59,7 @@ public:
   void load(const ShaderProgram& program) const;
   void draw() const;
   void draw(const ShaderProgram& program) const;
-  void save(const std::string& filePath) const;
+  void save(const FilePath& filePath) const;
 
 private:
   /// Creates an UV sphere mesh from a Sphere.
@@ -84,13 +85,13 @@ private:
   /// \param subdivCount Amount of subdivisions to apply to the mesh.
   void createIcosphere(const Sphere& sphere, uint32_t subdivCount);
 
-  void importObj(std::ifstream& file, const std::string& filePath);
+  void importObj(std::ifstream& file, const FilePath& filePath);
   void importOff(std::ifstream& file);
 #if defined(FBX_ENABLED)
-  void importFbx(const std::string& filePath);
+  void importFbx(const FilePath& filePath);
 #endif
 
-  void saveObj(std::ofstream& file, const std::string& filePath) const;
+  void saveObj(std::ofstream& file, const FilePath& filePath) const;
 
   std::vector<Submesh> m_submeshes {};
   std::vector<MaterialPtr> m_materials {};

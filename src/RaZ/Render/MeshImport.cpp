@@ -1,12 +1,12 @@
 #include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FileUtils.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <fstream>
 
 namespace Raz {
 
-void Mesh::import(const std::string& filePath) {
+void Mesh::import(const FilePath& filePath) {
   // Resetting the mesh to an empty state before importing
   m_submeshes.clear();
   m_submeshes.resize(1);
@@ -15,7 +15,7 @@ void Mesh::import(const std::string& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
-    const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
+    const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
     if (format == "obj")
       importObj(file, filePath);
@@ -34,9 +34,9 @@ void Mesh::import(const std::string& filePath) {
   }
 }
 
-void Mesh::save(const std::string& filePath) const {
+void Mesh::save(const FilePath& filePath) const {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
-  const std::string format = StrUtils::toLowercaseCopy(FileUtils::extractFileExtension(filePath));
+  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
   if (file) {
     if (format == "obj")

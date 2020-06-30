@@ -7,7 +7,6 @@
 #include "RaZ/Utils/Image.hpp"
 
 #include <memory>
-#include <string>
 
 namespace Raz {
 
@@ -40,8 +39,8 @@ public:
   /// \param bindingIndex Index of the texture's binding point.
   explicit Texture(ColorPreset preset, int bindingIndex = std::numeric_limits<int>::max());
   Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace = ImageColorspace::RGB, bool createMipmaps = true);
-  explicit Texture(const std::string& fileName, int bindingIndex, bool flipVertically = false, bool createMipmaps = true)
-    : Texture(bindingIndex) { load(fileName, flipVertically, createMipmaps); }
+  explicit Texture(const FilePath& filePath, int bindingIndex, bool flipVertically = false, bool createMipmaps = true)
+    : Texture(bindingIndex) { load(filePath, flipVertically, createMipmaps); }
   Texture(const Texture&) = delete;
   Texture(Texture&& texture) noexcept;
 
@@ -58,11 +57,11 @@ public:
   /// \param filePath Path to the texture to load.
   /// \param flipVertically Flip vertically the texture when loading.
   /// \param createMipmaps True to generate texture mipmaps, false otherwise.
-  void load(const std::string& filePath, bool flipVertically = false, bool createMipmaps = true);
+  void load(const FilePath& filePath, bool flipVertically = false, bool createMipmaps = true);
   /// Saves the texture on disk.
   /// \param filePath Path to where to save the texture.
   /// \param flipVertically Flip vertically the texture when saving.
-  void save(const std::string& filePath, bool flipVertically = false) const { m_image.save(filePath, flipVertically); }
+  void save(const FilePath& filePath, bool flipVertically = false) const { m_image.save(filePath, flipVertically); }
   /// Sets active the current texture.
   void activate() const;
   /// Binds the current texture.

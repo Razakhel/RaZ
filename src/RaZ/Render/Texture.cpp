@@ -58,7 +58,7 @@ Texture::Texture(Texture&& texture) noexcept
     m_bindingIndex{ std::exchange(texture.m_bindingIndex, std::numeric_limits<int>::max()) },
     m_image{ std::move(texture.m_image) } {}
 
-void Texture::load(const std::string& filePath, bool flipVertically, bool createMipmaps) {
+void Texture::load(const FilePath& filePath, bool flipVertically, bool createMipmaps) {
   m_image.read(filePath, flipVertically);
 
   if (m_image.isEmpty()) {

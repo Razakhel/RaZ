@@ -98,9 +98,9 @@ Cubemap::Cubemap(Cubemap&& cubemap) noexcept
     m_program{ std::move(cubemap.m_program) },
     m_viewProjUbo{ std::move(cubemap.m_viewProjUbo) } {}
 
-void Cubemap::load(const std::string& rightTexturePath, const std::string& leftTexturePath,
-                   const std::string& topTexturePath, const std::string& bottomTexturePath,
-                   const std::string& frontTexturePath, const std::string& backTexturePath) const {
+void Cubemap::load(const FilePath& rightTexturePath, const FilePath& leftTexturePath,
+                   const FilePath& topTexturePath, const FilePath& bottomTexturePath,
+                   const FilePath& frontTexturePath, const FilePath& backTexturePath) const {
   bind();
 
   Image img(rightTexturePath);
