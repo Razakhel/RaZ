@@ -398,6 +398,11 @@ enum class DrawBuffer : unsigned int {
   COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)
 };
 
+enum class BlitFilter : unsigned int {
+  NEAREST = static_cast<unsigned int>(TextureParamValue::NEAREST),
+  LINEAR  = static_cast<unsigned int>(TextureParamValue::LINEAR)
+};
+
 enum class ErrorCode : unsigned int {
   INVALID_ENUM                  = 1280, // GL_INVALID_ENUM
   INVALID_VALUE                 = 1281, // GL_INVALID_VALUE
@@ -485,6 +490,8 @@ public:
   static void generateTextures(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateTextures(unsigned int (&indices)[N]) { generateTextures(N, indices); }
   static void generateTexture(unsigned int& index) { generateTextures(1, &index); }
+  static void bindTexture(TextureType type, unsigned int index);
+  static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void activateTexture(unsigned int index);
   static void setTextureParameter(TextureType type, TextureParam param, int value);
   static void setTextureParameter(TextureType type, TextureParam param, float value);
@@ -529,8 +536,6 @@ public:
 #if defined(RAZ_USE_GL4)
   static void generateMipmap(unsigned int textureIndex);
 #endif
-  static void bindTexture(TextureType type, unsigned int index);
-  static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void deleteTextures(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteTextures(unsigned int (&indices)[N]) { deleteTextures(N, indices); }
   static void deleteTexture(unsigned int& index) { deleteTextures(1, &index); }
@@ -620,6 +625,8 @@ public:
   static void generateFramebuffers(int count, unsigned int* indices);
   template <std::size_t N> static void generateFramebuffers(unsigned int (&indices)[N]) { generateFramebuffers(N, indices); }
   static void generateFramebuffer(unsigned int& index) { generateFramebuffers(1, &index); }
+  static void bindFramebuffer(unsigned int index, FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static void unbindFramebuffer(FramebufferType type = FramebufferType::FRAMEBUFFER) { bindFramebuffer(0, type); }
   static FramebufferStatus getFramebufferStatus(FramebufferType type = FramebufferType::FRAMEBUFFER);
   static bool isFramebufferComplete(FramebufferType type = FramebufferType::FRAMEBUFFER) { return getFramebufferStatus(type) == FramebufferStatus::COMPLETE; }
   static void setFramebufferTexture2D(FramebufferAttachment attachment,
@@ -627,8 +634,9 @@ public:
                                       FramebufferType type = FramebufferType::FRAMEBUFFER);
   static void setDrawBuffers(unsigned int count, const DrawBuffer* buffers);
   template <std::size_t N> static void setDrawBuffers(DrawBuffer (&buffers)[N]) { setDrawBuffers(N, buffers); }
-  static void bindFramebuffer(unsigned int index, FramebufferType type = FramebufferType::FRAMEBUFFER);
-  static void unbindFramebuffer(FramebufferType type = FramebufferType::FRAMEBUFFER) { bindFramebuffer(0, type); }
+  static void blitFramebuffer(int readMinX, int readMinY, int readMaxX, int readMaxY,
+                              int writeMinX, int writeMinY, int writeMaxX, int writeMaxY,
+                              MaskType mask, BlitFilter filter);
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }

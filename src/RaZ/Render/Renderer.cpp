@@ -319,6 +319,14 @@ void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
   printConditionalErrors();
 }
 
+void Renderer::bindTexture(TextureType type, unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindTexture(static_cast<unsigned int>(type), index);
+
+  printConditionalErrors();
+}
+
 void Renderer::activateTexture(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -489,14 +497,6 @@ void Renderer::generateMipmap(unsigned int textureIndex) {
   printConditionalErrors();
 }
 #endif
-
-void Renderer::bindTexture(TextureType type, unsigned int index) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-
-  glBindTexture(static_cast<unsigned int>(type), index);
-
-  printConditionalErrors();
-}
 
 void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
@@ -816,6 +816,21 @@ void Renderer::generateFramebuffers(int count, unsigned int* indices) {
   printConditionalErrors();
 }
 
+void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindFramebuffer(static_cast<unsigned int>(type), index);
+
+#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
+  const ErrorCodes errorCodes = recoverErrors();
+
+  if (errorCodes[ErrorCode::INVALID_OPERATION])
+    std::cerr << "Renderer::bindFramebuffer - Bound object is not a valid framebuffer.\n";
+
+  std::cerr << std::flush;
+#endif
+}
+
 FramebufferStatus Renderer::getFramebufferStatus(FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -848,19 +863,16 @@ void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
   printConditionalErrors();
 }
 
-void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
+void Renderer::blitFramebuffer(int readMinX, int readMinY, int readMaxX, int readMaxY,
+                               int writeMinX, int writeMinY, int writeMaxX, int writeMaxY,
+                               MaskType mask, BlitFilter filter) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glBindFramebuffer(static_cast<unsigned int>(type), index);
+  glBlitFramebuffer(readMinX, readMinY, readMaxX, readMaxY,
+                    writeMinX, writeMinY, writeMaxX, writeMaxY,
+                    static_cast<unsigned int>(mask), static_cast<unsigned int>(filter));
 
-#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
-  const ErrorCodes errorCodes = recoverErrors();
-
-  if (errorCodes[ErrorCode::INVALID_OPERATION])
-    std::cerr << "Renderer::bindFramebuffer - Bound object is not a valid framebuffer.\n";
-
-  std::cerr << std::flush;
-#endif
+  printConditionalErrors();
 }
 
 void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
