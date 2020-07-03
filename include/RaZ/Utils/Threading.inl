@@ -4,8 +4,8 @@
 namespace Raz::Threading {
 
 template <typename Func, typename... Args, typename ResultType>
-std::future<ResultType> launchAsync(Func action, Args&&... args) {
-  return std::async(std::move(action), std::forward<Args>(args)...);
+std::future<ResultType> launchAsync(Func&& action, Args&&... args) {
+  return std::async(std::forward<Func>(action), std::forward<Args>(args)...);
 }
 
 template <typename ContainerType, typename Func, typename>
