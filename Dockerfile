@@ -5,6 +5,7 @@ FROM ubuntu:19.10
 #   - CMake, Make, GCC & Clang to build RaZ, and lcov to output code coverage
 #   - xz-utils to uncompress Emscripten
 #   - Doxygen & Dot to generate the documentation
+#   - OpenAL to handle the audio part
 #   - Wget to download the FBX SDK
 #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
 #   - Rubygems to get the 'gem' command, used to download coveralls-lcov, and git to fetch info needed by coveralls-lcov
@@ -17,6 +18,7 @@ RUN apt-get update && \
         cmake make gcc-8 g++-8 clang-7 lcov \
         xz-utils \
         doxygen python-pydot python-pydot-ng \
+        libopenal-dev \
         wget \
         xvfb \
         rubygems git && \

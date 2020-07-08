@@ -467,6 +467,15 @@ if (RAZ_PLATFORM_LINUX)
     endif ()
 endif ()
 
+################
+# RaZ - OpenAL #
+################
+
+find_package(OpenAL REQUIRED)
+
+target_include_directories(RaZ SYSTEM PRIVATE ${OPENAL_INCLUDE_DIRS})
+target_link_libraries(RaZ PUBLIC ${OPENAL_LIBS})
+
 #########################
 # RaZ - FBX file format #
 #########################
