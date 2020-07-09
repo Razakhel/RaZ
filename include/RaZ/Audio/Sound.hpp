@@ -5,6 +5,10 @@
 
 #include "RaZ/Component.hpp"
 
+#include <fstream>
+#include <limits>
+#include <vector>
+
 namespace Raz {
 
 class FilePath;
@@ -23,10 +27,15 @@ enum class SoundFormat : int {
 class Sound final : public Component {
 public:
   Sound();
+  explicit Sound(const FilePath& filePath) : Sound() { load(filePath); }
   Sound(const Sound&) = delete;
   Sound(Sound&& sound) noexcept;
 
   constexpr unsigned int getBufferIndex() const noexcept { return m_buffer; }
+
+  /// Loads a sound file.
+  /// \param filePath Path to the file to load.
+  void load(const FilePath& filePath);
 
   Sound& operator=(const Sound&) = delete;
   Sound& operator=(Sound&& sound) noexcept;
@@ -34,11 +43,16 @@ public:
   ~Sound() override;
 
 private:
+  /// Loads a [WAV](https://fr.wikipedia.org/wiki/Waveform_Audio_File_Format) audio file to memory.
+  /// \param file File to load.
+  void loadWav(std::ifstream& file);
+
   unsigned int m_buffer = std::numeric_limits<unsigned int>::max();
   unsigned int m_source = std::numeric_limits<unsigned int>::max();
 
   SoundFormat m_format {};
   int m_frequency {};
+  std::vector<std::byte> m_data {};
 };
 
 } // namespace Raz
