@@ -9,7 +9,7 @@ namespace Raz {
 
 namespace {
 
-inline constexpr const char* recoverAlErrorStr(int errorCode) {
+constexpr const char* recoverAlErrorStr(int errorCode) {
   switch (errorCode) {
     case AL_INVALID_NAME:      return "Invalid name";
     case AL_INVALID_ENUM:      return "Invalid enum";
@@ -21,22 +21,23 @@ inline constexpr const char* recoverAlErrorStr(int errorCode) {
   }
 }
 
+inline void checkError(const std::string_view& errorMsg) {
+  const int errorCode = alGetError();
+
+  if (errorCode != AL_NO_ERROR)
+    std::cerr << "[OpenAL] Error: " << errorMsg << " (" << recoverAlErrorStr(errorCode) << ")." << std::endl;
+}
+
 } // namespace
 
 Sound::Sound() {
   alGetError(); // Flushing errors
 
   alGenBuffers(1, &m_buffer);
-
-  int errorCode = alGetError();
-  if (errorCode != AL_NO_ERROR)
-    std::cerr << "Error: Failed to create a sound buffer (" << recoverAlErrorStr(errorCode) << ")." << std::endl;
+  checkError("Failed to create a sound buffer");
 
   alGenSources(1, &m_source);
-
-  errorCode = alGetError();
-  if (errorCode != AL_NO_ERROR)
-    std::cerr << "Error: Failed to create a sound source (" << recoverAlErrorStr(errorCode) << ")." << std::endl;
+  checkError("Failed to create a sound source");
 }
 
 Sound::Sound(Sound&& sound) noexcept
@@ -61,14 +62,23 @@ void Sound::load(const FilePath& filePath) {
   }
 
   alBufferData(m_buffer, static_cast<int>(m_format), m_data.data(), static_cast<int>(m_data.size()), m_frequency);
-
-  if (alGetError() != AL_NO_ERROR)
-    std::cerr << "Error: Failed to send sound information to the buffer." << std::endl;
+  checkError("Failed to send sound information to the buffer");
 
   alSourcei(m_source, AL_BUFFER, static_cast<int>(m_buffer));
+  checkError("Failed to map the sound buffer to the source");
+}
 
-  if (alGetError() != AL_NO_ERROR)
-    std::cerr << "Error: Failed to map the sound buffer to the source." << std::endl;
+void Sound::repeat(bool repeat) const {
+  alSourcei(m_source, AL_LOOPING, repeat);
+  checkError("Failed to change the sound's repeat state");
+}
+
+void Sound::play() const {
+  alSourcePlay(m_source);
+
+  int state = AL_PLAYING;
+  while (state == AL_PLAYING && alGetError() == AL_NO_ERROR)
+    alGetSourcei(m_source, AL_SOURCE_STATE, &state);
 }
 
 Sound& Sound::operator=(Sound&& sound) noexcept {
@@ -86,10 +96,8 @@ Sound::~Sound() {
   if (m_source != std::numeric_limits<unsigned int>::max())
     alDeleteSources(1, &m_source);
 
-  if (m_buffer == std::numeric_limits<unsigned int>::max())
-    return;
-
-  alDeleteBuffers(1, &m_buffer);
+  if (m_buffer != std::numeric_limits<unsigned int>::max())
+    alDeleteBuffers(1, &m_buffer);
 }
 
 } // namespace Raz

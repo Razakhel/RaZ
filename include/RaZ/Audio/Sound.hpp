@@ -36,6 +36,11 @@ public:
   /// Loads a sound file.
   /// \param filePath Path to the file to load.
   void load(const FilePath& filePath);
+  /// Sets the sound's repeat state.
+  /// \param repeat Repeat state; true if the sound should be repeated, false otherwise.
+  void repeat(bool repeat) const;
+  /// Plays the sound.
+  void play() const;
 
   Sound& operator=(const Sound&) = delete;
   Sound& operator=(Sound&& sound) noexcept;
