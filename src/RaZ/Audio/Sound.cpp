@@ -56,7 +56,7 @@ void Sound::load(const FilePath& filePath) {
     if (format == "wav")
       loadWav(file);
     else
-      std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
+      std::cerr << "Warning: '" + format + "' sound format is not supported" << std::endl;
   } else {
     std::cerr << "Error: Couldn't open the file '" + filePath + "'" << std::endl;
   }

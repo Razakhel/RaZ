@@ -476,7 +476,7 @@ endif ()
 
 find_package(OpenAL REQUIRED)
 
-target_include_directories(RaZ SYSTEM PRIVATE ${OPENAL_INCLUDE_DIRS})
+target_include_directories(RaZ SYSTEM PUBLIC ${OPENAL_INCLUDE_DIRS})
 target_link_libraries(RaZ PUBLIC ${OPENAL_LIBS})
 
 #########################

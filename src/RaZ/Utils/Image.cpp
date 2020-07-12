@@ -69,7 +69,7 @@ void Image::read(const FilePath& filePath, bool flipVertically) {
     else if (format == "tga")
       readTga(file, flipVertically);
     else
-      std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
+      std::cerr << "Warning: '" + format + "' image format is not supported" << std::endl;
   } else {
     std::cerr << "Error: Couldn't open the file '" + filePath + "'" << std::endl;
   }
@@ -86,7 +86,7 @@ void Image::save(const FilePath& filePath, bool flipVertically) const {
     /*else if (format == "tga")
       saveTga(file, flipVertically);*/
     else
-      std::cerr << "Warning: '" + format + "' format is not supported, image ignored" << std::endl;
+      std::cerr << "Warning: '" + format + "' image format is not supported" << std::endl;
   } else {
     throw std::runtime_error("Error: Unable to create a file as '" + filePath + "'; path to file must exist");
   }
