@@ -53,6 +53,7 @@ set(
     Main.cpp
 
     RaZ/*.cpp
+    RaZ/Audio/*.cpp
     RaZ/Math/*.cpp
     RaZ/Render/*.cpp
     RaZ/Utils/*.cpp

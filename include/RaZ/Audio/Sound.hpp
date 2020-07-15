@@ -32,6 +32,8 @@ public:
   Sound(Sound&& sound) noexcept;
 
   constexpr unsigned int getBufferIndex() const noexcept { return m_buffer; }
+  constexpr SoundFormat getFormat() const noexcept { return m_format; }
+  constexpr int getFrequency() const noexcept { return m_frequency; }
 
   /// Loads a sound file.
   /// \param filePath Path to the file to load.

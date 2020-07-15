@@ -146,9 +146,10 @@ script:
     #########
 
     # Run Docker, build RaZ, launch unit tests if asked, and generate code coverage details & upload them to Coveralls if asked
+    # The ALSOFT_DRIVERS environment variable is defined to null, to allow OpenAL to be initialized without a specific driver
     # Xvfb allows to run a program in headless mode (without a screen); this allows GLFW to be initialized properly
     - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ ${CXX_COMPILER} != "emcc" ]; then
-        docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
+        docker run --name RaZ -w /RaZ -v `pwd`:/RaZ -e ALSOFT_DRIVERS=null -e TRAVIS_JOB_ID="$TRAVIS_JOB_ID" -e TRAVIS_BRANCH="$TRAVIS_BRANCH" raz
             bash -c "
                 mkdir build && cd build &&
                 cmake -G \"Unix Makefiles\" -DCMAKE_C_COMPILER=${C_COMPILER} -DCMAKE_CXX_COMPILER=${CXX_COMPILER} -DCMAKE_BUILD_TYPE=Debug \
