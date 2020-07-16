@@ -57,12 +57,25 @@ public:
   void repeat(bool repeat) const noexcept;
   /// Plays the sound.
   void play() const noexcept;
+  /// Pauses the sound.
+  void pause() const noexcept;
+  /// Stops the sound.
+  void stop() const noexcept;
   /// Recovers the current state of the sound.
   /// \return Sound's state.
   SoundState recoverState() const noexcept;
   /// Checks if the sound is currently being played.
   /// \return True if the sound is being played, false otherwise.
+  /// \see recoverState()
   bool isPlaying() const noexcept { return (recoverState() == SoundState::PLAYING); }
+  /// Checks if the sound is currently paused.
+  /// \return True if the sound is paused, false otherwise.
+  /// \see recoverState()
+  bool isPaused() const noexcept { return (recoverState() == SoundState::PAUSED); }
+  /// Checks if the sound is currently stopped.
+  /// \return True if the sound is stopped, false otherwise.
+  /// \see recoverState()
+  bool isStopped() const noexcept { return (recoverState() == SoundState::STOPPED); }
 
   Sound& operator=(const Sound&) = delete;
   Sound& operator=(Sound&& sound) noexcept;

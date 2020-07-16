@@ -23,7 +23,7 @@ bool AudioSystem::update(float /* deltaTime */) {
     if (entity->hasComponent<Sound>()) {
       const Sound& sound = entity->getComponent<Sound>();
 
-      if (!sound.isPlaying())
+      if (!sound.isPaused() && !sound.isStopped())
         sound.play();
     }
   }

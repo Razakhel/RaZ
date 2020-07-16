@@ -84,7 +84,21 @@ void Sound::repeat(bool repeat) const noexcept {
 }
 
 void Sound::play() const noexcept {
+  if (isPlaying())
+    return;
+
   alSourcePlay(m_source);
+  checkError("Failed to play/resume the sound");
+}
+
+void Sound::pause() const noexcept {
+  alSourcePause(m_source);
+  checkError("Failed to pause the sound");
+}
+
+void Sound::stop() const noexcept {
+  alSourceStop(m_source);
+  checkError("Failed to stop the sound");
 }
 
 SoundState Sound::recoverState() const noexcept {
