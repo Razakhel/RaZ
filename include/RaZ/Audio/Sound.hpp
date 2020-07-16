@@ -24,6 +24,13 @@ enum class SoundFormat : int {
   STEREO_F64 = 65555 /* AL_FORMAT_STEREO_DOUBLE_EXT */  ///< Stereo format on 64 floating-point bits (double).
 };
 
+enum class SoundState : int {
+  INITIAL = 4113 /* AL_INITIAL */, ///< Initial state, nothing is happening.
+  PLAYING = 4114 /* AL_PLAYING */, ///< Being played.
+  PAUSED  = 4115 /* AL_PAUSED  */, ///< Paused.
+  STOPPED = 4116 /* AL_STOPPED */  ///< Stopped.
+};
+
 class Sound final : public Component {
 public:
   Sound();
@@ -43,6 +50,12 @@ public:
   void repeat(bool repeat) const;
   /// Plays the sound.
   void play() const;
+  /// Recovers the current state of the sound.
+  /// \return Sound's state.
+  SoundState recoverState() const noexcept;
+  /// Checks if the sound is currently being played.
+  /// \return True if the sound is being played, false otherwise.
+  bool isPlaying() const noexcept { return (recoverState() == SoundState::PLAYING); }
 
   Sound& operator=(const Sound&) = delete;
   Sound& operator=(Sound&& sound) noexcept;

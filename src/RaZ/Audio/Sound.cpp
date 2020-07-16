@@ -75,10 +75,13 @@ void Sound::repeat(bool repeat) const {
 
 void Sound::play() const {
   alSourcePlay(m_source);
+}
 
-  int state = AL_PLAYING;
-  while (state == AL_PLAYING && alGetError() == AL_NO_ERROR)
-    alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+SoundState Sound::recoverState() const noexcept {
+  int state {};
+  alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+
+  return static_cast<SoundState>(state);
 }
 
 Sound& Sound::operator=(Sound&& sound) noexcept {

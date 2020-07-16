@@ -16,9 +16,9 @@ int main() {
   auto& audio = world.addSystem<Raz::AudioSystem>();
   std::cout << "Current audio device: " << audio.recoverCurrentDevice() << std::endl;
 
-  world.addEntityWithComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
+  const Raz::Sound& sound = world.addEntityWithComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s).getComponent<Raz::Sound>();
 
-  app.runOnce();
+  app.run();
 
   return EXIT_SUCCESS;
 }
