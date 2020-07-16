@@ -46,6 +46,12 @@ public:
   /// Loads a sound file.
   /// \param filePath Path to the file to load.
   void load(const FilePath& filePath);
+  /// Sets the sound's pitch multiplier.
+  /// \param pitch Sound's pitch multiplier; must be positive. 1 is the default.
+  void setPitch(float pitch) const noexcept;
+  /// Sets the sound's gain (volume).
+  /// \param gain Sound's gain; must be positive. 1 is the default.
+  void setGain(float gain) const noexcept;
   /// Sets the audio source's position.
   /// \param position New source's position.
   void setPosition(const Vec3f& position) const noexcept;
@@ -61,6 +67,8 @@ public:
   void pause() const noexcept;
   /// Stops the sound.
   void stop() const noexcept;
+  /// Rewinds the sound.
+  void rewind() const noexcept;
   /// Recovers the current state of the sound.
   /// \return Sound's state.
   SoundState recoverState() const noexcept;

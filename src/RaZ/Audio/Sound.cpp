@@ -68,6 +68,20 @@ void Sound::load(const FilePath& filePath) {
   checkError("Failed to map the sound buffer to the source");
 }
 
+void Sound::setPitch(float pitch) const noexcept {
+  assert("Error: The source's pitch must be positive." && pitch >= 0.f);
+
+  alSourcef(m_source, AL_PITCH, pitch);
+  checkError("Failed to set the source's pitch");
+}
+
+void Sound::setGain(float gain) const noexcept {
+  assert("Error: The source's gain must be positive." && gain >= 0.f);
+
+  alSourcef(m_source, AL_GAIN, gain);
+  checkError("Failed to set the source's gain");
+}
+
 void Sound::setPosition(const Vec3f& position) const noexcept {
   alSource3f(m_source, AL_POSITION, position[0], position[1], position[2]);
   checkError("Failed to set the source's position");
@@ -99,6 +113,11 @@ void Sound::pause() const noexcept {
 void Sound::stop() const noexcept {
   alSourceStop(m_source);
   checkError("Failed to stop the sound");
+}
+
+void Sound::rewind() const noexcept {
+  alSourceRewind(m_source);
+  checkError("Failed to rewind the sound");
 }
 
 SoundState Sound::recoverState() const noexcept {
