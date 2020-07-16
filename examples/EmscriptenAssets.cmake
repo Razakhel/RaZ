@@ -1,4 +1,10 @@
-set(RaZ_FullDemo_assets
+#####################
+# Assets - FullDemo #
+#####################
+
+set(
+    RaZ_FullDemo_ASSETS
+
     assets/icons/RaZ_logo_128.png
     assets/meshes/shield.obj
     assets/materials/shield.mtl
@@ -15,16 +21,26 @@ set(RaZ_FullDemo_assets
     assets/textures/shield_ao.png
 )
 
-foreach (ASSET_PATH ${RaZ_FullDemo_assets})
+foreach (ASSET_PATH ${RaZ_FullDemo_ASSETS})
     target_link_options(RaZ_FullDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
 endforeach ()
 
-target_link_options(RaZ_FullDemo PRIVATE
+target_link_options(
+    RaZ_FullDemo
+
+    PRIVATE
+
     "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
-set(RaZ_MinDemo_assets
+####################
+# Assets - MinDemo #
+####################
+
+set(
+    RaZ_MinDemo_ASSETS
+
     assets/meshes/ball.obj
     assets/materials/test.mtl
     assets/textures/rustediron_albedo.png
@@ -33,16 +49,26 @@ set(RaZ_MinDemo_assets
     assets/textures/rustediron_roughness.png
 )
 
-foreach (ASSET_PATH ${RaZ_MinDemo_assets})
+foreach (ASSET_PATH ${RaZ_MinDemo_ASSETS})
     target_link_options(RaZ_MinDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
 endforeach ()
 
-target_link_options(RaZ_MinDemo PRIVATE
+target_link_options(
+    RaZ_MinDemo
+
+    PRIVATE
+
     "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
-set(RaZ_ShowcaseDemo_assets
+#########################
+# Assets - ShowcaseDemo #
+#########################
+
+set(
+    RaZ_ShowcaseDemo_ASSETS
+
     # Skyboxes
     assets/skyboxes/clouds_right.png
     assets/skyboxes/clouds_top.png
@@ -151,14 +177,39 @@ set(RaZ_ShowcaseDemo_assets
     assets/textures/cerberus_metallic.png
     assets/textures/cerberus_roughness.png
     assets/textures/cerberus_ao.png
-
 )
 
-foreach (ASSET_PATH ${RaZ_ShowcaseDemo_assets})
+foreach (ASSET_PATH ${RaZ_ShowcaseDemo_ASSETS})
     target_link_options(RaZ_ShowcaseDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
 endforeach ()
 
-target_link_options(RaZ_ShowcaseDemo PRIVATE
+target_link_options(
+    RaZ_ShowcaseDemo
+
+    PRIVATE
+
     "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+)
+
+######################
+# Assets - SoundDemo #
+######################
+
+set(
+    RaZ_SoundDemo_ASSETS
+
+    assets/sounds/wave_seagulls.wav
+)
+
+foreach (ASSET_PATH ${RaZ_SoundDemo_ASSETS})
+    target_link_options(RaZ_SoundDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+endforeach ()
+
+target_link_options(
+    RaZ_SoundDemo
+
+    PRIVATE
+
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
