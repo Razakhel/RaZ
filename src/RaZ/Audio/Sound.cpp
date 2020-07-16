@@ -68,12 +68,22 @@ void Sound::load(const FilePath& filePath) {
   checkError("Failed to map the sound buffer to the source");
 }
 
-void Sound::repeat(bool repeat) const {
+void Sound::setPosition(const Vec3f& position) const noexcept {
+  alSource3f(m_source, AL_POSITION, position[0], position[1], position[2]);
+  checkError("Failed to set the source's position");
+}
+
+void Sound::setVelocity(const Vec3f& velocity) const noexcept {
+  alSource3f(m_source, AL_VELOCITY, velocity[0], velocity[1], velocity[2]);
+  checkError("Failed to set the source's velocity");
+}
+
+void Sound::repeat(bool repeat) const noexcept {
   alSourcei(m_source, AL_LOOPING, repeat);
   checkError("Failed to change the sound's repeat state");
 }
 
-void Sound::play() const {
+void Sound::play() const noexcept {
   alSourcePlay(m_source);
 }
 

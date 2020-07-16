@@ -4,6 +4,7 @@
 #define RAZ_SOUND_HPP
 
 #include "RaZ/Component.hpp"
+#include "RaZ/Math/Vector.hpp"
 
 #include <fstream>
 #include <limits>
@@ -45,11 +46,17 @@ public:
   /// Loads a sound file.
   /// \param filePath Path to the file to load.
   void load(const FilePath& filePath);
+  /// Sets the audio source's position.
+  /// \param position New source's position.
+  void setPosition(const Vec3f& position) const noexcept;
+  /// Sets the audio source's velocity.
+  /// \param velocity New source's velocity.
+  void setVelocity(const Vec3f& velocity) const noexcept;
   /// Sets the sound's repeat state.
   /// \param repeat Repeat state; true if the sound should be repeated, false otherwise.
-  void repeat(bool repeat) const;
+  void repeat(bool repeat) const noexcept;
   /// Plays the sound.
-  void play() const;
+  void play() const noexcept;
   /// Recovers the current state of the sound.
   /// \return Sound's state.
   SoundState recoverState() const noexcept;
