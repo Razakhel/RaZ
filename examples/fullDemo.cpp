@@ -3,32 +3,75 @@
 using namespace std::literals;
 
 int main() {
+  ////////////////////
+  // Initialization //
+  ////////////////////
+
   Raz::Application app;
   Raz::World& world = app.addWorld(Raz::World(10));
+
+  ///////////////
+  // Rendering //
+  ///////////////
 
   auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ", 2);
   renderSystem.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s),
                                   Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
 
+  renderSystem.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s, RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
+                                       RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,   RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
+                                       RAZ_ROOT + "assets/skyboxes/clouds_front.png"s, RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
+
   Raz::Window& window = renderSystem.getWindow();
-  window.enableOverlay();
   window.setIcon(RAZ_ROOT + "assets/icons/RaZ_logo_128.png"s);
+
+#if !defined(USE_OPENGL_ES)
+  // Allow wireframe toggling
+  bool isWireframe = false;
+  window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
+    isWireframe = !isWireframe;
+    Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
+  }, Raz::Input::ONCE);
+#endif
+
+  // Allowing to quit the application with the Escape key
+  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+
+  ///////////////////
+  // Camera entity //
+  ///////////////////
 
   Raz::Entity& camera = renderSystem.getCameraEntity();
   auto& cameraComp    = camera.getComponent<Raz::Camera>();
   auto& cameraTrans   = camera.getComponent<Raz::Transform>();
   cameraTrans.setPosition(Raz::Vec3f(0.f, 0.f, -5.f));
 
+  /////////////////
+  // Mesh entity //
+  /////////////////
+
   Raz::Entity& mesh = world.addEntity();
-  auto& meshTrans   = mesh.addComponent<Raz::Transform>();
   mesh.addComponent<Raz::Mesh>(RAZ_ROOT + "assets/meshes/shield.obj"s);
 
+  auto& meshTrans = mesh.addComponent<Raz::Transform>();
   meshTrans.scale(0.2f);
   meshTrans.rotate(180.0_deg, Raz::Axis::Y);
 
-  renderSystem.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s, RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
-                                       RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,   RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
-                                       RAZ_ROOT + "assets/skyboxes/clouds_front.png"s, RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
+  window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) { mesh.disable(); },
+                        Raz::Input::ONCE,
+                        [&mesh] () { mesh.enable(); });
+
+  ///////////
+  // Audio //
+  ///////////
+
+  world.addSystem<Raz::AudioSystem>();
+  auto& meshSound = mesh.addComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
+  meshSound.repeat(true);
+
+  //////////////////
+  // Light entity //
+  //////////////////
 
   Raz::Entity& light = world.addEntity();
   /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT, // Type
@@ -40,22 +83,10 @@ int main() {
                                                    Raz::Vec3f(1.f));            // Color (RGB)
   auto& lightTrans = light.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 1.f, 0.f));
 
-  window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) { mesh.disable(); },
-                        Raz::Input::ONCE,
-                        [&mesh] () { mesh.enable(); });
+  /////////////////////
+  // Camera controls //
+  /////////////////////
 
-#if !defined(USE_OPENGL_ES)
-  // Allow wireframe toggling
-  bool isWireframe = false;
-  window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
-    isWireframe = !isWireframe;
-    Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
-  }, Raz::Input::ONCE);
-#endif
-
-  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
-
-  // Camera controls
   float cameraSpeed = 1.f;
   window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
                         [&cameraSpeed] (float /* deltaTime */) { cameraSpeed = 2.f; },
@@ -100,7 +131,10 @@ int main() {
     cameraTrans.rotate(-90.0_deg * deltaTime, Raz::Axis::Z); // Roll to the right
   });
 
-  // Mesh controls
+  ///////////////////
+  // Mesh controls //
+  ///////////////////
+
   window.addKeyCallback(Raz::Keyboard::T, [&meshTrans] (float deltaTime) { meshTrans.move(0.f, 0.f,  10.f * deltaTime); });
   window.addKeyCallback(Raz::Keyboard::G, [&meshTrans] (float deltaTime) { meshTrans.move(0.f, 0.f, -10.f * deltaTime); });
   window.addKeyCallback(Raz::Keyboard::F, [&meshTrans] (float deltaTime) { meshTrans.move(-10.f * deltaTime, 0.f, 0.f); });
@@ -114,7 +148,29 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTrans] (float deltaTime) { meshTrans.rotate(-90.0_deg * deltaTime, Raz::Axis::Y); });
   window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTrans] (float deltaTime) { meshTrans.rotate(90.0_deg * deltaTime, Raz::Axis::Y); });
 
-  // Light controls
+  // Toggling play/pause
+  window.addKeyCallback(Raz::Keyboard::NUM0, [&meshSound] (float /* deltaTime */) {
+    if (meshSound.isPlaying()) {
+      meshSound.pause();
+    } else {
+      meshSound.play();
+      std::cout << "Sound time: " << meshSound.recoverElapsedTime() << " minutes" << std::endl;
+    }
+  }, Raz::Input::ONCE);
+
+  // Stopping the sound
+  window.addKeyCallback(Raz::Keyboard::DECIMAL, [&meshSound] (float /* deltaTime */) { meshSound.stop(); }, Raz::Input::ONCE);
+
+  // Adding a new sound on the camera's position
+  window.addKeyCallback(Raz::Keyboard::ADD, [&world, &cameraTrans] (float /* deltaTime */) {
+    Raz::Entity& newSound = world.addEntityWithComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
+    newSound.addComponent<Raz::Transform>(cameraTrans.getPosition());
+  }, Raz::Input::ONCE);
+
+  ////////////////////
+  // Light controls //
+  ////////////////////
+
   window.addKeyCallback(Raz::Keyboard::I, [&lightTrans, &renderSystem] (float deltaTime) {
     lightTrans.translate(0.f, 0.f, 10.f * deltaTime);
     renderSystem.updateLights();
@@ -148,7 +204,10 @@ int main() {
 
   window.addKeyCallback(Raz::Keyboard::F5, [&renderSystem] (float /* deltaTime */) { renderSystem.updateShaders(); });
 
-  // Mouse callbacks
+  /////////////////////
+  // Mouse callbacks //
+  /////////////////////
+
   window.addMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
     cameraComp.setFieldOfView(Raz::Degreesf(std::max(15.f,
                                             std::min(90.f, (Raz::Degreesf(cameraComp.getFieldOfView()) + static_cast<float>(-yOffset) * 2.f).value))));
@@ -167,7 +226,12 @@ int main() {
                         Raz::Input::ONCE,
                         [&window] () { window.disableCursor(); });
 
-  // Overlay features
+  /////////////
+  // Overlay //
+  /////////////
+
+  window.enableOverlay();
+
   window.addOverlayLabel("RaZ - Full demo");
   window.addOverlaySeparator();
   window.addOverlayCheckbox("Enable face culling",
@@ -181,6 +245,10 @@ int main() {
   window.addOverlaySeparator();
   window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
   window.addOverlayFpsCounter("FPS: %.1f");
+
+  //////////////////////////
+  // Starting application //
+  //////////////////////////
 
   app.run();
 
