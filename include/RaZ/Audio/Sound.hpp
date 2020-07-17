@@ -84,6 +84,9 @@ public:
   /// \return True if the sound is stopped, false otherwise.
   /// \see recoverState()
   bool isStopped() const noexcept { return (recoverState() == SoundState::STOPPED); }
+  /// Recovers the amount of minutes the sound has been played so far.
+  /// \return Sound's elapsed time, in minutes.
+  float recoverElapsedTime() const noexcept;
 
   Sound& operator=(const Sound&) = delete;
   Sound& operator=(Sound&& sound) noexcept;
@@ -91,7 +94,7 @@ public:
   ~Sound() override;
 
 private:
-  /// Loads a [WAV](https://fr.wikipedia.org/wiki/Waveform_Audio_File_Format) audio file to memory.
+  /// Loads a [WAV](https://en.wikipedia.org/wiki/WAV) audio file to memory.
   /// \param file File to load.
   void loadWav(std::ifstream& file);
 

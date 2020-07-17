@@ -127,6 +127,13 @@ SoundState Sound::recoverState() const noexcept {
   return static_cast<SoundState>(state);
 }
 
+float Sound::recoverElapsedTime() const noexcept {
+  float seconds {};
+  alGetSourcef(m_source, AL_SEC_OFFSET, &seconds);
+
+  return (seconds / 60.f);
+}
+
 Sound& Sound::operator=(Sound&& sound) noexcept {
   std::swap(m_buffer, sound.m_buffer);
   std::swap(m_source, sound.m_source);
