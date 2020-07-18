@@ -19,6 +19,8 @@ using EntityPtr = std::unique_ptr<Entity>;
 class Entity {
 public:
   explicit Entity(std::size_t index, bool enabled = true) : m_id{ index }, m_enabled{ enabled } {}
+  Entity(const Entity&) = delete;
+  Entity(Entity&&) noexcept = delete;
 
   std::size_t getId() const { return m_id; }
   bool isEnabled() const { return m_enabled; }
@@ -66,6 +68,9 @@ public:
   void enable(bool enabled = true) { m_enabled = enabled; }
   /// Disables the entity.
   void disable() { enable(false); }
+
+  Entity& operator=(const Entity&) = delete;
+  Entity& operator=(Entity&&) noexcept = delete;
 
 protected:
   Entity() = default;
