@@ -51,6 +51,8 @@ void Sound::load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (file) {
+    m_data.clear();
+
     const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
     if (format == "wav")
