@@ -21,6 +21,7 @@ enum class OverlayElementType {
   LABEL,
   BUTTON,
   CHECKBOX,
+  SLIDER,
   TEXTBOX,
   SEPARATOR,
   FRAME_TIME,
@@ -30,6 +31,8 @@ enum class OverlayElementType {
 class Overlay {
 public:
   explicit Overlay(GLFWwindow* window);
+  Overlay(const Overlay&) = delete;
+  Overlay(Overlay&&) noexcept = default;
 
   template <typename... Args>
   static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
@@ -37,12 +40,16 @@ public:
   void addLabel(std::string label);
   void addButton(std::string label, std::function<void()> actionClick);
   void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
+  void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue);
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
   void addSeparator();
   void addFrameTime(std::string formattedLabel);
   void addFpsCounter(std::string formattedLabel);
   bool hasKeyboardFocus() const;
   void render();
+
+  Overlay& operator=(const Overlay&) = delete;
+  Overlay& operator=(Overlay&&) noexcept = default;
 
   ~Overlay();
 
@@ -58,6 +65,9 @@ private:
 
   class OverlayCheckbox;
   using OverlayCheckboxPtr = std::unique_ptr<OverlayCheckbox>;
+
+  class OverlaySlider;
+  using OverlaySliderPtr = std::unique_ptr<OverlaySlider>;
 
   class OverlayTextbox;
   using OverlayTextboxPtr = std::unique_ptr<OverlayTextbox>;
@@ -129,6 +139,25 @@ private:
     std::function<void()> m_actionOn {};
     std::function<void()> m_actionOff {};
     bool m_isChecked {};
+  };
+
+  class OverlaySlider final : public OverlayElement {
+    friend Overlay;
+
+  public:
+    OverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue)
+      : OverlayElement(std::move(label)), m_actionSlide{ std::move(actionSlide) }, m_minValue{ minValue }, m_maxValue{ maxValue }, m_currentValue{ minValue } {}
+
+    OverlayElementType getType() const override { return OverlayElementType::SLIDER; }
+
+    template <typename... Args>
+    static OverlaySliderPtr create(Args&&... args) { return std::make_unique<OverlaySlider>(std::forward<Args>(args)...); }
+
+  private:
+    std::function<void(float)> m_actionSlide {};
+    float m_minValue {};
+    float m_maxValue {};
+    float m_currentValue {};
   };
 
   class OverlayTextbox final : public OverlayElement {

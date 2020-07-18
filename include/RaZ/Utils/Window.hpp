@@ -28,7 +28,7 @@ class Window {
 public:
   Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t antiAliasingSampleCount = 1);
   Window(const Window&) = delete;
-  Window(Window&&) = default;
+  Window(Window&&) noexcept = default;
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -119,6 +119,12 @@ public:
   /// \param actionOff Action to be executed when toggled off.
   /// \param initVal Initial value, checked or not.
   void addOverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
+  /// Adds a floating-point slider on the overlay.
+  /// \param label Text to be displayed beside the slider.
+  /// \param actionSlide Action to be executed on a value change.
+  /// \param minValue Lower value bound.
+  /// \param maxValue Upper value bound.
+  void addOverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue);
   /// Adds a texbox on the overlay.
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.
@@ -144,7 +150,7 @@ public:
   void close();
 
   Window& operator=(const Window&) = delete;
-  Window& operator=(Window&&) = default;
+  Window& operator=(Window&&) noexcept = default;
 
   ~Window() { close(); }
 

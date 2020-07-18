@@ -233,7 +233,9 @@ int main() {
   window.enableOverlay();
 
   window.addOverlayLabel("RaZ - Full demo");
+
   window.addOverlaySeparator();
+
   window.addOverlayCheckbox("Enable face culling",
                             [&window] () { window.enableFaceCulling(); },
                             [&window] () { window.disableFaceCulling(); },
@@ -242,7 +244,13 @@ int main() {
                             [&window] () { window.enableVerticalSync(); },
                             [&window] () { window.disableVerticalSync(); },
                             window.recoverVerticalSyncState());
+
   window.addOverlaySeparator();
+
+  window.addOverlaySlider("Sound volume", [&meshSound] (float value) { meshSound.setGain(value); }, 0.f, 1.f);
+
+  window.addOverlaySeparator();
+
   window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
   window.addOverlayFpsCounter("FPS: %.1f");
 

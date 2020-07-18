@@ -33,6 +33,10 @@ void Overlay::addCheckbox(std::string label, std::function<void()> actionOn, std
   m_elements.emplace_back(OverlayCheckbox::create(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
 }
 
+void Overlay::addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue) {
+  m_elements.emplace_back(OverlaySlider::create(std::move(label), std::move(actionSlide), minValue, maxValue));
+}
+
 void Overlay::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
   m_elements.emplace_back(OverlayTextbox::create(std::move(label), std::move(callback)));
   static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
@@ -88,6 +92,16 @@ void Overlay::render() {
           else
             checkbox.m_actionOff();
         }
+
+        break;
+      }
+
+      case OverlayElementType::SLIDER:
+      {
+        auto& slider = static_cast<OverlaySlider&>(*element);
+
+        if (ImGui::SliderFloat(slider.m_label.c_str(), &slider.m_currentValue, slider.m_minValue, slider.m_maxValue))
+          slider.m_actionSlide(slider.m_currentValue);
 
         break;
       }
