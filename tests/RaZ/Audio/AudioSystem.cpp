@@ -2,6 +2,18 @@
 
 #include "RaZ/Audio/AudioSystem.hpp"
 
+TEST_CASE("AudioSystem initialization") {
+  {
+    Raz::AudioSystem audio;
+    CHECK(!audio.recoverCurrentDevice().empty());
+  }
+
+  {
+    Raz::AudioSystem audio("non-existing device");
+    CHECK(audio.recoverCurrentDevice().empty());
+  }
+}
+
 TEST_CASE("AudioSystem devices recovery") {
   const std::vector<std::string> devices = Raz::AudioSystem::recoverDevices();
 

@@ -32,6 +32,9 @@ bool AudioSystem::update(float /* deltaTime */) {
 }
 
 std::string AudioSystem::recoverCurrentDevice() const {
+  if (m_device == nullptr) // The system has failed to initialize; returning an empty device name
+    return {};
+
   return alcGetString(m_device, ALC_DEVICE_SPECIFIER);
 }
 
