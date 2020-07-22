@@ -4,7 +4,6 @@ namespace Raz {
 
 Entity& World::addEntity(bool enabled) {
   m_entities.emplace_back(Entity::create(m_maxEntityIndex++, enabled));
-
   m_activeEntityCount += enabled;
 
   return *m_entities.back();
@@ -50,9 +49,9 @@ void World::refresh() {
   m_activeEntityCount = static_cast<std::size_t>(std::distance(m_entities.begin(), entityEnd) + 1);
 
   for (std::size_t entityIndex = 0; entityIndex < m_activeEntityCount; ++entityIndex) {
-    const auto& entity = m_entities[entityIndex];
+    const EntityPtr& entity = m_entities[entityIndex];
 
-    for (auto& system : m_systems) {
+    for (const SystemPtr& system : m_systems) {
       const Bitset matchingComponents = system->getAcceptedComponents() & entity->getEnabledComponents();
 
       // If the system doesn't contain the entity, check if it should (possesses the accepted components); if yes, link it

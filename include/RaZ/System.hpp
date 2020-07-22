@@ -15,6 +15,8 @@ using SystemPtr = std::unique_ptr<System>;
 
 /// System class representing a base System to be inherited.
 class System {
+  friend class World;
+
 public:
   System(const System&) = delete;
   System(System&&) noexcept = delete;
@@ -32,12 +34,6 @@ public:
   /// \param entity Entity to be checked.
   /// \return True if the system contains the entity, false otherwise.
   bool containsEntity(const EntityPtr& entity);
-  /// Links the entity to the system.
-  /// \param entity Entity to be linked.
-  virtual void linkEntity(const EntityPtr& entity);
-  /// Unlinks the entity from the system.
-  /// \param entity Entity to be unlinked.
-  virtual void unlinkEntity(const EntityPtr& entity);
   /// Updates the system.
   /// This function is pure virtual and so must be reimplemented in the derived classes.
   /// \param deltaTime Time elapsed since the last update.
@@ -53,6 +49,13 @@ public:
 
 protected:
   System() = default;
+
+  /// Links the entity to the system.
+  /// \param entity Entity to be linked.
+  virtual void linkEntity(const EntityPtr& entity);
+  /// Unlinks the entity from the system.
+  /// \param entity Entity to be unlinked.
+  virtual void unlinkEntity(const EntityPtr& entity);
 
   std::vector<Entity*> m_entities {};
   Bitset m_acceptedComponents {};
