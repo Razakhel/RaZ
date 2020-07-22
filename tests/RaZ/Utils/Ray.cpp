@@ -108,21 +108,51 @@ TEST_CASE("Ray-plane intersection") {
 }
 
 TEST_CASE("Ray-sphere intersection") {
+  // See: https://www.geogebra.org/3d/sn7ajcj2
+
   const Raz::Sphere sphere1(Raz::Vec3f(0.f), 1.f);
   const Raz::Sphere sphere2(Raz::Vec3f(5.f, 10.f, 0.f), 5.f);
   const Raz::Sphere sphere3(Raz::Vec3f(-10.f, -10.f, 0.f), 1.f);
 
-  CHECK(ray1.intersects(sphere1));
-  CHECK(ray2.intersects(sphere1));
-  CHECK(ray3.intersects(sphere1));
+  Raz::RayHit hit;
 
-  CHECK(ray1.intersects(sphere2));
-  CHECK(ray2.intersects(sphere2));
+  CHECK(ray1.intersects(sphere1, &hit));
+  // TODO: this result is inconsistent with the ray-AABB intersection, which returns the one "behind" the ray's origin;
+  //  one of the two should probably be fixed for consistency
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(0.f, 1.f, 0.f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Axis::Y));
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(1.f));
+
+  CHECK(ray2.intersects(sphere1, &hit));
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(-0.70710677f, -0.70710677f, 0.f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f(-0.70710683f, -0.70710683f, 0.f)));
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(0.4142136f));
+
+  CHECK(ray3.intersects(sphere1, &hit));
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(0.70710677f, 0.70710677f, 0.f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f(0.70710683f, 0.70710683f, 0.f)));
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(0.4142136f));
+
+  CHECK(ray1.intersects(sphere2, &hit));
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(0.f, 10.f, 0.f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(-Raz::Axis::X));
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(10.f));
+
+  CHECK(ray2.intersects(sphere2, &hit));
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(5.0000005f, 5.0000005f, 0.f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(-Raz::Axis::Y));
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(8.4852819f));
+
   CHECK_FALSE(ray3.intersects(sphere2));
 
   CHECK_FALSE(ray1.intersects(sphere3));
+
   CHECK_FALSE(ray2.intersects(sphere3));
-  CHECK(ray3.intersects(sphere3));
+
+  CHECK(ray3.intersects(sphere3, &hit));
+  CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(-9.2928934f, -9.2928934f, 0.f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f(0.70710683f, 0.70710683f, 0.f)));
+  CHECK_THAT(hit.distance, IsNearlyEqualTo(14.5563498f));
 }
 
 TEST_CASE("Ray-triangle intersection") {
