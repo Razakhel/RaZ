@@ -487,6 +487,7 @@ public:
   static void deleteBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteBuffers(unsigned int (&indices)[N]) { deleteBuffers(N, indices); }
   static void deleteBuffer(unsigned int& index) { deleteBuffers(1, &index); }
+  static bool isTexture(unsigned int index);
   static void generateTextures(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateTextures(unsigned int (&indices)[N]) { generateTextures(N, indices); }
   static void generateTexture(unsigned int& index) { generateTextures(1, &index); }
