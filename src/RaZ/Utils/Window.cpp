@@ -235,6 +235,14 @@ void Window::addOverlayTextbox(std::string label, std::function<void(const std::
   m_overlay->addTextbox(std::move(label), std::move(callback));
 }
 
+void Window::addOverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
+  m_overlay->addTexture(texture, maxWidth, maxHeight);
+}
+
+void Window::addOverlayTexture(const Texture& texture) {
+  m_overlay->addTexture(texture);
+}
+
 void Window::addOverlaySeparator() {
   m_overlay->addSeparator();
 }

@@ -42,6 +42,14 @@ void Overlay::addTextbox(std::string label, std::function<void(const std::string
   static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
 }
 
+void Overlay::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
+  m_elements.emplace_back(OverlayTexture::create(texture, maxWidth, maxHeight));
+}
+
+void Overlay::addTexture(const Texture& texture) {
+  m_elements.emplace_back(OverlayTexture::create(texture));
+}
+
 void Overlay::addSeparator() {
   m_elements.emplace_back(OverlaySeparator::create());
 }
@@ -127,6 +135,20 @@ void Overlay::render() {
                          ImGuiInputTextFlags_CallbackCharFilter,
                          callback,
                          &textbox);
+
+        break;
+      }
+
+      case OverlayElementType::TEXTURE:
+      {
+        auto& texture = static_cast<OverlayTexture&>(*element);
+        assert("Error: The given texture is invalid." && Renderer::isTexture(texture.m_index));
+
+        const float minRatio = std::min(ImGui::GetWindowWidth() / texture.m_width, ImGui::GetWindowHeight() / texture.m_height);
+        const ImVec2 textureSize(std::min(texture.m_width, texture.m_width * minRatio),
+                                 std::min(texture.m_height, texture.m_height * minRatio));
+
+        ImGui::Image(reinterpret_cast<ImTextureID>(texture.m_index), textureSize);
 
         break;
       }

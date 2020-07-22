@@ -129,6 +129,14 @@ public:
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.
   void addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback);
+  /// Adds a texture on the overlay.
+  /// \param texture Texture to be displayed.
+  /// \param maxWidth Maximum texture's width.
+  /// \param maxHeight Maximum texture's height.
+  void addOverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  /// Adds a texture on the overlay. The maximum width & height will be those of the texture.
+  /// \param texture Texture to be displayed.
+  void addOverlayTexture(const Texture& texture);
   /// Adds an horizontal separator on the overlay.
   void addOverlaySeparator();
   /// Adds a frame time display on the overlay.

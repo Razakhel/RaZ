@@ -3,6 +3,8 @@
 #ifndef RAZ_OVERLAY_HPP
 #define RAZ_OVERLAY_HPP
 
+#include "RaZ/Render/Texture.hpp"
+
 #include <functional>
 #include <memory>
 #include <string>
@@ -23,6 +25,7 @@ enum class OverlayElementType {
   CHECKBOX,
   SLIDER,
   TEXTBOX,
+  TEXTURE,
   SEPARATOR,
   FRAME_TIME,
   FPS_COUNTER
@@ -42,6 +45,8 @@ public:
   void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
   void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue);
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
+  void addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  void addTexture(const Texture& texture);
   void addSeparator();
   void addFrameTime(std::string formattedLabel);
   void addFpsCounter(std::string formattedLabel);
@@ -71,6 +76,9 @@ private:
 
   class OverlayTextbox;
   using OverlayTextboxPtr = std::unique_ptr<OverlayTextbox>;
+
+  class OverlayTexture;
+  using OverlayTexturePtr = std::unique_ptr<OverlayTexture>;
 
   class OverlaySeparator;
   using OverlaySeparatorPtr = std::unique_ptr<OverlaySeparator>;
@@ -174,6 +182,25 @@ private:
   private:
     std::string m_text {};
     std::function<void(const std::string&)> m_callback {};
+  };
+
+  class OverlayTexture final : public OverlayElement {
+    friend Overlay;
+
+  public:
+    OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight)
+      : OverlayElement(), m_index{ texture.getIndex() }, m_width{ static_cast<float>(maxWidth) }, m_height{ static_cast<float>(maxHeight) } {}
+    OverlayTexture(const Texture& texture) : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
+
+    OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
+
+    template <typename... Args>
+    static OverlayTexturePtr create(Args&&... args) { return std::make_unique<OverlayTexture>(std::forward<Args>(args)...); }
+
+  private:
+    unsigned int m_index {};
+    float m_width {};
+    float m_height {};
   };
 
   class OverlaySeparator final : public OverlayElement {

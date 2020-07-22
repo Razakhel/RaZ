@@ -51,7 +51,7 @@ int main() {
   /////////////////
 
   Raz::Entity& mesh = world.addEntity();
-  mesh.addComponent<Raz::Mesh>(RAZ_ROOT + "assets/meshes/shield.obj"s);
+  auto& meshComp    = mesh.addComponent<Raz::Mesh>(RAZ_ROOT + "assets/meshes/shield.obj"s);
 
   auto& meshTrans = mesh.addComponent<Raz::Transform>();
   meshTrans.scale(0.2f);
@@ -248,6 +248,10 @@ int main() {
   window.addOverlaySeparator();
 
   window.addOverlaySlider("Sound volume", [&meshSound] (float value) { meshSound.setGain(value); }, 0.f, 1.f);
+
+  window.addOverlaySeparator();
+
+  window.addOverlayTexture(*meshComp.getMaterials().front()->getBaseColorMap(), 256, 256);
 
   window.addOverlaySeparator();
 
