@@ -1,5 +1,6 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Math/Transform.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <iostream>
@@ -19,12 +20,23 @@ AudioSystem::AudioSystem(const char* deviceName) {
 }
 
 bool AudioSystem::update(float /* deltaTime */) {
-  for (const Entity* entity : m_entities) {
+  for (Entity* entity : m_entities) {
     if (entity->hasComponent<Sound>()) {
       const Sound& sound = entity->getComponent<Sound>();
 
       if (!sound.isPaused() && !sound.isStopped())
         sound.play();
+
+      if (entity->hasComponent<Transform>()) {
+        auto& soundTrans = entity->getComponent<Transform>();
+
+        // TODO: Transform's update status may be reinitialized in the RenderSystem (and should theoretically be reset in every system, including here)
+        //  A viable solution must be implemented to check for and reset this status in all systems
+        if (soundTrans.hasUpdated()) {
+          sound.setPosition(soundTrans.getPosition());
+          //soundTrans.setUpdated(false);
+        }
+      }
     }
   }
 
