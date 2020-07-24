@@ -1,4 +1,5 @@
 #include "RaZ/Audio/AudioSystem.hpp"
+#include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
@@ -9,6 +10,7 @@ namespace Raz {
 
 AudioSystem::AudioSystem(const char* deviceName) {
   m_acceptedComponents.setBit(Component::getId<Sound>());
+  m_acceptedComponents.setBit(Component::getId<Listener>());
 
   m_device = alcOpenDevice(deviceName);
   if (!m_device)
@@ -20,6 +22,11 @@ AudioSystem::AudioSystem(const char* deviceName) {
 }
 
 bool AudioSystem::update(float /* deltaTime */) {
+#if defined(RAZ_CONFIG_DEBUG)
+  // Checking that only one Listener exists
+  bool hasOneListener = false;
+#endif
+
   for (Entity* entity : m_entities) {
     if (entity->hasComponent<Sound>()) {
       const Sound& sound = entity->getComponent<Sound>();
@@ -36,6 +43,25 @@ bool AudioSystem::update(float /* deltaTime */) {
           sound.setPosition(soundTrans.getPosition());
           //soundTrans.setUpdated(false);
         }
+      }
+    }
+
+    if (entity->hasComponent<Listener>()) {
+#if defined(RAZ_CONFIG_DEBUG)
+      assert("Error: Only one Listener component must exist in an AudioSystem." && !hasOneListener);
+      hasOneListener = true;
+#endif
+
+      assert("Error: A Listener entity must have a Transform component." && entity->hasComponent<Transform>());
+
+      auto& listener      = entity->getComponent<Listener>();
+      auto& listenerTrans = entity->getComponent<Transform>();
+
+      if (listenerTrans.hasUpdated()) {
+        listener.setPosition(listenerTrans.getPosition());
+        listener.setOrientation(Mat3f(listenerTrans.computeTransformMatrix()));
+
+        //listenerTrans.setUpdated(false);
       }
     }
   }
