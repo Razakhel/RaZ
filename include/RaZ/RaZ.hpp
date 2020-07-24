@@ -11,6 +11,7 @@
 #include "System.hpp"
 #include "World.hpp"
 #include "Audio/AudioSystem.hpp"
+#include "Audio/Listener.hpp"
 #include "Audio/Sound.hpp"
 #include "Math/Angle.hpp"
 #include "Math/Constants.hpp"
