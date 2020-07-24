@@ -148,7 +148,11 @@ void Overlay::render() {
         const ImVec2 textureSize(std::min(texture.m_width, texture.m_width * minRatio),
                                  std::min(texture.m_height, texture.m_height * minRatio));
 
-        ImGui::Image(reinterpret_cast<ImTextureID>(texture.m_index), textureSize);
+        // The UV's y component must be reverted, so that the texture isn't flipped upside down
+        const ImVec2 topCoords(0.f, 1.f);
+        const ImVec2 bottomCoords(1.f, 0.f);
+
+        ImGui::Image(reinterpret_cast<ImTextureID>(texture.m_index), textureSize, topCoords, bottomCoords);
 
         break;
       }
