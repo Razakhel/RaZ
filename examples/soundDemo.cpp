@@ -4,7 +4,7 @@ using namespace std::literals;
 
 int main() {
   Raz::Application app;
-  Raz::World& world = app.addWorld(Raz::World(2));
+  Raz::World& world = app.addWorld(2);
 
   const std::vector<std::string> devices = Raz::AudioSystem::recoverDevices();
 

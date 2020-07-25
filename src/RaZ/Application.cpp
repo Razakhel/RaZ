@@ -6,13 +6,6 @@
 
 namespace Raz {
 
-World& Application::addWorld(World world) {
-  m_worlds.emplace_back(std::move(world));
-  m_activeWorlds.setBit(m_worlds.size() - 1);
-
-  return m_worlds.back();
-}
-
 void Application::run() {
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_set_main_loop_arg([] (void* instance) {

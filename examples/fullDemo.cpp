@@ -8,7 +8,7 @@ int main() {
   ////////////////////
 
   Raz::Application app;
-  Raz::World& world = app.addWorld(Raz::World(10));
+  Raz::World& world = app.addWorld(10);
 
   ///////////////
   // Rendering //

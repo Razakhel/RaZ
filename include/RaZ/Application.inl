@@ -4,6 +4,14 @@
 
 namespace Raz {
 
+template <typename... Args>
+World& Application::addWorld(Args&&... args) {
+  m_worlds.emplace_back(std::forward<Args>(args)...);
+  m_activeWorlds.setBit(m_worlds.size() - 1);
+
+  return m_worlds.back();
+}
+
 template <typename F>
 void Application::run(F&& callback) {
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)

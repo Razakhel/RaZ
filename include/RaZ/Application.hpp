@@ -21,9 +21,10 @@ public:
   float getDeltaTime() const { return m_deltaTime; }
 
   /// Adds a World into the Application.
-  /// \param world World to be added.
+  /// \tparam Args Types of the arguments to be forwarded to the World.
+  /// \param args Arguments to be forwarded to the World.
   /// \return Reference to the newly added World.
-  World& addWorld(World world);
+  template <typename... Args> World& addWorld(Args&&... args);
   /// Runs the application.
   void run();
   /// Runs the application and call the given callable between each cycle.

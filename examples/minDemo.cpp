@@ -4,7 +4,7 @@ using namespace std::literals;
 
 int main() {
   Raz::Application app;
-  Raz::World& world = app.addWorld(Raz::World(2));
+  Raz::World& world = app.addWorld(2);
 
   auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
   render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));

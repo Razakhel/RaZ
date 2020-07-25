@@ -99,7 +99,7 @@ inline void loadLakeSkybox(Raz::RenderSystem& render) {
 
 int main() {
   Raz::Application app;
-  Raz::World& world = app.addWorld(Raz::World(1));
+  Raz::World& world = app.addWorld(1);
 
   auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ - Showcase");
 
