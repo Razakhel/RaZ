@@ -16,9 +16,20 @@ int main() {
   auto& audio = world.addSystem<Raz::AudioSystem>();
   std::cout << "Current audio device: " << audio.recoverCurrentDevice() << std::endl;
 
-  const Raz::Sound& sound = world.addEntityWithComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s).getComponent<Raz::Sound>();
+  Raz::Entity& sound = world.addEntity();
+  auto& soundComp    = sound.addComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
+  soundComp.play();
 
-  app.run();
+  float elapsedTime = 0.f;
+
+  app.run([&] () {
+    elapsedTime = std::max(elapsedTime, soundComp.recoverElapsedTime());
+
+    if (!soundComp.isPlaying()) {
+      std::cout << "Sound's duration: " << elapsedTime <<  " minutes" << std::endl;
+      app.quit();
+    }
+  });
 
   return EXIT_SUCCESS;
 }

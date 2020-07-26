@@ -31,9 +31,6 @@ bool AudioSystem::update(float /* deltaTime */) {
     if (entity->hasComponent<Sound>()) {
       const Sound& sound = entity->getComponent<Sound>();
 
-      if (!sound.isPaused() && !sound.isStopped())
-        sound.play();
-
       if (entity->hasComponent<Transform>()) {
         auto& soundTrans = entity->getComponent<Transform>();
 

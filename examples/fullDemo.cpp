@@ -65,9 +65,11 @@ int main() {
   // Audio //
   ///////////
 
-  world.addSystem<Raz::AudioSystem>();
+  auto& audio = world.addSystem<Raz::AudioSystem>();
+
   auto& meshSound = mesh.addComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
   meshSound.repeat(true);
+  meshSound.play();
 
   //////////////////
   // Light entity //
