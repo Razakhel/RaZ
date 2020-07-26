@@ -33,17 +33,14 @@ public:
     : m_window{ Window::create(sceneWidth, sceneHeight, windowTitle, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
 
   bool hasWindow() const { return (m_window != nullptr); }
-  const Window& getWindow() const { assert("Error: Window must be set before being accessed." && m_window); return *m_window; }
+  const Window& getWindow() const { assert("Error: Window must be set before being accessed." && hasWindow()); return *m_window; }
   Window& getWindow() { return const_cast<Window&>(static_cast<const RenderSystem*>(this)->getWindow()); }
-  const Entity& getCameraEntity() const { return m_cameraEntity; }
-  Entity& getCameraEntity() { return m_cameraEntity; }
-  const Camera& getCamera() const { return m_cameraEntity.getComponent<Camera>(); }
-  Camera& getCamera() { return m_cameraEntity.getComponent<Camera>(); }
   const GeometryPass& getGeometryPass() const;
   GeometryPass& getGeometryPass() { return const_cast<GeometryPass&>(static_cast<const RenderSystem*>(this)->getGeometryPass()); }
   const SSRPass& getSSRPass() const;
   SSRPass& getSSRPass() { return const_cast<SSRPass&>(static_cast<const RenderSystem*>(this)->getSSRPass()); }
-  const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && m_cubemap); return *m_cubemap; }
+  bool hasCubemap() const { return m_cubemap.has_value(); }
+  const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && hasCubemap()); return *m_cubemap; }
 
   void setCubemap(Cubemap cubemap) { m_cubemap = std::move(cubemap); }
 
@@ -53,7 +50,6 @@ public:
   void enableSSRPass(FragmentShader fragShader);
   void disableGeometryPass() { m_renderPasses[static_cast<std::size_t>(RenderPassType::GEOMETRY)].reset(); }
   void disableSSRPass() { m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)].reset(); }
-  void linkEntity(const EntityPtr& entity) override;
   bool update(float deltaTime) override;
   void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
   void sendInverseViewMatrix(const Mat4f& invViewMat) const { m_cameraUbo.sendData(invViewMat, sizeof(Mat4f)); }
@@ -70,6 +66,9 @@ public:
   void saveToImage(const FilePath& filePath, TextureFormat format = TextureFormat::RGB) const;
   void destroy() override { if (m_window) m_window->setShouldClose(); }
 
+protected:
+  void linkEntity(const EntityPtr& entity) override;
+
 private:
   void initialize();
   void initialize(unsigned int sceneWidth, unsigned int sceneHeight);
@@ -78,7 +77,7 @@ private:
   unsigned int m_sceneHeight {};
 
   WindowPtr m_window {};
-  Entity m_cameraEntity = Entity(0);
+  Entity* m_cameraEntity {};
 
   std::array<RenderPassPtr, static_cast<std::size_t>(RenderPassType::RENDER_PASS_COUNT)> m_renderPasses {};
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);

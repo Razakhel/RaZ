@@ -32,7 +32,8 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   if (m_window)
     m_window->resize(m_sceneWidth, m_sceneHeight);
 
-  m_cameraEntity.getComponent<Camera>().resizeViewport(m_sceneWidth, m_sceneHeight);
+  if (m_cameraEntity)
+    m_cameraEntity->getComponent<Camera>().resizeViewport(m_sceneWidth, m_sceneHeight);
 
   for (RenderPassPtr& renderPass : m_renderPasses) {
     if (renderPass)
@@ -49,23 +50,13 @@ void RenderSystem::enableSSRPass(FragmentShader fragShader) {
   m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)] = std::make_unique<SSRPass>(m_sceneWidth, m_sceneHeight, std::move(fragShader));
 }
 
-void RenderSystem::linkEntity(const EntityPtr& entity) {
-  System::linkEntity(entity);
-
-  if (entity->hasComponent<Mesh>())
-    entity->getComponent<Mesh>().load(m_renderPasses.front()->getProgram());
-
-  if (entity->hasComponent<Light>())
-    updateLights();
-}
-
 bool RenderSystem::update(float deltaTime) {
   assert("Error: Geometry pass must be enabled for the RenderSystem to be updated." && m_renderPasses.front());
 
   m_renderPasses.front()->getProgram().use();
 
-  auto& camera       = m_cameraEntity.getComponent<Camera>();
-  auto& camTransform = m_cameraEntity.getComponent<Transform>();
+  auto& camera       = m_cameraEntity->getComponent<Camera>();
+  auto& camTransform = m_cameraEntity->getComponent<Transform>();
 
   Mat4f viewProjMat;
 
@@ -118,7 +109,9 @@ bool RenderSystem::update(float deltaTime) {
 }
 
 void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
-  const auto& camera = m_cameraEntity.getComponent<Camera>();
+  assert("Error: A camera must be given to a RenderSystem to send its matrices." && (m_cameraEntity != nullptr));
+
+  const auto& camera = m_cameraEntity->getComponent<Camera>();
 
   m_cameraUbo.bind();
   sendViewMatrix(camera.getViewMatrix());
@@ -126,11 +119,13 @@ void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
   sendProjectionMatrix(camera.getProjectionMatrix());
   sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   sendViewProjectionMatrix(viewProjMat);
-  sendCameraPosition(m_cameraEntity.getComponent<Transform>().getPosition());
+  sendCameraPosition(m_cameraEntity->getComponent<Transform>().getPosition());
 }
 
 void RenderSystem::sendCameraMatrices() const {
-  const auto& camera = m_cameraEntity.getComponent<Camera>();
+  assert("Error: A camera must be given to a RenderSystem to send its matrices." && (m_cameraEntity != nullptr));
+
+  const auto& camera = m_cameraEntity->getComponent<Camera>();
   sendCameraMatrices(camera.getViewMatrix() * camera.getProjectionMatrix());
 }
 
@@ -170,7 +165,7 @@ void RenderSystem::updateLights() const {
 
   std::size_t lightCount = 0;
 
-  for (const auto& entity : m_entities) {
+  for (const Entity* entity : m_entities) {
     if (entity->hasComponent<Light>()) {
       updateLight(entity, lightCount);
       ++lightCount;
@@ -191,7 +186,7 @@ void RenderSystem::updateShaders() const {
   sendCameraMatrices();
   updateLights();
 
-  for (const auto& entity : m_entities) {
+  for (const Entity* entity : m_entities) {
     if (entity->hasComponent<Mesh>())
       entity->getComponent<Mesh>().load(getGeometryPass().getProgram());
   }
@@ -222,14 +217,25 @@ void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format) c
   img.save(filePath, true);
 }
 
+void RenderSystem::linkEntity(const EntityPtr& entity) {
+  System::linkEntity(entity);
+
+  if (entity->hasComponent<Camera>())
+    m_cameraEntity = entity.get();
+
+  if (entity->hasComponent<Light>())
+    updateLights();
+
+  if (entity->hasComponent<Mesh>())
+    entity->getComponent<Mesh>().load(m_renderPasses.front()->getProgram());
+}
+
 void RenderSystem::initialize() {
   Renderer::initialize();
 
-  m_cameraEntity.addComponent<Camera>();
-  m_cameraEntity.addComponent<Transform>();
-
-  m_acceptedComponents.setBit(Component::getId<Mesh>());
+  m_acceptedComponents.setBit(Component::getId<Camera>());
   m_acceptedComponents.setBit(Component::getId<Light>());
+  m_acceptedComponents.setBit(Component::getId<Mesh>());
 
   m_cameraUbo.bindBufferBase(0);
 
@@ -243,8 +249,6 @@ void RenderSystem::initialize() {
       m_cameraUbo.bindUniformBlock(passProgram, "uboCameraMatrices", 0);
     }
   }
-
-  sendCameraMatrices();
 }
 
 void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight) {

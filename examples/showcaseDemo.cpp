@@ -5,7 +5,6 @@ using namespace std::literals;
 inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
   render.updateLights();
-  render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/crytek_sponza.obj"s);
@@ -20,7 +19,6 @@ inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
-  render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/ball.obj"s);
@@ -35,7 +33,6 @@ inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
-  render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/shield.obj"s);
@@ -50,7 +47,6 @@ inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
-  render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/cerberus.obj"s);
@@ -66,7 +62,6 @@ inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
   render.updateLights();
-  render.sendCameraMatrices();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/shaderBall.fbx"s);
@@ -116,8 +111,9 @@ int main() {
   auto& meshTrans = mesh.addComponent<Raz::Transform>();
   mesh.addComponent<Raz::Mesh>();
 
-  auto& cameraTrans = render.getCameraEntity().getComponent<Raz::Transform>();
-  cameraTrans.translate(0.f, 0.f, -5.f);
+  Raz::Entity& camera = world.addEntity();
+  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f));
+  camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
   loadBallScene(mesh, render);
 

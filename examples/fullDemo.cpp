@@ -41,10 +41,9 @@ int main() {
   // Camera entity //
   ///////////////////
 
-  Raz::Entity& camera = renderSystem.getCameraEntity();
-  auto& cameraComp    = camera.getComponent<Raz::Camera>();
-  auto& cameraTrans   = camera.getComponent<Raz::Transform>();
-  cameraTrans.setPosition(Raz::Vec3f(0.f, 0.f, -5.f));
+  Raz::Entity& camera = world.addEntity();
+  auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f));
 
   /////////////////
   // Mesh entity //
