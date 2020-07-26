@@ -23,6 +23,7 @@ TEST_CASE("Sound WAV import") {
 TEST_CASE("Sound operations") {
   Raz::AudioSystem audio;
   Raz::Sound sound(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
+  sound.setGain(0.f); // Nobody wants his ears assaulted by a wild sound when launching tests
 
   sound.play();
   CHECK(sound.isPlaying());
