@@ -68,6 +68,11 @@ public:
   void bind() const;
   /// Unbinds the current texture.
   void unbind() const;
+  /// Resizes the texture.
+  /// \warning This does NOT resize the contained image.
+  /// \param width New texture width.
+  /// \param height New texture height.
+  void resize(unsigned int width, unsigned int height) const;
 
   Texture& operator=(const Texture&) = delete;
   Texture& operator=(Texture&& texture) noexcept;

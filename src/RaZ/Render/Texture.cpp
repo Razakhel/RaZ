@@ -21,31 +21,15 @@ Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, Imag
 
   bind();
 
-  if (colorspace != ImageColorspace::DEPTH) {
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR);
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
-
-    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
-                              0,
-                              static_cast<TextureInternalFormat>(colorspace),
-                              width,
-                              height,
-                              static_cast<TextureFormat>(colorspace),
-                              TextureDataType::UBYTE,
-                              nullptr);
-  } else {
+  if (colorspace == ImageColorspace::DEPTH) {
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, TextureParamValue::NEAREST);
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::NEAREST);
-
-    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
-                              0,
-                              TextureInternalFormat::DEPTH32F,
-                              width,
-                              height,
-                              static_cast<TextureFormat>(colorspace),
-                              TextureDataType::FLOAT,
-                              nullptr);
+  } else {
+    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR);
+    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
   }
+
+  resize(width, height);
 
   if (createMipmaps)
     Renderer::generateMipmap(TextureType::TEXTURE_2D);
@@ -78,7 +62,7 @@ void Texture::load(const FilePath& filePath, bool flipVertically, bool createMip
     const std::array<int, 4> swizzle = { GL_RED,
                                          GL_RED,
                                          GL_RED,
-                                         (m_image.getColorspace() == ImageColorspace::GRAY ? GL_ONE : GL_GREEN) };
+                                         (m_image.getColorspace() == ImageColorspace::GRAY_ALPHA ? GL_GREEN : GL_ONE) };
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_RGBA, swizzle.data());
   }
 
@@ -114,7 +98,7 @@ void Texture::load(const FilePath& filePath, bool flipVertically, bool createMip
                             colorFormat,
                             m_image.getWidth(),
                             m_image.getHeight(),
-                            static_cast<TextureFormat>(m_image.getColorspace()),
+                            static_cast<TextureFormat>(m_image.m_colorspace),
                             (m_image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
                             m_image.getDataPtr());
 
@@ -136,6 +120,28 @@ void Texture::bind() const {
 
 void Texture::unbind() const {
   Renderer::unbindTexture(TextureType::TEXTURE_2D);
+}
+
+void Texture::resize(unsigned int width, unsigned int height) const {
+  if (m_image.m_colorspace == ImageColorspace::DEPTH) {
+    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                              0,
+                              TextureInternalFormat::DEPTH32F,
+                              width,
+                              height,
+                              static_cast<TextureFormat>(m_image.m_colorspace),
+                              TextureDataType::FLOAT,
+                              (m_image.isEmpty() ? nullptr : m_image.getDataPtr()));
+  } else {
+    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                              0,
+                              static_cast<TextureInternalFormat>(m_image.m_colorspace),
+                              width,
+                              height,
+                              static_cast<TextureFormat>(m_image.m_colorspace),
+                              TextureDataType::UBYTE,
+                              (m_image.isEmpty() ? nullptr : m_image.getDataPtr()));
+  }
 }
 
 Texture& Texture::operator=(Texture&& texture) noexcept {
