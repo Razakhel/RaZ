@@ -60,7 +60,9 @@ Written in modern C++ (17), ECS driven, it is primarily developed for learning p
 
 The engine is available under Windows, Linux & macOS; it can also run in a web browser through [WebAssembly](https://webassembly.org/) (using [Emscripten](https://emscripten.org/)).
 
-If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/wiki). For the documentation, [look over here](http://razakhel.github.io/RaZ/doc/)!
+📖 If you want to get started, [head to the wiki](https://github.com/Razakhel/RaZ/wiki). For the documentation, [look over here](http://razakhel.github.io/RaZ/doc/)!
+
+💬 A Discord server dedicated to RaZ is [also available](https://discord.gg/25YGDED)! Feel free to come by to follow the development, ask any question, or just say hi 👋
 
 ### Gallery
 
