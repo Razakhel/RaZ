@@ -245,7 +245,6 @@ void RenderSystem::initialize() {
     if (pass) {
       const ShaderProgram& passProgram = pass->getProgram();
 
-      pass->getFramebuffer().initBuffers(passProgram);
       m_cameraUbo.bindUniformBlock(passProgram, "uboCameraMatrices", 0);
     }
   }

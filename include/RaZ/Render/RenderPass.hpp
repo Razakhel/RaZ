@@ -36,7 +36,7 @@ public:
   /// Resizes the render pass's framebuffer.
   /// \param width New framebuffer's width.
   /// \param height New framebuffer's height.
-  void resize(unsigned int width, unsigned int height) { m_framebuffer.resize(width, height); }
+  void resize(unsigned int width, unsigned int height) { m_writeFramebuffer.resize(width, height); }
 
   RenderPass& operator=(const RenderPass&) = delete;
   RenderPass& operator=(RenderPass&&) noexcept = default;

@@ -45,6 +45,7 @@ public:
   explicit VertexShader(FilePath filePath) : VertexShader() { import(std::move(filePath)); }
 
   static VertexShader loadFromSource(const std::string& source);
+  static VertexShader loadFromSource(const std::string_view& source) { return loadFromSource(std::string(source)); }
 };
 
 class FragmentShader : public Shader {
@@ -53,6 +54,7 @@ public:
   explicit FragmentShader(FilePath filePath) : FragmentShader() { import(std::move(filePath)); }
 
   static FragmentShader loadFromSource(const std::string& source);
+  static FragmentShader loadFromSource(const std::string_view& source) { return loadFromSource(std::string(source)); }
 };
 
 class GeometryShader : public Shader {
@@ -61,6 +63,7 @@ public:
   explicit GeometryShader(FilePath filePath) : GeometryShader() { import(std::move(filePath)); }
 
   static GeometryShader loadFromSource(const std::string& source);
+  static GeometryShader loadFromSource(const std::string_view& source) { return loadFromSource(std::string(source)); }
 };
 
 } // namespace Raz

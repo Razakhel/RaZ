@@ -9,20 +9,15 @@ Framebuffer::Framebuffer() {
   Renderer::generateFramebuffer(m_index);
 }
 
-Framebuffer::Framebuffer(ShaderProgram& program) : Framebuffer() {
-  program.setVertexShader(recoverVertexShader());
-  initBuffers(program);
-}
-
 Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
   : m_index{ std::exchange(fbo.m_index, std::numeric_limits<unsigned int>::max()) },
-    m_depthBuffer{ std::move(fbo.m_depthBuffer) },
+    m_depthBuffer{ std::exchange(fbo.m_depthBuffer, nullptr) },
     m_colorBuffers{ std::move(fbo.m_colorBuffers) } {
   mapBuffers();
 }
 
 VertexShader Framebuffer::recoverVertexShader() {
-  static const std::string vertSource = R"(
+  static constexpr std::string_view vertSource = R"(
     #version 330 core
 
     layout(location = 0) in vec2 vertPosition;
@@ -40,43 +35,29 @@ VertexShader Framebuffer::recoverVertexShader() {
   return VertexShader::loadFromSource(vertSource);
 }
 
-void Framebuffer::addBuffer(TexturePtr texture) {
-  if (texture->getImage().getColorspace() == ImageColorspace::DEPTH) {
+void Framebuffer::addTextureBuffer(const Texture& texture) {
+  if (texture.getImage().getColorspace() == ImageColorspace::DEPTH) {
     assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
 
-    m_depthBuffer = std::move(texture);
+    m_depthBuffer = &texture;
   } else {
     // Adding the color buffer only if it doesn't exist yet
-    if (std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture) == m_colorBuffers.cend())
-      m_colorBuffers.emplace_back(std::move(texture));
+    auto bufferIter = std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), &texture);
+
+    if (bufferIter == m_colorBuffers.cend()) {
+      m_colorBuffers.emplace_back(&texture);
+      bufferIter = m_colorBuffers.cend() - 1;
+    }
   }
 
   mapBuffers();
 }
 
-void Framebuffer::addDepthBuffer(unsigned int width, unsigned int height, int bindingIndex) {
-  addBuffer(Texture::create(width, height, bindingIndex, ImageColorspace::DEPTH, false));
-}
-
-void Framebuffer::addColorBuffer(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace) {
-  addBuffer(Texture::create(width, height, bindingIndex, colorspace, false));
-}
-
-void Framebuffer::initBuffers(const ShaderProgram& program) const {
-  bind();
-
-  program.use();
-  program.sendUniform("uniSceneBuffers.depth",  m_depthBuffer->getBindingIndex());
-  program.sendUniform("uniSceneBuffers.color",  m_colorBuffers[0]->getBindingIndex());
-  program.sendUniform("uniSceneBuffers.normal", m_colorBuffers[1]->getBindingIndex());
-
-  unbind();
-}
-
 void Framebuffer::mapBuffers() const {
   bind();
 
-  Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, TextureType::TEXTURE_2D, m_depthBuffer->getIndex(), 0);
+  if (m_depthBuffer)
+    Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, TextureType::TEXTURE_2D, m_depthBuffer->getIndex(), 0);
 
   std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size());
 
@@ -110,10 +91,12 @@ void Framebuffer::display(const ShaderProgram& program) const {
 
   program.use();
 
-  m_depthBuffer->activate();
-  m_depthBuffer->bind();
+  if (hasDepthBuffer()) {
+    m_depthBuffer->activate();
+    m_depthBuffer->bind();
+  }
 
-  for (const TexturePtr& colorBuffer : m_colorBuffers) {
+  for (const Texture* colorBuffer : m_colorBuffers) {
     colorBuffer->activate();
     colorBuffer->bind();
   }
@@ -121,18 +104,18 @@ void Framebuffer::display(const ShaderProgram& program) const {
   Mesh::drawUnitQuad();
 }
 
-void Framebuffer::resize(unsigned int width, unsigned int height) {
-  m_depthBuffer = Texture::create(width, height, m_depthBuffer->getBindingIndex(), ImageColorspace::DEPTH);
+void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
+  m_depthBuffer->resize(width, height);
 
-  for (TexturePtr& colorBuffer : m_colorBuffers)
-    colorBuffer = Texture::create(width, height, colorBuffer->getBindingIndex(), colorBuffer->getImage().getColorspace(), false);
+  for (const Texture* colorBuffer : m_colorBuffers)
+    colorBuffer->resize(width, height);
 
   mapBuffers();
 }
 
 Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
   std::swap(m_index, fbo.m_index);
-  m_depthBuffer  = std::move(fbo.m_depthBuffer);
+  std::swap(m_depthBuffer, fbo.m_depthBuffer);
   m_colorBuffers = std::move(fbo.m_colorBuffers);
 
   mapBuffers();
