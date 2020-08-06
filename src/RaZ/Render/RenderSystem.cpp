@@ -1,27 +1,10 @@
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
-#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 
 namespace Raz {
-
-const GeometryPass& RenderSystem::getGeometryPass() const {
-  const RenderPassPtr& renderPass = m_renderPasses[static_cast<std::size_t>(RenderPassType::GEOMETRY)];
-
-  assert("Error: Geometry pass isn't enabled." && renderPass);
-
-  return static_cast<const GeometryPass&>(*renderPass);
-}
-
-const SSRPass& RenderSystem::getSSRPass() const {
-  const RenderPassPtr& renderPass = m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)];
-
-  assert("Error: SSR pass isn't enabled." && renderPass);
-
-  return static_cast<const SSRPass&>(*renderPass);
-}
 
 void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   m_sceneWidth  = width;
@@ -35,68 +18,19 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   if (m_cameraEntity)
     m_cameraEntity->getComponent<Camera>().resizeViewport(m_sceneWidth, m_sceneHeight);
 
-  for (RenderPassPtr& renderPass : m_renderPasses) {
-    if (renderPass)
-      renderPass->resize(width, height);
-  }
+  m_renderGraph.resizeViewport(width, height);
 }
 
-void RenderSystem::enableGeometryPass(VertexShader vertShader, FragmentShader fragShader) {
-  m_renderPasses[static_cast<std::size_t>(RenderPassType::GEOMETRY)] = std::make_unique<GeometryPass>(m_sceneWidth, m_sceneHeight,
-                                                                                                      std::move(vertShader), std::move(fragShader));
+RenderPass& RenderSystem::addRenderPass(VertexShader vertShader, FragmentShader fragShader) {
+  return m_renderGraph.addNode(std::move(vertShader), std::move(fragShader));
 }
 
-void RenderSystem::enableSSRPass(FragmentShader fragShader) {
-  m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)] = std::make_unique<SSRPass>(m_sceneWidth, m_sceneHeight, std::move(fragShader));
+RenderPass& RenderSystem::addRenderPass(FragmentShader fragShader) {
+  return m_renderGraph.addNode(std::move(fragShader));
 }
 
 bool RenderSystem::update(float deltaTime) {
-  assert("Error: Geometry pass must be enabled for the RenderSystem to be updated." && m_renderPasses.front());
-
-  m_renderPasses.front()->getProgram().use();
-
-  auto& camera       = m_cameraEntity->getComponent<Camera>();
-  auto& camTransform = m_cameraEntity->getComponent<Transform>();
-
-  Mat4f viewProjMat;
-
-  if (camTransform.hasUpdated()) {
-    if (camera.getCameraType() == CameraType::LOOK_AT) {
-      camera.computeLookAt(camTransform.getPosition());
-    } else {
-      camera.computeViewMatrix(camTransform.computeTranslationMatrix(true),
-                               camTransform.getRotation().inverse());
-    }
-
-    camera.computeInverseViewMatrix();
-
-    const Mat4f& viewMat = camera.getViewMatrix();
-    viewProjMat = viewMat * camera.getProjectionMatrix();
-
-    sendCameraMatrices(viewProjMat);
-
-    camTransform.setUpdated(false);
-  } else {
-    viewProjMat = camera.getViewMatrix() * camera.getProjectionMatrix();
-  }
-
-  for (auto& entity : m_entities) {
-    if (entity->isEnabled()) {
-      if (entity->hasComponent<Mesh>() && entity->hasComponent<Transform>()) {
-        const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
-
-        const ShaderProgram& geometryProgram = m_renderPasses.front()->getProgram();
-
-        geometryProgram.sendUniform("uniModelMatrix", modelMat);
-        geometryProgram.sendUniform("uniMvpMatrix", modelMat * viewProjMat);
-
-        entity->getComponent<Mesh>().draw(geometryProgram);
-      }
-    }
-  }
-
-  if (m_cubemap)
-    m_cubemap->draw(camera);
+  m_renderGraph.execute(*this);
 
 #if defined(RAZ_CONFIG_DEBUG) && !defined(SKIP_RENDERER_ERRORS)
   Renderer::printErrors();
@@ -130,9 +64,7 @@ void RenderSystem::sendCameraMatrices() const {
 }
 
 void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
-  assert("Error: Geometry pass must be enabled for the RenderSystem's lights to be updated." && m_renderPasses.front());
-
-  const ShaderProgram& geometryProgram = getGeometryPass().getProgram();
+  const ShaderProgram& geometryProgram = getGeometryProgram();
 
   geometryProgram.use();
 
@@ -158,11 +90,6 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
 }
 
 void RenderSystem::updateLights() const {
-  assert("Error: Geometry pass must be enabled for the RenderSystem's lights to be updated." && m_renderPasses.front());
-
-  if (!m_renderPasses.front())
-    return;
-
   std::size_t lightCount = 0;
 
   for (const Entity* entity : m_entities) {
@@ -172,23 +99,18 @@ void RenderSystem::updateLights() const {
     }
   }
 
-  getGeometryPass().getProgram().sendUniform("uniLightCount", static_cast<unsigned int>(lightCount));
+  getGeometryProgram().sendUniform("uniLightCount", static_cast<unsigned int>(lightCount));
 }
 
 void RenderSystem::updateShaders() const {
-  assert("Error: Geometry pass must be enabled for the RenderSystem's shaders to be updated." && m_renderPasses.front());
-
-  for (const RenderPassPtr& renderPass : m_renderPasses) {
-    if (renderPass)
-      renderPass->getProgram().updateShaders();
-  }
+  m_renderGraph.updateShaders();
 
   sendCameraMatrices();
   updateLights();
 
   for (const Entity* entity : m_entities) {
     if (entity->hasComponent<Mesh>())
-      entity->getComponent<Mesh>().load(getGeometryPass().getProgram());
+      entity->getComponent<Mesh>().load(getGeometryProgram());
   }
 }
 
@@ -227,7 +149,7 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
     updateLights();
 
   if (entity->hasComponent<Mesh>())
-    entity->getComponent<Mesh>().load(m_renderPasses.front()->getProgram());
+    entity->getComponent<Mesh>().load(getGeometryProgram());
 }
 
 void RenderSystem::initialize() {
@@ -238,16 +160,6 @@ void RenderSystem::initialize() {
   m_acceptedComponents.setBit(Component::getId<Mesh>());
 
   m_cameraUbo.bindBufferBase(0);
-
-  for (std::size_t passIndex = 1; passIndex < m_renderPasses.size(); ++passIndex) {
-    const RenderPassPtr& pass = m_renderPasses[passIndex];
-
-    if (pass) {
-      const ShaderProgram& passProgram = pass->getProgram();
-
-      m_cameraUbo.bindUniformBlock(passProgram, "uboCameraMatrices", 0);
-    }
-  }
 }
 
 void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight) {

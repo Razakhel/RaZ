@@ -15,8 +15,8 @@ int main() {
   ///////////////
 
   auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ", 2);
-  renderSystem.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s),
-                                  Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  renderSystem.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s),
+                                               Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
 
   renderSystem.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s, RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
                                        RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,   RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,

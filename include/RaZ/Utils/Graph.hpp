@@ -16,8 +16,7 @@ public:
   GraphNode(const GraphNode&) = delete;
   GraphNode(GraphNode&&) noexcept = default;
 
-  const std::vector<const T*>& getChildren() const noexcept { return m_children; }
-  const std::vector<T*>& getChildren() noexcept { return m_children; }
+  const std::vector<T*>& getChildren() const noexcept { return m_children; }
   bool isRoot() const noexcept { return m_isRoot; }
 
   /// Links the given nodes as children of the current one.
@@ -78,7 +77,7 @@ public:
   Graph& operator=(const Graph&) = delete;
   Graph& operator=(Graph&&) noexcept = default;
 
-private:
+protected:
   std::vector<NodePtr> m_nodes {};
 };
 

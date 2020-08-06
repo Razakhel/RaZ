@@ -3,12 +3,12 @@
 using namespace std::literals;
 
 inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/crytek_sponza.obj"s);
-  meshComp.load(render.getGeometryPass().getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -1.f, 0.f);
@@ -17,12 +17,12 @@ inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/ball.obj"s);
-  meshComp.load(render.getGeometryPass().getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -31,12 +31,12 @@ inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/shield.obj"s);
-  meshComp.load(render.getGeometryPass().getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -45,12 +45,12 @@ inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/cerberus.obj"s);
-  meshComp.load(render.getGeometryPass().getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -60,12 +60,12 @@ inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
 #if defined(FBX_ENABLED)
 inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
   meshComp.import(RAZ_ROOT + "assets/meshes/shaderBall.fbx"s);
-  meshComp.load(render.getGeometryPass().getProgram());
+  meshComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -2.f, 5.f);

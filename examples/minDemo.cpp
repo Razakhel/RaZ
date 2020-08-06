@@ -7,7 +7,7 @@ int main() {
   Raz::World& world = app.addWorld(2);
 
   auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
-  render.enableGeometryPass(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
 
   Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f));
   camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());

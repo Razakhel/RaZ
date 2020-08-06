@@ -8,7 +8,7 @@
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
-#include "RaZ/Render/RenderPass.hpp"
+#include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/System.hpp"
 #include "RaZ/Utils/Window.hpp"
@@ -17,6 +17,8 @@ namespace Raz {
 
 /// RenderSystem class, handling the rendering part.
 class RenderSystem final : public System {
+  friend RenderGraph;
+
 public:
   /// Creates a render system, initializing its inner data.
   RenderSystem() { initialize(); }
@@ -35,10 +37,12 @@ public:
   bool hasWindow() const { return (m_window != nullptr); }
   const Window& getWindow() const { assert("Error: Window must be set before being accessed." && hasWindow()); return *m_window; }
   Window& getWindow() { return const_cast<Window&>(static_cast<const RenderSystem*>(this)->getWindow()); }
-  const GeometryPass& getGeometryPass() const;
-  GeometryPass& getGeometryPass() { return const_cast<GeometryPass&>(static_cast<const RenderSystem*>(this)->getGeometryPass()); }
-  const SSRPass& getSSRPass() const;
-  SSRPass& getSSRPass() { return const_cast<SSRPass&>(static_cast<const RenderSystem*>(this)->getSSRPass()); }
+  const RenderPass& getGeometryPass() const { return m_renderGraph.getGeometryPass(); }
+  RenderPass& getGeometryPass() { return m_renderGraph.getGeometryPass(); }
+  const ShaderProgram& getGeometryProgram() const { return getGeometryPass().getProgram(); }
+  ShaderProgram& getGeometryProgram() { return getGeometryPass().getProgram(); }
+  const RenderGraph& getRenderGraph() const { return m_renderGraph; }
+  RenderGraph& getRenderGraph() { return m_renderGraph; }
   bool hasCubemap() const { return m_cubemap.has_value(); }
   const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && hasCubemap()); return *m_cubemap; }
 
@@ -46,10 +50,8 @@ public:
 
   void resizeViewport(unsigned int width, unsigned int height);
   void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
-  void enableGeometryPass(VertexShader vertShader, FragmentShader fragShader);
-  void enableSSRPass(FragmentShader fragShader);
-  void disableGeometryPass() { m_renderPasses[static_cast<std::size_t>(RenderPassType::GEOMETRY)].reset(); }
-  void disableSSRPass() { m_renderPasses[static_cast<std::size_t>(RenderPassType::SSR)].reset(); }
+  RenderPass& addRenderPass(VertexShader vertShader, FragmentShader fragShader);
+  RenderPass& addRenderPass(FragmentShader fragShader);
   bool update(float deltaTime) override;
   void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
   void sendInverseViewMatrix(const Mat4f& invViewMat) const { m_cameraUbo.sendData(invViewMat, sizeof(Mat4f)); }
@@ -79,7 +81,7 @@ private:
   WindowPtr m_window {};
   Entity* m_cameraEntity {};
 
-  std::array<RenderPassPtr, static_cast<std::size_t>(RenderPassType::RENDER_PASS_COUNT)> m_renderPasses {};
+  RenderGraph m_renderGraph {};
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);
 
   std::optional<Cubemap> m_cubemap {};
