@@ -5,62 +5,59 @@
 
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Utils/Graph.hpp"
 
 namespace Raz {
-
-enum class RenderPassType : uint8_t {
-  GEOMETRY = 0,
-  //LIGHTING,
-  //SSAO,
-  SSR,
-  //SHADOW,
-  //TRANSPARENCY,
-
-  RENDER_PASS_COUNT
-};
 
 class RenderPass;
 using RenderPassPtr = std::unique_ptr<RenderPass>;
 
-class RenderPass {
+class RenderPass : public GraphNode<RenderPass> {
 public:
+  RenderPass() = default;
+  RenderPass(VertexShader vertShader, FragmentShader fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
+  explicit RenderPass(FragmentShader fragShader) : RenderPass(Framebuffer::recoverVertexShader(), std::move(fragShader)) {}
   RenderPass(const RenderPass&) = delete;
   RenderPass(RenderPass&&) noexcept = default;
 
+  bool isEnabled() const { return m_enabled; }
+  /// Checks that every write buffer has an associated read buffer in each of its children.
+  /// \note This doesn't check for precedency; if no subsequent pass exist, it is considered valid.
+  /// \return True if no child pass or if the render pass is valid, false otherwise.
+  /// \see RenderGraph::isValid()
+  bool isValid() const;
   const ShaderProgram& getProgram() const { return m_program; }
   ShaderProgram& getProgram() { return m_program; }
-  const Framebuffer& getFramebuffer() const { return m_framebuffer; }
+  const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
 
   void setProgram(ShaderProgram program) { m_program = std::move(program); }
 
-  /// Resizes the render pass's framebuffer.
-  /// \param width New framebuffer's width.
-  /// \param height New framebuffer's height.
-  void resize(unsigned int width, unsigned int height) { m_writeFramebuffer.resize(width, height); }
+  void addReadTexture(const Texture& texture, const std::string& uniformName);
+  void addWriteTexture(const Texture& texture) { m_writeFramebuffer.addTextureBuffer(texture); }
+  /// Resizes the render pass' write buffer textures.
+  /// \param width New buffers width.
+  /// \param height New buffers height.
+  void resizeWriteBuffers(unsigned int width, unsigned int height) { m_writeFramebuffer.resizeBuffers(width, height); }
+  /// Changes the render pass' enabled state.
+  /// \param enabled True if the render pass should be enabled, false if it should be disabled.
+  void enable(bool enabled = true) { m_enabled = enabled; }
+  /// Disables the render pass.
+  void disable() { enable(false); }
+  /// Executes the render pass.
+  /// \param prevFramebuffer Framebuffer written by the previous render pass.
+  void execute(const Framebuffer& prevFramebuffer) const;
 
   RenderPass& operator=(const RenderPass&) = delete;
   RenderPass& operator=(RenderPass&&) noexcept = default;
 
-  virtual ~RenderPass() = default;
+  ~RenderPass() override = default;
 
 protected:
-  RenderPass(VertexShader vertShader, FragmentShader fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
-  explicit RenderPass(FragmentShader fragShader) : RenderPass(Framebuffer::recoverVertexShader(), std::move(fragShader)) {}
+  bool m_enabled = true;
+  ShaderProgram m_program {};
 
-  ShaderProgram m_program;
-  Framebuffer m_framebuffer {};
-};
-
-/// Geometry render pass, rendering the base scene.
-class GeometryPass final : public RenderPass {
-public:
-  GeometryPass(unsigned int width, unsigned int height, VertexShader vertShader, FragmentShader fragShader);
-};
-
-/// Screen-Space Reflections render pass, producing real-time reflections in screen-space.
-class SSRPass final : public RenderPass {
-public:
-  SSRPass(unsigned int width, unsigned int height, FragmentShader fragShader);
+  std::vector<const Texture*> m_readTextures {};
+  Framebuffer m_writeFramebuffer {};
 };
 
 } // namespace Raz

@@ -11,6 +11,8 @@ namespace Raz {
 
 /// Framebuffer class, handling buffers used for deferred rendering.
 class Framebuffer {
+  friend class RenderPass;
+
 public:
   Framebuffer();
   Framebuffer(unsigned int width, unsigned int height) : Framebuffer() { resizeBuffers(width, height); }
