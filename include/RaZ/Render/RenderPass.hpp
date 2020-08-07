@@ -9,9 +9,6 @@
 
 namespace Raz {
 
-class RenderPass;
-using RenderPassPtr = std::unique_ptr<RenderPass>;
-
 class RenderPass : public GraphNode<RenderPass> {
 public:
   RenderPass() = default;

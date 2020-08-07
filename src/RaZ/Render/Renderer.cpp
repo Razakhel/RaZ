@@ -576,7 +576,23 @@ void Renderer::useProgram(unsigned int index) {
 
   glUseProgram(index);
 
-  printConditionalErrors();
+#if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
+  const ErrorCodes errorCodes = Renderer::recoverErrors();
+
+  if (errorCodes[ErrorCode::INVALID_VALUE])
+    std::cerr << "Renderer::useProgram - Invalid shader program index (" << index << ").\n";
+
+  if (errorCodes[ErrorCode::INVALID_OPERATION]) {
+    std::cerr << "Renderer::useProgram - ";
+
+    if (!isProgramLinked(index))
+      std::cerr << "A shader program must be linked before being defined as used.\n";
+    else
+      std::cerr << "Unknown invalid operation.\n";
+  }
+
+  std::cerr << std::flush;
+#endif
 }
 
 void Renderer::deleteProgram(unsigned int index) {

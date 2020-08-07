@@ -82,7 +82,6 @@ bool ShaderProgram::isLinked() const {
 }
 
 void ShaderProgram::use() const {
-  assert("Error: A shader program must be linked before being defined as used." && isLinked());
   Renderer::useProgram(m_index);
 }
 
@@ -111,47 +110,83 @@ int ShaderProgram::recoverUniformLocation(const std::string& uniformName) const 
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, int value) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniform(uniformIndex, value);
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, unsigned int value) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniform(uniformIndex, value);
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, float value) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniform(uniformIndex, value);
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Vec2f& vec) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniformVector2(uniformIndex, vec.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Vec3f& vec) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniformVector3(uniformIndex, vec.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Vec4f& vec) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniformVector4(uniformIndex, vec.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Mat2f& mat) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniformMatrix2x2(uniformIndex, mat.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Mat3f& mat) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniformMatrix3x3(uniformIndex, mat.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Mat4f& mat) const {
-  assert("Error: The current shader program must be defined as used before sending uniforms." && isUsed());
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!isUsed())
+    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
+#endif
+
   Renderer::sendUniformMatrix4x4(uniformIndex, mat.getDataPtr());
 }
 

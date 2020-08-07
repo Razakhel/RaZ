@@ -9,7 +9,7 @@ bool RenderGraph::isValid() const {
   if (!m_geometryPass.isValid())
     return false;
 
-  for (const RenderPassPtr& renderPass : m_nodes) {
+  for (const std::unique_ptr<RenderPass>& renderPass : m_nodes) {
     if (!renderPass->isValid())
       return false;
   }
@@ -22,12 +22,12 @@ const Texture& RenderGraph::addTextureBuffer(unsigned int width, unsigned int he
 }
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
-  for (RenderPassPtr& renderPass : m_nodes)
+  for (std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->resizeWriteBuffers(width, height);
 }
 
 void RenderGraph::updateShaders() const {
-  for (const RenderPassPtr& renderPass : m_nodes)
+  for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->getProgram().updateShaders();
 }
 
