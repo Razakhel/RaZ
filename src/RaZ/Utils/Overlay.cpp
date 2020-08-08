@@ -152,7 +152,7 @@ void Overlay::render() {
         const ImVec2 topCoords(0.f, 1.f);
         const ImVec2 bottomCoords(1.f, 0.f);
 
-        ImGui::Image(reinterpret_cast<ImTextureID>(texture.m_index), textureSize, topCoords, bottomCoords);
+        ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture.m_index)), textureSize, topCoords, bottomCoords);
 
         break;
       }

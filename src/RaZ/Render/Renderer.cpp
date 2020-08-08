@@ -314,7 +314,7 @@ void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
 bool Renderer::isTexture(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  const bool isTexture = glIsTexture(index);
+  const bool isTexture = (glIsTexture(index) == GL_TRUE);
 
   printConditionalErrors();
 

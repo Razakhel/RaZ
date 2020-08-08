@@ -42,7 +42,7 @@ Cubemap::Cubemap() {
     }
   )";
 #else
-  // The version must be on first line
+  // The version must be on the first line
   const std::string vertSource = R"(#version 300 es
 
     precision highp float;

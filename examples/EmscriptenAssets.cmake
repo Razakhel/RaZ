@@ -1,3 +1,32 @@
+#########################
+# Assets - DeferredDemo #
+#########################
+
+set(
+    RaZ_DeferredDemo_ASSETS
+
+    assets/meshes/shield.obj
+    assets/materials/shield.mtl
+    assets/textures/shield_albedo.png
+    assets/textures/shield_normal.png
+    assets/textures/shield_metallic.png
+    assets/textures/shield_roughness.png
+    assets/textures/shield_ao.png
+)
+
+foreach (ASSET_PATH ${RaZ_DeferredDemo_ASSETS})
+    target_link_options(RaZ_DeferredDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+endforeach ()
+
+target_link_options(
+    RaZ_DeferredDemo
+
+    PRIVATE
+
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+)
+
 #####################
 # Assets - FullDemo #
 #####################
