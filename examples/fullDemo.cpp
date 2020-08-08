@@ -54,7 +54,7 @@ int main() {
 
   auto& meshTrans = mesh.addComponent<Raz::Transform>();
   meshTrans.scale(0.2f);
-  meshTrans.rotate(180.0_deg, Raz::Axis::Y);
+  meshTrans.rotate(180_deg, Raz::Axis::Y);
 
   window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) { mesh.disable(); },
                         Raz::Input::ONCE,
@@ -118,23 +118,27 @@ int main() {
   });
 
   window.addKeyCallback(Raz::Keyboard::NUM8, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(-90.0_deg * deltaTime, Raz::Axis::X); // Looking up
+    cameraTrans.rotate(-90_deg * deltaTime, Raz::Axis::X); // Looking up
   });
   window.addKeyCallback(Raz::Keyboard::NUM2, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(90.0_deg * deltaTime, Raz::Axis::X); // Looking down
+    cameraTrans.rotate(90_deg * deltaTime, Raz::Axis::X); // Looking down
   });
   window.addKeyCallback(Raz::Keyboard::NUM4, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(-90.0_deg * deltaTime, Raz::Axis::Y); // Looking left
+    cameraTrans.rotate(-90_deg * deltaTime, Raz::Axis::Y); // Looking left
   });
   window.addKeyCallback(Raz::Keyboard::NUM6, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(90.0_deg * deltaTime, Raz::Axis::Y); // Looking right
+    cameraTrans.rotate(90_deg * deltaTime, Raz::Axis::Y); // Looking right
   });
-  // DO A BARREL ROLL
-  window.addKeyCallback(Raz::Keyboard::Q, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(90.0_deg * deltaTime, Raz::Axis::Z); // Roll to the left
+
+  window.addMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
+    cameraComp.setFieldOfView(Raz::Degreesf(std::max(15.f,
+                                                     std::min(90.f, (Raz::Degreesf(cameraComp.getFieldOfView()) + static_cast<float>(-yOffset) * 2.f).value))));
   });
-  window.addKeyCallback(Raz::Keyboard::E, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(-90.0_deg * deltaTime, Raz::Axis::Z); // Roll to the right
+
+  window.addMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
+    // Dividing move by window size to scale between -1 and 1
+    cameraTrans.rotate(90_deg * static_cast<float>(yMove) / window.getHeight(),
+                       90_deg * static_cast<float>(xMove) / window.getWidth());
   });
 
   ///////////////////
@@ -149,10 +153,10 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::X, [&meshTrans] (float /* deltaTime */) { meshTrans.scale(0.5f); }, Raz::Input::ONCE);
   window.addKeyCallback(Raz::Keyboard::C, [&meshTrans] (float /* deltaTime */) { meshTrans.scale(2.f); }, Raz::Input::ONCE);
 
-  window.addKeyCallback(Raz::Keyboard::UP,    [&meshTrans] (float deltaTime) { meshTrans.rotate(-90.0_deg * deltaTime, Raz::Axis::X); });
-  window.addKeyCallback(Raz::Keyboard::DOWN,  [&meshTrans] (float deltaTime) { meshTrans.rotate(90.0_deg * deltaTime, Raz::Axis::X); });
-  window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTrans] (float deltaTime) { meshTrans.rotate(-90.0_deg * deltaTime, Raz::Axis::Y); });
-  window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTrans] (float deltaTime) { meshTrans.rotate(90.0_deg * deltaTime, Raz::Axis::Y); });
+  window.addKeyCallback(Raz::Keyboard::UP,    [&meshTrans] (float deltaTime) { meshTrans.rotate(-90_deg * deltaTime, Raz::Axis::X); });
+  window.addKeyCallback(Raz::Keyboard::DOWN,  [&meshTrans] (float deltaTime) { meshTrans.rotate(90_deg * deltaTime, Raz::Axis::X); });
+  window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTrans] (float deltaTime) { meshTrans.rotate(-90_deg * deltaTime, Raz::Axis::Y); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTrans] (float deltaTime) { meshTrans.rotate(90_deg * deltaTime, Raz::Axis::Y); });
 
   // Toggling play/pause
   window.addKeyCallback(Raz::Keyboard::NUM0, [&meshSound] (float /* deltaTime */) {
@@ -213,18 +217,6 @@ int main() {
   /////////////////////
   // Mouse callbacks //
   /////////////////////
-
-  window.addMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
-    cameraComp.setFieldOfView(Raz::Degreesf(std::max(15.f,
-                                            std::min(90.f, (Raz::Degreesf(cameraComp.getFieldOfView()) + static_cast<float>(-yOffset) * 2.f).value))));
-  });
-
-  window.addMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
-    // Dividing move by window size to scale between -1 and 1
-    cameraTrans.rotate(90.0_deg * static_cast<float>(yMove) / window.getHeight(),
-                       90.0_deg * static_cast<float>(xMove) / window.getWidth(),
-                       0.0_deg);
-  });
 
   window.disableCursor(); // Disabling mouse cursor to allow continuous rotations
   window.addKeyCallback(Raz::Keyboard::LEFT_ALT,

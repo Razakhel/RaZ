@@ -34,6 +34,14 @@ void Transform::rotate(Radiansf angle, const Vec3f& axis) {
   m_updated = true;
 }
 
+void Transform::rotate(Radiansf xAngle, Radiansf yAngle) {
+  const Quaternionf xQuat(xAngle, Axis::X);
+  const Quaternionf yQuat(yAngle, Axis::Y);
+  m_rotation = xQuat.computeMatrix() * m_rotation * yQuat.computeMatrix();
+
+  m_updated = true;
+}
+
 void Transform::rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle) {
   const Quaternionf xQuat(xAngle, Axis::X);
   const Quaternionf yQuat(yAngle, Axis::Y);

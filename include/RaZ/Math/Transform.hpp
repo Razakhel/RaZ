@@ -49,6 +49,10 @@ public:
   /// Translates by the given values in absolute coordinates (doesn't take rotation into account).
   /// \param displacement Displacement to be translated by.
   void translate(const Vec3f& displacement) { translate(displacement[0], displacement[1], displacement[2]); }
+  /// Rotates around the given axes. This locks the up vector, preventing any rolling effect.
+  /// \param xAngle Value of X to rotate around.
+  /// \param yAngle Value of Y to rotate around.
+  void rotate(Radiansf xAngle, Radiansf yAngle);
   /// Rotates around the given axes.
   /// \param xAngle Value of X to rotate around.
   /// \param yAngle Value of Y to rotate around.
