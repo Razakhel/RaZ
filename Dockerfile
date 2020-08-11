@@ -4,6 +4,7 @@ FROM ubuntu:19.10
 #   - GL & X11 as needed graphical dependencies
 #   - CMake, Make, GCC & Clang to build RaZ, and lcov to output code coverage
 #   - xz-utils to uncompress Emscripten
+#   - Python 3.X to use Emscripten
 #   - Doxygen & Dot to generate the documentation
 #   - OpenAL to handle the audio part
 #   - Wget to download the FBX SDK
@@ -17,6 +18,7 @@ RUN apt-get update && \
         libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev \
         cmake make gcc-8 g++-8 clang-7 lcov \
         xz-utils \
+        python3 \
         doxygen python-pydot python-pydot-ng \
         libopenal-dev \
         wget \

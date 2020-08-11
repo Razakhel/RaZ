@@ -104,7 +104,7 @@ void main() {
 
   if (gl_FragCoord.x < 640) {
     float ssaoFactor = computeSsaoFactor(viewPos, worldNormal, depth);
-    fragColor = vec4(vec3(1.0) * ssaoFactor, 1.0);
+    fragColor = vec4(vec3(ssaoFactor), 1.0);
   } else {
     fragColor = vec4(texture(uniSceneBuffers.color, fragTexcoords).rgb, 1.0);
   }

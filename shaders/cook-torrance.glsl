@@ -105,6 +105,8 @@ void main() {
   // Base Fresnel (F)
   vec3 baseReflectivity = mix(vec3(0.04), albedo, metallic);
 
+  vec3 albedoFactor = albedo / PI;
+
   vec3 lightRadiance = vec3(0.0);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
@@ -141,7 +143,7 @@ void main() {
     vec3 diffuse = vec3(1.0) - fresnel;
     diffuse     *= 1.0 - metallic;
 
-    lightRadiance += (diffuse * albedo / PI + specular) * radiance * lightAngle;
+    lightRadiance += (diffuse * albedoFactor + specular) * radiance * lightAngle;
   }
 
   vec3 ambient = vec3(0.03) * albedo * ambOcc;
