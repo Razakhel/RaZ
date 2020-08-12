@@ -82,7 +82,7 @@ TEST_CASE("Fragment shader from source") {
 TEST_CASE("Vertex shader imported") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const std::string vertShaderPath = RAZ_TESTS_ROOT + "../shaders/vert.glsl"s;
+  const std::string vertShaderPath = RAZ_TESTS_ROOT + "../shaders/common.vert"s;
 
   const Raz::VertexShader vertShader(vertShaderPath);
   CHECK_FALSE(Raz::Renderer::hasErrors());
@@ -97,7 +97,7 @@ TEST_CASE("Vertex shader imported") {
 TEST_CASE("Fragment shader imported") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const std::string fragShaderPath = RAZ_TESTS_ROOT + "../shaders/lambert.glsl"s;
+  const std::string fragShaderPath = RAZ_TESTS_ROOT + "../shaders/lambert.frag"s;
 
   const Raz::FragmentShader fragShader(fragShaderPath);
   CHECK_FALSE(Raz::Renderer::hasErrors());

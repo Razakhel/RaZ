@@ -185,7 +185,7 @@ int main() {
   Raz::World& world = app.addWorld(2);
 
   auto& render = world.addSystem<Raz::RenderSystem>(sceneWidth, sceneHeight, "RaZ");
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s),
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s),
                                          Raz::FragmentShader::loadFromSource(geomFragSource));
 
   Raz::Window& window = render.getWindow();

@@ -3,7 +3,7 @@
 using namespace std::literals;
 
 inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.frag"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
@@ -17,7 +17,7 @@ inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
@@ -31,7 +31,7 @@ inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
@@ -45,7 +45,7 @@ inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
@@ -60,7 +60,7 @@ inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
 #if defined(FBX_ENABLED)
 inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/vert.glsl"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.glsl"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.frag"s));
   render.updateLights();
 
   auto& meshComp = mesh.getComponent<Raz::Mesh>();
