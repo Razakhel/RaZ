@@ -4,10 +4,12 @@
 
 project(GLEW)
 
-set(CMAKE_C_STANDARD 11)
+add_library(GLEW OBJECT)
+
+target_compile_features(GLEW PRIVATE c_std_11)
 
 # Defining preprocessor macros
-if (WIN32 OR CYGWIN)
+if (RAZ_PLATFORM_WINDOWS OR RAZ_PLATFORM_CYGWIN)
     set(
         GLEW_DEFINITIONS
 
@@ -20,7 +22,7 @@ if (WIN32 OR CYGWIN)
 
         opengl32
     )
-elseif (APPLE)
+elseif (RAZ_PLATFORM_MAC)
     find_package(OpenGL REQUIRED)
 
     set(
@@ -45,17 +47,24 @@ file(
 )
 
 # Building GLEW
-add_library(GLEW OBJECT ${GLEW_FILES})
+target_sources(GLEW PRIVATE ${GLEW_FILES})
 
-if (CYGWIN)
+if (RAZ_PLATFORM_CYGWIN)
     # Cygwin voluntarily removes the _WIN32 definition, which GLEW requires here
-    target_compile_definitions(GLEW PRIVATE -D_WIN32)
+    target_compile_definitions(GLEW PRIVATE _WIN32)
 
     # Since ptrdiff_t is redefined with Clang, it needs some more tinkering...
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if (RAZ_COMPILER_CLANG)
         # ptrdiff_t is actually redefined by GLEW; _PTR_DIFF_T_ is added so that this doesn't happen
         # __need_ptrdiff_t is then defined so that the standard library can make the type available by itself
-        target_compile_definitions(GLEW PRIVATE -D_PTRDIFF_T_ -D__need_ptrdiff_t)
+        target_compile_definitions(
+            GLEW
+
+            PRIVATE
+
+            _PTRDIFF_T_
+            __need_ptrdiff_t
+        )
     endif ()
 endif ()
 
@@ -64,7 +73,7 @@ target_include_directories(GLEW SYSTEM PUBLIC glew/include)
 target_compile_definitions(GLEW PUBLIC ${GLEW_DEFINITIONS})
 
 # Disabling all compilers warnings
-if (MSVC)
+if (RAZ_COMPILER_MSVC)
     target_compile_options(GLEW PRIVATE /w)
 else ()
     target_compile_options(GLEW PRIVATE -w)

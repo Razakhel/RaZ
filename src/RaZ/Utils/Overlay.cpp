@@ -2,6 +2,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+#include "imgui/misc/cpp/imgui_stdlib.h"
 #include "RaZ/Utils/Overlay.hpp"
 
 namespace Raz {
@@ -130,8 +131,7 @@ void Overlay::render() {
         auto& textbox = static_cast<OverlayTextbox&>(*element);
 
         ImGui::InputText(textbox.m_label.c_str(),
-                         textbox.m_text.data(),
-                         textbox.m_text.capacity(),
+                         &textbox.m_text,
                          ImGuiInputTextFlags_CallbackCharFilter,
                          callback,
                          &textbox);

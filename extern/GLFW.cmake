@@ -4,10 +4,12 @@
 
 project(GLFW)
 
-set(CMAKE_C_STANDARD 11)
+add_library(GLFW OBJECT)
+
+target_compile_features(GLFW PRIVATE c_std_11)
 
 # Defining preprocessor macros and selecting files to be removed
-if (WIN32 OR CYGWIN)
+if (RAZ_PLATFORM_WINDOWS OR RAZ_PLATFORM_CYGWIN)
     set(
         GLFW_DEFINITIONS
 
@@ -23,11 +25,11 @@ if (WIN32 OR CYGWIN)
         glfw/src/win32*
     )
 
-    if (CYGWIN)
+    if (RAZ_PLATFORM_CYGWIN)
         # GLFW needs to be linked against the Windows Gdi32 library with Cygwin
         set(GLFW_LINKER_FLAGS Gdi32)
     endif ()
-elseif (APPLE)
+elseif (RAZ_PLATFORM_MAC)
     set(
         GLFW_DEFINITIONS
 
@@ -54,7 +56,7 @@ elseif (APPLE)
         "-framework IOKit"
         "-framework CoreVideo"
     )
-elseif (UNIX)
+elseif (RAZ_PLATFORM_LINUX)
     option(GLFW_USE_WAYLAND "Use Wayland instead of X11" OFF)
 
     if (GLFW_USE_WAYLAND)
@@ -129,7 +131,7 @@ file(
 )
 
 # Building GLFW
-add_library(GLFW OBJECT ${GLFW_FILES})
+target_sources(GLFW PRIVATE ${GLFW_FILES})
 
 target_include_directories(
     GLFW
@@ -144,7 +146,7 @@ target_include_directories(
 target_compile_definitions(GLFW PUBLIC ${GLFW_DEFINITIONS})
 
 # Disabling all compilers warnings
-if (MSVC)
+if (RAZ_COMPILER_MSVC)
     target_compile_options(GLFW PRIVATE /w)
 else ()
     target_compile_options(GLFW PRIVATE -w)
