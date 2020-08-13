@@ -8,6 +8,7 @@
 #include <bitset>
 #include <cstddef>
 #include <string>
+#include <vector>
 
 namespace Raz {
 
@@ -544,7 +545,8 @@ public:
   static unsigned int createProgram();
   static void getProgramParameter(unsigned int index, ProgramParameter parameter, int* parameters);
   static bool isProgramLinked(unsigned int index);
-  static unsigned int recoverActiveUniformCount(unsigned int index);
+  static unsigned int recoverActiveUniformCount(unsigned int programIndex);
+  static std::vector<unsigned int> recoverAttachedShaders(unsigned int programIndex);
   static void linkProgram(unsigned int index);
   static void useProgram(unsigned int index);
   static void deleteProgram(unsigned int index);
@@ -556,6 +558,7 @@ public:
   static void compileShader(unsigned int index);
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
+  static bool isShaderAttached(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
   /// Gets the uniform's location (ID) corresponding to the given name.
   /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).

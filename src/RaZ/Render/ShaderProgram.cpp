@@ -16,6 +16,9 @@ ShaderProgram::ShaderProgram(ShaderProgram&& program) noexcept
     m_uniforms{ std::move(program.m_uniforms) } {}
 
 void ShaderProgram::setVertexShader(VertexShader&& vertShader) {
+  if (Renderer::isShaderAttached(m_index, m_vertShader.getIndex()))
+    Renderer::detachShader(m_index, m_vertShader.getIndex());
+
   m_vertShader = std::move(vertShader);
   m_vertShader.compile();
 
@@ -23,6 +26,9 @@ void ShaderProgram::setVertexShader(VertexShader&& vertShader) {
 }
 
 void ShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
+  if (m_geomShader && Renderer::isShaderAttached(m_index, m_geomShader->getIndex()))
+    Renderer::detachShader(m_index, m_geomShader->getIndex());
+
   m_geomShader = std::move(geomShader);
   m_geomShader->compile();
 
@@ -30,6 +36,9 @@ void ShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
 }
 
 void ShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
+  if (Renderer::isShaderAttached(m_index, m_fragShader.getIndex()))
+    Renderer::detachShader(m_index, m_fragShader.getIndex());
+
   m_fragShader = std::move(fragShader);
   m_fragShader.compile();
 

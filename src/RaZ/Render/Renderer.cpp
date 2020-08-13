@@ -1,6 +1,7 @@
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <iostream>
@@ -549,11 +550,25 @@ bool Renderer::isProgramLinked(unsigned int index) {
   return (linkStatus == GL_TRUE);
 }
 
-unsigned int Renderer::recoverActiveUniformCount(unsigned int index) {
+unsigned int Renderer::recoverActiveUniformCount(unsigned int programIndex) {
   int uniformCount {};
-  getProgramParameter(index, ProgramParameter::ACTIVE_UNIFORMS, &uniformCount);
+  getProgramParameter(programIndex, ProgramParameter::ACTIVE_UNIFORMS, &uniformCount);
 
   return static_cast<unsigned int>(uniformCount);
+}
+
+std::vector<unsigned int> Renderer::recoverAttachedShaders(unsigned int programIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  int attachedShaderCount {};
+  getProgramParameter(programIndex, ProgramParameter::ATTACHED_SHADERS, &attachedShaderCount);
+
+  std::vector<unsigned int> shaderIndices(static_cast<std::size_t>(attachedShaderCount));
+  glGetAttachedShaders(programIndex, attachedShaderCount, nullptr, shaderIndices.data());
+
+  printConditionalErrors();
+
+  return shaderIndices;
 }
 
 void Renderer::linkProgram(unsigned int index) {
@@ -671,6 +686,15 @@ void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex)
   glDetachShader(programIndex, shaderIndex);
 
   printConditionalErrors();
+}
+
+bool Renderer::isShaderAttached(unsigned int programIndex, unsigned int shaderIndex) {
+  const std::vector<unsigned int> shaderIndices = recoverAttachedShaders(programIndex);
+
+  if (std::find(shaderIndices.cbegin(), shaderIndices.cend(), shaderIndex) != shaderIndices.cend())
+    return true;
+
+  return false;
 }
 
 void Renderer::deleteShader(unsigned int index) {
