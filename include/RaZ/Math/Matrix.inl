@@ -466,6 +466,12 @@ constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) {
 }
 
 template <typename T, std::size_t W, std::size_t H>
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator*=(const Matrix<T, W, H>& mat) noexcept {
+  *this = *this * mat;
+  return *this;
+}
+
+template <typename T, std::size_t W, std::size_t H>
 constexpr bool Matrix<T, W, H>::operator==(const Matrix<T, W, H>& mat) const noexcept {
   if constexpr (std::is_floating_point_v<T>)
     return FloatUtils::areNearlyEqual(*this, mat);

@@ -141,7 +141,8 @@ public:
   /// \tparam HI Input matrix's height.
   /// \param mat Matrix to be multiplied by.
   /// \return Result of the multiplied matrices.
-  template <std::size_t WI, std::size_t HI> constexpr Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat) const noexcept;
+  template <std::size_t WI, std::size_t HI>
+  constexpr Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat) const noexcept;
   /// Element-wise matrix-matrix addition assignment operator.
   /// \param mat Matrix to be added.
   /// \return Reference to the modified original matrix.
@@ -170,10 +171,14 @@ public:
   /// \param mat Matrix to be divided by.
   /// \return Reference to the modified original matrix.
   constexpr Matrix& operator/=(const Matrix& mat);
-  /// Element-wise matrix-value divions assignment operator.
+  /// Element-wise matrix-value division assignment operator.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original matrix.
   constexpr Matrix& operator/=(T val);
+  /// Matrix-matrix multiplication assignment operator.
+  /// \param mat Matrix to be multiplied by.
+  /// \return Reference to the modified original matrix.
+  constexpr Matrix& operator*=(const Matrix& mat) noexcept;
   /// Element fetching operator with a single index.
   /// \param index Element's index.
   /// \return Constant reference to the fetched element.
