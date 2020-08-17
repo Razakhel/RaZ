@@ -63,10 +63,6 @@ public:
   /// \param normal Direction to compute the reflection over.
   /// \return Vector's reflection.
   constexpr Vector reflect(const Vector& normal) const noexcept { return (*this - normal * dot(normal) * 2); }
-  /// Computes the normalized vector.
-  /// Normalizing a vector makes it of length 1.
-  /// \return Normalized vector.
-  constexpr Vector normalize() const;
   /// Computes the length of the vector.
   /// Calculating the actual length requires a square root operation to be involved, which is expensive.
   /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredLength().
@@ -77,6 +73,10 @@ public:
   /// This calculation does not involve a square root; it is then to be preferred over computeLength() for faster operations.
   /// \return Vector's squared length.
   constexpr float computeSquaredLength() const noexcept { return dot(*this); }
+  /// Computes the normalized vector.
+  /// Normalizing a vector makes it of length 1.
+  /// \return Normalized vector.
+  constexpr Vector normalize() const;
   /// Checks for strict equality between the current vector & the given one.
   /// \param vec Vector to be compared with.
   /// \return True if vectors are strictly equal to each other, false otherwise.

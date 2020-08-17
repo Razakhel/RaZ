@@ -12,7 +12,7 @@ inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -1.f, 0.f);
-  meshTrans.setRotation(Raz::Mat4f::identity());
+  meshTrans.setRotation(Raz::Quaternionf::identity());
   meshTrans.setScale(0.01f);
 }
 
@@ -26,7 +26,7 @@ inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
-  meshTrans.setRotation(Raz::Mat4f::identity());
+  meshTrans.setRotation(Raz::Quaternionf::identity());
   meshTrans.setScale(1.f);
 }
 
@@ -54,7 +54,7 @@ inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
-  meshTrans.setRotation(Raz::Mat4f::identity());
+  meshTrans.setRotation(Raz::Quaternionf::identity());
   meshTrans.setScale(2.5f);
 }
 

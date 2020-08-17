@@ -13,21 +13,18 @@ namespace Raz {
 /// Transform class which handles 3D transformations (translation/rotation/scale).
 class Transform final : public Component {
 public:
-  explicit Transform(const Vec3f& position = Vec3f(0.f), const Mat4f& rotation = Mat4f::identity(), const Vec3f& scale = Vec3f(1.f))
+  explicit Transform(const Vec3f& position = Vec3f(0.f), const Quaternionf& rotation = Quaternionf::identity(), const Vec3f& scale = Vec3f(1.f))
     : m_position{ position }, m_rotation{ rotation }, m_scale{ scale } {}
 
   const Vec3f& getPosition() const { return m_position; }
-  Vec3f& getPosition() { return m_position; }
-  const Mat4f& getRotation() const { return m_rotation; }
-  Mat4f& getRotation() { return m_rotation; }
+  const Quaternionf& getRotation() const { return m_rotation; }
   const Vec3f& getScale() const { return m_scale; }
-  Vec3f& getScale() { return m_scale; }
   bool hasUpdated() const { return m_updated; }
 
   void setPosition(const Vec3f& position);
   void setPosition(float x, float y, float z) { setPosition(Vec3f(x, y, z)); }
-  void setRotation(const Mat4f& rotation);
-  void setRotation(Radiansf angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis).computeMatrix()); }
+  void setRotation(const Quaternionf& rotation);
+  void setRotation(Radiansf angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis)); }
   void setScale(const Vec3f& scale);
   void setScale(float val) { setScale(val, val, val); }
   void setScale(float x, float y, float z) { setScale(Vec3f(x, y, z)); }
@@ -87,9 +84,9 @@ public:
   Mat4f computeTransformMatrix() const;
 
 private:
-  Vec3f m_position;
-  Mat4f m_rotation;
-  Vec3f m_scale;
+  Vec3f m_position {};
+  Quaternionf m_rotation = Quaternionf::identity();
+  Vec3f m_scale = Vec3f(1.f);
   bool m_updated = true;
 };
 

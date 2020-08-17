@@ -7,7 +7,7 @@ void Transform::setPosition(const Vec3f& position) {
   m_updated  = true;
 }
 
-void Transform::setRotation(const Mat4f& rotation) {
+void Transform::setRotation(const Quaternionf& rotation) {
   m_rotation = rotation;
   m_updated  = true;
 }
@@ -29,7 +29,7 @@ void Transform::rotate(Radiansf angle, const Vec3f& axis) {
   assert("Error: Rotation axis must be normalized." && FloatUtils::areNearlyEqual(axis.computeLength(), 1.f));
 
   const Quaternionf quaternion(angle, axis);
-  m_rotation = quaternion.computeMatrix() * m_rotation;
+  m_rotation = quaternion * m_rotation;
 
   m_updated = true;
 }
@@ -37,7 +37,7 @@ void Transform::rotate(Radiansf angle, const Vec3f& axis) {
 void Transform::rotate(Radiansf xAngle, Radiansf yAngle) {
   const Quaternionf xQuat(xAngle, Axis::X);
   const Quaternionf yQuat(yAngle, Axis::Y);
-  m_rotation = xQuat.computeMatrix() * m_rotation * yQuat.computeMatrix();
+  m_rotation = yQuat * m_rotation * xQuat;
 
   m_updated = true;
 }
@@ -46,7 +46,7 @@ void Transform::rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle) {
   const Quaternionf xQuat(xAngle, Axis::X);
   const Quaternionf yQuat(yAngle, Axis::Y);
   const Quaternionf zQuat(zAngle, Axis::Z);
-  m_rotation = (xQuat * yQuat * zQuat).computeMatrix() * m_rotation;
+  m_rotation = xQuat * yQuat * zQuat * m_rotation;
 
   m_updated = true;
 }
@@ -75,7 +75,7 @@ Mat4f Transform::computeTransformMatrix() const {
                     0.f,        0.f,        m_scale[2], 0.f,
                     0.f,        0.f,        0.f,        1.f);
 
-  return scale * m_rotation * computeTranslationMatrix();
+  return scale * m_rotation.computeMatrix() * computeTranslationMatrix();
 }
 
 } // namespace Raz

@@ -117,19 +117,6 @@ int main() {
     cameraTrans.move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
   });
 
-  window.addKeyCallback(Raz::Keyboard::NUM8, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(-90_deg * deltaTime, Raz::Axis::X); // Looking up
-  });
-  window.addKeyCallback(Raz::Keyboard::NUM2, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(90_deg * deltaTime, Raz::Axis::X); // Looking down
-  });
-  window.addKeyCallback(Raz::Keyboard::NUM4, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(-90_deg * deltaTime, Raz::Axis::Y); // Looking left
-  });
-  window.addKeyCallback(Raz::Keyboard::NUM6, [&cameraTrans] (float deltaTime) {
-    cameraTrans.rotate(90_deg * deltaTime, Raz::Axis::Y); // Looking right
-  });
-
   window.addMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
     cameraComp.setFieldOfView(Raz::Degreesf(std::max(15.f,
                                                      std::min(90.f, (Raz::Degreesf(cameraComp.getFieldOfView()) + static_cast<float>(-yOffset) * 2.f).value))));

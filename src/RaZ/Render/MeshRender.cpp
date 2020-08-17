@@ -58,14 +58,14 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
 
   for (MaterialPtr& material : m_materials) {
     if (material->getType() == MaterialType::COOK_TORRANCE) {
-      auto materialCT = static_cast<MaterialCookTorrance*>(material.get());
+      auto* materialCT = static_cast<MaterialCookTorrance*>(material.get());
 
       materialCT->setBaseColor(newMaterial->getBaseColor());
       materialCT->setMetallicFactor(newMaterial->getMetallicFactor());
       materialCT->setRoughnessFactor(roughnessFactor);
       materialCT->setAlbedoMap(Texture::create(ColorPreset::WHITE));
     } else {
-      auto materialBP = static_cast<MaterialBlinnPhong*>(material.get());
+      auto* materialBP = static_cast<MaterialBlinnPhong*>(material.get());
       const float specular = newMaterial->getMetallicFactor() * (1.f - roughnessFactor);
 
       materialBP->setDiffuse(newMaterial->getBaseColor());

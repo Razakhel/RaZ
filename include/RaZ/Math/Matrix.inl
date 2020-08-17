@@ -399,10 +399,10 @@ constexpr Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& m
 
   for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
     for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
-      T& val = res.getData()[heightIndex * W + widthIndex];
+      T& val = res.getElement(widthIndex, heightIndex);
 
       for (std::size_t stride = 0; stride < W; ++stride)
-        val += m_data[heightIndex * W + stride] * mat.getData()[stride * WI + widthIndex];
+        val += getElement(stride, heightIndex) * mat.getElement(widthIndex, stride);
     }
   }
 
