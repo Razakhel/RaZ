@@ -10,7 +10,7 @@
 namespace Raz {
 
 /// Quaternion representing a rotation in 3D space.
-/// Quaternions are used to avoid <a href="https://en.wikipedia.org/wiki/Gimbal_lock">gimbal locks</a>, present with Euler angles.
+/// Quaternions are used to avoid [gimbal locks](https://en.wikipedia.org/wiki/Gimbal_lock), present with Euler angles.
 /// \tparam T Type of the values to be held by the quaternion.
 template <typename T = float>
 class Quaternion {
@@ -23,7 +23,8 @@ public:
   constexpr Quaternion(const Quaternion&) noexcept = default;
   constexpr Quaternion(Quaternion&&) noexcept = default;
 
-  /// Return a quaternion representing an identity transform
+  /// Creates a quaternion representing an identity transformation.
+  /// \return Identity quaternion.
   static constexpr Quaternion<T> identity() noexcept { return Quaternion<T>(1, 0, 0, 0); }
 
   /// Computes the norm of the quaternion.
@@ -37,7 +38,7 @@ public:
   /// \return Quaternion's squared norm.
   constexpr T computeSquaredNorm() const noexcept { return (m_real * m_real + m_complexes.computeSquaredLength()); }
   /// Computes the normalized quaternion to make it a unit one.
-  /// A unit quaternion is also called a <a href="https://en.wikipedia.org/wiki/Versor">versor</a>.
+  /// A unit quaternion is also called a [versor](https://en.wikipedia.org/wiki/Versor).
   /// \return Normalized quaternion.
   constexpr Quaternion<T> normalize() const noexcept;
   /// Computes the conjugate of the quaternion.

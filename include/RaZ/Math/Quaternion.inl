@@ -65,9 +65,11 @@ constexpr Mat4<T> Quaternion<T>::computeMatrix() const {
   const T yw = (2 * m_complexes[1] * m_real) * invSqNorm;
   const T zw = (2 * m_complexes[2] * m_real) * invSqNorm;
 
-  return Mat4<T>(1 - yy - zz,       xy + zw,           xz - yw,           static_cast<T>(0),
-                 xy - zw,           1 - xx - zz,       yz + xw,           static_cast<T>(0),
-                 xz + yw,           yz - xw,           1 - xx - yy,       static_cast<T>(0),
+  // Since RaZ's matrices are of a different majorness (row-major) than the usual (column-major),
+  //  the following matrix is transposed compared to the common implementations & usages (like glm)
+  return Mat4<T>(1 - yy - zz,       xy - zw,           xz + yw,           static_cast<T>(0),
+                 xy + zw,           1 - xx - zz,       yz - xw,           static_cast<T>(0),
+                 xz - yw,           yz + xw,           1 - xx - yy,       static_cast<T>(0),
                  static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(1));
 }
 
@@ -82,22 +84,22 @@ template <typename T>
 constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& quat) noexcept {
   const Quaternion<T> res = *this;
 
-  m_real = res.m_real * quat.m_real
+  m_real = res.m_real         * quat.m_real
          - res.m_complexes[0] * quat.m_complexes[0]
          - res.m_complexes[1] * quat.m_complexes[1]
          - res.m_complexes[2] * quat.m_complexes[2];
 
-  m_complexes[0] = res.m_real * quat.m_complexes[0]
+  m_complexes[0] = res.m_real         * quat.m_complexes[0]
                  + res.m_complexes[0] * quat.m_real
                  + res.m_complexes[1] * quat.m_complexes[2]
                  - res.m_complexes[2] * quat.m_complexes[1];
 
-  m_complexes[1] = res.m_real * quat.m_complexes[1]
+  m_complexes[1] = res.m_real         * quat.m_complexes[1]
                  - res.m_complexes[0] * quat.m_complexes[2]
                  + res.m_complexes[1] * quat.m_real
                  + res.m_complexes[2] * quat.m_complexes[0];
 
-  m_complexes[2] = res.m_real * quat.m_complexes[2]
+  m_complexes[2] = res.m_real         * quat.m_complexes[2]
                  + res.m_complexes[0] * quat.m_complexes[1]
                  - res.m_complexes[1] * quat.m_complexes[0]
                  + res.m_complexes[2] * quat.m_real;

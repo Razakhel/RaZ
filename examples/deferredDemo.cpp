@@ -255,8 +255,8 @@ int main() {
 
   window.addMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
     // Dividing move by window size to scale between -1 and 1
-    cameraTrans.rotate(90_deg * static_cast<float>(yMove) / window.getHeight(),
-                       90_deg * static_cast<float>(xMove) / window.getWidth());
+    cameraTrans.rotate(-90_deg * static_cast<float>(yMove) / window.getHeight(),
+                       -90_deg * static_cast<float>(xMove) / window.getWidth());
   });
 
   //////////////////////

@@ -138,7 +138,7 @@ int main() {
   });
 
   app.run([&] {
-    meshTrans.rotate(45.0_deg * app.getDeltaTime(), Raz::Axis::Y);
+    meshTrans.rotate(-45.0_deg * app.getDeltaTime(), Raz::Axis::Y);
   });
 
   return EXIT_SUCCESS;
