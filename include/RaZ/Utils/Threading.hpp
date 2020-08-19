@@ -57,7 +57,7 @@ inline void sleep(uint64_t milliseconds) { std::this_thread::sleep_for(std::chro
 /// \param action Action to be performed asynchronously.
 /// \param args Arguments to be forwarded to the given function.
 /// \return A std::future holding the future result of the process. This should not be discarded, as doing so will fail to run asynchronously.
-template <typename Func, typename... Args, typename ResultType = std::result_of_t<Func&&(Args&&...)>>
+template <typename Func, typename... Args, typename ResultType = std::invoke_result_t<Func&&, Args&&...>>
 [[nodiscard]] std::future<ResultType> launchAsync(Func&& action, Args&&... args);
 
 /// Calls a function in parallel on a given number of separate threads of execution.

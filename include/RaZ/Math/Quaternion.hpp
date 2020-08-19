@@ -27,6 +27,10 @@ public:
   /// \return Identity quaternion.
   static constexpr Quaternion<T> identity() noexcept { return Quaternion<T>(1, 0, 0, 0); }
 
+  /// Computes the dot product between quaternions.
+  /// \param quat Quaternion to compute the dot product with.
+  /// \return Quaternions' dot product.
+  constexpr T dot(const Quaternion& quat) const noexcept { return (m_real * quat.m_real + m_complexes.dot(quat.m_complexes)); }
   /// Computes the norm of the quaternion.
   /// Calculating the actual norm requires a square root operation to be involved, which is expensive.
   /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredNorm().
@@ -36,7 +40,7 @@ public:
   /// The squared norm is equal to the addition of all components (real & complexes alike) squared.
   /// This calculation does not involve a square root; it is then to be preferred over computeNorm() for faster operations.
   /// \return Quaternion's squared norm.
-  constexpr T computeSquaredNorm() const noexcept { return (m_real * m_real + m_complexes.computeSquaredLength()); }
+  constexpr T computeSquaredNorm() const noexcept { return dot(*this); }
   /// Computes the normalized quaternion to make it a unit one.
   /// A unit quaternion is also called a [versor](https://en.wikipedia.org/wiki/Versor).
   /// \return Normalized quaternion.

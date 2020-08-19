@@ -12,6 +12,29 @@ const Raz::Quaternionf quat3(180.0_deg, 1.f, -2.f, 5.f);
 
 } // namespace
 
+TEST_CASE("Quaternion dot product") {
+  const Raz::Quaternionf normedQuat1 = quat1.normalize();
+  const Raz::Quaternionf normedQuat2 = quat2.normalize();
+  const Raz::Quaternionf normedQuat3 = quat3.normalize();
+
+  CHECK(quat1.dot(quat1) == 1.f);
+  CHECK(normedQuat1.dot(normedQuat1) == 1.f);
+
+  CHECK(quat2.dot(quat2) == 15.5f);
+  CHECK_THAT(normedQuat2.dot(normedQuat2), IsNearlyEqualTo(1.f));
+
+  CHECK(quat3.dot(quat3) == 30.f);
+  CHECK_THAT(normedQuat3.dot(normedQuat3), IsNearlyEqualTo(1.f));
+
+  CHECK_THAT(quat1.dot(quat2), IsNearlyEqualTo(0.7660444f));
+  CHECK_THAT(normedQuat1.dot(normedQuat2), IsNearlyEqualTo(0.1945755f));
+  CHECK(quat1.dot(quat2) == quat2.dot(quat1));
+
+  CHECK_THAT(quat3.dot(quat1), IsNearlyEqualTo(0.0871557f));
+  CHECK_THAT(normedQuat3.dot(normedQuat1), IsNearlyEqualTo(0.0159124f));
+  CHECK(quat3.dot(quat1) == quat1.dot(quat3));
+}
+
 TEST_CASE("Quaternion norm computation") {
   CHECK_THAT(quat1.computeSquaredNorm(), IsNearlyEqualTo(1.f));
   CHECK_THAT(quat1.computeNorm(), IsNearlyEqualTo(1.f));
