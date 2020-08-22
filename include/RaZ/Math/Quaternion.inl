@@ -74,14 +74,14 @@ constexpr Mat4<T> Quaternion<T>::computeMatrix() const {
 }
 
 template <typename T>
-constexpr Quaternion<T> Quaternion<T>::operator*(const Quaternion<T>& quat) const noexcept {
+constexpr Quaternion<T> Quaternion<T>::operator*(const Quaternion& quat) const noexcept {
   Quaternion<T> res = *this;
   res *= quat;
   return res;
 }
 
 template <typename T>
-constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& quat) noexcept {
+constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion& quat) noexcept {
   const Quaternion<T> res = *this;
 
   m_real = res.m_real         * quat.m_real
@@ -105,6 +105,11 @@ constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& quat) no
                  + res.m_complexes[2] * quat.m_real;
 
   return *this;
+}
+
+template <typename T>
+constexpr bool Quaternion<T>::operator==(const Quaternion& quat) const noexcept {
+  return FloatUtils::areNearlyEqual(*this, quat);
 }
 
 } // namespace Raz

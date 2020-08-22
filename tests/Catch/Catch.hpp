@@ -39,6 +39,7 @@ public:
   std::string describe() const override {
     std::ostringstream stream;
     stream.precision(std::numeric_limits<T>::digits10 + 2);
+
     stream << "is not nearly equal to " << m_comparison;
     return stream.str();
   }
@@ -53,6 +54,7 @@ IsNearlyEqualTo(T, TolT) -> IsNearlyEqualTo<T, TolT>;
 
 /// Custom Catch matcher, which checks for near-equality between floating point vectors' values.
 /// \tparam T Type of the vector to be compared to.
+/// \tparam Size Size of the vectors to be compared.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, std::size_t Size, typename TolT = T>
 class IsNearlyEqualToVector final : public Catch::MatcherBase<Raz::Vector<T, Size>> {
@@ -100,6 +102,8 @@ IsNearlyEqualToVector(Raz::Vector<T, Size>, TolT) -> IsNearlyEqualToVector<T, Si
 
 /// Custom Catch matcher, which checks for near-equality between floating point matrices' values.
 /// \tparam T Type of the matrix to be compared to.
+/// \tparam W Width of the matrices to be compared.
+/// \tparam H Height of the matrices to be compared.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, std::size_t W, std::size_t H, typename TolT = T>
 class IsNearlyEqualToMatrix final : public Catch::MatcherBase<Raz::Matrix<T, W, H>> {
@@ -150,5 +154,45 @@ private:
 
 template <typename T, std::size_t W, std::size_t H, typename TolT>
 IsNearlyEqualToMatrix(Raz::Matrix<T, W, H>, TolT) -> IsNearlyEqualToMatrix<T, W, H, TolT>;
+
+/// Custom Catch matcher, which checks for near-equality between floating point quaternions' values.
+/// \tparam T Type of the quaternion to be compared to.
+/// \tparam TolT Tolerance type, which may differ from the value type.
+template <typename T, typename TolT = T>
+class IsNearlyEqualToQuaternion final : public Catch::MatcherBase<Raz::Quaternion<T>> {
+  static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualToQuaternion's value type must be floating point.");
+  static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualToQuaternion's tolerance type must be floating point.");
+
+public:
+  /// Creates an instance of a near-equality quaternion check custom matcher.
+  /// \param comparison Quaternion to be compared with.
+  /// \param absTol Absolute tolerance to compare the values with.
+  constexpr explicit IsNearlyEqualToQuaternion(const Raz::Quaternion<T>& comparison, TolT absTol = std::numeric_limits<TolT>::epsilon())
+    : m_comparison{ comparison }, m_absTol{ absTol } {}
+
+  /// Checks if the given quaternion has nearly equal values compared to the comparison one.
+  /// \param base Base quaternion to compare to.
+  /// \return True if values are nearly equal to each other, false otherwise.
+  constexpr bool match(const Raz::Quaternion<T>& base) const override {
+    return Raz::FloatUtils::areNearlyEqual(base, m_comparison, m_absTol);
+  }
+
+  /// Gets the description of the error if the match failed.
+  /// \return Error string to be printed.
+  std::string describe() const override {
+    std::ostringstream stream;
+    stream.precision(std::numeric_limits<T>::digits10 + 2);
+
+    stream << "is not nearly equal to " << m_comparison;
+    return stream.str();
+  }
+
+private:
+  Raz::Quaternion<T> m_comparison;
+  TolT m_absTol;
+};
+
+template <typename T, typename TolT>
+IsNearlyEqualToQuaternion(Raz::Quaternion<T>, TolT) -> IsNearlyEqualToQuaternion<T, TolT>;
 
 #endif // RAZ_CATCH_HPP

@@ -220,6 +220,8 @@ TEST_CASE("Matrix near-equality") {
   CHECK_THAT(baseMat[2], IsNearlyEqualTo(compMat[2]));
   CHECK_THAT(baseMat[3], IsNearlyEqualTo(compMat[3]));
 
+  CHECK_THAT(baseMat, IsNearlyEqualToMatrix(compMat)); // Simpler check in a single call
+
   CHECK(baseMat == compMat); // Matrix::operator== does a near-equality check on floating point types
 }
 

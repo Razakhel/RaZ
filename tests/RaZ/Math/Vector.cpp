@@ -173,6 +173,8 @@ TEST_CASE("Vector near-equality") {
   CHECK_THAT(baseVec[1], IsNearlyEqualTo(compVec[1]));
   CHECK_THAT(baseVec[2], IsNearlyEqualTo(compVec[2]));
 
+  CHECK_THAT(baseVec, IsNearlyEqualToVector(compVec)); // Simpler check in a single call
+
   CHECK(baseVec == compVec); // Vector::operator== does a near-equality check on floating point types
 }
 

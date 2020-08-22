@@ -103,3 +103,34 @@ TEST_CASE("Quaternion multiplication") {
                                                                        0.4783612f, -0.6894565f,  0.5438936f, 0.f,
                                                                        0.f,         0.f,         0.f,        1.f)));
 }
+
+TEST_CASE("Quaternion near-equality") {
+  CHECK_FALSE(quat1 == quat2);
+
+  constexpr Raz::Quaternionf baseQuat(1.f, 1.f, 1.f, 1.f);
+  Raz::Quaternionf compQuat = baseQuat;
+
+  CHECK(baseQuat.w() == compQuat.w()); // Copied, strict equality
+  CHECK(baseQuat.x() == compQuat.x());
+  CHECK(baseQuat.y() == compQuat.y());
+  CHECK(baseQuat.z() == compQuat.z());
+
+  compQuat = Raz::Quaternionf(baseQuat.w() + 0.0000001f,
+                              baseQuat.x() + 0.0000001f,
+                              baseQuat.y() + 0.0000001f,
+                              baseQuat.z() + 0.0000001f); // Adding a tiny offset
+
+  CHECK_FALSE(baseQuat.w() == compQuat.w()); // Values not strictly equal
+  CHECK_FALSE(baseQuat.x() == compQuat.x());
+  CHECK_FALSE(baseQuat.y() == compQuat.y());
+  CHECK_FALSE(baseQuat.z() == compQuat.z());
+
+  CHECK_THAT(baseQuat.w(), IsNearlyEqualTo(compQuat.w())); // Near-equality components check
+  CHECK_THAT(baseQuat.x(), IsNearlyEqualTo(compQuat.x()));
+  CHECK_THAT(baseQuat.y(), IsNearlyEqualTo(compQuat.y()));
+  CHECK_THAT(baseQuat.z(), IsNearlyEqualTo(compQuat.z()));
+
+  CHECK_THAT(baseQuat, IsNearlyEqualToQuaternion(compQuat)); // Simpler check in a single call
+
+  CHECK(baseQuat == compQuat); // Quaternion::operator== does a near-equality check
+}

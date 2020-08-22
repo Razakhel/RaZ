@@ -23,9 +23,14 @@ public:
   constexpr Quaternion(const Quaternion&) noexcept = default;
   constexpr Quaternion(Quaternion&&) noexcept = default;
 
+  constexpr T w() const noexcept { return m_real; }
+  constexpr T x() const noexcept { return m_complexes[0]; }
+  constexpr T y() const noexcept { return m_complexes[1]; }
+  constexpr T z() const noexcept { return m_complexes[2]; }
+
   /// Creates a quaternion representing an identity transformation.
   /// \return Identity quaternion.
-  static constexpr Quaternion<T> identity() noexcept { return Quaternion<T>(1, 0, 0, 0); }
+  static constexpr Quaternion identity() noexcept { return Quaternion<T>(1, 0, 0, 0); }
 
   /// Computes the dot product between quaternions.
   /// \param quat Quaternion to compute the dot product with.
@@ -72,6 +77,16 @@ public:
   /// \param quat Quaternion to be multiplied by.
   /// \return Reference to the modified original quaternion.
   constexpr Quaternion& operator*=(const Quaternion& quat) noexcept;
+  /// Quaternion equality comparison operator.
+  /// Uses a near-equality check to take floating-point errors into account.
+  /// \param quat Quaternion to be compared with.
+  /// \return True if quaternions are nearly equal, else otherwise.
+  constexpr bool operator==(const Quaternion& quat) const noexcept;
+  /// Quaternion inequality comparison operator.
+  /// Uses a near-equality check to take floating-point errors into account.
+  /// \param quat Quaternion to be compared with.
+  /// \return True if quaternions are different, else otherwise.
+  constexpr bool operator!=(const Quaternion& quat) const noexcept { return !(*this == quat); }
   /// Matrix conversion operator; computes the rotation matrix represented by the quaternion.
   /// \return Rotation matrix.
   constexpr operator Mat4<T>() const { return computeMatrix(); }

@@ -16,6 +16,9 @@ class Vector;
 template <typename T, std::size_t W, std::size_t H>
 class Matrix;
 
+template <typename T>
+class Quaternion;
+
 namespace FloatUtils {
 
 /// Checks if two given floating point values are nearly equal to each other.
@@ -69,6 +72,17 @@ constexpr bool areNearlyEqual(const Matrix<T, W, H>& mat1, const Matrix<T, W, H>
     if (!areNearlyEqual(mat1[i], mat2[i], absTol))
       return false;
   }
+
+  return true;
+}
+
+template <typename T, typename TolT = T>
+constexpr bool areNearlyEqual(const Quaternion<T>& quat1, const Quaternion<T>& quat2, TolT absTol = std::numeric_limits<TolT>::epsilon()) noexcept {
+  if (!areNearlyEqual(quat1.w(), quat2.w(), absTol)
+   || !areNearlyEqual(quat1.x(), quat2.x(), absTol)
+   || !areNearlyEqual(quat1.y(), quat2.y(), absTol)
+   || !areNearlyEqual(quat1.z(), quat2.z(), absTol))
+    return false;
 
   return true;
 }
