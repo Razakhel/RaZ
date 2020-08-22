@@ -212,3 +212,18 @@ TEST_CASE("Vector strict equality") {
   // When using the std::equal_to specialization, vectors are properly found to be unequal to each other
   CHECK_FALSE(std::equal(vectors.cbegin(), vectors.cend(), swappedVectors.cbegin(), std::equal_to<Raz::Vec3f>()));
 }
+
+TEST_CASE("Vector printing") {
+  std::stringstream stream;
+
+  stream << vec31;
+  CHECK(stream.str() == "[ 3.18; 42; 0.874 ]");
+
+  stream.str(std::string()); // Resetting the stream
+  stream << vec32;
+  CHECK(stream.str() == "[ 541.41; 47.25; 6.321 ]");
+
+  stream.str(std::string());
+  stream << vec41;
+  CHECK(stream.str() == "[ 84.47; 2; 0.001; 847.12 ]");
+}

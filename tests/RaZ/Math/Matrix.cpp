@@ -259,3 +259,25 @@ TEST_CASE("Matrix strict equality") {
   // When using the std::equal_to specialization, matrices are properly found to be unequal to each other
   CHECK_FALSE(std::equal(matrices.cbegin(), matrices.cend(), swappedMatrices.cbegin(), std::equal_to<Raz::Mat3f>()));
 }
+
+TEST_CASE("Matrix printing") {
+  std::stringstream stream;
+
+  stream << mat31;
+  CHECK(stream.str() == "[[ 4.12; 25.1; 30.7842 ]\n"
+                        " [ 3.04; 5; -64.5 ]\n"
+                        " [ -1; -7.54; 8.41 ]]");
+
+  stream.str(std::string()); // Resetting the stream
+  stream << mat32;
+  CHECK(stream.str() == "[[ 47.4; 10.001; 15.12 ]\n"
+                        " [ 8.01; -98.1; 97 ]\n"
+                        " [ 12.54; 70; -54.05 ]]");
+
+  stream.str(std::string());
+  stream << mat41;
+  CHECK(stream.str() == "[[ -3.2; 53.032; 832.451; 74.2 ]\n"
+                        " [ 10.01; 3.15; -91.41; 187.46 ]\n"
+                        " [ -6; -7.78; 90; 38 ]\n"
+                        " [ 123; -74.8; 147; 748.6 ]]");
+}

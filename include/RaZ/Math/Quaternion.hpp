@@ -9,6 +9,12 @@
 
 namespace Raz {
 
+template <typename T>
+class Quaternion;
+
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat);
+
 /// Quaternion representing a rotation in 3D space.
 /// Quaternions are used to avoid [gimbal locks](https://en.wikipedia.org/wiki/Gimbal_lock), present with Euler angles.
 /// \tparam T Type of the values to be held by the quaternion.
@@ -90,6 +96,10 @@ public:
   /// Matrix conversion operator; computes the rotation matrix represented by the quaternion.
   /// \return Rotation matrix.
   constexpr operator Mat4<T>() const { return computeMatrix(); }
+  /// Output stream operator.
+  /// \param stream Stream to output into.
+  /// \param quat Quaternion to be output.
+  friend std::ostream& operator<< <>(std::ostream& stream, const Quaternion& quat);
 
 private:
   T m_real {};

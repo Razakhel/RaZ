@@ -112,4 +112,10 @@ constexpr bool Quaternion<T>::operator==(const Quaternion& quat) const noexcept 
   return FloatUtils::areNearlyEqual(*this, quat);
 }
 
+template <typename T>
+std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat) {
+  stream << "[ " << quat.w() << "; " << quat.x() << "; " << quat.y() << "; " << quat.z() << " ]";
+  return stream;
+}
+
 } // namespace Raz
