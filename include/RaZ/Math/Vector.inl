@@ -64,7 +64,14 @@ constexpr Vector<T, Size> Vector<T, Size>::normalize() const {
 }
 
 template <typename T, std::size_t Size>
-constexpr bool Vector<T, Size>::strictlyEquals(const Vector<T, Size>& vec) const noexcept {
+constexpr Vector<T, Size> Vector<T, Size>::lerp(const Vector& vec, float coeff) const noexcept {
+  assert("Error: The interpolation coefficient must be between 0 & 1." && (coeff >= 0 && coeff <= 1));
+
+  return *this + (vec - *this) * coeff;
+}
+
+template <typename T, std::size_t Size>
+constexpr bool Vector<T, Size>::strictlyEquals(const Vector& vec) const noexcept {
   return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin());
 }
 

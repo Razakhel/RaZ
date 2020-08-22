@@ -77,6 +77,16 @@ public:
   /// Normalizing a vector makes it of length 1.
   /// \return Normalized vector.
   constexpr Vector normalize() const;
+  /// Computes the linear interpolation between vectors, according to a coefficient.
+  /// \param vec Vector to be interpolated with.
+  /// \param coeff Coefficient between 0 (returns the current vector) and 1 (returns the given vector).
+  /// \return Linearly interpolated vector.
+  constexpr Vector lerp(const Vector& vec, float coeff) const noexcept;
+  /// Computes the normalized linear interpolation between vectors, according to a coefficient.
+  /// \param vec Vector to be interpolated with.
+  /// \param coeff Coefficient between 0 (returns the normalized current vector) and 1 (returns the normalized given vector).
+  /// \return Normalized linearly interpolated vector.
+  constexpr Vector nlerp(const Vector& vec, float coeff) const noexcept { return lerp(vec, coeff).normalize(); }
   /// Checks for strict equality between the current vector & the given one.
   /// \param vec Vector to be compared with.
   /// \return True if vectors are strictly equal to each other, false otherwise.

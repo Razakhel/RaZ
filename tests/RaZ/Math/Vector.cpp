@@ -106,6 +106,22 @@ TEST_CASE("Vector manipulations") {
   CHECK(vec31.reflect(vec32) == Raz::Vec3f(-4'019'108.859'878'28f, -350'714.439'453f, -46'922.543'011'268f));
 }
 
+TEST_CASE("Vector interpolation") {
+  // lerp() doesn't normalize the resulting vector
+  CHECK(vec31.lerp(vec32, 0.f) == vec31);
+  CHECK(vec31.lerp(vec32, 0.25f) == Raz::Vec3f(137.73749f, 43.3125f, 2.23575f)); // (vec31 * 3 + vec32) / 4
+  CHECK(vec31.lerp(vec32, 0.5f) == (vec31 + vec32) / 2);
+  CHECK(vec31.lerp(vec32, 0.75f) == Raz::Vec3f(406.85248f, 45.9375f, 4.95925f)); // (vec31 + vec32 * 3) / 4
+  CHECK(vec31.lerp(vec32, 1.f) == vec32);
+
+  // nlerp() does normalize the resulting vector; it is strictly equal to vec.lerp(...).normalize()
+  CHECK(vec41.nlerp(vec42, 0.f) == vec41.normalize());
+  CHECK(vec41.nlerp(vec42, 0.25f) == Raz::Vec4f(0.10136666f, 0.00233993f, 0.0322656f, 0.994323f)); // (vec41 * 3 + vec42).normalize()
+  CHECK(vec41.nlerp(vec42, 0.5f) == (vec41 + vec42).normalize());
+  CHECK(vec41.nlerp(vec42, 0.75f) == Raz::Vec4f(0.11226334f, 0.00222709f, 0.23125429f, 0.966392f)); // (vec41 + vec42 * 3).normalize()
+  CHECK(vec41.nlerp(vec42, 1.f) == vec42.normalize());
+}
+
 TEST_CASE("Vector hash") {
   CHECK(vec31.hash() == vec31.hash());
   CHECK_FALSE(vec31.hash() == vec32.hash());
