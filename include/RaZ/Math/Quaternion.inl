@@ -5,10 +5,10 @@ namespace Raz {
 template <typename T>
 constexpr Quaternion<T>::Quaternion(Radians<T> angle, const Vec3<T>& axis) noexcept {
   const T halfAngle = angle.value / 2;
-  const T val       = std::sin(halfAngle);
+  const T sinAngle  = std::sin(halfAngle);
 
   m_real      = std::cos(halfAngle);
-  m_complexes = axis * val;
+  m_complexes = axis * sinAngle;
 }
 
 template <typename T>
@@ -24,6 +24,55 @@ constexpr Quaternion<T> Quaternion<T>::normalize() const noexcept {
   }
 
   return res;
+}
+
+template <typename T>
+constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T coeff) const noexcept {
+  assert("Error: The interpolation coefficient must be between 0 & 1." && (coeff >= 0 && coeff <= 1));
+
+  const T currCoeff = 1 - coeff;
+  return lerp(quat, currCoeff, coeff);
+}
+
+template <typename T>
+constexpr Quaternion<T> Quaternion<T>::nlerp(const Quaternion& quat, T coeff) const noexcept {
+  assert("Error: The interpolation coefficient must be between 0 & 1." && (coeff >= 0 && coeff <= 1));
+
+  const T currCoeff = 1 - coeff;
+  // A rotation may be represented by two opposite quaternions; should the dot product between those be negative,
+  //  one quaternion must be negated. This is made by negating the coefficient
+  const T otherCoeff = (dot(quat) > 0 ? coeff : -coeff);
+
+  return lerp(quat, currCoeff, otherCoeff).normalize();
+}
+
+template <typename T>
+constexpr Quaternion<T> Quaternion<T>::slerp(const Quaternion& quat, T coeff) const noexcept {
+  assert("Error: The interpolation coefficient must be between 0 & 1." && (coeff >= 0 && coeff <= 1));
+  assert("Error: Quaternions must be normalized for a slerp to be performed." && FloatUtils::areNearlyEqual(computeSquaredNorm(), static_cast<T>(1))
+                                                                              && FloatUtils::areNearlyEqual(quat.computeSquaredNorm(), static_cast<T>(1)));
+
+  const T cosAngle = dot(quat);
+
+  T currCoeff {};
+  T otherCoeff {};
+
+  // Checking the angle between the quaternions; if the angle is sufficient, perform an actual spherical interpolation
+  if (std::abs(cosAngle) < static_cast<T>(0.99999)) {
+    const T angle       = std::acos(cosAngle);
+    const T invSinAngle = 1 / std::sin(angle);
+
+    currCoeff  = std::sin((1 - coeff) * angle) * invSinAngle;
+    otherCoeff = std::sin(coeff * angle) * invSinAngle;
+  } else {
+    // If the angle is really small, a simple linear interpolation is performed
+    currCoeff  = 1 - coeff;
+    otherCoeff = coeff;
+  }
+
+  // Negating one quaternion if the angle is negative
+  otherCoeff = (cosAngle > 0 ? otherCoeff : -otherCoeff);
+  return lerp(quat, currCoeff, otherCoeff);
 }
 
 template <typename T>
@@ -116,6 +165,14 @@ template <typename T>
 std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat) {
   stream << "[ " << quat.w() << "; " << quat.x() << "; " << quat.y() << "; " << quat.z() << " ]";
   return stream;
+}
+
+template <typename T>
+constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T currCoeff, T otherCoeff) const noexcept {
+  return Quaternion(m_real         * currCoeff + quat.m_real         * otherCoeff,
+                    m_complexes[0] * currCoeff + quat.m_complexes[0] * otherCoeff,
+                    m_complexes[1] * currCoeff + quat.m_complexes[1] * otherCoeff,
+                    m_complexes[2] * currCoeff + quat.m_complexes[2] * otherCoeff);
 }
 
 } // namespace Raz

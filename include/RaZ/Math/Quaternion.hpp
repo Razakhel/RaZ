@@ -55,15 +55,31 @@ public:
   /// Computes the normalized quaternion to make it a unit one.
   /// A unit quaternion is also called a [versor](https://en.wikipedia.org/wiki/Versor).
   /// \return Normalized quaternion.
-  constexpr Quaternion<T> normalize() const noexcept;
+  constexpr Quaternion normalize() const noexcept;
+  /// Computes the linear interpolation between quaternions, according to a coefficient.
+  /// \param quat Quaternion to be interpolated with.
+  /// \param coeff Coefficient between 0 (returns the current quaternion) and 1 (returns the given quaternion).
+  /// \return Linearly interpolated quaternion.
+  constexpr Quaternion lerp(const Quaternion& quat, T coeff) const noexcept;
+  /// Computes the normalized linear interpolation between quaternions, according to a coefficient.
+  /// \param quat Quaternion to be interpolated with.
+  /// \param coeff Coefficient between 0 (returns the normalized current quaternion) and 1 (returns the normalized given quaternion).
+  /// \return Normalized linearly interpolated quaternion.
+  constexpr Quaternion nlerp(const Quaternion& quat, T coeff) const noexcept;
+  /// Computes the spherical linear interpolation between normalized quaternions, according to a coefficient.
+  /// \note Both quaternions (the current & given ones) must be normalized before calling this function.
+  /// \param quat Quaternion to be interpolated with. Must be normalized.
+  /// \param coeff Coefficient between 0 (returns the current quaternion) and 1 (returns the given quaternion).
+  /// \return Spherically interpolated quaternion.
+  constexpr Quaternion slerp(const Quaternion& quat, T coeff) const noexcept;
   /// Computes the conjugate of the quaternion.
   /// A quaternion's conjugate is simply computed by multiplying the complex components by -1.
   /// \return Quaternion's conjugate.
-  constexpr Quaternion<T> conjugate() const noexcept;
+  constexpr Quaternion conjugate() const noexcept;
   /// Computes the inverse (or reciprocal) of the quaternion.
   /// Inversing a quaternion consists of dividing the components of the conjugate by the squared norm.
   /// \return Quaternion's inverse.
-  constexpr Quaternion<T> inverse() const noexcept;
+  constexpr Quaternion inverse() const noexcept;
   /// Computes the rotation matrix represented by the quaternion.
   /// This operation automatically scales the matrix so that it returns a unit one.
   /// \return Rotation matrix.
@@ -102,6 +118,8 @@ public:
   friend std::ostream& operator<< <>(std::ostream& stream, const Quaternion& quat);
 
 private:
+  constexpr Quaternion lerp(const Quaternion& quat, T currCoeff, T otherCoeff) const noexcept;
+
   T m_real {};
   Vec3<T> m_complexes {};
 };

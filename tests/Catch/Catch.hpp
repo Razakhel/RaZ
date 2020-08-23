@@ -174,7 +174,9 @@ public:
   /// \param base Base quaternion to compare to.
   /// \return True if values are nearly equal to each other, false otherwise.
   constexpr bool match(const Raz::Quaternion<T>& base) const override {
-    return Raz::FloatUtils::areNearlyEqual(base, m_comparison, m_absTol);
+    const_cast<IsNearlyEqualToQuaternion*>(this)->m_base = base;
+
+    return Raz::FloatUtils::areNearlyEqual(m_base, m_comparison, m_absTol);
   }
 
   /// Gets the description of the error if the match failed.
@@ -183,12 +185,24 @@ public:
     std::ostringstream stream;
     stream.precision(std::numeric_limits<T>::digits10 + 2);
 
-    stream << "is not nearly equal to " << m_comparison;
+    if (!Raz::FloatUtils::areNearlyEqual(m_base.w(), m_comparison.w(), m_absTol))
+      stream << "\n\tOn w: " << m_base.w() << " is not nearly equal to " << m_comparison.w();
+
+    if (!Raz::FloatUtils::areNearlyEqual(m_base.x(), m_comparison.x(), m_absTol))
+      stream << "\n\tOn x: " << m_base.x() << " is not nearly equal to " << m_comparison.x();
+
+    if (!Raz::FloatUtils::areNearlyEqual(m_base.y(), m_comparison.y(), m_absTol))
+      stream << "\n\tOn y: " << m_base.y() << " is not nearly equal to " << m_comparison.y();
+
+    if (!Raz::FloatUtils::areNearlyEqual(m_base.z(), m_comparison.z(), m_absTol))
+      stream << "\n\tOn z: " << m_base.z() << " is not nearly equal to " << m_comparison.z();
+
     return stream.str();
   }
 
 private:
   Raz::Quaternion<T> m_comparison;
+  Raz::Quaternion<T> m_base = Raz::Quaternion<T>::identity(); // m_base needs an instantiation, since a Quaternion doesn't have a default constructor
   TolT m_absTol;
 };
 

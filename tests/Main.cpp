@@ -5,10 +5,10 @@
 
 int main(int argc, char* argv[]) {
   // Increasing precision output for floating-point values
-  Catch::StringMaker<float>::precision  = std::numeric_limits<float>::digits10 + 1;
-  Catch::StringMaker<double>::precision = std::numeric_limits<double>::digits10 + 1;
+  Catch::StringMaker<float>::precision  = std::numeric_limits<float>::digits10 + 2;
+  Catch::StringMaker<double>::precision = std::numeric_limits<double>::digits10 + 2;
   // 'long double' specializations are not available (yet?) in Catch
-  //Catch::StringMaker<long double>::precision = std::numeric_limits<long double>::digits10 + 1;
+  //Catch::StringMaker<long double>::precision = std::numeric_limits<long double>::digits10 + 2;
 
   // Some tests require an OpenGL context to be instantiated, which is done by the Window
   const Raz::Window window(1, 1);
