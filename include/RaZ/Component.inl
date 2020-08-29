@@ -1,3 +1,5 @@
+#include <type_traits>
+
 namespace Raz {
 
 template <typename Comp>

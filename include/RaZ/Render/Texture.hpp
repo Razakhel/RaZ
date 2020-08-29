@@ -39,6 +39,7 @@ public:
   /// \param bindingIndex Index of the texture's binding point.
   explicit Texture(ColorPreset preset, int bindingIndex = std::numeric_limits<int>::max());
   Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace = ImageColorspace::RGB, bool createMipmaps = true);
+  Texture(Image image, int bindingIndex, bool createMipmaps = true) : Texture(bindingIndex) { load(std::move(image), createMipmaps); }
   explicit Texture(const FilePath& filePath, int bindingIndex, bool flipVertically = false, bool createMipmaps = true)
     : Texture(bindingIndex) { load(filePath, flipVertically, createMipmaps); }
   Texture(const Texture&) = delete;
@@ -53,6 +54,10 @@ public:
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
 
+  /// Sets the image & loads it onto the graphics card.
+  /// \param image Image to be set as a texture.
+  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
+  void load(Image image, bool createMipmaps = true);
   /// Reads the texture in memory & loads it onto the graphics card.
   /// \param filePath Path to the texture to load.
   /// \param flipVertically Flip vertically the texture when loading.
@@ -80,6 +85,9 @@ public:
   ~Texture();
 
 private:
+  /// Loads it onto the graphics card.
+  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
+  void load(bool createMipmaps = true);
   /// Fills the texture with a single pixel (creates a single-colored 1x1 texture).
   /// \note This only allocates & fills memory on the graphics card; the image member's data is left untouched.
   /// \param color Color to fill the texture with.

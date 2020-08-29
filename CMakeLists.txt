@@ -250,7 +250,7 @@ if (RAZ_COMPILER_GCC)
     # Enabling code coverage
     option(RAZ_ENABLE_COVERAGE "Enable code coverage (GCC only)" OFF)
 
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND RAZ_ENABLE_COVERAGE)
+    if (RAZ_CONFIG_DEBUG AND RAZ_ENABLE_COVERAGE)
         set(
             RAZ_COMPILER_FLAGS
 
