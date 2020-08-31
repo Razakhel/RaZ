@@ -102,6 +102,7 @@ public:
   void addMouseMoveCallback(std::function<void(double, double)> func);
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
+#if defined(RAZ_USE_OVERLAY)
   /// Enables the overlay.
   void enableOverlay() { m_overlay = Overlay::create(m_window); }
   /// Disables the overlay.
@@ -145,6 +146,7 @@ public:
   /// Adds a FPS (frames per second) counter on the overlay.
   /// \param formattedLabel Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
   void addOverlayFpsCounter(std::string formattedLabel);
+#endif
   /// Runs the window, refreshing its state by displaying the rendered scene, drawing the overlay, etc.
   /// \param deltaTime Amount of time elapsed since the last frame.
   /// \return True if the window hasn't been required to close, false otherwise.
@@ -169,7 +171,10 @@ private:
 
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
+
+#if defined(RAZ_USE_OVERLAY)
   OverlayPtr m_overlay {};
+#endif
 };
 
 } // namespace Raz

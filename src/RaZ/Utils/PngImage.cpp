@@ -1,12 +1,7 @@
-#if defined(RAZ_PLATFORM_EMSCRIPTEN)
+#include "RaZ/Utils/Image.hpp"
+
 #include <png.h>
 #include <zlib.h>
-#else
-#include "png/png.h"
-#include "png/zlib.h"
-#endif
-
-#include "RaZ/Utils/Image.hpp"
 
 #include <array>
 #include <fstream>

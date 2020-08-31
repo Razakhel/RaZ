@@ -12,8 +12,10 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
 
   Renderer::resizeViewport(0, 0, m_sceneWidth, m_sceneHeight);
 
+#if defined(RAZ_USE_WINDOW)
   if (m_window)
     m_window->resize(m_sceneWidth, m_sceneHeight);
+#endif
 
   if (m_cameraEntity)
     m_cameraEntity->getComponent<Camera>().resizeViewport(m_sceneWidth, m_sceneHeight);
@@ -36,8 +38,10 @@ bool RenderSystem::update(float deltaTime) {
   Renderer::printErrors();
 #endif
 
+#if defined(RAZ_USE_WINDOW)
   if (m_window)
     return m_window->run(deltaTime);
+#endif
 
   return true;
 }
@@ -137,6 +141,13 @@ void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format) c
   Renderer::recoverFrame(m_sceneWidth, m_sceneHeight, format, dataType, img.getDataPtr());
 
   img.save(filePath, true);
+}
+
+void RenderSystem::destroy() {
+#if defined(RAZ_USE_WINDOW)
+  if (m_window)
+    m_window->setShouldClose();
+#endif
 }
 
 void RenderSystem::linkEntity(const EntityPtr& entity) {

@@ -282,6 +282,7 @@ int main() {
   // Overlay //
   /////////////
 
+#if defined(RAZ_USE_OVERLAY)
   window.enableOverlay();
 
   window.addOverlayLabel("RaZ - Deferred demo");
@@ -296,6 +297,7 @@ int main() {
 
   window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
   window.addOverlayFpsCounter("FPS: %.1f");
+#endif
 
   // Running the application
   app.run();

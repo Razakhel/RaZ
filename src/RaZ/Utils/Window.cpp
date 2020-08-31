@@ -215,6 +215,7 @@ void Window::updateCallbacks() const {
   }
 }
 
+#if defined(RAZ_USE_OVERLAY)
 void Window::addOverlayLabel(std::string label) {
   m_overlay->addLabel(std::move(label));
 }
@@ -254,6 +255,7 @@ void Window::addOverlayFrameTime(std::string formattedLabel) {
 void Window::addOverlayFpsCounter(std::string formattedLabel) {
   m_overlay->addFpsCounter(std::move(formattedLabel));
 }
+#endif
 
 bool Window::run(float deltaTime) {
   if (glfwWindowShouldClose(m_window))
@@ -261,8 +263,11 @@ bool Window::run(float deltaTime) {
 
   glfwPollEvents();
 
+#if defined(RAZ_USE_OVERLAY)
   // Input callbacks should not be executed if the overlay requested keyboard focus
-  if (!m_overlay || !m_overlay->hasKeyboardFocus()) {
+  if (!m_overlay || !m_overlay->hasKeyboardFocus())
+#endif
+  {
     // Process actions belonging to pressed keys & mouse buttons
     auto& actions   = std::get<4>(m_callbacks);
     auto actionIter = actions.begin();
@@ -284,8 +289,10 @@ bool Window::run(float deltaTime) {
     }
   }
 
+#if defined(RAZ_USE_OVERLAY)
   if (m_overlay)
     m_overlay->render();
+#endif
 
   glfwSwapBuffers(m_window);
 
@@ -312,7 +319,10 @@ void Window::setShouldClose() const {
 }
 
 void Window::close() {
+#if defined(RAZ_USE_OVERLAY)
   disableOverlay();
+#endif
+
   glfwTerminate();
 
   m_window = nullptr;

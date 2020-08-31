@@ -2,7 +2,7 @@
 # RaZ - Dependencies #
 ######################
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (NOT RAZ_USE_EMSCRIPTEN)
     option(RAZ_USE_LIBPNG "Compile & use libpng" ON)

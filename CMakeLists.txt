@@ -514,8 +514,6 @@ endif ()
 # RaZ - Build #
 ###############
 
-target_sources(RaZ PRIVATE ${RAZ_FILES})
-
 target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 option(SKIP_RENDERER_ERRORS "Do not print errors from the Renderer" OFF)
@@ -555,13 +553,38 @@ if (RAZ_USE_GLEW)
     target_link_libraries(RaZ PRIVATE GLEW)
 endif ()
 
-if (RAZ_USE_GLFW)
-    target_link_libraries(RaZ PRIVATE GLFW)
+if (RAZ_USE_GLFW OR RAZ_USE_EMSCRIPTEN)
+    if (NOT RAZ_USE_EMSCRIPTEN)
+        # Emscripten handles GLFW on its own, but it is however not available directly; its link must be disabled
+        target_link_libraries(RaZ PRIVATE GLFW)
+    endif ()
+
+    target_compile_definitions(RaZ PUBLIC RAZ_USE_WINDOW)
+else ()
+    list(
+        REMOVE_ITEM
+        RAZ_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/Window.cpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Utils/Window.hpp"
+    )
 endif ()
 
 if (RAZ_USE_IMGUI)
     target_link_libraries(RaZ PRIVATE ImGui)
+    target_compile_definitions(RaZ PUBLIC RAZ_USE_OVERLAY)
+else ()
+    list(
+        REMOVE_ITEM
+        RAZ_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/Overlay.cpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Utils/Overlay.cpp"
+    )
 endif ()
+
+# Compiling RaZ's sources
+target_sources(RaZ PRIVATE ${RAZ_FILES})
 
 # Build the examples
 option(RAZ_BUILD_EXAMPLES "Build examples" ON)

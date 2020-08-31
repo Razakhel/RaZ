@@ -4,8 +4,13 @@
 
 project(ImGui)
 
-if (NOT RAZ_USE_GLEW AND NOT RAZ_USE_EMSCRIPTEN)
-    message(SEND_ERROR "Error: ImGui requires GLEW to be used.")
+# If not compiling with Emscripten, GLEW and GLFW need to be enabled for ImGui to be available
+if (NOT RAZ_USE_EMSCRIPTEN)
+    if (NOT RAZ_USE_GLEW)
+        message(FATAL_ERROR "[RaZ] ImGui can't be used with GLEW disabled; either reenable the latter or disable the former")
+    elseif (NOT RAZ_USE_GLFW)
+        message(FATAL_ERROR "[RaZ] ImGui can't be used with GLFW disabled; either reenable the latter or disable the former")
+    endif ()
 endif ()
 
 add_library(ImGui OBJECT)
