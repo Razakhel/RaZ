@@ -33,6 +33,8 @@ public:
          ProjectionType projType = ProjectionType::PERSPECTIVE);
 
   Radiansf getFieldOfView() const { return m_fieldOfView; }
+  float getOrthoBoundX() const { return m_orthoBoundX; }
+  float getOrthoBoundY() const { return m_orthoBoundY; }
   CameraType getCameraType() const { return m_cameraType; }
   const Mat4f& getViewMatrix() const { return m_viewMat; }
   const Mat4f& getInverseViewMatrix() const { return m_invViewMat; }
@@ -40,6 +42,8 @@ public:
   const Mat4f& getInverseProjectionMatrix() const { return m_invProjMat; }
 
   void setFieldOfView(Radiansf fieldOfView);
+  void setOrthoBoundX(float boundX);
+  void setOrthoBoundY(float boundY);
   void setCameraType(CameraType camType) { m_cameraType = camType; }
   void setProjectionType(ProjectionType projType);
   void setTarget(const Vec3f& target) { m_target = target; }
@@ -95,6 +99,8 @@ private:
   Radiansf m_fieldOfView = Degreesf(45.f);
   float m_nearPlane      = 0.1f;
   float m_farPlane       = 100.f;
+  float m_orthoBoundX    = 1.f;
+  float m_orthoBoundY    = 1.f;
 
   CameraType m_cameraType   = CameraType::FREE_FLY;
   ProjectionType m_projType = ProjectionType::PERSPECTIVE;

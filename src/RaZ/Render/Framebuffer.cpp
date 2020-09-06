@@ -61,10 +61,8 @@ void Framebuffer::addTextureBuffer(const Texture& texture) {
     // Adding the color buffer only if it doesn't exist yet
     auto bufferIter = std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), &texture);
 
-    if (bufferIter == m_colorBuffers.cend()) {
+    if (bufferIter == m_colorBuffers.cend())
       m_colorBuffers.emplace_back(&texture);
-      bufferIter = m_colorBuffers.cend() - 1;
-    }
   }
 
   mapBuffers();

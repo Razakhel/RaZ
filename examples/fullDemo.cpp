@@ -104,11 +104,19 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::V, [&cameraTrans, &cameraSpeed] (float deltaTime) {
     cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
   });
-  window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f, 0.f, (10.f * deltaTime) * cameraSpeed);
+  window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraComp, &cameraSpeed] (float deltaTime) {
+    const float moveVal = (10.f * deltaTime) * cameraSpeed;
+
+    cameraTrans.move(0.f, 0.f, moveVal);
+    cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() - moveVal);
+    cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() - moveVal);
   });
-  window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f,  0.f, (-10.f * deltaTime) * cameraSpeed);
+  window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraComp, &cameraSpeed] (float deltaTime) {
+    const float moveVal = (-10.f * deltaTime) * cameraSpeed;
+
+    cameraTrans.move(0.f, 0.f, moveVal);
+    cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() - moveVal);
+    cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() - moveVal);
   });
   window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
     cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);

@@ -20,6 +20,24 @@ void Camera::setFieldOfView(Radiansf fieldOfView) {
   computeInverseProjectionMatrix();
 }
 
+void Camera::setOrthoBoundX(float boundX) {
+  m_orthoBoundX = boundX;
+
+  if (m_projType == ProjectionType::ORTHOGRAPHIC) {
+    computeProjectionMatrix();
+    computeInverseProjectionMatrix();
+  }
+}
+
+void Camera::setOrthoBoundY(float boundY) {
+  m_orthoBoundY = boundY;
+
+  if (m_projType == ProjectionType::ORTHOGRAPHIC) {
+    computeProjectionMatrix();
+    computeInverseProjectionMatrix();
+  }
+}
+
 void Camera::setProjectionType(ProjectionType projType) {
   m_projType = projType;
 
@@ -69,17 +87,19 @@ const Mat4f& Camera::computeOrthographicMatrix(float right, float left, float to
   const float yDist = top - bottom;
   const float zDist = far - near;
 
-  m_projMat = Mat4f(2.f / xDist, 0.f,          0.f,         -(right + left) / xDist,
-                    0.f,         2.f / yDist,  0.f,         -(top + bottom) / yDist,
-                    0.f,         0.f,         -2.f / zDist, -(far + near) / zDist,
-                    0.f,         0.f,          0.f,          1.f);
+  m_projMat = Mat4f( 2.f / xDist,             0.f,                     0.f,                  0.f,
+                     0.f,                     2.f / yDist,             0.f,                  0.f,
+                     0.f,                     0.f,                    -2.f / zDist,          0.f,
+                    -(right + left) / xDist, -(top + bottom) / yDist, -(far + near) / zDist, 1.f);
 
   return m_projMat;
 }
 
 const Mat4f& Camera::computeProjectionMatrix() {
-  if (m_projType == ProjectionType::ORTHOGRAPHIC)
-    return computeOrthographicMatrix(1.f, -1.f, -1.f, 1.f, m_nearPlane, m_farPlane);
+  if (m_projType == ProjectionType::ORTHOGRAPHIC) {
+    const float orthoX = m_orthoBoundX * m_frameRatio;
+    return computeOrthographicMatrix(orthoX, -orthoX, m_orthoBoundY, -m_orthoBoundY, m_nearPlane, m_farPlane);
+  }
 
   return computePerspectiveMatrix();
 }

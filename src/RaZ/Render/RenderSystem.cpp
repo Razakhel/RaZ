@@ -31,7 +31,7 @@ RenderPass& RenderSystem::addRenderPass(FragmentShader fragShader) {
   return m_renderGraph.addNode(std::move(fragShader));
 }
 
-bool RenderSystem::update(float deltaTime) {
+bool RenderSystem::update([[maybe_unused]] float deltaTime) {
   m_renderGraph.execute(*this);
 
 #if defined(RAZ_CONFIG_DEBUG) && !defined(SKIP_RENDERER_ERRORS)

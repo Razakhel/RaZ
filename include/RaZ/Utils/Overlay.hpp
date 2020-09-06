@@ -190,7 +190,7 @@ private:
   public:
     OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight)
       : OverlayElement(), m_index{ texture.getIndex() }, m_width{ static_cast<float>(maxWidth) }, m_height{ static_cast<float>(maxHeight) } {}
-    OverlayTexture(const Texture& texture) : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
+    explicit OverlayTexture(const Texture& texture) : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
 
     OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
 
