@@ -26,6 +26,12 @@ private:
 
 } // namespace
 
+enum class EnumTest {
+  VALUE,
+  TEST,
+  AGAIN
+};
+
 TEST_CASE("TypeUtils type str") {
   int testInt {};
   const int& testIntRef = testInt;
@@ -48,6 +54,19 @@ TEST_CASE("TypeUtils type str") {
   CHECK(Raz::TypeUtils::getTypeStr<decltype(testIntRef)>() == "const int&");
   CHECK(Raz::TypeUtils::getTypeStr<decltype("Hello world!")>() == "const char(&)[13]");
   CHECK(Raz::TypeUtils::getTypeStr<std::string_view>() == "class std::basic_string_view<char,struct std::char_traits<char> >");
+#endif
+}
+
+TEST_CASE("TypeUtils enum str") {
+#if defined(RAZ_COMPILER_GCC) && __GNUC__ < 9
+  // Prior to version 9, GCC prints enum values as (Type)value
+  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::VALUE>() == "(EnumTest)0");
+  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::TEST>() == "(EnumTest)1");
+  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::AGAIN>() == "(EnumTest)2");
+#else
+  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::VALUE>() == "EnumTest::VALUE");
+  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::TEST>() == "EnumTest::TEST");
+  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::AGAIN>() == "EnumTest::AGAIN");
 #endif
 }
 
