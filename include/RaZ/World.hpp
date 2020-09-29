@@ -26,8 +26,13 @@ public:
   /// Gets a given system contained by the world.
   /// This system must be present within the world. If not, an exception is thrown.
   /// \tparam Sys Type of the system to be fetched.
+  /// \return Constant reference to the found system.
+  template <typename Sys> const Sys& getSystem() const;
+  /// Gets a given system contained by the world.
+  /// This system must be present within the world. If not, an exception is thrown.
+  /// \tparam Sys Type of the system to be fetched.
   /// \return Reference to the found system.
-  template <typename Sys> Sys& getSystem();
+  template <typename Sys> Sys& getSystem() { return const_cast<Sys&>(static_cast<const World*>(this)->getSystem<Sys>()); }
   /// Adds a given system to the world.
   /// \tparam Sys Type of the system to be added.
   /// \tparam Args Types of the arguments to be forwarded to the given system.

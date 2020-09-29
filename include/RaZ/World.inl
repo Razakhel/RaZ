@@ -11,11 +11,11 @@ bool World::hasSystem() const {
 }
 
 template <typename Sys>
-Sys& World::getSystem() {
+const Sys& World::getSystem() const {
   static_assert(std::is_base_of_v<System, Sys>, "Error: Fetched system must be derived from System.");
 
   if (hasSystem<Sys>())
-    return static_cast<Sys&>(*m_systems[System::getId<Sys>()]);
+    return static_cast<const Sys&>(*m_systems[System::getId<Sys>()]);
 
   throw std::runtime_error("Error: No system available of specified type");
 }
