@@ -45,17 +45,12 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
 
   const std::size_t imageDataSize = width * height * m_channelCount;
 
-  if (colorspace == ImageColorspace::DEPTH) {
-    ImageDataFPtr imgData = ImageDataF::create();
-    imgData->data.resize(imageDataSize);
+  if (colorspace == ImageColorspace::DEPTH)
+    m_data = ImageDataF::create();
+  else
+    m_data = ImageDataB::create();
 
-    m_data = std::move(imgData);
-  } else {
-    ImageDataBPtr imgData = ImageDataB::create();
-    imgData->data.resize(imageDataSize);
-
-    m_data = std::move(imgData);
-  }
+  m_data->resize(imageDataSize);
 }
 
 void Image::read(const FilePath& filePath, bool flipVertically) {

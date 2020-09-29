@@ -39,6 +39,9 @@ struct ImageData {
   /// Checks if the image doesn't contain data.
   /// \return True if the image has no data, false otherwise.
   virtual bool isEmpty() const = 0;
+  /// Resizes the data container.
+  /// \param size New data size.
+  virtual void resize(std::size_t size) = 0;
 
   /// Checks if the current image data is equal to another given one.
   /// Datas' types must be the same.
@@ -66,6 +69,9 @@ struct ImageDataB final : public ImageData {
   /// Checks if the image doesn't contain data.
   /// \return True if the image has no data, false otherwise.
   bool isEmpty() const override { return data.empty(); }
+  /// Resizes the data container.
+  /// \param size New data size.
+  void resize(std::size_t size) override { data.resize(size); }
 
   /// Checks if the current byte image data is equal to another given one.
   /// The given data must be of byte type as well.
@@ -88,6 +94,9 @@ struct ImageDataF final : public ImageData {
   /// Checks if the image doesn't contain data.
   /// \return True if the image has no data, false otherwise.
   bool isEmpty() const override { return data.empty(); }
+  /// Resizes the data container.
+  /// \param size New data size.
+  void resize(std::size_t size) override { data.resize(size); }
 
   /// Checks if the current floating point image data is equal to another given one.
   /// The given data must be of floating point type as well.

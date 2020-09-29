@@ -6,6 +6,7 @@
 #include "RaZ/Component.hpp"
 #include "RaZ/Math/Vector.hpp"
 
+#include <cstddef>
 #include <fstream>
 #include <limits>
 #include <vector>

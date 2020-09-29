@@ -97,7 +97,7 @@ void RenderSystem::updateLights() const {
   std::size_t lightCount = 0;
 
   for (const Entity* entity : m_entities) {
-    if (entity->hasComponent<Light>()) {
+    if (entity->hasComponent<Light>() && entity->isEnabled()) {
       updateLight(entity, lightCount);
       ++lightCount;
     }
