@@ -21,3 +21,27 @@ TEST_CASE("MathUtils linear interpolation") {
   CHECK(Raz::MathUtils::interpolate(-1.43f, 8.12f, 0.75f) == 5.7325001f);
   CHECK(Raz::MathUtils::interpolate(-1.43f, 8.12f, 1.f) == 8.12f);
 }
+
+TEST_CASE("MathUtils smoothstep") {
+  CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, -1.f) == 0.f); // If value < minThresh, returns 0
+  CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 0.f) == 0.f);
+  CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 0.25f) == 0.15625f);
+  CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 0.5f) == 0.5f);
+  CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 0.75f) == 0.84375f);
+  CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 1.f) == 1.f);
+  CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 2.f) == 1.f); // If value > maxThresh, returns 1
+
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, -10.f) == 0.f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, -5.f - std::numeric_limits<float>::epsilon()) == 0.f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, -5.f) == 0.f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, -4.5f) == 0.00725000072f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, -2.5f) == 0.15625f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, -0.5f) == 0.42524996f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 0.f) == 0.5f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 0.5f) == 0.57475001f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 2.5f) == 0.84375f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 4.5f) == 0.99274999f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 5.f) == 1.f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 5.f + std::numeric_limits<float>::epsilon()) == 1.f);
+  CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 10.f) == 1.f);
+}
