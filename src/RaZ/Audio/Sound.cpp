@@ -51,7 +51,7 @@ void Sound::load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)
-    throw std::runtime_error("Error: Couldn't open the file '" + filePath + "'");
+    throw std::invalid_argument("Error: Couldn't open the sound file '" + filePath + "'");
 
   m_data.clear();
 
@@ -60,7 +60,7 @@ void Sound::load(const FilePath& filePath) {
   if (format == "wav")
     loadWav(file);
   else
-    throw std::runtime_error("Error: '" + format + "' sound format is not supported");
+    throw std::invalid_argument("Error: '" + format + "' sound format is not supported");
 
   alSourcei(m_source, AL_BUFFER, 0); // Detaching the previous buffer (if any) from the source
 

@@ -14,38 +14,36 @@ void Mesh::import(const FilePath& filePath) {
 
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
-  if (file) {
-    const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
+  if (!file)
+    throw std::invalid_argument("Error: Couldn't open the mesh file '" + filePath + "'");
 
-    if (format == "obj")
-      importObj(file, filePath);
-    else if (format == "off")
-      importOff(file);
-    else if (format == "fbx")
+  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
+
+  if (format == "obj")
+    importObj(file, filePath);
+  else if (format == "off")
+    importOff(file);
+  else if (format == "fbx")
 #if defined(FBX_ENABLED)
-      importFbx(filePath);
+    importFbx(filePath);
 #else
-      throw std::runtime_error("Error: FBX disabled; check that you allowed its usage when building RaZ");
+    throw std::invalid_argument("Error: FBX disabled; check that you allowed its usage when building RaZ");
 #endif
-    else
-      throw std::runtime_error("Error: '" + format + "' format is not supported");
-  } else {
-    throw std::runtime_error("Error: Couldn't open the file '" + filePath + "'");
-  }
+  else
+    throw std::invalid_argument("Error: '" + format + "' mesh format is not supported");
 }
 
 void Mesh::save(const FilePath& filePath) const {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
   const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
-  if (file) {
-    if (format == "obj")
-      saveObj(file, filePath);
-    else
-      throw std::runtime_error("Error: '" + format + "' format is not supported");
-  } else {
-    throw std::runtime_error("Error: Unable to create a file as '" + filePath + "'; path to file must exist");
-  }
+  if (!file)
+    throw std::invalid_argument("Error: Unable to create a mesh file as '" + filePath + "'; path to file must exist");
+
+  if (format == "obj")
+    saveObj(file, filePath);
+  else
+    throw std::invalid_argument("Error: '" + format + "' mesh format is not supported");
 }
 
 } // namespace Raz
