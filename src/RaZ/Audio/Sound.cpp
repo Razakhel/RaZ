@@ -62,6 +62,7 @@ void Sound::load(const FilePath& filePath) {
   else
     throw std::invalid_argument("Error: '" + format + "' sound format is not supported");
 
+  stop(); // Making sure the sound isn't paused or currently playing
   alSourcei(m_source, AL_BUFFER, 0); // Detaching the previous buffer (if any) from the source
 
   alBufferData(m_buffer, static_cast<int>(m_format), m_data.data(), static_cast<int>(m_data.size()), m_frequency);
