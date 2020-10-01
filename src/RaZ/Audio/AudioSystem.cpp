@@ -70,15 +70,21 @@ std::string AudioSystem::recoverCurrentDevice() const {
   if (m_device == nullptr) // The system has failed to initialize; returning an empty device name
     return {};
 
-  return alcGetString(m_device, ALC_DEVICE_SPECIFIER);
+  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty string
+    return {};
+
+  return alcGetString(m_device, ALC_ALL_DEVICES_SPECIFIER);
 }
 
 std::vector<std::string> AudioSystem::recoverDevices() {
+  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty vector
+    return {};
+
   std::vector<std::string> devices;
 
   // This recovers all devices' names in a single string, each name separated by a null character ('\0'), and ending with two of those
   // For example: "First device\0Second device\0Third device\0\0"
-  const char* devicesNames = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
+  const char* devicesNames = alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER);
 
   while (devicesNames[0] != '\0') {
     devices.emplace_back(devicesNames); // This automatically fills the string until the first \0

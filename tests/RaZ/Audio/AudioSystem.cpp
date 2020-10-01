@@ -5,7 +5,7 @@
 TEST_CASE("AudioSystem initialization") {
   {
     Raz::AudioSystem audio;
-    CHECK(!audio.recoverCurrentDevice().empty());
+    CHECK(!audio.recoverCurrentDevice().empty()); // If it is actually empty, audio features won't be available on this platform
   }
 
   {
