@@ -50,18 +50,19 @@ Sound::Sound(Sound&& sound) noexcept
 void Sound::load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
-  if (file) {
-    m_data.clear();
+  if (!file)
+    throw std::runtime_error("Error: Couldn't open the file '" + filePath + "'");
 
-    const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
+  m_data.clear();
 
-    if (format == "wav")
-      loadWav(file);
-    else
-      std::cerr << "Warning: '" + format + "' sound format is not supported" << std::endl;
-  } else {
-    std::cerr << "Error: Couldn't open the file '" + filePath + "'" << std::endl;
-  }
+  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
+
+  if (format == "wav")
+    loadWav(file);
+  else
+    throw std::runtime_error("Error: '" + format + "' sound format is not supported");
+
+  alSourcei(m_source, AL_BUFFER, 0); // Detaching the previous buffer (if any) from the source
 
   alBufferData(m_buffer, static_cast<int>(m_format), m_data.data(), static_cast<int>(m_data.size()), m_frequency);
   checkError("Failed to send sound information to the buffer");
@@ -148,11 +149,15 @@ Sound& Sound::operator=(Sound&& sound) noexcept {
 }
 
 Sound::~Sound() {
-  if (m_source != std::numeric_limits<unsigned int>::max())
+  if (m_source != std::numeric_limits<unsigned int>::max()) {
     alDeleteSources(1, &m_source);
+    checkError("Failed to delete source");
+  }
 
-  if (m_buffer != std::numeric_limits<unsigned int>::max())
+  if (m_buffer != std::numeric_limits<unsigned int>::max()) {
     alDeleteBuffers(1, &m_buffer);
+    checkError("Failed to delete buffer");
+  }
 }
 
 } // namespace Raz
