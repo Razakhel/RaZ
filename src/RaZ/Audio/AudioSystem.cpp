@@ -8,17 +8,60 @@
 
 namespace Raz {
 
+namespace {
+
+constexpr const char* recoverAlcErrorStr(int errorCode) {
+  switch (errorCode) {
+    case ALC_INVALID_DEVICE:  return "Invalid device";
+    case ALC_INVALID_CONTEXT: return "Invalid context";
+    case ALC_INVALID_ENUM:    return "Invalid enum";
+    case ALC_INVALID_VALUE:   return "Invalid value";
+    case ALC_OUT_OF_MEMORY:   return "Out of memory";
+    case ALC_NO_ERROR:        return "No error";
+    default:                  return "Unknown error";
+  }
+}
+
+inline void checkError(ALCdevice* device, const std::string_view& errorMsg) {
+  const int errorCode = alcGetError(device);
+
+  if (errorCode != ALC_NO_ERROR)
+    std::cerr << "[OpenAL] Error: " << errorMsg << " (" << recoverAlcErrorStr(errorCode) << ")." << std::endl;
+}
+
+} // namespace
+
 AudioSystem::AudioSystem(const char* deviceName) {
   m_acceptedComponents.setBit(Component::getId<Sound>());
   m_acceptedComponents.setBit(Component::getId<Listener>());
 
+  openDevice(deviceName);
+}
+
+void AudioSystem::openDevice(const char* deviceName) {
+  destroy();
+
   m_device = alcOpenDevice(deviceName);
   if (!m_device)
-    std::cerr << "Error: Failed to open an audio device." << std::endl;
+    std::cerr << "[OpenAL] Error: Failed to open an audio device." << std::endl;
 
   m_context = alcCreateContext(m_device, nullptr);
-  if (!alcMakeContextCurrent(m_context))
-    std::cerr << "Error: Failed to make the audio context current." << std::endl;
+  checkError(m_device, "Failed to create context");
+
+  if (!alcMakeContextCurrent(m_context)) {
+    std::cerr << "[OpenAL] Error: Failed to make the audio context current." << std::endl;
+    alcGetError(m_device); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
+  }
+}
+
+std::string AudioSystem::recoverCurrentDevice() const {
+  if (m_device == nullptr) // The system has failed to initialize; returning an empty device name
+    return {};
+
+  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty string
+    return {};
+
+  return alcGetString(m_device, ALC_ALL_DEVICES_SPECIFIER);
 }
 
 bool AudioSystem::update(float /* deltaTime */) {
@@ -66,14 +109,20 @@ bool AudioSystem::update(float /* deltaTime */) {
   return true;
 }
 
-std::string AudioSystem::recoverCurrentDevice() const {
-  if (m_device == nullptr) // The system has failed to initialize; returning an empty device name
-    return {};
+void AudioSystem::destroy() {
+  alcMakeContextCurrent(nullptr);
 
-  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty string
-    return {};
+  if (m_context != nullptr) {
+    alcDestroyContext(m_context);
+    checkError(m_device, "Failed to destroy context");
+    m_context = nullptr;
+  }
 
-  return alcGetString(m_device, ALC_ALL_DEVICES_SPECIFIER);
+  if (m_device != nullptr) {
+    if (!alcCloseDevice(m_device))
+      std::cerr << "[OpenAL] Error: Failed to close the audio device." << std::endl;
+    m_device = nullptr;
+  }
 }
 
 std::vector<std::string> AudioSystem::recoverDevices() {
@@ -92,12 +141,6 @@ std::vector<std::string> AudioSystem::recoverDevices() {
   }
 
   return devices;
-}
-
-AudioSystem::~AudioSystem() {
-  alcMakeContextCurrent(nullptr);
-  alcDestroyContext(m_context);
-  alcCloseDevice(m_device);
 }
 
 } // namespace Raz
