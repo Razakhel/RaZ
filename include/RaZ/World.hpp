@@ -68,12 +68,12 @@ public:
   World& operator=(World&&) noexcept = default;
 
 private:
-  std::vector<SystemPtr> m_systems {};
-  Bitset m_activeSystems {};
-
-  std::vector<EntityPtr> m_entities {};
+  std::vector<EntityPtr> m_entities {}; // Entities must be declared before systems, in order to be destroyed prior to them
   std::size_t m_activeEntityCount = 0;
   std::size_t m_maxEntityIndex = 0;
+
+  std::vector<SystemPtr> m_systems {};
+  Bitset m_activeSystems {};
 };
 
 } // namespace Raz

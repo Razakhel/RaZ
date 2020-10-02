@@ -35,7 +35,7 @@ enum class SoundState : int {
 
 class Sound final : public Component {
 public:
-  Sound();
+  Sound() { init(); }
   explicit Sound(const FilePath& filePath) : Sound() { load(filePath); }
   Sound(const Sound&) = delete;
   Sound(Sound&& sound) noexcept;
@@ -44,6 +44,10 @@ public:
   constexpr SoundFormat getFormat() const noexcept { return m_format; }
   constexpr int getFrequency() const noexcept { return m_frequency; }
 
+  /// Initializes the sound.
+  /// \note A Sound must be initialized again after opening an audio device.
+  /// \see AudioSystem::open()
+  void init();
   /// Loads a sound file.
   /// \param filePath Path to the file to load.
   void load(const FilePath& filePath);
@@ -88,11 +92,13 @@ public:
   /// Recovers the amount of minutes the sound has been played so far.
   /// \return Sound's elapsed time, in minutes.
   float recoverElapsedTime() const noexcept;
+  /// Destroys the sound.
+  void destroy();
 
   Sound& operator=(const Sound&) = delete;
   Sound& operator=(Sound&& sound) noexcept;
 
-  ~Sound() override;
+  ~Sound() override { destroy(); }
 
 private:
   /// Loads a [WAV](https://en.wikipedia.org/wiki/WAV) audio file to memory.

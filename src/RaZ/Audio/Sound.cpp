@@ -30,8 +30,17 @@ inline void checkError(const std::string_view& errorMsg) {
 
 } // namespace
 
-Sound::Sound() {
+Sound::Sound(Sound&& sound) noexcept
+  : m_buffer{ std::exchange(sound.m_buffer, std::numeric_limits<unsigned int>::max()) },
+    m_source{ std::exchange(sound.m_source, std::numeric_limits<unsigned int>::max()) },
+    m_format{ sound.m_format },
+    m_frequency{ sound.m_frequency },
+    m_data{ std::move(sound.m_data) } {}
+
+void Sound::init() {
   alGetError(); // Flushing errors
+
+  destroy();
 
   alGenBuffers(1, &m_buffer);
   checkError("Failed to create a sound buffer");
@@ -39,13 +48,6 @@ Sound::Sound() {
   alGenSources(1, &m_source);
   checkError("Failed to create a sound source");
 }
-
-Sound::Sound(Sound&& sound) noexcept
-  : m_buffer{ std::exchange(sound.m_buffer, std::numeric_limits<unsigned int>::max()) },
-    m_source{ std::exchange(sound.m_source, std::numeric_limits<unsigned int>::max()) },
-    m_format{ sound.m_format },
-    m_frequency{ sound.m_frequency },
-    m_data{ std::move(sound.m_data) } {}
 
 void Sound::load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
@@ -138,6 +140,20 @@ float Sound::recoverElapsedTime() const noexcept {
   return (seconds / 60.f);
 }
 
+void Sound::destroy() {
+  if (m_source != std::numeric_limits<unsigned int>::max()) {
+    alDeleteSources(1, &m_source);
+    checkError("Failed to delete source");
+    m_source = std::numeric_limits<unsigned int>::max();
+  }
+
+  if (m_buffer != std::numeric_limits<unsigned int>::max()) {
+    alDeleteBuffers(1, &m_buffer);
+    checkError("Failed to delete buffer");
+    m_buffer = std::numeric_limits<unsigned int>::max();
+  }
+}
+
 Sound& Sound::operator=(Sound&& sound) noexcept {
   std::swap(m_buffer, sound.m_buffer);
   std::swap(m_source, sound.m_source);
@@ -147,18 +163,6 @@ Sound& Sound::operator=(Sound&& sound) noexcept {
   m_data      = std::move(sound.m_data);
 
   return *this;
-}
-
-Sound::~Sound() {
-  if (m_source != std::numeric_limits<unsigned int>::max()) {
-    alDeleteSources(1, &m_source);
-    checkError("Failed to delete source");
-  }
-
-  if (m_buffer != std::numeric_limits<unsigned int>::max()) {
-    alDeleteBuffers(1, &m_buffer);
-    checkError("Failed to delete buffer");
-  }
 }
 
 } // namespace Raz
