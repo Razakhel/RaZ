@@ -88,13 +88,13 @@ void Sound::setGain(float gain) const noexcept {
   checkError("Failed to set the source's gain");
 }
 
-void Sound::setPosition(const Vec3f& position) const noexcept {
-  alSource3f(m_source, AL_POSITION, position[0], position[1], position[2]);
+void Sound::setPosition(float x, float y, float z) const noexcept {
+  alSource3f(m_source, AL_POSITION, x, y, z);
   checkError("Failed to set the source's position");
 }
 
-void Sound::setVelocity(const Vec3f& velocity) const noexcept {
-  alSource3f(m_source, AL_VELOCITY, velocity[0], velocity[1], velocity[2]);
+void Sound::setVelocity(float x, float y, float z) const noexcept {
+  alSource3f(m_source, AL_VELOCITY, x, y, z);
   checkError("Failed to set the source's velocity");
 }
 

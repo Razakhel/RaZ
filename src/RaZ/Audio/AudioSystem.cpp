@@ -80,10 +80,10 @@ bool AudioSystem::update(float /* deltaTime */) {
 
         // TODO: Transform's update status may be reinitialized in the RenderSystem (and should theoretically be reset in every system, including here)
         //  A viable solution must be implemented to check for and reset this status in all systems
-        if (soundTrans.hasUpdated()) {
+        //if (soundTrans.hasUpdated()) {
           sound.setPosition(soundTrans.getPosition());
           //soundTrans.setUpdated(false);
-        }
+        //}
       }
     }
 
@@ -98,12 +98,12 @@ bool AudioSystem::update(float /* deltaTime */) {
       auto& listener      = entity->getComponent<Listener>();
       auto& listenerTrans = entity->getComponent<Transform>();
 
-      if (listenerTrans.hasUpdated()) {
+      //if (listenerTrans.hasUpdated()) {
         listener.setPosition(listenerTrans.getPosition());
         listener.setOrientation(Mat3f(listenerTrans.computeTransformMatrix()));
 
         //listenerTrans.setUpdated(false);
-      }
+      //}
     }
   }
 
