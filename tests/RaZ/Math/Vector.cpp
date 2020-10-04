@@ -27,6 +27,38 @@ TEST_CASE("Vector deduction guides") {
   CHECK(std::is_same_v<std::decay_t<decltype(vec4u)>, Raz::Vec4u>);
 }
 
+TEST_CASE("Vector indexing") {
+  CHECK(vec31[0] == 3.18f);
+  CHECK(vec31[1] == 42.f);
+  CHECK(vec31[2] == 0.874f);
+
+  CHECK(vec31.x() == 3.18f);
+  CHECK(vec31.y() == 42.f);
+  CHECK(vec31.z() == 0.874f);
+
+  Raz::Vec4f vecCopy = vec41;
+
+  vecCopy[0] += 1.f;
+  vecCopy[1] += 1.f;
+  vecCopy[2] += 1.f;
+  vecCopy[3] += 1.f;
+
+  vecCopy.x() += 1.f;
+  vecCopy.y() += 1.f;
+  vecCopy.z() += 1.f;
+  vecCopy.w() += 1.f;
+
+  CHECK(vecCopy[0] == vec41[0] + 2.f);
+  CHECK(vecCopy[1] == vec41[1] + 2.f);
+  CHECK(vecCopy[2] == vec41[2] + 2.f);
+  CHECK(vecCopy[3] == vec41[3] + 2.f);
+
+  CHECK(vecCopy.x() == vec41.x() + 2.f);
+  CHECK(vecCopy.y() == vec41.y() + 2.f);
+  CHECK(vecCopy.z() == vec41.z() + 2.f);
+  CHECK(vecCopy.w() == vec41.w() + 2.f);
+}
+
 TEST_CASE("Vector/scalar operations") {
   CHECK((vec31 + 3.5f) == Raz::Vec3f(6.68f, 45.5f, 4.374f));
   CHECK((vec32 - 74.42f) == Raz::Vec3f(466.99f, -27.17f, -68.099f));

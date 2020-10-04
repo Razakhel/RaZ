@@ -45,6 +45,30 @@ public:
   constexpr const T* getDataPtr() const noexcept { return m_data.data(); }
   constexpr T* getDataPtr() noexcept { return m_data.data(); }
 
+  /// Gets the vector's X component.
+  /// \return Constant reference to the X component.
+  constexpr const T& x() const noexcept;
+  /// Gets the vector's X component.
+  /// \return Reference to the X component.
+  constexpr T& x() noexcept;
+  /// Gets the vector's Y component.
+  /// \return Constant reference to the Y component.
+  constexpr const T& y() const noexcept;
+  /// Gets the vector's Y component.
+  /// \return Reference to the Y component.
+  constexpr T& y() noexcept;
+  /// Gets the vector's Z component.
+  /// \return Constant reference to the Z component.
+  constexpr const T& z() const noexcept;
+  /// Gets the vector's Z component.
+  /// \return Reference to the Z component.
+  constexpr T& z() noexcept;
+  /// Gets the vector's W component.
+  /// \return Constant reference to the W component.
+  constexpr const T& w() const noexcept;
+  /// Gets the vector's W component.
+  /// \return Reference to the W component.
+  constexpr T& w() noexcept;
   /// Computes the dot product (scalar product) between the current vector & the given one.
   /// The dot product calculates the projection of one of the vectors onto the other; the order doesn't matter.
   /// On normalized vectors, the returned value represents the cosine of the angle (in radians) between them.
@@ -182,9 +206,6 @@ public:
   /// \param index Element's index.
   /// \return Reference to the fetched element.
   constexpr T& operator[](std::size_t index) noexcept { return m_data[index]; }
-  /// Hash computation operator.
-  /// \return Vector's hash.
-  constexpr std::size_t operator()() const noexcept { return hash(0); }
   /// Vector equality comparison operator.
   /// Uses a near-equality check on floating types to take floating-point errors into account.
   /// \param vec Vector to be compared with.

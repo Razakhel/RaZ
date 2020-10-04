@@ -36,6 +36,54 @@ Vector<T, Size>::Vector(std::initializer_list<T> list) noexcept {
 }
 
 template <typename T, std::size_t Size>
+constexpr const T& Vector<T, Size>::x() const noexcept {
+  static_assert(Size >= 1, "Error: Getting the X component requires the vector to be of size 1 or more.");
+
+  return m_data[0];
+}
+
+template <typename T, std::size_t Size>
+constexpr T& Vector<T, Size>::x() noexcept {
+  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->x());
+}
+
+template <typename T, std::size_t Size>
+constexpr const T& Vector<T, Size>::y() const noexcept {
+  static_assert(Size >= 2, "Error: Getting the Y component requires the vector to be of size 2 or more.");
+
+  return m_data[1];
+}
+
+template <typename T, std::size_t Size>
+constexpr T& Vector<T, Size>::y() noexcept {
+  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->y());
+}
+
+template <typename T, std::size_t Size>
+constexpr const T& Vector<T, Size>::z() const noexcept {
+  static_assert(Size >= 3, "Error: Getting the Z component requires the vector to be of size 3 or more.");
+
+  return m_data[2];
+}
+
+template <typename T, std::size_t Size>
+constexpr T& Vector<T, Size>::z() noexcept {
+  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->z());
+}
+
+template <typename T, std::size_t Size>
+constexpr const T& Vector<T, Size>::w() const noexcept {
+  static_assert(Size >= 4, "Error: Getting the W component requires the vector to be of size 4 or more.");
+
+  return m_data[3];
+}
+
+template <typename T, std::size_t Size>
+constexpr T& Vector<T, Size>::w() noexcept {
+  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->w());
+}
+
+template <typename T, std::size_t Size>
 constexpr T Vector<T, Size>::dot(const Vector& vec) const noexcept {
   T res {};
   for (std::size_t i = 0; i < Size; ++i)
