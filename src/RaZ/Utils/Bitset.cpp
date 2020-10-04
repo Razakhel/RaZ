@@ -1,17 +1,6 @@
 #include "RaZ/Utils/Bitset.hpp"
 
-#include <algorithm>
-
 namespace Raz {
-
-bool Bitset::isEmpty() const {
-  for (bool bit : m_bits) {
-    if (bit)
-      return false;
-  }
-
-  return true;
-}
 
 void Bitset::setBit(std::size_t position, bool value) {
   if (position >= m_bits.size())
@@ -20,7 +9,7 @@ void Bitset::setBit(std::size_t position, bool value) {
   m_bits[position] = value;
 }
 
-Bitset Bitset::operator~() const {
+Bitset Bitset::operator~() const noexcept {
   Bitset res = *this;
 
   for (auto bit : res.getBits())
@@ -29,25 +18,25 @@ Bitset Bitset::operator~() const {
   return res;
 }
 
-Bitset Bitset::operator&(const Bitset& bitset) const {
+Bitset Bitset::operator&(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + res.getSize(), res.getBits().begin());
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.getBits().begin());
 
   res &= bitset;
   return res;
 }
 
-Bitset Bitset::operator|(const Bitset& bitset) const {
+Bitset Bitset::operator|(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + res.getSize(), res.getBits().begin());
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.getBits().begin());
 
   res |= bitset;
   return res;
 }
 
-Bitset Bitset::operator^(const Bitset& bitset) const {
+Bitset Bitset::operator^(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + res.getSize(), res.getBits().begin());
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.getBits().begin());
 
   res ^= bitset;
   return res;
@@ -65,19 +54,19 @@ Bitset Bitset::operator>>(std::size_t shift) const {
   return res;
 }
 
-Bitset& Bitset::operator&=(const Bitset& bitset) {
+Bitset& Bitset::operator&=(const Bitset& bitset) noexcept {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
     m_bits[bitIndex] = m_bits[bitIndex] & bitset[bitIndex];
   return *this;
 }
 
-Bitset& Bitset::operator|=(const Bitset& bitset) {
+Bitset& Bitset::operator|=(const Bitset& bitset) noexcept {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
     m_bits[bitIndex] = m_bits[bitIndex] | bitset[bitIndex];
   return *this;
 }
 
-Bitset& Bitset::operator^=(const Bitset& bitset) {
+Bitset& Bitset::operator^=(const Bitset& bitset) noexcept {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
     m_bits[bitIndex] = m_bits[bitIndex] ^ bitset[bitIndex];
   return *this;
