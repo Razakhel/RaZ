@@ -65,6 +65,9 @@ public:
   /// \param y New source's Y position.
   /// \param z New source's Z position.
   void setPosition(float x, float y, float z) const noexcept;
+  /// Recovers the position of the sound emitter.
+  /// \return Sound's position.
+  Vec3f recoverPosition() const noexcept;
   /// Sets the audio source's velocity.
   /// \param velocity New source's velocity.
   void setVelocity(const Vec3f& velocity) const noexcept { setVelocity(velocity[0], velocity[1], velocity[2]); }
@@ -73,6 +76,9 @@ public:
   /// \param y New source's Y velocity.
   /// \param z New source's Z velocity.
   void setVelocity(float x, float y, float z) const noexcept;
+  /// Recovers the velocity of the sound emitter.
+  /// \return Sound's velocity.
+  Vec3f recoverVelocity() const noexcept;
   /// Sets the sound's repeat state.
   /// \param repeat Repeat state; true if the sound should be repeated, false otherwise.
   void repeat(bool repeat) const noexcept;

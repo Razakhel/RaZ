@@ -93,9 +93,27 @@ void Sound::setPosition(float x, float y, float z) const noexcept {
   checkError("Failed to set the source's position");
 }
 
+Vec3f Sound::recoverPosition() const noexcept {
+  Vec3f position;
+
+  alGetSource3f(m_source, AL_POSITION, &position.x(), &position.y(), &position.z());
+  checkError("Failed to recover the source's position");
+
+  return position;
+}
+
 void Sound::setVelocity(float x, float y, float z) const noexcept {
   alSource3f(m_source, AL_VELOCITY, x, y, z);
   checkError("Failed to set the source's velocity");
+}
+
+Vec3f Sound::recoverVelocity() const noexcept {
+  Vec3f velocity;
+
+  alGetSource3f(m_source, AL_VELOCITY, &velocity.x(), &velocity.y(), &velocity.z());
+  checkError("Failed to recover the source's velocity");
+
+  return velocity;
 }
 
 void Sound::repeat(bool repeat) const noexcept {
