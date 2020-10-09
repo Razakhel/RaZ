@@ -2,6 +2,36 @@
 
 #include "RaZ/Utils/StrUtils.hpp"
 
+TEST_CASE("String starts/ends with") {
+  {
+    const std::string str = "this is a test";
+
+    CHECK(Raz::StrUtils::startsWith(str, "this"));
+    CHECK(Raz::StrUtils::startsWith(str, 't'));
+    CHECK_FALSE(Raz::StrUtils::startsWith(str, "his"));
+    CHECK_FALSE(Raz::StrUtils::startsWith(str, "test"));
+
+    CHECK_FALSE(Raz::StrUtils::endsWith(str, "this"));
+    CHECK(Raz::StrUtils::endsWith(str, "test"));
+    CHECK(Raz::StrUtils::endsWith(str, 't'));
+    CHECK(Raz::StrUtils::endsWith(str, "est"));
+  }
+
+  {
+    const std::wstring str = L"this is a test";
+
+    CHECK(Raz::StrUtils::startsWith(str, L"this"));
+    CHECK(Raz::StrUtils::startsWith(str, L't'));
+    CHECK_FALSE(Raz::StrUtils::startsWith(str, L"his"));
+    CHECK_FALSE(Raz::StrUtils::startsWith(str, L"test"));
+
+    CHECK_FALSE(Raz::StrUtils::endsWith(str, L"this"));
+    CHECK(Raz::StrUtils::endsWith(str, L"test"));
+    CHECK(Raz::StrUtils::endsWith(str, L't'));
+    CHECK(Raz::StrUtils::endsWith(str, L"est"));
+  }
+}
+
 TEST_CASE("String case changes") {
   const std::string lowerStr = "this is a test";
   const std::string upperStr = "THIS IS A TEST";
@@ -23,7 +53,7 @@ TEST_CASE("String trimming") {
   std::string str = baseStr;
 
   CHECK(Raz::StrUtils::trimLeft(str) == trimmedLeftStr); // Modified in-place, no copy occurring
-  CHECK(str == trimmedLeftStr); // String is still in uppercase
+  CHECK(str == trimmedLeftStr);
   CHECK(Raz::StrUtils::trimRight(str) == trimmedBothStr); // Already trimmed left, trimming right makes it fully trimmed
 
   CHECK(Raz::StrUtils::trimLeftCopy(baseStr) == trimmedLeftStr);

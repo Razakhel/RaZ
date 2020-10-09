@@ -13,6 +13,70 @@
 
 namespace Raz::StrUtils {
 
+/// Checks if a string starts with a given character.
+/// \param text String to be checked.
+/// \param token Character token to be searched.
+/// \return True if the text starts with the token, false otherwise.
+inline bool startsWith(const std::string& text, char token) {
+  return (text.front() == token);
+}
+
+/// Checks if a wide string starts with a given wide character.
+/// \param text Wide string to be checked.
+/// \param token Wide character token to be searched.
+/// \return True if the text starts with the token, false otherwise.
+inline bool startsWith(const std::wstring& text, wchar_t token) {
+  return (text.front() == token);
+}
+
+/// Checks if a string starts with a given substring.
+/// \param text String to be checked.
+/// \param token String token to be searched.
+/// \return True if the text starts with the token, false otherwise.
+inline bool startsWith(const std::string& text, const std::string& token) {
+  return (text.find(token) == 0);
+}
+
+/// Checks if a wide string starts with a given wide substring.
+/// \param text Wide string to be checked.
+/// \param token Wide string token to be searched.
+/// \return True if the text starts with the token, false otherwise.
+inline bool startsWith(const std::wstring& text, const std::wstring& token) {
+  return (text.find(token) == 0);
+}
+
+/// Checks if a string ends with a given character.
+/// \param text String to be checked.
+/// \param token Character token to be searched.
+/// \return True if the text ends with the token, false otherwise.
+inline bool endsWith(const std::string& text, char token) {
+  return (text.back() == token);
+}
+
+/// Checks if a wide string ends with a given wide character.
+/// \param text Wide string to be checked.
+/// \param token Wide character token to be searched.
+/// \return True if the text ends with the token, false otherwise.
+inline bool endsWith(const std::wstring& text, wchar_t token) {
+  return (text.back() == token);
+}
+
+/// Checks if a string ends with a given substring.
+/// \param text String to be checked.
+/// \param token String token to be searched.
+/// \return True if the text ends with the token, false otherwise.
+inline bool endsWith(const std::string& text, const std::string& token) {
+  return (text.rfind(token) == text.size() - token.size());
+}
+
+/// Checks if a wide string ends with a given wide substring.
+/// \param text Wide string to be checked.
+/// \param token Wide string token to be searched.
+/// \return True if the text ends with the token, false otherwise.
+inline bool endsWith(const std::wstring& text, const std::wstring& token) {
+  return (text.rfind(token) == text.size() - token.size());
+}
+
 /// Transforms in-place a character to lowercase.
 /// \param character Character to be transformed.
 /// \return Lowercase character.
