@@ -422,6 +422,7 @@ set(
     RAZ_SRC
 
     src/RaZ/*.cpp
+    src/RaZ/Animation/*.cpp
     src/RaZ/Audio/*.cpp
     src/RaZ/Math/*.cpp
     src/RaZ/Physics/*.cpp
@@ -430,6 +431,7 @@ set(
 
     include/RaZ/*.hpp
     include/RaZ/*.inl
+    include/RaZ/Animation/*.hpp
     include/RaZ/Audio/*.hpp
     include/RaZ/Audio/*.inl
     include/RaZ/Math/*.hpp

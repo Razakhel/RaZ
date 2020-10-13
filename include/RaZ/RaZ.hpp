@@ -10,6 +10,7 @@
 #include "Entity.hpp"
 #include "System.hpp"
 #include "World.hpp"
+#include "Animation/Skeleton.hpp"
 #include "Audio/AudioSystem.hpp"
 #include "Audio/Listener.hpp"
 #include "Audio/Sound.hpp"
