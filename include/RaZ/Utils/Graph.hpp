@@ -17,6 +17,11 @@ public:
   GraphNode(GraphNode&&) noexcept = default;
 
   const std::vector<T*>& getChildren() const noexcept { return m_children; }
+  std::size_t getChildCount() const noexcept { return m_children.size(); }
+  const T& getChild(std::size_t index) const noexcept;
+  T& getChild(std::size_t index) noexcept;
+  /// Checks if the current node is a root, that is, a node without any parent.
+  /// \return True if it is a root node, false otherwise.
   bool isRoot() const noexcept { return m_isRoot; }
 
   /// Links the given nodes as children of the current one.
@@ -46,8 +51,8 @@ protected:
   bool m_isRoot = true;
 };
 
-/// Graph class, representing a <a href="https://en.wikipedia.org/wiki/Directed_graph">directed graph</a>.
-/// This class is implemented as an <a href="https://en.wikipedia.org/wiki/Adjacency_list">adjacency list</a>.
+/// Graph class, representing a [directed graph](https://en.wikipedia.org/wiki/Directed_graph).
+/// This class is implemented as an [adjacency list](https://en.wikipedia.org/wiki/Adjacency_list).
 /// \tparam NodeT Type of the graph's nodes. Must be a type derived from GraphNode.
 template <typename NodeT>
 class Graph {
@@ -64,8 +69,9 @@ public:
   Graph(const Graph&) = delete;
   Graph(Graph&&) noexcept = default;
 
-  const std::vector<const NodePtr>& getNodes() const noexcept { return m_nodes; }
-  const std::vector<NodePtr>& getNodes() noexcept { return m_nodes; }
+  std::size_t getNodeCount() const noexcept { return m_nodes.size(); }
+  const NodeT& getNode(std::size_t index) const noexcept;
+  NodeT& getNode(std::size_t index) noexcept;
 
   /// Adds a node into the graph.
   /// \tparam Args Types of the arguments to be forwarded to the node's constructor.

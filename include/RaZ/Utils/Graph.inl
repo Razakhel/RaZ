@@ -1,6 +1,18 @@
 namespace Raz {
 
 template <typename T>
+const T& GraphNode<T>::getChild(std::size_t index) const noexcept {
+  assert("Error: The requested child node is out of bounds." && index < m_children.size());
+  return *m_children[index];
+}
+
+template <typename T>
+T& GraphNode<T>::getChild(std::size_t index) noexcept {
+  assert("Error: The requested child node is out of bounds." && index < m_children.size());
+  return *m_children[index];
+}
+
+template <typename T>
 template <typename NodeT, typename... OtherNodesTs>
 void GraphNode<T>::addChildren(NodeT&& node, OtherNodesTs&&... otherNodes) {
   static_assert(std::is_same_v<T, std::decay_t<NodeT>>, "Error: The given objects' type must be the same as the node's one.");
@@ -36,6 +48,18 @@ void GraphNode<T>::addParents(NodeT&& node, OtherNodesTs&&... otherNodes) {
   // Stop the recursive unpacking if no more nodes are to be added as parents
   if constexpr (sizeof...(otherNodes) > 0)
     addParents(std::forward<OtherNodesTs>(otherNodes)...);
+}
+
+template <typename NodeT>
+const NodeT& Graph<NodeT>::getNode(std::size_t index) const noexcept {
+  assert("Error: The requested node is out of bounds." && index < m_nodes.size());
+  return *m_nodes[index];
+}
+
+template <typename NodeT>
+NodeT& Graph<NodeT>::getNode(std::size_t index) noexcept {
+  assert("Error: The requested node is out of bounds." && index < m_nodes.size());
+  return *m_nodes[index];
 }
 
 template <typename NodeT>

@@ -4,10 +4,7 @@
 
 namespace {
 
-class TestNode final : public Raz::GraphNode<TestNode> {
-public:
-  std::size_t getChildrenCount() const noexcept { return m_children.size(); }
-};
+class TestNode final : public Raz::GraphNode<TestNode> {};
 
 } // namespace
 
@@ -20,7 +17,7 @@ TEST_CASE("Graph linking test") {
   TestNode& node12 = graph.addNode();
   TestNode& node2  = graph.addNode();
 
-  CHECK(graph.getNodes().size() == 5);
+  CHECK(graph.getNodeCount() == 5);
 
   // root -> node1
   root.addChildren(node1);
@@ -28,9 +25,9 @@ TEST_CASE("Graph linking test") {
   CHECK(root.isRoot());
   CHECK_FALSE(node1.isRoot());
 
-  CHECK(root.getChildrenCount() == 1);
-  CHECK(node1.getChildrenCount() == 0);
-  CHECK(root.getChildren().front() == &node1);
+  CHECK(root.getChildCount() == 1);
+  CHECK(node1.getChildCount() == 0);
+  CHECK(&root.getChild(0) == &node1);
 
   // Unchanged, node1 is already a child of root
   node1.addParents(root);
@@ -38,9 +35,9 @@ TEST_CASE("Graph linking test") {
   CHECK(root.isRoot());
   CHECK_FALSE(node1.isRoot());
 
-  CHECK(root.getChildrenCount() == 1);
-  CHECK(node1.getChildrenCount() == 0);
-  CHECK(root.getChildren().front() == &node1);
+  CHECK(root.getChildCount() == 1);
+  CHECK(node1.getChildCount() == 0);
+  CHECK(&root.getChild(0) == &node1);
 
   //              / node11
   // root -> node1
@@ -52,12 +49,12 @@ TEST_CASE("Graph linking test") {
   CHECK_FALSE(node11.isRoot());
   CHECK_FALSE(node12.isRoot());
 
-  CHECK(root.getChildrenCount() == 1);
-  CHECK(node1.getChildrenCount() == 2);
-  CHECK(node11.getChildrenCount() == 0);
-  CHECK(node12.getChildrenCount() == 0);
-  CHECK(node1.getChildren()[0] == &node11);
-  CHECK(node1.getChildren()[1] == &node12);
+  CHECK(root.getChildCount() == 1);
+  CHECK(node1.getChildCount() == 2);
+  CHECK(node11.getChildCount() == 0);
+  CHECK(node12.getChildCount() == 0);
+  CHECK(&node1.getChild(0) == &node11);
+  CHECK(&node1.getChild(1) == &node12);
 
   //            / node11
   //     / node1
@@ -71,13 +68,13 @@ TEST_CASE("Graph linking test") {
   CHECK_FALSE(node12.isRoot());
   CHECK_FALSE(node2.isRoot());
 
-  CHECK(root.getChildrenCount() == 2);
-  CHECK(node1.getChildrenCount() == 2);
-  CHECK(node11.getChildrenCount() == 0);
-  CHECK(node12.getChildrenCount() == 0);
-  CHECK(node2.getChildrenCount() == 0);
-  CHECK(root.getChildren()[0] == &node1);
-  CHECK(root.getChildren()[1] == &node2);
+  CHECK(root.getChildCount() == 2);
+  CHECK(node1.getChildCount() == 2);
+  CHECK(node11.getChildCount() == 0);
+  CHECK(node12.getChildCount() == 0);
+  CHECK(node2.getChildCount() == 0);
+  CHECK(&root.getChild(0) == &node1);
+  CHECK(&root.getChild(1) == &node2);
 }
 
 TEST_CASE("Graph root test") {
