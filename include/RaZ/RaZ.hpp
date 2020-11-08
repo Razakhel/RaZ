@@ -38,6 +38,7 @@
 #include "Render/Texture.hpp"
 #include "Render/UniformBuffer.hpp"
 #include "Utils/Bitset.hpp"
+#include "Utils/BvhFormat.hpp"
 #include "Utils/CompilerUtils.hpp"
 #include "Utils/EnumUtils.hpp"
 #include "Utils/FilePath.hpp"
