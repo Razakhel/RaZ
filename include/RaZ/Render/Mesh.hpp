@@ -49,6 +49,7 @@ public:
 
   void import(const FilePath& filePath);
   void setRenderMode(RenderMode renderMode);
+  void setMaterial(MaterialPtr material);
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
   void addSubmesh(Submesh submesh = Submesh()) { m_submeshes.emplace_back(std::move(submesh)); }
   void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }

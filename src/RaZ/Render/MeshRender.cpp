@@ -53,6 +53,14 @@ void Mesh::setRenderMode(RenderMode renderMode) {
     submesh.setRenderMode(renderMode);
 }
 
+void Mesh::setMaterial(MaterialPtr material) {
+  m_materials.clear();
+  m_materials.emplace_back(std::move(material));
+
+  for (Submesh& submesh : m_submeshes)
+    submesh.setMaterialIndex(0);
+}
+
 void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
   const MaterialCookTorrancePtr& newMaterial = Material::recoverMaterial(materialPreset, roughnessFactor);
 
