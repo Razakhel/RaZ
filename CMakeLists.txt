@@ -534,7 +534,6 @@ if (NOT RAZ_COMPILER_MSVC)
     set(RAZ_COMPILER_FLAGS $<$<COMPILE_LANGUAGE:CXX>:${RAZ_COMPILER_FLAGS}>)
 endif ()
 
-# Compiling RaZ
 target_compile_options(RaZ PRIVATE ${RAZ_COMPILER_FLAGS})
 target_link_libraries(RaZ PRIVATE ${RAZ_LINKER_FLAGS})
 

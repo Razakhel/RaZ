@@ -29,6 +29,7 @@ if (RAZ_COMPILER_CLANG)
         -Wno-double-promotion # [long] double/float operations are voluntarily made
         -Wno-float-equal # Floating-point strict equality checks are voluntarily made
         -Wno-header-hygiene # The namespace std::literals is imported in the Catch.hpp custom header
+        -Wno-unneeded-member-function # Test structures may contain unnecessary member functions
     )
 endif ()
 
