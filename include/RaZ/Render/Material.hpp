@@ -64,7 +64,7 @@ protected:
 
   Vec3f m_baseColor = Vec3f(1.f);
 
-  TexturePtr m_baseColorMap = Texture::create(ColorPreset::WHITE);
+  TexturePtr m_baseColorMap = Texture::create(ColorPreset::WHITE, 0);
 };
 
 class MaterialBlinnPhong final : public Material {
@@ -124,11 +124,11 @@ private:
   Vec3f m_emissive     = Vec3f(0.f);
   float m_transparency = 1.f;
 
-  TexturePtr m_ambientMap      = Texture::create(ColorPreset::WHITE);
-  TexturePtr m_specularMap     = Texture::create(ColorPreset::WHITE);
-  TexturePtr m_emissiveMap     = Texture::create(ColorPreset::WHITE);
-  TexturePtr m_transparencyMap = Texture::create(ColorPreset::WHITE);
-  TexturePtr m_bumpMap         = Texture::create(ColorPreset::WHITE);
+  TexturePtr m_ambientMap      = Texture::create(ColorPreset::WHITE, 1);
+  TexturePtr m_specularMap     = Texture::create(ColorPreset::WHITE, 2);
+  TexturePtr m_emissiveMap     = Texture::create(ColorPreset::WHITE, 3);
+  TexturePtr m_transparencyMap = Texture::create(ColorPreset::WHITE, 4);
+  TexturePtr m_bumpMap         = Texture::create(ColorPreset::WHITE, 5);
 };
 
 class MaterialCookTorrance final : public Material {
@@ -176,10 +176,10 @@ private:
   float m_metallicFactor  = 1.f;
   float m_roughnessFactor = 1.f;
 
-  TexturePtr m_normalMap           = Texture::create(ColorPreset::WHITE);
-  TexturePtr m_metallicMap         = Texture::create(ColorPreset::WHITE);
-  TexturePtr m_roughnessMap        = Texture::create(ColorPreset::WHITE);
-  TexturePtr m_ambientOcclusionMap = Texture::create(ColorPreset::WHITE);
+  TexturePtr m_normalMap           = Texture::create(ColorPreset::WHITE, 1);
+  TexturePtr m_metallicMap         = Texture::create(ColorPreset::WHITE, 2);
+  TexturePtr m_roughnessMap        = Texture::create(ColorPreset::WHITE, 3);
+  TexturePtr m_ambientOcclusionMap = Texture::create(ColorPreset::WHITE, 4);
 };
 
 } // namespace Raz
