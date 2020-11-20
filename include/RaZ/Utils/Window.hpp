@@ -125,7 +125,8 @@ public:
   /// \param actionSlide Action to be executed on a value change.
   /// \param minValue Lower value bound.
   /// \param maxValue Upper value bound.
-  void addOverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue);
+  /// \param initValue Initial value.
+  void addOverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
   /// Adds a texbox on the overlay.
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.

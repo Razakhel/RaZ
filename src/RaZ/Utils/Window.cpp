@@ -228,8 +228,8 @@ void Window::addOverlayCheckbox(std::string label, std::function<void()> actionO
   m_overlay->addCheckbox(std::move(label), std::move(actionOn), std::move(actionOff), initVal);
 }
 
-void Window::addOverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue) {
-  m_overlay->addSlider(std::move(label), std::move(actionSlide), minValue, maxValue);
+void Window::addOverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue) {
+  m_overlay->addSlider(std::move(label), std::move(actionSlide), minValue, maxValue, initValue);
 }
 
 void Window::addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback) {

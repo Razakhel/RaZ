@@ -243,7 +243,7 @@ int main() {
 
   window.addOverlaySeparator();
 
-  window.addOverlaySlider("Sound volume", [&meshSound] (float value) { meshSound.setGain(value); }, 0.f, 1.f);
+  window.addOverlaySlider("Sound volume", [&meshSound] (float value) { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
 
   window.addOverlaySeparator();
 

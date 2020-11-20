@@ -43,7 +43,7 @@ public:
   void addLabel(std::string label);
   void addButton(std::string label, std::function<void()> actionClick);
   void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
-  void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue);
+  void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
   void addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
   void addTexture(const Texture& texture);
@@ -153,8 +153,8 @@ private:
     friend Overlay;
 
   public:
-    OverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue)
-      : OverlayElement(std::move(label)), m_actionSlide{ std::move(actionSlide) }, m_minValue{ minValue }, m_maxValue{ maxValue }, m_currentValue{ minValue } {}
+    OverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue)
+      : OverlayElement(std::move(label)), m_actionSlide{ std::move(actionSlide) }, m_minValue{ minValue }, m_maxValue{ maxValue }, m_currentValue{ initValue } {}
 
     OverlayElementType getType() const override { return OverlayElementType::SLIDER; }
 
