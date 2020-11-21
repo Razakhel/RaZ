@@ -34,8 +34,6 @@ public:
             typename = std::enable_if_t<sizeof...(Args) == Size>, // There can't be more or less values than Size
             typename = std::enable_if_t<(std::is_same_v<T, std::decay_t<Args>> && ...)>> // Given values must be of the same type
   constexpr explicit Vector(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
-  [[deprecated("Vector(std::initializer_list) is deprecated; use Vector(Args...) instead.")]]
-  Vector(std::initializer_list<T> list) noexcept;
   constexpr Vector(const Vector&) noexcept = default;
   constexpr Vector(Vector&&) noexcept = default;
 

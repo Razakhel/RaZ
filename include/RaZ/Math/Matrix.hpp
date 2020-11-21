@@ -43,8 +43,6 @@ public:
   /// \param vecs Other row vectors.
   template <typename... Vecs>
   constexpr explicit Matrix(const Vector<T, W>& vec, Vecs&&... vecs) noexcept;
-  [[deprecated("Matrix(std::initializer_list<std::initializer_list>) is deprecated; use Matrix(Args...) instead.")]]
-  Matrix(std::initializer_list<std::initializer_list<T>> list) noexcept;
   constexpr Matrix(const Matrix&) noexcept = default;
   constexpr Matrix(Matrix&&) noexcept = default;
 

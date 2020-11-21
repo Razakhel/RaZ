@@ -228,22 +228,6 @@ constexpr Matrix<T, W, H>::Matrix(const Vector<T, W>& vec, Vecs&&... vecs) noexc
 }
 
 template <typename T, std::size_t W, std::size_t H>
-Matrix<T, W, H>::Matrix(std::initializer_list<std::initializer_list<T>> list) noexcept {
-  assert("Error: A Matrix cannot be created with less/more values than specified." && H == list.size());
-
-  auto row = list.begin();
-
-  for (std::size_t heightIndex = 0; heightIndex < list.size(); ++heightIndex, ++row) {
-    assert("Error: A Matrix cannot be created with less/more values than specified." && W == (list.begin() + heightIndex)->size());
-
-    auto element = row->begin();
-
-    for (std::size_t widthIndex = 0; widthIndex < list.begin()->size(); ++widthIndex, ++element)
-      m_data[heightIndex * list.begin()->size() + widthIndex] = *element;
-  }
-}
-
-template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::identity() noexcept {
   static_assert(W == H, "Error: Matrix must be a square one.");
 

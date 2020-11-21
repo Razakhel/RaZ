@@ -26,16 +26,6 @@ constexpr Vector<T, Size>::Vector(T val) noexcept {
 }
 
 template <typename T, std::size_t Size>
-Vector<T, Size>::Vector(std::initializer_list<T> list) noexcept {
-  assert("Error: A Vector cannot be created with less/more values than specified." && Size == list.size());
-
-  auto element = list.begin();
-
-  for (std::size_t i = 0; i < list.size(); ++i, ++element)
-    m_data[i] = *element;
-}
-
-template <typename T, std::size_t Size>
 constexpr const T& Vector<T, Size>::x() const noexcept {
   static_assert(Size >= 1, "Error: Getting the X component requires the vector to be of size 1 or more.");
 
