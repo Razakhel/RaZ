@@ -78,15 +78,14 @@ Window::Window(unsigned int width, unsigned int height,
 
   Renderer::initialize();
   Renderer::enable(Capability::DEPTH_TEST);
+  enableFaceCulling();
 #endif
 
   glfwSetWindowUserPointer(m_windowHandle, this);
 
-  glfwSetFramebufferSizeCallback(m_window, [] (GLFWwindow*, int newWidth, int newHeight) {
+  glfwSetFramebufferSizeCallback(m_windowHandle, [] (GLFWwindow*, int newWidth, int newHeight) {
     Renderer::resizeViewport(0, 0, static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
   });
-
-  enableFaceCulling();
 }
 
 void Window::setTitle(const std::string& title) const {

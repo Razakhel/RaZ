@@ -1,6 +1,13 @@
 #define GLFW_INCLUDE_VULKAN
 #include "GLFW/glfw3.h"
+
+#include "RaZ/Math/Angle.hpp"
+#include "RaZ/Math/Matrix.hpp"
+#include "RaZ/Math/Transform.hpp"
+#include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/RendererVk.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Image.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -9,11 +16,6 @@
 #include <iostream>
 #include <optional>
 #include <set>
-
-#include "RaZ/Math/Matrix.hpp"
-#include "RaZ/Math/Transform.hpp"
-#include "RaZ/Render/Camera.hpp"
-#include "RaZ/Utils/Image.hpp"
 
 using namespace std::literals;
 
@@ -684,7 +686,7 @@ void transitionImageLayout(VkImage image,
 
 inline void createTexture(VkImage& textureImage,
                           VkDeviceMemory& textureMemory,
-                          const std::string& texturePath,
+                          const FilePath& texturePath,
                           VkCommandPool commandPool,
                           VkQueue graphicsQueue,
                           VkPhysicalDevice physicalDevice,
@@ -888,7 +890,7 @@ inline void updateUniformBuffer(VkExtent2D swapchainExtent,
   const float totalTime  = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
   Camera camera(swapchainExtent.width, swapchainExtent.height, Degreesf(45.f), 0.1f, 100.f, ProjectionType::PERSPECTIVE);
-  transform.setRotation(Quaternionf(Degreesf(90.f) * totalTime, Axis::Z).computeMatrix());
+  transform.setRotation(Quaternionf(Degreesf(90.f) * totalTime, Axis::Z));
 
   UniformMatrices matrices {};
   matrices.model      = transform.computeTransformMatrix();
