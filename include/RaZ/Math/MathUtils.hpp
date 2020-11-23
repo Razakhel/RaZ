@@ -54,6 +54,23 @@ constexpr T smoothstep(T minThresh, T maxThresh, T value) noexcept {
   return clampedVal * clampedVal * (3 - 2 * clampedVal);
 }
 
+/// Computes the [smootherstep](https://en.wikipedia.org/wiki/Smoothstep#Variations) between two thresholds.
+/// This is Ken Perlin's smoothstep variation, which produces a slightly smoother smoothstep.
+/// \tparam T Type to compute the interpolation with.
+/// \param minThresh Minimum threshold value.
+/// \param maxThresh Maximum threshold value.
+/// \param value Value to be interpolated.
+/// \return 0 if `value` is lower than `minThresh`.
+/// \return 1 if `value` is greater than `maxThresh`.
+/// \return The interpolated value (between 0 & 1) otherwise.
+template <typename T>
+constexpr T smootherstep(T minThresh, T maxThresh, T value) noexcept {
+  assert("Error: The smootherstep's maximum threshold must be greater than the minimum one." && maxThresh > minThresh);
+
+  const T clampedVal = std::clamp((value - minThresh) / (maxThresh - minThresh), static_cast<T>(0), static_cast<T>(1));
+  return clampedVal * clampedVal * clampedVal * (clampedVal * (clampedVal * 6 - 15) + 10);
+}
+
 } // namespace Raz::MathUtils
 
 #endif // RAZ_MATHUTILS_HPP

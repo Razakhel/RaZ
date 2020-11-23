@@ -45,3 +45,27 @@ TEST_CASE("MathUtils smoothstep") {
   CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 5.f + std::numeric_limits<float>::epsilon()) == 1.f);
   CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 10.f) == 1.f);
 }
+
+TEST_CASE("MathUtils smootherstep") {
+  CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, -1.f) == 0.f); // If value < minThresh, returns 0
+  CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 0.f) == 0.f);
+  CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 0.25f) == 0.103515625f);
+  CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 0.5f) == 0.5f);
+  CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 0.75f) == 0.89648438f);
+  CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 1.f) == 1.f);
+  CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 2.f) == 1.f); // If value > maxThresh, returns 1
+
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, -10.f) == 0.f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, -5.f - std::numeric_limits<float>::epsilon()) == 0.f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, -5.f) == 0.f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, -4.5f) == 0.0011581251f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, -2.5f) == 0.103515625f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, -0.5f) == 0.40687308f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 0.f) == 0.5f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 0.5f) == 0.59312695f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 2.5f) == 0.89648438f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 4.5f) == 0.99884182f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 5.f) == 1.f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 5.f + std::numeric_limits<float>::epsilon()) == 1.f);
+  CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 10.f) == 1.f);
+}
