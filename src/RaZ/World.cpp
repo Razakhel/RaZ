@@ -26,27 +26,7 @@ void World::refresh() {
   if (m_entities.empty())
     return;
 
-  // Reorganizing the entites, swapping enabled & disabled ones so that the enabled ones are in front
-  auto entityBegin = m_entities.begin();
-  auto entityEnd   = m_entities.end() - 1;
-
-  while (entityBegin != entityEnd) {
-    if (!(*entityBegin)->isEnabled()) {
-      while (entityBegin != entityEnd && (*entityEnd == nullptr || !(*entityEnd)->isEnabled()))
-        --entityEnd;
-
-      if (entityBegin == entityEnd) {
-        break;
-      } else {
-        std::swap(*entityBegin, *entityEnd);
-        --entityEnd;
-      }
-    } else {
-      ++entityBegin;
-    }
-  }
-
-  m_activeEntityCount = static_cast<std::size_t>(std::distance(m_entities.begin(), entityEnd) + 1);
+  sortEntities();
 
   for (std::size_t entityIndex = 0; entityIndex < m_activeEntityCount; ++entityIndex) {
     const EntityPtr& entity = m_entities[entityIndex];
@@ -65,6 +45,33 @@ void World::refresh() {
       }
     }
   }
+}
+
+void World::sortEntities() {
+  // Reorganizing the entites, swapping enabled & disabled ones so that the enabled ones are in front
+  auto firstEntity = m_entities.begin();
+  auto lastEntity  = m_entities.end() - 1;
+
+  while (firstEntity != lastEntity) {
+    // Iterating from the beginning to the end, trying to find a disabled entity
+    if ((*firstEntity)->isEnabled()) {
+      ++firstEntity;
+      continue;
+    }
+
+    // Iterating from the end to the beginning, trying to find an enabled entity
+    while (firstEntity != lastEntity && (*lastEntity == nullptr || !(*lastEntity)->isEnabled()))
+      --lastEntity;
+
+    // If both iterators are equal to each other, the list is sorted
+    if (firstEntity == lastEntity)
+      break;
+
+    std::swap(*firstEntity, *lastEntity);
+    --lastEntity;
+  }
+
+  m_activeEntityCount = static_cast<std::size_t>(std::distance(m_entities.begin(), lastEntity) + 1);
 }
 
 } // namespace Raz

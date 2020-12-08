@@ -61,13 +61,16 @@ public:
   /// \param deltaTime Time elapsed since the last update.
   /// \return True if the world still has active systems, false otherwise.
   bool update(float deltaTime);
-  /// Refreshes the world, reorganizing its entities to optimize caching by moving the active entities in front.
+  /// Refreshes the world, optimizing the entities & linking/unlinking entities to systems if needed.
   void refresh();
 
   World& operator=(const World&) = delete;
   World& operator=(World&&) noexcept = default;
 
 private:
+  /// Sorts entities so that the disabled ones are packed to the end of the list.
+  void sortEntities();
+
   std::vector<EntityPtr> m_entities {}; // Entities must be declared before systems, in order to be destroyed prior to them
   std::size_t m_activeEntityCount = 0;
   std::size_t m_maxEntityIndex = 0;
