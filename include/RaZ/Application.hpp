@@ -41,7 +41,7 @@ private:
   std::vector<World> m_worlds {};
   Bitset m_activeWorlds {};
 
-  std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime {};
+  std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime = std::chrono::system_clock::now();
   float m_deltaTime {};
   bool m_isRunning = true;
 };

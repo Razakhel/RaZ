@@ -18,7 +18,7 @@ void Application::run() {
 
 bool Application::runOnce() {
   const auto currentTime = std::chrono::system_clock::now();
-  m_deltaTime            = std::chrono::duration_cast<std::chrono::duration<float>>(currentTime - m_lastFrameTime).count();
+  m_deltaTime            = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
   m_lastFrameTime        = currentTime;
 
   for (std::size_t worldIndex = 0; worldIndex < m_worlds.size(); ++worldIndex) {
