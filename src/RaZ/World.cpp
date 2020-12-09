@@ -13,10 +13,23 @@ bool World::update(float deltaTime) {
   refresh();
 
   for (std::size_t systemIndex = 0; systemIndex < m_systems.size(); ++systemIndex) {
-    if (m_activeSystems[systemIndex]) {
-      if (!m_systems[systemIndex]->update(deltaTime))
-        m_activeSystems.setBit(systemIndex, false);
+    if (!m_activeSystems[systemIndex])
+      continue;
+
+    SystemPtr& system = m_systems[systemIndex];
+
+    bool isSystemActive = system->update(deltaTime);
+    float remainingTime = deltaTime;
+    
+    while (remainingTime > 0.f) {
+      const float fixedTime = std::min(remainingTime, 0.016666f);
+
+      isSystemActive = system->step(fixedTime) && isSystemActive;
+      remainingTime -= fixedTime;
     }
+
+    if (!isSystemActive)
+      m_activeSystems.setBit(systemIndex, false);
   }
 
   return !m_activeSystems.isEmpty();
