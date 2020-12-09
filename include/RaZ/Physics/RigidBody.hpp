@@ -13,9 +13,7 @@ public:
   /// Creates a rigid body with given mass & bounciness.
   /// \param mass Mass of the rigid body. 0 represents an infinite mass.
   /// \param bounciness Coefficient of restitution (must be between 0 & 1).
-  constexpr explicit RigidBody(float mass, float bounciness) noexcept : m_mass{ mass },
-                                                                        m_invMass{ (mass != 0.f ? 1.f / mass : 0.f) },
-                                                                        m_bounciness{ bounciness } {
+  constexpr RigidBody(float mass, float bounciness) noexcept : m_mass{ mass }, m_invMass{ (mass != 0.f ? 1.f / mass : 0.f) }, m_bounciness{ bounciness } {
     assert("Error: Bounciness value must be between 0 & 1." && (bounciness >= 0.f && bounciness <= 1.f));
   }
 

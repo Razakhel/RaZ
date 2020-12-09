@@ -18,8 +18,7 @@ public:
     m_friction = friction;
   }
 
-  bool update(float deltaTime) override;
-  void destroy() override {}
+  bool step(float deltaTime) override;
 
 private:
   Vec3f m_gravity  = Vec3f(0.f, -9.80665f, 0.f); ///< Gravity force.

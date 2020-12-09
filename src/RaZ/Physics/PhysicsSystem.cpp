@@ -8,7 +8,7 @@ PhysicsSystem::PhysicsSystem() {
   m_acceptedComponents.setBit(Component::getId<RigidBody>());
 }
 
-bool PhysicsSystem::update(float deltaTime) {
+bool PhysicsSystem::step(float deltaTime) {
   for (Entity* entity : m_entities) {
     if (entity->isEnabled()) {
       auto& rigidBody = entity->getComponent<RigidBody>();
