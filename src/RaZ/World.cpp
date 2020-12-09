@@ -12,20 +12,21 @@ Entity& World::addEntity(bool enabled) {
 bool World::update(float deltaTime) {
   refresh();
 
+  // The fixed time step may need to be user-definable later; moreover, it should probably be handled by the Application
+  constexpr float fixedTimeStep = 0.016666f;
+
   for (std::size_t systemIndex = 0; systemIndex < m_systems.size(); ++systemIndex) {
     if (!m_activeSystems[systemIndex])
       continue;
 
-    SystemPtr& system = m_systems[systemIndex];
+    System& system = *m_systems[systemIndex];
 
-    bool isSystemActive = system->update(deltaTime);
-    float remainingTime = deltaTime;
-    
-    while (remainingTime > 0.f) {
-      const float fixedTime = std::min(remainingTime, 0.016666f);
+    bool isSystemActive = system.update(deltaTime);
+    m_remainingTime    += deltaTime;
 
-      isSystemActive = system->step(fixedTime) && isSystemActive;
-      remainingTime -= fixedTime;
+    while (m_remainingTime >= fixedTimeStep) {
+      isSystemActive   = system.step(fixedTimeStep) && isSystemActive;
+      m_remainingTime -= fixedTimeStep;
     }
 
     if (!isSystemActive)

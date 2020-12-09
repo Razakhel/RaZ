@@ -22,6 +22,9 @@ bool Application::runOnce() {
   m_lastFrameTime        = currentTime;
 
   for (std::size_t worldIndex = 0; worldIndex < m_worlds.size(); ++worldIndex) {
+    if (!m_activeWorlds[worldIndex])
+      continue;
+
     if (!m_worlds[worldIndex].update(m_deltaTime))
       m_activeWorlds.setBit(worldIndex, false);
   }

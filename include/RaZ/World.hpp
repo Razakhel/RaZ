@@ -77,6 +77,8 @@ private:
 
   std::vector<SystemPtr> m_systems {};
   Bitset m_activeSystems {};
+
+  float m_remainingTime {}; ///< Extra time remaining after executing the systems' fixed step update.
 };
 
 } // namespace Raz
