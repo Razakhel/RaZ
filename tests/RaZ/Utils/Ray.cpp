@@ -108,7 +108,7 @@ TEST_CASE("Ray-plane intersection") {
 }
 
 TEST_CASE("Ray-sphere intersection") {
-  // See: https://www.geogebra.org/3d/sn7ajcj2
+  // See: https://www.geogebra.org/m/sn7ajcj2
 
   const Raz::Sphere sphere1(Raz::Vec3f(0.f), 1.f);
   const Raz::Sphere sphere2(Raz::Vec3f(5.f, 10.f, 0.f), 5.f);
@@ -198,7 +198,7 @@ TEST_CASE("Ray-triangle intersection") {
   CHECK_FALSE(ray2.intersects(triangle3));
 
   CHECK(ray3.intersects(triangle3, &hit));
-  // The second point is almost aligned with the ray; see https://www.geogebra.org/3d/g4pumzwu
+  // The second point is almost aligned with the ray; see https://www.geogebra.org/m/g4pumzwu
   CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(-1.5000002f, -1.5000002f, 0.f)));
   CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f(-0.077791f, 0.9334918f, -0.3500594f)));
   CHECK_THAT(hit.distance, IsNearlyEqualTo(3.5355341f));
@@ -221,7 +221,7 @@ TEST_CASE("Ray-AABB intersection") {
   //  2 -> [    2;    3;   -5 ]
   //  3 -> [  -10;  -10;   -5 ]
 
-  // See: https://www.geogebra.org/3d/uwrt4ecn
+  // See: https://www.geogebra.org/m/uwrt4ecn
 
   const Raz::AABB aabb1(Raz::Vec3f(-0.5f), Raz::Vec3f(0.5f));
   const Raz::AABB aabb2(Raz::Vec3f(2.f, 3.f, -5.f), Raz::Vec3f(5.f));

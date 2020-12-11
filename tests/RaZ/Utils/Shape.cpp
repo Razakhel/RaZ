@@ -33,6 +33,22 @@ const Raz::Plane plane1(1.f, Raz::Axis::Y);
 const Raz::Plane plane2(0.5f, Raz::Vec3f(1.f, 1.f, 0.f).normalize());
 const Raz::Plane plane3(0.5f, Raz::Vec3f(-1.f, 1.f, 0.f).normalize());
 
+//      Sphere 1      |      Sphere 2     |      Sphere 3
+//                    |                   |
+//      .------.      |         .-"""-.   |                ^
+//    .'        `.    |        /       \  |                |
+//   /     ^      \   |        |[5; 10]|  |                +--->
+//  |      |       |  |        \       /  |   .-"""-.
+//  |      +--->   |  |         '-...-'   |  /       \
+//   \   [0; 0]   /   |  ^                |  |   x   |
+//    `._      _.'    |  |                |  \       /
+//      `"----"'      |  +--->            |   '-...-'
+//                    |                   |  [-10; -10]
+
+const Raz::Sphere sphere1(Raz::Vec3f(0.f), 1.f);
+const Raz::Sphere sphere2(Raz::Vec3f(5.f, 10.f, 0.f), 5.f);
+const Raz::Sphere sphere3(Raz::Vec3f(-10.f, -10.f, 0.f), 1.f);
+
 // These triangles are defined so that:
 //  - triangle1 is laying flat slightly above 0
 //  - triangle2 is standing, parallel to the Y/Z plane (facing the X direction)
@@ -65,7 +81,7 @@ const Raz::AABB aabb3(Raz::Vec3f(-10.f, -10.f, -5.f), Raz::Vec3f(-6.f, -5.f, 5.f
 } // namespace
 
 TEST_CASE("Line basic") {
-  // See: https://www.geogebra.org/3d/fbq8scce
+  // See: https://www.geogebra.org/m/fbq8scce
 
   CHECK(line1.computeCentroid() == Raz::Vec3f(0.5f, 0.f, 0.f));
   CHECK(line2.computeCentroid() == Raz::Vec3f(0.f, 0.5f, 0.f));
@@ -104,7 +120,7 @@ TEST_CASE("Line-plane intersection") {
 }
 
 TEST_CASE("Line-AABB intersection") {
-  // See: https://www.geogebra.org/3d/fru9r3r6
+  // See: https://www.geogebra.org/m/fru9r3r6
 
   CHECK(line1.intersects(aabb1));
   CHECK_FALSE(line1.intersects(aabb2));
@@ -152,8 +168,24 @@ TEST_CASE("Plane-plane intersection") {
   CHECK_FALSE(plane3.intersects(plane3));
 }
 
+TEST_CASE("Plane-sphere intersection") {
+  // See: https://www.geogebra.org/m/r3brvcsn
+
+  CHECK(plane1.intersects(sphere1));
+  CHECK_FALSE(plane1.intersects(sphere2));
+  CHECK_FALSE(plane1.intersects(sphere3));
+
+  CHECK(plane2.intersects(sphere1));
+  CHECK_FALSE(plane2.intersects(sphere2));
+  CHECK_FALSE(plane2.intersects(sphere3));
+
+  CHECK(plane3.intersects(sphere1));
+  CHECK(plane3.intersects(sphere2));
+  CHECK(plane3.intersects(sphere3));
+}
+
 TEST_CASE("Triangle basic") {
-  // See: https://www.geogebra.org/3d/gszsn33d
+  // See: https://www.geogebra.org/m/gszsn33d
 
   CHECK(triangle1.computeCentroid() == Raz::Vec3f(0.f, 0.5f, 0.f));
   CHECK(triangle1.computeNormal() == Raz::Axis::Y);
@@ -192,7 +224,7 @@ TEST_CASE("AABB basic") {
 }
 
 TEST_CASE("AABB point containment") {
-  // See: https://www.geogebra.org/3d/kwkkt9ry
+  // See: https://www.geogebra.org/m/kwkkt9ry
 
   CHECK(aabb1.contains(aabb1.computeCentroid()));
   CHECK(aabb1.contains(aabb1.getLeftBottomBackPos()));
