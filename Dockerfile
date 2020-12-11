@@ -1,5 +1,6 @@
-FROM ubuntu:19.10
+FROM ubuntu:20.04
 
+# Defining the timezone to Europe/Paris, which is reqired by apt
 # Updating packages' repo & installing only the needed packages:
 #   - GL & X11 as needed graphical dependencies
 #   - CMake, Make, GCC & Clang to build RaZ, and lcov to output code coverage
@@ -13,13 +14,14 @@ FROM ubuntu:19.10
 # Cleaning the apt lists & removing lists' cache entries to save image space
 #   - See: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
 # Downloading coveralls-lcov to upload coverage to Coveralls
-RUN apt-get update && \
+RUN ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
-        libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev \
+        libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
         cmake make gcc-8 g++-8 clang-7 lcov \
         xz-utils \
         python3 \
-        doxygen python-pydot python-pydot-ng \
+        doxygen python3-pydot python3-pydot-ng \
         libopenal-dev \
         wget \
         xvfb \
