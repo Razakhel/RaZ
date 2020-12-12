@@ -184,6 +184,20 @@ TEST_CASE("Plane-sphere intersection") {
   CHECK(plane3.intersects(sphere3));
 }
 
+TEST_CASE("Sphere point containment") {
+  CHECK(sphere1.contains(sphere1.getCenter()));
+  CHECK(sphere1.contains(Raz::Vec3f(0.f, 1.f, 0.f))); // Right on the sphere's border
+  CHECK_FALSE(sphere1.contains(Raz::Vec3f(0.f, 1.f + std::numeric_limits<float>::epsilon(), 0.f)));
+
+  CHECK(sphere2.contains(sphere2.getCenter()));
+  CHECK_FALSE(sphere2.contains(Raz::Vec3f(0.f)));
+  CHECK_FALSE(sphere2.contains(sphere2.getCenter() / 2.f));
+
+  CHECK(sphere3.contains(sphere3.getCenter()));
+  CHECK_FALSE(sphere3.contains(-sphere3.getCenter()));
+  CHECK_FALSE(sphere3.contains(Raz::Vec3f(sphere3.getCenter().x(), sphere3.getCenter().y(), sphere3.getRadius() + std::numeric_limits<float>::epsilon())));
+}
+
 TEST_CASE("Triangle basic") {
   // See: https://www.geogebra.org/m/gszsn33d
 
@@ -207,10 +221,13 @@ TEST_CASE("Triangle clockwiseness") {
   Raz::Triangle testTriangle2(Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 1.f, 0.f), Raz::Vec3f(-1.f, 0.f, 0.f));
 
   CHECK_FALSE(testTriangle1.isCounterClockwise(Raz::Axis::Z));
-  CHECK(testTriangle2.isCounterClockwise(Raz::Axis::Z));
-
   testTriangle1.makeCounterClockwise(Raz::Axis::Z);
   CHECK(testTriangle1.isCounterClockwise(Raz::Axis::Z));
+
+  // Trying to make it counter-clockwise while it already is has no effect
+  CHECK(testTriangle2.isCounterClockwise(Raz::Axis::Z));
+  testTriangle2.makeCounterClockwise(Raz::Axis::Z);
+  CHECK(testTriangle2.isCounterClockwise(Raz::Axis::Z));
 }
 
 TEST_CASE("AABB basic") {
