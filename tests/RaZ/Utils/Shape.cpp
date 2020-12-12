@@ -101,6 +101,20 @@ TEST_CASE("Line basic") {
   CHECK_THAT(line4.computeSquaredLength(), IsNearlyEqualTo(512.f));
 }
 
+TEST_CASE("Line point containment") {
+  CHECK(line1.contains(line1.getBeginPos()));
+  CHECK(line1.contains(line1.getEndPos()));
+  CHECK(line1.contains(line1.computeCentroid()));
+  const Raz::Vec3f furtherEnd(line1.getEndPos().x() + std::numeric_limits<float>::epsilon() * 2.f, line1.getEndPos().y(), line1.getEndPos().z());
+  CHECK_FALSE(line1.contains(furtherEnd));
+
+  CHECK_FALSE(line2.contains(line2.computeCentroid() + Raz::Vec3f(0.f, 0.f, std::numeric_limits<float>::epsilon() * 2.f)));
+
+  CHECK(line3.contains(line3.computeCentroid()));
+
+  CHECK(line4.contains(line4.computeCentroid()));
+}
+
 TEST_CASE("Line-plane intersection") {
   CHECK_FALSE(line1.intersects(plane1));
   CHECK(line1.intersects(plane2));
@@ -143,11 +157,8 @@ TEST_CASE("Plane basic") {
   const Raz::Plane testPlane1(Raz::Vec3f(0.f, 1.f, 0.f), Raz::Axis::Y);
   const Raz::Plane testPlane2(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-1.f, 1.f, -1.f), Raz::Vec3f(0.f, 1.f, 1.f));
 
-  // Checking that the 3 planes are strictly equal to each other
+  // Checking that the 2 planes are strictly equal to each other
   CHECK_THAT(testPlane1.getDistance(), IsNearlyEqualTo(testPlane2.getDistance()));
-  CHECK_THAT(testPlane1.getDistance(), IsNearlyEqualTo(testPlane2.getDistance()));
-
-  CHECK(testPlane1.getNormal() == testPlane2.getNormal());
   CHECK(testPlane1.getNormal() == testPlane2.getNormal());
 }
 
