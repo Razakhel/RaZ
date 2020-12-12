@@ -126,10 +126,10 @@ bool Sphere::contains(const Vec3f& point) const {
 }
 
 bool Sphere::intersects(const Sphere& sphere) const {
-  const float sqDist  = (m_centerPos - sphere.getCenter()).computeSquaredLength();
-  const float sqRadii = (m_radius * m_radius) + (sphere.getRadius() * sphere.getRadius());
+  const float sqDist   = (m_centerPos - sphere.getCenter()).computeSquaredLength();
+  const float sumRadii = m_radius + sphere.getRadius();
 
-  return (sqDist <= sqRadii);
+  return (sqDist <= sumRadii * sumRadii);
 }
 
 bool Sphere::intersects(const Triangle& triangle) const {

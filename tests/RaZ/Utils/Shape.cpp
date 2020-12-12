@@ -238,6 +238,26 @@ TEST_CASE("Sphere point containment") {
   CHECK_FALSE(sphere3.contains(Raz::Vec3f(sphere3.getCenter().x(), sphere3.getCenter().y(), sphere3.getRadius() + std::numeric_limits<float>::epsilon())));
 }
 
+TEST_CASE("Sphere-sphere intersection") {
+  // See: https://www.geogebra.org/m/tsfueyp5
+
+  const Raz::Sphere testSphere(Raz::Vec3f(0.f), 13.15f); // This sphere intersects all of the test ones
+
+  CHECK(sphere1.intersects(sphere1));
+  CHECK_FALSE(sphere1.intersects(sphere2));
+  CHECK_FALSE(sphere1.intersects(sphere3));
+  CHECK(sphere1.intersects(testSphere)); // Containment implies intersection
+
+  CHECK(sphere2.intersects(sphere2));
+  CHECK_FALSE(sphere2.intersects(sphere3));
+  CHECK(sphere2.intersects(testSphere));
+
+  CHECK(sphere3.intersects(sphere3));
+  CHECK(sphere3.intersects(Raz::Sphere(sphere3.getCenter() + std::numeric_limits<float>::epsilon(), 0.f))); // Intersects with a 0-radius sphere
+  CHECK(sphere3.intersects(testSphere));
+  CHECK(testSphere.intersects(sphere3));
+}
+
 TEST_CASE("Triangle basic") {
   // See: https://www.geogebra.org/m/gszsn33d
 
