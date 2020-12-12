@@ -80,7 +80,7 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
   // v                 |         v         |                  v
   //    A----------B   |   A----------B    |   A----------B
 
-  return m_beginPos + lineVec * std::min(1.f, std::max(pointDist, 0.f));
+  return m_beginPos + lineVec * std::clamp(pointDist, 0.f, 1.f);
 }
 
 // Plane functions

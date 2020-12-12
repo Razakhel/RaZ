@@ -153,6 +153,35 @@ TEST_CASE("Line-AABB intersection") {
   CHECK(line4.intersects(aabb3));
 }
 
+TEST_CASE("Line point projection") {
+  CHECK(line1.computeProjection(line1.getBeginPos()) == line1.getBeginPos());
+  CHECK(line1.computeProjection(line1.getEndPos()) == line1.getEndPos());
+  const Raz::Vec3f centroid1 = line1.computeCentroid();
+  CHECK(line1.computeProjection(centroid1) == centroid1);
+
+  const Raz::Vec3f centroid2 = line2.computeCentroid();
+  CHECK(line2.computeProjection(centroid2) == centroid2);
+  const Raz::Vec3f furtherEnd(line2.getEndPos().x(), line2.getEndPos().y() * 2.f, line2.getEndPos().z());
+  CHECK(line2.computeProjection(furtherEnd) == line2.getEndPos()); // The result is clamped to the line's bounds
+  CHECK(line2.computeProjection(Raz::Vec3f(-100.f, 0.5f, 0.f)) == centroid2);
+
+  const Raz::Vec3f centroid3 = line3.computeCentroid();
+  CHECK(line3.computeProjection(centroid3) == centroid3);
+  CHECK(line3.computeProjection(centroid3 + Raz::Axis::Z) == centroid3);
+  CHECK(line3.computeProjection(Raz::Vec3f(3.543f, 3.478f, 0.0239f)) == Raz::Vec3f(3.653168678f, 3.654269695f, 0.f));
+
+  const Raz::Vec3f centroid4 = line4.computeCentroid();
+  CHECK(line4.computeProjection(centroid4) == centroid4);
+  //   x      /
+  //    \   /
+  //      P
+  //    /
+  //  /
+  CHECK(line4.computeProjection(centroid4 - Raz::Axis::X + Raz::Axis::Y) == centroid4);
+  const Raz::Vec3f furtherBegin(line4.getBeginPos().x(), line4.getBeginPos().y() + 1.f, line4.getBeginPos().z());
+  CHECK(line4.computeProjection(furtherBegin) == Raz::Vec3f(-9.5f, -9.5f, 0.f));
+}
+
 TEST_CASE("Plane basic") {
   const Raz::Plane testPlane1(Raz::Vec3f(0.f, 1.f, 0.f), Raz::Axis::Y);
   const Raz::Plane testPlane2(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-1.f, 1.f, -1.f), Raz::Vec3f(0.f, 1.f, 1.f));
