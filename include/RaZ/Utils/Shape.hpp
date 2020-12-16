@@ -10,6 +10,16 @@
 
 namespace Raz {
 
+enum class ShapeType {
+  LINE,
+  PLANE,
+  SPHERE,
+  TRIANGLE,
+  QUAD,
+  AABB,
+  OBB
+};
+
 class Line;
 class Plane;
 class Sphere;
@@ -22,6 +32,10 @@ class Shape {
 public:
   Shape(const Shape&) = default;
   Shape(Shape&&) noexcept = default;
+
+  /// Gets the type of the shape.
+  /// \return Shape's type.
+  virtual ShapeType getType() const noexcept = 0;
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -83,6 +97,7 @@ public:
   Line() = default;
   Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
 
+  ShapeType getType() const noexcept override { return ShapeType::LINE; }
   const Vec3f& getBeginPos() const { return m_beginPos; }
   const Vec3f& getEndPos() const { return m_endPos; }
 
@@ -155,6 +170,7 @@ public:
     : m_distance{ ((firstPoint + secondPoint + thirdPoint) / 3.f).computeLength() },
       m_normal{ (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize() } {}
 
+  ShapeType getType() const noexcept override { return ShapeType::PLANE; }
   float getDistance() const { return m_distance; }
   const Vec3f& getNormal() const { return m_normal; }
 
@@ -215,6 +231,7 @@ public:
   Sphere() = default;
   Sphere(const Vec3f& centerPos, float radius) : m_centerPos{ centerPos }, m_radius{ radius } {}
 
+  ShapeType getType() const noexcept override { return ShapeType::SPHERE; }
   const Vec3f& getCenter() const { return m_centerPos; }
   float getRadius() const { return m_radius; }
 
@@ -276,6 +293,7 @@ public:
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
     : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
+  ShapeType getType() const noexcept override { return ShapeType::TRIANGLE; }
   const Vec3f& getFirstPos() const { return m_firstPos; }
   const Vec3f& getSecondPos() const { return m_secondPos; }
   const Vec3f& getThirdPos() const { return m_thirdPos; }
@@ -349,6 +367,7 @@ public:
   Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos)
     : m_leftTopPos{ leftTopPos }, m_rightTopPos{ rightTopPos }, m_rightBottomPos{ rightBottomPos }, m_leftBottomPos{ leftBottomPos } {}
 
+  ShapeType getType() const noexcept override { return ShapeType::QUAD; }
   const Vec3f& getLeftTopPos() const { return m_leftTopPos; }
   const Vec3f& getRightTopPos() const { return m_rightTopPos; }
   const Vec3f& getRightBottomPos() const { return m_rightBottomPos; }
@@ -440,6 +459,7 @@ public:
   AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos)
     : m_leftBottomBackPos{ leftBottomBackPos }, m_rightTopFrontPos{ rightTopFrontPos } {}
 
+  ShapeType getType() const noexcept override { return ShapeType::AABB; }
   const Vec3f& getLeftBottomBackPos() const { return m_leftBottomBackPos; }
   const Vec3f& getRightTopFrontPos() const { return m_rightTopFrontPos; }
 
@@ -563,6 +583,7 @@ public:
     : m_aabb(leftBottomBackPos, rightTopFrontPos), m_rotation{ rotation } {}
   explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
 
+  ShapeType getType() const noexcept override { return ShapeType::OBB; }
   const Vec3f& getLeftBottomBackPos() const { return m_aabb.getLeftBottomBackPos(); }
   const Vec3f& getRightTopFrontPos() const { return m_aabb.getRightTopFrontPos(); }
   const Mat3f& getRotation() const { return m_rotation; }
