@@ -99,6 +99,13 @@ TEST_CASE("Line basic") {
 
   CHECK_THAT(line4.computeLength(), IsNearlyEqualTo(22.6274166f));
   CHECK_THAT(line4.computeSquaredLength(), IsNearlyEqualTo(512.f));
+
+  Raz::Line testLine            = line3;
+  const Raz::Vec3f prevCentroid = testLine.computeCentroid();
+
+  constexpr Raz::Vec3f displacement(1.045f, 874.f, 42.875f);
+  testLine.translate(displacement);
+  CHECK(testLine.computeCentroid() == prevCentroid + displacement);
 }
 
 TEST_CASE("Line point containment") {
@@ -183,7 +190,7 @@ TEST_CASE("Line point projection") {
 }
 
 TEST_CASE("Plane basic") {
-  const Raz::Plane testPlane1(1.f, Raz::Axis::Y);
+  Raz::Plane testPlane1(1.f, Raz::Axis::Y);
   CHECK(testPlane1.computeDistance() == 1.f);
 
   constexpr Raz::Vec3f planePos = Raz::Vec3f(0.f, 1.f, 0.f);
@@ -198,6 +205,10 @@ TEST_CASE("Plane basic") {
 
   CHECK(testPlane2.getPosition() == testPlane3.getPosition());
   CHECK(testPlane2.getNormal() == testPlane3.getNormal());
+
+  testPlane1.translate(Raz::Vec3f(1.f, 2.f, 3.f));
+  CHECK(testPlane1.computeCentroid() == Raz::Vec3f(1.f, 3.f, 3.f));
+  CHECK(testPlane1.getPosition() == testPlane1.computeCentroid()); // The plane's position is its centroid
 }
 
 TEST_CASE("Plane-plane intersection") {
@@ -231,6 +242,15 @@ TEST_CASE("Plane-sphere intersection") {
   CHECK(plane3.intersects(sphere1));
   CHECK(plane3.intersects(sphere2));
   CHECK(plane3.intersects(sphere3));
+}
+
+TEST_CASE("Sphere basic") {
+  constexpr Raz::Vec3f spherePos(45.f, 0.004f, 8654.f);
+  Raz::Sphere testSphere(spherePos, 1.f);
+
+  testSphere.translate(-spherePos);
+  CHECK(testSphere.computeCentroid() == Raz::Vec3f(0.f));
+  CHECK(testSphere.computeCentroid() == testSphere.getCenter()); // The sphere's center is its centroid
 }
 
 TEST_CASE("Sphere point containment") {
@@ -278,6 +298,13 @@ TEST_CASE("Triangle basic") {
 
   CHECK(triangle3.computeCentroid() == Raz::Vec3f(-0.5f, -1.416666666f, 0.f));
   CHECK_THAT(triangle3.computeNormal(), IsNearlyEqualToVector(Raz::Vec3f(0.077791f, -0.93349177f, 0.35005942f)));
+
+  Raz::Triangle testTriangle    = triangle2;
+  const Raz::Vec3f prevCentroid = testTriangle.computeCentroid();
+
+  constexpr Raz::Vec3f displacement(0.485f, 487.4f, 10.f);
+  testTriangle.translate(displacement);
+  CHECK(testTriangle.computeCentroid() == prevCentroid + displacement);
 }
 
 TEST_CASE("Triangle clockwiseness") {
@@ -307,6 +334,13 @@ TEST_CASE("AABB basic") {
   CHECK(aabb1.computeHalfExtents() == Raz::Vec3f(0.5f));
   CHECK(aabb2.computeHalfExtents() == Raz::Vec3f(1.5f, 1.f, 5.f));
   CHECK(aabb3.computeHalfExtents() == Raz::Vec3f(2.f, 2.5f, 5.f));
+
+  Raz::AABB testAabb            = aabb2;
+  const Raz::Vec3f prevCentroid = testAabb.computeCentroid();
+
+  constexpr Raz::Vec3f displacement(87.f, 0.008f, 2.5874f);
+  testAabb.translate(displacement);
+  CHECK(testAabb.computeCentroid() == prevCentroid + displacement);
 }
 
 TEST_CASE("AABB point containment") {

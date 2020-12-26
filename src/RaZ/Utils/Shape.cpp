@@ -83,6 +83,11 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
   return m_beginPos + lineVec * std::clamp(pointDist, 0.f, 1.f);
 }
 
+void Line::translate(const Vec3f& displacement) noexcept {
+  m_beginPos += displacement;
+  m_endPos   += displacement;
+}
+
 // Plane functions
 
 bool Plane::intersects(const Plane& plane) const {
@@ -116,6 +121,10 @@ bool Plane::intersects(const AABB& aabb) const {
 
 bool Plane::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
+}
+
+void Plane::translate(const Vec3f& displacement) noexcept {
+  m_position += displacement;
 }
 
 // Sphere functions
@@ -173,6 +182,12 @@ Vec3f Triangle::computeProjection(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+void Triangle::translate(const Vec3f& displacement) noexcept {
+  m_firstPos  += displacement;
+  m_secondPos += displacement;
+  m_thirdPos  += displacement;
+}
+
 Vec3f Triangle::computeNormal() const {
   const Vec3f firstEdge  = m_secondPos - m_firstPos;
   const Vec3f secondEdge = m_thirdPos - m_firstPos;
@@ -205,6 +220,13 @@ bool Quad::intersects(const OBB&) const {
 
 Vec3f Quad::computeProjection(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
+}
+
+void Quad::translate(const Vec3f& displacement) noexcept {
+  m_leftTopPos     += displacement;
+  m_rightTopPos    += displacement;
+  m_rightBottomPos += displacement;
+  m_leftBottomPos  += displacement;
 }
 
 // AABB functions
@@ -259,6 +281,11 @@ Vec3f AABB::computeProjection(const Vec3f& point) const {
   const float closestZ = std::max(std::min(point.z(), m_rightTopFrontPos.z()), m_leftBottomBackPos.z());
 
   return Vec3f(closestX, closestY, closestZ);
+}
+
+void AABB::translate(const Vec3f& displacement) noexcept {
+  m_leftBottomBackPos += displacement;
+  m_rightTopFrontPos  += displacement;
 }
 
 // OBB functions

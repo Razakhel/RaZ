@@ -81,6 +81,9 @@ public:
   /// Computes the shape's centroid.
   /// \return Computed centroid.
   virtual Vec3f computeCentroid() const = 0;
+  /// Translates the shape by the given displacement.
+  /// \param displacement Displacement to be translated by.
+  virtual void translate(const Vec3f& displacement) noexcept = 0;
 
   Shape& operator=(const Shape&) = default;
   Shape& operator=(Shape&&) noexcept = default;
@@ -146,6 +149,9 @@ public:
   /// Computes the line's centroid, which is the point lying directly between the two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) * 0.5f; }
+  /// Translates the line by the given displacement.
+  /// \param displacement Displacement to translate the line by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Line length computation.
   /// To be used if the actual length is needed; otherwise, prefer computeSquaredLength().
   /// \return Line's length.
@@ -219,6 +225,9 @@ public:
   /// Computes the plane's centroid, which is the point lying onto the plane at its distance from the center in its normal direction.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_position; }
+  /// Translates the plane by the given displacement.
+  /// \param displacement Displacement to translate the plane by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the distance to the plane from the origin.
   /// To be used if the actual distance is needed; otherwise, prefer computeSquaredDistance().
   /// \return Plane's distance.
@@ -288,6 +297,9 @@ public:
   /// Computes the sphere's centroid, which is its center. Strictly equivalent to getCenterPos().
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_centerPos; }
+  /// Translates the sphere by the given displacement.
+  /// \param displacement Displacement to translate the sphere by.
+  void translate(const Vec3f& displacement) noexcept override { m_centerPos += displacement; }
 
 private:
   Vec3f m_centerPos {};
@@ -351,6 +363,9 @@ public:
   /// Computes the triangle's centroid, which is the point lying directly between its three points.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_firstPos + m_secondPos + m_thirdPos) / 3.f; }
+  /// Translates the triangle by the given displacement.
+  /// \param displacement Displacement to translate the triangle by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the triangle's normal from its points.
   /// \return Computed normal.
   Vec3f computeNormal() const;
@@ -426,6 +441,9 @@ public:
   /// Computes the quad's centroid, which is the point lying directly between its four points.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_leftTopPos + m_rightTopPos + m_rightBottomPos + m_leftBottomPos) * 0.25f; }
+  /// Translates the quad by the given displacement.
+  /// \param displacement Displacement to translate the quad by.
+  void translate(const Vec3f& displacement) noexcept override;
 
 private:
   Vec3f m_leftTopPos {};
@@ -516,6 +534,9 @@ public:
   /// Computes the AABB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_rightTopFrontPos + m_leftBottomBackPos) * 0.5f; }
+  /// Translates the AABB by the given displacement.
+  /// \param displacement Displacement to translate the AABB by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the half extents of the box, starting from its centroid.
   ///
   ///          _______________________
@@ -643,6 +664,9 @@ public:
   /// Computes the OBB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
+  /// Translates the OBB by the given displacement.
+  /// \param displacement Displacement to translate the OBB by.
+  void translate(const Vec3f& displacement) noexcept override { m_aabb.translate(displacement); }
   /// Computes the half extents of the box, starting from its centroid.
   /// These half extents are oriented according to the box's rotation.
   ///
