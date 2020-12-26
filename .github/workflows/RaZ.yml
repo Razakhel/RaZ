@@ -1,0 +1,80 @@
+name: RaZ
+
+on: [push, pull_request]
+
+env:
+  build_type: Debug
+
+jobs:
+  linux:
+    name: Linux (${{ matrix.compiler.c }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - { c: gcc, cpp: g++ }
+          - { c: clang, cpp: clang++ }
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Defining the timezone to Europe/Paris, which is required by apt (Ubuntu 20.04):
+    #   sudo ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone
+    # Updating packages' repo & installing only the needed packages:
+    #   - GL & X11 as needed graphical dependencies
+    #   - GCC & Clang to build RaZ, and lcov to output code coverage
+    #   - xz-utils to uncompress Emscripten
+    #   - Python 3.X to use Emscripten
+    #   - Doxygen & Dot to generate the documentation (python3-* from Ubuntu 20.04 onwards)
+    #   - OpenAL to handle the audio part
+    #   - Wget to download the FBX SDK
+    #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
+    #   - Rubygems to get the 'gem' command, used to download coveralls-lcov, and git to fetch info needed by coveralls-lcov
+    - name: Packages installation
+      run: |
+        sudo apt update &&
+        sudo apt install -y --no-install-recommends \
+          libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
+          gcc-8 g++-8 clang-7 lcov \
+          doxygen python-pydot python-pydot-ng \
+          libopenal-dev \
+          xvfb \
+          rubygems &&
+        sudo gem install coveralls-lcov
+
+    - name: Build setup
+      run: cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+
+    - name: Configuration
+      shell: bash
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: |
+        cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
+                                  -DCMAKE_BUILD_TYPE=$build_type \
+                                  -DRAZ_BUILD_EXAMPLES=ON \
+                                  -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=ON -DSKIP_RENDERER_ERRORS=ON \
+                                  -DENABLE_DEBUG_INFO=ON \
+                                  $GITHUB_WORKSPACE &&
+        cmake --build . --target RaZ_PrintDebugInfo
+
+    - name: Build
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
+
+    - name: Test
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      shell: bash
+      run: ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests
+
+    # Running code coverage; only done with GCC
+    - name: Coverage
+      if: matrix.compiler.c == 'gcc'
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: |
+        lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
+        lcov -r coverage.info '/usr/*' -o coverage.info &&
+        lcov -l coverage.info &&
+        coveralls-lcov --repo-token=${{ secrets.COVERALLS_TOKEN }} coverage.info;
