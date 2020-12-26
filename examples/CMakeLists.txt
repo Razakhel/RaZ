@@ -1,21 +1,27 @@
 project(RaZ_Examples)
 
-set(CMAKE_CXX_STANDARD 17)
+# Defining an interface library to hold common settings for all examples
+add_library(RaZ_Examples INTERFACE)
+target_compile_features(RaZ_Examples INTERFACE cxx_std_17)
+target_link_libraries(RaZ_Examples INTERFACE RaZ)
+
+include(CompilerFlags)
+add_compiler_flags(RaZ_Examples INTERFACE)
 
 add_executable(RaZ_DeferredDemo deferredDemo.cpp)
-target_link_libraries(RaZ_DeferredDemo RaZ)
+target_link_libraries(RaZ_DeferredDemo RaZ_Examples)
 
 add_executable(RaZ_FullDemo fullDemo.cpp)
-target_link_libraries(RaZ_FullDemo RaZ)
+target_link_libraries(RaZ_FullDemo RaZ_Examples)
 
 add_executable(RaZ_MinDemo minDemo.cpp)
-target_link_libraries(RaZ_MinDemo RaZ)
+target_link_libraries(RaZ_MinDemo RaZ_Examples)
 
 add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
-target_link_libraries(RaZ_ShowcaseDemo RaZ)
+target_link_libraries(RaZ_ShowcaseDemo RaZ_Examples)
 
 add_executable(RaZ_SoundDemo soundDemo.cpp)
-target_link_libraries(RaZ_SoundDemo RaZ)
+target_link_libraries(RaZ_SoundDemo RaZ_Examples)
 
 if (RAZ_USE_EMSCRIPTEN)
     set_target_properties(RaZ_DeferredDemo PROPERTIES SUFFIX ".html")
