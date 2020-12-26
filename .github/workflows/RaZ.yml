@@ -78,3 +78,40 @@ jobs:
         lcov -r coverage.info '/usr/*' -o coverage.info &&
         lcov -l coverage.info &&
         coveralls-lcov --repo-token=${{ secrets.COVERALLS_TOKEN }} coverage.info;
+
+  windows:
+    name: Windows (${{ matrix.compiler.c }})
+    runs-on: windows-2016
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - { c: cl, cpp: cl }
+
+    steps:
+    - uses: actions/checkout@v2
+
+      # Download & unpack OpenAL
+    - name: Build setup
+      run: |
+        curl --silent https://www.openal-soft.org/openal-binaries/openal-soft-1.20.1-bin.zip -O &&
+        7z x openal-soft-1.20.1-bin.zip &&
+        mv openal-soft-1.20.1-bin C:/OpenAL;
+        cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+
+    - name: Configuration
+      shell: bash
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: |
+        cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=$build_type \
+                                                -DRAZ_BUILD_EXAMPLES=ON \
+                                                -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
+                                                -DENABLE_DEBUG_INFO=ON \
+                                                $GITHUB_WORKSPACE &&
+        cmake --build . --target RaZ_PrintDebugInfo
+
+    - name: Build
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
