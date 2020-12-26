@@ -6,7 +6,7 @@
 namespace Raz {
 
 Mesh::Mesh(const Plane& plane, float width, float depth, RenderMode renderMode) : Mesh() {
-  const float height = (plane.getNormal() * plane.getDistance())[1];
+  const float height = plane.getPosition().y();
 
   const Vec3f firstPos(-width, height, depth);
   const Vec3f secondPos(width, height, depth);

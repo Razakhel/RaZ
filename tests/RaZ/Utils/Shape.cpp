@@ -183,12 +183,21 @@ TEST_CASE("Line point projection") {
 }
 
 TEST_CASE("Plane basic") {
-  const Raz::Plane testPlane1(Raz::Vec3f(0.f, 1.f, 0.f), Raz::Axis::Y);
-  const Raz::Plane testPlane2(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-1.f, 1.f, -1.f), Raz::Vec3f(0.f, 1.f, 1.f));
+  const Raz::Plane testPlane1(1.f, Raz::Axis::Y);
+  CHECK(testPlane1.computeDistance() == 1.f);
 
-  // Checking that the 2 planes are strictly equal to each other
-  CHECK_THAT(testPlane1.getDistance(), IsNearlyEqualTo(testPlane2.getDistance()));
+  constexpr Raz::Vec3f planePos = Raz::Vec3f(0.f, 1.f, 0.f);
+  const Raz::Plane testPlane2(planePos, Raz::Axis::Y);
+  CHECK(testPlane2.getPosition() == planePos);
+
+  const Raz::Plane testPlane3(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-1.f, 1.f, -1.f), Raz::Vec3f(0.f, 1.f, 1.f));
+
+  // Checking that the 3 planes are strictly equal to each other
+  CHECK(testPlane1.getPosition() == testPlane2.getPosition());
   CHECK(testPlane1.getNormal() == testPlane2.getNormal());
+
+  CHECK(testPlane2.getPosition() == testPlane3.getPosition());
+  CHECK(testPlane2.getNormal() == testPlane3.getNormal());
 }
 
 TEST_CASE("Plane-plane intersection") {

@@ -20,7 +20,7 @@ bool Line::intersects(const Plane& plane) const {
 
   // Calculating the relative distance along the line where it is intersected by the plane
   // If this distance is below 0 or above 1, the intersection isn't between the line's two extremities
-  const float intersectDist = (plane.getDistance() - lineStartPlaneAngle) / lineVecPlaneAngle;
+  const float intersectDist = (plane.computeDistance() - lineStartPlaneAngle) / lineVecPlaneAngle;
   return ((intersectDist >= 0.f) && (intersectDist <= 1.f));
 }
 
@@ -106,10 +106,10 @@ bool Plane::intersects(const Quad&) const {
 bool Plane::intersects(const AABB& aabb) const {
   const Vec3f halfExtents = aabb.computeHalfExtents();
 
-  const float topBoxDist = halfExtents[0] * std::abs(m_normal[0])
-                         + halfExtents[1] * std::abs(m_normal[1])
-                         + halfExtents[2] * std::abs(m_normal[2]);
-  const float boxDist = m_normal.dot(aabb.computeCentroid()) - m_distance;
+  const float topBoxDist = halfExtents.x() * std::abs(m_normal.x())
+                         + halfExtents.y() * std::abs(m_normal.y())
+                         + halfExtents.z() * std::abs(m_normal.z());
+  const float boxDist = m_normal.dot(aabb.computeCentroid()) - computeDistance();
 
   return (std::abs(boxDist) <= topBoxDist);
 }
@@ -210,9 +210,9 @@ Vec3f Quad::computeProjection(const Vec3f&) const {
 // AABB functions
 
 bool AABB::contains(const Vec3f& point) const {
-  const bool isInBoundsX = point[0] >= m_leftBottomBackPos[0] && point[0] <= m_rightTopFrontPos[0];
-  const bool isInBoundsY = point[1] >= m_leftBottomBackPos[1] && point[1] <= m_rightTopFrontPos[1];
-  const bool isInBoundsZ = point[2] >= m_leftBottomBackPos[2] && point[2] <= m_rightTopFrontPos[2];
+  const bool isInBoundsX = point.x() >= m_leftBottomBackPos.x() && point.x() <= m_rightTopFrontPos.x();
+  const bool isInBoundsY = point.y() >= m_leftBottomBackPos.y() && point.y() <= m_rightTopFrontPos.y();
+  const bool isInBoundsZ = point.z() >= m_leftBottomBackPos.z() && point.z() <= m_rightTopFrontPos.z();
 
   return (isInBoundsX && isInBoundsY && isInBoundsZ);
 }
@@ -242,9 +242,9 @@ bool AABB::intersects(const AABB& aabb) const {
   //                     ^
   //                   min2
 
-  const bool intersectsX = (minPoint1[0] <= maxPoint2[0]) && (maxPoint1[0] >= minPoint2[0]);
-  const bool intersectsY = (minPoint1[1] <= maxPoint2[1]) && (maxPoint1[1] >= minPoint2[1]);
-  const bool intersectsZ = (minPoint1[2] <= maxPoint2[2]) && (maxPoint1[2] >= minPoint2[2]);
+  const bool intersectsX = (minPoint1.x() <= maxPoint2.x()) && (maxPoint1.x() >= minPoint2.x());
+  const bool intersectsY = (minPoint1.y() <= maxPoint2.y()) && (maxPoint1.y() >= minPoint2.y());
+  const bool intersectsZ = (minPoint1.z() <= maxPoint2.z()) && (maxPoint1.z() >= minPoint2.z());
 
   return (intersectsX && intersectsY && intersectsZ);
 }
@@ -254,9 +254,9 @@ bool AABB::intersects(const OBB&) const {
 }
 
 Vec3f AABB::computeProjection(const Vec3f& point) const {
-  const float closestX = std::max(std::min(point[0], m_rightTopFrontPos[0]), m_leftBottomBackPos[0]);
-  const float closestY = std::max(std::min(point[1], m_rightTopFrontPos[1]), m_leftBottomBackPos[1]);
-  const float closestZ = std::max(std::min(point[2], m_rightTopFrontPos[2]), m_leftBottomBackPos[2]);
+  const float closestX = std::max(std::min(point.x(), m_rightTopFrontPos.x()), m_leftBottomBackPos.x());
+  const float closestY = std::max(std::min(point.y(), m_rightTopFrontPos.y()), m_leftBottomBackPos.y());
+  const float closestZ = std::max(std::min(point.z(), m_rightTopFrontPos.z()), m_leftBottomBackPos.z());
 
   return Vec3f(closestX, closestY, closestZ);
 }

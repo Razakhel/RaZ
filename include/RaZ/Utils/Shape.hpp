@@ -147,7 +147,7 @@ public:
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) * 0.5f; }
   /// Line length computation.
-  /// To be used if actual length is needed; otherwise, prefer computeSquaredLength().
+  /// To be used if the actual length is needed; otherwise, prefer computeSquaredLength().
   /// \return Line's length.
   float computeLength() const { return (m_endPos - m_beginPos).computeLength(); }
   /// Line squared length computation.
@@ -164,20 +164,20 @@ private:
 class Plane final : public Shape {
 public:
   Plane() = default;
-  explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_distance{ distance }, m_normal{ normal } {}
-  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_distance{ position.computeLength() }, m_normal{ normal } {}
+  explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_position{ normal * distance }, m_normal{ normal } {}
+  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_position{ position }, m_normal{ normal } {}
   Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint)
-    : m_distance{ ((firstPoint + secondPoint + thirdPoint) / 3.f).computeLength() },
+    : m_position{ ((firstPoint + secondPoint + thirdPoint) / 3.f) },
       m_normal{ (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize() } {}
 
   ShapeType getType() const noexcept override { return ShapeType::PLANE; }
-  float getDistance() const { return m_distance; }
+  const Vec3f& getPosition() const { return m_position; }
   const Vec3f& getNormal() const { return m_normal; }
 
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is located on the plane, false otherwise.
-  bool contains(const Vec3f& point) const override { return FloatUtils::areNearlyEqual(m_normal.dot(point) - m_distance, 0.f); }
+  bool contains(const Vec3f& point) const override { return FloatUtils::areNearlyEqual(m_normal.dot(point) - computeDistance(), 0.f); }
   /// Plane-line intersection check.
   /// \param line Line to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
@@ -215,13 +215,21 @@ public:
   /// The projected point is necessarily located on the plane.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the plane.
-  Vec3f computeProjection(const Vec3f& point) const override { return point - m_normal * (m_normal.dot(point) - m_distance); }
+  Vec3f computeProjection(const Vec3f& point) const override { return point - m_normal * (m_normal.dot(point) - computeDistance()); }
   /// Computes the plane's centroid, which is the point lying onto the plane at its distance from the center in its normal direction.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return m_normal * m_distance; }
+  Vec3f computeCentroid() const override { return m_position; }
+  /// Computes the distance to the plane from the origin.
+  /// To be used if the actual distance is needed; otherwise, prefer computeSquaredDistance().
+  /// \return Plane's distance.
+  float computeDistance() const noexcept { return m_position.computeLength(); }
+  /// Computes the squared distance to the plane from the origin.
+  /// To be preferred over computeDistance() for faster operations.
+  /// \return Plane's squared distance.
+  float computeSquaredDistance() const noexcept { return m_position.computeSquaredLength(); }
 
 private:
-  float m_distance {};
+  Vec3f m_position {};
   Vec3f m_normal {};
 };
 
