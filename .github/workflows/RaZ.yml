@@ -115,3 +115,39 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
+
+  macos:
+    name: macOS (${{ matrix.compiler.c }})
+    runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - { c: clang, cpp: clang++ }
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Install OpenAL
+    - name: Build setup
+      run: |
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install openal-soft;
+        cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+
+    - name: Configuration
+      shell: bash
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: |
+        cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
+              -DCMAKE_BUILD_TYPE=$build_type \
+              -DRAZ_BUILD_EXAMPLES=ON \
+              -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
+              -DENABLE_DEBUG_INFO=ON \
+              $GITHUB_WORKSPACE &&
+        cmake --build . --target RaZ_PrintDebugInfo
+
+    - name: Build
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      shell: bash
+      run: cmake --build . --config $BUILD_TYPE
