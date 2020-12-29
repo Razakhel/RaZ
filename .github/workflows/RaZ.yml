@@ -6,6 +6,7 @@ env:
   build_type: Debug
 
 jobs:
+  # Linux build
   linux:
     name: Linux (${{ matrix.compiler.c }})
     runs-on: ubuntu-latest
@@ -25,8 +26,6 @@ jobs:
     # Updating packages' repo & installing only the needed packages:
     #   - GL & X11 as needed graphical dependencies
     #   - GCC & Clang to build RaZ, and lcov to output code coverage
-    #   - xz-utils to uncompress Emscripten
-    #   - Python 3.X to use Emscripten
     #   - Doxygen & Dot to generate the documentation (python3-* from Ubuntu 20.04 onwards)
     #   - OpenAL to handle the audio part
     #   - Wget to download the FBX SDK
@@ -60,13 +59,13 @@ jobs:
         cmake --build . --target RaZ_PrintDebugInfo
 
     - name: Build
-      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       shell: bash
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Test
-      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       shell: bash
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests
 
     # Running code coverage; only done with GCC
@@ -77,8 +76,9 @@ jobs:
         lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
         lcov -r coverage.info '/usr/*' -o coverage.info &&
         lcov -l coverage.info &&
-        coveralls-lcov --repo-token=${{ secrets.COVERALLS_TOKEN }} coverage.info;
+        coveralls-lcov --repo-token=${{ secrets.COVERALLS_TOKEN }} coverage.info
 
+  # Windows build
   windows:
     name: Windows (${{ matrix.compiler.c }})
     runs-on: windows-2016
@@ -112,10 +112,11 @@ jobs:
         cmake --build . --target RaZ_PrintDebugInfo
 
     - name: Build
-      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       shell: bash
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: cmake --build . --config $BUILD_TYPE
 
+  # macOS build
   macos:
     name: macOS (${{ matrix.compiler.c }})
     runs-on: macos-latest
@@ -151,3 +152,59 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
+
+  # Emscripten build
+  emscripten:
+    name: Emscripten (${{ matrix.compiler.c }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - { c: emcc, cpp: em++ }
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Defining the timezone to Europe/Paris, which is required by apt (Ubuntu 20.04):
+      #   sudo ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone
+      # Updating packages' repo & installing only the needed packages:
+      #   - GL & X11 as needed graphical dependencies
+      #   - xz-utils to uncompress Emscripten
+      #   - Python 3.X to use Emscripten
+      #   - OpenAL to handle the audio part
+      #   - Wget to download the FBX SDK
+      - name: Packages installation
+        run: |
+          sudo apt update &&
+          sudo apt install -y --no-install-recommends \
+            libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
+            xz-utils \
+            python3 \
+            libopenal-dev
+
+      # Downloading & installing Emscripten, to build RaZ in WebAssembly
+      - name: Build setup
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git ~/emsdk &&
+          ~/emsdk/emsdk install latest && ~/emsdk/emsdk activate latest;
+          cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+
+      - name: Configuration
+        shell: bash
+        working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+        run: |
+          source ~/emsdk/emsdk_env.sh &&
+          emcmake cmake -DCMAKE_BUILD_TYPE=$build_type \
+                        -DRAZ_BUILD_EXAMPLES=ON \
+                        -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
+                        -DENABLE_DEBUG_INFO=ON \
+                        $GITHUB_WORKSPACE &&
+          cmake --build . --target RaZ_PrintDebugInfo
+
+      - name: Build
+        shell: bash
+        working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+        run: cmake --build . --config $BUILD_TYPE
