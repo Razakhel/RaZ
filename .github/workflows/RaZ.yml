@@ -6,7 +6,10 @@ env:
   build_type: Debug
 
 jobs:
-  # Linux build
+  #########
+  # Linux #
+  #########
+
   linux:
     name: Linux (${{ matrix.compiler.c }})
     runs-on: ubuntu-latest
@@ -30,7 +33,6 @@ jobs:
     #   - OpenAL to handle the audio part
     #   - Wget to download the FBX SDK
     #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
-    #   - Rubygems to get the 'gem' command, used to download coveralls-lcov, and git to fetch info needed by coveralls-lcov
     - name: Packages installation
       run: |
         sudo apt update &&
@@ -39,9 +41,7 @@ jobs:
           gcc-8 g++-8 clang-7 lcov \
           doxygen python-pydot python-pydot-ng \
           libopenal-dev \
-          xvfb \
-          rubygems &&
-        sudo gem install coveralls-lcov
+          xvfb
 
     - name: Build setup
       run: cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
@@ -68,17 +68,28 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests
 
-    # Running code coverage; only done with GCC
-    - name: Coverage
+    # Preparing code coverage; only done with GCC
+    - name: Coverage setup
       if: matrix.compiler.c == 'gcc'
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
         lcov -r coverage.info '/usr/*' -o coverage.info &&
-        lcov -l coverage.info &&
-        coveralls-lcov --repo-token=${{ secrets.COVERALLS_TOKEN }} coverage.info
+        lcov -l coverage.info
 
-  # Windows build
+    # Processing code coverage; only done with GCC
+    - name: Coverage processing
+      if: matrix.compiler.c == 'gcc'
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        flag-name: github-actions-${{ github.run_id }}
+        path-to-lcov: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/coverage.info
+
+  ###########
+  # Windows #
+  ###########
+
   windows:
     name: Windows (${{ matrix.compiler.c }})
     runs-on: windows-2016
@@ -116,7 +127,10 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: cmake --build . --config $BUILD_TYPE
 
-  # macOS build
+  #########
+  # macOS #
+  #########
+
   macos:
     name: macOS (${{ matrix.compiler.c }})
     runs-on: macos-latest
@@ -153,7 +167,10 @@ jobs:
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
-  # Emscripten build
+  ##############
+  # Emscripten #
+  ##############
+
   emscripten:
     name: Emscripten (${{ matrix.compiler.c }})
     runs-on: ubuntu-latest

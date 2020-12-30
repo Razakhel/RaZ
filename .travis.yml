@@ -160,13 +160,13 @@ script:
                 pwd && find . &&
                 if [[ ${RUN_TESTS} == true ]]; then
                     xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests;
-                fi &&
-                if [[ ${COVERAGE} == true ]]; then
-                    lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
-                    lcov -r coverage.info '/usr/*' -o coverage.info &&
-                    lcov -l coverage.info &&
-                    coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info;
                 fi
+                #&& if [[ ${COVERAGE} == true ]]; then
+                #    lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
+                #    lcov -r coverage.info '/usr/*' -o coverage.info &&
+                #    lcov -l coverage.info &&
+                #    coveralls-lcov --repo-token=${COVERALLS_TOKEN} coverage.info;
+                #fi
             ";
       fi
 
