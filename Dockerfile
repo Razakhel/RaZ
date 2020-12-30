@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-# Defining the timezone to Europe/Paris, which is reqired by apt
+# Defining the timezone to Europe/Paris, which is required by apt
 # Updating packages' repo & installing only the needed packages:
 #   - GL & X11 as needed graphical dependencies
 #   - CMake, Make, GCC & Clang to build RaZ, and lcov to output code coverage
