@@ -210,7 +210,19 @@ jobs:
       #    chmod +x ./fbx20190_fbxsdk_linux &&
       #    printf 'yes\nn' | ./fbx20190_fbxsdk_linux /usr
 
+      # Caching Emscripten's installation; this avoids installing it on every build
+      - name: Emscripten caching
+        uses: actions/cache@v2
+        id: emsdk
+        with:
+          path: ~/emsdk
+          key: emsdk-${{ hashFiles('~/emsdk/**') }}
+          restore-keys: |
+            emsdk-
+
+      # Downloading & installing Emscripten; only done when failed to find its cached installation
       - name: Emscripten setup
+        if: steps.emsdk.outputs.cache-hit != 'true'
         shell: bash
         run: |
           git clone --depth 1 https://github.com/emscripten-core/emsdk.git ~/emsdk &&
