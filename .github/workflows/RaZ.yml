@@ -30,7 +30,7 @@ jobs:
     #   - GL & X11 as needed graphical dependencies
     #   - GCC & Clang to build RaZ, and lcov to output code coverage
     #   - Doxygen & Dot to generate the documentation (python3-* from Ubuntu 20.04 onwards)
-    #   - OpenAL to handle the audio part
+    #   - OpenAL-soft to handle the audio part
     #   - Wget to download the FBX SDK
     #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
     - name: Packages installation
@@ -41,7 +41,17 @@ jobs:
           gcc-8 g++-8 clang-7 lcov \
           doxygen python-pydot python-pydot-ng \
           libopenal-dev \
+          wget \
           xvfb
+
+    # Installing the FBX SDK (in /usr)
+    # The installation asks for software user agreement (send 'yes'), then afterwards if the README file should be opened (send 'n')
+    #- name: FBX SDK setup
+    #  run: |
+    #    wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O ./fbx_sdk.tar.gz &&
+    #    tar xvf ./fbx_sdk.tar.gz &&
+    #    chmod +x ./fbx20190_fbxsdk_linux &&
+    #    printf 'yes\nn' | sudo ./fbx20190_fbxsdk_linux /usr
 
     - name: Build setup
       run: cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
@@ -52,7 +62,7 @@ jobs:
       run: |
         cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
                                   -DCMAKE_BUILD_TYPE=$build_type \
-                                  -DRAZ_BUILD_EXAMPLES=ON \
+                                  -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON -DRAZ_USE_FBX=OFF \
                                   -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=ON -DSKIP_RENDERER_ERRORS=ON \
                                   -DENABLE_DEBUG_INFO=ON \
                                   $GITHUB_WORKSPACE &&
@@ -116,7 +126,7 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=$build_type \
-                                                -DRAZ_BUILD_EXAMPLES=ON \
+                                                -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_FBX=OFF \
                                                 -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
                                                 -DENABLE_DEBUG_INFO=ON \
                                                 $GITHUB_WORKSPACE &&
@@ -156,7 +166,7 @@ jobs:
       run: |
         cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
               -DCMAKE_BUILD_TYPE=$build_type \
-              -DRAZ_BUILD_EXAMPLES=ON \
+              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_FBX=OFF \
               -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
               -DENABLE_DEBUG_INFO=ON \
               $GITHUB_WORKSPACE &&
@@ -201,6 +211,13 @@ jobs:
             python3 \
             libopenal-dev
 
+      #- name: FBX SDK setup
+      #  run: |
+      #    wget http://download.autodesk.com/us/fbx/2019/2019.0/fbx20190_fbxsdk_linux.tar.gz -O ./fbx_sdk.tar.gz &&
+      #    tar xvf ./fbx_sdk.tar.gz &&
+      #    chmod +x ./fbx20190_fbxsdk_linux &&
+      #    printf 'yes\nn' | ./fbx20190_fbxsdk_linux /usr
+
       # Downloading & installing Emscripten, to build RaZ in WebAssembly
       - name: Build setup
         shell: bash
@@ -215,7 +232,7 @@ jobs:
         run: |
           source ~/emsdk/emsdk_env.sh &&
           emcmake cmake -DCMAKE_BUILD_TYPE=$build_type \
-                        -DRAZ_BUILD_EXAMPLES=ON \
+                        -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_FBX=OFF \
                         -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
                         -DENABLE_DEBUG_INFO=ON \
                         $GITHUB_WORKSPACE &&
