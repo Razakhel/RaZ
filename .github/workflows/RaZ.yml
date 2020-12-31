@@ -26,22 +26,19 @@ jobs:
 
     # Defining the timezone to Europe/Paris, which is required by apt (Ubuntu 20.04):
     #   sudo ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone
-    # Updating packages' repo & installing only the needed packages:
-    #   - GL & X11 as needed graphical dependencies
-    #   - GCC & Clang to build RaZ, and lcov to output code coverage
+    # Installing the needed packages:
+    #   - GLEW & X11 as graphical dependencies
+    #   - Lcov to output code coverage
     #   - Doxygen & Dot to generate the documentation (python3-* from Ubuntu 20.04 onwards)
     #   - OpenAL-soft to handle the audio part
-    #   - Wget to download the FBX SDK
     #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
     - name: Packages installation
       run: |
-        sudo apt update &&
         sudo apt install -y --no-install-recommends \
           libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
-          gcc-8 g++-8 clang-7 lcov \
+          lcov \
           doxygen python-pydot python-pydot-ng \
           libopenal-dev \
-          wget \
           xvfb
 
     # Installing the FBX SDK (in /usr)
@@ -71,7 +68,7 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config $build_type
 
     - name: Test
       shell: bash
@@ -113,7 +110,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-      # Download & unpack OpenAL
+      # Downloading & unpacking OpenAL
     - name: Build setup
       run: |
         curl --silent https://www.openal-soft.org/openal-binaries/openal-soft-1.20.1-bin.zip -O &&
@@ -135,7 +132,7 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config $build_type
 
   #########
   # macOS #
@@ -154,11 +151,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # Install OpenAL
+    # Install OpenAL-soft to handle the audio part
+    - name: Packages installation
+      run: HOMEBREW_NO_AUTO_UPDATE=1 brew install openal-soft
+
     - name: Build setup
-      run: |
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install openal-soft;
-        cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
 
     - name: Configuration
       shell: bash
@@ -175,7 +173,7 @@ jobs:
     - name: Build
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE
+      run: cmake --build . --config $build_type
 
   ##############
   # Emscripten #
@@ -198,17 +196,11 @@ jobs:
       #   sudo ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone
       # Updating packages' repo & installing only the needed packages:
       #   - GL & X11 as needed graphical dependencies
-      #   - xz-utils to uncompress Emscripten
-      #   - Python 3.X to use Emscripten
-      #   - OpenAL to handle the audio part
-      #   - Wget to download the FBX SDK
+      #   - OpenAL-soft to handle the audio part
       - name: Packages installation
         run: |
-          sudo apt update &&
           sudo apt install -y --no-install-recommends \
             libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
-            xz-utils \
-            python3 \
             libopenal-dev
 
       #- name: FBX SDK setup
@@ -218,13 +210,16 @@ jobs:
       #    chmod +x ./fbx20190_fbxsdk_linux &&
       #    printf 'yes\nn' | ./fbx20190_fbxsdk_linux /usr
 
-      # Downloading & installing Emscripten, to build RaZ in WebAssembly
-      - name: Build setup
+      - name: Emscripten setup
         shell: bash
         run: |
           git clone --depth 1 https://github.com/emscripten-core/emsdk.git ~/emsdk &&
-          ~/emsdk/emsdk install latest && ~/emsdk/emsdk activate latest;
-          cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+          ~/emsdk/emsdk install latest && ~/emsdk/emsdk activate latest
+
+      # Downloading & installing Emscripten, to build RaZ in WebAssembly
+      - name: Build setup
+        shell: bash
+        run: cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
 
       - name: Configuration
         shell: bash
@@ -241,4 +236,4 @@ jobs:
       - name: Build
         shell: bash
         working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-        run: cmake --build . --config $BUILD_TYPE
+        run: cmake --build . --config $build_type
