@@ -63,7 +63,7 @@ jobs:
                                   -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=ON -DSKIP_RENDERER_ERRORS=ON \
                                   -DENABLE_DEBUG_INFO=ON \
                                   $GITHUB_WORKSPACE &&
-        cmake --build . --target RaZ_PrintDebugInfo
+        cmake --build . --target RaZ_PrintDebugInfo --config ${{ matrix.build_type }}
 
     - name: Build
       shell: bash
@@ -94,6 +94,19 @@ jobs:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         flag-name: github-actions-${{ github.run_id }}
         path-to-lcov: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/coverage.info
+
+    # Installing RaZ in the build directory; default is /usr/local
+    - name: Install
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
+
+    - name: Upload build
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
+        path: |
+          ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/include
+          ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/lib
 
   ###########
   # Windows #
@@ -189,7 +202,7 @@ jobs:
               -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
               -DENABLE_DEBUG_INFO=ON \
               $GITHUB_WORKSPACE &&
-        cmake --build . --target RaZ_PrintDebugInfo
+        cmake --build . --target RaZ_PrintDebugInfo --config ${{ matrix.build_type }}
 
     - name: Build
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
@@ -269,7 +282,7 @@ jobs:
                         -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
                         -DENABLE_DEBUG_INFO=ON \
                         $GITHUB_WORKSPACE &&
-          cmake --build . --target RaZ_PrintDebugInfo
+          cmake --build . --target RaZ_PrintDebugInfo --config ${{ matrix.build_type }}
 
       - name: Build
         shell: bash
