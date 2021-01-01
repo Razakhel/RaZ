@@ -2,16 +2,13 @@ name: RaZ
 
 on: [push, pull_request]
 
-env:
-  build_type: Debug
-
 jobs:
   #########
   # Linux #
   #########
 
   linux:
-    name: Linux (${{ matrix.compiler.c }})
+    name: Linux (${{ matrix.compiler.c }}, ${{ matrix.build_type }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,6 +17,9 @@ jobs:
         compiler:
           - { c: gcc, cpp: g++ }
           - { c: clang, cpp: clang++ }
+        build_type:
+          - Debug
+          - Release
 
     steps:
     - uses: actions/checkout@v2
@@ -58,7 +58,7 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         cmake -G "Unix Makefiles" -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
-                                  -DCMAKE_BUILD_TYPE=$build_type \
+                                  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                   -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON -DRAZ_USE_FBX=OFF \
                                   -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=ON -DSKIP_RENDERER_ERRORS=ON \
                                   -DENABLE_DEBUG_INFO=ON \
@@ -68,25 +68,27 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: cmake --build . --config $build_type
+      run: |
+        cmake --build . --config ${{ matrix.build_type }} &&
+        pwd && find .
 
     - name: Test
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests
 
-    # Preparing code coverage; only done with GCC
+    # Preparing code coverage; only done with GCC in Debug
     - name: Coverage setup
-      if: matrix.compiler.c == 'gcc'
+      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug'
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
         lcov -r coverage.info '/usr/*' -o coverage.info &&
         lcov -l coverage.info
 
-    # Processing code coverage; only done with GCC
+    # Processing code coverage; only done with GCC in Debug
     - name: Coverage processing
-      if: matrix.compiler.c == 'gcc'
+      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug'
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -98,7 +100,7 @@ jobs:
   ###########
 
   windows:
-    name: Windows (${{ matrix.compiler.c }})
+    name: Windows (${{ matrix.compiler.c }}, ${{ matrix.build_type }})
     runs-on: windows-2016
 
     strategy:
@@ -106,6 +108,9 @@ jobs:
       matrix:
         compiler:
           - { c: cl, cpp: cl }
+        build_type:
+          - Debug
+          - Release
 
     steps:
     - uses: actions/checkout@v2
@@ -122,7 +127,7 @@ jobs:
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
-        cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=$build_type \
+        cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                                 -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_FBX=OFF \
                                                 -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
                                                 -DENABLE_DEBUG_INFO=ON \
@@ -132,14 +137,16 @@ jobs:
     - name: Build
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: cmake --build . --config $build_type
+      run: |
+        cmake --build . --config ${{ matrix.build_type }} &&
+        pwd && find .
 
   #########
   # macOS #
   #########
 
   macos:
-    name: macOS (${{ matrix.compiler.c }})
+    name: macOS (${{ matrix.compiler.c }}, ${{ matrix.build_type }})
     runs-on: macos-latest
 
     strategy:
@@ -147,6 +154,9 @@ jobs:
       matrix:
         compiler:
           - { c: clang, cpp: clang++ }
+        build_type:
+          - Debug
+          - Release
 
     steps:
     - uses: actions/checkout@v2
@@ -163,7 +173,7 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         cmake -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
-              -DCMAKE_BUILD_TYPE=$build_type \
+              -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
               -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_FBX=OFF \
               -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
               -DENABLE_DEBUG_INFO=ON \
@@ -173,14 +183,16 @@ jobs:
     - name: Build
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       shell: bash
-      run: cmake --build . --config $build_type
+      run: |
+        cmake --build . --config ${{ matrix.build_type }} &&
+        pwd && find .
 
   ##############
   # Emscripten #
   ##############
 
   emscripten:
-    name: Emscripten (${{ matrix.compiler.c }})
+    name: Emscripten (${{ matrix.compiler.c }}, ${{ matrix.build_type }})
     runs-on: ubuntu-latest
 
     strategy:
@@ -188,6 +200,9 @@ jobs:
       matrix:
         compiler:
           - { c: emcc, cpp: em++ }
+        build_type:
+          - Debug
+          - Release
 
     steps:
       - uses: actions/checkout@v2
@@ -238,7 +253,7 @@ jobs:
         working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
         run: |
           source ~/emsdk/emsdk_env.sh &&
-          emcmake cmake -DCMAKE_BUILD_TYPE=$build_type \
+          emcmake cmake -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                         -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_FBX=OFF \
                         -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
                         -DENABLE_DEBUG_INFO=ON \
@@ -248,4 +263,6 @@ jobs:
       - name: Build
         shell: bash
         working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-        run: cmake --build . --config $build_type
+        run: |
+          cmake --build . --config ${{ matrix.build_type }} &&
+          pwd && find .
