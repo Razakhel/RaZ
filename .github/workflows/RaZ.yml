@@ -132,7 +132,7 @@ jobs:
                                                 -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=OFF -DSKIP_RENDERER_ERRORS=ON \
                                                 -DENABLE_DEBUG_INFO=ON \
                                                 $GITHUB_WORKSPACE &&
-        cmake --build . --target RaZ_PrintDebugInfo
+        cmake --build . --target RaZ_PrintDebugInfo --config ${{ matrix.build_type }}
 
     - name: Build
       shell: bash
@@ -140,6 +140,17 @@ jobs:
       run: |
         cmake --build . --config ${{ matrix.build_type }} &&
         pwd && find .
+
+    - name: Install
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: cmake --install . --prefix C:/RaZ --config ${{ matrix.build_type }}
+
+    - name: Upload build
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
+        path: |
+          C:/RaZ
 
   #########
   # macOS #
