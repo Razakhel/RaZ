@@ -16,7 +16,10 @@
 
 namespace Raz {
 
-Window::Window(unsigned int width, unsigned int height, const std::string& title, uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
+Window::Window(unsigned int width, unsigned int height,
+               const std::string& title,
+               WindowSetting settings,
+               uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
   glfwSetErrorCallback([] (int errorCode, const char* description) {
     std::cerr << "GLFW error " << errorCode << ": " << description << std::endl;
   });
@@ -42,7 +45,19 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 #endif
 
-  glfwWindowHint(GLFW_RESIZABLE, false);
+  glfwWindowHint(GLFW_FOCUSED, static_cast<int>(settings & WindowSetting::FOCUSED));
+  glfwWindowHint(GLFW_RESIZABLE, static_cast<int>(settings & WindowSetting::RESIZABLE));
+  glfwWindowHint(GLFW_VISIBLE, static_cast<int>(settings & WindowSetting::VISIBLE));
+  glfwWindowHint(GLFW_DECORATED, static_cast<int>(settings & WindowSetting::DECORATED));
+  glfwWindowHint(GLFW_AUTO_ICONIFY, static_cast<int>(settings & WindowSetting::AUTO_MINIMIZE));
+  glfwWindowHint(GLFW_FLOATING, static_cast<int>(settings & WindowSetting::ALWAYS_ON_TOP));
+  glfwWindowHint(GLFW_MAXIMIZED, static_cast<int>(settings & WindowSetting::MAXIMIZED));
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  glfwWindowHint(GLFW_CENTER_CURSOR, static_cast<int>(settings & WindowSetting::CENTER_CURSOR));
+  glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, static_cast<int>(settings & WindowSetting::TRANSPARENT_FB));
+  glfwWindowHint(GLFW_FOCUS_ON_SHOW, static_cast<int>(settings & WindowSetting::AUTOFOCUS));
+#endif
+
   glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
 
   m_window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
@@ -57,6 +72,10 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   Renderer::enable(Capability::DEPTH_TEST);
 
   glfwSetWindowUserPointer(m_window, this);
+
+  glfwSetFramebufferSizeCallback(m_window, [] (GLFWwindow*, int newWidth, int newHeight) {
+    Renderer::resizeViewport(0, 0, static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
+  });
 
   enableFaceCulling();
 }

@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
   //Catch::StringMaker<long double>::precision = std::numeric_limits<long double>::digits10 + 2;
 
   // Some tests require an OpenGL context to be instantiated, which is done by the Window
-  const Raz::Window window(1, 1);
+  const Raz::Window window(1, 1, "", Raz::WindowSetting::INVISIBLE);
 
   // Setting texture [un]pack alignment to 1, so that the elements are aligned on bytes. This allows direct comparison with raw data
   Raz::Renderer::setPixelStorage(Raz::PixelStorage::PACK_ALIGNMENT, 1);

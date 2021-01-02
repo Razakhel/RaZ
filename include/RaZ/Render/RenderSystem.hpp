@@ -27,13 +27,17 @@ public:
   /// \param sceneHeight Height of the scene.
   RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight) : RenderSystem() { resizeViewport(sceneWidth, sceneHeight); }
 #if defined(RAZ_USE_WINDOW)
-  /// Creates a render system along with a Window.
+  /// Creates a render system along with a window.
   /// \param sceneWidth Width of the scene.
   /// \param sceneHeight Height of the scene.
   /// \param windowTitle Title of the window.
+  /// \param settings Settings to create the window with.
   /// \param antiAliasingSampleCount Number of anti-aliasing samples.
-  RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight, const std::string& windowTitle, uint8_t antiAliasingSampleCount = 1)
-    : m_window{ Window::create(sceneWidth, sceneHeight, windowTitle, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
+  RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight,
+               const std::string& windowTitle,
+               WindowSetting settings = WindowSetting::DEFAULT,
+               uint8_t antiAliasingSampleCount = 1)
+    : m_window{ Window::create(sceneWidth, sceneHeight, windowTitle, settings, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
 #endif
 
 #if defined(RAZ_USE_WINDOW)

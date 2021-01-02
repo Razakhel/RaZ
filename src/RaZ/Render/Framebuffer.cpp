@@ -106,7 +106,7 @@ void Framebuffer::display(const ShaderProgram& program) const {
 
   program.use();
 
-  if (hasDepthBuffer()) {
+  if (m_depthBuffer) {
     m_depthBuffer->activate();
     m_depthBuffer->bind();
   }
@@ -120,7 +120,8 @@ void Framebuffer::display(const ShaderProgram& program) const {
 }
 
 void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
-  m_depthBuffer->resize(width, height);
+  if (m_depthBuffer)
+    m_depthBuffer->resize(width, height);
 
   for (const Texture* colorBuffer : m_colorBuffers)
     colorBuffer->resize(width, height);

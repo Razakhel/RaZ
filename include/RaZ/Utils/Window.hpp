@@ -23,10 +23,40 @@ using MouseMoveCallback    = std::tuple<double, double, std::function<void(doubl
 using InputActions         = std::unordered_map<int, std::pair<std::function<void(float)>, Input::ActionTrigger>>;
 using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
 
+enum class WindowSetting : unsigned int {
+  FOCUSED        = 1,   ///< Forces the window to take the focus.
+  RESIZABLE      = 2,   ///< Makes the window able to be resized, either by dragging the edges & corners or by maximizing it.
+  VISIBLE        = 4,   ///< Makes the window visible.
+  DECORATED      = 8,   ///< Defines if there are borders, minimize/maximize/close buttons, etc.
+  AUTO_MINIMIZE  = 16,  ///< Automatically minimizes the full-screen window on focus loss.
+  ALWAYS_ON_TOP  = 32,  ///< Forces the window to be floating, on top of everything on the screen.
+  MAXIMIZED      = 64,  ///< Maximizes the window, taking the whole screen space.
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  CENTER_CURSOR  = 128, ///< Centers the cursor on created full-screen windows.
+  TRANSPARENT_FB = 256, ///< Blends what is behind the window according to the framebuffer's alpha channel.
+  AUTOFOCUS      = 512, ///< Focuses the window every time it is shown.
+#endif
+
+  DEFAULT    = FOCUSED /*| RESIZABLE*/ | VISIBLE | DECORATED, ///< Default window settings.
+  WINDOWED   = DEFAULT | MAXIMIZED,                           ///< Windowed full-screen window (with decorations).
+  BORDERLESS = FOCUSED | VISIBLE,                             ///< Borderless full-screen window (without decorations).
+  INVISIBLE  = 0                                              ///< Invisible window.
+};
+MAKE_ENUM_FLAG(WindowSetting)
+
 /// Graphical window to render the scenes on, with input custom actions.
 class Window {
 public:
-  Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t antiAliasingSampleCount = 1);
+  /// Creates a window.
+  /// \param width Width of the window.
+  /// \param height Height of the window.
+  /// \param title Title of the window.
+  /// \param settings Settings to create the window with.
+  /// \param antiAliasingSampleCount Number of anti-aliasing samples.
+  Window(unsigned int width, unsigned int height,
+         const std::string& title = "",
+         WindowSetting settings = WindowSetting::DEFAULT,
+         uint8_t antiAliasingSampleCount = 1);
   Window(const Window&) = delete;
   Window(Window&&) noexcept = default;
 
