@@ -8,6 +8,32 @@ target_link_libraries(RaZ_Examples INTERFACE RaZ)
 include(CompilerFlags)
 add_compiler_flags(RaZ_Examples INTERFACE)
 
+# Disabling some warnings, which are intendedly present
+if (RAZ_COMPILER_GCC)
+    set(
+        RAZ_EXAMPLES_DISABLED_WARNINGS
+
+        -Wno-unused-variable
+    )
+elseif (RAZ_COMPILER_CLANG)
+    set(
+        RAZ_EXAMPLES_DISABLED_WARNINGS
+
+        -Wno-header-hygiene
+        -Wno-unused-variable
+    )
+elseif (RAZ_COMPILER_MSVC)
+    set(
+        RAZ_EXAMPLES_DISABLED_WARNINGS
+
+        # Warnings triggered by MSVC's standard library
+        /wd4189 # Local variable is initalized but not referenced (unused variable)
+        /wd5220 # Non-static volatile member doesn't imply non-trivial move/copy ctor/operator=
+    )
+endif ()
+
+target_compile_options(RaZ_Examples INTERFACE ${RAZ_EXAMPLES_DISABLED_WARNINGS})
+
 add_executable(RaZ_DeferredDemo deferredDemo.cpp)
 target_link_libraries(RaZ_DeferredDemo RaZ_Examples)
 
