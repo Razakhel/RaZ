@@ -61,6 +61,21 @@ void World::refresh() {
   }
 }
 
+void World::destroy() {
+  // Entities must be released before the systems, since their destruction may depend on those
+  m_entities.clear();
+  m_activeEntityCount = 0;
+  m_maxEntityIndex    = 0;
+
+  // This means that no entity must be used in any system destructor, since they will all be invalid
+  // Their list is thus cleared to avoid any invalid usage
+  for (SystemPtr& system : m_systems)
+    system->m_entities.clear();
+
+  m_systems.clear();
+  m_activeSystems.clear();
+}
+
 void World::sortEntities() {
   // Reorganizing the entites, swapping enabled & disabled ones so that the enabled ones are in front
   auto firstEntity = m_entities.begin();

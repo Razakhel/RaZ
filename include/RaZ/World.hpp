@@ -63,20 +63,24 @@ public:
   bool update(float deltaTime);
   /// Refreshes the world, optimizing the entities & linking/unlinking entities to systems if needed.
   void refresh();
+  /// Destroys the world, releasing all its entities & systems.
+  void destroy();
 
   World& operator=(const World&) = delete;
   World& operator=(World&&) noexcept = default;
+
+  ~World() { destroy(); }
 
 private:
   /// Sorts entities so that the disabled ones are packed to the end of the list.
   void sortEntities();
 
-  std::vector<EntityPtr> m_entities {}; // Entities must be declared before systems, in order to be destroyed prior to them
-  std::size_t m_activeEntityCount = 0;
-  std::size_t m_maxEntityIndex = 0;
-
   std::vector<SystemPtr> m_systems {};
   Bitset m_activeSystems {};
+
+  std::vector<EntityPtr> m_entities {};
+  std::size_t m_activeEntityCount = 0;
+  std::size_t m_maxEntityIndex = 0;
 
   float m_remainingTime {}; ///< Extra time remaining after executing the systems' fixed step update.
 };

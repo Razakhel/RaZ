@@ -111,11 +111,6 @@ bool AudioSystem::update(float /* deltaTime */) {
 }
 
 void AudioSystem::destroy() {
-  for (Entity* entity : m_entities) {
-    if (entity->hasComponent<Sound>())
-      entity->getComponent<Sound>().destroy();
-  }
-
   alcMakeContextCurrent(nullptr);
 
   if (m_context != nullptr) {
