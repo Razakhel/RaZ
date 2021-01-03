@@ -131,9 +131,9 @@ jobs:
       # Installing OpenAL-soft to handle the audio part
     - name: Build setup
       run: |
-        curl --silent https://www.openal-soft.org/openal-binaries/openal-soft-1.20.1-bin.zip -O &&
-        7z x openal-soft-1.20.1-bin.zip &&
-        mv openal-soft-1.20.1-bin C:/OpenAL;
+        curl --silent --insecure https://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip -O &&
+        7z x openal-soft-1.21.0-bin.zip &&
+        mv openal-soft-1.21.0-bin C:/OpenAL;
         cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
 
     - name: Configuration
