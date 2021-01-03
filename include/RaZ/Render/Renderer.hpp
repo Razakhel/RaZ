@@ -422,7 +422,7 @@ enum class ErrorCode : unsigned int {
 struct ErrorCodes {
   /// Checks if no error code has been set.
   /// \return True if no code has been set, false otherwise.
-  bool isEmpty() const { return codes.none(); }
+  bool isEmpty() const noexcept { return codes.none(); }
   /// Checks if the given error code has been set.
   /// \param code Error code to be checked.
   /// \return True if the code has been set, false otherwise.
@@ -644,8 +644,8 @@ public:
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
-  static ErrorCodes recoverErrors();
-  static bool hasErrors() { return !recoverErrors().isEmpty(); }
+  static ErrorCodes recoverErrors() noexcept;
+  static bool hasErrors() noexcept { return !recoverErrors().isEmpty(); }
   static void printErrors();
 
   Renderer& operator=(const Renderer&) = delete;

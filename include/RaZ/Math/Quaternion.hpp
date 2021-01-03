@@ -30,9 +30,9 @@ public:
   constexpr Quaternion(Quaternion&&) noexcept = default;
 
   constexpr T w() const noexcept { return m_real; }
-  constexpr T x() const noexcept { return m_complexes[0]; }
-  constexpr T y() const noexcept { return m_complexes[1]; }
-  constexpr T z() const noexcept { return m_complexes[2]; }
+  constexpr T x() const noexcept { return m_complexes.x(); }
+  constexpr T y() const noexcept { return m_complexes.y(); }
+  constexpr T z() const noexcept { return m_complexes.z(); }
 
   /// Creates a quaternion representing an identity transformation.
   /// \return Identity quaternion.

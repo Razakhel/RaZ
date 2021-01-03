@@ -51,8 +51,8 @@ public:
   void setRenderMode(RenderMode renderMode);
   void setMaterial(MaterialPtr material);
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
-  void addSubmesh(Submesh submesh = Submesh()) { m_submeshes.emplace_back(std::move(submesh)); }
-  void addMaterial(MaterialPtr material) { m_materials.emplace_back(std::move(material)); }
+  Submesh& addSubmesh(Submesh submesh = Submesh()) { return m_submeshes.emplace_back(std::move(submesh)); }
+  Material& addMaterial(MaterialPtr material) { return *m_materials.emplace_back(std::move(material)); }
   /// Computes & updates the mesh's bounding box by computing the submeshes' ones.
   /// \return Mesh's bounding box.
   const AABB& computeBoundingBox();

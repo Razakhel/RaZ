@@ -10,7 +10,7 @@ namespace Raz {
 namespace {
 
 constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
-                               const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
+                               const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) noexcept {
   const Vec3f firstEdge = secondPos - firstPos;
   const Vec3f secondEdge = thirdPos - firstPos;
 
@@ -25,20 +25,10 @@ constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, co
 }
 
 inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath, int bindingIndex = 0) {
-  static std::unordered_map<FilePath, TexturePtr> loadedTextures;
+  const FilePath texturePath = mtlFilePath.recoverPathToFile() + textureFilePath;
 
-  TexturePtr map;
-  const auto loadedTexturePos = loadedTextures.find(textureFilePath);
-
-  if (loadedTexturePos != loadedTextures.cend()) {
-    map = loadedTexturePos->second;
-  } else {
-    const FilePath texturePath = mtlFilePath.recoverPathToFile() + textureFilePath;
-    map = Texture::create(texturePath, bindingIndex, true); // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-    loadedTextures.emplace(textureFilePath, map);
-  }
-
-  return map;
+  // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
+  return Texture::create(mtlFilePath.recoverPathToFile() + textureFilePath, bindingIndex, true);
 }
 
 inline void importMtl(const FilePath& mtlFilePath,

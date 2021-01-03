@@ -127,7 +127,7 @@ public:
   /// Vector negation operator.
   /// This unary minus negates the components of the vector, reversing its direction.
   /// \return Negated vector.
-  constexpr Vector operator-() const { return (*this * -1); }
+  constexpr Vector operator-() const noexcept { return (*this * -1); }
   /// Element-wise vector-vector addition operator.
   /// \param vec Vector to be added.
   /// \return Result of the summed vectors.

@@ -933,8 +933,8 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
   printConditionalErrors();
 }
 
-ErrorCodes Renderer::recoverErrors() {
-  static constexpr auto recoverErrorCodeIndex = [] (ErrorCode code) -> uint8_t {
+ErrorCodes Renderer::recoverErrors() noexcept {
+  static constexpr auto recoverErrorCodeIndex = [] (ErrorCode code) constexpr noexcept -> uint8_t {
     return (static_cast<uint8_t>(static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)));
   };
 

@@ -102,17 +102,17 @@ template <typename T>
 constexpr Mat4<T> Quaternion<T>::computeMatrix() const {
   const T invSqNorm = 1 / computeSquaredNorm();
 
-  const T xx = (2 * m_complexes[0] * m_complexes[0]) * invSqNorm;
-  const T yy = (2 * m_complexes[1] * m_complexes[1]) * invSqNorm;
-  const T zz = (2 * m_complexes[2] * m_complexes[2]) * invSqNorm;
+  const T xx = (2 * m_complexes.x() * m_complexes.x()) * invSqNorm;
+  const T yy = (2 * m_complexes.y() * m_complexes.y()) * invSqNorm;
+  const T zz = (2 * m_complexes.z() * m_complexes.z()) * invSqNorm;
 
-  const T xy = (2 * m_complexes[0] * m_complexes[1]) * invSqNorm;
-  const T xz = (2 * m_complexes[0] * m_complexes[2]) * invSqNorm;
-  const T yz = (2 * m_complexes[1] * m_complexes[2]) * invSqNorm;
+  const T xy = (2 * m_complexes.x() * m_complexes.y()) * invSqNorm;
+  const T xz = (2 * m_complexes.x() * m_complexes.z()) * invSqNorm;
+  const T yz = (2 * m_complexes.y() * m_complexes.z()) * invSqNorm;
 
-  const T xw = (2 * m_complexes[0] * m_real) * invSqNorm;
-  const T yw = (2 * m_complexes[1] * m_real) * invSqNorm;
-  const T zw = (2 * m_complexes[2] * m_real) * invSqNorm;
+  const T xw = (2 * m_complexes.x() * m_real) * invSqNorm;
+  const T yw = (2 * m_complexes.y() * m_real) * invSqNorm;
+  const T zw = (2 * m_complexes.z() * m_real) * invSqNorm;
 
   // Since RaZ's matrices are of a different majorness (row-major) than the usual (column-major),
   //  the following matrix is transposed compared to the common implementations & usages (like glm)
@@ -133,25 +133,25 @@ template <typename T>
 constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion& quat) noexcept {
   const Quaternion<T> res = *this;
 
-  m_real = res.m_real         * quat.m_real
-         - res.m_complexes[0] * quat.m_complexes[0]
-         - res.m_complexes[1] * quat.m_complexes[1]
-         - res.m_complexes[2] * quat.m_complexes[2];
+  m_real = res.m_real          * quat.m_real
+         - res.m_complexes.x() * quat.m_complexes.x()
+         - res.m_complexes.y() * quat.m_complexes.y()
+         - res.m_complexes.z() * quat.m_complexes.z();
 
-  m_complexes[0] = res.m_real         * quat.m_complexes[0]
-                 + res.m_complexes[0] * quat.m_real
-                 + res.m_complexes[1] * quat.m_complexes[2]
-                 - res.m_complexes[2] * quat.m_complexes[1];
+  m_complexes.x() = res.m_real          * quat.m_complexes.x()
+                  + res.m_complexes.x() * quat.m_real
+                  + res.m_complexes.y() * quat.m_complexes.z()
+                  - res.m_complexes.z() * quat.m_complexes.y();
 
-  m_complexes[1] = res.m_real         * quat.m_complexes[1]
-                 - res.m_complexes[0] * quat.m_complexes[2]
-                 + res.m_complexes[1] * quat.m_real
-                 + res.m_complexes[2] * quat.m_complexes[0];
+  m_complexes.y() = res.m_real          * quat.m_complexes.y()
+                  - res.m_complexes.x() * quat.m_complexes.z()
+                  + res.m_complexes.y() * quat.m_real
+                  + res.m_complexes.z() * quat.m_complexes.x();
 
-  m_complexes[2] = res.m_real         * quat.m_complexes[2]
-                 + res.m_complexes[0] * quat.m_complexes[1]
-                 - res.m_complexes[1] * quat.m_complexes[0]
-                 + res.m_complexes[2] * quat.m_real;
+  m_complexes.z() = res.m_real          * quat.m_complexes.z()
+                  + res.m_complexes.x() * quat.m_complexes.y()
+                  - res.m_complexes.y() * quat.m_complexes.x()
+                  + res.m_complexes.z() * quat.m_real;
 
   return *this;
 }
@@ -169,10 +169,10 @@ std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat) {
 
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T currCoeff, T otherCoeff) const noexcept {
-  return Quaternion(m_real         * currCoeff + quat.m_real         * otherCoeff,
-                    m_complexes[0] * currCoeff + quat.m_complexes[0] * otherCoeff,
-                    m_complexes[1] * currCoeff + quat.m_complexes[1] * otherCoeff,
-                    m_complexes[2] * currCoeff + quat.m_complexes[2] * otherCoeff);
+  return Quaternion(m_real          * currCoeff + quat.m_real          * otherCoeff,
+                    m_complexes.x() * currCoeff + quat.m_complexes.x() * otherCoeff,
+                    m_complexes.y() * currCoeff + quat.m_complexes.y() * otherCoeff,
+                    m_complexes.z() * currCoeff + quat.m_complexes.z() * otherCoeff);
 }
 
 } // namespace Raz

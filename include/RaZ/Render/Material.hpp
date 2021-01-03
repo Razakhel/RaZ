@@ -35,7 +35,7 @@ enum class MaterialPreset : uint16_t {
 
 class Material {
 public:
-  Material(Material&&) = default;
+  Material(Material&&) noexcept = default;
 
   virtual MaterialType getType() const = 0;
   const Vec3f& getBaseColor() const { return m_baseColor; }
@@ -58,7 +58,7 @@ public:
 
 protected:
   Material() = default;
-  Material(const Material&) = default;
+  Material(const Material&) noexcept = default;
   explicit Material(TexturePtr baseColorMap) : m_baseColorMap{ std::move(baseColorMap) } {}
   explicit Material(const FilePath& filePath, bool flipVertically = true) : Material(Texture::create(filePath, flipVertically)) {}
 
