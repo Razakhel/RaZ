@@ -20,6 +20,7 @@
 #include "Math/Quaternion.hpp"
 #include "Math/Transform.hpp"
 #include "Math/Vector.hpp"
+#include "Physics/Collider.hpp"
 #include "Physics/PhysicsSystem.hpp"
 #include "Physics/RigidBody.hpp"
 #include "Render/Camera.hpp"
