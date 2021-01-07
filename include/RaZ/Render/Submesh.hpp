@@ -57,7 +57,7 @@ private:
   VertexArray m_vao {};
   VertexBuffer m_vbo {};
   IndexBuffer m_ibo {};
-  AABB m_boundingBox {};
+  AABB m_boundingBox = AABB(Vec3f(), Vec3f());
 
   RenderMode m_renderMode = RenderMode::TRIANGLE;
   std::function<void(const Submesh&)> m_renderFunc {};

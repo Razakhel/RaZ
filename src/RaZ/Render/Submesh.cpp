@@ -42,13 +42,13 @@ const AABB& Submesh::computeBoundingBox() {
   Vec3f minPos(std::numeric_limits<float>::max());
 
   for (const Vertex& vert : m_vbo.getVertices()) {
-    maxPos[0] = std::max(maxPos[0], vert.position[0]);
-    maxPos[1] = std::max(maxPos[1], vert.position[1]);
-    maxPos[2] = std::max(maxPos[2], vert.position[2]);
+    maxPos.x() = std::max(maxPos.x(), vert.position.x());
+    maxPos.y() = std::max(maxPos.y(), vert.position.y());
+    maxPos.z() = std::max(maxPos.z(), vert.position.z());
 
-    minPos[0] = std::min(minPos[0], vert.position[0]);
-    minPos[1] = std::min(minPos[1], vert.position[1]);
-    minPos[2] = std::min(minPos[2], vert.position[2]);
+    minPos.x() = std::min(minPos.x(), vert.position.x());
+    minPos.y() = std::min(minPos.y(), vert.position.y());
+    minPos.z() = std::min(minPos.z(), vert.position.z());
   }
 
   m_boundingBox = AABB(minPos, maxPos);

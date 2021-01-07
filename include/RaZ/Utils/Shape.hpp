@@ -81,9 +81,6 @@ public:
   /// Computes the shape's centroid.
   /// \return Computed centroid.
   virtual Vec3f computeCentroid() const = 0;
-  /// Translates the shape by the given displacement.
-  /// \param displacement Displacement to be translated by.
-  virtual void translate(const Vec3f& displacement) noexcept = 0;
 
   Shape& operator=(const Shape&) = default;
   Shape& operator=(Shape&&) noexcept = default;
@@ -97,7 +94,6 @@ protected:
 /// Line segment defined by its two extremities' positions.
 class Line final : public Shape {
 public:
-  Line() = default;
   Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
 
   ShapeType getType() const noexcept override { return ShapeType::LINE; }
@@ -149,9 +145,6 @@ public:
   /// Computes the line's centroid, which is the point lying directly between the two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) * 0.5f; }
-  /// Translates the line by the given displacement.
-  /// \param displacement Displacement to translate the line by.
-  void translate(const Vec3f& displacement) noexcept override;
   /// Line length computation.
   /// To be used if the actual length is needed; otherwise, prefer computeSquaredLength().
   /// \return Line's length.
@@ -169,21 +162,20 @@ private:
 /// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
 class Plane final : public Shape {
 public:
-  Plane() = default;
-  explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_position{ normal * distance }, m_normal{ normal } {}
-  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_position{ position }, m_normal{ normal } {}
+  explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_distance{ distance }, m_normal{ normal } {}
+  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_distance{ position.computeLength() }, m_normal{ normal } {}
   Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint)
-    : m_position{ ((firstPoint + secondPoint + thirdPoint) / 3.f) },
+    : m_distance{ ((firstPoint + secondPoint + thirdPoint) / 3.f).computeLength() },
       m_normal{ (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize() } {}
 
   ShapeType getType() const noexcept override { return ShapeType::PLANE; }
-  const Vec3f& getPosition() const { return m_position; }
+  float getDistance() const { return m_distance; }
   const Vec3f& getNormal() const { return m_normal; }
 
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is located on the plane, false otherwise.
-  bool contains(const Vec3f& point) const override { return FloatUtils::areNearlyEqual(m_normal.dot(point) - computeDistance(), 0.f); }
+  bool contains(const Vec3f& point) const override { return FloatUtils::areNearlyEqual(m_normal.dot(point) - m_distance, 0.f); }
   /// Plane-line intersection check.
   /// \param line Line to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
@@ -221,31 +213,19 @@ public:
   /// The projected point is necessarily located on the plane.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the plane.
-  Vec3f computeProjection(const Vec3f& point) const override { return point - m_normal * (m_normal.dot(point) - computeDistance()); }
+  Vec3f computeProjection(const Vec3f& point) const override { return point - m_normal * (m_normal.dot(point) - m_distance); }
   /// Computes the plane's centroid, which is the point lying onto the plane at its distance from the center in its normal direction.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return m_position; }
-  /// Translates the plane by the given displacement.
-  /// \param displacement Displacement to translate the plane by.
-  void translate(const Vec3f& displacement) noexcept override;
-  /// Computes the distance to the plane from the origin.
-  /// To be used if the actual distance is needed; otherwise, prefer computeSquaredDistance().
-  /// \return Plane's distance.
-  float computeDistance() const noexcept { return m_position.computeLength(); }
-  /// Computes the squared distance to the plane from the origin.
-  /// To be preferred over computeDistance() for faster operations.
-  /// \return Plane's squared distance.
-  float computeSquaredDistance() const noexcept { return m_position.computeSquaredLength(); }
+  Vec3f computeCentroid() const override { return m_normal * m_distance; }
 
 private:
-  Vec3f m_position {};
+  float m_distance {};
   Vec3f m_normal {};
 };
 
 /// Sphere defined by its center position and a radius.
 class Sphere final : public Shape {
 public:
-  Sphere() = default;
   Sphere(const Vec3f& centerPos, float radius) : m_centerPos{ centerPos }, m_radius{ radius } {}
 
   ShapeType getType() const noexcept override { return ShapeType::SPHERE; }
@@ -297,9 +277,6 @@ public:
   /// Computes the sphere's centroid, which is its center. Strictly equivalent to getCenterPos().
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_centerPos; }
-  /// Translates the sphere by the given displacement.
-  /// \param displacement Displacement to translate the sphere by.
-  void translate(const Vec3f& displacement) noexcept override { m_centerPos += displacement; }
 
 private:
   Vec3f m_centerPos {};
@@ -309,7 +286,6 @@ private:
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
 class Triangle final : public Shape {
 public:
-  Triangle() = default;
   Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
     : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
@@ -363,9 +339,6 @@ public:
   /// Computes the triangle's centroid, which is the point lying directly between its three points.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_firstPos + m_secondPos + m_thirdPos) / 3.f; }
-  /// Translates the triangle by the given displacement.
-  /// \param displacement Displacement to translate the triangle by.
-  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the triangle's normal from its points.
   /// \return Computed normal.
   Vec3f computeNormal() const;
@@ -386,7 +359,6 @@ private:
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.
 class Quad final : public Shape {
 public:
-  Quad() = default;
   Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos)
     : m_leftTopPos{ leftTopPos }, m_rightTopPos{ rightTopPos }, m_rightBottomPos{ rightBottomPos }, m_leftBottomPos{ leftBottomPos } {}
 
@@ -441,9 +413,6 @@ public:
   /// Computes the quad's centroid, which is the point lying directly between its four points.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_leftTopPos + m_rightTopPos + m_rightBottomPos + m_leftBottomPos) * 0.25f; }
-  /// Translates the quad by the given displacement.
-  /// \param displacement Displacement to translate the quad by.
-  void translate(const Vec3f& displacement) noexcept override;
 
 private:
   Vec3f m_leftTopPos {};
@@ -481,7 +450,6 @@ private:
 /// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
 class AABB final : public Shape {
 public:
-  AABB() = default;
   AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos)
     : m_leftBottomBackPos{ leftBottomBackPos }, m_rightTopFrontPos{ rightTopFrontPos } {}
 
@@ -534,9 +502,6 @@ public:
   /// Computes the AABB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_rightTopFrontPos + m_leftBottomBackPos) * 0.5f; }
-  /// Translates the AABB by the given displacement.
-  /// \param displacement Displacement to translate the AABB by.
-  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the half extents of the box, starting from its centroid.
   ///
   ///          _______________________
@@ -607,7 +572,6 @@ private:
 ///
 class OBB final : public Shape {
 public:
-  OBB() = default;
   OBB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos, const Mat3f& rotation = Mat3f::identity())
     : m_aabb(leftBottomBackPos, rightTopFrontPos), m_rotation{ rotation } {}
   explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
@@ -664,9 +628,6 @@ public:
   /// Computes the OBB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
-  /// Translates the OBB by the given displacement.
-  /// \param displacement Displacement to translate the OBB by.
-  void translate(const Vec3f& displacement) noexcept override { m_aabb.translate(displacement); }
   /// Computes the half extents of the box, starting from its centroid.
   /// These half extents are oriented according to the box's rotation.
   ///
@@ -685,7 +646,7 @@ public:
   Vec3f computeHalfExtents() const { return m_aabb.computeHalfExtents() * m_rotation; }
 
 private:
-  AABB m_aabb {};
+  AABB m_aabb;
   Mat3f m_rotation {};
   Mat3f m_invRotation {};
 };

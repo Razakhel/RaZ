@@ -63,7 +63,7 @@ bool Ray::intersects(const Plane& plane, RayHit* hit) const {
     return false;
 
   const float origAngle = m_origin.dot(plane.getNormal());
-  const float hitDist   = (plane.computeDistance() - origAngle) / dirAngle;
+  const float hitDist   = (plane.getDistance() - origAngle) / dirAngle;
 
   if (hitDist <= 0.f) // The plane is behind the ray
     return false;

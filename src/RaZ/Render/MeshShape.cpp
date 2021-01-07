@@ -6,7 +6,7 @@
 namespace Raz {
 
 Mesh::Mesh(const Plane& plane, float width, float depth, RenderMode renderMode) : Mesh() {
-  const float height = plane.getPosition().y();
+  const float height = plane.computeCentroid().y();
 
   const Vec3f firstPos(-width, height, depth);
   const Vec3f secondPos(width, height, depth);
@@ -294,13 +294,13 @@ const AABB& Mesh::computeBoundingBox() {
   for (Submesh& submesh : m_submeshes) {
     const AABB& boundingBox = submesh.computeBoundingBox();
 
-    maxPos[0] = std::max(maxPos[0], boundingBox.getRightTopFrontPos()[0]);
-    maxPos[1] = std::max(maxPos[1], boundingBox.getRightTopFrontPos()[1]);
-    maxPos[2] = std::max(maxPos[2], boundingBox.getRightTopFrontPos()[2]);
+    maxPos.x() = std::max(maxPos.x(), boundingBox.getRightTopFrontPos().x());
+    maxPos.y() = std::max(maxPos.y(), boundingBox.getRightTopFrontPos().y());
+    maxPos.z() = std::max(maxPos.z(), boundingBox.getRightTopFrontPos().z());
 
-    minPos[0] = std::min(minPos[0], boundingBox.getLeftBottomBackPos()[0]);
-    minPos[1] = std::min(minPos[1], boundingBox.getLeftBottomBackPos()[1]);
-    minPos[2] = std::min(minPos[2], boundingBox.getLeftBottomBackPos()[2]);
+    minPos.x() = std::min(minPos.x(), boundingBox.getLeftBottomBackPos().x());
+    minPos.y() = std::min(minPos.y(), boundingBox.getLeftBottomBackPos().y());
+    minPos.z() = std::min(minPos.z(), boundingBox.getLeftBottomBackPos().z());
   }
 
   m_boundingBox = AABB(minPos, maxPos);

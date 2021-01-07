@@ -96,7 +96,7 @@ private:
 
   std::vector<Submesh> m_submeshes {};
   std::vector<MaterialPtr> m_materials {};
-  AABB m_boundingBox {};
+  AABB m_boundingBox = AABB(Vec3f(), Vec3f());
 };
 
 } // namespace Raz

@@ -5,7 +5,7 @@
 TEST_CASE("Collider basic") {
   Raz::Collider collider(Raz::Plane(1.5f));
   CHECK(collider.getShapeType() == Raz::ShapeType::PLANE);
-  CHECK(collider.getShape<Raz::Plane>().computeDistance() == 1.5f);
+  CHECK(collider.getShape<Raz::Plane>().getDistance() == 1.5f);
 
   constexpr Raz::Vec3f center(1.f, 2.f, 3.f);
   collider.setShape(Raz::Sphere(center, 3.f));
