@@ -10,18 +10,22 @@ PhysicsSystem::PhysicsSystem() {
 
 bool PhysicsSystem::step(float deltaTime) {
   for (Entity* entity : m_entities) {
-    if (entity->isEnabled()) {
-      auto& rigidBody = entity->getComponent<RigidBody>();
-      rigidBody.applyForces(m_gravity);
+    if (!entity->isEnabled() || !entity->hasComponent<RigidBody>())
+      continue;
 
-      const Vec3f acceleration = rigidBody.getForces() * rigidBody.getInvMass();
-      const Vec3f oldVelocity  = rigidBody.getVelocity();
+    auto& rigidBody = entity->getComponent<RigidBody>();
+    auto& transform = entity->getComponent<Transform>();
 
-      const Vec3f velocity = oldVelocity * m_friction + acceleration * deltaTime;
-      rigidBody.setVelocity(velocity);
+    rigidBody.m_oldPosition = transform.getPosition();
+    rigidBody.applyForces(m_gravity);
 
-      entity->getComponent<Transform>().translate((oldVelocity + velocity) * 0.5f * deltaTime);
-    }
+    const Vec3f acceleration = rigidBody.getForces() * rigidBody.getInvMass();
+    const Vec3f oldVelocity  = rigidBody.getVelocity();
+
+    const Vec3f velocity = oldVelocity * m_friction + acceleration * deltaTime;
+    rigidBody.setVelocity(velocity);
+
+    transform.translate((oldVelocity + velocity) * 0.5f * deltaTime);
   }
 
   return true;

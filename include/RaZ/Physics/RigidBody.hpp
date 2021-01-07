@@ -9,6 +9,8 @@
 namespace Raz {
 
 class RigidBody final : public Component {
+  friend class PhysicsSystem;
+
 public:
   /// Creates a rigid body with given mass & bounciness.
   /// \param mass Mass of the rigid body. 0 represents an infinite mass.
@@ -34,6 +36,7 @@ private:
 
   Vec3f m_forces {}; ///< Forces applied to the rigid body.
   Vec3f m_velocity {}; ///< Velocity of the rigid body.
+  Vec3f m_oldPosition {}; ///< Previous position of the rigid body.
 };
 
 } // namespace Raz
