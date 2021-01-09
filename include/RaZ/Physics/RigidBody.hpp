@@ -15,9 +15,7 @@ public:
   /// Creates a rigid body with given mass & bounciness.
   /// \param mass Mass of the rigid body. 0 represents an infinite mass.
   /// \param bounciness Coefficient of restitution (must be between 0 & 1).
-  constexpr RigidBody(float mass, float bounciness) noexcept : m_mass{ mass }, m_invMass{ (mass != 0.f ? 1.f / mass : 0.f) }, m_bounciness{ bounciness } {
-    assert("Error: Bounciness value must be between 0 & 1." && (bounciness >= 0.f && bounciness <= 1.f));
-  }
+  constexpr RigidBody(float mass, float bounciness) noexcept : m_mass{ mass }, m_invMass{ (mass != 0.f ? 1.f / mass : 0.f) } { setBounciness(bounciness); }
 
   constexpr float getMass() const noexcept { return m_mass; }
   constexpr float getInvMass() const noexcept { return m_invMass; }
@@ -25,6 +23,11 @@ public:
   constexpr const Vec3f& getForces() const noexcept { return m_forces; }
   constexpr const Vec3f& getVelocity() const noexcept { return m_velocity; }
 
+  constexpr void setMass(float mass) noexcept { m_mass = mass; }
+  constexpr void setBounciness(float bounciness) noexcept {
+    assert("Error: The bounciness value must be between 0 & 1." && (bounciness >= 0.f && bounciness <= 1.f));
+    m_bounciness = bounciness;
+  }
   constexpr void setVelocity(const Vec3f& velocity) noexcept { m_velocity = velocity; }
 
   constexpr void applyForces(const Vec3f& gravity) noexcept { m_forces = gravity; }

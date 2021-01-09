@@ -12,6 +12,9 @@ class PhysicsSystem final : public System {
 public:
   PhysicsSystem();
 
+  constexpr const Vec3f& getGravity() const noexcept { return m_gravity; }
+  constexpr float getFriction() const noexcept { return m_friction; }
+
   void setGravity(const Vec3f& gravity) { m_gravity = gravity; }
   void setFriction(float friction) {
     assert("Error: Friction coefficient must be between 0 & 1." && (friction >= 0.f && friction <= 1.f));
@@ -30,4 +33,3 @@ private:
 } // namespace Raz
 
 #endif // RAZ_PHYSICSSYSTEM_HPP
-
