@@ -43,6 +43,9 @@ target_link_libraries(RaZ_FullDemo RaZ_Examples)
 add_executable(RaZ_MinDemo minDemo.cpp)
 target_link_libraries(RaZ_MinDemo RaZ_Examples)
 
+add_executable(RaZ_PhysicsDemo physicsDemo.cpp)
+target_link_libraries(RaZ_PhysicsDemo RaZ_Examples)
+
 add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
 target_link_libraries(RaZ_ShowcaseDemo RaZ_Examples)
 
@@ -53,6 +56,7 @@ if (RAZ_USE_EMSCRIPTEN)
     set_target_properties(RaZ_DeferredDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_FullDemo     PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_MinDemo      PROPERTIES SUFFIX ".html")
+    set_target_properties(RaZ_PhysicsDemo  PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_ShowcaseDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_SoundDemo    PROPERTIES SUFFIX ".html")
 

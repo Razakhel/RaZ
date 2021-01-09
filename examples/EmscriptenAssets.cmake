@@ -91,6 +91,34 @@ target_link_options(
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
+########################
+# Assets - PhysicsDemo #
+########################
+
+set(
+    RaZ_PhysicsDemo_ASSETS
+
+    assets/meshes/ball.obj
+    assets/materials/test.mtl
+    assets/textures/rustediron_albedo.png
+    assets/textures/rustediron_normal.png
+    assets/textures/rustediron_metallic.png
+    assets/textures/rustediron_roughness.png
+)
+
+foreach (ASSET_PATH ${RaZ_PhysicsDemo_ASSETS})
+    target_link_options(RaZ_PhysicsDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+endforeach ()
+
+target_link_options(
+    RaZ_PhysicsDemo
+
+    PRIVATE
+
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+)
+
 #########################
 # Assets - ShowcaseDemo #
 #########################

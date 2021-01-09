@@ -236,10 +236,12 @@ int main() {
                             [&window] () { window.enableFaceCulling(); },
                             [&window] () { window.disableFaceCulling(); },
                             true);
+#if !defined(USE_OPENGL_ES)
   window.addOverlayCheckbox("Enable vertical sync",
                             [&window] () { window.enableVerticalSync(); },
                             [&window] () { window.disableVerticalSync(); },
                             window.recoverVerticalSyncState());
+#endif
 
   window.addOverlaySeparator();
 
