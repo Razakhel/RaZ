@@ -49,6 +49,23 @@ if (WIN32 OR CYGWIN)
         REQUIRED
         NO_DEFAULT_PATH
     )
+
+    if (WIN32)
+        # Under Windows, finding the DLL may be useful in some cases
+        find_file(
+            OPENAL_DLL
+
+            NAMES
+                soft_oal.dll
+            HINTS
+                ENV OPENALDIR
+                ENV OPENAL_SDK_PATH
+            PATH_SUFFIXES
+                bin bin/Win64
+            PATHS
+                ${OPENAL_SEARCH_PATHS}
+        )
+    endif ()
 elseif (APPLE)
     set(OPENAL_LIBS "-framework OpenAL")
 
@@ -100,3 +117,6 @@ endif ()
 
 message("  - Include directory: ${OPENAL_INCLUDE_DIRS}")
 message("  - Library: ${OPENAL_LIBS}")
+if (WIN32)
+    message("  - DLL: ${OPENAL_DLL}")
+endif ()
