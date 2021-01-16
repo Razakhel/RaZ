@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include <initializer_list>
+#include <limits>
 
 namespace Raz {
 
@@ -89,7 +90,7 @@ public:
   /// Calculating the actual length requires a square root operation to be involved, which is expensive.
   /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredLength().
   /// \return Vector's length.
-  constexpr float computeLength() const { return std::sqrt(computeSquaredLength()); }
+  constexpr float computeLength() const noexcept { return std::sqrt(computeSquaredLength()); }
   /// Computes the squared length of the vector.
   /// The squared length is equal to the dot product of the vector with itself.
   /// This calculation does not involve a square root; it is then to be preferred over computeLength() for faster operations.
@@ -98,7 +99,7 @@ public:
   /// Computes the normalized vector.
   /// Normalizing a vector makes it of length 1.
   /// \return Normalized vector.
-  constexpr Vector normalize() const;
+  constexpr Vector normalize() const noexcept;
   /// Computes the linear interpolation between vectors, according to a coefficient.
   /// \param vec Vector to be interpolated with.
   /// \param coeff Coefficient between 0 (returns the current vector) and 1 (returns the given vector).
@@ -155,11 +156,11 @@ public:
   /// Element-wise vector-vector division operator.
   /// \param vec Vector to be divided by.
   /// \return Result of the summed vectors.
-  constexpr Vector operator/(const Vector& vec) const;
+  constexpr Vector operator/(const Vector& vec) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Element-wise vector-value division operator.
   /// \param val Value to be divided by.
   /// \return Result of the vector divided by the value.
-  constexpr Vector operator/(T val) const;
+  constexpr Vector operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Vector-matrix multiplication operator (assumes the vector to be horizontal).
   /// \param mat Matrix to be multiplied by.
   /// \return Result of the vector-matrix multiplication.
@@ -191,11 +192,11 @@ public:
   /// Element-wise vector-vector division assignment operator.
   /// \param vec Vector to be divided by.
   /// \return Reference to the modified original vector.
-  constexpr Vector& operator/=(const Vector& vec);
+  constexpr Vector& operator/=(const Vector& vec) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Element-wise vector-value division assignment operator.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original vector.
-  constexpr Vector& operator/=(T val);
+  constexpr Vector& operator/=(T val) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Element fetching operator given its index.
   /// \param index Element's index.
   /// \return Constant reference to the fetched element.

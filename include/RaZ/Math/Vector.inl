@@ -95,7 +95,7 @@ constexpr Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const noexce
 }
 
 template <typename T, std::size_t Size>
-constexpr Vector<T, Size> Vector<T, Size>::normalize() const {
+constexpr Vector<T, Size> Vector<T, Size>::normalize() const noexcept {
   Vector<T, Size> res = *this;
   res /= computeLength();
   return res;
@@ -166,14 +166,14 @@ constexpr Vector<T, Size> Vector<T, Size>::operator*(T val) const noexcept {
 }
 
 template <typename T, std::size_t Size>
-constexpr Vector<T, Size> Vector<T, Size>::operator/(const Vector& vec) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator/(const Vector& vec) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   Vector<T, Size> res = *this;
   res /= vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
-constexpr Vector<T, Size> Vector<T, Size>::operator/(T val) const {
+constexpr Vector<T, Size> Vector<T, Size>::operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   Vector<T, Size> res = *this;
   res /= val;
   return res;
@@ -236,14 +236,14 @@ constexpr Vector<T, Size>& Vector<T, Size>::operator*=(T val) noexcept {
 }
 
 template <typename T, std::size_t Size>
-constexpr Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] /= vec[i];
   return *this;
 }
 
 template <typename T, std::size_t Size>
-constexpr Vector<T, Size>& Vector<T, Size>::operator/=(T val) {
+constexpr Vector<T, Size>& Vector<T, Size>::operator/=(T val) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   for (T& elt : m_data)
     elt /= val;
   return *this;

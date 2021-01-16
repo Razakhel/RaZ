@@ -53,7 +53,7 @@ constexpr T computeMatrixDeterminant(const Mat4<T>& mat) noexcept {
 }
 
 template <typename T>
-constexpr Mat2<T> computeMatrixInverse(const Mat2<T>& mat, T determinant) {
+constexpr Mat2<T> computeMatrixInverse(const Mat2<T>& mat, T determinant) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   const Mat2<T> res( mat.getData()[3], -mat.getData()[1],
                     -mat.getData()[2],  mat.getData()[0]);
 
@@ -61,7 +61,7 @@ constexpr Mat2<T> computeMatrixInverse(const Mat2<T>& mat, T determinant) {
 }
 
 template <typename T>
-constexpr Mat3<T> computeMatrixInverse(const Mat3<T>& mat, T determinant) {
+constexpr Mat3<T> computeMatrixInverse(const Mat3<T>& mat, T determinant) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   const Mat2<T> topLeft(mat.getData()[4], mat.getData()[5],
                         mat.getData()[7], mat.getData()[8]);
   const Mat2<T> topCenter(mat.getData()[3], mat.getData()[5],
@@ -91,7 +91,7 @@ constexpr Mat3<T> computeMatrixInverse(const Mat3<T>& mat, T determinant) {
 }
 
 template <typename T>
-constexpr Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T determinant) {
+constexpr Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T determinant) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   const Mat3<T> topLeft(mat.getData()[5],  mat.getData()[6],  mat.getData()[7],
                         mat.getData()[9],  mat.getData()[10], mat.getData()[11],
                         mat.getData()[13], mat.getData()[14], mat.getData()[15]);
@@ -259,7 +259,7 @@ constexpr T Matrix<T, W, H>::computeDeterminant() const noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H> Matrix<T, W, H>::inverse() const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::inverse() const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
   return computeMatrixInverse(*this, computeMatrixDeterminant(*this));
@@ -348,14 +348,14 @@ constexpr Matrix<T, W, H> Matrix<T, W, H>::operator*(T val) const noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   Matrix<T, W, H> res = *this;
   res /= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   Matrix<T, W, H> res = *this;
   res /= val;
   return res;
@@ -436,14 +436,14 @@ constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator*=(T val) noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] /= mat.getData()[i];
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
   for (T& it : m_data)
     it /= val;
   return *this;

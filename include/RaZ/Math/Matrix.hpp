@@ -6,6 +6,7 @@
 #include <array>
 #include <iostream>
 #include <initializer_list>
+#include <limits>
 
 namespace Raz {
 
@@ -74,7 +75,7 @@ public:
   constexpr T computeDeterminant() const noexcept;
   /// Inverse matrix computation.
   /// \return Matrix's inverse.
-  constexpr Matrix inverse() const;
+  constexpr Matrix inverse() const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Recovers the values in the row at the given index.
   /// \param rowIndex Index of the row to recover.
   /// \return Vector containing the row elements.
@@ -125,11 +126,11 @@ public:
   /// Element-wise matrix-matrix division operator.
   /// \param mat Matrix to be divided by.
   /// \return Result of the divided matrices.
-  constexpr Matrix operator/(const Matrix& mat) const;
+  constexpr Matrix operator/(const Matrix& mat) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Element-wise matrix-value division operator.
   /// \param val Value to be divided by.
   /// \return Result of the matrix divided by the value.
-  constexpr Matrix operator/(T val) const;
+  constexpr Matrix operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Matrix-vector multiplication operator (assumes the vector to be vertical).
   /// \param vec Vector to be multiplied by.
   /// \return Result of the matrix-vector multiplication.
@@ -168,11 +169,11 @@ public:
   /// Element-wise matrix-matrix division assignment operator.
   /// \param mat Matrix to be divided by.
   /// \return Reference to the modified original matrix.
-  constexpr Matrix& operator/=(const Matrix& mat);
+  constexpr Matrix& operator/=(const Matrix& mat) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Element-wise matrix-value division assignment operator.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original matrix.
-  constexpr Matrix& operator/=(T val);
+  constexpr Matrix& operator/=(T val) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Matrix-matrix multiplication assignment operator.
   /// \param mat Matrix to be multiplied by.
   /// \return Reference to the modified original matrix.
