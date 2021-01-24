@@ -71,10 +71,14 @@ constexpr std::string_view getTypeStr() noexcept {
 //
 //  return std::string_view(funcSignature.data() + firstPos + funcName.size(), lastPos - firstPos - funcName.size());
 #else
-  static_assert(false, "Error: The current compiler is not supported.");
+#pragma message("Warning: The current compiler is not supported.")
+  return {};
 #endif
 }
 
+/// Recovers a string of the given enumeration value's name at compile-time.
+/// \tparam Enum Enumeration value to recover the name of.
+/// \return String representing the enum value's name.
 template <auto Enum>
 constexpr std::string_view getEnumStr() noexcept {
   static_assert(std::is_enum_v<decltype(Enum)>, "Error: The type of the given value must be an enum.");
@@ -110,7 +114,8 @@ constexpr std::string_view getEnumStr() noexcept {
 
   return std::string_view(funcSignature.data() + startStride, funcSignature.size() - startStride - endStride);
 #else
-  static_assert(false, "Error: The current compiler is not supported.");
+#pragma message("Warning: The current compiler is not supported.")
+  return {};
 #endif
 }
 
