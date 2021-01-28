@@ -62,7 +62,7 @@ private:
   RenderMode m_renderMode = RenderMode::TRIANGLE;
   std::function<void(const Submesh&)> m_renderFunc {};
 
-  std::size_t m_materialIndex = std::numeric_limits<std::size_t>::max();
+  std::size_t m_materialIndex = 0;
 };
 
 } // namespace Raz

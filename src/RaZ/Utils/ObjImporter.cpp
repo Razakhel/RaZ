@@ -25,8 +25,6 @@ constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, co
 }
 
 inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath, int bindingIndex = 0) {
-  const FilePath texturePath = mtlFilePath.recoverPathToFile() + textureFilePath;
-
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
   return Texture::create(mtlFilePath.recoverPathToFile() + textureFilePath, bindingIndex, true);
 }
@@ -90,7 +88,7 @@ inline void importMtl(const FilePath& mtlFilePath,
 
         isBlinnPhongMaterial = true;
       } else if (tag[0] == 'm') {                      // Import texture
-        const TexturePtr& map = loadTexture(mtlFilePath, nextValue);
+        const TexturePtr map = loadTexture(mtlFilePath, nextValue);
 
         if (tag[4] == 'K') {                           // Standard maps
           if (tag[5] == 'd') {                         // Diffuse/albedo map [map_Kd]
@@ -156,7 +154,8 @@ inline void importMtl(const FilePath& mtlFilePath,
       }
     }
   } else {
-    throw std::runtime_error("Error: Couldn't open the file '" + mtlFilePath + "'");
+    std::cerr << "Error: Couldn't open the material file '" << mtlFilePath << "'\n";
+    isCookTorranceMaterial = true;
   }
 
   addLocalMaterial(isCookTorranceMaterial);
@@ -258,14 +257,14 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
       normalsIndices.back().emplace_back(partIndices[7 + quadStride]);
       normalsIndices.back().emplace_back(partIndices[6 + quadStride]);
       normalsIndices.back().emplace_back(partIndices[8 + quadStride]);
-    } else if (line[0] == 'm') {
+    } else if (line[0] == 'm') { // Material import (mtllib)
       std::string mtlFileName;
       file >> mtlFileName;
 
       const std::string mtlFilePath = filePath.recoverPathToFile() + mtlFileName;
 
       importMtl(mtlFilePath, m_materials, materialCorrespIndices);
-    } else if (line[0] == 'u') {
+    } else if (line[0] == 'u') { // Material usage (usemtl)
       if (!materialCorrespIndices.empty()) {
         std::string materialName;
         file >> materialName;
@@ -273,9 +272,9 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
         const auto correspMaterial = materialCorrespIndices.find(materialName);
 
         if (correspMaterial == materialCorrespIndices.cend())
-          throw std::runtime_error("Error: No corresponding material found with the name '" + materialName + "'");
-
-        m_submeshes.back().setMaterialIndex(correspMaterial->second);
+          std::cerr << "Error: No corresponding material found with the name '" << materialName << "'\n";
+        else
+          m_submeshes.back().setMaterialIndex(correspMaterial->second);
       }
     } else if (line[0] == 'o' || line[0] == 'g') {
       if (!posIndices.front().empty()) {
