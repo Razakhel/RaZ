@@ -128,12 +128,26 @@ int main() {
   });
 
   window.addMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
-    cameraComp.setFieldOfView(Raz::Degreesf(std::max(15.f,
-                                                     std::min(90.f, (Raz::Degreesf(cameraComp.getFieldOfView()) + static_cast<float>(-yOffset) * 2.f).value))));
+    const float newFovDeg = std::clamp(Raz::Degreesf(cameraComp.getFieldOfView()).value + static_cast<float>(-yOffset) * 2.f, 15.f, 90.f);
+    cameraComp.setFieldOfView(Raz::Degreesf(newFovDeg));
   });
 
-  window.addMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
-    // Dividing move by window size to scale between -1 and 1
+  // The camera can be rotated while holding the mouse right click
+  bool isRightClicking = false;
+
+  window.addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&isRightClicking, &window] (float /* deltaTime */) {
+    isRightClicking = true;
+    window.disableCursor();
+  }, Raz::Input::ONCE, [&isRightClicking, &window] () {
+    isRightClicking = false;
+    window.showCursor();
+  });
+
+  window.addMouseMoveCallback([&isRightClicking, &cameraTrans, &window] (double xMove, double yMove) {
+    if (!isRightClicking)
+      return;
+
+    // Dividing movement by the window's size to scale between -1 and 1
     cameraTrans.rotate(-90_deg * static_cast<float>(yMove) / window.getHeight(),
                        -90_deg * static_cast<float>(xMove) / window.getWidth());
   });
@@ -203,23 +217,13 @@ int main() {
     renderSystem.updateLights();
   });
 
-  window.addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&world, &cameraTrans] (float /* deltaTime */) {
+  window.addMouseButtonCallback(Raz::Mouse::MIDDLE_CLICK, [&world, &cameraTrans] (float /* deltaTime */) {
     auto& newLight = world.addEntityWithComponent<Raz::Light>(Raz::LightType::POINT, // Type (point light)
                                                               10.f);                 // Energy
     newLight.addComponent<Raz::Transform>(cameraTrans.getPosition());
   }, Raz::Input::ONCE);
 
   window.addKeyCallback(Raz::Keyboard::F5, [&renderSystem] (float /* deltaTime */) { renderSystem.updateShaders(); });
-
-  /////////////////////
-  // Mouse callbacks //
-  /////////////////////
-
-  window.disableCursor(); // Disabling mouse cursor to allow continuous rotations
-  window.addKeyCallback(Raz::Keyboard::LEFT_ALT,
-                        [&window] (float /* deltaTime */) { window.showCursor(); },
-                        Raz::Input::ONCE,
-                        [&window] () { window.disableCursor(); });
 
   /////////////
   // Overlay //
