@@ -47,7 +47,6 @@ int main() {
 
   Raz::Entity& floor = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, -5.f, 0.f));
   auto& floorMesh    = floor.addComponent<Raz::Mesh>(Raz::Plane(0.f), 10.f, 10.f);
-  floorMesh.setMaterial(Raz::MaterialCookTorrance::create(Raz::Texture::create(Raz::ColorPreset::WHITE, 0))); // Setting a white texture
   floor.addComponent<Raz::Collider>(Raz::Plane(0.f));
 
   Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();

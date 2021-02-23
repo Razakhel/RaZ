@@ -21,8 +21,8 @@ enum class SphereMeshType {
 
 class Mesh final : public Component {
 public:
-  Mesh() : m_submeshes(1) {}
-  explicit Mesh(const FilePath& filePath) : Mesh() { import(filePath); }
+  Mesh() : m_submeshes(1) { m_materials.emplace_back(MaterialCookTorrance::create()); }
+  explicit Mesh(const FilePath& filePath) { import(filePath); }
   Mesh(const Plane& plane, float width, float depth, RenderMode renderMode = RenderMode::TRIANGLE);
   /// Creates a mesh from a Sphere.
   /// \param sphere Sphere to create the mesh with.
