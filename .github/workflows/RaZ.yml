@@ -24,12 +24,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # Defining the timezone to Europe/Paris, which is required by apt (Ubuntu 20.04):
-    #   sudo ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone
     # Installing the needed packages:
     #   - GLEW & X11 as graphical dependencies
     #   - Lcov to output code coverage
-    #   - Doxygen & Dot to generate the documentation (python3-* from Ubuntu 20.04 onwards)
+    #   - Doxygen & Dot to generate the documentation
     #   - OpenAL-soft to handle the audio part
     #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
     - name: Packages installation
@@ -37,7 +35,7 @@ jobs:
         sudo apt install -y --no-install-recommends \
           libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
           lcov \
-          doxygen python-pydot python-pydot-ng \
+          doxygen python3-pydot python3-pydot-ng \
           libopenal-dev \
           xvfb
 
@@ -244,8 +242,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Defining the timezone to Europe/Paris, which is required by apt (Ubuntu 20.04):
-      #   sudo ln -snf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo Europe/Paris > /etc/timezone
       # Updating packages' repo & installing only the needed packages:
       #   - GL & X11 as needed graphical dependencies
       #   - OpenAL-soft to handle the audio part
