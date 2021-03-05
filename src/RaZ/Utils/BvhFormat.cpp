@@ -84,19 +84,7 @@ void loadJoint(std::ifstream& file, std::unordered_map<std::string, SkeletonJoin
   }
 }
 
-} // namespace
-
-void BvhFormat::import(const FilePath& filePath) {
-  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
-
-  if (!file)
-    throw std::invalid_argument("Error: Couldn't open the BVH file '" + filePath + "'");
-
-  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
-
-  if (format != "bvh")
-    throw std::invalid_argument("Error: '" + filePath + "' doesn't have a .bvh extension");
-
+void loadSkeleton(std::ifstream& file, Skeleton& skeleton) {
   std::string token;
 
   file >> token;
@@ -139,8 +127,95 @@ void BvhFormat::import(const FilePath& filePath) {
 
   loadJoint(file, joints, skeleton, rootJoint);
   std::getline(file, token); // Root joint's closing scope
+}
 
-  // TODO: import animation
+void loadAnimation(std::ifstream& file, Animation& animation, std::size_t jointCount) {
+  std::string token;
+
+  file >> token;
+  if (token != "MOTION")
+    throw std::invalid_argument("Error: Invalid BVH animation declaration");
+
+  file >> token;
+  if (token != "Frames:")
+    throw std::invalid_argument("Error: Invalid BVH animation frame count declaration");
+
+  file >> token;
+  const int frameCount = std::stoi(token);
+  if (frameCount <= 0)
+    throw std::invalid_argument("Error: Invalid BVH animation frame count");
+  std::getline(file, token);
+
+  std::getline(file, token, ':');
+  if (token != "Frame Time")
+    throw std::invalid_argument("Error: Invalid BVH animation frame time declaration");
+  file.ignore(1);
+
+  file >> token;
+  const float frameTime = std::stof(token);
+  if (frameTime <= 0.f)
+    throw std::invalid_argument("Error: Invalid BVH animation frame time");
+  std::getline(file, token);
+
+  for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+    Keyframe& keyframe = animation.addKeyframe();
+    keyframe.setKeyTime(frameTime);
+
+    // Loading the root transform
+    {
+      Vec3f rootPosition;
+
+      file >> token;
+      rootPosition.x() = std::stof(token);
+
+      file >> token;
+      rootPosition.y() = std::stof(token);
+
+      file >> token;
+      rootPosition.z() = std::stof(token);
+
+      file >> token;
+      Quaternionf rootRotation(Degreesf(std::stof(token)), Axis::Z);
+
+      file >> token;
+      rootRotation *= Quaternionf(Degreesf(std::stof(token)), Axis::X);
+
+      file >> token;
+      rootRotation *= Quaternionf(Degreesf(std::stof(token)), Axis::Y);
+
+      keyframe.addJointTransform(rootRotation, rootPosition);
+    }
+
+    for (std::size_t transformIndex = 1; transformIndex < jointCount; ++transformIndex) {
+      file >> token;
+      Quaternionf rotation(Degreesf(std::stof(token)), Axis::Z);
+
+      file >> token;
+      rotation = Quaternionf(Degreesf(std::stof(token)), Axis::X) * rotation;
+
+      file >> token;
+      rotation = Quaternionf(Degreesf(std::stof(token)), Axis::Y) * rotation;
+
+      keyframe.addJointTransform(rotation);
+    }
+  }
+}
+
+} // namespace
+
+void BvhFormat::import(const FilePath& filePath) {
+  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+
+  if (!file)
+    throw std::invalid_argument("Error: Couldn't open the BVH file '" + filePath + "'");
+
+  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
+
+  if (format != "bvh")
+    throw std::invalid_argument("Error: '" + filePath + "' doesn't have a .bvh extension");
+
+  loadSkeleton(file, skeleton);
+  loadAnimation(file, animation, skeleton.getNodeCount());
 }
 
 } // namespace Raz

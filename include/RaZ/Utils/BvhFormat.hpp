@@ -3,6 +3,7 @@
 #ifndef RAZ_BVHFORMAT_HPP
 #define RAZ_BVHFORMAT_HPP
 
+#include "RaZ/Animation/Animation.hpp"
 #include "RaZ/Animation/Skeleton.hpp"
 
 #include <vector>
@@ -18,6 +19,7 @@ public:
   void import(const FilePath& filePath);
 
   Skeleton skeleton {};
+  Animation animation {};
 };
 
 } // namespace Raz
