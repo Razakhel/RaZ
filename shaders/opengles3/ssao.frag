@@ -25,7 +25,7 @@ uniform Buffers uniSceneBuffers;
 layout(location = 0) out vec4 fragColor;
 
 const uint ssaoCount    = 32u;
-const float goldenRatio = (2.236f + 1.0f) / 2.0f;
+const float goldenRatio = (2.236 + 1.0) / 2.0;
 
 #define PI 3.1415926535897932384626433832795
 
@@ -43,20 +43,20 @@ float copysign(float a, float b) {
 }
 
 void buildOrthoBase(vec3 normal, out vec3 xAxis, out vec3 zAxis) {
-  float sign = copysign(1.0f, normal.z);
-  float a    = -1.0f / (sign + normal.z);
+  float sign = copysign(1.0, normal.z);
+  float a    = -1.0 / (sign + normal.z);
   float b    = normal.x * normal.y * a;
 
-  xAxis = vec3(1.0f + sign * normal.x * normal.x * a, sign * b, -sign * normal.x);
+  xAxis = vec3(1.0 + sign * normal.x * normal.x * a, sign * b, -sign * normal.x);
   zAxis = vec3(b, sign + normal.y * normal.y * a, -normal.y);
 }
 
 vec3 computeFiboDir(vec3 normal, uint raySample) {
-  float cosTheta = 1.0f - ((2.0f * raySample + 1.0f) / (2.0f * ssaoCount));
-  float sinTheta = sqrt(1.0f - (cosTheta * cosTheta));
+  float cosTheta = 1.0 - ((2.0 * float(raySample) + 1.0) / (2.0 * float(ssaoCount)));
+  float sinTheta = sqrt(1.0 - (cosTheta * cosTheta));
 
-  float rand = (raySample + rand(normal.xz)) / goldenRatio;
-  float phi  = 2.0f * PI * (rand - floor(rand));
+  float randVal = (raySample + rand(normal.xz)) / goldenRatio;
+  float phi     = 2.0 * PI * (randVal - floor(randVal));
 
   vec3 direction = vec3(cos(phi) * sinTheta, cosTheta, sin(phi) * sinTheta);
 
@@ -67,26 +67,25 @@ vec3 computeFiboDir(vec3 normal, uint raySample) {
 }
 
 float computeSsaoFactor(vec3 viewPos, vec3 worldNormal, float depth) {
-  vec3 rayOrig = viewPos + 0.0001f * worldNormal;
-  float nbHits = 0.0f;
+  vec3 rayOrig   = viewPos + worldNormal * 0.0001;
+  float hitCount = 0.0;
 
   for (uint raySample = 0u; raySample < ssaoCount; ++raySample) {
-    vec3 rayDir  = computeFiboDir(worldNormal, raySample);
-    float rand   = rand(viewPos.xy * raySample) * 50;
-    vec3 rayStep = rayOrig + rand * rayDir;
+    vec3 rayDir   = computeFiboDir(worldNormal, raySample);
+    float randVal = rand(viewPos.xy * raySample) * 50;
+    vec3 rayStep  = rayOrig + randVal * rayDir;
 
     vec4 projCoords = projectionMat * vec4(rayStep, 1.0);
     projCoords     /= projCoords.w;
 
-    vec2 hitCoords  = projCoords.xy * 0.5 + 0.5;
-    float hitDepth  = texture(uniSceneBuffers.depth, hitCoords).r;
+    vec2 hitCoords = projCoords.xy * 0.5 + 0.5;
+    float hitDepth = texture(uniSceneBuffers.depth, hitCoords).r;
 
     if (hitDepth > depth)
-      ++nbHits;
+      ++hitCount;
   }
 
-  float coeff = nbHits / ssaoCount;
-
+  float coeff = hitCount / ssaoCount;
   return clamp(pow(coeff, 0.5), 0, 1);
 }
 

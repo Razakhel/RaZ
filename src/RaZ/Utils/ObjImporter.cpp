@@ -37,9 +37,6 @@ inline void importMtl(const FilePath& mtlFilePath,
   auto blinnPhongMaterial   = MaterialBlinnPhong::create();
   auto cookTorranceMaterial = MaterialCookTorrance::create();
 
-  bool isBlinnPhongMaterial   = false;
-  bool isCookTorranceMaterial = false;
-
   auto addLocalMaterial = [&blinnPhongMaterial, &cookTorranceMaterial, &materials] (bool isCookTorrance) {
     if (isCookTorrance) {
       cookTorranceMaterial->getAlbedoMap()->setBindingIndex(0);
@@ -61,101 +58,105 @@ inline void importMtl(const FilePath& mtlFilePath,
     }
   };
 
-  if (file) {
-    while (!file.eof()) {
-      std::string tag;
-      std::string nextValue;
-      file >> tag >> nextValue;
-
-      if (tag[0] == 'K') { // Assign properties
-        std::string secondValue;
-        std::string thirdValue;
-        file >> secondValue >> thirdValue;
-
-        const float red   = std::stof(nextValue);
-        const float green = std::stof(secondValue);
-        const float blue  = std::stof(thirdValue);
-
-        if (tag[1] == 'a') {                           // Ambient/ambient occlusion factor [Ka]
-          blinnPhongMaterial->setAmbient(red, green, blue);
-        } else if (tag[1] == 'd') {                    // Diffuse/albedo factor [Kd]
-          blinnPhongMaterial->setDiffuse(red, green, blue);
-        } else if (tag[1] == 's') {                    // Specular factor [Ks]
-          blinnPhongMaterial->setSpecular(red, green, blue);
-        } else if (tag[1] == 'e') {                    // Emissive factor [Ke]
-          blinnPhongMaterial->setEmissive(red, green, blue);
-        }
-
-        isBlinnPhongMaterial = true;
-      } else if (tag[0] == 'm') {                      // Import texture
-        const TexturePtr map = loadTexture(mtlFilePath, nextValue);
-
-        if (tag[4] == 'K') {                           // Standard maps
-          if (tag[5] == 'd') {                         // Diffuse/albedo map [map_Kd]
-            blinnPhongMaterial->setDiffuseMap(map);
-            cookTorranceMaterial->setAlbedoMap(map);
-          } else if (tag[5] == 'a') {                  // Ambient/ambient occlusion map [map_Ka]
-            blinnPhongMaterial->setAmbientMap(map);
-            cookTorranceMaterial->setAmbientOcclusionMap(map);
-          } else if (tag[5] == 's') {                   // Specular map [map_Ks]
-            blinnPhongMaterial->setSpecularMap(map);
-            isBlinnPhongMaterial = true;
-          } else if (tag[5] == 'e') {                  // Emissive map [map_Ke]
-            blinnPhongMaterial->setEmissiveMap(map);
-          }
-        }  else if (tag[4] == 'P') {                   // PBR maps
-          if (tag[5] == 'm') {                         // Metallic map [map_Pm]
-            cookTorranceMaterial->setMetallicMap(map);
-          } else if (tag[5] == 'r') {                  // Roughness map [map_Pr]
-            cookTorranceMaterial->setRoughnessMap(map);
-          }
-
-          isCookTorranceMaterial = true;
-        } else if (tag[4] == 'd') {                    // Transparency map [map_d]
-          blinnPhongMaterial->setTransparencyMap(map);
-          isBlinnPhongMaterial = true;
-        } else if (tag[4] == 'b') {                    // Bump map [map_bump]
-          blinnPhongMaterial->setBumpMap(map);
-          isBlinnPhongMaterial = true;
-        }
-      } else if (tag[0] == 'd') {                      // Transparency factor
-        blinnPhongMaterial->setTransparency(std::stof(nextValue));
-        isBlinnPhongMaterial = true;
-      } else if (tag[0] == 'T') {
-        if (tag[1] == 'r') {                           // Transparency factor (alias, 1 - d) [Tr]
-          blinnPhongMaterial->setTransparency(1.f - std::stof(nextValue));
-          isBlinnPhongMaterial = true;
-        }/* else if (line[1] == 'f') {                 // Transmission filter [Tf]
-
-          isBlinnPhongMaterial = true;
-        }*/
-      }  else if (tag[0] == 'b') {                     // Bump map (alias) [bump]
-        blinnPhongMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue, 5));
-        isBlinnPhongMaterial = true;
-      } else if (tag[0] == 'n') {
-        if (tag[1] == 'o') {                           // Normal map [norm]
-          cookTorranceMaterial->setNormalMap(loadTexture(mtlFilePath, nextValue, 1));
-        } else if (tag[1] == 'e') {                    // New material [newmtl]
-          materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
-
-          if (!isBlinnPhongMaterial && !isCookTorranceMaterial)
-            continue;
-
-          addLocalMaterial(isCookTorranceMaterial);
-
-          blinnPhongMaterial   = MaterialBlinnPhong::create();
-          cookTorranceMaterial = MaterialCookTorrance::create();
-
-          isBlinnPhongMaterial   = false;
-          isCookTorranceMaterial = false;
-        }
-      } else {
-        std::getline(file, tag); // Skip the rest of the line
-      }
-    }
-  } else {
+  if (!file) {
     std::cerr << "Error: Couldn't open the material file '" << mtlFilePath << "'\n";
-    isCookTorranceMaterial = true;
+    addLocalMaterial(true);
+    return;
+  }
+
+  bool isBlinnPhongMaterial   = false;
+  bool isCookTorranceMaterial = false;
+
+  while (!file.eof()) {
+    std::string tag;
+    std::string nextValue;
+    file >> tag >> nextValue;
+
+    if (tag[0] == 'K') { // Assign properties
+      std::string secondValue;
+      std::string thirdValue;
+      file >> secondValue >> thirdValue;
+
+      const float red   = std::stof(nextValue);
+      const float green = std::stof(secondValue);
+      const float blue  = std::stof(thirdValue);
+
+      if (tag[1] == 'a') {                           // Ambient/ambient occlusion factor [Ka]
+        blinnPhongMaterial->setAmbient(red, green, blue);
+      } else if (tag[1] == 'd') {                    // Diffuse/albedo factor [Kd]
+        blinnPhongMaterial->setDiffuse(red, green, blue);
+      } else if (tag[1] == 's') {                    // Specular factor [Ks]
+        blinnPhongMaterial->setSpecular(red, green, blue);
+      } else if (tag[1] == 'e') {                    // Emissive factor [Ke]
+        blinnPhongMaterial->setEmissive(red, green, blue);
+      }
+
+      isBlinnPhongMaterial = true;
+    } else if (tag[0] == 'm') {                      // Import texture
+      const TexturePtr map = loadTexture(mtlFilePath, nextValue);
+
+      if (tag[4] == 'K') {                           // Standard maps
+        if (tag[5] == 'd') {                         // Diffuse/albedo map [map_Kd]
+          blinnPhongMaterial->setDiffuseMap(map);
+          cookTorranceMaterial->setAlbedoMap(map);
+        } else if (tag[5] == 'a') {                  // Ambient/ambient occlusion map [map_Ka]
+          blinnPhongMaterial->setAmbientMap(map);
+          cookTorranceMaterial->setAmbientOcclusionMap(map);
+        } else if (tag[5] == 's') {                   // Specular map [map_Ks]
+          blinnPhongMaterial->setSpecularMap(map);
+          isBlinnPhongMaterial = true;
+        } else if (tag[5] == 'e') {                  // Emissive map [map_Ke]
+          blinnPhongMaterial->setEmissiveMap(map);
+        }
+      }  else if (tag[4] == 'P') {                   // PBR maps
+        if (tag[5] == 'm') {                         // Metallic map [map_Pm]
+          cookTorranceMaterial->setMetallicMap(map);
+        } else if (tag[5] == 'r') {                  // Roughness map [map_Pr]
+          cookTorranceMaterial->setRoughnessMap(map);
+        }
+
+        isCookTorranceMaterial = true;
+      } else if (tag[4] == 'd') {                    // Transparency map [map_d]
+        blinnPhongMaterial->setTransparencyMap(map);
+        isBlinnPhongMaterial = true;
+      } else if (tag[4] == 'b') {                    // Bump map [map_bump]
+        blinnPhongMaterial->setBumpMap(map);
+        isBlinnPhongMaterial = true;
+      }
+    } else if (tag[0] == 'd') {                      // Transparency factor
+      blinnPhongMaterial->setTransparency(std::stof(nextValue));
+      isBlinnPhongMaterial = true;
+    } else if (tag[0] == 'T') {
+      if (tag[1] == 'r') {                           // Transparency factor (alias, 1 - d) [Tr]
+        blinnPhongMaterial->setTransparency(1.f - std::stof(nextValue));
+        isBlinnPhongMaterial = true;
+      }/* else if (line[1] == 'f') {                 // Transmission filter [Tf]
+
+        isBlinnPhongMaterial = true;
+      }*/
+    }  else if (tag[0] == 'b') {                     // Bump map (alias) [bump]
+      blinnPhongMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue, 5));
+      isBlinnPhongMaterial = true;
+    } else if (tag[0] == 'n') {
+      if (tag[1] == 'o') {                           // Normal map [norm]
+        cookTorranceMaterial->setNormalMap(loadTexture(mtlFilePath, nextValue, 1));
+      } else if (tag[1] == 'e') {                    // New material [newmtl]
+        materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
+
+        if (!isBlinnPhongMaterial && !isCookTorranceMaterial)
+          continue;
+
+        addLocalMaterial(isCookTorranceMaterial);
+
+        blinnPhongMaterial   = MaterialBlinnPhong::create();
+        cookTorranceMaterial = MaterialCookTorrance::create();
+
+        isBlinnPhongMaterial   = false;
+        isCookTorranceMaterial = false;
+      }
+    } else {
+      std::getline(file, tag); // Skip the rest of the line
+    }
   }
 
   addLocalMaterial(isCookTorranceMaterial);
@@ -206,7 +207,7 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
     } else if (line[0] == 'f') { // Faces
       std::getline(file, line);
 
-      const char delim      = '/';
+      constexpr char delim  = '/';
       const auto nbVertices = static_cast<uint16_t>(std::count(line.cbegin(), line.cend(), ' '));
       const auto nbParts    = static_cast<uint8_t>(std::count(line.cbegin(), line.cend(), delim) / nbVertices + 1);
       const bool quadFaces  = (nbVertices == 4);
@@ -262,20 +263,20 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
       file >> mtlFileName;
 
       const std::string mtlFilePath = filePath.recoverPathToFile() + mtlFileName;
-
       importMtl(mtlFilePath, m_materials, materialCorrespIndices);
     } else if (line[0] == 'u') { // Material usage (usemtl)
-      if (!materialCorrespIndices.empty()) {
-        std::string materialName;
-        file >> materialName;
+      if (materialCorrespIndices.empty())
+        continue;
 
-        const auto correspMaterial = materialCorrespIndices.find(materialName);
+      std::string materialName;
+      file >> materialName;
 
-        if (correspMaterial == materialCorrespIndices.cend())
-          std::cerr << "Error: No corresponding material found with the name '" << materialName << "'\n";
-        else
-          m_submeshes.back().setMaterialIndex(correspMaterial->second);
-      }
+      const auto correspMaterial = materialCorrespIndices.find(materialName);
+
+      if (correspMaterial == materialCorrespIndices.cend())
+        std::cerr << "Error: No corresponding material found with the name '" << materialName << "'\n";
+      else
+        m_submeshes.back().setMaterialIndex(correspMaterial->second);
     } else if (line[0] == 'o' || line[0] == 'g') {
       if (!posIndices.front().empty()) {
         const std::size_t newSize = posIndices.size() + 1;

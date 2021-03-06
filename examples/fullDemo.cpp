@@ -39,6 +39,25 @@ int main() {
   // Allowing to quit the application with the Escape key
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
 
+  ///////////////
+  // Blur pass //
+  ///////////////
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
+
+  const Raz::Texture& depthBuffer = renderGraph.addTextureBuffer(window.getWidth(), window.getHeight(), 0, Raz::ImageColorspace::DEPTH);
+  const Raz::Texture& colorBuffer = renderGraph.addTextureBuffer(window.getWidth(), window.getHeight(), 1, Raz::ImageColorspace::RGBA);
+  geometryPass.addWriteTexture(depthBuffer); // A depth buffer is always needed
+  geometryPass.addWriteTexture(colorBuffer);
+
+  Raz::RenderPass& blurPass = renderGraph.addNode(Raz::FragmentShader(RAZ_ROOT + "shaders/blur.frag"s));
+  blurPass.addReadTexture(colorBuffer, "uniBuffer");
+  blurPass.getProgram().sendUniform("uniKernelSize", 1); // Neutralizing the blur at first
+
+  geometryPass.addChildren(blurPass);
+#endif
+
   ///////////////////
   // Camera entity //
   ///////////////////
@@ -250,6 +269,11 @@ int main() {
   window.addOverlaySeparator();
 
   window.addOverlaySlider("Sound volume", [&meshSound] (float value) { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  window.addOverlaySlider("Blur strength",
+                          [&blurPass] (float value) { blurPass.getProgram().sendUniform("uniKernelSize", static_cast<int>(value)); },
+                          1.f, 16.f, 1.f);
+#endif
 
   window.addOverlaySeparator();
 

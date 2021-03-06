@@ -1,8 +1,8 @@
 project(RaZ_Tests)
 
-#######################
-# RaZ Tests - Library #
-#######################
+##########################
+# RaZ Tests - Executable #
+##########################
 
 add_executable(RaZ_Tests)
 
@@ -25,7 +25,7 @@ if (RAZ_COMPILER_CLANG)
     set(
         RAZ_TESTS_COMPILER_FLAGS
 
-        ${RAZ_COMPILER_FLAGS}
+        ${RAZ_TESTS_COMPILER_FLAGS}
         -Wno-double-promotion # [long] double/float operations are voluntarily made
         -Wno-float-equal # Floating-point strict equality checks are voluntarily made
         -Wno-header-hygiene # The namespace std::literals is imported in the Catch.hpp custom header
