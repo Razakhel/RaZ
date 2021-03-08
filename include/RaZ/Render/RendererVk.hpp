@@ -460,24 +460,20 @@ public:
                                PipelineStage srcStage,
                                PipelineStage dstStage,
                                MemoryAccess srcAccess,
-                               MemoryAccess dstAccess,
-                               VkDevice logicalDevice);
+                               MemoryAccess dstAccess);
   static void createDescriptorSetLayout(VkDescriptorSetLayout& descriptorSetLayout,
-                                        std::initializer_list<VkDescriptorSetLayoutBinding> layoutBindings,
-                                        VkDevice logicalDevice);
-  static void createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr, VkDevice logicalDevice);
-  static void destroyShaderModule(VkShaderModule shaderModule, VkDevice logicalDevice);
+                                        std::initializer_list<VkDescriptorSetLayoutBinding> layoutBindings);
+  static void createShaderModule(VkShaderModule& shaderModule, std::size_t shaderCodeSize, const char* shaderCodeStr);
+  static void destroyShaderModule(VkShaderModule shaderModule);
   static void createPipelineLayout(VkPipelineLayout& pipelineLayout,
                                    uint32_t descriptorSetLayoutCount,
                                    const VkDescriptorSetLayout* descriptorSetLayouts,
                                    uint32_t pushConstantRangeCount,
-                                   const VkPushConstantRange* pushConstantRanges,
-                                   VkDevice logicalDevice);
+                                   const VkPushConstantRange* pushConstantRanges);
   static void createPipelineLayout(VkPipelineLayout& pipelineLayout,
                                    std::initializer_list<VkDescriptorSetLayout> descriptorSetLayouts,
-                                   std::initializer_list<VkPushConstantRange> pushConstantRanges,
-                                   VkDevice logicalDevice);
-  static void createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex, VkDevice logicalDevice);
+                                   std::initializer_list<VkPushConstantRange> pushConstantRanges);
+  static void createCommandPool(VkCommandPool& commandPool, CommandPoolOption options, uint32_t queueFamilyIndex);
   static void createImage(VkImage& image,
                           VkDeviceMemory& imageMemory,
                           ImageType imgType,
@@ -490,10 +486,8 @@ public:
                           ImageTiling imgTiling,
                           ImageUsage imgUsage,
                           SharingMode sharingMode,
-                          ImageLayout initialLayout,
-                          VkPhysicalDevice physicalDevice,
-                          VkDevice logicalDevice);
-  static void destroyImage(VkImage image, VkDeviceMemory imageMemory, VkDevice logicalDevice);
+                          ImageLayout initialLayout);
+  static void destroyImage(VkImage image, VkDeviceMemory imageMemory);
   static void createImageView(VkImageView& imageView,
                               VkImage image,
                               ImageViewType imageViewType,
@@ -506,9 +500,8 @@ public:
                               uint32_t firstMipLevel,
                               uint32_t mipLevelCount,
                               uint32_t firstArrayLayer,
-                              uint32_t arrayLayerCount,
-                              VkDevice logicalDevice);
-  static void destroyImageView(VkImageView imageView, VkDevice logicalDevice);
+                              uint32_t arrayLayerCount);
+  static void destroyImageView(VkImageView imageView);
   static void createSampler(VkSampler& sampler,
                             TextureFilter magnifyFilter,
                             TextureFilter minifyFilter,
@@ -524,31 +517,25 @@ public:
                             float mipmapMinLod,
                             float mipmapMaxLod,
                             BorderColor borderColor,
-                            bool unnormalizedCoordinates,
-                            VkDevice logicalDevice);
-  static void destroySampler(VkSampler sampler, VkDevice logicalDevice);
+                            bool unnormalizedCoordinates);
+  static void destroySampler(VkSampler sampler);
   static void createBuffer(VkBuffer& buffer,
                            VkDeviceMemory& bufferMemory,
                            BufferUsage usageFlags,
                            MemoryProperty propertyFlags,
-                           std::size_t bufferSize,
-                           VkPhysicalDevice physicalDevice,
-                           VkDevice logicalDevice);
+                           std::size_t bufferSize);
   static void createStagedBuffer(VkBuffer& buffer,
                                  VkDeviceMemory& bufferMemory,
                                  BufferUsage bufferType,
                                  const void* bufferData,
                                  std::size_t bufferSize,
-                                 VkPhysicalDevice physicalDevice,
-                                 VkDevice logicalDevice,
                                  VkQueue queue,
                                  VkCommandPool commandPool);
   static void copyBuffer(VkBuffer srcBuffer,
                          VkBuffer dstBuffer,
                          VkDeviceSize bufferSize,
                          VkCommandPool commandPool,
-                         VkQueue queue,
-                         VkDevice logicalDevice);
+                         VkQueue queue);
   static void copyBuffer(VkBuffer srcBuffer,
                          VkImage dstImage,
                          ImageAspect imgAspect,
@@ -557,19 +544,16 @@ public:
                          uint32_t imgDepth,
                          ImageLayout imgLayout,
                          VkCommandPool commandPool,
-                         VkQueue queue,
-                         VkDevice logicalDevice);
-  static void destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory, VkDevice logicalDevice);
+                         VkQueue queue);
+  static void destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory);
   static void beginCommandBuffer(VkCommandBuffer& commandBuffer,
                                  VkCommandPool commandPool,
                                  CommandBufferLevel commandBufferLevel,
-                                 CommandBufferUsage commandBufferUsage,
-                                 VkDevice logicalDevice);
-  static void endCommandBuffer(VkCommandBuffer& commandBuffer, VkQueue queue, VkCommandPool commandPool, VkDevice logicalDevice);
+                                 CommandBufferUsage commandBufferUsage);
+  static void endCommandBuffer(VkCommandBuffer& commandBuffer, VkQueue queue, VkCommandPool commandPool);
   static void createDescriptorPool(VkDescriptorPool& descriptorPool,
                                    uint32_t maxSetCount,
-                                   std::initializer_list<VkDescriptorPoolSize> poolSizes,
-                                   VkDevice logicalDevice);
+                                   std::initializer_list<VkDescriptorPoolSize> poolSizes);
 
   static void recreateSwapchain();
   static void drawFrame();
@@ -648,13 +632,13 @@ private:
 
   static inline bool s_isInitialized = false;
 
-  static inline VkInstance m_instance {};
-  static inline VkSurfaceKHR m_surface {};
-  static inline GLFWwindow* m_windowHandle {};
-  static inline VkPhysicalDevice m_physicalDevice {};
-  static inline VkDevice m_logicalDevice {};
-  static inline VkQueue m_graphicsQueue {};
-  static inline VkQueue m_presentQueue {};
+  static inline VkInstance s_instance {};
+  static inline VkSurfaceKHR s_surface {};
+  static inline GLFWwindow* s_windowHandle {};
+  static inline VkPhysicalDevice s_physicalDevice {};
+  static inline VkDevice s_logicalDevice {};
+  static inline VkQueue s_graphicsQueue {};
+  static inline VkQueue s_presentQueue {};
 
   static inline VkSwapchainKHR m_swapchain {};
   static inline std::vector<VkImage> m_swapchainImages {};
