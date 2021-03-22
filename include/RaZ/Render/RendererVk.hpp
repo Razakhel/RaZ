@@ -557,6 +557,7 @@ public:
 
   static void recreateSwapchain();
   static void drawFrame();
+  static void destroyRenderPass(VkRenderPass renderPass);
   /// Destroys the renderer, deallocating Vulkan resources.
   static void destroy();
 

@@ -654,16 +654,16 @@ void transitionImageLayout(VkImage image,
 
   if (oldLayout == ImageLayout::UNDEFINED && newLayout == ImageLayout::TRANSFER_DST) {
     barrier.srcAccessMask = 0;
-    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+    barrier.dstAccessMask = static_cast<VkAccessFlags>(MemoryAccess::TRANSFER_WRITE);
 
-    srcStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
-    dstStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    srcStage = static_cast<VkPipelineStageFlags>(PipelineStage::TOP_OF_PIPE);
+    dstStage = static_cast<VkPipelineStageFlags>(PipelineStage::TRANSFER);
   } else if (oldLayout == ImageLayout::TRANSFER_DST && newLayout == ImageLayout::SHADER_READ_ONLY) {
-    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    barrier.srcAccessMask = static_cast<VkAccessFlags>(MemoryAccess::TRANSFER_WRITE);
+    barrier.dstAccessMask = static_cast<VkAccessFlags>(MemoryAccess::SHADER_READ);
 
-    srcStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-    dstStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    srcStage = static_cast<VkPipelineStageFlags>(PipelineStage::TRANSFER);
+    dstStage = static_cast<VkPipelineStageFlags>(PipelineStage::FRAGMENT_SHADER);
   } else {
     throw std::invalid_argument("Error: Unsupported layout transition.");
   }
@@ -909,7 +909,7 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
   VkCommandBufferAllocateInfo allocInfo {};
   allocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
   allocInfo.commandPool        = commandPool;
-  allocInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  allocInfo.level              = static_cast<VkCommandBufferLevel>(CommandBufferLevel::PRIMARY);
   allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
   if (vkAllocateCommandBuffers(logicalDevice, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
@@ -937,13 +937,13 @@ inline void createCommandBuffers(std::vector<VkCommandBuffer>& commandBuffers,
 
     vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     {
-      vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+      vkCmdBindPipeline(commandBuffers[i], static_cast<VkPipelineBindPoint>(PipelineBindPoint::GRAPHICS), graphicsPipeline);
 
       const std::array<VkBuffer, 1> vertexBuffers = { vertexBuffer };
       const std::array<VkDeviceSize, 1> offsets = { 0 };
       vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers.data(), offsets.data());
       vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-      vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
+      vkCmdBindDescriptorSets(commandBuffers[i], static_cast<VkPipelineBindPoint>(PipelineBindPoint::GRAPHICS), pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 
       vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
     }
@@ -962,7 +962,7 @@ inline void destroySwapchain(const std::vector<VkFramebuffer>& swapchainFramebuf
                              const std::vector<VkDeviceMemory>& uniformBuffersMemory,
                              VkPipeline graphicsPipeline,
                              VkPipelineLayout pipelineLayout,
-                             VkRenderPass m_renderPass,
+                             VkRenderPass renderPass,
                              const std::vector<VkImageView>& swapchainImageViews,
                              VkSwapchainKHR swapchain,
                              VkDevice logicalDevice) {
@@ -978,7 +978,7 @@ inline void destroySwapchain(const std::vector<VkFramebuffer>& swapchainFramebuf
 
   vkDestroyPipeline(logicalDevice, graphicsPipeline, nullptr);
   vkDestroyPipelineLayout(logicalDevice, pipelineLayout, nullptr);
-  vkDestroyRenderPass(logicalDevice, m_renderPass, nullptr);
+  Renderer::destroyRenderPass(renderPass);
 
   for (VkImageView imageView : swapchainImageViews)
     Renderer::destroyImageView(imageView);
@@ -989,6 +989,8 @@ inline void destroySwapchain(const std::vector<VkFramebuffer>& swapchainFramebuf
 } // namespace
 
 void Renderer::initialize(GLFWwindow* windowHandle) {
+  // To dynamically load Vulkan, see: https://github.com/charles-lunarg/vk-bootstrap/blob/master/src/VkBootstrap.cpp
+
   // If already initialized, do nothing
   if (s_isInitialized)
     return;
@@ -1901,6 +1903,10 @@ void Renderer::drawFrame() {
   }
 
   m_currentFrameIndex = (m_currentFrameIndex + 1) % MaxFramesInFlight;
+}
+
+void Renderer::destroyRenderPass(VkRenderPass renderPass) {
+  vkDestroyRenderPass(s_logicalDevice, renderPass, nullptr);
 }
 
 void Renderer::destroy() {

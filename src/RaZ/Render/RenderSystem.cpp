@@ -148,6 +148,10 @@ void RenderSystem::destroy() {
   if (m_window)
     m_window->setShouldClose();
 #endif
+
+#if defined(RAZ_USE_VULKAN)
+  Renderer::destroy();
+#endif
 }
 
 void RenderSystem::linkEntity(const EntityPtr& entity) {
