@@ -475,13 +475,13 @@ inline void createGraphicsPipeline(VkPipeline& graphicsPipeline,
 
   VkPipelineShaderStageCreateInfo vertShaderStageInfo {};
   vertShaderStageInfo.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-  vertShaderStageInfo.stage  = VK_SHADER_STAGE_VERTEX_BIT;
+  vertShaderStageInfo.stage  = static_cast<VkShaderStageFlagBits>(ShaderStage::VERTEX);
   vertShaderStageInfo.module = vertShaderModule;
   vertShaderStageInfo.pName  = "main";
 
   VkPipelineShaderStageCreateInfo fragShaderStageInfo {};
   fragShaderStageInfo.sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-  fragShaderStageInfo.stage  = VK_SHADER_STAGE_FRAGMENT_BIT;
+  fragShaderStageInfo.stage  = static_cast<VkShaderStageFlagBits>(ShaderStage::FRAGMENT);
   fragShaderStageInfo.module = fragShaderModule;
   fragShaderStageInfo.pName  = "main";
 
@@ -525,7 +525,7 @@ inline void createGraphicsPipeline(VkPipeline& graphicsPipeline,
   rasterizer.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
   rasterizer.depthClampEnable        = VK_FALSE;
   rasterizer.rasterizerDiscardEnable = VK_FALSE;
-  rasterizer.polygonMode             = VK_POLYGON_MODE_FILL;
+  rasterizer.polygonMode             = static_cast<VkPolygonMode>(PolygonMode::FILL);
   rasterizer.lineWidth               = 1.f;
   rasterizer.cullMode                = static_cast<uint32_t>(CullingMode::BACK);
   rasterizer.frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE;
@@ -537,7 +537,7 @@ inline void createGraphicsPipeline(VkPipeline& graphicsPipeline,
   VkPipelineMultisampleStateCreateInfo multisampling {};
   multisampling.sType                 = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
   multisampling.sampleShadingEnable   = VK_FALSE;
-  multisampling.rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT;
+  multisampling.rasterizationSamples  = static_cast<VkSampleCountFlagBits>(SampleCount::ONE);
   multisampling.minSampleShading      = 1.f;
   multisampling.pSampleMask           = nullptr;
   multisampling.alphaToCoverageEnable = VK_FALSE;
@@ -967,7 +967,7 @@ inline void destroySwapchain(const std::vector<VkFramebuffer>& swapchainFramebuf
                              VkSwapchainKHR swapchain,
                              VkDevice logicalDevice) {
   for (VkFramebuffer framebuffer : swapchainFramebuffers)
-    vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
+    Renderer::destroyFramebuffer(framebuffer);
 
   vkFreeCommandBuffers(logicalDevice, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
@@ -1903,6 +1903,10 @@ void Renderer::drawFrame() {
   }
 
   m_currentFrameIndex = (m_currentFrameIndex + 1) % MaxFramesInFlight;
+}
+
+void Renderer::destroyFramebuffer(VkFramebuffer framebuffer) {
+  vkDestroyFramebuffer(s_logicalDevice, framebuffer, nullptr);
 }
 
 void Renderer::destroyRenderPass(VkRenderPass renderPass) {
