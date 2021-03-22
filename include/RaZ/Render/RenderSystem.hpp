@@ -78,6 +78,8 @@ public:
   void saveToImage(const FilePath& filePath, TextureFormat format = TextureFormat::RGB) const;
   void destroy() override;
 
+  ~RenderSystem() override { destroy(); }
+
 protected:
   void linkEntity(const EntityPtr& entity) override;
 
