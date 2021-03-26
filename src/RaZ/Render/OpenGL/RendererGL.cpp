@@ -1,5 +1,5 @@
 #include "GL/glew.h"
-#include "RaZ/Render/RendererGL.hpp"
+#include "RaZ/Render/OpenGL/RendererGL.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <algorithm>

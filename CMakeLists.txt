@@ -458,13 +458,13 @@ if (RAZ_USE_VULKAN)
             message(WARNING "[RaZ] Warning: GLSLC executable not found. To compile shaders into SPIR-V, please specify its path manually.")
         endif ()
 
-        # Removing GL-specific files
-        list(
-            REMOVE_ITEM
-            RAZ_FILES
+        # Adding Vulkan-specific files
+        file(
+            GLOB
+            RAZ_API_FILES
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/RendererGL.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/RendererGL.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/Vulkan/*
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/Vulkan/*
         )
     else ()
         # Neither method has found a match, send an error
@@ -473,15 +473,22 @@ if (RAZ_USE_VULKAN)
         message(SEND_ERROR "[RaZ] Error: Vulkan SDK not found, please specify its installation path manually.")
     endif ()
 else ()
-    # Removing Vk-specific files
-    list(
-        REMOVE_ITEM
-        RAZ_FILES
+    # Adding OpenGL-specific files
+    file(
+        GLOB
+        RAZ_API_FILES
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/RendererVk.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/RendererVk.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ/Render/OpenGL/*
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ/Render/OpenGL/*
     )
 endif ()
+
+list(
+    APPEND
+    RAZ_FILES
+
+    ${RAZ_API_FILES}
+)
 
 target_link_libraries(RaZ PRIVATE ${RAZ_LINKER_FLAGS})
 
