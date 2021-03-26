@@ -5,7 +5,7 @@
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
-#include "RaZ/Render/RendererVk.hpp"
+#include "RaZ/Render/Vulkan/RendererVk.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Image.hpp"
 
