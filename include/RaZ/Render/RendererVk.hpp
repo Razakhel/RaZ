@@ -545,6 +545,9 @@ public:
                          ImageLayout imgLayout,
                          VkCommandPool commandPool,
                          VkQueue queue);
+  static void copyMemory(VkDeviceMemory memory, uint64_t size, const void* data, uint64_t offset = 0);
+  template <typename T>
+  static void copyMemory(VkDeviceMemory memory, T&& data, uint64_t offset = 0) { copyMemory(memory, sizeof(T), &data, offset); }
   static void destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory);
   static void beginCommandBuffer(VkCommandBuffer& commandBuffer,
                                  VkCommandPool commandPool,

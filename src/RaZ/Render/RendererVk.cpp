@@ -686,8 +686,7 @@ inline void createTexture(VkImage& textureImage,
                           VkDeviceMemory& textureMemory,
                           const FilePath& texturePath,
                           VkCommandPool commandPool,
-                          VkQueue graphicsQueue,
-                          VkDevice logicalDevice) {
+                          VkQueue graphicsQueue) {
   const Image img(texturePath);
 
   uint8_t channelCount {};
@@ -722,10 +721,7 @@ inline void createTexture(VkImage& textureImage,
                          MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
                          imgSize);
 
-  void* data {};
-  vkMapMemory(logicalDevice, stagingBufferMemory, 0, imgSize, 0, &data);
-  std::memcpy(data, img.getDataPtr(), imgSize);
-  vkUnmapMemory(logicalDevice, stagingBufferMemory);
+  Renderer::copyMemory(stagingBufferMemory, imgSize, img.getDataPtr());
 
   Renderer::createImage(textureImage,
                         textureMemory,
@@ -866,9 +862,7 @@ inline void createDescriptorSets(std::vector<VkDescriptorSet>& descriptorSets,
 }
 
 inline void updateUniformBuffer(VkExtent2D swapchainExtent,
-                                uint32_t currentImageIndex,
-                                const std::vector<VkDeviceMemory>& uniformBuffersMemory,
-                                VkDevice logicalDevice) {
+                                VkDeviceMemory uniformBufferMemory) {
   static Transform transform {};
   static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -883,10 +877,7 @@ inline void updateUniformBuffer(VkExtent2D swapchainExtent,
   matrices.view       = camera.computeLookAt(Vec3f(0.f, 2.f, 2.f));
   matrices.projection = camera.computePerspectiveMatrix();
 
-  void* data {};
-  vkMapMemory(logicalDevice, uniformBuffersMemory[currentImageIndex], 0, sizeof(UniformMatrices), 0, &data);
-  std::memcpy(data, &matrices, sizeof(UniformMatrices));
-  vkUnmapMemory(logicalDevice, uniformBuffersMemory[currentImageIndex]);
+  Renderer::copyMemory(uniformBufferMemory, matrices);
 }
 
 /////////////////////
@@ -1219,7 +1210,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   // Texture //
   /////////////
 
-  createTexture(m_textureImage, m_textureMemory, RAZ_ROOT + "assets/textures/default.png"s, m_commandPool, s_graphicsQueue, s_logicalDevice);
+  createTexture(m_textureImage, m_textureMemory, RAZ_ROOT + "assets/textures/default.png"s, m_commandPool, s_graphicsQueue);
 
   Renderer::createImageView(m_textureImageView,
                             m_textureImage,
@@ -1597,7 +1588,7 @@ void Renderer::createBuffer(VkBuffer& buffer,
                             VkDeviceMemory& bufferMemory,
                             BufferUsage usageFlags,
                             MemoryProperty propertyFlags,
-                            std::size_t bufferSize) {
+                            uint64_t bufferSize) {
   VkBufferCreateInfo bufferInfo {};
   bufferInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
   bufferInfo.size        = bufferSize;
@@ -1637,10 +1628,7 @@ void Renderer::createStagedBuffer(VkBuffer& buffer,
                          MemoryProperty::HOST_VISIBLE | MemoryProperty::HOST_COHERENT,
                          bufferSize);
 
-  void* data {};
-  vkMapMemory(s_logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
-  std::memcpy(data, bufferData, bufferSize);
-  vkUnmapMemory(s_logicalDevice, stagingBufferMemory);
+  Renderer::copyMemory(stagingBufferMemory, bufferSize, bufferData);
 
   Renderer::createBuffer(buffer,
                          bufferMemory,
@@ -1708,6 +1696,13 @@ void Renderer::copyBuffer(VkBuffer srcBuffer,
                          &region);
 
   Renderer::endCommandBuffer(commandBuffer, queue, commandPool);
+}
+
+void Renderer::copyMemory(VkDeviceMemory memory, uint64_t size, const void* data, uint64_t offset) {
+  void* tmpData {};
+  vkMapMemory(s_logicalDevice, memory, offset, size, 0, &tmpData);
+  std::memcpy(tmpData, data, size);
+  vkUnmapMemory(s_logicalDevice, memory);
 }
 
 void Renderer::destroyBuffer(VkBuffer buffer, VkDeviceMemory bufferMemory) {
@@ -1855,7 +1850,7 @@ void Renderer::drawFrame() {
     throw std::runtime_error("Error: Failed to acquire a swapchain image.");
   }
 
-  updateUniformBuffer(m_swapchainExtent, imageIndex, m_uniformBuffersMemory, s_logicalDevice);
+  updateUniformBuffer(m_swapchainExtent, m_uniformBuffersMemory[imageIndex]);
 
   if (m_imagesInFlight[imageIndex] != nullptr)
     vkWaitForFences(s_logicalDevice, 1, &m_imagesInFlight[imageIndex], VK_TRUE, std::numeric_limits<uint64_t>::max());
@@ -1863,7 +1858,7 @@ void Renderer::drawFrame() {
   m_imagesInFlight[imageIndex] = m_inFlightFences[m_currentFrameIndex];
 
   const std::array<VkSemaphore, 1> waitSemaphores      = { m_imageAvailableSemaphores[m_currentFrameIndex] };
-  const std::array<VkPipelineStageFlags, 1> waitStages = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+  const std::array<VkPipelineStageFlags, 1> waitStages = { static_cast<VkPipelineStageFlags>(PipelineStage::COLOR_ATTACHMENT_OUTPUT) };
   const std::array<VkSemaphore, 1> signalSemaphores    = { m_renderFinishedSemaphores[m_currentFrameIndex] };
 
   VkSubmitInfo submitInfo {};
