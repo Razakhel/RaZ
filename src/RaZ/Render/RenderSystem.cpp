@@ -150,6 +150,7 @@ void RenderSystem::destroy() {
 #endif
 
 #if defined(RAZ_USE_VULKAN)
+  m_cameraUbo.destroy();
   Renderer::destroy();
 #endif
 }
