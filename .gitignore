@@ -36,15 +36,5 @@ RaZ_Tests
 # CLion folder
 .idea/
 
-# CMake Files
-*CMakeFiles*/
-CMakeCache.txt
-cmake_install.cmake
-# Generated test file
-CTestTestfile.cmake
-
-# Generates CMake Files
-Makefile
-
 # MacOS specific files
 .DS_Store
