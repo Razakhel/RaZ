@@ -20,10 +20,31 @@
 # Executables
 *.exe
 *.out
-*.app
+
+# Mac executables (they don't have a .app extension anymore)
+RaZ_DeferredDemo
+RaZ_FullDemo
+RaZ_MinDemo
+RaZ_PhysicsDemo
+RaZ_ShowcaseDemo
+RaZ_SoundDemo
+RaZ_Tests
 
 # Build folders
 *build*/
 
 # CLion folder
 .idea/
+
+# CMake Files
+*CMakeFiles*/
+CMakeCache.txt
+cmake_install.cmake
+# Generated test file
+CTestTestfile.cmake
+
+# Generates CMake Files
+Makefile
+
+# MacOS specific files
+.DS_Store
