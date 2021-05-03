@@ -13,6 +13,8 @@
 
 namespace Raz {
 
+class Application;
+
 class Window;
 using WindowPtr = std::unique_ptr<Window>;
 
@@ -74,6 +76,10 @@ public:
 
   template <typename... Args>
   static WindowPtr create(Args&&... args) { return std::make_unique<Window>(std::forward<Args>(args)...); }
+
+  // Attaches the window to an application.
+  /// \param app The application to attach to the window
+  void attachToApplication(Application* app);
 
   /// Resizes the window.
   /// \param width New window width.
@@ -202,6 +208,7 @@ private:
 
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
+  Application* m_attached_application = nullptr;
 
 #if defined(RAZ_USE_OVERLAY)
   OverlayPtr m_overlay {};

@@ -7,6 +7,7 @@
 #include "GLFW/glfw3.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Window.hpp"
+#include "RaZ/Application.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten/html5.h>
@@ -103,6 +104,15 @@ void Window::enableFaceCulling(bool value) const {
     Renderer::enable(Capability::CULL);
   else
     Renderer::disable(Capability::CULL);
+}
+
+void Window::attachToApplication(Application* app) {
+  m_attached_application = app;
+
+  glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
+    Window* ptr = (Window*)glfwGetWindowUserPointer(window);
+    ptr->m_attached_application->quit();
+  });
 }
 
 bool Window::recoverVerticalSyncState() const {

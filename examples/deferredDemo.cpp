@@ -277,6 +277,7 @@ int main() {
 
   // Allowing to quit the application by pressing the Esc key
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+  render.getWindow().attachToApplication(&app);
 
   /////////////
   // Overlay //

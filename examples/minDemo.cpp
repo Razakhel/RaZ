@@ -22,6 +22,7 @@ int main() {
                                  Raz::Vec3f(1.f));            // Color (R/G/B)
 
   render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+  render.getWindow().attachToApplication(&app);
 
   app.run();
 

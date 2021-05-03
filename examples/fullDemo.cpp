@@ -26,6 +26,7 @@ int main() {
 
   Raz::Window& window = renderSystem.getWindow();
   window.setIcon(RAZ_ROOT + "assets/icons/RaZ_logo_128.png"s);
+  window.attachToApplication(&app);
 
 #if !defined(USE_OPENGL_ES)
   // Allow wireframe toggling
