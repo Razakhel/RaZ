@@ -26,7 +26,6 @@ int main() {
 
   Raz::Window& window = renderSystem.getWindow();
   window.setIcon(RAZ_ROOT + "assets/icons/RaZ_logo_128.png"s);
-  window.attachToApplication(&app);
 
 #if !defined(USE_OPENGL_ES)
   // Allow wireframe toggling
@@ -39,6 +38,8 @@ int main() {
 
   // Allowing to quit the application with the Escape key
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+  // Allowing to quit the application when the close button is clicked
+  window.setCloseCallback([&app] { app.quit(); });
 
   ///////////////
   // Blur pass //

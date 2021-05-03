@@ -24,6 +24,7 @@ using MouseScrollCallback  = std::function<void(double, double)>;
 using MouseMoveCallback    = std::tuple<double, double, std::function<void(double, double)>>;
 using InputActions         = std::unordered_map<int, std::pair<std::function<void(float)>, Input::ActionTrigger>>;
 using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
+using CloseCallback        = std::function<void()>;
 
 enum class WindowSetting : unsigned int {
   FOCUSED        = 1,   ///< Forces the window to take the focus.
@@ -67,6 +68,8 @@ public:
   const Vec4f& getClearColor() const { return m_clearColor; }
   const InputCallbacks& getCallbacks() const { return m_callbacks; }
   InputCallbacks& getCallbacks() { return m_callbacks; }
+  const CloseCallback& getCloseCallback() const { return m_close_callback; }
+  CloseCallback& getCloseCallback() { return m_close_callback; }
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
   void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f(red, green, blue, alpha)); }
@@ -76,10 +79,6 @@ public:
 
   template <typename... Args>
   static WindowPtr create(Args&&... args) { return std::make_unique<Window>(std::forward<Args>(args)...); }
-
-  // Attaches the window to an application.
-  /// \param app The application to attach to the window
-  void attachToApplication(Application* app);
 
   /// Resizes the window.
   /// \param width New window width.
@@ -130,6 +129,10 @@ public:
   void addMouseButtonCallback(Mouse::Button button, std::function<void(float)> actionPress,
                                                     Input::ActionTrigger frequency = Input::ALWAYS,
                                                     std::function<void()> actionRelease = nullptr);
+
+  /// Attaches a function that will be called when the window is closed
+  void setCloseCallback(CloseCallback callback);
+
   /// Defines an action on mouse wheel scroll.
   /// \param func Action to be executed when scrolling.
   void addMouseScrollCallback(std::function<void(double, double)> func);
@@ -208,7 +211,7 @@ private:
 
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
-  Application* m_attached_application = nullptr;
+  CloseCallback m_close_callback {};
 
 #if defined(RAZ_USE_OVERLAY)
   OverlayPtr m_overlay {};

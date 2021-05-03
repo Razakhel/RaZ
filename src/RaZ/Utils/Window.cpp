@@ -106,15 +106,6 @@ void Window::enableFaceCulling(bool value) const {
     Renderer::disable(Capability::CULL);
 }
 
-void Window::attachToApplication(Application* app) {
-  m_attached_application = app;
-
-  glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
-    Window* ptr = (Window*)glfwGetWindowUserPointer(window);
-    ptr->m_attached_application->quit();
-  });
-}
-
 bool Window::recoverVerticalSyncState() const {
 #if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT())
@@ -175,6 +166,15 @@ void Window::addMouseScrollCallback(std::function<void(double, double)> func) {
 void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
   std::get<3>(m_callbacks) = std::make_tuple(m_width / 2, m_height / 2, std::move(func));
   updateCallbacks();
+}
+
+void Window::setCloseCallback(CloseCallback callback) {
+  m_close_callback = callback;
+
+  glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
+    CloseCallback& close = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
+    close();
+  }); 
 }
 
 void Window::updateCallbacks() const {

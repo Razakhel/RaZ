@@ -174,10 +174,10 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::L, [&render] (float /* deltaTime */) { loadLakeSkybox(render); }, Raz::Input::ONCE);
 
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+  window.setCloseCallback([&app] { app.quit(); });
   window.addMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {
     cameraTrans.translate(0.f, 0.f, 0.5f * static_cast<float>(yOffset));
   });
-  render.getWindow().attachToApplication(&app);
 
   //////////////////
   // Display help //
