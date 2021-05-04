@@ -53,7 +53,7 @@ int main() {
   light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -1.f, 1.f), 1.f, Raz::Vec3f(1.f));
 
   render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
-  render.getWindow().setCloseCallback([&app] { app.quit(); });
+  render.getWindow().setCloseCallback([&app] () { app.quit(); });
 
   app.run();
 

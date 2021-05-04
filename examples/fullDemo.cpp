@@ -39,7 +39,7 @@ int main() {
   // Allowing to quit the application with the Escape key
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
   // Allowing to quit the application when the close button is clicked
-  window.setCloseCallback([&app] { app.quit(); });
+  window.setCloseCallback([&app] () { app.quit(); });
 
   ///////////////
   // Blur pass //
