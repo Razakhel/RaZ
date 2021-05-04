@@ -13,8 +13,6 @@
 
 namespace Raz {
 
-class Application;
-
 class Window;
 using WindowPtr = std::unique_ptr<Window>;
 
@@ -128,16 +126,15 @@ public:
   void addMouseButtonCallback(Mouse::Button button, std::function<void(float)> actionPress,
                                                     Input::ActionTrigger frequency = Input::ALWAYS,
                                                     std::function<void()> actionRelease = nullptr);
-
-  /// Defines an action to be executed when the window is closed.
-  /// \param callback Callback to be called when the window is closed.
-  void setCloseCallback(std::function<void()> callback);
   /// Defines an action on mouse wheel scroll.
   /// \param func Action to be executed when scrolling.
   void addMouseScrollCallback(std::function<void(double, double)> func);
   /// Defines an action on mouse move.
   /// \param func Action to be executed when the mouse is moved.
   void addMouseMoveCallback(std::function<void(double, double)> func);
+  /// Defines an action to be executed when the window is closed.
+  /// \param callback Callback to be called when the window is closed.
+  void setCloseCallback(std::function<void()> callback);
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
 #if defined(RAZ_USE_OVERLAY)

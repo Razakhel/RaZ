@@ -5,7 +5,6 @@
 #include "GL/glxew.h"
 #endif
 #include "GLFW/glfw3.h"
-#include "RaZ/Application.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Window.hpp"
 
