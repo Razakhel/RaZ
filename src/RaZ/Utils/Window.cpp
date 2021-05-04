@@ -117,7 +117,7 @@ bool Window::recoverVerticalSyncState() const {
     return static_cast<bool>(interval);
   }
 #elif defined(RAZ_PLATFORM_MAC)
-  return static_cast<bool>(1);
+  return true;
 #endif
 
   std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
