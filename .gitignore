@@ -20,15 +20,7 @@
 # Executables
 *.exe
 *.out
-
-# Mac executables (they don't have a .app extension anymore)
-RaZ_DeferredDemo
-RaZ_FullDemo
-RaZ_MinDemo
-RaZ_PhysicsDemo
-RaZ_ShowcaseDemo
-RaZ_SoundDemo
-RaZ_Tests
+*.app
 
 # Build folders
 *build*/
