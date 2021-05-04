@@ -22,6 +22,7 @@ using MouseScrollCallback  = std::function<void(double, double)>;
 using MouseMoveCallback    = std::tuple<double, double, std::function<void(double, double)>>;
 using InputActions         = std::unordered_map<int, std::pair<std::function<void(float)>, Input::ActionTrigger>>;
 using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
+using CloseCallback        = std::function<void()>;
 
 enum class WindowSetting : unsigned int {
   FOCUSED        = 1,   ///< Forces the window to take the focus.
@@ -132,7 +133,7 @@ public:
   /// Defines an action on mouse move.
   /// \param func Action to be executed when the mouse is moved.
   void addMouseMoveCallback(std::function<void(double, double)> func);
-  /// Defines an action to be executed when the window is closed.
+  /// Action to be executed on window close.
   /// \param callback Callback to be called when the window is closed.
   void setCloseCallback(std::function<void()> callback);
   /// Associates all of the callbacks, making them active.

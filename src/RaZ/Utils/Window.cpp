@@ -116,6 +116,8 @@ bool Window::recoverVerticalSyncState() const {
 
     return static_cast<bool>(interval);
   }
+#elif defined(RAZ_PLATFORM_MAC)
+  return static_cast<bool>(1);
 #endif
 
   std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
@@ -134,6 +136,8 @@ void Window::enableVerticalSync([[maybe_unused]] bool value) const {
     glXSwapIntervalMESA(static_cast<unsigned int>(value));
     return;
   }
+#elif defined(RAZ_PLATFORM_MAC)
+  glfwSwapInterval(value);
 #endif
 
   std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
@@ -171,8 +175,8 @@ void Window::setCloseCallback(std::function<void()> callback) {
   m_closeCallback = std::move(callback);
 
   glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
-    CloseCallback& close = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
-    close();
+    CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
+    closeCallback();
   }); 
 }
 
