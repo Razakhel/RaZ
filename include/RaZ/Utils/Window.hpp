@@ -133,9 +133,9 @@ public:
   /// Defines an action on mouse move.
   /// \param func Action to be executed when the mouse is moved.
   void addMouseMoveCallback(std::function<void(double, double)> func);
-  /// Action to be executed on window close.
-  /// \param callback Callback to be called when the window is closed.
-  void setCloseCallback(std::function<void()> callback);
+  /// Defines an action on window close.
+  /// \param callback Action to be executed when the window is closed.
+  void setCloseCallback(std::function<void()> func);
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
 #if defined(RAZ_USE_OVERLAY)

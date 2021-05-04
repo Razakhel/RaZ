@@ -171,8 +171,8 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
   updateCallbacks();
 }
 
-void Window::setCloseCallback(std::function<void()> callback) {
-  m_closeCallback = std::move(callback);
+void Window::setCloseCallback(std::function<void()> func) {
+  m_closeCallback = std::move(func);
 
   glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
     CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
