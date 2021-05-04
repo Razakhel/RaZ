@@ -68,8 +68,8 @@ public:
   const Vec4f& getClearColor() const { return m_clearColor; }
   const InputCallbacks& getCallbacks() const { return m_callbacks; }
   InputCallbacks& getCallbacks() { return m_callbacks; }
-  const CloseCallback& getCloseCallback() const { return m_close_callback; }
-  CloseCallback& getCloseCallback() { return m_close_callback; }
+  const CloseCallback& getCloseCallback() const { return m_closeCallback; }
+  CloseCallback& getCloseCallback() { return m_closeCallback; }
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
   void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f(red, green, blue, alpha)); }
@@ -130,9 +130,9 @@ public:
                                                     Input::ActionTrigger frequency = Input::ALWAYS,
                                                     std::function<void()> actionRelease = nullptr);
 
-  /// Attaches a function that will be called when the window is closed
+  /// Defines an action to be executed when the window is closed.
+  /// \param callback Callback to be called when the window is closed.
   void setCloseCallback(CloseCallback callback);
-
   /// Defines an action on mouse wheel scroll.
   /// \param func Action to be executed when scrolling.
   void addMouseScrollCallback(std::function<void(double, double)> func);
@@ -211,7 +211,7 @@ private:
 
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
-  CloseCallback m_close_callback {};
+  CloseCallback m_closeCallback {};
 
 #if defined(RAZ_USE_OVERLAY)
   OverlayPtr m_overlay {};

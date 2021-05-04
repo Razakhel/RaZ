@@ -5,9 +5,9 @@
 #include "GL/glxew.h"
 #endif
 #include "GLFW/glfw3.h"
+#include "RaZ/Application.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Window.hpp"
-#include "RaZ/Application.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten/html5.h>
@@ -169,7 +169,7 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
 }
 
 void Window::setCloseCallback(CloseCallback callback) {
-  m_close_callback = callback;
+  m_closeCallback = std::move(callback);
 
   glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
     CloseCallback& close = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
