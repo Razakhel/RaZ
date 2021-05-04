@@ -116,6 +116,8 @@ bool Window::recoverVerticalSyncState() const {
 
     return static_cast<bool>(interval);
   }
+#elif defined(RAZ_PLATFORM_MAC)
+  return true;
 #endif
 
   std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
@@ -134,6 +136,8 @@ void Window::enableVerticalSync([[maybe_unused]] bool value) const {
     glXSwapIntervalMESA(static_cast<unsigned int>(value));
     return;
   }
+#elif defined(RAZ_PLATFORM_MAC)
+  glfwSwapInterval(value);
 #endif
 
   std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
@@ -165,6 +169,15 @@ void Window::addMouseScrollCallback(std::function<void(double, double)> func) {
 void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
   std::get<3>(m_callbacks) = std::make_tuple(m_width / 2, m_height / 2, std::move(func));
   updateCallbacks();
+}
+
+void Window::setCloseCallback(std::function<void()> func) {
+  m_closeCallback = std::move(func);
+
+  glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
+    CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
+    closeCallback();
+  }); 
 }
 
 void Window::updateCallbacks() const {

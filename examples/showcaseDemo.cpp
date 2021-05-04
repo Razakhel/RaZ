@@ -177,6 +177,7 @@ int main() {
   window.addMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {
     cameraTrans.translate(0.f, 0.f, 0.5f * static_cast<float>(yOffset));
   });
+  window.setCloseCallback([&app] () { app.quit(); });
 
   //////////////////
   // Display help //
