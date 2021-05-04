@@ -24,7 +24,6 @@ using MouseScrollCallback  = std::function<void(double, double)>;
 using MouseMoveCallback    = std::tuple<double, double, std::function<void(double, double)>>;
 using InputActions         = std::unordered_map<int, std::pair<std::function<void(float)>, Input::ActionTrigger>>;
 using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
-using CloseCallback        = std::function<void()>;
 
 enum class WindowSetting : unsigned int {
   FOCUSED        = 1,   ///< Forces the window to take the focus.
@@ -132,7 +131,7 @@ public:
 
   /// Defines an action to be executed when the window is closed.
   /// \param callback Callback to be called when the window is closed.
-  void setCloseCallback(CloseCallback callback);
+  void setCloseCallback(std::function<void()> callback);
   /// Defines an action on mouse wheel scroll.
   /// \param func Action to be executed when scrolling.
   void addMouseScrollCallback(std::function<void(double, double)> func);
