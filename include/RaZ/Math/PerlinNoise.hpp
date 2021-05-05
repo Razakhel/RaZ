@@ -5,6 +5,7 @@
 
 namespace Raz::PerlinNoise {
 
+float get(float x);
 float get(float x, float y);
 
 } // namespace Raz::PerlinNoise

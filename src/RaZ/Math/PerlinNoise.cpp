@@ -40,11 +40,40 @@ constexpr std::array<Vec2f, 8> gradients2D = {
   Vec2f(0.7071067691f, -0.7071067691f), Vec2f(-0.7071067691f, -0.7071067691f)
 };
 
+constexpr float getGradient1D(unsigned int x) {
+  return (permutations[x] % 2 == 0 ? 1.f : -1.f);
+}
+
 constexpr const Vec2f& getGradient2D(unsigned int x, unsigned int y) {
   return gradients2D[permutations[permutations[x] + y] % gradients2D.size()];
 }
 
 } // namespace
+
+float get(float x) {
+  // Determining coordinates on the line
+  //
+  //  x0---------x0+1
+
+  const auto x0 = static_cast<unsigned int>(x) & 255u;
+
+  const float leftGrad  = getGradient1D(x0);
+  const float rightGrad = getGradient1D(x0 + 1);
+
+  // Computing the distance to the coordinate
+  //
+  //  |------X--|
+  //      xWeight
+
+  const float xWeight = x - static_cast<float>(x0);
+
+  const float leftDot  = xWeight * leftGrad;
+  const float rightDot = (xWeight - 1) * rightGrad;
+
+  const float smoothX = MathUtils::smootherstep(xWeight);
+
+  return (MathUtils::lerp(leftDot, rightDot, smoothX) + 1) / 2; // Scaling between [0; 1]
+}
 
 float get(float x, float y) {
   // Recovering integer coordinates on the quad
