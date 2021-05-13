@@ -19,7 +19,6 @@ namespace Raz::MathUtils {
 template <typename T, typename CoeffT>
 constexpr T lerp(T min, T max, CoeffT coeff) noexcept {
   static_assert(std::is_floating_point_v<CoeffT>, "Error: The coefficient type must be floating point.");
-  assert("Error: The interpolation coefficient must be between 0 & 1." && (coeff >= 0 && coeff <= 1));
 
   return min * (1 - coeff) + max * coeff;
 }

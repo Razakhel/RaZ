@@ -44,18 +44,14 @@ constexpr float getGradient1D(unsigned int x) {
   return (permutations[x] % 2 == 0 ? 1.f : -1.f);
 }
 
-constexpr const Vec2f& getGradient2D(unsigned int x, unsigned int y) {
-  return gradients2D[permutations[permutations[x] + y] % gradients2D.size()];
-}
-
-} // namespace
-
-float get(float x) {
+constexpr float getValue(float x) {
   // Determining coordinates on the line
   //
   //  x0---------x0+1
 
-  const auto x0 = static_cast<unsigned int>(x) & 255u;
+  const auto intX = static_cast<unsigned int>(x);
+
+  const unsigned int x0 = intX & 255u;
 
   const float leftGrad  = getGradient1D(x0);
   const float rightGrad = getGradient1D(x0 + 1);
@@ -65,17 +61,21 @@ float get(float x) {
   //  |------X--|
   //      xWeight
 
-  const float xWeight = x - static_cast<float>(x0);
+  const float xWeight = x - static_cast<float>(intX);
 
   const float leftDot  = xWeight * leftGrad;
   const float rightDot = (xWeight - 1) * rightGrad;
 
   const float smoothX = MathUtils::smootherstep(xWeight);
 
-  return (MathUtils::lerp(leftDot, rightDot, smoothX) + 1) / 2; // Scaling between [0; 1]
+  return MathUtils::lerp(leftDot, rightDot, smoothX);
 }
 
-float get(float x, float y) {
+constexpr const Vec2f& getGradient2D(unsigned int x, unsigned int y) {
+  return gradients2D[permutations[permutations[x] + y] % gradients2D.size()];
+}
+
+constexpr float getValue(float x, float y) {
   // Recovering integer coordinates on the quad
   //
   //  y0+1______x0+1/y0+1
@@ -83,8 +83,11 @@ float get(float x, float y) {
   //     |      |
   // x0/y0______x0+1
 
-  const auto x0 = static_cast<unsigned int>(std::floor(x)) & 255u;
-  const auto y0 = static_cast<unsigned int>(std::floor(y)) & 255u;
+  const auto intX = static_cast<unsigned int>(x);
+  const auto intY = static_cast<unsigned int>(y);
+
+  const unsigned int x0 = intX & 255u;
+  const unsigned int y0 = intY & 255u;
 
   // Recovering pseudo-random gradients at each corner of the quad
   const Vec2f& botLeftGrad  = getGradient2D(x0, y0);
@@ -100,8 +103,8 @@ float get(float x, float y) {
   //  |         | yWeight
   //  |_________|_|
 
-  const float xWeight = x - static_cast<float>(x0);
-  const float yWeight = y - static_cast<float>(y0);
+  const float xWeight = x - static_cast<float>(intX);
+  const float yWeight = y - static_cast<float>(intY);
 
   const float botLeftDot  = Vec2f(xWeight    , yWeight    ).dot(botLeftGrad);
   const float botRightDot = Vec2f(xWeight - 1, yWeight    ).dot(botRightGrad);
@@ -114,7 +117,45 @@ float get(float x, float y) {
   const float botCoeff = MathUtils::lerp(botLeftDot, botRightDot, smoothX);
   const float topCoeff = MathUtils::lerp(topLeftDot, topRightDot, smoothX);
 
-  return (MathUtils::lerp(botCoeff, topCoeff, smoothY) + 1) / 2; // Scaling between [0; 1]
+  return MathUtils::lerp(botCoeff, topCoeff, smoothY);
+}
+
+} // namespace
+
+float get1D(float x, uint8_t octaveCount, bool normalize) {
+  float frequency = 1.f;
+  float amplitude = 1.f;
+  float total     = 0.f;
+
+  for (uint8_t i = 0; i < octaveCount; ++i) {
+    total += getValue(x * frequency) * amplitude;
+
+    amplitude *= 0.5f;
+    frequency *= 2.f;
+  }
+
+  if (normalize)
+    return (total + 1) / 2; // Scaling between [0; 1]
+
+  return total;
+}
+
+float get2D(float x, float y, uint8_t octaveCount, bool normalize) {
+  float frequency = 1.f;
+  float amplitude = 1.f;
+  float total     = 0.f;
+
+  for (uint8_t i = 0; i < octaveCount; ++i) {
+    total += getValue(x * frequency, y * frequency) * amplitude;
+
+    amplitude *= 0.5f;
+    frequency *= 2.f;
+  }
+
+  if (normalize)
+    return (total + 1) / 2; // Scaling between [0; 1]
+
+  return total;
 }
 
 } // namespace Raz::PerlinNoise
