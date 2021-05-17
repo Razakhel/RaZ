@@ -33,8 +33,8 @@ public:
   constexpr explicit Vector(T val) noexcept;
   template <typename... Args,
             typename = std::enable_if_t<sizeof...(Args) == Size>, // There can't be more or less values than Size
-            typename = std::enable_if_t<(std::is_same_v<T, std::decay_t<Args>> && ...)>> // Given values must be of the same type
-  constexpr explicit Vector(Args&&... args) noexcept : m_data{ std::forward<Args>(args)... } {}
+            typename = std::enable_if_t<(std::is_convertible_v<std::decay_t<Args>, T> && ...)>> // Given values must be of a convertible type
+  constexpr explicit Vector(Args&&... args) noexcept : m_data{ static_cast<T>(args)... } {}
   constexpr Vector(const Vector&) noexcept = default;
   constexpr Vector(Vector&&) noexcept = default;
 
@@ -150,9 +150,10 @@ public:
   /// \return Result of the multiplied vectors.
   constexpr Vector operator*(const Vector& vec) const noexcept;
   /// Element-wise vector-value multiplication operator.
+  /// \tparam T2 Type of the given value.
   /// \param val Value to be multiplied by.
   /// \return Result of the vector multiplied by the value.
-  constexpr Vector operator*(T val) const noexcept;
+  template <typename T2> constexpr Vector operator*(T2 val) const noexcept;
   /// Element-wise vector-vector division operator.
   /// \param vec Vector to be divided by.
   /// \return Result of the summed vectors.
@@ -186,9 +187,10 @@ public:
   /// \return Reference to the modified original vector.
   constexpr Vector& operator*=(const Vector& vec) noexcept;
   /// Element-wise vector-value multiplication assignment operator.
+  /// \tparam T2 Type of the given value.
   /// \param val Value to be multiplied by.
   /// \return Reference to the modified original vector.
-  constexpr Vector& operator*=(T val) noexcept;
+  template <typename T2> constexpr Vector& operator*=(T2 val) noexcept;
   /// Element-wise vector-vector division assignment operator.
   /// \param vec Vector to be divided by.
   /// \return Reference to the modified original vector.
