@@ -1,8 +1,9 @@
 #include "Catch.hpp"
 
 #include "RaZ/Math/MathUtils.hpp"
+#include "RaZ/Math/Vector.hpp"
 
-TEST_CASE("MathUtils linear interpolation") {
+TEST_CASE("MathUtils lerp arithmetic types") {
   CHECK(Raz::MathUtils::lerp(0.f, 1.f, 0.f) == 0.f);
   CHECK(Raz::MathUtils::lerp(0.f, 1.f, 0.25f) == 0.25f);
   CHECK(Raz::MathUtils::lerp(0.f, 1.f, 0.5f) == 0.5f);
@@ -20,6 +21,38 @@ TEST_CASE("MathUtils linear interpolation") {
   CHECK(Raz::MathUtils::lerp(-1.43f, 8.12f, 0.5f) == 3.345f);
   CHECK(Raz::MathUtils::lerp(-1.43f, 8.12f, 0.75f) == 5.7325001f);
   CHECK(Raz::MathUtils::lerp(-1.43f, 8.12f, 1.f) == 8.12f);
+
+  CHECK(Raz::MathUtils::lerp(457, 5324, 0.f) == 457);
+  CHECK(Raz::MathUtils::lerp(457, 5324, 0.25f) == 1673);
+  CHECK(Raz::MathUtils::lerp(457, 5324, 0.5f) == 2890);
+  CHECK(Raz::MathUtils::lerp(457, 5324, 0.75f) == 4107);
+  CHECK(Raz::MathUtils::lerp(457, 5324, 1.f) == 5324);
+}
+
+TEST_CASE("MathUtils lerp vector") {
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 0.f) == Raz::Vec3f(0.f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 0.25f) == Raz::Vec3f(0.25f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 0.5f) == Raz::Vec3f(0.5f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 0.75f) == Raz::Vec3f(0.75f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 1.f) == Raz::Vec3f(1.f));
+
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(1.f, 2.f, 3.f), Raz::Vec3f(3.f, 2.f, 1.f), 0.f) == Raz::Vec3f(1.f, 2.f, 3.f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(1.f, 2.f, 3.f), Raz::Vec3f(3.f, 2.f, 1.f), 0.25f) == Raz::Vec3f(1.5f, 2.f, 2.5f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(1.f, 2.f, 3.f), Raz::Vec3f(3.f, 2.f, 1.f), 0.5f) == Raz::Vec3f(2.f, 2.f, 2.f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(1.f, 2.f, 3.f), Raz::Vec3f(3.f, 2.f, 1.f), 0.75f) == Raz::Vec3f(2.5f, 2.f, 1.5f));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3f(1.f, 2.f, 3.f), Raz::Vec3f(3.f, 2.f, 1.f), 1.f) == Raz::Vec3f(3.f, 2.f, 1.f));
+
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.f) == Raz::Vec3i(140, 874, 3541));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.25f) == Raz::Vec3i(315, 668, 3833));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.5f) == Raz::Vec3i(490, 463, 4126));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.75f) == Raz::Vec3i(665, 257, 4419));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 1.f) == Raz::Vec3i(841, 53, 4712));
+
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.f) == Raz::Vec3b(255, 140, 27));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.25f) == Raz::Vec3b(209, 165, 63));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.5f) == Raz::Vec3b(164, 190, 99));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.75f) == Raz::Vec3b(119, 215, 135));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 1.f) == Raz::Vec3b(75, 241, 173));
 }
 
 TEST_CASE("MathUtils smoothstep value") {
