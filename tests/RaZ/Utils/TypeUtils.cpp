@@ -36,37 +36,41 @@ TEST_CASE("TypeUtils type str") {
   int testInt {};
   const int& testIntRef = testInt;
 
-  CHECK(Raz::TypeUtils::getTypeStr<int>() == "int");
-  CHECK(Raz::TypeUtils::getTypeStr<decltype(testInt)>() == "int");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<int>() == "int");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<decltype(testInt)>() == "int");
 
 #if defined(RAZ_COMPILER_CLANG)
-  CHECK(Raz::TypeUtils::getTypeStr<const int*>() == "const int *");
-  CHECK(Raz::TypeUtils::getTypeStr<decltype(testIntRef)>() == "const int &");
-  CHECK(Raz::TypeUtils::getTypeStr<decltype("Hello world!")>() == "char const (&)[13]");
-  CHECK(Raz::TypeUtils::getTypeStr<std::string_view>() == "std::basic_string_view<char, std::char_traits<char> >");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<const int*>() == "const int *");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<decltype(testIntRef)>() == "const int &");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<decltype("Hello world!")>() == "char const (&)[13]");
+#if __clang_major__ == 11
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<std::string_view>() == "std::basic_string_view<char>");
+#else
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<std::string_view>() == "std::basic_string_view<char, std::char_traits<char> >");
+#endif
 #elif defined(RAZ_COMPILER_GCC)
-  CHECK(Raz::TypeUtils::getTypeStr<const int*>() == "const int*");
-  CHECK(Raz::TypeUtils::getTypeStr<decltype(testIntRef)>() == "const int&");
-  CHECK(Raz::TypeUtils::getTypeStr<decltype("Hello world!")>() == "const char (&)[13]");
-  CHECK(Raz::TypeUtils::getTypeStr<std::string_view>() == "std::basic_string_view<char>");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<const int*>() == "const int*");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<decltype(testIntRef)>() == "const int&");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<decltype("Hello world!")>() == "const char (&)[13]");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<std::string_view>() == "std::basic_string_view<char>");
 #elif defined(RAZ_COMPILER_MSVC)
-  CHECK(Raz::TypeUtils::getTypeStr<const int*>() == "const int*");
-  CHECK(Raz::TypeUtils::getTypeStr<decltype(testIntRef)>() == "const int&");
-  CHECK(Raz::TypeUtils::getTypeStr<decltype("Hello world!")>() == "const char(&)[13]");
-  CHECK(Raz::TypeUtils::getTypeStr<std::string_view>() == "class std::basic_string_view<char,struct std::char_traits<char> >");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<const int*>() == "const int*");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<decltype(testIntRef)>() == "const int&");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<decltype("Hello world!")>() == "const char(&)[13]");
+  CHECK_NOFAIL(Raz::TypeUtils::getTypeStr<std::string_view>() == "class std::basic_string_view<char,struct std::char_traits<char> >");
 #endif
 }
 
 TEST_CASE("TypeUtils enum str") {
 #if defined(RAZ_COMPILER_GCC) && __GNUC__ < 9
   // Prior to version 9, GCC prints enum values as (Type)value
-  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::VALUE>() == "(EnumTest)0");
-  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::TEST>() == "(EnumTest)1");
-  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::AGAIN>() == "(EnumTest)2");
+  CHECK_NOFAIL(Raz::TypeUtils::getEnumStr<EnumTest::VALUE>() == "(EnumTest)0");
+  CHECK_NOFAIL(Raz::TypeUtils::getEnumStr<EnumTest::TEST>() == "(EnumTest)1");
+  CHECK_NOFAIL(Raz::TypeUtils::getEnumStr<EnumTest::AGAIN>() == "(EnumTest)2");
 #else
-  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::VALUE>() == "EnumTest::VALUE");
-  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::TEST>() == "EnumTest::TEST");
-  CHECK(Raz::TypeUtils::getEnumStr<EnumTest::AGAIN>() == "EnumTest::AGAIN");
+  CHECK_NOFAIL(Raz::TypeUtils::getEnumStr<EnumTest::VALUE>() == "EnumTest::VALUE");
+  CHECK_NOFAIL(Raz::TypeUtils::getEnumStr<EnumTest::TEST>() == "EnumTest::TEST");
+  CHECK_NOFAIL(Raz::TypeUtils::getEnumStr<EnumTest::AGAIN>() == "EnumTest::AGAIN");
 #endif
 }
 
