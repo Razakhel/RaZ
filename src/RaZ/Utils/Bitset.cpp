@@ -1,5 +1,7 @@
 #include "RaZ/Utils/Bitset.hpp"
 
+#include <iostream>
+
 namespace Raz {
 
 void Bitset::setBit(std::size_t position, bool value) {

@@ -5,7 +5,6 @@
 
 #include <array>
 #include <iostream>
-#include <initializer_list>
 #include <limits>
 
 namespace Raz {

@@ -4,7 +4,7 @@
 #define RAZ_BITSET_HPP
 
 #include <algorithm>
-#include <iostream>
+#include <iosfwd>
 #include <initializer_list>
 #include <vector>
 

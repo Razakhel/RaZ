@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 namespace Raz {
 
 template <typename Comp>
