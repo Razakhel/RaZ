@@ -3,6 +3,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Image.hpp"
 
+#include <numeric>
+
 TEST_CASE("Image manual creation") {
   const Raz::Image imgEmpty(0, 0);
 
@@ -19,6 +21,38 @@ TEST_CASE("Image manual creation") {
   CHECK(imgSmall.getColorspace() == Raz::ImageColorspace::RGB);
   CHECK(imgSmall.getDataType() == Raz::ImageDataType::BYTE);
   CHECK_FALSE(imgSmall.isEmpty());
+}
+
+TEST_CASE("Image copy/move") {
+  Raz::Image imgBase(3, 3, Raz::ImageColorspace::RGB);
+
+  auto* imgData = static_cast<uint8_t*>(imgBase.getDataPtr());
+  std::iota(imgData, imgData + 9, 0);
+
+  auto areEqual = [] (const Raz::Image& img1, const Raz::Image& img2) {
+    return (img1.getWidth() == img2.getWidth()
+         && img1.getHeight() == img2.getHeight()
+         && img1.getColorspace() == img2.getColorspace()
+         && img1 == img2); // Comparing image data
+  };
+
+  Raz::Image imgCopy(imgBase); // Copy constructor
+  CHECK_FALSE(imgCopy.isEmpty());
+  CHECK(areEqual(imgCopy, imgBase));
+
+  imgCopy = imgBase; // Copy assignment operator
+  CHECK_FALSE(imgCopy.isEmpty());
+  CHECK(areEqual(imgCopy, imgBase));
+
+  Raz::Image imgMove(std::move(imgBase)); // Move constructor
+  CHECK_FALSE(imgMove.isEmpty());
+  CHECK(imgBase.isEmpty());
+  CHECK_FALSE(areEqual(imgMove, imgBase));
+
+  imgMove = std::move(imgCopy); // Move assignment operator
+  CHECK_FALSE(imgMove.isEmpty());
+  CHECK(imgCopy.isEmpty());
+  CHECK_FALSE(areEqual(imgMove, imgCopy));
 }
 
 TEST_CASE("Image imported PNG") {

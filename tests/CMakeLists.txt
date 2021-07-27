@@ -34,6 +34,15 @@ if (RAZ_COMPILER_CLANG)
 endif ()
 
 if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
+    set(
+        RAZ_TESTS_COMPILER_FLAGS
+
+        ${RAZ_TESTS_COMPILER_FLAGS}
+        /permissive- # Improving standard compliance
+        /EHsc # Enabling exceptions
+        /utf-8 # Forcing MSVC to actually handle files as UTF-8
+    )
+
     target_compile_definitions(
         RaZ_Tests
 

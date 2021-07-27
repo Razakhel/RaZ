@@ -123,6 +123,8 @@ public:
   Image() = default;
   Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
   explicit Image(const FilePath& filePath, bool flipVertically = false) { read(filePath, flipVertically); }
+  Image(const Image& image);
+  Image(Image&&) noexcept = default;
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -145,6 +147,8 @@ public:
   /// \param flipVertically Flip vertically the image when saving.
   void save(const FilePath& filePath, bool flipVertically = false) const;
 
+  Image& operator=(const Image& image);
+  Image& operator=(Image&&) noexcept = default;
   /// Checks if the current image is equal to another given one.
   /// Their inner data must be of the same type.
   /// \param img Image to be compared with.

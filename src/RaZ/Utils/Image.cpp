@@ -53,6 +53,25 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
   m_data->resize(imageDataSize);
 }
 
+Image::Image(const Image& image) : m_width{ image.m_width },
+                                   m_height{ image.m_height },
+                                   m_colorspace{ image.m_colorspace },
+                                   m_channelCount{ image.m_channelCount },
+                                   m_bitDepth{ image.m_bitDepth } {
+  if (image.m_data == nullptr)
+    return;
+
+  switch (image.m_data->getDataType()) {
+    case ImageDataType::BYTE:
+      m_data = ImageDataB::create(*static_cast<ImageDataB*>(image.m_data.get()));
+      break;
+
+    case ImageDataType::FLOAT:
+      m_data = ImageDataF::create(*static_cast<ImageDataF*>(image.m_data.get()));
+      break;
+  }
+}
+
 void Image::read(const FilePath& filePath, bool flipVertically) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
@@ -85,7 +104,34 @@ void Image::save(const FilePath& filePath, bool flipVertically) const {
     throw std::invalid_argument("Error: '" + format + "' image format is not supported");
 }
 
+Image& Image::operator=(const Image& image) {
+  m_width        = image.m_width;
+  m_height       = image.m_height;
+  m_colorspace   = image.m_colorspace;
+  m_channelCount = image.m_channelCount;
+  m_bitDepth     = image.m_bitDepth;
+
+  if (image.m_data) {
+    switch (image.m_data->getDataType()) {
+      case ImageDataType::BYTE:
+        m_data = ImageDataB::create(*static_cast<ImageDataB*>(image.m_data.get()));
+        break;
+
+      case ImageDataType::FLOAT:
+        m_data = ImageDataF::create(*static_cast<ImageDataF*>(image.m_data.get()));
+        break;
+    }
+  } else {
+    m_data.reset();
+  }
+
+  return *this;
+}
+
 bool Image::operator==(const Image& img) const {
+  if (m_data == nullptr || img.m_data == nullptr)
+    return false;
+
   assert("Error: Image equality check requires having images of the same type." && getDataType() == img.getDataType());
 
   return (*m_data == *img.m_data);

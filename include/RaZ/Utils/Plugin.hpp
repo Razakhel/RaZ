@@ -3,12 +3,15 @@
 #ifndef RAZ_PLUGIN_HPP
 #define RAZ_PLUGIN_HPP
 
+#include <string>
+
 namespace Raz {
 
 class FilePath;
 
 class Plugin {
 public:
+  Plugin() = default;
   explicit Plugin(const FilePath& pluginPath) { load(pluginPath); }
 
   void load(const FilePath& pluginPath);
