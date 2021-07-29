@@ -52,8 +52,8 @@ int main() {
   Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
   light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -1.f, 1.f), 1.f, Raz::Vec3f(1.f));
 
-  render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
-  render.getWindow().setCloseCallback([&app] () { app.quit(); });
+  render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+  render.getWindow().setCloseCallback([&app] () noexcept { app.quit(); });
 
   app.run();
 

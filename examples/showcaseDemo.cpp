@@ -148,7 +148,7 @@ int main() {
 
   window.addOverlaySeparator();
 
-  window.addOverlayButton("Remove skybox",      [&render] () { render.removeCubemap(); });
+  window.addOverlayButton("Remove skybox",      [&render] () noexcept { render.removeCubemap(); });
   window.addOverlayButton("Load Clouds skybox", [&render] () { loadCloudsSkybox(render); });
   window.addOverlayButton("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
 
@@ -169,15 +169,16 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::D, [&mesh, &render] (float /* deltaTime */) { loadShaderBallScene(mesh, render); });
 #endif
 
-  window.addKeyCallback(Raz::Keyboard::R, [&render] (float /* deltaTime */) { render.removeCubemap(); }, Raz::Input::ONCE);
+  window.addKeyCallback(Raz::Keyboard::R, [&render] (float /* deltaTime */) noexcept { render.removeCubemap(); }, Raz::Input::ONCE);
   window.addKeyCallback(Raz::Keyboard::O, [&render] (float /* deltaTime */) { loadCloudsSkybox(render); }, Raz::Input::ONCE);
   window.addKeyCallback(Raz::Keyboard::L, [&render] (float /* deltaTime */) { loadLakeSkybox(render); }, Raz::Input::ONCE);
 
-  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
   window.addMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {
     cameraTrans.translate(0.f, 0.f, 0.5f * static_cast<float>(yOffset));
   });
-  window.setCloseCallback([&app] () { app.quit(); });
+
+  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+  window.setCloseCallback([&app] () noexcept { app.quit(); });
 
   //////////////////
   // Display help //

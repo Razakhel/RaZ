@@ -231,9 +231,9 @@ int main() {
 
   float cameraSpeed = 1.f;
   window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
-                        [&cameraSpeed] (float /* deltaTime */) { cameraSpeed = 2.f; },
+                        [&cameraSpeed] (float /* deltaTime */) noexcept { cameraSpeed = 2.f; },
                         Raz::Input::ONCE,
-                        [&cameraSpeed] () { cameraSpeed = 1.f; });
+                        [&cameraSpeed] () noexcept { cameraSpeed = 1.f; });
   window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraTrans, &cameraSpeed] (float deltaTime) {
     cameraTrans.move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
   });
@@ -273,12 +273,12 @@ int main() {
 #endif
 
   // Toggling the render pass' enabled state
-  window.addKeyCallback(Raz::Keyboard::R, [&renderPass] (float /* deltaTime */) { renderPass.enable(!renderPass.isEnabled()); }, Raz::Input::ONCE);
+  window.addKeyCallback(Raz::Keyboard::R, [&renderPass] (float /* deltaTime */) noexcept { renderPass.enable(!renderPass.isEnabled()); }, Raz::Input::ONCE);
 
   // Allowing to quit the application by pressing the Esc key
-  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
   // Allowing to quit the application when the close button is clicked
-  window.setCloseCallback([&app] () { app.quit(); });
+  window.setCloseCallback([&app] () noexcept { app.quit(); });
 
   /////////////
   // Overlay //

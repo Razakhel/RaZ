@@ -14,7 +14,7 @@ int main() {
   // Rendering //
   ///////////////
 
-  auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ", Raz::WindowSetting::DEFAULT, 2);
+  auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280u, 720u, "RaZ", Raz::WindowSetting::DEFAULT, 2);
 
   Raz::RenderPass& geometryPass = renderSystem.getGeometryPass();
   geometryPass.getProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s),
@@ -37,9 +37,9 @@ int main() {
 #endif
 
   // Allowing to quit the application with the Escape key
-  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
+  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
   // Allowing to quit the application when the close button is clicked
-  window.setCloseCallback([&app] () { app.quit(); });
+  window.setCloseCallback([&app] () noexcept { app.quit(); });
 
   ///////////////
   // Blur pass //
@@ -79,9 +79,9 @@ int main() {
   meshTrans.scale(0.2f);
   meshTrans.rotate(180_deg, Raz::Axis::Y);
 
-  window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) { mesh.disable(); },
+  window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) noexcept { mesh.disable(); },
                         Raz::Input::ONCE,
-                        [&mesh] () { mesh.enable(); });
+                        [&mesh] () noexcept { mesh.enable(); });
 
   ///////////
   // Audio //
@@ -118,9 +118,9 @@ int main() {
 
   float cameraSpeed = 1.f;
   window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
-                        [&cameraSpeed] (float /* deltaTime */) { cameraSpeed = 2.f; },
+                        [&cameraSpeed] (float /* deltaTime */) noexcept { cameraSpeed = 2.f; },
                         Raz::Input::ONCE,
-                        [&cameraSpeed] () { cameraSpeed = 1.f; });
+                        [&cameraSpeed] () noexcept { cameraSpeed = 1.f; });
   window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraTrans, &cameraSpeed] (float deltaTime) {
     cameraTrans.move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
   });
@@ -201,7 +201,7 @@ int main() {
   }, Raz::Input::ONCE);
 
   // Stopping the sound
-  window.addKeyCallback(Raz::Keyboard::DECIMAL, [&meshSound] (float /* deltaTime */) { meshSound.stop(); }, Raz::Input::ONCE);
+  window.addKeyCallback(Raz::Keyboard::DECIMAL, [&meshSound] (float /* deltaTime */) noexcept { meshSound.stop(); }, Raz::Input::ONCE);
 
   // Adding a new sound on the camera's position
   window.addKeyCallback(Raz::Keyboard::ADD, [&world, &cameraTrans] (float /* deltaTime */) {
@@ -270,7 +270,7 @@ int main() {
 
   window.addOverlaySeparator();
 
-  window.addOverlaySlider("Sound volume", [&meshSound] (float value) { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
+  window.addOverlaySlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   window.addOverlaySlider("Blur strength",
                           [&blurPass] (float value) { blurPass.getProgram().sendUniform("uniKernelSize", static_cast<int>(value)); },
