@@ -2,7 +2,6 @@
 #include "RaZ/Utils/Plugin.hpp"
 
 #if defined(RAZ_PLATFORM_WINDOWS)
-#include <cstring>
 #include <Windows.h>
 #else
 #include <dlfcn.h>
@@ -10,7 +9,7 @@
 
 namespace Raz {
 
-void Plugin::load(const FilePath& pluginPath) {
+void Plugin::load(const FilePath& pluginPath) noexcept {
   close();
 
 #if defined(RAZ_PLATFORM_WINDOWS)
@@ -20,7 +19,7 @@ void Plugin::load(const FilePath& pluginPath) {
 #endif
 }
 
-void Plugin::close() {
+void Plugin::close() noexcept {
   if (m_pluginHandle == nullptr)
     return;
 
@@ -33,7 +32,7 @@ void Plugin::close() {
   m_pluginHandle = nullptr;
 }
 
-void* Plugin::loadFunctionPointer(const std::string& functionName) {
+void* Plugin::loadFunctionPointer(const std::string& functionName) noexcept {
 #if defined(RAZ_PLATFORM_WINDOWS)
   static_assert(sizeof(void*) == sizeof(FARPROC));
 
