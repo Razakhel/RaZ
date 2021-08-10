@@ -30,7 +30,7 @@ public:
   }
   constexpr void setVelocity(const Vec3f& velocity) noexcept { m_velocity = velocity; }
 
-  constexpr void applyForces(const Vec3f& gravity) noexcept { m_forces = gravity; }
+  constexpr void applyForces(const Vec3f& gravity) noexcept { m_forces = m_mass * gravity; }
 
 private:
   float m_mass {}; ///< Mass of the rigid body.
