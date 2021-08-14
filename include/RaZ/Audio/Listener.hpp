@@ -19,9 +19,14 @@ public:
   Listener(Listener&& listener) noexcept = default;
 
   void setPosition(const Vec3f& position) const noexcept;
+  Vec3f recoverPosition() const noexcept;
   void setVelocity(const Vec3f& velocity) const noexcept;
+  Vec3f recoverVelocity() const noexcept;
   void setOrientation(const Vec3f& forwardDirection, const Vec3f& upDirection = Axis::Y) const noexcept;
   void setOrientation(const Mat3f& transformMatrix) const noexcept;
+  std::pair<Vec3f, Vec3f> recoverOrientation() const noexcept;
+  Vec3f recoverForwardOrientation() const noexcept { return recoverOrientation().first; }
+  Vec3f recoverUpOrientation() const noexcept { return recoverOrientation().second; }
 
   Listener& operator=(const Listener&) = delete;
   Listener& operator=(Listener&& listener) noexcept = default;

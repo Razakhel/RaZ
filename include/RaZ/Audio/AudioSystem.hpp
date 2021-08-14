@@ -5,8 +5,6 @@
 
 #include "RaZ/System.hpp"
 
-#include <AL/alc.h>
-
 namespace Raz {
 
 class AudioSystem final : public System {
@@ -33,8 +31,8 @@ public:
   ~AudioSystem() override { destroy(); }
 
 private:
-  ALCdevice* m_device {};
-  ALCcontext* m_context {};
+  void* m_device {};
+  void* m_context {};
 };
 
 } // namespace Raz

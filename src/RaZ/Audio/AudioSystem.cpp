@@ -4,6 +4,8 @@
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
+#include <AL/alc.h>
+
 #include <iostream>
 #include <string_view>
 
@@ -23,8 +25,8 @@ constexpr const char* recoverAlcErrorStr(int errorCode) {
   }
 }
 
-inline void checkError(ALCdevice* device, const std::string_view& errorMsg) {
-  const int errorCode = alcGetError(device);
+inline void checkError(void* device, const std::string_view& errorMsg) {
+  const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
 
   if (errorCode != ALC_NO_ERROR)
     std::cerr << "[OpenAL] Error: " << errorMsg << " (" << recoverAlcErrorStr(errorCode) << ")." << std::endl;
@@ -46,12 +48,12 @@ void AudioSystem::openDevice(const char* deviceName) {
   if (!m_device)
     std::cerr << "[OpenAL] Error: Failed to open an audio device." << std::endl;
 
-  m_context = alcCreateContext(m_device, nullptr);
+  m_context = alcCreateContext(static_cast<ALCdevice*>(m_device), nullptr);
   checkError(m_device, "Failed to create context");
 
-  if (!alcMakeContextCurrent(m_context)) {
+  if (!alcMakeContextCurrent(static_cast<ALCcontext*>(m_context))) {
     std::cerr << "[OpenAL] Error: Failed to make the audio context current." << std::endl;
-    alcGetError(m_device); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
+    alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
   }
 }
 
@@ -62,7 +64,7 @@ std::string AudioSystem::recoverCurrentDevice() const {
   if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty string
     return {};
 
-  return alcGetString(m_device, ALC_ALL_DEVICES_SPECIFIER);
+  return alcGetString(static_cast<ALCdevice*>(m_device), ALC_ALL_DEVICES_SPECIFIER);
 }
 
 bool AudioSystem::update(float /* deltaTime */) {
@@ -114,13 +116,13 @@ void AudioSystem::destroy() {
   alcMakeContextCurrent(nullptr);
 
   if (m_context != nullptr) {
-    alcDestroyContext(m_context);
+    alcDestroyContext(static_cast<ALCcontext*>(m_context));
     checkError(m_device, "Failed to destroy context");
     m_context = nullptr;
   }
 
   if (m_device != nullptr) {
-    if (!alcCloseDevice(m_device))
+    if (!alcCloseDevice(static_cast<ALCdevice*>(m_device)))
       std::cerr << "[OpenAL] Error: Failed to close the audio device." << std::endl;
     m_device = nullptr;
   }
