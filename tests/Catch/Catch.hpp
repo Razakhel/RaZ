@@ -38,7 +38,7 @@ public:
   /// \return Error string to be printed.
   std::string describe() const override {
     std::ostringstream stream;
-    stream.precision(std::numeric_limits<T>::digits10 + 2);
+    stream.precision(std::numeric_limits<T>::digits10 + 3);
 
     stream << "is not nearly equal to " << m_comparison;
     return stream.str();
@@ -81,7 +81,7 @@ public:
   /// \return Error string to be printed.
   std::string describe() const override {
     std::ostringstream stream;
-    stream.precision(std::numeric_limits<T>::digits10 + 2);
+    stream.precision(std::numeric_limits<T>::digits10 + 3);
 
     for (std::size_t i = 0; i < Size; ++i) {
       if (!Raz::FloatUtils::areNearlyEqual(m_base[i], m_comparison[i], m_absTol))
@@ -130,7 +130,7 @@ public:
   /// \return Error string to be printed.
   std::string describe() const override {
     std::ostringstream stream;
-    stream.precision(std::numeric_limits<T>::digits10 + 2);
+    stream.precision(std::numeric_limits<T>::digits10 + 3);
 
     for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
       const std::size_t finalHeightIndex = heightIndex * W;
@@ -183,7 +183,7 @@ public:
   /// \return Error string to be printed.
   std::string describe() const override {
     std::ostringstream stream;
-    stream.precision(std::numeric_limits<T>::digits10 + 2);
+    stream.precision(std::numeric_limits<T>::digits10 + 3);
 
     if (!Raz::FloatUtils::areNearlyEqual(m_base.w(), m_comparison.w(), m_absTol))
       stream << "\n\tOn w: " << m_base.w() << " is not nearly equal to " << m_comparison.w();

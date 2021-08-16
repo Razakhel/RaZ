@@ -9,6 +9,18 @@ Entity& World::addEntity(bool enabled) {
   return *m_entities.back();
 }
 
+void World::removeEntity(const Entity& entity) {
+  auto iter = std::find_if(m_entities.begin(), m_entities.end(), [&entity] (const EntityPtr& entityPtr) { return (&entity == entityPtr.get()); });
+
+  if (iter == m_entities.end())
+    throw std::invalid_argument("Error: The entity isn't owned by this world");
+
+  for (SystemPtr& system : m_systems)
+    system->unlinkEntity(*iter);
+
+  m_entities.erase(iter);
+}
+
 bool World::update(float deltaTime) {
   refresh();
 

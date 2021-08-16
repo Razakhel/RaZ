@@ -57,6 +57,9 @@ public:
   /// \param enabled True if the entity should be active immediately, false otherwise.
   /// \return Reference to the newly added entity.
   template <typename... Comps> Entity& addEntityWithComponents(bool enabled = true);
+  /// Removes an entity from the world. It *must* be an entity created by this world.
+  /// \param entity Entity to be removed.
+  void removeEntity(const Entity& entity);
   /// Updates the world, updating all the systems it contains.
   /// \param deltaTime Time elapsed since the last update.
   /// \return True if the world still has active systems, false otherwise.

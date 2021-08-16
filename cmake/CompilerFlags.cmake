@@ -3,7 +3,7 @@
 function(add_compiler_flags TARGET_NAME SCOPE)
     if (RAZ_COMPILER_GCC)
         set(
-            COMPILER_WARNINGS
+            COMPILER_FLAGS
 
             -pedantic
             -pedantic-errors
@@ -50,9 +50,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         # Enabling some other warnings available since GCC 5
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
             set(
-                COMPILER_WARNINGS
+                COMPILER_FLAGS
 
-                ${COMPILER_WARNINGS}
+                ${COMPILER_FLAGS}
                 -fsized-deallocation
                 -Warray-bounds=2
                 -Wformat-signedness
@@ -63,9 +63,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         # Enabling some other warnings available since GCC 6
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 6)
             set(
-                COMPILER_WARNINGS
+                COMPILER_FLAGS
 
-                ${COMPILER_WARNINGS}
+                ${COMPILER_FLAGS}
                 -Wduplicated-cond
                 -Wnull-dereference
             )
@@ -74,9 +74,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         # Enabling some other warnings available since GCC 7
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
             set(
-                COMPILER_WARNINGS
+                COMPILER_FLAGS
 
-                ${COMPILER_WARNINGS}
+                ${COMPILER_FLAGS}
                 -Waligned-new
                 -Walloca
                 -Walloc-zero
@@ -86,7 +86,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
     elseif (RAZ_COMPILER_CLANG)
         set(
-            COMPILER_WARNINGS
+            COMPILER_FLAGS
 
             -Weverything
 
@@ -110,9 +110,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
         if (RAZ_COMPILER_CLANG_CL)
             set(
-                COMPILER_WARNINGS
+                COMPILER_FLAGS
 
-                ${COMPILER_WARNINGS}
+                ${COMPILER_FLAGS}
                 # Disabling warnings triggered in externals
                 -Wno-language-extension-token
                 -Wno-nonportable-system-include-path
@@ -120,9 +120,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             )
         else ()
             set(
-                COMPILER_WARNINGS
+                COMPILER_FLAGS
 
-                ${COMPILER_WARNINGS}
+                ${COMPILER_FLAGS}
                 # Other warning flags not recognized by clang-cl
                 -pedantic
                 -pedantic-errors
@@ -132,17 +132,18 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         # Disabling some warnings available since Clang 5
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
             set(
-                COMPILER_WARNINGS
+                COMPILER_FLAGS
 
-                ${COMPILER_WARNINGS}
+                ${COMPILER_FLAGS}
                 -Wno-unused-template
             )
         endif ()
     elseif (RAZ_COMPILER_MSVC)
         set(
-            COMPILER_WARNINGS
+            COMPILER_FLAGS
 
             /Wall
+            /MP # Enabling multi-processes compilation
 
             /wd4061 # Enum value in a switch not explicitly handled by a case label
             /wd4571 # SEH exceptions aren't caught since Visual C++ 7.1
@@ -188,9 +189,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
     if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
         set(
-            COMPILER_WARNINGS
+            COMPILER_FLAGS
 
-            ${COMPILER_WARNINGS}
+            ${COMPILER_FLAGS}
             /permissive- # Improving standard compliance
             /EHsc # Enabling exceptions
             /utf-8 # Forcing MSVC to actually handle files as UTF-8
@@ -214,8 +215,8 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
     if (NOT RAZ_COMPILER_MSVC)
         # Defining the compiler flags only for C++; this doesn't work with MSVC
-        set(COMPILER_WARNINGS $<$<COMPILE_LANGUAGE:CXX>:${COMPILER_WARNINGS}>)
+        set(COMPILER_FLAGS $<$<COMPILE_LANGUAGE:CXX>:${COMPILER_FLAGS}>)
     endif ()
 
-    target_compile_options(${TARGET_NAME} ${SCOPE} ${COMPILER_WARNINGS})
+    target_compile_options(${TARGET_NAME} ${SCOPE} ${COMPILER_FLAGS})
 endfunction()

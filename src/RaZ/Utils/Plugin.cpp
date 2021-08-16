@@ -2,6 +2,10 @@
 #include "RaZ/Utils/Plugin.hpp"
 
 #if defined(RAZ_PLATFORM_WINDOWS)
+#if defined(RAZ_COMPILER_MSVC)
+struct IUnknown; // Workaround for "combaseapi.h(229): error C2187: syntax error: 'identifier' was unexpected here" when using /permissive-
+#endif
+
 #include <Windows.h>
 #else
 #include <dlfcn.h>
