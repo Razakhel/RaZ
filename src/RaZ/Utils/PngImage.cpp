@@ -1,4 +1,5 @@
 #include "RaZ/Utils/Image.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <png.h>
 #include <zlib.h>
@@ -82,7 +83,7 @@ void Image::readPng(std::ifstream& file, bool flipVertically) {
   }
 
   if (!png_set_interlace_handling(readStruct))
-    std::cerr << "Error: Couldn't set PNG interlace handling" << std::endl;
+    Logger::error("Couldn't set PNG interlace handling.");
 
   png_set_scale_16(readStruct);
 

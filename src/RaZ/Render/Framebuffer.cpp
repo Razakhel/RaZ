@@ -1,5 +1,6 @@
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <iostream>
 
@@ -87,7 +88,7 @@ void Framebuffer::mapBuffers() const {
   Renderer::setDrawBuffers(static_cast<unsigned int>(drawBuffers.size()), drawBuffers.data());
 
   if (!Renderer::isFramebufferComplete())
-    std::cerr << "Error: Framebuffer is not complete." << std::endl;
+    Logger::error("Framebuffer is not complete.");
 
   unbind();
 }

@@ -1,5 +1,6 @@
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <fstream>
 #include <map>
@@ -59,7 +60,7 @@ inline void importMtl(const FilePath& mtlFilePath,
   };
 
   if (!file) {
-    std::cerr << "Error: Couldn't open the material file '" << mtlFilePath << "'\n";
+    Logger::error("[OBJ] Couldn't open the material file '" + mtlFilePath + "'.");
     addLocalMaterial(true);
     return;
   }
@@ -274,7 +275,7 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
       const auto correspMaterial = materialCorrespIndices.find(materialName);
 
       if (correspMaterial == materialCorrespIndices.cend())
-        std::cerr << "Error: No corresponding material found with the name '" << materialName << "'\n";
+        Logger::error("[OBJ] No corresponding material found with the name '" + materialName + "'.");
       else
         m_submeshes.back().setMaterialIndex(correspMaterial->second);
     } else if (line[0] == 'o' || line[0] == 'g') {

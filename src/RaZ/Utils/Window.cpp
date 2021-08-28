@@ -6,6 +6,7 @@
 #endif
 #include "GLFW/glfw3.h"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/Window.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
@@ -21,7 +22,7 @@ Window::Window(unsigned int width, unsigned int height,
                WindowSetting settings,
                uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
   glfwSetErrorCallback([] (int errorCode, const char* description) {
-    std::cerr << "GLFW error " << errorCode << ": " << description << std::endl;
+    Logger::error("[GLFW] " + std::string(description) + "(error code " + std::to_string(errorCode) + ").");
   });
 
   if (!glfwInit())
@@ -177,7 +178,7 @@ void Window::setCloseCallback(std::function<void()> func) {
   glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
     CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
     closeCallback();
-  }); 
+  });
 }
 
 void Window::updateCallbacks() const {

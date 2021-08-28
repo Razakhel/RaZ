@@ -1,5 +1,6 @@
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <algorithm>
 #include <array>
@@ -18,38 +19,40 @@ inline void GLAPIENTRY callbackDebugLog(GLenum source,
                                         int /* length */,
                                         const char* message,
                                         const void* /* userParam */) {
-  std::cerr << "OpenGL Debug - ";
+  std::string errorMsg = "OpenGL Debug - ";
 
   switch (source) {
-    case GL_DEBUG_SOURCE_API:             std::cerr << "Source: OpenGL\t"; break;
-    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cerr << "Source: Windows\t"; break;
-    case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cerr << "Source: Shader compiler\t"; break;
-    case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cerr << "Source: Third party\t"; break;
-    case GL_DEBUG_SOURCE_APPLICATION:     std::cerr << "Source: Application\t"; break;
-    case GL_DEBUG_SOURCE_OTHER:           std::cerr << "Source: Other\t"; break;
+    case GL_DEBUG_SOURCE_API:             errorMsg += "Source: OpenGL\t"; break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   errorMsg += "Source: Windows\t"; break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER: errorMsg += "Source: Shader compiler\t"; break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:     errorMsg += "Source: Third party\t"; break;
+    case GL_DEBUG_SOURCE_APPLICATION:     errorMsg += "Source: Application\t"; break;
+    case GL_DEBUG_SOURCE_OTHER:           errorMsg += "Source: Other\t"; break;
     default: break;
   }
 
   switch (type) {
-    case GL_DEBUG_TYPE_ERROR:               std::cerr << "Type: Error\t"; break;
-    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cerr << "Type: Deprecated behavior\t"; break;
-    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cerr << "Type: Undefined behavior\t"; break;
-    case GL_DEBUG_TYPE_PORTABILITY:         std::cerr << "Type: Portability\t"; break;
-    case GL_DEBUG_TYPE_PERFORMANCE:         std::cerr << "Type: Performance\t"; break;
-    case GL_DEBUG_TYPE_OTHER:               std::cerr << "Type: Other\t"; break;
+    case GL_DEBUG_TYPE_ERROR:               errorMsg += "Type: Error\t"; break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: errorMsg += "Type: Deprecated behavior\t"; break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  errorMsg += "Type: Undefined behavior\t"; break;
+    case GL_DEBUG_TYPE_PORTABILITY:         errorMsg += "Type: Portability\t"; break;
+    case GL_DEBUG_TYPE_PERFORMANCE:         errorMsg += "Type: Performance\t"; break;
+    case GL_DEBUG_TYPE_OTHER:               errorMsg += "Type: Other\t"; break;
     default: break;
   }
 
-  std::cerr << "ID: " << id << "\t";
+  errorMsg += "ID: " + id + '\t';
 
   switch (severity) {
-    case GL_DEBUG_SEVERITY_HIGH:   std::cerr << "Severity: High\t"; break;
-    case GL_DEBUG_SEVERITY_MEDIUM: std::cerr << "Severity: Medium\t"; break;
-    case GL_DEBUG_SEVERITY_LOW:    std::cerr << "Severity: Low\t"; break;
+    case GL_DEBUG_SEVERITY_HIGH:   errorMsg += "Severity: High\t"; break;
+    case GL_DEBUG_SEVERITY_MEDIUM: errorMsg += "Severity: Medium\t"; break;
+    case GL_DEBUG_SEVERITY_LOW:    errorMsg += "Severity: Low\t"; break;
     default: break;
   }
 
-  std::cerr << "Message: " << message << std::endl;
+  errorMsg += "Message: " + message;
+
+  Logger::error(errorMsg);
 }
 #endif
 
@@ -76,7 +79,7 @@ void Renderer::initialize() {
   glewExperimental = GL_TRUE;
 
   if (glewInit() != GLEW_OK) {
-    std::cerr << "Error: Failed to initialize GLEW." << std::endl;
+    Logger::error("Failed to initialize GLEW.");
   } else {
     s_isInitialized = true;
 
@@ -242,9 +245,7 @@ void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
   const ErrorCodes errorCodes = Renderer::recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_VALUE])
-    std::cerr << "Renderer::setPixelStorage - " << value << " is not a valid alignment value. Only 1, 2, 4 & 8 are accepted.\n";
-
-  std::cerr << std::flush;
+    Logger::error("Renderer::setPixelStorage - " + std::to_string(value) + " is not a valid alignment value. Only 1, 2, 4 & 8 are accepted.");
 #endif
 }
 
@@ -580,7 +581,7 @@ void Renderer::linkProgram(unsigned int index) {
     char infoLog[512];
 
     glGetProgramInfoLog(index, static_cast<int>(std::size(infoLog)), nullptr, infoLog);
-    std::cerr << "Error: Shader program link failed (ID " << index << ").\n" << infoLog << std::endl;
+    Logger::error("Shader program link failed (ID " + std::to_string(index) + "): " + infoLog);
   }
 
   printConditionalErrors();
@@ -595,18 +596,18 @@ void Renderer::useProgram(unsigned int index) {
   const ErrorCodes errorCodes = Renderer::recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_VALUE])
-    std::cerr << "Renderer::useProgram - Invalid shader program index (" << index << ").\n";
+    Logger::error("Renderer::useProgram - Invalid shader program index (" + std::to_string(index) + ").");
 
   if (errorCodes[ErrorCode::INVALID_OPERATION]) {
-    std::cerr << "Renderer::useProgram - ";
+    std::string errorMsg = "Renderer::useProgram - ";
 
     if (!isProgramLinked(index))
-      std::cerr << "A shader program must be linked before being defined as used.\n";
+      errorMsg += "A shader program must be linked before being defined as used.";
     else
-      std::cerr << "Unknown invalid operation.\n";
-  }
+      errorMsg += "Unknown invalid operation.";
 
-  std::cerr << std::flush;
+    Logger::error(errorMsg);
+  }
 #endif
 }
 
@@ -666,7 +667,7 @@ void Renderer::compileShader(unsigned int index) {
     char infoLog[512];
 
     glGetShaderInfoLog(index, static_cast<int>(std::size(infoLog)), nullptr, infoLog);
-    std::cerr << "Error: Shader compilation failed (ID " << index << ").\n" << infoLog << std::endl;
+    Logger::error("Shader compilation failed (ID " + std::to_string(index) + "): " + infoLog);
   }
 
   printConditionalErrors();
@@ -690,11 +691,7 @@ void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex)
 
 bool Renderer::isShaderAttached(unsigned int programIndex, unsigned int shaderIndex) {
   const std::vector<unsigned int> shaderIndices = recoverAttachedShaders(programIndex);
-
-  if (std::find(shaderIndices.cbegin(), shaderIndices.cend(), shaderIndex) != shaderIndices.cend())
-    return true;
-
-  return false;
+  return (std::find(shaderIndices.cbegin(), shaderIndices.cend(), shaderIndex) != shaderIndices.cend());
 }
 
 void Renderer::deleteShader(unsigned int index) {
@@ -744,21 +741,23 @@ void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int unifor
   if (errorCodes.isEmpty())
     return;
 
-  std::cerr << "Renderer::recoverUniformInfo - ";
-
   if (errorCodes[ErrorCode::INVALID_OPERATION])
-    std::cerr << "Tried to fetch program information from a non-program object.\n";
+    Logger::error("Renderer::recoverUniformInfo - Tried to fetch program information from a non-program object.");
 
   if (errorCodes[ErrorCode::INVALID_VALUE]) {
+    std::string errorMsg = "Renderer::recoverUniformInfo - ";
+
     const unsigned int uniCount = recoverActiveUniformCount(programIndex);
 
-    if (uniformIndex >= uniCount)
-      std::cerr << "The given uniform index (" << uniformIndex << ") is greater than or equal to the program's active uniform count (" << uniCount << ").\n";
-    else
-      std::cerr << "The given program index has not been created by OpenGL.\n";
-  }
+    if (uniformIndex >= uniCount) {
+      errorMsg += "The given uniform index (" + std::to_string(uniformIndex) + ") "
+                  "is greater than or equal to the program's active uniform count (" + std::to_string(uniCount) + ").";
+    } else {
+      errorMsg += "The given program index has not been created by OpenGL.";
+    }
 
-  std::cerr << std::flush;
+    Logger::error(errorMsg);
+  }
 #endif
 }
 
@@ -875,9 +874,7 @@ void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
   const ErrorCodes errorCodes = recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_OPERATION])
-    std::cerr << "Renderer::bindFramebuffer - Bound object is not a valid framebuffer.\n";
-
-  std::cerr << std::flush;
+    Logger::error("Renderer::bindFramebuffer - Bound object is not a valid framebuffer.");
 #endif
 }
 
@@ -967,11 +964,9 @@ void Renderer::printErrors() {
   for (uint8_t errorIndex = 0; errorIndex < static_cast<uint8_t>(errorCodes.codes.size()); ++errorIndex) {
     if (errorCodes.codes[errorIndex]) {
       const unsigned int errorValue = errorIndex + static_cast<unsigned int>(ErrorCode::INVALID_ENUM);
-      std::cerr << "OpenGL error - " << recoverGlErrorStr(errorValue) << " (code " << errorValue << ")\n";
+      Logger::error("[OpenGL] " + std::string(recoverGlErrorStr(errorValue)) + " (code " + std::to_string(errorValue) + ')');
     }
   }
-
-  std::cerr << std::flush;
 }
 
 } // namespace Raz

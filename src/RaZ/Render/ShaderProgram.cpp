@@ -1,9 +1,21 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <array>
 
 namespace Raz {
+
+namespace {
+
+inline void checkProgramUsed([[maybe_unused]] const ShaderProgram& program) {
+#if defined(RAZ_CONFIG_DEBUG)
+  if (!program.isUsed())
+    Logger::error("The current shader program must be defined as used before sending uniforms to it.");
+#endif
+}
+
+} // namespace
 
 ShaderProgram::ShaderProgram()
   : m_index{ Renderer::createProgram() } {}
@@ -119,83 +131,47 @@ int ShaderProgram::recoverUniformLocation(const std::string& uniformName) const 
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, int value) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniform(uniformIndex, value);
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, unsigned int value) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniform(uniformIndex, value);
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, float value) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniform(uniformIndex, value);
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Vec2f& vec) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniformVector2(uniformIndex, vec.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Vec3f& vec) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniformVector3(uniformIndex, vec.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Vec4f& vec) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniformVector4(uniformIndex, vec.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Mat2f& mat) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniformMatrix2x2(uniformIndex, mat.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Mat3f& mat) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniformMatrix3x3(uniformIndex, mat.getDataPtr());
 }
 
 void ShaderProgram::sendUniform(int uniformIndex, const Mat4f& mat) const {
-#if defined(RAZ_CONFIG_DEBUG)
-  if (!isUsed())
-    std::cerr << "Error: The current shader program must be defined as used before sending uniforms to it." << std::endl;
-#endif
-
+  checkProgramUsed(*this);
   Renderer::sendUniformMatrix4x4(uniformIndex, mat.getDataPtr());
 }
 

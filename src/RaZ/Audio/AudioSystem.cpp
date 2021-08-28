@@ -2,6 +2,7 @@
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Math/Transform.hpp"
+#include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <AL/alc.h>
@@ -25,11 +26,11 @@ constexpr const char* recoverAlcErrorStr(int errorCode) {
   }
 }
 
-inline void checkError(void* device, const std::string_view& errorMsg) {
+inline void checkError(void* device, const std::string& errorMsg) {
   const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
 
   if (errorCode != ALC_NO_ERROR)
-    std::cerr << "[OpenAL] Error: " << errorMsg << " (" << recoverAlcErrorStr(errorCode) << ")." << std::endl;
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlcErrorStr(errorCode) + ").");
 }
 
 } // namespace
@@ -46,13 +47,13 @@ void AudioSystem::openDevice(const char* deviceName) {
 
   m_device = alcOpenDevice(deviceName);
   if (!m_device)
-    std::cerr << "[OpenAL] Error: Failed to open an audio device." << std::endl;
+    Logger::error("[OpenAL] Failed to open an audio device.");
 
   m_context = alcCreateContext(static_cast<ALCdevice*>(m_device), nullptr);
   checkError(m_device, "Failed to create context");
 
   if (!alcMakeContextCurrent(static_cast<ALCcontext*>(m_context))) {
-    std::cerr << "[OpenAL] Error: Failed to make the audio context current." << std::endl;
+    Logger::error("[OpenAL] Failed to make the audio context current.");
     alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
   }
 }
@@ -123,7 +124,8 @@ void AudioSystem::destroy() {
 
   if (m_device != nullptr) {
     if (!alcCloseDevice(static_cast<ALCdevice*>(m_device)))
-      std::cerr << "[OpenAL] Error: Failed to close the audio device." << std::endl;
+      Logger::error("[OpenAL] Failed to close the audio device.");
+
     m_device = nullptr;
   }
 }

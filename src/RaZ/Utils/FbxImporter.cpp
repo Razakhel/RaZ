@@ -1,5 +1,6 @@
 #include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <fbxsdk.h>
 #include <fstream>
@@ -110,7 +111,7 @@ void Mesh::importFbx(const FilePath& filePath) {
         // TODO: small hack to avoid segfaulting when mesh count > material count, but clearly wrong; find another way
         submesh.setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
       else
-        std::cerr << "Error: Materials can't be mapped by anything other than the whole submesh" << std::endl;
+        Logger::error("[FBX] Materials can't be mapped by anything other than the whole submesh.");
     }
 
     addSubmesh(std::move(submesh));

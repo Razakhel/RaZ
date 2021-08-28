@@ -1,5 +1,6 @@
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <AL/al.h>
@@ -21,11 +22,11 @@ constexpr const char* recoverAlErrorStr(int errorCode) {
   }
 }
 
-inline void checkError(const std::string_view& errorMsg) {
+inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    std::cerr << "[OpenAL] Error: " << errorMsg << " (" << recoverAlErrorStr(errorCode) << ")." << std::endl;
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ").");
 }
 
 } // namespace
