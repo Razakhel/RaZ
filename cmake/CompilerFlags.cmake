@@ -1,6 +1,12 @@
 # Allows to define useful compiler flags (warnings, needed definitions, ...)
 
 function(add_compiler_flags TARGET_NAME SCOPE)
+    # The definitions MUST be propagated to avoid warnings and/or errors in headers
+    set(DEFINITIONS_SCOPE ${SCOPE})
+    if (DEFINITIONS_SCOPE STREQUAL "PRIVATE")
+        set(DEFINITIONS_SCOPE "PUBLIC")
+    endif ()
+
     if (RAZ_COMPILER_GCC)
         set(
             COMPILER_FLAGS
@@ -197,12 +203,6 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /utf-8 # Forcing MSVC to actually handle files as UTF-8
         )
 
-        # These definitions MUST be propagated to avoid warnings and/or errors in headers
-        set(DEFINITIONS_SCOPE ${SCOPE})
-        if (DEFINITIONS_SCOPE STREQUAL "PRIVATE")
-            set(DEFINITIONS_SCOPE "PUBLIC")
-        endif ()
-
         target_compile_definitions(
             ${TARGET_NAME}
 
@@ -216,6 +216,16 @@ function(add_compiler_flags TARGET_NAME SCOPE)
     if (NOT RAZ_COMPILER_MSVC)
         # Defining the compiler flags only for C++; this doesn't work with MSVC
         set(COMPILER_FLAGS $<$<COMPILE_LANGUAGE:CXX>:${COMPILER_FLAGS}>)
+    endif ()
+
+    if (RAZ_PLATFORM_WINDOWS)
+        target_compile_definitions(
+            ${TARGET_NAME}
+
+            ${DEFINITIONS_SCOPE}
+
+            NOGDI # Preventing definition of the 'ERROR' macro
+        )
     endif ()
 
     target_compile_options(${TARGET_NAME} ${SCOPE} ${COMPILER_FLAGS})

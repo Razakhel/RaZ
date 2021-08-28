@@ -32,7 +32,7 @@ jobs:
     #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
     - name: Packages installation
       run: |
-        sudo apt install -y --no-install-recommends \
+        sudo apt update && sudo apt install -y --no-install-recommends \
           libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
           lcov \
           doxygen python3-pydot python3-pydot-ng \
@@ -247,7 +247,7 @@ jobs:
       #   - OpenAL-soft to handle the audio part
       - name: Packages installation
         run: |
-          sudo apt install -y --no-install-recommends \
+          sudo apt update && sudo apt install -y --no-install-recommends \
             libglew-dev libxi-dev libxcursor-dev libxrandr-dev libxinerama-dev libxxf86vm-dev \
             libopenal-dev
 

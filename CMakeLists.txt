@@ -323,6 +323,11 @@ if (SKIP_RENDERER_ERRORS)
     target_compile_definitions(RaZ PRIVATE SKIP_RENDERER_ERRORS)
 endif ()
 
+option(RAZ_FORCE_DEBUG_LOG "Force the ouput of debug logging calls in non-Debug modes" OFF)
+if (RAZ_FORCE_DEBUG_LOG)
+    target_compile_definitions(RaZ PUBLIC RAZ_FORCE_DEBUG_LOG)
+endif ()
+
 # OpenGL version
 option(RAZ_USE_GL4 "Use OpenGL 4" OFF)
 if (RAZ_USE_GL4)

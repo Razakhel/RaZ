@@ -49,6 +49,7 @@
 #include "Utils/Graph.hpp"
 #include "Utils/Image.hpp"
 #include "Utils/Input.hpp"
+#include "Utils/Logger.hpp"
 #include "Utils/Overlay.hpp"
 #include "Utils/Plugin.hpp"
 #include "Utils/Ray.hpp"
