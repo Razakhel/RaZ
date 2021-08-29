@@ -13,6 +13,10 @@ TEST_CASE("Logger custom function") {
         str += "Error";
         break;
 
+      case Raz::LoggingLevel::WARNING:
+        str += "Warning";
+        break;
+
       case Raz::LoggingLevel::INFO:
         str += "Info";
         break;
@@ -30,6 +34,10 @@ TEST_CASE("Logger custom function") {
 
   Raz::Logger::error("Error message");
   CHECK(str == "Error (Error message)");
+  str.clear();
+
+  Raz::Logger::warn("Warning message");
+  CHECK(str == "Warning (Warning message)");
   str.clear();
 
   Raz::Logger::info("Info message");
@@ -60,6 +68,10 @@ TEST_CASE("Logger levels") {
     CHECK(str == "a");
     str.clear();
 
+    Raz::Logger::warn("");
+    CHECK(str == "a");
+    str.clear();
+
     Raz::Logger::info("");
     CHECK(str == "a");
     str.clear();
@@ -77,9 +89,31 @@ TEST_CASE("Logger levels") {
     CHECK(str == "a");
     str.clear();
 
+    Raz::Logger::warn("");
+    CHECK(str == "a");
+    str.clear();
+
     Raz::Logger::info("");
     CHECK(str == "a");
     str.clear();
+
+    Raz::Logger::debug("");
+    CHECK(str.empty());
+  }
+
+  {
+    Raz::Logger::setLoggingLevel(Raz::LoggingLevel::WARNING);
+
+    Raz::Logger::error("");
+    CHECK(str == "a");
+    str.clear();
+
+    Raz::Logger::warn("");
+    CHECK(str == "a");
+    str.clear();
+
+    Raz::Logger::info("");
+    CHECK(str.empty());
 
     Raz::Logger::debug("");
     CHECK(str.empty());
@@ -92,6 +126,9 @@ TEST_CASE("Logger levels") {
     CHECK(str == "a");
     str.clear();
 
+    Raz::Logger::warn("");
+    CHECK(str.empty());
+
     Raz::Logger::info("");
     CHECK(str.empty());
 
@@ -103,6 +140,9 @@ TEST_CASE("Logger levels") {
     Raz::Logger::setLoggingLevel(Raz::LoggingLevel::NONE);
 
     Raz::Logger::error("");
+    CHECK(str.empty());
+
+    Raz::Logger::warn("");
     CHECK(str.empty());
 
     Raz::Logger::info("");

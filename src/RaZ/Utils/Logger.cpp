@@ -14,6 +14,16 @@ void Logger::error(const std::string& message) {
     std::cerr << "[RaZ] [Error] - " << message << '\n';
 }
 
+void Logger::warn(const std::string& message) {
+  if (static_cast<int>(m_logLevel) < static_cast<int>(LoggingLevel::WARNING))
+    return;
+
+  if (m_logFunc)
+    m_logFunc(LoggingLevel::WARNING, message);
+  else
+    std::cerr << "[RaZ] [Warning] - " << message << '\n';
+}
+
 void Logger::info(const std::string& message) {
   if (static_cast<int>(m_logLevel) < static_cast<int>(LoggingLevel::INFO))
     return;

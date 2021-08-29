@@ -4,7 +4,6 @@
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <AL/al.h>
-#include <iostream>
 
 namespace Raz {
 

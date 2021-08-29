@@ -7,8 +7,7 @@
 
 #include <AL/alc.h>
 
-#include <iostream>
-#include <string_view>
+#include <string>
 
 namespace Raz {
 

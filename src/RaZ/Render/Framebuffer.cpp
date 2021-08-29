@@ -2,8 +2,6 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <iostream>
-
 namespace Raz {
 
 Framebuffer::Framebuffer() {

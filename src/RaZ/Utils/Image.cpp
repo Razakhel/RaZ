@@ -4,7 +4,6 @@
 
 #include <cassert>
 #include <fstream>
-#include <iostream>
 
 namespace Raz {
 

@@ -1,7 +1,7 @@
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <array>
-#include <iostream>
 #include <string>
 
 namespace Raz {
@@ -76,7 +76,7 @@ inline WavInfo validateWav(std::ifstream& file) {
   // 80: MPEG
 
   if (info.audioFormat != 1)
-    std::cerr << "Warning: Only WAV files with a PCM format are supported." << std::endl;
+    Logger::warn("Only WAV files with a PCM format are supported.");
 
   file.read(reinterpret_cast<char*>(bytes.data()), 2); // Channel count
   info.channelCount = fromLittleEndian(bytes[0], bytes[1]);
@@ -100,7 +100,7 @@ inline WavInfo validateWav(std::ifstream& file) {
   info.bitsPerSample = fromLittleEndian(bytes[0], bytes[1]);
 
   if (info.audioFormat == 0)
-    std::cerr << "Warning: Failed to recover the WAV sound format." << std::endl;
+    Logger::warn("Failed to recover the WAV sound format.");
 
   ////////////////
   // Data block //

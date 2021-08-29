@@ -13,8 +13,6 @@
 #include <emscripten/html5.h>
 #endif
 
-#include <iostream>
-
 namespace Raz {
 
 Window::Window(unsigned int width, unsigned int height,
@@ -121,7 +119,7 @@ bool Window::recoverVerticalSyncState() const {
   return true;
 #endif
 
-  std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
+  Logger::warn("Vertical synchronization unsupported.");
   return false;
 }
 
@@ -141,7 +139,7 @@ void Window::enableVerticalSync([[maybe_unused]] bool value) const {
   glfwSwapInterval(value);
 #endif
 
-  std::cerr << "Warning: Vertical synchronization unsupported." << std::endl;
+  Logger::warn("Vertical synchronization unsupported.");
 }
 
 void Window::changeCursorState(Cursor::State state) const {

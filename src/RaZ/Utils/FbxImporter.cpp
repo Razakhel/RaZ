@@ -4,7 +4,6 @@
 
 #include <fbxsdk.h>
 #include <fstream>
-#include <iostream>
 
 namespace Raz {
 

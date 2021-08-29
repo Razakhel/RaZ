@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
-#include <iostream>
 
 namespace Raz {
 
@@ -711,7 +710,7 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   printErrors();
 
   if (location == -1)
-    std::cerr << "Warning: Uniform '" << uniformName << "' unrecognized." << std::endl;
+    Logger::warn("Uniform '" + std::string(uniformName) + "' unrecognized.");
 #endif
 
   return location;

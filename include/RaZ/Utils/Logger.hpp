@@ -11,6 +11,7 @@ namespace Raz {
 enum class LoggingLevel {
   NONE = 0, ///< Ignore all logs.
   ERROR,    ///< Output logs of error category.
+  WARNING,  ///< Output logs of warning category & below.
   INFO,     ///< Output logs of info category & below.
   DEBUG,    ///< Output logs of debug category & below.
   ALL       ///< Output all logs.
@@ -28,6 +29,10 @@ public:
   /// \note Requires a logging level of "error" or above.
   /// \param message Message to be printed.
   static void error(const std::string& message);
+  /// Prints a warning message.
+  /// \note Requires a logging level of "warning" or above.
+  /// \param message Message to be printed.
+  static void warn(const std::string& message);
   /// Prints an information message.
   /// \note Requires a logging level of "info" or above.
   /// \param message Message to be printed.
