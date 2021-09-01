@@ -72,6 +72,42 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
   }
 }
 
+template <typename T>
+inline void printSendUniformErrors(unsigned int uniformIndex, T value) {
+  const ErrorCodes errorCodes = Renderer::recoverErrors();
+
+  if (errorCodes.isEmpty())
+    return;
+
+  std::cerr << "Renderer::sendUniform - ";
+
+  if (errorCodes[ErrorCode::INVALID_OPERATION]) {
+    if (Renderer::getCurrentProgram() == 0)
+      std::cerr << "No program currently defined as being used.\n";
+
+    if (uniformIndex == -1) {
+      std::cerr << "Unrecognized uniform location index (" << uniformIndex << ").\n";
+    } else {
+      std::string uniformName;
+      UniformType uniformType;
+      Renderer::recoverUniformInfo(Renderer::getCurrentProgram(), uniformIndex, uniformType, uniformName);
+
+      if (!std::is_same_v<std::decay_t<T>, float> && (uniformType == UniformType::FLOAT
+                                                   || uniformType == UniformType::VEC2
+                                                   || uniformType == UniformType::VEC3
+                                                   || uniformType == UniformType::VEC4)) {
+        std::cerr << "Trying to pass a non-float value to a float uniform.\n";
+      }
+
+    }
+  }
+
+  if (errorCodes[ErrorCode::INVALID_VALUE])
+    std::cerr << "Negative uniform count are not accepted.\n";
+
+  std::cerr << std::flush;
+}
+
 } // namespace
 
 void Renderer::initialize() {

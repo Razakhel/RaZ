@@ -73,8 +73,10 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
 
         const ShaderProgram& geometryProgram = m_geometryPass.getProgram();
 
+#if !defined(RAZ_USE_VULKAN)
         geometryProgram.sendUniform("uniModelMatrix", modelMat);
         geometryProgram.sendUniform("uniMvpMatrix", modelMat * viewProjMat);
+#endif
 
         entity->getComponent<Mesh>().draw(geometryProgram);
       }
@@ -86,8 +88,10 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
 
   geometryFramebuffer.unbind();
 
+#if !defined(RAZ_USE_VULKAN)
   for (const RenderPass* renderPass : m_geometryPass.getChildren())
     renderPass->execute(geometryFramebuffer);
+#endif
 }
 
 } // namespace Raz

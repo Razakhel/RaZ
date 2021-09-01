@@ -45,8 +45,10 @@ public:
   void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
   void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
+#if !defined(RAZ_USE_VULKAN)
   void addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
   void addTexture(const Texture& texture);
+#endif
   void addSeparator();
   void addFrameTime(std::string formattedLabel);
   void addFpsCounter(std::string formattedLabel);
@@ -184,6 +186,7 @@ private:
     std::function<void(const std::string&)> m_callback {};
   };
 
+#if !defined(RAZ_USE_VULKAN)
   class OverlayTexture final : public OverlayElement {
     friend Overlay;
 
@@ -202,6 +205,7 @@ private:
     float m_width {};
     float m_height {};
   };
+#endif
 
   class OverlaySeparator final : public OverlayElement {
   public:

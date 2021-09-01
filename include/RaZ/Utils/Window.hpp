@@ -169,6 +169,7 @@ public:
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.
   void addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback);
+#if !defined(RAZ_USE_VULKAN)
   /// Adds a texture on the overlay.
   /// \param texture Texture to be displayed.
   /// \param maxWidth Maximum texture's width.
@@ -177,6 +178,7 @@ public:
   /// Adds a texture on the overlay. The maximum width & height will be those of the texture.
   /// \param texture Texture to be displayed.
   void addOverlayTexture(const Texture& texture);
+#endif
   /// Adds an horizontal separator on the overlay.
   void addOverlaySeparator();
   /// Adds a frame time display on the overlay.

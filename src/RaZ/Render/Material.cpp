@@ -65,6 +65,7 @@ void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
   static const std::string transparencyMapLocation = locationBase + "transparencyMap";
   static const std::string bumpMapLocation         = locationBase + "bumpMap";
 
+#if !defined(RAZ_USE_VULKAN)
   program.use();
   program.sendUniform(diffuseMapLocation,      m_baseColorMap->getBindingIndex());
   program.sendUniform(ambientMapLocation,      m_ambientMap->getBindingIndex());
@@ -72,6 +73,7 @@ void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
   program.sendUniform(emissiveMapLocation,     m_emissiveMap->getBindingIndex());
   program.sendUniform(transparencyMapLocation, m_transparencyMap->getBindingIndex());
   program.sendUniform(bumpMapLocation,         m_bumpMap->getBindingIndex());
+#endif
 }
 
 void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
@@ -83,12 +85,14 @@ void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
   static const std::string emissiveLocation     = locationBase + "emissive";
   static const std::string transparencyLocation = locationBase + "transparency";
 
+#if !defined(RAZ_USE_VULKAN)
   program.use();
   program.sendUniform(diffuseLocation,      m_baseColor);
   program.sendUniform(ambientLocation,      m_ambient);
   program.sendUniform(specularLocation,     m_specular);
   program.sendUniform(emissiveLocation,     m_emissive);
   program.sendUniform(transparencyLocation, m_transparency);
+#endif
 
   m_baseColorMap->activate();
   m_baseColorMap->bind();
@@ -138,12 +142,14 @@ void MaterialCookTorrance::initTextures(const ShaderProgram& program) const {
   static const std::string roughnessMapLocation        = locationBase + "roughnessMap";
   static const std::string ambientOcclusionMapLocation = locationBase + "ambientOcclusionMap";
 
+#if !defined(RAZ_USE_VULKAN)
   program.use();
   program.sendUniform(albedoMapLocation,           m_baseColorMap->getBindingIndex());
   program.sendUniform(normalMapLocation,           m_normalMap->getBindingIndex());
   program.sendUniform(metallicMapLocation,         m_metallicMap->getBindingIndex());
   program.sendUniform(roughnessMapLocation,        m_roughnessMap->getBindingIndex());
   program.sendUniform(ambientOcclusionMapLocation, m_ambientOcclusionMap->getBindingIndex());
+#endif
 }
 
 void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
@@ -153,10 +159,12 @@ void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
   static const std::string metallicFactorLocation  = locationBase + "metallicFactor";
   static const std::string roughnessFactorLocation = locationBase + "roughnessFactor";
 
+#if !defined(RAZ_USE_VULKAN)
   program.use();
   program.sendUniform(baseColorLocation,       m_baseColor);
   program.sendUniform(metallicFactorLocation,  m_metallicFactor);
   program.sendUniform(roughnessFactorLocation, m_roughnessFactor);
+#endif
 
   m_baseColorMap->activate();
   m_baseColorMap->bind();

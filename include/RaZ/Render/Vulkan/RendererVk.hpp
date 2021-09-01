@@ -4,6 +4,8 @@
 #define RAZ_RENDERERVK_HPP
 
 #include "RaZ/Utils/EnumUtils.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Plugin.hpp"
 
 #include <vulkan/vulkan.h>
 
@@ -15,6 +17,36 @@
 #include <vector>
 
 struct GLFWwindow;
+
+using VkInstance               = struct VkInstance_T*;
+using VkPhysicalDevice         = struct VkPhysicalDevice_T*;
+using VkDevice                 = struct VkDevice_T*;
+using VkQueue                  = struct VkQueue_T*;
+using VkSemaphore              = struct VkSemaphore_T*;
+using VkCommandBuffer          = struct VkCommandBuffer_T*;
+using VkFence                  = struct VkFence_T*;
+using VkBuffer                 = struct VkBuffer_T*;
+using VkDeviceMemory           = struct VkDeviceMemory_T*;
+using VkImage                  = struct VkImage_T*;
+using VkEvent                  = struct VkEvent_T*;
+using VkQueryPool              = struct VkQueryPool_T*;
+using VkBufferView             = struct VkBufferView_T*;
+using VkImageView              = struct VkImageView_T*;
+using VkShaderModule           = struct VkShaderModule_T*;
+using VkPipelineCache          = struct VkPipelineCache_T*;
+using VkPipelineLayout         = struct VkPipelineLayout_T*;
+using VkRenderPass             = struct VkRenderPass_T*;
+using VkPipeline               = struct VkPipeline_T*;
+using VkDescriptorSetLayout    = struct VkDescriptorSetLayout_T*;
+using VkSampler                = struct VkSampler_T*;
+using VkDescriptorPool         = struct VkDescriptorPool_T*;
+using VkDescriptorSet          = struct VkDescriptorSet_T*;
+using VkFramebuffer            = struct VkFramebuffer_T*;
+using VkCommandPool            = struct VkCommandPool_T*;
+using VkSurfaceKHR             = struct VkSurfaceKHR_T*;
+using VkSwapchainKHR           = struct VkSwapchainKHR_T*;
+using VkDebugUtilsMessengerEXT = struct VkDebugUtilsMessengerEXT_T*;
+using VkDeviceSize             = uint64_t;
 
 namespace Raz {
 
@@ -523,7 +555,7 @@ public:
                            VkDeviceMemory& bufferMemory,
                            BufferUsage usageFlags,
                            MemoryProperty propertyFlags,
-                           std::size_t bufferSize);
+                           uint64_t bufferSize);
   static void createStagedBuffer(VkBuffer& buffer,
                                  VkDeviceMemory& bufferMemory,
                                  BufferUsage bufferType,
@@ -562,6 +594,7 @@ public:
   static void drawFrame();
   static void destroyFramebuffer(VkFramebuffer framebuffer);
   static void destroyRenderPass(VkRenderPass renderPass);
+  static void waitDevice();
   /// Destroys the renderer, deallocating Vulkan resources.
   static void destroy();
 
@@ -633,6 +666,27 @@ public:
   ~Renderer() = delete;
 
 private:
+  ///////////////////////////////
+  // Vulkan plugin & functions //
+  ///////////////////////////////
+
+  [[nodiscard]] static bool loadVkFunctions();
+
+  static inline Plugin s_vulkanLib {};
+
+  using VkCreateInstanceT = VkResult (*)(const VkInstanceCreateInfo*, const VkAllocationCallbacks*, VkInstance*);
+  static inline VkCreateInstanceT s_vkCreateInstance {};
+
+  using VkEnumeratePhysicalDevicesT = VkResult (*)(VkInstance, uint32_t*, VkPhysicalDevice*);
+  static inline VkEnumeratePhysicalDevicesT s_vkEnumeratePhysicalDevices {};
+
+  using VkGetPhysicalDevicePropertiesT = VkResult (*)(VkPhysicalDevice, VkPhysicalDeviceProperties*);
+  static inline VkGetPhysicalDevicePropertiesT s_vkGetPhysicalDeviceProperties {};
+
+  //////////////////////
+  // Renderer members //
+  //////////////////////
+
   static constexpr int MaxFramesInFlight = 2;
 
   static inline bool s_isInitialized = false;

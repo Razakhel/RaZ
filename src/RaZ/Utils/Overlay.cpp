@@ -43,6 +43,7 @@ void Overlay::addTextbox(std::string label, std::function<void(const std::string
   static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
 }
 
+#if !defined(RAZ_USE_VULKAN)
 void Overlay::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
   m_elements.emplace_back(OverlayTexture::create(texture, maxWidth, maxHeight));
 }
@@ -50,6 +51,7 @@ void Overlay::addTexture(const Texture& texture, unsigned int maxWidth, unsigned
 void Overlay::addTexture(const Texture& texture) {
   m_elements.emplace_back(OverlayTexture::create(texture));
 }
+#endif
 
 void Overlay::addSeparator() {
   m_elements.emplace_back(OverlaySeparator::create());
@@ -139,6 +141,7 @@ void Overlay::render() {
         break;
       }
 
+#if !defined(RAZ_USE_VULKAN)
       case OverlayElementType::TEXTURE:
       {
         auto& texture = static_cast<OverlayTexture&>(*element);
@@ -156,6 +159,7 @@ void Overlay::render() {
 
         break;
       }
+#endif
 
       case OverlayElementType::SEPARATOR:
         ImGui::Separator();

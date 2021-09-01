@@ -987,6 +987,13 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
     return;
 
   ///////////////////////
+  // Functions loading //
+  ///////////////////////
+
+  if (!loadVkFunctions())
+    throw std::runtime_error("Error: Vulkan unsupported.");
+
+  ///////////////////////
   // Validation layers //
   ///////////////////////
 
@@ -1023,7 +1030,7 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   instanceCreateInfo.pNext = &debugCreateInfo;
 #endif
 
-  if (vkCreateInstance(&instanceCreateInfo, nullptr, &s_instance) != VK_SUCCESS)
+  if (s_vkCreateInstance(&instanceCreateInfo, nullptr, &s_instance) != VK_SUCCESS)
     throw std::runtime_error("Error: Failed to create a Vulkan instance.");
 
   ////////////////////
@@ -1067,13 +1074,13 @@ void Renderer::initialize(GLFWwindow* windowHandle) {
   /////////////////////
 
   uint32_t deviceCount = 0;
-  vkEnumeratePhysicalDevices(s_instance, &deviceCount, nullptr);
+  s_vkEnumeratePhysicalDevices(s_instance, &deviceCount, nullptr);
 
   if (deviceCount == 0)
     throw std::runtime_error("Error: No GPU available with Vulkan support.");
 
   std::vector<VkPhysicalDevice> devices(deviceCount);
-  vkEnumeratePhysicalDevices(s_instance, &deviceCount, devices.data());
+  s_vkEnumeratePhysicalDevices(s_instance, &deviceCount, devices.data());
 
   for (const VkPhysicalDevice& device : devices) {
     if (isDeviceSuitable(device, s_surface)) {
@@ -1908,8 +1915,12 @@ void Renderer::destroyRenderPass(VkRenderPass renderPass) {
   vkDestroyRenderPass(s_logicalDevice, renderPass, nullptr);
 }
 
-void Renderer::destroy() {
+void Renderer::waitDevice() {
   vkDeviceWaitIdle(s_logicalDevice);
+}
+
+void Renderer::destroy() {
+  Renderer::waitDevice();
 
 #if !defined(NDEBUG)
   destroyDebugUtilsMessengerEXT(s_instance, m_debugMessenger, nullptr);
@@ -1949,8 +1960,34 @@ void Renderer::destroy() {
   vkDestroySurfaceKHR(s_instance, s_surface, nullptr);
   vkDestroyInstance(s_instance, nullptr);
 
+  s_vkGetPhysicalDeviceProperties = nullptr;
+  s_vkEnumeratePhysicalDevices = nullptr;
+  s_vkCreateInstance = nullptr;
+  s_vulkanLib.close();
+
   s_windowHandle = nullptr;
   s_isInitialized = false;
+}
+
+bool Renderer::loadVkFunctions() {
+  s_vulkanLib.load("vulkan-1.dll");
+
+  if (!s_vulkanLib.isLoaded())
+    return false;
+
+  s_vkCreateInstance = s_vulkanLib.loadFunction<VkCreateInstanceT>("vkCreateInstance");
+  if (!s_vkCreateInstance)
+    return false;
+
+  s_vkEnumeratePhysicalDevices = s_vulkanLib.loadFunction<VkEnumeratePhysicalDevicesT>("vkEnumeratePhysicalDevices");
+  if (!s_vkEnumeratePhysicalDevices)
+    return false;
+
+  s_vkGetPhysicalDeviceProperties = s_vulkanLib.loadFunction<VkGetPhysicalDevicePropertiesT>("vkGetPhysicalDeviceProperties");
+  if (!s_vkGetPhysicalDeviceProperties)
+    return false;
+
+  return true;
 }
 
 } // namespace Raz

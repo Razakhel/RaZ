@@ -82,6 +82,7 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
   const auto& lightComp = entity->getComponent<Light>();
   Vec4f homogeneousPos(entity->getComponent<Transform>().getPosition(), 1.f);
 
+#if !defined(RAZ_USE_VULKAN)
   if (lightComp.getType() == LightType::DIRECTIONAL) {
     homogeneousPos[3] = 0.f;
     geometryProgram.sendUniform(strBase + "direction", lightComp.getDirection());
@@ -91,6 +92,7 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
   geometryProgram.sendUniform(energyStr, lightComp.getEnergy());
   geometryProgram.sendUniform(colorStr,  lightComp.getColor());
   geometryProgram.sendUniform(angleStr,  lightComp.getAngle());
+#endif
 }
 
 void RenderSystem::updateLights() const {
@@ -103,7 +105,9 @@ void RenderSystem::updateLights() const {
     }
   }
 
+#if !defined(RAZ_USE_VULKAN)
   getGeometryProgram().sendUniform("uniLightCount", static_cast<unsigned int>(lightCount));
+#endif
 }
 
 void RenderSystem::updateShaders() const {

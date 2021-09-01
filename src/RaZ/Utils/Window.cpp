@@ -106,7 +106,7 @@ void Window::resize(unsigned int width, unsigned int height) {
   glfwSetWindowSize(m_windowHandle, static_cast<int>(width), static_cast<int>(height));
 }
 
-void Window::enableFaceCulling(bool value) const {
+void Window::enableFaceCulling([[maybe_unused]] bool value) const {
 #if !defined(RAZ_USE_VULKAN)
   if (value)
     Renderer::enable(Capability::CULL);
@@ -195,7 +195,7 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
 void Window::setCloseCallback(std::function<void()> func) {
   m_closeCallback = std::move(func);
 
-  glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
+  glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow* window) {
     CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
     closeCallback();
   });
@@ -289,6 +289,7 @@ void Window::addOverlayTextbox(std::string label, std::function<void(const std::
   m_overlay->addTextbox(std::move(label), std::move(callback));
 }
 
+#if !defined(RAZ_USE_VULKAN)
 void Window::addOverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
   m_overlay->addTexture(texture, maxWidth, maxHeight);
 }
@@ -296,6 +297,7 @@ void Window::addOverlayTexture(const Texture& texture, unsigned int maxWidth, un
 void Window::addOverlayTexture(const Texture& texture) {
   m_overlay->addTexture(texture);
 }
+#endif
 
 void Window::addOverlaySeparator() {
   m_overlay->addSeparator();

@@ -1,0 +1,159 @@
+#version 450
+
+#define MAX_LIGHT_COUNT 10
+#define PI 3.1415926535897932384626433832795
+
+struct Light {
+  vec4 position;
+  vec3 direction;
+  float energy;
+  vec3 color;
+  float angle;
+};
+
+layout(location = 0) in MeshInfo {
+  vec3 vertPosition;
+  vec2 vertTexcoords;
+  mat3 vertTBNMatrix;
+} fragMeshInfo;
+
+layout(binding = 0, std140) uniform uboCameraMatrices {
+  mat4 viewMat;
+  mat4 invViewMat;
+  mat4 projectionMat;
+  mat4 invProjectionMat;
+  mat4 viewProjectionMat;
+  vec3 cameraPos;
+};
+
+layout(binding = 1, std140) uniform uboLightInfo {
+  uint lightCount;
+  Light lights[MAX_LIGHT_COUNT];
+};
+
+layout(binding = 2, std140) uniform uboMaterial {
+  vec3 baseColor;
+  float metallicFactor;
+  float roughnessFactor;
+
+  sampler2D albedoMap;
+  sampler2D normalMap;
+  sampler2D metallicMap;
+  sampler2D roughnessMap;
+  sampler2D ambientOcclusionMap;
+};
+
+layout(location = 0) out vec4 fragColor;
+layout(location = 1) out vec3 bufferNormal;
+
+// Normal Distribution Function: Trowbridge-Reitz GGX
+float computeNormalDistrib(vec3 normal, vec3 halfVec, float roughness) {
+  float sqrRough  = roughness * roughness;
+  float frthRough = sqrRough * sqrRough;
+
+  float halfVecAngle    = max(dot(halfVec, normal), 0.0);
+  float sqrHalfVecAngle = halfVecAngle * halfVecAngle;
+
+  float divider = (sqrHalfVecAngle * (frthRough - 1.0) + 1.0);
+  divider       = PI * divider * divider;
+
+  return frthRough / max(divider, 0.001);
+}
+
+// Fresnel: Shlick
+vec3 computeFresnel(float cosTheta, vec3 baseReflectivity) {
+  // Optimized exponent version, from: http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+  return baseReflectivity + (1.0 - baseReflectivity) * pow(2.0, (-5.55473 * cosTheta - 6.98316) * cosTheta);
+}
+
+// Shlick-Beckmann for Geometry part
+float computeGeomShlickGGX(float angle, float roughness) {
+  float incrRough   = (roughness + 1.0);
+  float roughFactor = (incrRough * incrRough) / 8.0;
+
+  float denom = angle * (1.0 - roughFactor) + roughFactor;
+
+  return angle / denom;
+}
+
+// Geometry: Smith's Shlick GGX
+float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness) {
+  float viewAngle  = max(dot(viewDir, normal), 0.0);
+  float lightAngle = max(dot(lightDir, normal), 0.0);
+
+  float viewGeom  = computeGeomShlickGGX(viewAngle, roughness);
+  float lightGeom = computeGeomShlickGGX(lightAngle, roughness);
+
+  return viewGeom * lightGeom;
+}
+
+void main() {
+  // Gamma correction for albedo (sRGB presumed)
+  vec3 albedo     = pow(texture(uboMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uboMaterial.baseColor;
+  float metallic  = texture(uboMaterial.metallicMap, fragMeshInfo.vertTexcoords).r * uboMaterial.metallicFactor;
+  float roughness = texture(uboMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r * uboMaterial.roughnessFactor;
+  float ambOcc    = texture(uboMaterial.ambientOcclusionMap, fragMeshInfo.vertTexcoords).r;
+
+  vec3 normal = texture(uboMaterial.normalMap, fragMeshInfo.vertTexcoords).rgb;
+  normal      = normalize(normal * 2.0 - 1.0);
+  normal      = normalize(fragMeshInfo.vertTBNMatrix * normal);
+
+  vec3 viewDir = normalize(cameraPos - fragMeshInfo.vertPosition);
+
+  // Base Fresnel (F)
+  vec3 baseReflectivity = mix(vec3(0.04), albedo, metallic);
+
+  vec3 albedoFactor = albedo / PI;
+
+  vec3 lightRadiance = vec3(0.0);
+
+  for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
+    vec3 fullLightDir;
+    float attenuation = uboLightInfo.lights[lightIndex].energy;
+
+    if (uboLightInfo.lights[lightIndex].position.w != 0.0) {
+      fullLightDir = uboLightInfo.lights[lightIndex].position.xyz - fragMeshInfo.vertPosition;
+
+      float sqrDist = dot(fullLightDir, fullLightDir);
+      attenuation  /= sqrDist;
+    } else {
+      fullLightDir = -uboLightInfo.lights[lightIndex].direction;
+    }
+
+    vec3 lightDir = normalize(fullLightDir);
+    vec3 halfDir  = normalize(viewDir + lightDir);
+    vec3 radiance = uboLightInfo.lights[lightIndex].color * attenuation;
+
+    // Normal distrib (D)
+    float normalDistrib = computeNormalDistrib(normal, halfDir, roughness);
+
+    // Fresnel (F)
+    vec3 fresnel = computeFresnel(max(dot(halfDir, viewDir), 0.0), baseReflectivity);
+
+    // Geometry (G)
+    float geometry = computeGeometry(normal, viewDir, lightDir, roughness);
+
+    vec3 DFG         = normalDistrib * fresnel * geometry;
+    float lightAngle = max(dot(lightDir, normal), 0.0);
+    float divider    = 4.0 * max(dot(viewDir, normal), 0.0) * lightAngle;
+    vec3 specular    = DFG / max(divider, 0.001);
+
+    vec3 diffuse = vec3(1.0) - fresnel;
+    diffuse     *= 1.0 - metallic;
+
+    lightRadiance += (diffuse * albedoFactor + specular) * radiance * lightAngle;
+  }
+
+  vec3 ambient = vec3(0.03) * albedo * ambOcc;
+  vec3 color   = ambient + lightRadiance;
+
+  // HDR tone mapping
+  color = color / (color + vec3(1.0));
+  // Gamma correction
+  color = pow(color, vec3(1.0 / 2.2));
+
+  fragColor = vec4(color, metallic);
+
+  // Sending fragment normal to next framebuffer(s), if any
+  bufferNormal = fragMeshInfo.vertTBNMatrix[2];
+}
