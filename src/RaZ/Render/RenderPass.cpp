@@ -1,4 +1,5 @@
 #include "RaZ/Render/RenderPass.hpp"
+#include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 

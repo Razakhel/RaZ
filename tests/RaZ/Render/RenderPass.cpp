@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Render/RenderPass.hpp"
+#include "RaZ/Render/Texture.hpp"
 
 TEST_CASE("RenderPass validity") {
   Raz::RenderPass initialPass;

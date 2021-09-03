@@ -1,6 +1,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
+#include <iostream>
+
 namespace Raz {
 
 namespace {
@@ -110,5 +112,15 @@ std::wstring FilePath::toWide() const {
   return StrUtils::toWide(m_path);
 }
 #endif
+
+std::ostream& operator<<(std::ostream& stream, const FilePath& filePath) {
+  stream << filePath.toUtf8();
+  return stream;
+}
+
+std::wostream& operator<<(std::wostream& stream, const FilePath& filePath) {
+  stream << filePath.toWide();
+  return stream;
+}
 
 } // namespace Raz

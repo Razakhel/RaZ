@@ -20,6 +20,14 @@
 /// \note Make sure the warnings' state has been pushed before.
 /// \param Warning ID of the warning to disable.
 #define DISABLE_WARNING(Warning) DO_PRAGMA(warning(disable : Warning))
+
+/// Disables the given MSVC warning; must be a 4 digits number.
+/// \note Make sure the warnings' state has been pushed before.
+/// \param Warning ID of the warning to disable.
+#define DISABLE_WARNING_MSVC(Warning) DISABLE_WARNING(Warning)
+
+#define DISABLE_WARNING_GCC(Warning)
+#define DISABLE_WARNING_CLANG(Warning)
 #elif defined(RAZ_COMPILER_GCC) || defined(RAZ_COMPILER_CLANG)
 /// Declares a pragma directive, passing it the given argument.
 /// \param Arg Argument to be passed to the pragma directive.
@@ -35,23 +43,34 @@
 
 /// Disables the given GCC/Clang warning; must be an unquoted string starting with -W.
 /// \note Make sure the warnings' state has been pushed before.
-/// \param Warning String literal of the warning to disable.
+/// \param Warning Enquoted name of the warning to disable.
 #define DISABLE_WARNING(Warning) DO_PRAGMA(GCC diagnostic ignored #Warning)
-#else
-/// Declares a pragma directive, passing it the given argument.
-/// \param Arg Argument to be passed to the pragma directive.
-#define DO_PRAGMA(Arg)
-/// Saves the warnings' state to be reapplied later.
-/// \see POP_WARNINGS_STATE.
-#define PUSH_WARNINGS_STATE
-/// Reapplies the previously pushed warnings' state.
-/// \see PUSH_WARNINGS_STATE.
-#define POP_WARNINGS_STATE
-/// Disables the given compiler-specific warning.
+
+#if defined(RAZ_COMPILER_CLANG)
+/// Disables the given Clang warning; must be an unquoted string starting with -W.
 /// \note Make sure the warnings' state has been pushed before.
-/// \see PUSH_WARNINGS_STATE.
-/// \param Warning Warning to disable.
+/// \param Warning Enquoted name of the warning to disable.
+#define DISABLE_WARNING_CLANG(Warning) DISABLE_WARNING(Warning)
+
+#define DISABLE_WARNING_GCC(Warning)
+#else
+/// Disables the given GCC warning; must be an unquoted string starting with -W.
+/// \note Make sure the warnings' state has been pushed before.
+/// \param Warning Enquoted name of the warning to disable.
+#define DISABLE_WARNING_GCC(Warning) DISABLE_WARNING(Warning)
+
+#define DISABLE_WARNING_CLANG(Warning)
+#endif
+
+#define DISABLE_WARNING_MSVC(Warning)
+#else
+#define DO_PRAGMA(Arg)
+#define PUSH_WARNINGS_STATE
+#define POP_WARNINGS_STATE
 #define DISABLE_WARNING(Warning)
+#define DISABLE_WARNING_GCC(Warning)
+#define DISABLE_WARNING_CLANG(Warning)
+#define DISABLE_WARNING_MSVC(Warning)
 #endif
 
 #endif // RAZ_COMPILERUTILS_HPP

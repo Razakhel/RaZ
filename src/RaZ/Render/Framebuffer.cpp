@@ -1,5 +1,7 @@
 #include "RaZ/Render/Framebuffer.hpp"
+#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 namespace Raz {

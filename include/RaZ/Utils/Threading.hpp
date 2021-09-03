@@ -3,6 +3,9 @@
 #ifndef RAZ_THREADING_HPP
 #define RAZ_THREADING_HPP
 
+// <thread> must be included first, since it creates the definition checked below
+#include <thread>
+
 // std::thread is not available on MinGW with Win32 threads
 #if defined(__MINGW32__) && !defined(_GLIBCXX_HAS_GTHREADS)
 #pragma message("Warning: Threads are not available with your compiler; check that you're using POSIX threads and not Win32 ones.")
@@ -14,7 +17,6 @@
 
 #include <functional>
 #include <future>
-#include <thread>
 
 namespace Raz::Threading {
 

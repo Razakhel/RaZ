@@ -96,22 +96,6 @@ TEST_CASE("FilePath concatenation") {
     concat = testPath + str;
     CHECK(concat == L"tèstPâth_strïng_");
   }
-
-  // operator<<(std::ostream)
-  {
-    std::stringstream stream;
-    stream << testPath;
-
-    CHECK(stream.str() == "tèstPâth");
-  }
-
-  // operator<<(std::wostream)
-  {
-    std::wstringstream stream;
-    stream << testPath;
-
-    CHECK(stream.str() == L"tèstPâth");
-  }
 }
 
 TEST_CASE("FilePath utilities") {
@@ -149,4 +133,24 @@ TEST_CASE("FilePath utilities") {
   CHECK(Raz::FilePath::recoverFileName(mixedSeparatorsTestPath /*, true */) == "fïlè.êxt");
   CHECK(Raz::FilePath::recoverFileName(mixedSeparatorsTestPath, false) == "fïlè");
   CHECK(Raz::FilePath::recoverExtension(mixedSeparatorsTestPath) == "êxt");
+}
+
+TEST_CASE("FilePath printing") {
+  const Raz::FilePath testPath = "tèstPâth";
+
+  // operator<<(std::ostream)
+  {
+    std::stringstream stream;
+
+    stream << testPath;
+    CHECK(stream.str() == "tèstPâth");
+  }
+
+  // operator<<(std::wostream)
+  {
+    std::wstringstream stream;
+
+    stream << testPath;
+    CHECK(stream.str() == L"tèstPâth");
+  }
 }

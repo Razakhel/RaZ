@@ -4,6 +4,7 @@
 #define RAZ_RENDERGRAPH_HPP
 
 #include "RaZ/Render/RenderPass.hpp"
+#include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Graph.hpp"
 
 namespace Raz {

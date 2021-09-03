@@ -1,6 +1,7 @@
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
+#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 

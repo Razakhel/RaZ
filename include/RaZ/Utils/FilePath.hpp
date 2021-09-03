@@ -3,7 +3,7 @@
 #ifndef RAZ_FILEPATH_HPP
 #define RAZ_FILEPATH_HPP
 
-#include <iostream>
+#include <iosfwd>
 #include <string>
 #include <string_view>
 
@@ -118,15 +118,8 @@ static inline std::wstring operator+(const std::wstring& pathStr, const FilePath
   return pathStr + filePath.toWide();
 }
 
-static inline std::ostream& operator<<(std::ostream& stream, const FilePath& filePath) {
-  stream << filePath.toUtf8();
-  return stream;
-}
-
-static inline std::wostream& operator<<(std::wostream& stream, const FilePath& filePath) {
-  stream << filePath.toWide();
-  return stream;
-}
+extern std::ostream& operator<<(std::ostream& stream, const FilePath& filePath);
+extern std::wostream& operator<<(std::wostream& stream, const FilePath& filePath);
 
 } // namespace Raz
 
