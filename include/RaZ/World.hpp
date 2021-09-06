@@ -19,6 +19,12 @@ public:
   const std::vector<SystemPtr>& getSystems() const { return m_systems; }
   const std::vector<EntityPtr>& getEntities() const { return m_entities; }
 
+  /// Adds a given system to the world.
+  /// \tparam Sys Type of the system to be added.
+  /// \tparam Args Types of the arguments to be forwarded to the given system.
+  /// \param args Arguments to be forwarded to the given system.
+  /// \return Reference to the newly added system.
+  template <typename Sys, typename... Args> Sys& addSystem(Args&&... args);
   /// Tells if a given system exists within the world.
   /// \tparam Sys Type of the system to be checked.
   /// \return True if the given system is present, false otherwise.
@@ -33,12 +39,6 @@ public:
   /// \tparam Sys Type of the system to be fetched.
   /// \return Reference to the found system.
   template <typename Sys> Sys& getSystem() { return const_cast<Sys&>(static_cast<const World*>(this)->getSystem<Sys>()); }
-  /// Adds a given system to the world.
-  /// \tparam Sys Type of the system to be added.
-  /// \tparam Args Types of the arguments to be forwarded to the given system.
-  /// \param args Arguments to be forwarded to the given system.
-  /// \return Reference to the newly added system.
-  template <typename Sys, typename... Args> Sys& addSystem(Args&&... args);
   /// Removes the given system from the world.
   /// \tparam Sys Type of the system to be removed.
   template <typename Sys> void removeSystem();
@@ -57,6 +57,10 @@ public:
   /// \param enabled True if the entity should be active immediately, false otherwise.
   /// \return Reference to the newly added entity.
   template <typename... Comps> Entity& addEntityWithComponents(bool enabled = true);
+  /// Fetches entities which contain specific component(s).
+  /// \tparam Comps Types of the components to query.
+  /// \return List of entities containing all given components.
+  template <typename... Comps> std::vector<Entity*> recoverEntitiesWithComponents();
   /// Removes an entity from the world. It *must* be an entity created by this world.
   /// \param entity Entity to be removed.
   void removeEntity(const Entity& entity);

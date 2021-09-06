@@ -2,7 +2,7 @@
 
 #include "RaZ/World.hpp"
 
-TEST_CASE("World entities") {
+TEST_CASE("World entities manipulation") {
   Raz::World world(3);
 
   // The constructor argument simply reserves the size for entities
@@ -38,6 +38,43 @@ TEST_CASE("World entities") {
   // The entity removal is made by checking the pointers; if it isn't owned by this world, it throws an exception
   Raz::Entity extEntity(0);
   CHECK_THROWS(world.removeEntity(extEntity));
+}
+
+TEST_CASE("World get entities with components") {
+  struct TestComp1 : public Raz::Component {};
+  struct TestComp2 : public Raz::Component {};
+
+  Raz::World world(2);
+
+  Raz::Entity& entity1 = world.addEntity();
+  Raz::Entity& entity2 = world.addEntity();
+
+  CHECK(world.recoverEntitiesWithComponents<TestComp1>().empty());
+  CHECK(world.recoverEntitiesWithComponents<TestComp2>().empty());
+  CHECK(world.recoverEntitiesWithComponents<TestComp1, TestComp2>().empty());
+
+  entity1.addComponent<TestComp1>();
+  entity2.addComponent<TestComp2>();
+  REQUIRE(world.recoverEntitiesWithComponents<TestComp1>().size() == 1);
+  CHECK(world.recoverEntitiesWithComponents<TestComp1>().front() == &entity1);
+  REQUIRE(world.recoverEntitiesWithComponents<TestComp2>().size() == 1);
+  CHECK(world.recoverEntitiesWithComponents<TestComp2>().front() == &entity2);
+  CHECK(world.recoverEntitiesWithComponents<TestComp1, TestComp2>().empty()); // No entity has both components
+
+  entity1.addComponent<TestComp2>();
+  CHECK(world.recoverEntitiesWithComponents<TestComp1>().front() == &entity1); // Fetching with the first component is still valid
+  REQUIRE(world.recoverEntitiesWithComponents<TestComp1, TestComp2>().size() == 1);
+  CHECK(world.recoverEntitiesWithComponents<TestComp1, TestComp2>().front() == &entity1);
+  CHECK(world.recoverEntitiesWithComponents<TestComp2, TestComp1>().front() == &entity1); // The order doesn't matter
+
+  for (Raz::Entity* entity : world.recoverEntitiesWithComponents<TestComp1, TestComp2>()) {
+    CHECK(entity->hasComponent<TestComp1>());
+    CHECK(entity->hasComponent<TestComp2>());
+  }
+
+  entity1.removeComponent<TestComp2>();
+  CHECK(world.recoverEntitiesWithComponents<TestComp1, TestComp2>().empty());
+  CHECK(world.recoverEntitiesWithComponents<TestComp1>().front() == &entity1); // Still has the first component
 }
 
 TEST_CASE("World refresh") {

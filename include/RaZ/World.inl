@@ -2,6 +2,21 @@
 
 namespace Raz {
 
+template <typename Sys, typename... Args>
+Sys& World::addSystem(Args&&... args) {
+  static_assert(std::is_base_of_v<System, Sys>, "Error: Added system must be derived from System.");
+
+  const std::size_t sysId = System::getId<Sys>();
+
+  if (sysId >= m_systems.size())
+    m_systems.resize(sysId + 1);
+
+  m_systems[sysId] = std::make_unique<Sys>(std::forward<Args>(args)...);
+  m_activeSystems.setBit(sysId);
+
+  return static_cast<Sys&>(*m_systems[sysId]);
+}
+
 template <typename Sys>
 bool World::hasSystem() const {
   static_assert(std::is_base_of_v<System, Sys>, "Error: Checked system must be derived from System.");
@@ -18,21 +33,6 @@ const Sys& World::getSystem() const {
     return static_cast<const Sys&>(*m_systems[System::getId<Sys>()]);
 
   throw std::runtime_error("Error: No system available of specified type");
-}
-
-template <typename Sys, typename... Args>
-Sys& World::addSystem(Args&&... args) {
-  static_assert(std::is_base_of_v<System, Sys>, "Error: Added system must be derived from System.");
-
-  const std::size_t sysId = System::getId<Sys>();
-
-  if (sysId >= m_systems.size())
-    m_systems.resize(sysId + 1);
-
-  m_systems[sysId] = std::make_unique<Sys>(std::forward<Args>(args)...);
-  m_activeSystems.setBit(sysId);
-
-  return static_cast<Sys&>(*m_systems[sysId]);
 }
 
 template <typename Sys>
@@ -57,6 +57,20 @@ Entity& World::addEntityWithComponents(bool enabled) {
   entity.addComponents<Comps...>();
 
   return entity;
+}
+
+template <typename... Comps>
+std::vector<Entity*> World::recoverEntitiesWithComponents() {
+  static_assert((std::is_base_of_v<Component, Comps> && ...), "Error: Components to query the entity with must all be derived from Component.");
+
+  std::vector<Entity*> entities;
+
+  for (const EntityPtr& entity : m_entities) {
+    if ((entity->hasComponent<Comps>() && ...))
+      entities.emplace_back(entity.get());
+  }
+
+  return entities;
 }
 
 } // namespace Raz
