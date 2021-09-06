@@ -43,20 +43,20 @@
 
 /// Disables the given GCC/Clang warning; must be an unquoted string starting with -W.
 /// \note Make sure the warnings' state has been pushed before.
-/// \param Warning Enquoted name of the warning to disable.
+/// \param Warning Unquoted name of the warning to disable.
 #define DISABLE_WARNING(Warning) DO_PRAGMA(GCC diagnostic ignored #Warning)
 
 #if defined(__clang__)
 /// Disables the given Clang warning; must be an unquoted string starting with -W.
 /// \note Make sure the warnings' state has been pushed before.
-/// \param Warning Enquoted name of the warning to disable.
+/// \param Warning Unquoted name of the warning to disable.
 #define DISABLE_WARNING_CLANG(Warning) DISABLE_WARNING(Warning)
 
 #define DISABLE_WARNING_GCC(Warning)
 #else
 /// Disables the given GCC warning; must be an unquoted string starting with -W.
 /// \note Make sure the warnings' state has been pushed before.
-/// \param Warning Enquoted name of the warning to disable.
+/// \param Warning Unquoted name of the warning to disable.
 #define DISABLE_WARNING_GCC(Warning) DISABLE_WARNING(Warning)
 
 #define DISABLE_WARNING_CLANG(Warning)

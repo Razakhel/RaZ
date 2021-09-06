@@ -3,6 +3,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/misc/cpp/imgui_stdlib.h"
+#include "RaZ/Utils/CompilerUtils.hpp"
 #include "RaZ/Utils/Overlay.hpp"
 
 namespace Raz {
@@ -24,6 +25,14 @@ Overlay::Overlay(GLFWwindow* window) {
 
 void Overlay::addLabel(std::string label) {
   m_elements.emplace_back(OverlayLabel::create(std::move(label)));
+}
+
+void Overlay::addColoredLabel(std::string label, Vec4f color) {
+  m_elements.emplace_back(OverlayColoredLabel::create(std::move(label), color));
+}
+
+void Overlay::addColoredLabel(std::string label, float red, float green, float blue, float alpha) {
+  addColoredLabel(std::move(label), Vec4f(red, green, blue, alpha));
 }
 
 void Overlay::addButton(std::string label, std::function<void()> actionClick) {
@@ -77,6 +86,18 @@ void Overlay::render() {
       case OverlayElementType::LABEL:
         ImGui::TextUnformatted(element->m_label.c_str());
         break;
+
+      case OverlayElementType::COLORED_LABEL:
+      {
+        const auto& label = static_cast<OverlayColoredLabel&>(*element);
+
+        PUSH_WARNINGS_STATE
+        DISABLE_WARNING_GCC(-Wformat-security)
+        ImGui::TextColored(ImVec4(label.m_color.x(), label.m_color.y(), label.m_color.z(), label.m_color.w()), element->m_label.c_str());
+        POP_WARNINGS_STATE
+
+        break;
+      }
 
       case OverlayElementType::BUTTON:
       {

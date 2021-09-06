@@ -146,6 +146,17 @@ public:
   /// Adds a label on the overlay.
   /// \param label Text to be displayed.
   void addOverlayLabel(std::string label);
+  /// Adds a colored label on the overlay.
+  /// \param label Text to be displayed.
+  /// \param color Color to display the text with.
+  void addOverlayColoredLabel(std::string label, Vec4f color);
+  /// Adds a colored label on the overlay.
+  /// \param label Text to be displayed.
+  /// \param red Text color's red component.
+  /// \param green Text color's green component.
+  /// \param blue Text color's blue component.
+  /// \param alpha Text color's alpha component.
+  void addOverlayColoredLabel(std::string label, float red, float green, float blue, float alpha = 1.f);
   /// Adds a button on the overlay.
   /// \param label Text to be displayed beside the button.
   /// \param action Action to be executed when clicked.

@@ -251,6 +251,14 @@ void Window::addOverlayLabel(std::string label) {
   m_overlay->addLabel(std::move(label));
 }
 
+void Window::addOverlayColoredLabel(std::string label, Vec4f color) {
+  m_overlay->addColoredLabel(std::move(label), color);
+}
+
+void Window::addOverlayColoredLabel(std::string label, float red, float green, float blue, float alpha) {
+  m_overlay->addColoredLabel(std::move(label), red, green, blue, alpha);
+}
+
 void Window::addOverlayButton(std::string label, std::function<void()> action) {
   m_overlay->addButton(std::move(label), std::move(action));
 }

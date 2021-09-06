@@ -21,6 +21,7 @@ using OverlayPtr = std::unique_ptr<Overlay>;
 
 enum class OverlayElementType {
   LABEL,
+  COLORED_LABEL,
   BUTTON,
   CHECKBOX,
   SLIDER,
@@ -41,6 +42,8 @@ public:
   static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
 
   void addLabel(std::string label);
+  void addColoredLabel(std::string label, Vec4f color);
+  void addColoredLabel(std::string label, float red, float green, float blue, float alpha = 1.f);
   void addButton(std::string label, std::function<void()> actionClick);
   void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
   void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
@@ -64,6 +67,9 @@ private:
 
   class OverlayLabel;
   using OverlayLabelPtr = std::unique_ptr<OverlayLabel>;
+
+  class OverlayColoredLabel;
+  using OverlayColoredLabelPtr = std::unique_ptr<OverlayColoredLabel>;
 
   class OverlayButton;
   using OverlayButtonPtr = std::unique_ptr<OverlayButton>;
@@ -114,6 +120,21 @@ private:
 
     template <typename... Args>
     static OverlayLabelPtr create(Args&&... args) { return std::make_unique<OverlayLabel>(std::forward<Args>(args)...); }
+  };
+
+  class OverlayColoredLabel final : public OverlayElement {
+    friend Overlay;
+
+  public:
+    explicit OverlayColoredLabel(std::string label, Vec4f color) : OverlayElement(std::move(label)), m_color{ color } {}
+
+    OverlayElementType getType() const override { return OverlayElementType::COLORED_LABEL; }
+
+    template <typename... Args>
+    static OverlayColoredLabelPtr create(Args&&... args) { return std::make_unique<OverlayColoredLabel>(std::forward<Args>(args)...); }
+
+  private:
+    Vec4f m_color {};
   };
 
   class OverlayButton final : public OverlayElement {
