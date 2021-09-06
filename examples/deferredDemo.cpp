@@ -284,7 +284,7 @@ int main() {
   // Overlay //
   /////////////
 
-#if defined(RAZ_USE_OVERLAY)
+#if !defined(RAZ_NO_OVERLAY)
   window.enableOverlay();
 
   window.addOverlayLabel("RaZ - Deferred demo");

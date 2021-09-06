@@ -138,7 +138,7 @@ public:
   void setCloseCallback(std::function<void()> func);
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
-#if defined(RAZ_USE_OVERLAY)
+#if !defined(RAZ_NO_OVERLAY)
   /// Enables the overlay.
   void enableOverlay() { m_overlay = Overlay::create(m_window); }
   /// Disables the overlay.
@@ -210,7 +210,7 @@ private:
   InputCallbacks m_callbacks {};
   CloseCallback m_closeCallback {};
 
-#if defined(RAZ_USE_OVERLAY)
+#if !defined(RAZ_NO_OVERLAY)
   OverlayPtr m_overlay {};
 #endif
 };

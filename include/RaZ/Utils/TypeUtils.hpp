@@ -12,7 +12,7 @@ namespace Raz::TypeUtils {
 /// \return String representing the type's name.
 template <typename T>
 constexpr std::string_view getTypeStr() noexcept {
-#if defined(RAZ_COMPILER_CLANG)
+#if defined(__clang__)
   // Has the form "std::string_view Raz::TypeUtils::getTypeStr() [T = ...]"
 
   constexpr std::string_view funcSignature = __PRETTY_FUNCTION__;
@@ -32,7 +32,7 @@ constexpr std::string_view getTypeStr() noexcept {
 //  static_assert(firstPos < lastPos, "Error: Trailing character found before leading one in the function's signature.");
 //
 //  return std::string_view(funcSignature.data() + firstPos + 2, lastPos - firstPos - 2);
-#elif defined(RAZ_COMPILER_GCC)
+#elif defined(__GNUC__)
   // Has the form "constexpr std::string_view Raz::TypeUtils::getTypeStr() [with T = ...; std::string_view = std::basic_string_view<char>]"
 
   constexpr std::string_view funcSignature = __PRETTY_FUNCTION__;
@@ -46,7 +46,7 @@ constexpr std::string_view getTypeStr() noexcept {
   static_assert(firstPos < lastPos, "Error: Trailing character found before leading one in the function's signature.");
 
   return std::string_view(funcSignature.data() + firstPos + 2, lastPos - firstPos - 2);
-#elif defined(RAZ_COMPILER_MSVC)
+#elif defined(_MSC_VER)
   // Has the form "class std::basic_string_view<char,struct std::char_traits<char> > __cdecl Raz::TypeUtils::getTypeStr<...>(void) noexcept"
 
   constexpr std::string_view funcSignature = __FUNCSIG__;
@@ -83,14 +83,14 @@ template <auto Enum>
 constexpr std::string_view getEnumStr() noexcept {
   static_assert(std::is_enum_v<decltype(Enum)>, "Error: The type of the given value must be an enum.");
 
-#if defined(RAZ_COMPILER_CLANG)
+#if defined(__clang__)
   // Has the form "std::string_view Raz::TypeUtils::getEnumStr() [Enum = ...]"
 
   constexpr std::string_view funcSignature = __PRETTY_FUNCTION__;
   constexpr std::size_t startStride        = std::size("std::string_view Raz::TypeUtils::getEnumStr() [Enum = ") - 1;
 
   return std::string_view(funcSignature.data() + startStride, funcSignature.size() - startStride - 1);
-#elif defined(RAZ_COMPILER_GCC)
+#elif defined(__GNUC__)
   // Has the form "constexpr std::string_view Raz::TypeUtils::getEnumStr() [with auto Enum = ...; std::string_view = std::basic_string_view<char>]"
 
   constexpr std::string_view funcSignature = __PRETTY_FUNCTION__;
@@ -104,7 +104,7 @@ constexpr std::string_view getEnumStr() noexcept {
   static_assert(firstPos < lastPos, "Error: Trailing character found before leading one in the function's signature.");
 
   return std::string_view(funcSignature.data() + firstPos + 2, lastPos - firstPos - 2);
-#elif defined(RAZ_COMPILER_MSVC)
+#elif defined(_MSC_VER)
   // Has the form "class std::basic_string_view<char,struct std::char_traits<char> > __cdecl Raz::TypeUtils::getEnumStr<...>(void) noexcept"
 
   constexpr std::string_view funcSignature = __FUNCSIG__;
@@ -125,7 +125,7 @@ constexpr std::string_view getEnumStr() noexcept {
 // TODO: this implementation doesn't work with MSVC (which always returns true for every attribute)
 // See: https://stackoverflow.com/a/35755737/3292304
 
-#if !defined(RAZ_COMPILER_MSVC)
+#if !defined(_MSC_VER)
 
 namespace Details {
 

@@ -26,7 +26,7 @@ public:
   /// \param sceneWidth Width of the scene.
   /// \param sceneHeight Height of the scene.
   RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight) : RenderSystem() { resizeViewport(sceneWidth, sceneHeight); }
-#if defined(RAZ_USE_WINDOW)
+#if !defined(RAZ_NO_WINDOW)
   /// Creates a render system along with a window.
   /// \param sceneWidth Width of the scene.
   /// \param sceneHeight Height of the scene.
@@ -40,7 +40,7 @@ public:
     : m_window{ Window::create(sceneWidth, sceneHeight, windowTitle, settings, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
 #endif
 
-#if defined(RAZ_USE_WINDOW)
+#if !defined(RAZ_NO_WINDOW)
   bool hasWindow() const { return (m_window != nullptr); }
   const Window& getWindow() const { assert("Error: Window must be set before being accessed." && hasWindow()); return *m_window; }
   Window& getWindow() { return const_cast<Window&>(static_cast<const RenderSystem*>(this)->getWindow()); }
@@ -56,7 +56,7 @@ public:
 
   void setCubemap(Cubemap cubemap) { m_cubemap = std::move(cubemap); }
 
-#if defined(RAZ_USE_WINDOW)
+#if !defined(RAZ_NO_WINDOW)
   void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
 #endif
   void resizeViewport(unsigned int width, unsigned int height);
@@ -88,7 +88,7 @@ private:
   unsigned int m_sceneWidth {};
   unsigned int m_sceneHeight {};
 
-#if defined(RAZ_USE_WINDOW)
+#if !defined(RAZ_NO_WINDOW)
   WindowPtr m_window {};
 #endif
 

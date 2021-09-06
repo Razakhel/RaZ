@@ -246,7 +246,7 @@ void Window::updateCallbacks() const {
   }
 }
 
-#if defined(RAZ_USE_OVERLAY)
+#if !defined(RAZ_NO_OVERLAY)
 void Window::addOverlayLabel(std::string label) {
   m_overlay->addLabel(std::move(label));
 }
@@ -294,7 +294,7 @@ bool Window::run(float deltaTime) {
 
   glfwPollEvents();
 
-#if defined(RAZ_USE_OVERLAY)
+#if !defined(RAZ_NO_OVERLAY)
   // Input callbacks should not be executed if the overlay requested keyboard focus
   if (!m_overlay || !m_overlay->hasKeyboardFocus())
 #endif
@@ -320,7 +320,7 @@ bool Window::run(float deltaTime) {
     }
   }
 
-#if defined(RAZ_USE_OVERLAY)
+#if !defined(RAZ_NO_OVERLAY)
   if (m_overlay)
     m_overlay->render();
 #endif
@@ -350,7 +350,7 @@ void Window::setShouldClose() const {
 }
 
 void Window::close() {
-#if defined(RAZ_USE_OVERLAY)
+#if !defined(RAZ_NO_OVERLAY)
   disableOverlay();
 #endif
 

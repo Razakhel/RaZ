@@ -353,14 +353,9 @@ if (RAZ_USE_GLEW)
     target_link_libraries(RaZ PRIVATE GLEW)
 endif ()
 
-if (RAZ_USE_GLFW OR RAZ_USE_EMSCRIPTEN)
-    if (NOT RAZ_USE_EMSCRIPTEN)
-        # Emscripten handles GLFW on its own, but it is however not available directly; its link must be disabled
-        target_link_libraries(RaZ PRIVATE GLFW)
-    endif ()
-
-    target_compile_definitions(RaZ PUBLIC RAZ_USE_WINDOW)
-else ()
+if (RAZ_USE_GLFW)
+    target_link_libraries(RaZ PRIVATE GLFW)
+elseif (NOT RAZ_USE_EMSCRIPTEN) # Emscripten handles GLFW on its own, but still needs the Window to render into
     list(
         REMOVE_ITEM
         RAZ_FILES
@@ -368,19 +363,22 @@ else ()
         "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/Window.cpp"
         "${PROJECT_SOURCE_DIR}/include/RaZ/Utils/Window.hpp"
     )
+
+    target_compile_definitions(RaZ PUBLIC RAZ_NO_WINDOW)
 endif ()
 
 if (RAZ_USE_IMGUI)
     target_link_libraries(RaZ PRIVATE ImGui)
-    target_compile_definitions(RaZ PUBLIC RAZ_USE_OVERLAY)
 else ()
     list(
         REMOVE_ITEM
         RAZ_FILES
 
         "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/Overlay.cpp"
-        "${PROJECT_SOURCE_DIR}/include/RaZ/Utils/Overlay.cpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Utils/Overlay.hpp"
     )
+
+    target_compile_definitions(RaZ PUBLIC RAZ_NO_OVERLAY)
 endif ()
 
 # Compiling RaZ's sources

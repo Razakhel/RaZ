@@ -3,7 +3,7 @@
 #ifndef RAZ_COMPILERUTILS_HPP
 #define RAZ_COMPILERUTILS_HPP
 
-#if defined(RAZ_COMPILER_MSVC)
+#if defined(_MSC_VER)
 /// Declares a pragma directive, passing it the given argument.
 /// \param Arg Argument to be passed to the pragma directive.
 #define DO_PRAGMA(Arg) __pragma(Arg)
@@ -28,7 +28,7 @@
 
 #define DISABLE_WARNING_GCC(Warning)
 #define DISABLE_WARNING_CLANG(Warning)
-#elif defined(RAZ_COMPILER_GCC) || defined(RAZ_COMPILER_CLANG)
+#elif defined(__GNUC__) || defined(__clang__)
 /// Declares a pragma directive, passing it the given argument.
 /// \param Arg Argument to be passed to the pragma directive.
 #define DO_PRAGMA(Arg) _Pragma(#Arg)
@@ -46,7 +46,7 @@
 /// \param Warning Enquoted name of the warning to disable.
 #define DISABLE_WARNING(Warning) DO_PRAGMA(GCC diagnostic ignored #Warning)
 
-#if defined(RAZ_COMPILER_CLANG)
+#if defined(__clang__)
 /// Disables the given Clang warning; must be an unquoted string starting with -W.
 /// \note Make sure the warnings' state has been pushed before.
 /// \param Warning Enquoted name of the warning to disable.

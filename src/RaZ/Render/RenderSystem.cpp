@@ -13,7 +13,7 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
 
   Renderer::resizeViewport(0, 0, m_sceneWidth, m_sceneHeight);
 
-#if defined(RAZ_USE_WINDOW)
+#if !defined(RAZ_NO_WINDOW)
   if (m_window)
     m_window->resize(m_sceneWidth, m_sceneHeight);
 #endif
@@ -39,7 +39,7 @@ bool RenderSystem::update([[maybe_unused]] float deltaTime) {
   Renderer::printErrors();
 #endif
 
-#if defined(RAZ_USE_WINDOW)
+#if !defined(RAZ_NO_WINDOW)
   if (m_window)
     return m_window->run(deltaTime);
 #endif
@@ -145,7 +145,7 @@ void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format) c
 }
 
 void RenderSystem::destroy() {
-#if defined(RAZ_USE_WINDOW)
+#if !defined(RAZ_NO_WINDOW)
   if (m_window)
     m_window->setShouldClose();
 #endif
