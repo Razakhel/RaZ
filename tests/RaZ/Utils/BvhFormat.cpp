@@ -17,12 +17,12 @@ TEST_CASE("BVH import") {
 
   // Animation
 
+  CHECK(file.animation.getFrameTime() == 0.033333f);
   CHECK(file.animation.getKeyframeCount() == 2);
 
   {
     const Raz::Keyframe& keyframe = file.animation.getKeyframe(0);
 
-    CHECK(keyframe.getKeyTime() == 0.033333f);
     CHECK(keyframe.getJointTransformCount() == file.skeleton.getNodeCount());
 
     CHECK(keyframe.getJointTransform(0).getRotation() == Raz::Quaternionf(0.998057663, 0.0337132, 0.0444906, 0.0276579));
@@ -44,7 +44,6 @@ TEST_CASE("BVH import") {
   {
     const Raz::Keyframe& keyframe = file.animation.getKeyframe(1);
 
-    CHECK(keyframe.getKeyTime() == 0.033333f);
     CHECK(keyframe.getJointTransformCount() == file.skeleton.getNodeCount());
 
     CHECK(keyframe.getJointTransform(0).getRotation() == Raz::Quaternionf(0.979321539, 0.099087, 0.116802841, 0.132167399));

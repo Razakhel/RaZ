@@ -1,3 +1,27 @@
+##########################
+# Assets - AnimationDemo #
+##########################
+
+set(
+    RaZ_AnimationDemo_ASSETS
+
+    assets/meshes/character.obj
+    assets/animations/character.bvh
+)
+
+foreach (ASSET_PATH ${RaZ_AnimationDemo_ASSETS})
+    target_link_options(RaZ_AnimationDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+endforeach ()
+
+target_link_options(
+    RaZ_AnimationDemo
+
+    PRIVATE
+
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+)
+
 #########################
 # Assets - DeferredDemo #
 #########################

@@ -44,18 +44,14 @@ class Keyframe {
 public:
   Keyframe() = default;
 
-  float getKeyTime() const noexcept { return m_keyTime; }
   std::size_t getJointTransformCount() const noexcept { return m_transforms.size(); }
   const JointTransform& getJointTransform(std::size_t index) const noexcept { return m_transforms[index]; }
   JointTransform& getJointTransform(std::size_t index) noexcept { return m_transforms[index]; }
-
-  void setKeyTime(float keyTime) { m_keyTime = keyTime; }
 
   template <typename... Args>
   void addJointTransform(Args&&... args) { m_transforms.emplace_back(std::forward<Args>(args)...); }
 
 private:
-  float m_keyTime {};
   std::vector<JointTransform> m_transforms {};
 };
 

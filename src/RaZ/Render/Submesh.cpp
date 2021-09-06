@@ -80,32 +80,57 @@ void Submesh::loadVertices() const {
 
   constexpr uint8_t stride = sizeof(vertices.front());
 
-  glVertexAttribPointer(0, 3,
-                        GL_FLOAT, GL_FALSE,
+  // Position
+  glVertexAttribPointer(0,
+                        3, GL_FLOAT, // vec3
+                        GL_FALSE,
                         stride,
-                        nullptr);
+                        nullptr); // Position offset is 0
   glEnableVertexAttribArray(0);
 
-  constexpr std::size_t positionSize = sizeof(vertices.front().position);
-  glVertexAttribPointer(1, 2,
-                        GL_FLOAT, GL_FALSE,
+  // Texcoords
+  constexpr std::size_t texcoordsOffset = sizeof(vertices.front().position);
+  glVertexAttribPointer(1,
+                        2, GL_FLOAT, // vec2
+                        GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(positionSize));
+                        reinterpret_cast<void*>(texcoordsOffset));
   glEnableVertexAttribArray(1);
 
-  constexpr std::size_t texcoordsSize = sizeof(vertices.front().texcoords);
-  glVertexAttribPointer(2, 3,
-                        GL_FLOAT, GL_FALSE,
+  // Normal
+  constexpr std::size_t normalOffset = texcoordsOffset + sizeof(vertices.front().texcoords);
+  glVertexAttribPointer(2,
+                        3, GL_FLOAT, // vec3
+                        GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(positionSize + texcoordsSize));
+                        reinterpret_cast<void*>(normalOffset));
   glEnableVertexAttribArray(2);
 
-  constexpr std::size_t normalSize = sizeof(vertices.front().normal);
-  glVertexAttribPointer(3, 3,
-                        GL_FLOAT, GL_FALSE,
+  // Tangent
+  constexpr std::size_t tangentOffset = normalOffset + sizeof(vertices.front().normal);
+  glVertexAttribPointer(3,
+                        3, GL_FLOAT, // vec3
+                        GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(positionSize + texcoordsSize + normalSize));
+                        reinterpret_cast<void*>(tangentOffset));
   glEnableVertexAttribArray(3);
+
+  // Bone indices
+  constexpr std::size_t boneIndicesOffset = tangentOffset + sizeof(vertices.front().tangent);
+  glVertexAttribIPointer(4,
+                         4, GL_INT, // ivec4
+                         stride,
+                         reinterpret_cast<void*>(boneIndicesOffset));
+  glEnableVertexAttribArray(4);
+
+  // Bone weights
+  constexpr std::size_t boneWeightsOffset = boneIndicesOffset + sizeof(vertices.front().boneIndices);
+  glVertexAttribPointer(5,
+                        4, GL_FLOAT, // vec4
+                        GL_FALSE,
+                        stride,
+                        reinterpret_cast<void*>(boneWeightsOffset));
+  glEnableVertexAttribArray(5);
 
   m_vbo.unbind();
   m_vao.unbind();

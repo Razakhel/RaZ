@@ -157,9 +157,10 @@ void loadAnimation(std::ifstream& file, Animation& animation, std::size_t jointC
     throw std::invalid_argument("Error: Invalid BVH animation frame time");
   std::getline(file, token);
 
+  animation.setFrameTime(frameTime);
+
   for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
     Keyframe& keyframe = animation.addKeyframe();
-    keyframe.setKeyTime(frameTime);
 
     // Loading the root transform
     {

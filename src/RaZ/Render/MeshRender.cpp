@@ -2,22 +2,10 @@
 
 namespace Raz {
 
-std::size_t Mesh::recoverVertexCount() const {
-  std::size_t vertexCount = 0;
+void Mesh::setSkeleton(Skeleton&& skeleton) noexcept {
+  m_skeleton = std::move(skeleton);
 
-  for (const Submesh& submesh : m_submeshes)
-    vertexCount += submesh.getVertexCount();
-
-  return vertexCount;
-}
-
-std::size_t Mesh::recoverTriangleCount() const {
-  std::size_t indexCount = 0;
-
-  for (const Submesh& submesh : m_submeshes)
-    indexCount += submesh.getTriangleIndexCount();
-
-  return indexCount / 3;
+  // TODO: map skeleton bones to vertices
 }
 
 void Mesh::drawUnitPlane(const Vec3f& normal) {
@@ -53,7 +41,7 @@ void Mesh::setRenderMode(RenderMode renderMode) {
     submesh.setRenderMode(renderMode);
 }
 
-void Mesh::setMaterial(MaterialPtr material) {
+void Mesh::setMaterial(MaterialPtr&& material) {
   m_materials.clear();
   m_materials.emplace_back(std::move(material));
 
@@ -81,6 +69,24 @@ void Mesh::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
       materialBP->setDiffuseMap(Texture::create(ColorPreset::WHITE));
     }
   }
+}
+
+std::size_t Mesh::recoverVertexCount() const {
+  std::size_t vertexCount = 0;
+
+  for (const Submesh& submesh : m_submeshes)
+    vertexCount += submesh.getVertexCount();
+
+  return vertexCount;
+}
+
+std::size_t Mesh::recoverTriangleCount() const {
+  std::size_t indexCount = 0;
+
+  for (const Submesh& submesh : m_submeshes)
+    indexCount += submesh.getTriangleIndexCount();
+
+  return indexCount / 3;
 }
 
 void Mesh::load() const {

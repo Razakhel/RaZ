@@ -5,13 +5,22 @@
 
 #include "RaZ/System.hpp"
 
+#include <unordered_map>
+
 namespace Raz {
 
-class AnimationSystem : public System {
+class AnimationSystem final : public System {
 public:
   AnimationSystem();
 
   bool update(float deltaTime) override;
+
+protected:
+  void linkEntity(const EntityPtr& entity) override;
+  void unlinkEntity(const EntityPtr& entity) override;
+
+private:
+  std::unordered_map<Entity*, float> m_timers {};
 };
 
 } // namespace Raz

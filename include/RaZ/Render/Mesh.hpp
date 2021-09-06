@@ -4,6 +4,7 @@
 #define RAZ_MESH_HPP
 
 #include "RaZ/Component.hpp"
+#include "RaZ/Animation/Skeleton.hpp"
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/Submesh.hpp"
 #include "RaZ/Utils/Shape.hpp"
@@ -39,8 +40,8 @@ public:
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
   std::vector<MaterialPtr>& getMaterials() { return m_materials; }
   const AABB& getBoundingBox() const { return m_boundingBox; }
-  std::size_t recoverVertexCount() const;
-  std::size_t recoverTriangleCount() const;
+
+  void setSkeleton(Skeleton&& skeleton) noexcept;
 
   static void drawUnitPlane(const Vec3f& normal = Axis::Y);
   static void drawUnitSphere();
@@ -49,10 +50,12 @@ public:
 
   void import(const FilePath& filePath);
   void setRenderMode(RenderMode renderMode);
-  void setMaterial(MaterialPtr material);
+  void setMaterial(MaterialPtr&& material);
   void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
-  Submesh& addSubmesh(Submesh submesh = Submesh()) { return m_submeshes.emplace_back(std::move(submesh)); }
-  Material& addMaterial(MaterialPtr material) { return *m_materials.emplace_back(std::move(material)); }
+  Submesh& addSubmesh(Submesh&& submesh = Submesh()) { return m_submeshes.emplace_back(std::move(submesh)); }
+  Material& addMaterial(MaterialPtr&& material) { return *m_materials.emplace_back(std::move(material)); }
+  std::size_t recoverVertexCount() const;
+  std::size_t recoverTriangleCount() const;
   /// Computes & updates the mesh's bounding box by computing the submeshes' ones.
   /// \return Mesh's bounding box.
   const AABB& computeBoundingBox();
@@ -95,6 +98,7 @@ private:
   void saveObj(std::ofstream& file, const FilePath& filePath) const;
 
   std::vector<Submesh> m_submeshes {};
+  std::optional<Skeleton> m_skeleton {};
   std::vector<MaterialPtr> m_materials {};
   AABB m_boundingBox = AABB(Vec3f(), Vec3f());
 };
