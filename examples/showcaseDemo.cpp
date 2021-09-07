@@ -138,19 +138,34 @@ int main() {
 #if !defined(RAZ_NO_OVERLAY)
   window.enableOverlay();
 
-  window.addOverlayButton("Load Sponza scene",   [&mesh, &render] () { loadSponzaScene(mesh, render); });
-  window.addOverlayButton("Load Ball scene",     [&mesh, &render] () { loadBallScene(mesh, render); });
-  window.addOverlayButton("Load Shield scene",   [&mesh, &render] () { loadShieldScene(mesh, render); });
-  window.addOverlayButton("Load Cerberus scene", [&mesh, &render] () { loadCerberusScene(mesh, render); });
+  std::vector<std::string> scenes = { "Sponza", "Ball", "Shield", "Cerberus" };
 #if defined(FBX_ENABLED)
-  window.addOverlayButton("Load Shader ball scene", [&mesh, &render] () { loadShaderBallScene(mesh, render); });
+  scenes.emplace_back("Shader ball");
 #endif
+
+  window.addOverlayDropdown("Scene", std::move(scenes), [&mesh, &render] (const std::string&, std::size_t index) {
+    switch (index) {
+      case 0: loadSponzaScene(mesh, render); break;
+      case 1: loadBallScene(mesh, render); break;
+      case 2: loadShieldScene(mesh, render); break;
+      case 3: loadCerberusScene(mesh, render); break;
+#if defined(FBX_ENABLED)
+      case 4: loadShaderBallScene(mesh, render); break;
+#endif
+      default: break;
+    }
+  }, 1);
 
   window.addOverlaySeparator();
 
-  window.addOverlayButton("Remove skybox",      [&render] () noexcept { render.removeCubemap(); });
-  window.addOverlayButton("Load Clouds skybox", [&render] () { loadCloudsSkybox(render); });
-  window.addOverlayButton("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
+  window.addOverlayDropdown("Skybox", { "None", "Clouds", "Lake" }, [&render] (const std::string&, std::size_t index) {
+    switch (index) {
+      case 0: render.removeCubemap(); break;
+      case 1: loadCloudsSkybox(render); break;
+      case 2: loadLakeSkybox(render); break;
+      default: break;
+    }
+  });
 
   window.addOverlaySeparator();
 

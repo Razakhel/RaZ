@@ -26,6 +26,7 @@ enum class OverlayElementType {
   CHECKBOX,
   SLIDER,
   TEXTBOX,
+  DROPDOWN,
   TEXTURE,
   SEPARATOR,
   FRAME_TIME,
@@ -48,6 +49,8 @@ public:
   void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
   void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
+  void addDropdown(std::string label, std::vector<std::string> entries,
+                   std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
   void addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
   void addTexture(const Texture& texture);
   void addSeparator();
@@ -82,6 +85,9 @@ private:
 
   class OverlayTextbox;
   using OverlayTextboxPtr = std::unique_ptr<OverlayTextbox>;
+
+  class OverlayDropdown;
+  using OverlayDropdownPtr = std::unique_ptr<OverlayDropdown>;
 
   class OverlayTexture;
   using OverlayTexturePtr = std::unique_ptr<OverlayTexture>;
@@ -203,6 +209,27 @@ private:
   private:
     std::string m_text {};
     std::function<void(const std::string&)> m_callback {};
+  };
+
+  class OverlayDropdown final : public OverlayElement {
+    friend Overlay;
+
+  public:
+    OverlayDropdown(std::string label, std::vector<std::string> entries,
+                    std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
+      : OverlayElement(std::move(label)),
+        m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
+
+    OverlayElementType getType() const override { return OverlayElementType::DROPDOWN; }
+
+    template <typename... Args>
+    static OverlayDropdownPtr create(Args&&... args) { return std::make_unique<OverlayDropdown>(std::forward<Args>(args)...); }
+
+  private:
+    std::vector<std::string> m_entries {};
+    std::function<void(const std::string&, std::size_t)> m_actionChanged {};
+    std::size_t m_currentId {};
+    const char* m_currentVal {};
   };
 
   class OverlayTexture final : public OverlayElement {

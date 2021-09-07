@@ -4,6 +4,7 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/misc/cpp/imgui_stdlib.h"
 #include "RaZ/Utils/CompilerUtils.hpp"
+#include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/Overlay.hpp"
 
 namespace Raz {
@@ -50,6 +51,17 @@ void Overlay::addSlider(std::string label, std::function<void(float)> actionSlid
 void Overlay::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
   m_elements.emplace_back(OverlayTextbox::create(std::move(label), std::move(callback)));
   static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
+}
+
+void Overlay::addDropdown(std::string label, std::vector<std::string> entries,
+                          std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+  if (entries.empty()) {
+    Logger::error("[Overlay] Cannot create a dropdown list with no entry.");
+    return;
+  }
+
+  assert("Error: A dropdown's initial index cannot reference a non-existing entry." && initId < entries.size());
+  m_elements.emplace_back(OverlayDropdown::create(std::move(label), std::move(entries), std::move(actionChanged), initId));
 }
 
 void Overlay::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
@@ -156,6 +168,31 @@ void Overlay::render() {
                          ImGuiInputTextFlags_CallbackCharFilter,
                          callback,
                          &textbox);
+
+        break;
+      }
+
+      case OverlayElementType::DROPDOWN:
+      {
+        auto& dropdown = static_cast<OverlayDropdown&>(*element);
+
+        if (ImGui::BeginCombo(dropdown.m_label.c_str(), dropdown.m_entries[dropdown.m_currentId].c_str())) {
+          for (std::size_t i = 0; i < dropdown.m_entries.size(); ++i) {
+            const bool isSelected = (dropdown.m_currentId == i);
+
+            if (ImGui::Selectable(dropdown.m_entries[i].c_str(), isSelected)) {
+              if (!isSelected) { // If the item isn't already selected
+                dropdown.m_actionChanged(dropdown.m_entries[i], i);
+                dropdown.m_currentId = i;
+              }
+            }
+
+            if (isSelected)
+              ImGui::SetItemDefaultFocus();
+          }
+
+          ImGui::EndCombo();
+        }
 
         break;
       }

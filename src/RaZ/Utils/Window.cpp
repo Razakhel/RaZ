@@ -275,6 +275,11 @@ void Window::addOverlayTextbox(std::string label, std::function<void(const std::
   m_overlay->addTextbox(std::move(label), std::move(callback));
 }
 
+void Window::addOverlayDropdown(std::string label, std::vector<std::string> entries,
+                                std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+  m_overlay->addDropdown(std::move(label), std::move(entries), std::move(actionChanged), initId);
+}
+
 void Window::addOverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
   m_overlay->addTexture(texture, maxWidth, maxHeight);
 }

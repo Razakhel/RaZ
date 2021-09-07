@@ -134,7 +134,7 @@ public:
   /// \param func Action to be executed when the mouse is moved.
   void addMouseMoveCallback(std::function<void(double, double)> func);
   /// Defines an action on window close.
-  /// \param callback Action to be executed when the window is closed.
+  /// \param func Action to be executed when the window is closed.
   void setCloseCallback(std::function<void()> func);
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
@@ -178,6 +178,13 @@ public:
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.
   void addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback);
+  /// Adds a dropdown list on the overlay.
+  /// \param label Text to be displayed beside the dropdown.
+  /// \param entries Texts to fill the dropdown with.
+  /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
+  /// \param initId Index of which element to pick first. Must be less than the entry count.
+  void addOverlayDropdown(std::string label, std::vector<std::string> entries,
+                          std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
   /// Adds a texture on the overlay.
   /// \param texture Texture to be displayed.
   /// \param maxWidth Maximum texture's width.
