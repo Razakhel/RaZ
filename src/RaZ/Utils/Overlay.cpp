@@ -82,7 +82,7 @@ void OverlayWindow::addTextbox(std::string label, std::function<void(const std::
 }
 
 void OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
-                          std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+                                std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
   if (entries.empty()) {
     Logger::error("[Overlay] Cannot create a dropdown list with no entry.");
     return;
@@ -172,7 +172,7 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::TEXTBOX:
       {
-        static auto callback = [] (ImGuiTextEditCallbackData* data) {
+        static auto callback = [] (ImGuiInputTextCallbackData* data) {
           auto& textbox = *static_cast<Overlay::OverlayTextbox*>(data->UserData);
 
           textbox.m_text += static_cast<char>(data->EventChar);
