@@ -139,68 +139,15 @@ public:
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
 #if !defined(RAZ_NO_OVERLAY)
-  /// Enables the overlay.
-  void enableOverlay() { m_overlay = Overlay::create(m_window); }
+  /// Adds a new overlay window.
+  /// \param title Window title.
+  /// \return The newly added window.
+  [[nodiscard]] OverlayWindow& addOverlayWindow(std::string title) { return m_overlay.addWindow(std::move(title)); }
+  /// Changes the overlay's enabled state.
+  /// \param enable True if it should be enabled, false otherwise.
+  void enableOverlay(bool enable = true) { m_isOverlayEnabled = enable; }
   /// Disables the overlay.
-  void disableOverlay() { m_overlay.reset(); }
-  /// Adds a label on the overlay.
-  /// \param label Text to be displayed.
-  void addOverlayLabel(std::string label);
-  /// Adds a colored label on the overlay.
-  /// \param label Text to be displayed.
-  /// \param color Color to display the text with.
-  void addOverlayColoredLabel(std::string label, Vec4f color);
-  /// Adds a colored label on the overlay.
-  /// \param label Text to be displayed.
-  /// \param red Text color's red component.
-  /// \param green Text color's green component.
-  /// \param blue Text color's blue component.
-  /// \param alpha Text color's alpha component.
-  void addOverlayColoredLabel(std::string label, float red, float green, float blue, float alpha = 1.f);
-  /// Adds a button on the overlay.
-  /// \param label Text to be displayed beside the button.
-  /// \param action Action to be executed when clicked.
-  void addOverlayButton(std::string label, std::function<void()> action);
-  /// Adds a checkbox on the overlay.
-  /// \param label Text to be displayed beside the checkbox.
-  /// \param actionOn Action to be executed when toggled on.
-  /// \param actionOff Action to be executed when toggled off.
-  /// \param initVal Initial value, checked or not.
-  void addOverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
-  /// Adds a floating-point slider on the overlay.
-  /// \param label Text to be displayed beside the slider.
-  /// \param actionSlide Action to be executed on a value change.
-  /// \param minValue Lower value bound.
-  /// \param maxValue Upper value bound.
-  /// \param initValue Initial value.
-  void addOverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
-  /// Adds a texbox on the overlay.
-  /// \param label Text to be displayed beside the checkbox.
-  /// \param callback Function to be called every time the content is modified.
-  void addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback);
-  /// Adds a dropdown list on the overlay.
-  /// \param label Text to be displayed beside the dropdown.
-  /// \param entries Texts to fill the dropdown with.
-  /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
-  /// \param initId Index of which element to pick first. Must be less than the entry count.
-  void addOverlayDropdown(std::string label, std::vector<std::string> entries,
-                          std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
-  /// Adds a texture on the overlay.
-  /// \param texture Texture to be displayed.
-  /// \param maxWidth Maximum texture's width.
-  /// \param maxHeight Maximum texture's height.
-  void addOverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
-  /// Adds a texture on the overlay. The maximum width & height will be those of the texture.
-  /// \param texture Texture to be displayed.
-  void addOverlayTexture(const Texture& texture);
-  /// Adds an horizontal separator on the overlay.
-  void addOverlaySeparator();
-  /// Adds a frame time display on the overlay.
-  /// \param formattedLabel Text with a formatting placeholder to display the frame time (%.Xf, X being the precision after the comma).
-  void addOverlayFrameTime(std::string formattedLabel);
-  /// Adds a FPS (frames per second) counter on the overlay.
-  /// \param formattedLabel Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
-  void addOverlayFpsCounter(std::string formattedLabel);
+  void disableOverlay() { enableOverlay(false); }
 #endif
   /// Runs the window, refreshing its state by displaying the rendered scene, drawing the overlay, etc.
   /// \param deltaTime Amount of time elapsed since the last frame.
@@ -224,12 +171,13 @@ private:
   unsigned int m_height {};
   Vec4f m_clearColor = Vec4f(0.15f, 0.15f, 0.15f, 1.f);
 
-  GLFWwindow* m_window {};
+  GLFWwindow* m_windowHandle {};
   InputCallbacks m_callbacks {};
   CloseCallback m_closeCallback {};
 
 #if !defined(RAZ_NO_OVERLAY)
-  OverlayPtr m_overlay {};
+  Overlay m_overlay {};
+  bool m_isOverlayEnabled = true;
 #endif
 };
 

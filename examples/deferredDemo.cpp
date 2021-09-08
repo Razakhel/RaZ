@@ -285,20 +285,16 @@ int main() {
   /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  window.enableOverlay();
+  Raz::OverlayWindow& overlay = window.addOverlayWindow("RaZ - Deferred demo");
 
-  window.addOverlayLabel("RaZ - Deferred demo");
+  overlay.addTexture(geomDepthBuffer, sceneWidth / 3, sceneHeight / 3);
+  overlay.addTexture(geomColorBuffer, sceneWidth / 3, sceneHeight / 3);
+  overlay.addTexture(geomNormalBuffer, sceneWidth / 3, sceneHeight / 3);
 
-  window.addOverlaySeparator();
+  overlay.addSeparator();
 
-  window.addOverlayTexture(geomDepthBuffer, sceneWidth / 3, sceneHeight / 3);
-  window.addOverlayTexture(geomColorBuffer, sceneWidth / 3, sceneHeight / 3);
-  window.addOverlayTexture(geomNormalBuffer, sceneWidth / 3, sceneHeight / 3);
-
-  window.addOverlaySeparator();
-
-  window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
-  window.addOverlayFpsCounter("FPS: %.1f");
+  overlay.addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  overlay.addFpsCounter("FPS: %.1f");
 #endif
 
   // Running the application

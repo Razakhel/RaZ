@@ -9,13 +9,13 @@
 
 namespace Raz {
 
-Overlay::Overlay(GLFWwindow* window) {
+void Overlay::initialize(GLFWwindow* windowHandle) const {
   IMGUI_CHECKVERSION();
 
   ImGui::CreateContext();
   ImGui::StyleColorsDark();
 
-  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplGlfw_InitForOpenGL(windowHandle, true);
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ImGui_ImplOpenGL3_Init("#version 330 core");
@@ -24,36 +24,64 @@ Overlay::Overlay(GLFWwindow* window) {
 #endif
 }
 
-void Overlay::addLabel(std::string label) {
-  m_elements.emplace_back(OverlayLabel::create(std::move(label)));
+OverlayWindow& Overlay::addWindow(std::string title) {
+  return m_windows.emplace_back(std::move(title));
 }
 
-void Overlay::addColoredLabel(std::string label, Vec4f color) {
-  m_elements.emplace_back(OverlayColoredLabel::create(std::move(label), color));
+bool Overlay::hasKeyboardFocus() const {
+  return ImGui::GetIO().WantCaptureKeyboard;
 }
 
-void Overlay::addColoredLabel(std::string label, float red, float green, float blue, float alpha) {
+void Overlay::render() const {
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
+  for (const OverlayWindow& window : m_windows)
+    window.render();
+
+  ImGui::Render();
+
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Overlay::destroy() const {
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
+
+  ImGui::DestroyContext();
+}
+
+void OverlayWindow::addLabel(std::string label) {
+  m_elements.emplace_back(Overlay::OverlayLabel::create(std::move(label)));
+}
+
+void OverlayWindow::addColoredLabel(std::string label, Vec4f color) {
+  m_elements.emplace_back(Overlay::OverlayColoredLabel::create(std::move(label), color));
+}
+
+void OverlayWindow::addColoredLabel(std::string label, float red, float green, float blue, float alpha) {
   addColoredLabel(std::move(label), Vec4f(red, green, blue, alpha));
 }
 
-void Overlay::addButton(std::string label, std::function<void()> actionClick) {
-  m_elements.emplace_back(OverlayButton::create(std::move(label), std::move(actionClick)));
+void OverlayWindow::addButton(std::string label, std::function<void()> actionClick) {
+  m_elements.emplace_back(Overlay::OverlayButton::create(std::move(label), std::move(actionClick)));
 }
 
-void Overlay::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
-  m_elements.emplace_back(OverlayCheckbox::create(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
+void OverlayWindow::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
+  m_elements.emplace_back(Overlay::OverlayCheckbox::create(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
 }
 
-void Overlay::addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue) {
-  m_elements.emplace_back(OverlaySlider::create(std::move(label), std::move(actionSlide), minValue, maxValue, initValue));
+void OverlayWindow::addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue) {
+  m_elements.emplace_back(Overlay::OverlaySlider::create(std::move(label), std::move(actionSlide), minValue, maxValue, initValue));
 }
 
-void Overlay::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
-  m_elements.emplace_back(OverlayTextbox::create(std::move(label), std::move(callback)));
-  static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
+void OverlayWindow::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
+  m_elements.emplace_back(Overlay::OverlayTextbox::create(std::move(label), std::move(callback)));
+  static_cast<Overlay::OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
 }
 
-void Overlay::addDropdown(std::string label, std::vector<std::string> entries,
+void OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
                           std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
   if (entries.empty()) {
     Logger::error("[Overlay] Cannot create a dropdown list with no entry.");
@@ -61,37 +89,31 @@ void Overlay::addDropdown(std::string label, std::vector<std::string> entries,
   }
 
   assert("Error: A dropdown's initial index cannot reference a non-existing entry." && initId < entries.size());
-  m_elements.emplace_back(OverlayDropdown::create(std::move(label), std::move(entries), std::move(actionChanged), initId));
+  m_elements.emplace_back(Overlay::OverlayDropdown::create(std::move(label), std::move(entries), std::move(actionChanged), initId));
 }
 
-void Overlay::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
-  m_elements.emplace_back(OverlayTexture::create(texture, maxWidth, maxHeight));
+void OverlayWindow::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
+  m_elements.emplace_back(Overlay::OverlayTexture::create(texture, maxWidth, maxHeight));
 }
 
-void Overlay::addTexture(const Texture& texture) {
-  m_elements.emplace_back(OverlayTexture::create(texture));
+void OverlayWindow::addTexture(const Texture& texture) {
+  m_elements.emplace_back(Overlay::OverlayTexture::create(texture));
 }
 
-void Overlay::addSeparator() {
-  m_elements.emplace_back(OverlaySeparator::create());
+void OverlayWindow::addSeparator() {
+  m_elements.emplace_back(Overlay::OverlaySeparator::create());
 }
 
-void Overlay::addFrameTime(std::string formattedLabel) {
-  m_elements.emplace_back(OverlayFrameTime::create(std::move(formattedLabel)));
+void OverlayWindow::addFrameTime(std::string formattedLabel) {
+  m_elements.emplace_back(Overlay::OverlayFrameTime::create(std::move(formattedLabel)));
 }
 
-void Overlay::addFpsCounter(std::string formattedLabel) {
-  m_elements.emplace_back(OverlayFpsCounter::create(std::move(formattedLabel)));
+void OverlayWindow::addFpsCounter(std::string formattedLabel) {
+  m_elements.emplace_back(Overlay::OverlayFpsCounter::create(std::move(formattedLabel)));
 }
 
-bool Overlay::hasKeyboardFocus() const {
-  return ImGui::GetIO().WantCaptureKeyboard;
-}
-
-void Overlay::render() {
-  ImGui_ImplOpenGL3_NewFrame();
-  ImGui_ImplGlfw_NewFrame();
-  ImGui::NewFrame();
+void OverlayWindow::render() const {
+  ImGui::Begin(m_title.c_str());
 
   for (auto& element : m_elements) {
     switch (element->getType()) {
@@ -101,7 +123,7 @@ void Overlay::render() {
 
       case OverlayElementType::COLORED_LABEL:
       {
-        const auto& label = static_cast<OverlayColoredLabel&>(*element);
+        const auto& label = static_cast<Overlay::OverlayColoredLabel&>(*element);
 
         PUSH_WARNINGS_STATE
         DISABLE_WARNING_GCC(-Wformat-security)
@@ -113,7 +135,7 @@ void Overlay::render() {
 
       case OverlayElementType::BUTTON:
       {
-        const auto& button = static_cast<OverlayButton&>(*element);
+        const auto& button = static_cast<Overlay::OverlayButton&>(*element);
 
         if (ImGui::Button(button.m_label.c_str()))
           button.m_actionClick();
@@ -123,7 +145,7 @@ void Overlay::render() {
 
       case OverlayElementType::CHECKBOX:
       {
-        auto& checkbox = static_cast<OverlayCheckbox&>(*element);
+        auto& checkbox = static_cast<Overlay::OverlayCheckbox&>(*element);
         const bool prevValue = checkbox.m_isChecked;
 
         ImGui::Checkbox(checkbox.m_label.c_str(), &checkbox.m_isChecked);
@@ -140,7 +162,7 @@ void Overlay::render() {
 
       case OverlayElementType::SLIDER:
       {
-        auto& slider = static_cast<OverlaySlider&>(*element);
+        auto& slider = static_cast<Overlay::OverlaySlider&>(*element);
 
         if (ImGui::SliderFloat(slider.m_label.c_str(), &slider.m_currentValue, slider.m_minValue, slider.m_maxValue))
           slider.m_actionSlide(slider.m_currentValue);
@@ -151,7 +173,7 @@ void Overlay::render() {
       case OverlayElementType::TEXTBOX:
       {
         static auto callback = [] (ImGuiTextEditCallbackData* data) {
-          auto& textbox = *static_cast<OverlayTextbox*>(data->UserData);
+          auto& textbox = *static_cast<Overlay::OverlayTextbox*>(data->UserData);
 
           textbox.m_text += static_cast<char>(data->EventChar);
 
@@ -161,7 +183,7 @@ void Overlay::render() {
           return 0;
         };
 
-        auto& textbox = static_cast<OverlayTextbox&>(*element);
+        auto& textbox = static_cast<Overlay::OverlayTextbox&>(*element);
 
         ImGui::InputText(textbox.m_label.c_str(),
                          &textbox.m_text,
@@ -174,7 +196,7 @@ void Overlay::render() {
 
       case OverlayElementType::DROPDOWN:
       {
-        auto& dropdown = static_cast<OverlayDropdown&>(*element);
+        auto& dropdown = static_cast<Overlay::OverlayDropdown&>(*element);
 
         if (ImGui::BeginCombo(dropdown.m_label.c_str(), dropdown.m_entries[dropdown.m_currentId].c_str())) {
           for (std::size_t i = 0; i < dropdown.m_entries.size(); ++i) {
@@ -199,7 +221,7 @@ void Overlay::render() {
 
       case OverlayElementType::TEXTURE:
       {
-        auto& texture = static_cast<OverlayTexture&>(*element);
+        auto& texture = static_cast<Overlay::OverlayTexture&>(*element);
         assert("Error: The given texture is invalid." && Renderer::isTexture(texture.m_index));
 
         const float minRatio = std::min(ImGui::GetWindowWidth() / texture.m_width, ImGui::GetWindowHeight() / texture.m_height);
@@ -232,16 +254,7 @@ void Overlay::render() {
     }
   }
 
-  ImGui::Render();
-
-  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-Overlay::~Overlay() {
-  ImGui_ImplOpenGL3_Shutdown();
-
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
+  ImGui::End();
 }
 
 } // namespace Raz

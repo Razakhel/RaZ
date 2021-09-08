@@ -251,40 +251,38 @@ int main() {
   /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  window.enableOverlay();
+  Raz::OverlayWindow& overlay = window.addOverlayWindow("RaZ - Full demo");
 
-  window.addOverlayLabel("RaZ - Full demo");
+  overlay.addCheckbox("Enable face culling",
+                      [&window] () { window.enableFaceCulling(); },
+                      [&window] () { window.disableFaceCulling(); },
+                      true);
 
-  window.addOverlaySeparator();
-
-  window.addOverlayCheckbox("Enable face culling",
-                            [&window] () { window.enableFaceCulling(); },
-                            [&window] () { window.disableFaceCulling(); },
-                            true);
 #if !defined(USE_OPENGL_ES)
-  window.addOverlayCheckbox("Enable vertical sync",
-                            [&window] () { window.enableVerticalSync(); },
-                            [&window] () { window.disableVerticalSync(); },
-                            window.recoverVerticalSyncState());
+  overlay.addCheckbox("Enable vertical sync",
+                      [&window] () { window.enableVerticalSync(); },
+                      [&window] () { window.disableVerticalSync(); },
+                      window.recoverVerticalSyncState());
 #endif
 
-  window.addOverlaySeparator();
+  overlay.addSeparator();
 
-  window.addOverlaySlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
+  overlay.addSlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
+
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
-  window.addOverlaySlider("Blur strength",
+  overlay.addSlider("Blur strength",
                           [&blurPass] (float value) { blurPass.getProgram().sendUniform("uniKernelSize", static_cast<int>(value)); },
                           1.f, 16.f, 1.f);
 #endif
 
-  window.addOverlaySeparator();
+  overlay.addSeparator();
 
-  window.addOverlayTexture(*meshComp.getMaterials().front()->getBaseColorMap(), 256, 256);
+  overlay.addTexture(*meshComp.getMaterials().front()->getBaseColorMap(), 256, 256);
 
-  window.addOverlaySeparator();
+  overlay.addSeparator();
 
-  window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
-  window.addOverlayFpsCounter("FPS: %.1f");
+  overlay.addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  overlay.addFpsCounter("FPS: %.1f");
 #endif
 
   //////////////////////////

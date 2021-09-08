@@ -136,14 +136,14 @@ int main() {
   /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  window.enableOverlay();
+  Raz::OverlayWindow& overlay = window.addOverlayWindow("RaZ - Showcase demo");
 
   std::vector<std::string> scenes = { "Sponza", "Ball", "Shield", "Cerberus" };
 #if defined(FBX_ENABLED)
   scenes.emplace_back("Shader ball");
 #endif
 
-  window.addOverlayDropdown("Scene", std::move(scenes), [&mesh, &render] (const std::string&, std::size_t index) {
+  overlay.addDropdown("Scene", std::move(scenes), [&mesh, &render] (const std::string&, std::size_t index) {
     switch (index) {
       case 0: loadSponzaScene(mesh, render); break;
       case 1: loadBallScene(mesh, render); break;
@@ -156,9 +156,9 @@ int main() {
     }
   }, 1);
 
-  window.addOverlaySeparator();
+  overlay.addSeparator();
 
-  window.addOverlayDropdown("Skybox", { "None", "Clouds", "Lake" }, [&render] (const std::string&, std::size_t index) {
+  overlay.addDropdown("Skybox", { "None", "Clouds", "Lake" }, [&render] (const std::string&, std::size_t index) {
     switch (index) {
       case 0: render.removeCubemap(); break;
       case 1: loadCloudsSkybox(render); break;
@@ -167,9 +167,9 @@ int main() {
     }
   });
 
-  window.addOverlaySeparator();
+  overlay.addSeparator();
 
-  window.addOverlayFpsCounter("FPS: %.1f");
+  overlay.addFpsCounter("FPS: %.1f");
 #endif
 
   ///////////////////

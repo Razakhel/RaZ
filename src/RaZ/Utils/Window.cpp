@@ -20,7 +20,7 @@ Window::Window(unsigned int width, unsigned int height,
                WindowSetting settings,
                uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
   glfwSetErrorCallback([] (int errorCode, const char* description) {
-    Logger::error("[GLFW] " + std::string(description) + "(error code " + std::to_string(errorCode) + ").");
+    Logger::error("[GLFW] " + std::string(description) + " (error code " + std::to_string(errorCode) + ").");
   });
 
   if (!glfwInit())
@@ -59,42 +59,46 @@ Window::Window(unsigned int width, unsigned int height,
 
   glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
 
-  m_window = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
-  if (!m_window) {
+  m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
+  if (!m_windowHandle) {
     close();
     throw std::runtime_error("Error: Failed to create GLFW Window");
   }
 
-  glfwMakeContextCurrent(m_window);
+  glfwMakeContextCurrent(m_windowHandle);
 
   Renderer::initialize();
   Renderer::enable(Capability::DEPTH_TEST);
 
-  glfwSetWindowUserPointer(m_window, this);
+  glfwSetWindowUserPointer(m_windowHandle, this);
 
-  glfwSetFramebufferSizeCallback(m_window, [] (GLFWwindow*, int newWidth, int newHeight) {
+  glfwSetFramebufferSizeCallback(m_windowHandle, [] (GLFWwindow*, int newWidth, int newHeight) {
     Renderer::resizeViewport(0, 0, static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
   });
 
   enableFaceCulling();
+
+#if !defined(RAZ_NO_OVERLAY)
+  m_overlay.initialize(m_windowHandle);
+#endif
 }
 
 void Window::setTitle(const std::string& title) const {
-  glfwSetWindowTitle(m_window, title.c_str());
+  glfwSetWindowTitle(m_windowHandle, title.c_str());
 }
 
 void Window::setIcon(const Image& img) const {
   const GLFWimage icon = { static_cast<int>(img.getWidth()),
                            static_cast<int>(img.getHeight()),
                            const_cast<unsigned char*>(static_cast<const uint8_t*>(img.getDataPtr())) };
-  glfwSetWindowIcon(m_window, 1, &icon);
+  glfwSetWindowIcon(m_windowHandle, 1, &icon);
 }
 
 void Window::resize(unsigned int width, unsigned int height) {
   m_width  = width;
   m_height = height;
 
-  glfwSetWindowSize(m_window, static_cast<int>(width), static_cast<int>(height));
+  glfwSetWindowSize(m_windowHandle, static_cast<int>(width), static_cast<int>(height));
 }
 
 void Window::enableFaceCulling(bool value) const {
@@ -143,7 +147,7 @@ void Window::enableVerticalSync([[maybe_unused]] bool value) const {
 }
 
 void Window::changeCursorState(Cursor::State state) const {
-  glfwSetInputMode(m_window, GLFW_CURSOR, state);
+  glfwSetInputMode(m_windowHandle, GLFW_CURSOR, state);
 }
 
 void Window::addKeyCallback(Keyboard::Key key, std::function<void(float)> actionPress,
@@ -173,7 +177,7 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
 void Window::setCloseCallback(std::function<void()> func) {
   m_closeCallback = std::move(func);
 
-  glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
+  glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow* window) {
     CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
     closeCallback();
   });
@@ -182,7 +186,7 @@ void Window::setCloseCallback(std::function<void()> func) {
 void Window::updateCallbacks() const {
   // Keyboard inputs
   if (!std::get<0>(m_callbacks).empty()) {
-    glfwSetKeyCallback(m_window, [] (GLFWwindow* window, int key, int /* scancode */, int action, int /* mode */) {
+    glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* window, int key, int /* scancode */, int action, int /* mode */) {
       InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
       const auto& keyCallbacks = std::get<0>(callbacks);
 
@@ -203,7 +207,7 @@ void Window::updateCallbacks() const {
 
   // Mouse buttons inputs
   if (!std::get<1>(m_callbacks).empty()) {
-    glfwSetMouseButtonCallback(m_window, [] (GLFWwindow* window, int button, int action, int /* mods */) {
+    glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* window, int button, int action, int /* mods */) {
       InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
       const MouseButtonCallbacks& mouseCallbacks = std::get<1>(callbacks);
 
@@ -224,7 +228,7 @@ void Window::updateCallbacks() const {
 
   // Mouse scroll input
   if (std::get<2>(m_callbacks)) {
-    glfwSetScrollCallback(m_window, [] (GLFWwindow* window, double xOffset, double yOffset) {
+    glfwSetScrollCallback(m_windowHandle, [] (GLFWwindow* window, double xOffset, double yOffset) {
       const MouseScrollCallback& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
       scrollCallback(xOffset, yOffset);
     });
@@ -232,7 +236,7 @@ void Window::updateCallbacks() const {
 
   // Mouse move input
   if (std::get<2>(std::get<3>(m_callbacks))) {
-    glfwSetCursorPosCallback(m_window, [] (GLFWwindow* window, double xPosition, double yPosition) {
+    glfwSetCursorPosCallback(m_windowHandle, [] (GLFWwindow* window, double xPosition, double yPosition) {
       MouseMoveCallback& moveCallback = std::get<3>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
 
       double& xPrevPos = std::get<0>(moveCallback);
@@ -246,70 +250,15 @@ void Window::updateCallbacks() const {
   }
 }
 
-#if !defined(RAZ_NO_OVERLAY)
-void Window::addOverlayLabel(std::string label) {
-  m_overlay->addLabel(std::move(label));
-}
-
-void Window::addOverlayColoredLabel(std::string label, Vec4f color) {
-  m_overlay->addColoredLabel(std::move(label), color);
-}
-
-void Window::addOverlayColoredLabel(std::string label, float red, float green, float blue, float alpha) {
-  m_overlay->addColoredLabel(std::move(label), red, green, blue, alpha);
-}
-
-void Window::addOverlayButton(std::string label, std::function<void()> action) {
-  m_overlay->addButton(std::move(label), std::move(action));
-}
-
-void Window::addOverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
-  m_overlay->addCheckbox(std::move(label), std::move(actionOn), std::move(actionOff), initVal);
-}
-
-void Window::addOverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue) {
-  m_overlay->addSlider(std::move(label), std::move(actionSlide), minValue, maxValue, initValue);
-}
-
-void Window::addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback) {
-  m_overlay->addTextbox(std::move(label), std::move(callback));
-}
-
-void Window::addOverlayDropdown(std::string label, std::vector<std::string> entries,
-                                std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
-  m_overlay->addDropdown(std::move(label), std::move(entries), std::move(actionChanged), initId);
-}
-
-void Window::addOverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
-  m_overlay->addTexture(texture, maxWidth, maxHeight);
-}
-
-void Window::addOverlayTexture(const Texture& texture) {
-  m_overlay->addTexture(texture);
-}
-
-void Window::addOverlaySeparator() {
-  m_overlay->addSeparator();
-}
-
-void Window::addOverlayFrameTime(std::string formattedLabel) {
-  m_overlay->addFrameTime(std::move(formattedLabel));
-}
-
-void Window::addOverlayFpsCounter(std::string formattedLabel) {
-  m_overlay->addFpsCounter(std::move(formattedLabel));
-}
-#endif
-
 bool Window::run(float deltaTime) {
-  if (glfwWindowShouldClose(m_window))
+  if (glfwWindowShouldClose(m_windowHandle))
     return false;
 
   glfwPollEvents();
 
 #if !defined(RAZ_NO_OVERLAY)
   // Input callbacks should not be executed if the overlay requested keyboard focus
-  if (!m_overlay || !m_overlay->hasKeyboardFocus())
+  if (!m_overlay.hasKeyboardFocus())
 #endif
   {
     // Process actions belonging to pressed keys & mouse buttons
@@ -334,11 +283,11 @@ bool Window::run(float deltaTime) {
   }
 
 #if !defined(RAZ_NO_OVERLAY)
-  if (m_overlay)
-    m_overlay->render();
+  if (m_isOverlayEnabled && !m_overlay.isEmpty())
+    m_overlay.render();
 #endif
 
-  glfwSwapBuffers(m_window);
+  glfwSwapBuffers(m_windowHandle);
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_webgl_commit_frame();
@@ -353,23 +302,23 @@ bool Window::run(float deltaTime) {
 Vec2f Window::recoverMousePosition() const {
   double xPos {};
   double yPos {};
-  glfwGetCursorPos(m_window, &xPos, &yPos);
+  glfwGetCursorPos(m_windowHandle, &xPos, &yPos);
 
   return Vec2f(static_cast<float>(xPos), static_cast<float>(yPos));
 }
 
 void Window::setShouldClose() const {
-  glfwSetWindowShouldClose(m_window, true);
+  glfwSetWindowShouldClose(m_windowHandle, true);
 }
 
 void Window::close() {
 #if !defined(RAZ_NO_OVERLAY)
-  disableOverlay();
+  m_overlay.destroy();
 #endif
 
   glfwTerminate();
 
-  m_window = nullptr;
+  m_windowHandle = nullptr;
 }
 
 } // namespace Raz
