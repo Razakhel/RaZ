@@ -81,6 +81,17 @@ void OverlayWindow::addTextbox(std::string label, std::function<void(const std::
   static_cast<Overlay::OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
 }
 
+void OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
+                               std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+  if (entries.empty()) {
+    Logger::error("[Overlay] Cannot create a list box with no entry.");
+    return;
+  }
+
+  assert("Error: A list box's initial index cannot reference a non-existing entry." && initId < entries.size());
+  m_elements.emplace_back(Overlay::OverlayListBox::create(std::move(label), std::move(entries), std::move(actionChanged), initId));
+}
+
 void OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
                                 std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
   if (entries.empty()) {
@@ -190,6 +201,31 @@ void OverlayWindow::render() const {
                          ImGuiInputTextFlags_CallbackCharFilter,
                          callback,
                          &textbox);
+
+        break;
+      }
+
+      case OverlayElementType::LIST_BOX:
+      {
+        auto& listBox = static_cast<Overlay::OverlayListBox&>(*element);
+
+        if (ImGui::BeginListBox(listBox.m_label.c_str())) {
+          for (std::size_t i = 0; i < listBox.m_entries.size(); ++i) {
+            const bool isSelected = (listBox.m_currentId == i);
+
+            if (ImGui::Selectable(listBox.m_entries[i].c_str(), isSelected)) {
+              if (!isSelected) { // If the item isn't already selected
+                listBox.m_actionChanged(listBox.m_entries[i], i);
+                listBox.m_currentId = i;
+              }
+            }
+
+            if (isSelected)
+              ImGui::SetItemDefaultFocus();
+          }
+
+          ImGui::EndListBox();
+        }
 
         break;
       }

@@ -29,6 +29,7 @@ enum class OverlayElementType {
   CHECKBOX,
   SLIDER,
   TEXTBOX,
+  LIST_BOX,
   DROPDOWN,
   TEXTURE,
   SEPARATOR,
@@ -89,6 +90,9 @@ private:
 
   class OverlayTextbox;
   using OverlayTextboxPtr = std::unique_ptr<OverlayTextbox>;
+
+  class OverlayListBox;
+  using OverlayListBoxPtr = std::unique_ptr<OverlayListBox>;
 
   class OverlayDropdown;
   using OverlayDropdownPtr = std::unique_ptr<OverlayDropdown>;
@@ -215,6 +219,27 @@ private:
     std::function<void(const std::string&)> m_callback {};
   };
 
+  class OverlayListBox final : public OverlayElement {
+    friend OverlayWindow;
+
+  public:
+    OverlayListBox(std::string label, std::vector<std::string> entries,
+                   std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
+      : OverlayElement(std::move(label)),
+        m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
+
+    OverlayElementType getType() const override { return OverlayElementType::LIST_BOX; }
+
+    template <typename... Args>
+    static OverlayListBoxPtr create(Args&&... args) { return std::make_unique<OverlayListBox>(std::forward<Args>(args)...); }
+
+  private:
+    std::vector<std::string> m_entries {};
+    std::function<void(const std::string&, std::size_t)> m_actionChanged {};
+    std::size_t m_currentId {};
+    const char* m_currentVal {};
+  };
+
   class OverlayDropdown final : public OverlayElement {
     friend OverlayWindow;
 
@@ -328,11 +353,18 @@ public:
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.
   void addTextbox(std::string label, std::function<void(const std::string&)> callback);
+  /// Adds a list box on the overlay window.
+  /// \param label Text to be displayed beside the list.
+  /// \param entries Texts to fill the list with.
+  /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
+  /// \param initId Index of the element to select at initialization. Must be less than the entry count.
+  void addListBox(std::string label, std::vector<std::string> entries,
+                  std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
   /// Adds a dropdown list on the overlay window.
   /// \param label Text to be displayed beside the dropdown.
   /// \param entries Texts to fill the dropdown with.
   /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
-  /// \param initId Index of which element to pick first. Must be less than the entry count.
+  /// \param initId Index of the element to select at initialization. Must be less than the entry count.
   void addDropdown(std::string label, std::vector<std::string> entries,
                    std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
   /// Adds a texture on the overlay window.
