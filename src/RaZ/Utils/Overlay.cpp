@@ -15,7 +15,7 @@ void Overlay::initialize(GLFWwindow* windowHandle) const {
   ImGui::CreateContext();
   ImGui::StyleColorsDark();
 
-  ImGui_ImplGlfw_InitForOpenGL(windowHandle, true);
+  ImGui_ImplGlfw_InitForOpenGL(windowHandle, false);
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ImGui_ImplOpenGL3_Init("#version 330 core");
@@ -30,6 +30,10 @@ OverlayWindow& Overlay::addWindow(std::string title) {
 
 bool Overlay::hasKeyboardFocus() const {
   return ImGui::GetIO().WantCaptureKeyboard;
+}
+
+bool Overlay::hasMouseFocus() const {
+  return ImGui::GetIO().WantCaptureMouse;
 }
 
 void Overlay::render() const {

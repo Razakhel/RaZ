@@ -1,9 +1,16 @@
+// GLEW is needed for V-sync management
 #include "GL/glew.h"
 #if defined(RAZ_PLATFORM_WINDOWS)
 #include "GL/wglew.h"
 #elif defined(RAZ_PLATFORM_LINUX)
 #include "GL/glxew.h"
 #endif
+
+#if !defined(RAZ_NO_OVERLAY)
+// Needed to set ImGui's callbacks
+#include "imgui/imgui_impl_glfw.h"
+#endif
+
 #include "GLFW/glfw3.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -184,11 +191,25 @@ void Window::setCloseCallback(std::function<void()> func) {
 }
 
 void Window::updateCallbacks() const {
+#if !defined(RAZ_NO_OVERLAY)
+  // Monitor events
+  glfwSetMonitorCallback([] (GLFWmonitor* monitor, int event) {
+    ImGui_ImplGlfw_MonitorCallback(monitor, event);
+  });
+#endif
+
+#if !defined(RAZ_NO_OVERLAY)
+  // Window focus
+  glfwSetWindowFocusCallback(m_windowHandle, [] (GLFWwindow* window, int focused) {
+    ImGui_ImplGlfw_WindowFocusCallback(window, focused);
+  });
+#endif
+
   // Keyboard inputs
   if (!std::get<0>(m_callbacks).empty()) {
-    glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* window, int key, int /* scancode */, int action, int /* mode */) {
+    glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
       InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
-      const auto& keyCallbacks = std::get<0>(callbacks);
+      const auto& keyCallbacks  = std::get<0>(callbacks);
 
       for (const auto& callback : keyCallbacks) {
         if (key == std::get<0>(callback)) {
@@ -197,19 +218,39 @@ void Window::updateCallbacks() const {
           } else if (action == GLFW_RELEASE) {
             std::get<4>(callbacks).erase(key);
 
-            if (std::get<3>(callback))
-              std::get<3>(callback)();
+            const auto& actionRelease = std::get<3>(callback);
+
+            if (actionRelease)
+              actionRelease();
           }
         }
       }
+
+#if !defined(RAZ_NO_OVERLAY)
+      ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+#endif
     });
   }
 
+#if !defined(RAZ_NO_OVERLAY)
+  // Unicode character inputs
+  glfwSetCharCallback(m_windowHandle, [] (GLFWwindow* window, unsigned int codePoint) {
+    ImGui_ImplGlfw_CharCallback(window, codePoint);
+  });
+#endif
+
+#if !defined(RAZ_NO_OVERLAY)
+  // Cursor enter event
+  glfwSetCursorEnterCallback(m_windowHandle, [] (GLFWwindow* window, int entered) {
+    ImGui_ImplGlfw_CursorEnterCallback(window, entered);
+  });
+#endif
+
   // Mouse buttons inputs
   if (!std::get<1>(m_callbacks).empty()) {
-    glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* window, int button, int action, int /* mods */) {
-      InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
-      const MouseButtonCallbacks& mouseCallbacks = std::get<1>(callbacks);
+    glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* window, int button, int action, int mods) {
+      InputCallbacks& callbacks  = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
+      const auto& mouseCallbacks = std::get<1>(callbacks);
 
       for (const auto& callback : mouseCallbacks) {
         if (button == std::get<0>(callback)) {
@@ -223,14 +264,22 @@ void Window::updateCallbacks() const {
           }
         }
       }
+
+#if !defined(RAZ_NO_OVERLAY)
+      ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+#endif
     });
   }
 
   // Mouse scroll input
   if (std::get<2>(m_callbacks)) {
     glfwSetScrollCallback(m_windowHandle, [] (GLFWwindow* window, double xOffset, double yOffset) {
-      const MouseScrollCallback& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
+      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
       scrollCallback(xOffset, yOffset);
+
+#if !defined(RAZ_NO_OVERLAY)
+      ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
+#endif
     });
   }
 
@@ -263,10 +312,10 @@ bool Window::run(float deltaTime) {
   {
     // Process actions belonging to pressed keys & mouse buttons
     auto& actions   = std::get<4>(m_callbacks);
-    auto actionIter = actions.begin();
+    auto actionIter = actions.cbegin();
 
-    while (actionIter != actions.end()) {
-      auto& action = actionIter->second;
+    while (actionIter != actions.cend()) {
+      const auto& action = actionIter->second;
 
       // An action consists of two parts:
       //   - a callback associated to the triggered key or button

@@ -11,7 +11,6 @@
 #include <unordered_map>
 #include <vector>
 
-// Forward declaration of GLFWwindow, to allow its usage into functions
 struct GLFWwindow;
 
 namespace Raz {
@@ -61,6 +60,9 @@ public:
   /// Checks if the overlay is currently requesting the keyboard inputs.
   /// \return True if the keyboard focus is taken, false otherwise.
   bool hasKeyboardFocus() const;
+  /// Checks if the overlay is currently requesting the mouse inputs.
+  /// \return True if the mouse focus is taken, false otherwise.
+  bool hasMouseFocus() const;
   /// Renders the overlay.
   void render() const;
   /// Destroys the overlay.
