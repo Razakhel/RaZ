@@ -208,6 +208,14 @@ void Window::updateCallbacks() const {
   // Keyboard inputs
   if (!std::get<0>(m_callbacks).empty()) {
     glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
+#if !defined(RAZ_NO_OVERLAY)
+      ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+
+      // Key callbacks should not be executed if the overlay requested keyboard focus
+      if (ImGui::GetIO().WantCaptureKeyboard)
+        return;
+#endif
+
       InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
       const auto& keyCallbacks  = std::get<0>(callbacks);
 
@@ -225,10 +233,6 @@ void Window::updateCallbacks() const {
           }
         }
       }
-
-#if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
-#endif
     });
   }
 
@@ -249,6 +253,14 @@ void Window::updateCallbacks() const {
   // Mouse buttons inputs
   if (!std::get<1>(m_callbacks).empty()) {
     glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* window, int button, int action, int mods) {
+#if !defined(RAZ_NO_OVERLAY)
+      ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+
+      // Mouse buttons callbacks should not be executed if the overlay requested mouse focus
+      if (ImGui::GetIO().WantCaptureMouse)
+        return;
+#endif
+
       InputCallbacks& callbacks  = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
       const auto& mouseCallbacks = std::get<1>(callbacks);
 
@@ -264,22 +276,22 @@ void Window::updateCallbacks() const {
           }
         }
       }
-
-#if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-#endif
     });
   }
 
   // Mouse scroll input
   if (std::get<2>(m_callbacks)) {
     glfwSetScrollCallback(m_windowHandle, [] (GLFWwindow* window, double xOffset, double yOffset) {
-      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
-      scrollCallback(xOffset, yOffset);
-
 #if !defined(RAZ_NO_OVERLAY)
       ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
+
+      // Scroll callback should not be executed if the overlay requested mouse focus
+      if (ImGui::GetIO().WantCaptureMouse)
+        return;
 #endif
+
+      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
+      scrollCallback(xOffset, yOffset);
     });
   }
 
@@ -305,30 +317,24 @@ bool Window::run(float deltaTime) {
 
   glfwPollEvents();
 
-#if !defined(RAZ_NO_OVERLAY)
-  // Input callbacks should not be executed if the overlay requested keyboard focus
-  if (!m_overlay.hasKeyboardFocus())
-#endif
-  {
-    // Process actions belonging to pressed keys & mouse buttons
-    auto& actions   = std::get<4>(m_callbacks);
-    auto actionIter = actions.cbegin();
+  // Process actions belonging to pressed keys & mouse buttons
+  auto& actions   = std::get<4>(m_callbacks);
+  auto actionIter = actions.cbegin();
 
-    while (actionIter != actions.cend()) {
-      const auto& action = actionIter->second;
+  while (actionIter != actions.cend()) {
+    const auto& action = actionIter->second;
 
-      // An action consists of two parts:
-      //   - a callback associated to the triggered key or button
-      //   - a value indicating if it should be executed only once or every frame
+    // An action consists of two parts:
+    //   - a callback associated to the triggered key or button
+    //   - a value indicating if it should be executed only once or every frame
 
-      action.first(deltaTime);
+    action.first(deltaTime);
 
-      // Removing the current action if ONCE is given, or simply increment the iterator
-      if (action.second == Input::ONCE)
-        actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
-      else
-        ++actionIter;
-    }
+    // Removing the current action if ONCE is given, or simply increment the iterator
+    if (action.second == Input::ONCE)
+      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
+    else
+      ++actionIter;
   }
 
 #if !defined(RAZ_NO_OVERLAY)

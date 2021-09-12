@@ -45,7 +45,6 @@ void Overlay::render() const {
     window.render();
 
   ImGui::Render();
-
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
@@ -130,7 +129,7 @@ void OverlayWindow::addFpsCounter(std::string formattedLabel) {
 void OverlayWindow::render() const {
   ImGui::Begin(m_title.c_str());
 
-  for (auto& element : m_elements) {
+  for (const auto& element : m_elements) {
     switch (element->getType()) {
       case OverlayElementType::LABEL:
         ImGui::TextUnformatted(element->m_label.c_str());
