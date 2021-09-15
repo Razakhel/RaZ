@@ -19,7 +19,7 @@ bool RenderGraph::isValid() const {
 }
 
 const Texture& RenderGraph::addTextureBuffer(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace) {
-  return *m_buffers.emplace_back(std::make_unique<Texture>(width, height, bindingIndex, colorspace, false));
+  return *m_buffers.emplace_back(std::make_unique<Texture>(width, height, bindingIndex, colorspace));
 }
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {

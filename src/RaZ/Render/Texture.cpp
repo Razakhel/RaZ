@@ -16,7 +16,7 @@ Texture::Texture(ColorPreset preset, int bindingIndex) : Texture(bindingIndex) {
   makePlainColored(Vec3b(red, green, blue));
 }
 
-Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, bool createMipmaps) : Texture(bindingIndex) {
+Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace) : Texture(bindingIndex) {
   m_image.m_colorspace = colorspace;
 
   bind();
@@ -29,10 +29,10 @@ Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, Imag
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
   }
 
-  resize(width, height);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
 
-  if (createMipmaps)
-    Renderer::generateMipmap(TextureType::TEXTURE_2D);
+  resize(width, height);
 
   unbind();
 }
@@ -111,6 +111,7 @@ void Texture::load(bool createMipmaps) {
   }
 
   bind();
+
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::REPEAT);
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::REPEAT);
 
