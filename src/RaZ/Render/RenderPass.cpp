@@ -10,6 +10,20 @@ bool RenderPass::isValid() const {
   if (m_children.empty())
     return (currentBufferCount == 0);
 
+  const std::vector<const Texture*>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
+
+  for (const Texture* readTexture : m_readTextures) {
+    // If the same depth buffer exists both in read & write, the pass is invalid
+    if (readTexture->getImage().getColorspace() == ImageColorspace::DEPTH && m_writeFramebuffer.hasDepthBuffer()) {
+      if (&m_writeFramebuffer.getDepthBuffer() == readTexture)
+        return false;
+    }
+
+    // Likewise for the color buffers: if any has been added as both read & write, the pass is invalid
+    if (std::find(writeColorBuffers.cbegin(), writeColorBuffers.cend(), readTexture) != writeColorBuffers.cend())
+      return false;
+  }
+
   for (const RenderPass* nextPass : m_children) {
     // If the amount of read textures doesn't match the write's (colors + depth), the pass necessarily isn't valid
     if (nextPass->m_readTextures.size() != currentBufferCount)
@@ -27,7 +41,6 @@ bool RenderPass::isValid() const {
           return false;
       } else {
         // If any of the color buffers don't match, the pass is invalid
-        const std::vector<const Texture*>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
         if (std::find(writeColorBuffers.cbegin(), writeColorBuffers.cend(), nextReadTexture) == writeColorBuffers.cend())
           return false;
       }

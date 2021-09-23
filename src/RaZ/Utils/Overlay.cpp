@@ -138,12 +138,7 @@ void OverlayWindow::render() const {
       case OverlayElementType::COLORED_LABEL:
       {
         const auto& label = static_cast<Overlay::OverlayColoredLabel&>(*element);
-
-        PUSH_WARNINGS_STATE
-        DISABLE_WARNING_GCC(-Wformat-security)
-        ImGui::TextColored(ImVec4(label.m_color.x(), label.m_color.y(), label.m_color.z(), label.m_color.w()), element->m_label.c_str());
-        POP_WARNINGS_STATE
-
+        ImGui::TextColored(ImVec4(label.m_color.x(), label.m_color.y(), label.m_color.z(), label.m_color.w()), "%s", element->m_label.c_str());
         break;
       }
 

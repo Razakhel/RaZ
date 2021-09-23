@@ -32,6 +32,10 @@ enum class ImageDataType : uint8_t {
 
 /// ImageData class, representing data held by an Image.
 struct ImageData {
+  ImageData() = default;
+  ImageData(const ImageData&) = default;
+  ImageData(ImageData&&) noexcept = default;
+
   virtual ImageDataType getDataType() const = 0;
   virtual const void* getDataPtr() const = 0;
   virtual void* getDataPtr() = 0;
@@ -43,6 +47,8 @@ struct ImageData {
   /// \param size New data size.
   virtual void resize(std::size_t size) = 0;
 
+  ImageData& operator=(const ImageData&) = default;
+  ImageData& operator=(ImageData&&) noexcept = default;
   /// Checks if the current image data is equal to another given one.
   /// Datas' types must be the same.
   /// \param imgData Image data to be compared with.

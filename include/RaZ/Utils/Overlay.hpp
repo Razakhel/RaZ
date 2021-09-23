@@ -316,7 +316,7 @@ private:
 /// OverlayWindow class, representing a specific window in the Overlay.
 class OverlayWindow final {
 public:
-  explicit OverlayWindow(std::string title) : m_title{ std::move(title) } {}
+  explicit OverlayWindow(std::string title) noexcept : m_title{ std::move(title) } {}
   OverlayWindow(const OverlayWindow&) = delete;
   OverlayWindow(OverlayWindow&&) noexcept = default;
 

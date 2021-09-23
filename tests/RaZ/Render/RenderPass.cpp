@@ -42,4 +42,19 @@ TEST_CASE("RenderPass validity") {
   nextPass.addReadTexture(depthTexture, "");
   CHECK(initialPass.isValid()); // Every buffer texture has a match, the pass is finally valid
   CHECK(nextPass.isValid()); // The subsequent pass remains so
+
+  // When a pass has a same texture in both read & write usages, the pass is invalid
+  initialPass.addReadTexture(colorTexture, "");
+  CHECK_FALSE(initialPass.isValid());
+  CHECK(nextPass.isValid());
+
+  nextPass.addWriteTexture(depthTexture);
+  CHECK_FALSE(initialPass.isValid());
+  CHECK_FALSE(nextPass.isValid()); // Since the pass has write textures but no child pass, it is considered invalid anyway
+
+  Raz::RenderPass finalPass;
+  finalPass.addReadTexture(depthTexture, "");
+  nextPass.addChildren(finalPass);
+  CHECK_FALSE(initialPass.isValid());
+  CHECK_FALSE(nextPass.isValid()); // Even when having a subsequent pass with a matching depth buffer, it remains invalid
 }
