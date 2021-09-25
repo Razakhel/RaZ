@@ -1,8 +1,8 @@
 #include "Catch.hpp"
 
 #include "RaZ/Entity.hpp"
+#include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Transform.hpp"
-#include "RaZ/Render/Mesh.hpp"
 #include "RaZ/System.hpp"
 
 class TestSystem : public Raz::System {

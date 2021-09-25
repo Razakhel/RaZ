@@ -1,8 +1,8 @@
 #include "Catch.hpp"
 
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Data/Mesh.hpp"
 
-TEST_CASE("UV sphere mesh from Sphere") {
+TEST_CASE("Mesh UV sphere") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
   // UV sphere mesh with 10 splits in latitude/longitude
@@ -51,7 +51,7 @@ TEST_CASE("UV sphere mesh from Sphere") {
   }
 }
 
-TEST_CASE("Icosphere mesh from Sphere") {
+TEST_CASE("Mesh icosphere") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
   // Icosphere mesh with 1 subdivision

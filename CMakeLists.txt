@@ -220,6 +220,7 @@ set(
     src/RaZ/*.cpp
     src/RaZ/Animation/*.cpp
     src/RaZ/Audio/*.cpp
+    src/RaZ/Data/*.cpp
     src/RaZ/Math/*.cpp
     src/RaZ/Physics/*.cpp
     src/RaZ/Render/*.cpp
@@ -230,6 +231,8 @@ set(
     include/RaZ/Animation/*.hpp
     include/RaZ/Audio/*.hpp
     include/RaZ/Audio/*.inl
+    include/RaZ/Data/*.hpp
+    include/RaZ/Data/*.inl
     include/RaZ/Math/*.hpp
     include/RaZ/Math/*.inl
     include/RaZ/Physics/*.hpp

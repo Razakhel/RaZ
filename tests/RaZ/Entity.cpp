@@ -1,9 +1,9 @@
 #include "Catch.hpp"
 
 #include "RaZ/Entity.hpp"
+#include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Light.hpp"
-#include "RaZ/Render/Mesh.hpp"
 
 namespace {
 

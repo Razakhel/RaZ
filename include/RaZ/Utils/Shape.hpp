@@ -450,7 +450,7 @@ private:
 /// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
 class AABB final : public Shape {
 public:
-  AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos)
+  AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos) noexcept
     : m_leftBottomBackPos{ leftBottomBackPos }, m_rightTopFrontPos{ rightTopFrontPos } {}
 
   ShapeType getType() const noexcept override { return ShapeType::AABB; }

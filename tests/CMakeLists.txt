@@ -65,6 +65,7 @@ set(
     RaZ/*.cpp
     RaZ/Animation/*.cpp
     RaZ/Audio/*.cpp
+    RaZ/Data/*.cpp
     RaZ/Math/*.cpp
     RaZ/Physics/*.cpp
     RaZ/Render/*.cpp
