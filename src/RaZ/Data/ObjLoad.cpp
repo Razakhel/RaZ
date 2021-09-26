@@ -1,4 +1,6 @@
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Data/ObjFormat.hpp"
+#include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
@@ -6,7 +8,7 @@
 #include <map>
 #include <sstream>
 
-namespace Raz {
+namespace Raz::ObjFormat {
 
 namespace {
 
@@ -30,9 +32,9 @@ inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textu
   return Texture::create(mtlFilePath.recoverPathToFile() + textureFilePath, bindingIndex, true);
 }
 
-inline void importMtl(const FilePath& mtlFilePath,
-                      std::vector<MaterialPtr>& materials,
-                      std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
+inline void loadMtl(const FilePath& mtlFilePath,
+                    std::vector<MaterialPtr>& materials,
+                    std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
   auto blinnPhongMaterial   = MaterialBlinnPhong::create();
@@ -165,7 +167,18 @@ inline void importMtl(const FilePath& mtlFilePath,
 
 } // namespace
 
-void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
+std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
+  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+
+  if (!file)
+    throw std::invalid_argument("Error: Couldn't open the mesh file '" + filePath + "'");
+
+  Mesh mesh;
+  MeshRenderer meshRenderer;
+
+  mesh.addSubmesh();
+  meshRenderer.addSubmeshRenderer();
+
   std::unordered_map<std::string, std::size_t> materialCorrespIndices;
 
   std::vector<Vec3f> positions;
@@ -264,7 +277,7 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
       file >> mtlFileName;
 
       const std::string mtlFilePath = filePath.recoverPathToFile() + mtlFileName;
-      importMtl(mtlFilePath, m_materials, materialCorrespIndices);
+      loadMtl(mtlFilePath, meshRenderer.getMaterials(), materialCorrespIndices);
     } else if (line[0] == 'u') { // Material usage (usemtl)
       if (materialCorrespIndices.empty())
         continue;
@@ -277,7 +290,7 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
       if (correspMaterial == materialCorrespIndices.cend())
         Logger::error("[OBJ] No corresponding material found with the name '" + materialName + "'.");
       else
-        m_submeshes.back().setMaterialIndex(correspMaterial->second);
+        meshRenderer.getSubmeshRenderers().back().setMaterialIndex(correspMaterial->second);
     } else if (line[0] == 'o' || line[0] == 'g') {
       if (!posIndices.front().empty()) {
         const std::size_t newSize = posIndices.size() + 1;
@@ -285,7 +298,8 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
         texcoordsIndices.resize(newSize);
         normalsIndices.resize(newSize);
 
-        addSubmesh();
+        mesh.addSubmesh();
+        meshRenderer.addSubmeshRenderer().setMaterialIndex(std::numeric_limits<std::size_t>::max());
       }
 
       std::getline(file, line);
@@ -300,8 +314,8 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
 
   std::map<std::array<std::size_t, 3>, unsigned int> indicesMap;
 
-  for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
-    Submesh& submesh = m_submeshes[submeshIndex];
+  for (std::size_t submeshIndex = 0; submeshIndex < mesh.getSubmeshes().size(); ++submeshIndex) {
+    Submesh& submesh = mesh.getSubmeshes()[submeshIndex];
     indicesMap.clear();
 
     for (std::size_t partIndex = 0; partIndex < posIndices[submeshIndex].size(); ++partIndex) {
@@ -381,7 +395,7 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
 
           submesh.getTriangleIndices().emplace_back(static_cast<unsigned int>(indicesMap.size()));
           indicesMap.emplace(vertIndices[vertPartIndex], static_cast<unsigned int>(indicesMap.size()));
-          submesh.getVertices().push_back(vert);
+          submesh.getVertices().emplace_back(vert);
         }
       }
     }
@@ -389,7 +403,12 @@ void Mesh::importObj(std::ifstream& file, const FilePath& filePath) {
     // Normalizing tangents to become unit vectors & to be averaged after being accumulated
     for (Vertex& vertex : submesh.getVertices())
       vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
+
+    // Creating the submesh renderer from the submesh's data
+    meshRenderer.getSubmeshRenderers()[submeshIndex].load(submesh);
   }
+
+  return { std::move(mesh), std::move(meshRenderer) };
 }
 
-} // namespace Raz
+} // namespace Raz::ObjFormat

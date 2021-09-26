@@ -14,6 +14,7 @@
 #include "Audio/AudioSystem.hpp"
 #include "Audio/Listener.hpp"
 #include "Audio/Sound.hpp"
+#include "Data/ObjFormat.hpp"
 #include "Data/Mesh.hpp"
 #include "Data/Submesh.hpp"
 #include "Math/Angle.hpp"

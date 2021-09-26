@@ -1,29 +1,34 @@
 #include "Catch.hpp"
 
-#include "RaZ/Render/Mesh.hpp"
-#include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Data/ObjFormat.hpp"
+#include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
 
-TEST_CASE("Mesh imported OBJ quad faces") {
-  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "../assets/meshes/ballQuads.obj"s);
+TEST_CASE("ObjFormat load quad faces") {
+  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT + "../assets/meshes/ballQuads.obj"s);
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 439);
   CHECK(mesh.recoverTriangleCount() == 760);
 
-  CHECK(mesh.getMaterials().empty());
+  CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
+  CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
+  CHECK(meshRenderer.getMaterials().empty());
 }
 
-TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
-  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "assets/meshes/çûbè_BP.obj"s);
+TEST_CASE("ObjFormat load Blinn-Phong") {
+  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT + "assets/meshes/çûbè_BP.obj"s);
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.recoverTriangleCount() == 12);
 
-  REQUIRE(mesh.getMaterials().size() == 1);
-  REQUIRE(mesh.getMaterials().front()->getType() == Raz::MaterialType::BLINN_PHONG);
+  CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
+  CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
+  REQUIRE(meshRenderer.getMaterials().size() == 1);
+  REQUIRE(meshRenderer.getMaterials().front()->getType() == Raz::MaterialType::BLINN_PHONG);
 
-  const auto& material = static_cast<const Raz::MaterialBlinnPhong&>(*mesh.getMaterials().front());
+  const auto& material = static_cast<const Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials().front());
 
   CHECK(material.getBaseColor() == Raz::Vec3f(1.f));
   CHECK(material.getAmbient() == Raz::Vec3f(0.67f));
@@ -233,17 +238,19 @@ TEST_CASE("Mesh imported OBJ cube (Blinn-Phong)") {
   }
 }
 
-TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
-  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "assets/meshes/çûbè_CT.obj"s);
+TEST_CASE("ObjFormat load Cook-Torrance") {
+  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT + "assets/meshes/çûbè_CT.obj"s);
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.recoverTriangleCount() == 12);
 
-  REQUIRE(mesh.getMaterials().size() == 1);
-  REQUIRE(mesh.getMaterials().front()->getType() == Raz::MaterialType::COOK_TORRANCE);
+  CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
+  CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
+  REQUIRE(meshRenderer.getMaterials().size() == 1);
+  REQUIRE(meshRenderer.getMaterials().front()->getType() == Raz::MaterialType::COOK_TORRANCE);
 
-  const auto& material = static_cast<const Raz::MaterialCookTorrance&>(*mesh.getMaterials().front());
+  const auto& material = static_cast<const Raz::MaterialCookTorrance&>(*meshRenderer.getMaterials().front());
 
   CHECK(material.getBaseColor() == Raz::Vec3f(1.f));
   CHECK(material.getMetallicFactor() == 1.f);
@@ -414,14 +421,3 @@ TEST_CASE("Mesh imported OBJ (Cook-Torrance)") {
     CHECK(ambientOccData[3] == 0);
   }
 }
-
-#if defined(FBX_ENABLED)
-TEST_CASE("Mesh imported FBX") {
-  const Raz::Mesh mesh(RAZ_TESTS_ROOT + "../assets/meshes/shaderBall.fbx"s);
-
-  CHECK(mesh.getSubmeshes().size() == 8);
-  CHECK(mesh.recoverVertexCount() == 40004);
-  CHECK(mesh.recoverTriangleCount() == 78312);
-  CHECK(mesh.getMaterials().size() == 4);
-}
-#endif

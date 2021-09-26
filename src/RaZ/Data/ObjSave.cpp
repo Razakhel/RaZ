@@ -1,10 +1,14 @@
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Data/ObjFormat.hpp"
+#include "RaZ/Render/Material.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
+#include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
 #include <fstream>
 #include <map>
 
-namespace Raz {
+namespace Raz::ObjFormat {
 
 namespace {
 
@@ -118,10 +122,15 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
 
 } // namespace
 
-void Mesh::saveObj(std::ofstream& file, const FilePath& filePath) const {
+void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRenderer) {
+  std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
+
+  if (!file)
+    throw std::invalid_argument("Error: Unable to create a mesh file as '" + filePath + "'; path to file must exist");
+
   file << "# OBJ file created with RaZ - https://github.com/Razakhel/RaZ\n\n";
 
-  if (!m_materials.empty()) {
+  if (meshRenderer && !meshRenderer->getMaterials().empty()) {
     const std::string mtlFileName = filePath.recoverFileName(false) + ".mtl";
     const FilePath mtlFilePath    = filePath.recoverPathToFile() + mtlFileName;
 
@@ -129,14 +138,14 @@ void Mesh::saveObj(std::ofstream& file, const FilePath& filePath) const {
 
     std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
 
-    saveMtl(mtlFilePath, m_materials);
+    saveMtl(mtlFilePath, meshRenderer->getMaterials());
   }
 
   std::map<std::array<float, 3>, std::size_t> posCorrespIndices;
   std::map<std::array<float, 2>, std::size_t> texCorrespIndices;
   std::map<std::array<float, 3>, std::size_t> normCorrespIndices;
 
-  for (const Submesh& submesh : m_submeshes) {
+  for (const Submesh& submesh : mesh.getSubmeshes()) {
     for (const Vertex& vertex : submesh.getVertices()) {
       const std::array<float, 3> pos = { vertex.position[0], vertex.position[1], vertex.position[2] };
 
@@ -168,13 +177,13 @@ void Mesh::saveObj(std::ofstream& file, const FilePath& filePath) const {
 
   const std::string fileName = filePath.recoverFileName(false).toUtf8();
 
-  for (std::size_t submeshIndex = 0; submeshIndex < m_submeshes.size(); ++submeshIndex) {
-    const Submesh& submesh = m_submeshes[submeshIndex];
+  for (std::size_t submeshIndex = 0; submeshIndex < mesh.getSubmeshes().size(); ++submeshIndex) {
+    const Submesh& submesh = mesh.getSubmeshes()[submeshIndex];
 
     file << "\no " << fileName << '_' << submeshIndex << '\n';
 
-    if (!m_materials.empty())
-      file << "usemtl " << fileName << '_' << submesh.getMaterialIndex() << '\n';
+    if (meshRenderer && !meshRenderer->getMaterials().empty())
+      file << "usemtl " << fileName << '_' << meshRenderer->getSubmeshRenderers()[submeshIndex].getMaterialIndex() << '\n';
 
     for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
       file << "f ";
@@ -221,4 +230,4 @@ void Mesh::saveObj(std::ofstream& file, const FilePath& filePath) const {
   }
 }
 
-} // namespace Raz
+} // namespace Raz::ObjFormat
