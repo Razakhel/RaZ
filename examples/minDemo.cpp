@@ -13,7 +13,10 @@ int main() {
   camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());
 
   Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
-  mesh.addComponent<Raz::Mesh>(RAZ_ROOT + "assets/meshes/ball.obj"s);
+
+  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/ball.obj"s);
+  mesh.addComponent<Raz::Mesh>(std::move(meshData));
+  mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
 
   Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
   light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type

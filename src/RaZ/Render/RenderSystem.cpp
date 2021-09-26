@@ -1,7 +1,7 @@
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 
@@ -114,8 +114,8 @@ void RenderSystem::updateShaders() const {
   updateLights();
 
   for (const Entity* entity : m_entities) {
-    if (entity->hasComponent<Mesh>())
-      entity->getComponent<Mesh>().load(getGeometryProgram());
+    if (entity->hasComponent<MeshRenderer>())
+      entity->getComponent<MeshRenderer>().load(getGeometryProgram());
   }
 }
 
@@ -160,8 +160,8 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
   if (entity->hasComponent<Light>())
     updateLights();
 
-  if (entity->hasComponent<Mesh>())
-    entity->getComponent<Mesh>().load(getGeometryProgram());
+  if (entity->hasComponent<MeshRenderer>())
+    entity->getComponent<MeshRenderer>().load(getGeometryProgram());
 }
 
 void RenderSystem::initialize() {
@@ -169,7 +169,7 @@ void RenderSystem::initialize() {
 
   m_acceptedComponents.setBit(Component::getId<Camera>());
   m_acceptedComponents.setBit(Component::getId<Light>());
-  m_acceptedComponents.setBit(Component::getId<Mesh>());
+  m_acceptedComponents.setBit(Component::getId<MeshRenderer>());
 
   m_cameraUbo.bindBufferBase(0);
 }

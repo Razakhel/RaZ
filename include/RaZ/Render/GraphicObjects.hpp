@@ -49,8 +49,6 @@ public:
   VertexBuffer(VertexBuffer&& vertexBuffer) noexcept;
 
   unsigned int getIndex() const { return m_index; }
-  const std::vector<Vertex>& getVertices() const { return m_vertices; }
-  std::vector<Vertex>& getVertices() { return m_vertices; }
 
   void bind() const;
   void unbind() const;
@@ -64,7 +62,6 @@ public:
 
 private:
   unsigned int m_index {};
-  std::vector<Vertex> m_vertices {};
 };
 
 class IndexBuffer {
@@ -74,10 +71,6 @@ public:
   IndexBuffer(IndexBuffer&& indexBuffer) noexcept;
 
   unsigned int getIndex() const { return m_index; }
-  const std::vector<unsigned int>& getLineIndices() const { return m_lineIndices; }
-  std::vector<unsigned int>& getLineIndices() { return m_lineIndices; }
-  const std::vector<unsigned int>& getTriangleIndices() const { return m_triangleIndices; }
-  std::vector<unsigned int>& getTriangleIndices() noexcept { return m_triangleIndices; }
 
   void bind() const;
   void unbind() const;
@@ -92,8 +85,6 @@ public:
 
 private:
   unsigned int m_index {};
-  std::vector<unsigned int> m_lineIndices {};
-  std::vector<unsigned int> m_triangleIndices {};
 };
 
 } // namespace Raz

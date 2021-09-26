@@ -1,6 +1,6 @@
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 
@@ -69,7 +69,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
 
   for (const Entity* entity : renderSystem.m_entities) {
     if (entity->isEnabled()) {
-      if (entity->hasComponent<Mesh>() && entity->hasComponent<Transform>()) {
+      if (entity->hasComponent<MeshRenderer>() && entity->hasComponent<Transform>()) {
         const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
 
         const ShaderProgram& geometryProgram = m_geometryPass.getProgram();
@@ -77,7 +77,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
         geometryProgram.sendUniform("uniModelMatrix", modelMat);
         geometryProgram.sendUniform("uniMvpMatrix", modelMat * viewProjMat);
 
-        entity->getComponent<Mesh>().draw(geometryProgram);
+        entity->getComponent<MeshRenderer>().draw(geometryProgram);
       }
     }
   }

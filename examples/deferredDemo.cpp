@@ -215,7 +215,10 @@ int main() {
 
   // Importing the mesh & transforming it so that it can be fully visible
   Raz::Entity& mesh = world.addEntity();
-  mesh.addComponent<Raz::Mesh>(RAZ_ROOT + "assets/meshes/shield.obj"s);
+
+  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/shield.obj"s);
+  mesh.addComponent<Raz::Mesh>(std::move(meshData));
+  mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
 
   auto& meshTrans = mesh.addComponent<Raz::Transform>();
   meshTrans.scale(0.2f);

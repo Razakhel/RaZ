@@ -1,5 +1,5 @@
 #include "RaZ/Render/Framebuffer.hpp"
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -117,7 +117,7 @@ void Framebuffer::display(const ShaderProgram& program) const {
     colorBuffer->bind();
   }
 
-  Mesh::drawUnitQuad();
+  MeshRenderer::drawUnitQuad();
 }
 
 void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {

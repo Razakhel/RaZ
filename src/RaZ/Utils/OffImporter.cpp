@@ -1,4 +1,4 @@
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Data/Mesh.hpp"
 
 #include <fstream>
 

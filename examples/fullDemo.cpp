@@ -73,7 +73,10 @@ int main() {
   /////////////////
 
   Raz::Entity& mesh = world.addEntity();
-  auto& meshComp    = mesh.addComponent<Raz::Mesh>(RAZ_ROOT + "assets/meshes/shield.obj"s);
+
+  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/shield.obj"s);
+  auto& meshComp       = mesh.addComponent<Raz::Mesh>(std::move(meshData));
+  auto& meshRenderComp = mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
 
   auto& meshTrans = mesh.addComponent<Raz::Transform>();
   meshTrans.scale(0.2f);
@@ -277,7 +280,7 @@ int main() {
 
   overlay.addSeparator();
 
-  overlay.addTexture(*meshComp.getMaterials().front()->getBaseColorMap(), 256, 256);
+  overlay.addTexture(*meshRenderComp.getMaterials().front()->getBaseColorMap(), 256, 256);
 
   overlay.addSeparator();
 

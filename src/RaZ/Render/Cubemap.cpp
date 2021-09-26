@@ -1,5 +1,5 @@
 #include "RaZ/Render/Cubemap.hpp"
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Image.hpp"
 
@@ -192,7 +192,7 @@ void Cubemap::draw(const Camera& camera) const {
   m_viewProjUbo.bind();
   sendViewProjectionMatrix(Mat4f(Mat3f(camera.getViewMatrix())) * camera.getProjectionMatrix());
 
-  Mesh::drawUnitCube();
+  MeshRenderer::drawUnitCube();
 
   Renderer::setFaceCulling(FaceOrientation::BACK);
   Renderer::setDepthFunction(DepthFunction::LESS);
