@@ -305,13 +305,14 @@ if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_GCC AND NOT MINGW) # FBX SDK unavailable f
     endif ()
 endif ()
 
-# If FBX SDK not used or found, do not compile FBX loader
+# If FBX SDK not used or found, do not reference FBX files
 if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
     list(
         REMOVE_ITEM
         RAZ_FILES
 
-        "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/FbxImporter.cpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Data/FbxLoad.cpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Data/FbxFormat.hpp"
     )
 endif ()
 

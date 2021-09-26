@@ -71,9 +71,11 @@ inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.frag"s));
   render.updateLights();
 
-  auto& meshComp = mesh.getComponent<Raz::Mesh>();
-  meshComp.import(RAZ_ROOT + "assets/meshes/shaderBall.fbx"s);
-  mesh.getComponent<Raz::MeshRenderer>().load(meshComp, render.getGeometryProgram());
+  auto [meshData, meshRenderData] = Raz::FbxFormat::load(RAZ_ROOT + "assets/meshes/shaderBall.fbx"s);
+  mesh.getComponent<Raz::Mesh>() = std::move(meshData);
+  auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
+  meshRenderComp = std::move(meshRenderData);
+  meshRenderComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -2.f, 5.f);

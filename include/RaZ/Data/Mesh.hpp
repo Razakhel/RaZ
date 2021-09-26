@@ -74,9 +74,6 @@ private:
   void createIcosphere(const Sphere& sphere, uint32_t subdivCount);
 
   void importOff(std::ifstream& file);
-#if defined(FBX_ENABLED)
-  void importFbx(const FilePath& filePath);
-#endif
 
   std::vector<Submesh> m_submeshes {};
   AABB m_boundingBox = AABB(Vec3f(), Vec3f());

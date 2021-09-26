@@ -20,12 +20,6 @@ void Mesh::import(const FilePath& filePath) {
 
   if (format == "off")
     importOff(file);
-  else if (format == "fbx")
-#if defined(FBX_ENABLED)
-    importFbx(filePath);
-#else
-    throw std::invalid_argument("Error: FBX disabled; check that you allowed its usage when building RaZ");
-#endif
   else
     throw std::invalid_argument("Error: '" + format + "' mesh format is not supported");
 }

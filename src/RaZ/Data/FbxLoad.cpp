@@ -1,15 +1,16 @@
-#include "RaZ/Render/Mesh.hpp"
+#include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <fbxsdk.h>
 #include <fstream>
 
-namespace Raz {
+namespace Raz::FbxFormat {
 
 namespace {
 
-void importMaterials(Mesh& mesh, FbxScene* scene, const FilePath& filePath) {
+void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const FilePath& filePath) {
   for (int matIndex = 0; matIndex < scene->GetMaterialCount(); ++matIndex) {
     const FbxSurfaceMaterial* fbxMaterial = scene->GetMaterial(matIndex);
     auto material = MaterialBlinnPhong::create();
@@ -113,13 +114,13 @@ void importMaterials(Mesh& mesh, FbxScene* scene, const FilePath& filePath) {
     }
     */
 
-    mesh.addMaterial(std::move(material));
+    materials.emplace_back(std::move(material));
   }
 }
 
 } // namespace
 
-void Mesh::importFbx(const FilePath& filePath) {
+std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   FbxManager* manager = FbxManager::Create();
   manager->SetIOSettings(FbxIOSettings::Create(manager, IOSROOT));
 
@@ -133,10 +134,17 @@ void Mesh::importFbx(const FilePath& filePath) {
     importer->Destroy();
   }
 
+  Mesh mesh;
+  MeshRenderer meshRenderer;
+
+  mesh.getSubmeshes().reserve(scene->GetGeometryCount());
+  meshRenderer.getSubmeshRenderers().reserve(scene->GetGeometryCount());
+
   // Recovering geometry
   for (int meshIndex = 0; meshIndex < scene->GetGeometryCount(); ++meshIndex) {
     auto* fbxMesh = static_cast<FbxMesh*>(scene->GetGeometry(meshIndex));
     Submesh submesh;
+    SubmeshRenderer submeshRenderer;
 
     ////////////
     // Values //
@@ -221,18 +229,23 @@ void Mesh::importFbx(const FilePath& filePath) {
     if (meshMaterial) {
       if (meshMaterial->GetMappingMode() == FbxLayerElement::EMappingMode::eAllSame)
         // TODO: small hack to avoid segfaulting when mesh count > material count, but clearly wrong; find another way
-        submesh.setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
+        submeshRenderer.setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
       else
-        Logger::error("[FBX] Materials can't be mapped by anything other than the whole submesh.");
+        Logger::error("[FBX] Materials can't be mapped to anything other than the whole submesh.");
     }
 
-    addSubmesh(std::move(submesh));
+    mesh.addSubmesh(std::move(submesh));
+    meshRenderer.addSubmeshRenderer(std::move(submeshRenderer));
+
+    meshRenderer.getSubmeshRenderers().back().load(mesh.getSubmeshes().back());
   }
 
-  importMaterials(*this, scene, filePath);
+  loadMaterials(scene, meshRenderer.getMaterials(), filePath);
 
   scene->Destroy();
   manager->Destroy();
+
+  return { std::move(mesh), std::move(meshRenderer) };
 }
 
-} // namespace Raz
+} // namespace Raz::FbxFormat
