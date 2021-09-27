@@ -54,6 +54,8 @@ public:
   virtual void initTextures(const ShaderProgram& program) const = 0;
   virtual void bindAttributes(const ShaderProgram& program) const = 0;
 
+  Material& operator=(Material&&) noexcept = default;
+
   virtual ~Material() = default;
 
 protected:

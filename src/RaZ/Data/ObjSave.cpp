@@ -17,8 +17,7 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
 
   mtlFile << "# MTL file created with RaZ - https://github.com/Razakhel/RaZ\n";
 
-  const std::string mtlFileName   = mtlFilePath.recoverFileName(false).toUtf8();
-  const TexturePtr defaultTexture = Texture::create(ColorPreset::WHITE);
+  const std::string mtlFileName = mtlFilePath.recoverFileName(false).toUtf8();
 
   for (std::size_t matIndex = 0; matIndex < materials.size(); ++matIndex) {
     const MaterialPtr& material    = materials[matIndex];
@@ -33,35 +32,35 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
       mtlFile << "\tPm " << matCT->getMetallicFactor() << '\n';
       mtlFile << "\tPr " << matCT->getRoughnessFactor() << '\n';
 
-      if (matCT->getAlbedoMap() && matCT->getAlbedoMap() != defaultTexture) {
+      if (matCT->getAlbedoMap() && !matCT->getAlbedoMap()->getImage().isEmpty()) {
         const auto albedoMapPath = materialName + "_albedo.png";
 
         mtlFile << "\tmap_Kd " << albedoMapPath << '\n';
         matCT->getAlbedoMap()->save(albedoMapPath, true);
       }
 
-      if (matCT->getNormalMap() && matCT->getNormalMap() != defaultTexture) {
+      if (matCT->getNormalMap() && !matCT->getNormalMap()->getImage().isEmpty()) {
         const auto normalMapPath = materialName + "_normal.png";
 
         mtlFile << "\tnorm " << normalMapPath << '\n';
         matCT->getNormalMap()->save(normalMapPath, true);
       }
 
-      if (matCT->getMetallicMap() && matCT->getMetallicMap() != defaultTexture) {
+      if (matCT->getMetallicMap() && !matCT->getMetallicMap()->getImage().isEmpty()) {
         const auto metallicMapPath = materialName + "_metallic.png";
 
         mtlFile << "\tmap_Pm " << metallicMapPath << '\n';
         matCT->getMetallicMap()->save(metallicMapPath, true);
       }
 
-      if (matCT->getRoughnessMap() && matCT->getRoughnessMap() != defaultTexture) {
+      if (matCT->getRoughnessMap() && !matCT->getRoughnessMap()->getImage().isEmpty()) {
         const auto roughnessMapPath = materialName + "_roughness.png";
 
         mtlFile << "\tmap_Pr " << roughnessMapPath << '\n';
         matCT->getRoughnessMap()->save(roughnessMapPath, true);
       }
 
-      if (matCT->getAmbientOcclusionMap() && matCT->getAmbientOcclusionMap() != defaultTexture) {
+      if (matCT->getAmbientOcclusionMap() && !matCT->getAmbientOcclusionMap()->getImage().isEmpty()) {
         const auto ambOccMapPath = materialName + "_ambient_occlusion.png";
 
         mtlFile << "\tmap_Ka " << ambOccMapPath << '\n';
@@ -75,42 +74,42 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
       mtlFile << "\tKe " << matBP->getEmissive()[0] << ' ' << matBP->getEmissive()[1] << ' ' << matBP->getEmissive()[2] << '\n';
       mtlFile << "\td  " << matBP->getTransparency() << '\n';
 
-      if (matBP->getDiffuseMap() && matBP->getDiffuseMap() != defaultTexture) {
+      if (matBP->getDiffuseMap() && !matBP->getDiffuseMap()->getImage().isEmpty()) {
         const auto diffuseMapPath = materialName + "_diffuse.png";
 
         mtlFile << "\tmap_Kd " << diffuseMapPath << '\n';
         matBP->getDiffuseMap()->save(diffuseMapPath, true);
       }
 
-      if (matBP->getAmbientMap() && matBP->getAmbientMap() != defaultTexture) {
+      if (matBP->getAmbientMap() && !matBP->getAmbientMap()->getImage().isEmpty()) {
         const auto ambientMapPath = materialName + "_ambient.png";
 
         mtlFile << "\tmap_Ka " << ambientMapPath << '\n';
         matBP->getAmbientMap()->save(ambientMapPath, true);
       }
 
-      if (matBP->getSpecularMap() && matBP->getSpecularMap() != defaultTexture) {
+      if (matBP->getSpecularMap() && !matBP->getSpecularMap()->getImage().isEmpty()) {
         const auto specularMapPath = materialName + "_specular.png";
 
         mtlFile << "\tmap_Ks " << specularMapPath << '\n';
         matBP->getSpecularMap()->save(specularMapPath, true);
       }
 
-      if (matBP->getEmissiveMap() && matBP->getEmissiveMap() != defaultTexture) {
+      if (matBP->getEmissiveMap() && !matBP->getEmissiveMap()->getImage().isEmpty()) {
         const auto emissiveMapPath = materialName + "_emissive.png";
 
         mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
         matBP->getEmissiveMap()->save(emissiveMapPath, true);
       }
 
-      if (matBP->getTransparencyMap() && matBP->getTransparencyMap() != defaultTexture) {
+      if (matBP->getTransparencyMap() && !matBP->getTransparencyMap()->getImage().isEmpty()) {
         const auto transparencyMapPath = materialName + "_transparency.png";
 
         mtlFile << "\tmap_d " << transparencyMapPath << '\n';
         matBP->getTransparencyMap()->save(transparencyMapPath, true);
       }
 
-      if (matBP->getBumpMap() && matBP->getBumpMap() != defaultTexture) {
+      if (matBP->getBumpMap() && !matBP->getBumpMap()->getImage().isEmpty()) {
         const auto ambOccMapPath = materialName + "_bump.png";
 
         mtlFile << "\tmap_bump " << ambOccMapPath << '\n';
@@ -135,8 +134,6 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
     const FilePath mtlFilePath    = filePath.recoverPathToFile() + mtlFileName;
 
     file << "mtllib " << mtlFilePath << "\n\n";
-
-    std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
 
     saveMtl(mtlFilePath, meshRenderer->getMaterials());
   }

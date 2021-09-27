@@ -1,5 +1,6 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Image.hpp"
+#include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <cassert>
@@ -88,6 +89,11 @@ void Image::read(const FilePath& filePath, bool flipVertically) {
 }
 
 void Image::save(const FilePath& filePath, bool flipVertically) const {
+  if (isEmpty()) {
+    Logger::error("[Image] Cannot save empty image to '" + filePath.toUtf8() + "'.");
+    return;
+  }
+
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
   if (!file)

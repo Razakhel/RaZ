@@ -4,6 +4,71 @@
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 
+namespace {
+
+Raz::Mesh createMesh() {
+  Raz::Mesh mesh;
+
+  {
+    Raz::Submesh& submesh = mesh.addSubmesh();
+
+    std::vector<Raz::Vertex>& vertices = submesh.getVertices();
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(10.f), Raz::Vec2f(0.f), Raz::Axis::X });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(20.f), Raz::Vec2f(0.1f), Raz::Axis::Y });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(30.f), Raz::Vec2f(0.2f), Raz::Axis::Z });
+
+    std::vector<unsigned int>& indices = submesh.getTriangleIndices();
+    submesh.getTriangleIndices().emplace_back(0);
+    submesh.getTriangleIndices().emplace_back(1);
+    submesh.getTriangleIndices().emplace_back(2);
+  }
+
+  {
+    Raz::Submesh& submesh = mesh.addSubmesh();
+
+    std::vector<Raz::Vertex>& vertices = submesh.getVertices();
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(100.f), Raz::Vec2f(0.8f), Raz::Axis::Z });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(200.f), Raz::Vec2f(0.9f), Raz::Axis::X });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(300.f), Raz::Vec2f(1.f), Raz::Axis::Y });
+
+    std::vector<unsigned int>& indices = submesh.getTriangleIndices();
+    submesh.getTriangleIndices().emplace_back(0);
+    submesh.getTriangleIndices().emplace_back(1);
+    submesh.getTriangleIndices().emplace_back(2);
+  }
+
+  return mesh;
+}
+
+Raz::MeshRenderer createMeshRenderer() {
+  Raz::MeshRenderer meshRenderer;
+
+  meshRenderer.addSubmeshRenderer().setMaterialIndex(0);
+  meshRenderer.addSubmeshRenderer().setMaterialIndex(1);
+
+  {
+    auto material = Raz::MaterialCookTorrance::create();
+    material->setBaseColor(Raz::Vec3f(1.f, 0.f, 0.f));
+    material->setMetallicFactor(0.25f);
+    material->setRoughnessFactor(0.75f);
+    meshRenderer.addMaterial(std::move(material));
+  }
+
+  {
+    auto material = Raz::MaterialBlinnPhong::create();
+    material->setDiffuse(Raz::Vec3f(1.f, 0.f, 0.f));
+    material->setAmbient(Raz::Vec3f(0.f, 1.f, 0.f));
+    material->setSpecular(Raz::Vec3f(0.f, 0.f, 1.f));
+    material->setEmissive(Raz::Vec3f(1.f, 1.f, 1.f));
+    material->setTransparency(0.5f);
+    meshRenderer.addMaterial(std::move(material));
+  }
+
+  return meshRenderer;
+}
+
+} // namespace
+
 TEST_CASE("ObjFormat load quad faces") {
   const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT + "../assets/meshes/ballQuads.obj"s);
 
@@ -419,5 +484,93 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     CHECK(ambientOccData[1] == 255);
     CHECK(ambientOccData[2] == 255);
     CHECK(ambientOccData[3] == 0);
+  }
+}
+
+TEST_CASE("ObjFormat save") {
+  const auto checkMeshData = [] (const Raz::Mesh& mesh) {
+    CHECK(mesh.getSubmeshes().size() == 2);
+
+    {
+      const Raz::Submesh& submesh = mesh.getSubmeshes()[0];
+
+      CHECK(submesh.getVertexCount() == 3);
+
+      CHECK(submesh.getVertices()[0] == Raz::Vertex{ Raz::Vec3f(10.f), Raz::Vec2f(0.f), Raz::Axis::X });
+      CHECK(submesh.getVertices()[1] == Raz::Vertex{ Raz::Vec3f(20.f), Raz::Vec2f(0.1f), Raz::Axis::Y });
+      CHECK(submesh.getVertices()[2] == Raz::Vertex{ Raz::Vec3f(30.f), Raz::Vec2f(0.2f), Raz::Axis::Z });
+
+      CHECK(submesh.getTriangleIndexCount() == 3);
+
+      CHECK(submesh.getTriangleIndices()[0] == 0);
+      CHECK(submesh.getTriangleIndices()[1] == 1);
+      CHECK(submesh.getTriangleIndices()[2] == 2);
+    }
+
+    {
+      const Raz::Submesh& submesh = mesh.getSubmeshes()[1];
+
+      CHECK(submesh.getVertexCount() == 3);
+
+      CHECK(submesh.getVertices()[0] == Raz::Vertex{ Raz::Vec3f(100.f), Raz::Vec2f(0.8f), Raz::Axis::Z });
+      CHECK(submesh.getVertices()[1] == Raz::Vertex{ Raz::Vec3f(200.f), Raz::Vec2f(0.9f), Raz::Axis::X });
+      CHECK(submesh.getVertices()[2] == Raz::Vertex{ Raz::Vec3f(300.f), Raz::Vec2f(1.f), Raz::Axis::Y });
+
+      CHECK(submesh.getTriangleIndexCount() == 3);
+
+      CHECK(submesh.getTriangleIndices()[0] == 0);
+      CHECK(submesh.getTriangleIndices()[1] == 1);
+      CHECK(submesh.getTriangleIndices()[2] == 2);
+    }
+  };
+
+  const Raz::Mesh mesh = createMesh();
+  Raz::ObjFormat::save("téstÊxpørt.obj", mesh);
+
+  {
+    const auto [meshData, meshRendererData] = Raz::ObjFormat::load("téstÊxpørt.obj");
+
+    checkMeshData(meshData);
+
+    CHECK(meshRendererData.getSubmeshRenderers().size() == 2);
+
+    CHECK(meshRendererData.getSubmeshRenderers()[0].getMaterialIndex() == 0);
+    CHECK(meshRendererData.getSubmeshRenderers()[1].getMaterialIndex() == std::numeric_limits<std::size_t>::max());
+  }
+
+  const Raz::MeshRenderer meshRenderer = createMeshRenderer();
+  Raz::ObjFormat::save("téstÊxpørt.obj", mesh, &meshRenderer);
+
+  {
+    const auto [meshData, meshRendererData] = Raz::ObjFormat::load("téstÊxpørt.obj");
+
+    checkMeshData(meshData);
+
+    CHECK(meshRendererData.getSubmeshRenderers().size() == 2);
+
+    CHECK(meshRendererData.getSubmeshRenderers()[0].getMaterialIndex() == 0);
+    CHECK(meshRendererData.getSubmeshRenderers()[1].getMaterialIndex() == 1);
+
+    CHECK(meshRendererData.getMaterials().size() == 2);
+
+    {
+      CHECK(meshRendererData.getMaterials()[0]->getType() == Raz::MaterialType::COOK_TORRANCE);
+
+      auto& material = static_cast<Raz::MaterialCookTorrance&>(*meshRendererData.getMaterials()[0]);
+      CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(material.getMetallicFactor() == 0.25f);
+      CHECK(material.getRoughnessFactor() == 0.75f);
+    }
+
+    {
+      CHECK(meshRendererData.getMaterials()[1]->getType() == Raz::MaterialType::BLINN_PHONG);
+
+      auto& material = static_cast<Raz::MaterialBlinnPhong&>(*meshRendererData.getMaterials()[1]);
+      CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(material.getAmbient().strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
+      CHECK(material.getSpecular().strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
+      CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
+      CHECK(material.getTransparency() == 0.5f);
+    }
   }
 }
