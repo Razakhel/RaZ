@@ -49,6 +49,7 @@ public:
 
   const StringType& getPath() const noexcept { return m_path; }
   const CharType* getPathStr() const noexcept { return m_path.c_str(); }
+  bool isEmpty() const noexcept { return m_path.empty(); }
 
   static FilePath recoverPathToFile(const std::string& pathStr);
   static FilePath recoverPathToFile(const std::wstring& pathStr);

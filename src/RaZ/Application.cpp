@@ -1,4 +1,5 @@
 #include "RaZ/Application.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten.h>
@@ -7,6 +8,8 @@
 namespace Raz {
 
 void Application::run() {
+  Logger::debug("[Application] Running...");
+
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_set_main_loop_arg([] (void* instance) {
     static_cast<decltype(this)>(instance)->runOnce();
@@ -14,6 +17,8 @@ void Application::run() {
 #else
   while (runOnce());
 #endif
+
+  Logger::debug("[Application] Exiting...");
 }
 
 bool Application::runOnce() {

@@ -28,6 +28,8 @@ ShaderProgram::ShaderProgram(ShaderProgram&& program) noexcept
     m_uniforms{ std::move(program.m_uniforms) } {}
 
 void ShaderProgram::setVertexShader(VertexShader&& vertShader) {
+  Logger::debug("[ShaderProgram] Setting vertex shader (ID: " + std::to_string(vertShader.getIndex()) + ", path: '" + vertShader.getPath() + "')");
+
   if (Renderer::isShaderAttached(m_index, m_vertShader.getIndex()))
     Renderer::detachShader(m_index, m_vertShader.getIndex());
 
@@ -38,6 +40,8 @@ void ShaderProgram::setVertexShader(VertexShader&& vertShader) {
 }
 
 void ShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
+  Logger::debug("[ShaderProgram] Setting geometry shader (ID: " + std::to_string(geomShader.getIndex()) + ", path: '" + geomShader.getPath() + "')");
+
   if (m_geomShader && Renderer::isShaderAttached(m_index, m_geomShader->getIndex()))
     Renderer::detachShader(m_index, m_geomShader->getIndex());
 
@@ -48,6 +52,8 @@ void ShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
 }
 
 void ShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
+  Logger::debug("[ShaderProgram] Setting fragment shader (ID: " + std::to_string(fragShader.getIndex()) + ", path: '" + fragShader.getPath() + "')");
+
   if (Renderer::isShaderAttached(m_index, m_fragShader.getIndex()))
     Renderer::detachShader(m_index, m_fragShader.getIndex());
 
@@ -73,17 +79,25 @@ void ShaderProgram::setShaders(VertexShader&& vertShader, GeometryShader&& geomS
 }
 
 void ShaderProgram::loadShaders() const {
+  Logger::debug("[ShaderProgram] Loading shaders...");
+
   m_vertShader.load();
   if (m_geomShader)
     m_geomShader->load();
   m_fragShader.load();
+
+  Logger::debug("[ShaderProgram] Loaded shaders");
 }
 
 void ShaderProgram::compileShaders() const {
+  Logger::debug("[ShaderProgram] Compiling shaders...");
+
   m_vertShader.compile();
   if (m_geomShader)
     m_geomShader->compile();
   m_fragShader.compile();
+
+  Logger::debug("[ShaderProgram] Compiled shaders");
 }
 
 void ShaderProgram::link() const {
@@ -95,7 +109,9 @@ void ShaderProgram::link() const {
     && ((m_geomShader && m_geomShader->isValid()) ? m_geomShader->isCompiled() : true));
   assert("Error: A shader program's fragment shader must be compiled before being linked." && (m_fragShader.isValid() ? m_fragShader.isCompiled() : true));
 
+  Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
   Renderer::linkProgram(m_index);
+  Logger::debug("[ShaderProgram] Linked");
 }
 
 bool ShaderProgram::isLinked() const {
@@ -111,10 +127,14 @@ bool ShaderProgram::isUsed() const {
 }
 
 void ShaderProgram::updateShaders() const {
+  Logger::debug("[ShaderProgram] Updating shaders...");
+
   loadShaders();
   compileShaders();
   link();
   use();
+
+  Logger::debug("[ShaderProgram] Updated shaders");
 }
 
 void ShaderProgram::createUniform(const std::string& uniformName) {
@@ -208,7 +228,9 @@ ShaderProgram::~ShaderProgram() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
+  Logger::debug("[ShaderProgram] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteProgram(m_index);
+  Logger::debug("[ShaderProgram] Destroyed");
 }
 
 } // namespace Raz

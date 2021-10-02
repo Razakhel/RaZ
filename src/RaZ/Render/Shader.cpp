@@ -1,6 +1,7 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <fstream>
 #include <limits>
@@ -25,6 +26,8 @@ void Shader::load() const {
   if (m_path.getPath().empty()) // Shader imported directly from source, no path available
     return;
 
+  Logger::debug("[Shader] Loading (ID: " + std::to_string(m_index) + ", path: '" + m_path + "')...");
+
   std::ifstream shaderSource(m_path, std::ios::in | std::ios::binary | std::ios::ate);
 
   if (!shaderSource)
@@ -37,10 +40,14 @@ void Shader::load() const {
   shaderSource.read(bytes.data(), static_cast<std::streamsize>(fileSize));
 
   Renderer::sendShaderSource(m_index, bytes.data(), static_cast<int>(fileSize));
+
+  Logger::debug("[Shader] Loaded");
 }
 
 void Shader::compile() const {
+  Logger::debug("[Shader] Compiling (ID: " + std::to_string(m_index) + ")...");
   Renderer::compileShader(m_index);
+  Logger::debug("[Shader] Compiled");
 }
 
 bool Shader::isCompiled() const {
@@ -48,15 +55,19 @@ bool Shader::isCompiled() const {
 }
 
 void Shader::loadSource(const std::string& source) const {
+  Logger::debug("[Shader] Loading source (ID: " + std::to_string(m_index) + ")...");
   Renderer::sendShaderSource(m_index, source);
+  Logger::debug("[Shader] Loaded source");
 }
 
 void Shader::destroy() {
   if (!isValid())
     return;
 
+  Logger::debug("[Shader] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteShader(m_index);
   m_index = std::numeric_limits<unsigned int>::max();
+  Logger::debug("[Shader] Destroyed");
 }
 
 Shader& Shader::operator=(Shader&& shader) noexcept {
@@ -67,7 +78,9 @@ Shader& Shader::operator=(Shader&& shader) noexcept {
 }
 
 VertexShader::VertexShader() {
+  Logger::debug("[Shader] Creating vertex shader...");
   m_index = Renderer::createShader(ShaderType::VERTEX);
+  Logger::debug("[Shader] Created vertex shader (ID: " + std::to_string(m_index) + ")");
 }
 
 VertexShader VertexShader::loadFromSource(const std::string& source) {
@@ -77,7 +90,9 @@ VertexShader VertexShader::loadFromSource(const std::string& source) {
 }
 
 FragmentShader::FragmentShader() {
+  Logger::debug("[Shader] Creating fragment shader...");
   m_index = Renderer::createShader(ShaderType::FRAGMENT);
+  Logger::debug("[Shader] Created fragment shader (ID: " + std::to_string(m_index) + ")");
 }
 
 FragmentShader FragmentShader::loadFromSource(const std::string& source) {
@@ -87,7 +102,9 @@ FragmentShader FragmentShader::loadFromSource(const std::string& source) {
 }
 
 GeometryShader::GeometryShader() {
+  Logger::debug("[Shader] Creating geometry shader...");
   m_index = Renderer::createShader(ShaderType::GEOMETRY);
+  Logger::debug("[Shader] Created geometry shader (ID: " + std::to_string(m_index) + ")");
 }
 
 GeometryShader GeometryShader::loadFromSource(const std::string& source) {
