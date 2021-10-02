@@ -29,7 +29,6 @@ target_compile_features(RaZ PRIVATE cxx_std_17)
 # Detect whether Emscripten is being used
 if (CMAKE_CXX_COMPILER MATCHES "/em\\+\\+.*$")
     set(RAZ_USE_EMSCRIPTEN ON)
-    target_compile_options(RaZ PRIVATE -c)
 else ()
     set(RAZ_USE_EMSCRIPTEN OFF)
 endif ()
@@ -187,27 +186,16 @@ if (RAZ_COMPILER_GCC)
 endif ()
 
 if (RAZ_USE_EMSCRIPTEN)
-    target_compile_options(
+    target_link_options(
         RaZ
 
-        PRIVATE
+        PUBLIC
 
         "SHELL:-s USE_GLFW=3"
         "SHELL:-s USE_LIBPNG=1"
     )
 
-    set(
-        RAZ_LINKER_FLAGS
-
-        ${RAZ_LINKER_FLAGS}
-        "-s USE_LIBPNG=1"
-        "-s USE_GLFW=3"
-        "-s USE_WEBGL2=1"
-        "-s OFFSCREEN_FRAMEBUFFER=1"
-        "-s OFFSCREENCANVAS_SUPPORT=1"
-        "-s DOUBLE_MODE=0"
-        glfw
-    )
+    set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} glfw)
 endif ()
 
 ######################

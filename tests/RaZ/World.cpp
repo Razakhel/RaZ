@@ -29,7 +29,7 @@ TEST_CASE("World entities manipulation") {
   CHECK(world.getEntities().size() == 1);
   CHECK(world.getEntities()[0]->getId() == 1);
 
-  Raz::Entity& entity4 = world.addEntity();
+  [[maybe_unused]] Raz::Entity& entity4 = world.addEntity();
 
   CHECK(world.getEntities().size() == 2);
   CHECK(world.getEntities()[0]->getId() == 1);

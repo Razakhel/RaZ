@@ -75,6 +75,11 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
 } // namespace
 
 void Renderer::initialize() {
+  if (s_isInitialized)
+    return;
+
+  Logger::debug("[Renderer] Initializing...");
+
   glewExperimental = GL_TRUE;
 
   if (glewInit() != GLEW_OK) {
@@ -86,6 +91,8 @@ void Renderer::initialize() {
     glDebugMessageCallback(&callbackDebugLog, nullptr);
     enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
+
+    Logger::debug("[Renderer] Initialized");
   }
 }
 
@@ -259,7 +266,7 @@ void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureForm
 void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glGenBuffers(count, indices);
+  glGenBuffers(static_cast<int>(count), indices);
 
   printConditionalErrors();
 }
@@ -307,7 +314,7 @@ void Renderer::sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::pt
 void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glDeleteBuffers(count, indices);
+  glDeleteBuffers(static_cast<int>(count), indices);
 
   printConditionalErrors();
 }
@@ -562,6 +569,9 @@ std::vector<unsigned int> Renderer::recoverAttachedShaders(unsigned int programI
 
   int attachedShaderCount {};
   getProgramParameter(programIndex, ProgramParameter::ATTACHED_SHADERS, &attachedShaderCount);
+
+  if (attachedShaderCount == 0)
+    return {};
 
   std::vector<unsigned int> shaderIndices(static_cast<std::size_t>(attachedShaderCount));
   glGetAttachedShaders(programIndex, attachedShaderCount, nullptr, shaderIndices.data());
@@ -904,7 +914,7 @@ void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
 void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glDrawBuffers(count, reinterpret_cast<const unsigned int*>(buffers));
+  glDrawBuffers(static_cast<int>(count), reinterpret_cast<const unsigned int*>(buffers));
 
   printConditionalErrors();
 }
@@ -924,7 +934,7 @@ void Renderer::blitFramebuffer(int readMinX, int readMinY, int readMaxX, int rea
 void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
-  glDeleteFramebuffers(count, indices);
+  glDeleteFramebuffers(static_cast<int>(count), indices);
 
   printConditionalErrors();
 }

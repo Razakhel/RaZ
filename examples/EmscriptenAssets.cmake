@@ -43,6 +43,7 @@ set(
     assets/skyboxes/clouds_left.png
     assets/skyboxes/clouds_bottom.png
     assets/skyboxes/clouds_back.png
+    assets/sounds/wave_seagulls.wav
     assets/textures/shield_albedo.png
     assets/textures/shield_normal.png
     assets/textures/shield_metallic.png

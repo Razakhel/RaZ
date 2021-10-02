@@ -18,9 +18,9 @@ Raz::Mesh createMesh() {
     vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(30.f), Raz::Vec2f(0.2f), Raz::Axis::Z });
 
     std::vector<unsigned int>& indices = submesh.getTriangleIndices();
-    submesh.getTriangleIndices().emplace_back(0);
-    submesh.getTriangleIndices().emplace_back(1);
-    submesh.getTriangleIndices().emplace_back(2);
+    indices.emplace_back(0);
+    indices.emplace_back(1);
+    indices.emplace_back(2);
   }
 
   {
@@ -32,9 +32,9 @@ Raz::Mesh createMesh() {
     vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(300.f), Raz::Vec2f(1.f), Raz::Axis::Y });
 
     std::vector<unsigned int>& indices = submesh.getTriangleIndices();
-    submesh.getTriangleIndices().emplace_back(0);
-    submesh.getTriangleIndices().emplace_back(1);
-    submesh.getTriangleIndices().emplace_back(2);
+    indices.emplace_back(0);
+    indices.emplace_back(1);
+    indices.emplace_back(2);
   }
 
   return mesh;

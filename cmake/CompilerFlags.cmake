@@ -157,17 +157,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
             # Warnings triggered by the FBX SDK
             /wd4266 # No override available (function is hidden)
+            /wd4365 # Signed/unsigned mismatch (implicit conversion)
             /wd4619 # Unknown warning number
             /wd4625 # Copy constructor implicitly deleted
             /wd4626 # Copy assignment operator implicitly deleted
-
-            # Warnings triggered by Catch
-            /wd4365 # Signed/unsigned mismatch (implicit conversion)
-            /wd4388 # Signed/unsigned mismatch (equality comparison)
-            /wd4583 # Destructor not implicitly called
-            /wd4623 # Default constructor implicitly deleted
-            /wd4868 # Evaluation order not guaranteed in braced initializing list
-            /wd5204 # Class with virtual functions but no virtual destructor
 
             # Warnings triggered by MSVC's standard library
             /wd4355 # 'this' used in base member initializing list
@@ -181,6 +174,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd5026 # Move constructor implicitly deleted
             /wd5027 # Move assignment operator implicitly deleted
             /wd5039 # Pointer/ref to a potentially throwing function passed to an 'extern "C"' function (with -EHc)
+            /wd5204 # Class with virtual functions but no virtual destructor
             /wd5220 # Non-static volatile member doesn't imply non-trivial move/copy ctor/operator=
         )
 
@@ -225,6 +219,62 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             ${DEFINITIONS_SCOPE}
 
             NOGDI # Preventing definition of the 'ERROR' macro
+        )
+    endif ()
+
+    if (RAZ_USE_EMSCRIPTEN)
+        # List of all compiler & linker options: https://emscripten.org/docs/tools_reference/emcc.html
+        # List of all -s options: https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
+
+        if (RAZ_CONFIG_DEBUG)
+            set(
+                COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                -O0 -g
+                #-fsanitize=address,undefined # Enable sanitizers
+            )
+
+            target_link_options(
+                ${TARGET_NAME}
+
+                ${SCOPE}
+
+                --emrun # Forward stdout & stderr to the launching console
+                --cpuprofiler # Display a CPU profiler on the page
+                #--memoryprofiler # Display a memory profiler on the page (SAFE_HEAP needs to be disabled: "maximum call stack size exceeded")
+                #-gsource-map # Generate source map
+                "SHELL:-s ASSERTIONS=1" # Enable assertions
+                "SHELL:-s SAFE_HEAP=1" # Enable heap checks
+                "SHELL:-s STACK_OVERFLOW_CHECK=2" # Enhance call stack precision
+                "SHELL:-s GL_ASSERTIONS=1" # Enable OpenGL error checks
+                #"SHELL:-s GL_TESTING=1" # Keep the drawing buffer alive to allow testing
+                #-fsanitize=address,undefined # Enable sanitizers
+                #"SHELL:-s INITIAL_MEMORY=300MB" # Expanding the initial memory pool; required for asan
+            )
+        else ()
+            target_compile_definitions(${TARGET_NAME} ${DEFINITIONS_SCOPE} NDEBUG)
+            set(COMPILER_FLAGS ${COMPILER_FLAGS} -O3)
+        endif ()
+
+        set(
+            COMPILER_FLAGS
+
+            ${COMPILER_FLAGS}
+            -c # Emit object files (may be unrequired)
+            "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
+        )
+
+        target_link_options(
+            ${TARGET_NAME}
+
+            ${SCOPE}
+
+            "SHELL:-s USE_WEBGL2=1" # Force the use of WebGL2
+            "SHELL:-s OFFSCREEN_FRAMEBUFFER=1" # Enable rendering to offscreen targets
+            "SHELL:-s OFFSCREENCANVAS_SUPPORT=1" # Allow creating multiple GL contexts on separate threads & swapping between them
+            "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
+            "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed
         )
     endif ()
 

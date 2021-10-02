@@ -15,41 +15,38 @@ enable_testing()
 # RaZ Tests - Compiler flags #
 ##############################
 
-set(
-    RAZ_TESTS_COMPILER_FLAGS
-
-    ${RAZ_COMPILER_FLAGS}
-)
+include(CompilerFlags)
+add_compiler_flags(RaZ_Tests PRIVATE)
 
 if (RAZ_COMPILER_CLANG)
-    set(
-        RAZ_TESTS_COMPILER_FLAGS
-
-        ${RAZ_TESTS_COMPILER_FLAGS}
-        -Wno-double-promotion # [long] double/float operations are voluntarily made
-        -Wno-float-equal # Floating-point strict equality checks are voluntarily made
-        -Wno-header-hygiene # The namespace std::literals is imported in the Catch.hpp custom header
-        -Wno-unneeded-member-function # Test structures may contain unnecessary member functions
-    )
-endif ()
-
-if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
-    set(
-        RAZ_TESTS_COMPILER_FLAGS
-
-        ${RAZ_TESTS_COMPILER_FLAGS}
-        /permissive- # Improving standard compliance
-        /EHsc # Enabling exceptions
-        /utf-8 # Forcing MSVC to actually handle files as UTF-8
-    )
-
-    target_compile_definitions(
+    target_compile_options(
         RaZ_Tests
 
         PRIVATE
 
-        NOMINMAX # Preventing definitions of min & max macros
-        _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING # Ignoring std::codecvt deprecation warnings
+        -Wno-double-promotion # [long] double/float operations are voluntarily made
+        -Wno-float-conversion # Can occur voluntarily for readability
+        -Wno-header-hygiene # The namespace std::literals is imported in the Catch.hpp custom header
+        -Wno-implicit-int-float-conversion # Can occur voluntarily for readability
+        -Wno-unneeded-member-function # Test structures may contain unnecessary member functions
+    )
+
+    # Disabling some other warnings available since Clang 13.X
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13)
+        target_compile_options(RaZ_Tests PRIVATE -Wno-reserved-identifier) # Each Catch test case macro triggers this
+    endif ()
+elseif (RAZ_COMPILER_MSVC)
+    target_compile_options(
+        RaZ_Tests
+
+        PRIVATE
+
+        # Warnings triggered by Catch
+        /wd4388 # Signed/unsigned mismatch (equality comparison)
+        /wd4583 # Destructor not implicitly called
+        /wd4623 # Default constructor implicitly deleted
+        /wd4868 # Evaluation order not guaranteed in braced initializing list
+        /wd5219 # Implicit conversion, possible loss of data
     )
 endif ()
 
@@ -115,8 +112,6 @@ target_include_directories(
 
 # Adding a definition for the tests root path, so that it can be used in tests instead of full relative paths
 target_compile_definitions(RaZ_Tests PRIVATE RAZ_TESTS_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
-
-target_compile_options(RaZ_Tests PRIVATE ${RAZ_TESTS_COMPILER_FLAGS})
 
 target_link_libraries(RaZ_Tests PUBLIC RaZ)
 
