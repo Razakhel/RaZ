@@ -26,6 +26,9 @@ public:
   RenderMode getRenderMode() const { return m_renderMode; }
   std::size_t getMaterialIndex() const { return m_materialIndex; }
 
+  /// Sets a specific mode to render the submesh into.
+  /// \param renderMode Render mode to apply.
+  /// \param submesh Submesh to load the render mode's indices from.
   void setRenderMode(RenderMode renderMode, const Submesh& submesh);
   void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
 

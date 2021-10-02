@@ -26,6 +26,8 @@ Window::Window(unsigned int width, unsigned int height,
                const std::string& title,
                WindowSetting settings,
                uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
+  Logger::debug("[Window] Initializing...");
+
   glfwSetErrorCallback([] (int errorCode, const char* description) {
     Logger::error("[GLFW] " + std::string(description) + " (error code " + std::to_string(errorCode) + ").");
   });
@@ -88,6 +90,8 @@ Window::Window(unsigned int width, unsigned int height,
 #if !defined(RAZ_NO_OVERLAY)
   m_overlay.initialize(m_windowHandle);
 #endif
+
+  Logger::debug("[Window] Initialized");
 }
 
 void Window::setTitle(const std::string& title) const {
@@ -367,6 +371,8 @@ void Window::setShouldClose() const {
 }
 
 void Window::close() {
+  Logger::debug("[Window] Closing...");
+
 #if !defined(RAZ_NO_OVERLAY)
   m_overlay.destroy();
 #endif
@@ -374,6 +380,8 @@ void Window::close() {
   glfwTerminate();
 
   m_windowHandle = nullptr;
+
+  Logger::debug("[Window] Closed");
 }
 
 } // namespace Raz

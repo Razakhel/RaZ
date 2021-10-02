@@ -10,6 +10,8 @@
 namespace Raz {
 
 void Overlay::initialize(GLFWwindow* windowHandle) const {
+  Logger::debug("[Overlay] Initializing...");
+
   IMGUI_CHECKVERSION();
 
   ImGui::CreateContext();
@@ -22,6 +24,8 @@ void Overlay::initialize(GLFWwindow* windowHandle) const {
 #else
   ImGui_ImplOpenGL3_Init("#version 300 es");
 #endif
+
+  Logger::debug("[Overlay] Initialized");
 }
 
 OverlayWindow& Overlay::addWindow(std::string title) {
@@ -49,10 +53,14 @@ void Overlay::render() const {
 }
 
 void Overlay::destroy() const {
+  Logger::debug("[Overlay] Destroying...");
+
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
 
   ImGui::DestroyContext();
+
+  Logger::debug("[Overlay] Destroyed");
 }
 
 void OverlayWindow::addLabel(std::string label) {

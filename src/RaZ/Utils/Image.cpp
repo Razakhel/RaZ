@@ -90,7 +90,7 @@ void Image::read(const FilePath& filePath, bool flipVertically) {
 
 void Image::save(const FilePath& filePath, bool flipVertically) const {
   if (isEmpty()) {
-    Logger::error("[Image] Cannot save empty image to '" + filePath.toUtf8() + "'.");
+    Logger::error("[Image] Cannot save empty image to '" + filePath + "'.");
     return;
   }
 

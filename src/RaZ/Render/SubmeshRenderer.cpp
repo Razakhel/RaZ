@@ -1,6 +1,7 @@
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/SubmeshRenderer.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 namespace Raz {
 
@@ -58,6 +59,8 @@ void SubmeshRenderer::draw() const {
 }
 
 void SubmeshRenderer::loadVertices(const Submesh& submesh) const {
+  Logger::debug("[SubmeshRenderer] Loading submesh vertices...");
+
   m_vao.bind();
   m_vbo.bind();
 
@@ -99,9 +102,13 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) const {
 
   m_vbo.unbind();
   m_vao.unbind();
+
+  Logger::debug("[SubmeshRenderer] Loaded submesh vertices (" + std::to_string(vertices.size()) + " vertices loaded)");
 }
 
 void SubmeshRenderer::loadIndices(const Submesh& submesh) {
+  Logger::debug("[SubmeshRenderer] Loading submesh indices...");
+
   m_vao.bind();
   m_ibo.bind();
 
@@ -118,6 +125,8 @@ void SubmeshRenderer::loadIndices(const Submesh& submesh) {
 
   m_ibo.unbind();
   m_vao.unbind();
+
+  Logger::debug("[SubmeshRenderer] Loaded submesh indices (" + std::to_string(indices.size()) + " indices loaded)");
 }
 
 } // namespace Raz

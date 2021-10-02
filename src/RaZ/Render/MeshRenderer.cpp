@@ -1,5 +1,6 @@
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 namespace Raz {
 
@@ -77,6 +78,8 @@ MeshRenderer MeshRenderer::clone() const {
 }
 
 void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
+  Logger::debug("[MeshRenderer] Loading mesh data...");
+
   m_submeshRenderers.clear();
   m_submeshRenderers.reserve(mesh.getSubmeshes().size());
 
@@ -86,6 +89,8 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
   // If no material exists, create a default one
   if (m_materials.empty())
     setMaterial(MaterialCookTorrance::create());
+
+  Logger::debug("[MeshRenderer] Loaded mesh data");
 }
 
 void MeshRenderer::load(const ShaderProgram& program) const {

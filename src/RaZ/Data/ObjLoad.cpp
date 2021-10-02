@@ -36,6 +36,8 @@ inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textu
 inline void loadMtl(const FilePath& mtlFilePath,
                     std::vector<MaterialPtr>& materials,
                     std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
+  Logger::debug("[ObjLoad] Loading MTL file ('" + mtlFilePath + "')...");
+
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
   auto blinnPhongMaterial   = MaterialBlinnPhong::create();
@@ -63,7 +65,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
   };
 
   if (!file) {
-    Logger::error("[OBJ] Couldn't open the material file '" + mtlFilePath + "'.");
+    Logger::error("[ObjLoad] Couldn't open the MTL file '" + mtlFilePath + "'.");
     addLocalMaterial(true);
     return;
   }
@@ -173,15 +175,19 @@ inline void loadMtl(const FilePath& mtlFilePath,
   }
 
   addLocalMaterial(isCookTorranceMaterial);
+
+  Logger::debug("[ObjLoad] Loaded MTL file (" + std::to_string(materials.size()) + " material(s) loaded)");
 }
 
 } // namespace
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
+  Logger::debug("[ObjLoad] Loading OBJ file ('" + filePath + "')...");
+
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Couldn't open the mesh file '" + filePath + "'");
+    throw std::invalid_argument("Error: Couldn't open the OBJ file '" + filePath + '\'');
 
   Mesh mesh;
   MeshRenderer meshRenderer;
@@ -298,7 +304,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
       const auto correspMaterial = materialCorrespIndices.find(materialName);
 
       if (correspMaterial == materialCorrespIndices.cend())
-        Logger::error("[OBJ] No corresponding material found with the name '" + materialName + "'.");
+        Logger::error("[ObjLoad] No corresponding material found with the name '" + materialName + "'.");
       else
         meshRenderer.getSubmeshRenderers().back().setMaterialIndex(correspMaterial->second);
     } else if (line[0] == 'o' || line[0] == 'g') {
@@ -422,6 +428,10 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
     // Creating the submesh renderer from the submesh's data
     meshRenderer.getSubmeshRenderers()[submeshIndex].load(submesh);
   }
+
+  Logger::debug("[ObjLoad] Loaded OBJ file (" + std::to_string(mesh.getSubmeshes().size()) + " submesh(es), "
+                                              + std::to_string(mesh.recoverVertexCount()) + " vertices, "
+                                              + std::to_string(mesh.recoverTriangleCount()) + " triangles)");
 
   return { std::move(mesh), std::move(meshRenderer) };
 }
