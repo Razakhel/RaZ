@@ -7,7 +7,12 @@
 #include <cassert>
 #include <type_traits>
 
-namespace Raz::MathUtils {
+namespace Raz {
+
+template <typename T, std::size_t Size>
+class Vector;
+
+namespace MathUtils {
 
 /// Computes the linear interpolation between two values, according to a coefficient.
 /// \tparam T Type to compute the interpolation with.
@@ -20,7 +25,27 @@ template <typename T, typename CoeffT>
 constexpr T lerp(T min, T max, CoeffT coeff) noexcept {
   static_assert(std::is_floating_point_v<CoeffT>, "Error: The coefficient type must be floating point.");
 
-  return min * (1 - coeff) + max * coeff;
+  return static_cast<T>(static_cast<CoeffT>(min) * (1 - coeff) + static_cast<CoeffT>(max) * coeff);
+}
+
+/// Computes the component-wise linear interpolation between two vectors, according to a coefficient.
+/// \tparam T Type of the vectors' values to compute the interpolation with.
+/// \tparam Size Size of the vectors to compute the interpolation with.
+/// \tparam CoeffT Type of the coefficient to apply.
+/// \param min Minimum value (lower bound).
+/// \param max Maximum value (upper bound).
+/// \param coeff Coefficient between 0 (returns `min`) and 1 (returns `max`).
+/// \return Computed linear interpolation between `min` and `max`.
+template <typename T, std::size_t Size, typename CoeffT>
+constexpr Vector<T, Size> lerp(const Vector<T, Size>& min, const Vector<T, Size>& max, CoeffT coeff) noexcept {
+  static_assert(std::is_floating_point_v<CoeffT>, "Error: The coefficient type must be floating point.");
+
+  Vector<T, Size> res {};
+
+  for (std::size_t i = 0; i < Size; ++i)
+    res[i] = lerp(min[i], max[i], coeff);
+
+  return res;
 }
 
 /// Computes the cubic [Hermite interpolation](https://en.wikipedia.org/wiki/Hermite_interpolation) of a value.
@@ -112,6 +137,8 @@ constexpr T smootherstep(T minThresh, T maxThresh, T value) noexcept {
   return smootherstep(clampedVal);
 }
 
-} // namespace Raz::MathUtils
+} // namespace MathUtils
+
+} // namespace Raz
 
 #endif // RAZ_MATHUTILS_HPP

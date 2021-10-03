@@ -9,7 +9,6 @@
 
 namespace Raz {
 
-// Forward declaration of Vector, to allow its usage into functions
 template <typename T, std::size_t Size>
 class Vector;
 

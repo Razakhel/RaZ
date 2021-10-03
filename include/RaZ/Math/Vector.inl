@@ -230,12 +230,10 @@ constexpr Vector<T, Size>& Vector<T, Size>::operator*=(const Vector& vec) noexce
 }
 
 template <typename T, std::size_t Size>
-template <typename T2>
-constexpr Vector<T, Size>& Vector<T, Size>::operator*=(T2 val) noexcept {
-  using OperationT = decltype(std::declval<T>() * std::declval<T2>());
-
+template <typename ValT>
+constexpr Vector<T, Size>& Vector<T, Size>::operator*=(ValT val) noexcept {
   for (T& elt : m_data)
-    elt = static_cast<T>(static_cast<OperationT>(elt) * static_cast<OperationT>(val));
+    elt *= static_cast<T>(val);
   return *this;
 }
 

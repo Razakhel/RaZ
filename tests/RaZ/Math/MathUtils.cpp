@@ -45,13 +45,13 @@ TEST_CASE("MathUtils lerp vector") {
   CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.f) == Raz::Vec3i(140, 874, 3541));
   CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.25f) == Raz::Vec3i(315, 668, 3833));
   CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.5f) == Raz::Vec3i(490, 463, 4126));
-  CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.75f) == Raz::Vec3i(665, 257, 4419));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 0.75f) == Raz::Vec3i(665, 258, 4419));
   CHECK(Raz::MathUtils::lerp(Raz::Vec3i(140, 874, 3541), Raz::Vec3i(841, 53, 4712), 1.f) == Raz::Vec3i(841, 53, 4712));
 
   CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.f) == Raz::Vec3b(255, 140, 27));
-  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.25f) == Raz::Vec3b(209, 165, 63));
-  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.5f) == Raz::Vec3b(164, 190, 99));
-  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.75f) == Raz::Vec3b(119, 215, 135));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.25f) == Raz::Vec3b(210, 165, 63));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.5f) == Raz::Vec3b(165, 190, 100));
+  CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 0.75f) == Raz::Vec3b(120, 215, 136));
   CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 1.f) == Raz::Vec3b(75, 241, 173));
 }
 

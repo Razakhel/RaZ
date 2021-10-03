@@ -10,7 +10,6 @@
 
 namespace Raz {
 
-// Forward declaration of Matrix, to allow its usage into functions
 template <typename T, std::size_t W, std::size_t H>
 class Matrix;
 
@@ -186,10 +185,10 @@ public:
   /// \return Reference to the modified original vector.
   constexpr Vector& operator*=(const Vector& vec) noexcept;
   /// Element-wise vector-value multiplication assignment operator.
-  /// \tparam T2 Type of the given value.
+  /// \tparam ValT Type of the value to be multiplied by.
   /// \param val Value to be multiplied by.
   /// \return Reference to the modified original vector.
-  template <typename T2> constexpr Vector& operator*=(T2 val) noexcept;
+  template <typename ValT> constexpr Vector& operator*=(ValT val) noexcept;
   /// Element-wise vector-vector division assignment operator.
   /// \param vec Vector to be divided by.
   /// \return Reference to the modified original vector.
