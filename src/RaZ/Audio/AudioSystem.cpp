@@ -42,11 +42,15 @@ AudioSystem::AudioSystem(const char* deviceName) {
 }
 
 void AudioSystem::openDevice(const char* deviceName) {
+  Logger::debug("[AudioSystem] Opening " + (deviceName ? + "device '" + std::string(deviceName) + '\'' : "default device") + "...");
+
   destroy();
 
   m_device = alcOpenDevice(deviceName);
-  if (!m_device)
+  if (!m_device) {
     Logger::error("[OpenAL] Failed to open an audio device.");
+    return;
+  }
 
   m_context = alcCreateContext(static_cast<ALCdevice*>(m_device), nullptr);
   checkError(m_device, "Failed to create context");
@@ -55,6 +59,8 @@ void AudioSystem::openDevice(const char* deviceName) {
     Logger::error("[OpenAL] Failed to make the audio context current.");
     alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
   }
+
+  Logger::debug("[AudioSystem] Opened device");
 }
 
 std::string AudioSystem::recoverCurrentDevice() const {
@@ -113,6 +119,11 @@ bool AudioSystem::update(float /* deltaTime */) {
 }
 
 void AudioSystem::destroy() {
+  if (m_context == nullptr && m_device == nullptr)
+    return;
+
+  Logger::debug("[AudioSystem] Destroying...");
+
   alcMakeContextCurrent(nullptr);
 
   if (m_context != nullptr) {
@@ -127,6 +138,8 @@ void AudioSystem::destroy() {
 
     m_device = nullptr;
   }
+
+  Logger::debug("[AudioSystem] Destroyed");
 }
 
 std::vector<std::string> AudioSystem::recoverDevices() {

@@ -7,13 +7,12 @@
 #include "RaZ/Math/Vector.hpp"
 
 #include <cstddef>
-#include <fstream>
 #include <limits>
 #include <vector>
 
 namespace Raz {
 
-class FilePath;
+namespace Internal { class SoundAccess; }
 
 enum class SoundFormat : int {
   MONO_U8    = 4352  /* AL_FORMAT_MONO8             */, ///< Mono format on 8 unsigned bits (0 to 255).
@@ -34,9 +33,10 @@ enum class SoundState : int {
 };
 
 class Sound final : public Component {
+  friend Internal::SoundAccess;
+
 public:
   Sound() { init(); }
-  explicit Sound(const FilePath& filePath) : Sound() { load(filePath); }
   Sound(const Sound&) = delete;
   Sound(Sound&& sound) noexcept;
 
@@ -48,9 +48,8 @@ public:
   /// \note A Sound must be initialized again after opening an audio device.
   /// \see AudioSystem::open()
   void init();
-  /// Loads a sound file.
-  /// \param filePath Path to the file to load.
-  void load(const FilePath& filePath);
+  /// Loads the sound's data into memory.
+  void load();
   /// Sets the sound's pitch multiplier.
   /// \param pitch Sound's pitch multiplier; must be positive. 1 is the default.
   void setPitch(float pitch) const noexcept;
@@ -117,10 +116,6 @@ public:
   ~Sound() override { destroy(); }
 
 private:
-  /// Loads a [WAV](https://en.wikipedia.org/wiki/WAV) audio file to memory.
-  /// \param file File to load.
-  void loadWav(std::ifstream& file);
-
   unsigned int m_buffer = std::numeric_limits<unsigned int>::max();
   unsigned int m_source = std::numeric_limits<unsigned int>::max();
 
@@ -128,6 +123,21 @@ private:
   int m_frequency {};
   std::vector<std::byte> m_data {};
 };
+
+namespace Internal {
+
+/// Class giving direct access to a Sound's private members; useful for file importers.
+/// \note This class is not meant to be used in user code.
+class SoundAccess {
+public:
+  SoundAccess() = delete;
+
+  static SoundFormat& getFormat(Sound& sound) { return sound.m_format; }
+  static int& getFrequency(Sound& sound) { return sound.m_frequency; }
+  static std::vector<std::byte>& getData(Sound& sound) { return sound.m_data; }
+};
+
+} // namespace Internal
 
 } // namespace Raz
 

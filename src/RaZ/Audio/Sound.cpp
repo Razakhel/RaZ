@@ -38,32 +38,26 @@ Sound::Sound(Sound&& sound) noexcept
     m_data{ std::move(sound.m_data) } {}
 
 void Sound::init() {
+  Logger::debug("[Sound] Initializing...");
+
   alGetError(); // Flushing errors
 
   destroy();
 
+  Logger::debug("[Sound] Creating buffer...");
   alGenBuffers(1, &m_buffer);
   checkError("Failed to create a sound buffer");
+  Logger::debug("[Sound] Created buffer (ID: " + std::to_string(m_buffer) + ')');
 
+  Logger::debug("[Sound] Creating source...");
   alGenSources(1, &m_source);
   checkError("Failed to create a sound source");
+  Logger::debug("[Sound] Created source (ID: " + std::to_string(m_source) + ')');
+
+  Logger::debug("[Sound] Initialized");
 }
 
-void Sound::load(const FilePath& filePath) {
-  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
-
-  if (!file)
-    throw std::invalid_argument("Error: Couldn't open the sound file '" + filePath + "'");
-
-  m_data.clear();
-
-  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
-
-  if (format == "wav")
-    loadWav(file);
-  else
-    throw std::invalid_argument("Error: '" + format + "' sound format is not supported");
-
+void Sound::load() {
   stop(); // Making sure the sound isn't paused or currently playing
   alSourcei(m_source, AL_BUFFER, 0); // Detaching the previous buffer (if any) from the source
 
@@ -159,17 +153,32 @@ float Sound::recoverElapsedTime() const noexcept {
 }
 
 void Sound::destroy() {
+  if (m_source == std::numeric_limits<unsigned int>::max() &&  m_buffer == std::numeric_limits<unsigned int>::max())
+    return;
+
+  Logger::debug("[Sound] Destroying...");
+
   if (m_source != std::numeric_limits<unsigned int>::max()) {
+    Logger::debug("[Sound] Destroying source (ID: " + std::to_string(m_source) + ")...");
+
     alDeleteSources(1, &m_source);
     checkError("Failed to delete source");
     m_source = std::numeric_limits<unsigned int>::max();
+
+    Logger::debug("[Sound] Destroyed source");
   }
 
   if (m_buffer != std::numeric_limits<unsigned int>::max()) {
+    Logger::debug("[Sound] Destroying buffer (ID: " + std::to_string(m_buffer) + ")...");
+
     alDeleteBuffers(1, &m_buffer);
     checkError("Failed to delete buffer");
     m_buffer = std::numeric_limits<unsigned int>::max();
+
+    Logger::debug("[Sound] Destroyed buffer");
   }
+
+  Logger::debug("[Sound] Destroyed");
 }
 
 Sound& Sound::operator=(Sound&& sound) noexcept {

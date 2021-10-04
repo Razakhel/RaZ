@@ -80,7 +80,7 @@ Shader& Shader::operator=(Shader&& shader) noexcept {
 VertexShader::VertexShader() {
   Logger::debug("[Shader] Creating vertex shader...");
   m_index = Renderer::createShader(ShaderType::VERTEX);
-  Logger::debug("[Shader] Created vertex shader (ID: " + std::to_string(m_index) + ")");
+  Logger::debug("[Shader] Created vertex shader (ID: " + std::to_string(m_index) + ')');
 }
 
 VertexShader VertexShader::loadFromSource(const std::string& source) {
@@ -92,7 +92,7 @@ VertexShader VertexShader::loadFromSource(const std::string& source) {
 FragmentShader::FragmentShader() {
   Logger::debug("[Shader] Creating fragment shader...");
   m_index = Renderer::createShader(ShaderType::FRAGMENT);
-  Logger::debug("[Shader] Created fragment shader (ID: " + std::to_string(m_index) + ")");
+  Logger::debug("[Shader] Created fragment shader (ID: " + std::to_string(m_index) + ')');
 }
 
 FragmentShader FragmentShader::loadFromSource(const std::string& source) {
@@ -104,7 +104,7 @@ FragmentShader FragmentShader::loadFromSource(const std::string& source) {
 GeometryShader::GeometryShader() {
   Logger::debug("[Shader] Creating geometry shader...");
   m_index = Renderer::createShader(ShaderType::GEOMETRY);
-  Logger::debug("[Shader] Created geometry shader (ID: " + std::to_string(m_index) + ")");
+  Logger::debug("[Shader] Created geometry shader (ID: " + std::to_string(m_index) + ')');
 }
 
 GeometryShader GeometryShader::loadFromSource(const std::string& source) {

@@ -1,10 +1,13 @@
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Data/WavFormat.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <array>
+#include <fstream>
 #include <string>
 
-namespace Raz {
+namespace Raz::WavFormat {
 
 namespace {
 
@@ -39,14 +42,14 @@ inline WavInfo validateWav(std::ifstream& file) {
   // Header //
   ////////////
 
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // "RIFF"
+  file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'RIFF'
   if (bytes[0] != 'R' && bytes[1] != 'I' && bytes[2] != 'F' && bytes[3] != 'F')
     return info;
 
   file.read(reinterpret_cast<char*>(bytes.data()), 4); // File size - 8
   info.fileSize = fromLittleEndian(bytes); // Values are in little-endian; they must be converted
 
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // "WAVE"
+  file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'WAVE'
   if (bytes[0] != 'W' && bytes[1] != 'A' && bytes[2] != 'V' && bytes[3] != 'E')
     return info;
 
@@ -83,9 +86,9 @@ inline WavInfo validateWav(std::ifstream& file) {
   // 1 channel:  mono
   // 2 channels: stereo
   // 3 channels: left, center & right
-  // 4 channels: front left, front right, back left, back right
+  // 4 channels: front left, front right, back left & back right
   // 5 channels: left, center, right & surround
-  // 6 channels: left, center left, center, center right, right, surround
+  // 6 channels: left, center left, center, center right, right & surround
 
   file.read(reinterpret_cast<char*>(bytes.data()), 4); // Sampling frequency
   info.frequency = fromLittleEndian(bytes);
@@ -106,9 +109,9 @@ inline WavInfo validateWav(std::ifstream& file) {
   // Data block //
   ////////////////
 
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // Supposed to be "data"
+  file.read(reinterpret_cast<char*>(bytes.data()), 4); // Supposed to be 'data'
 
-  // A "cue " field can be specified; if so, the given amount of bytes will be ignored
+  // A 'cue ' field can be specified; if so, the given amount of bytes will be ignored
   // See: https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#cue
   if (bytes[0] == 'c' && bytes[1] == 'u' && bytes[2] == 'e' && bytes[3] == ' ') {
     file.read(reinterpret_cast<char*>(bytes.data()), 4); // Cue data size
@@ -116,7 +119,7 @@ inline WavInfo validateWav(std::ifstream& file) {
     const uint32_t cueDataSize = fromLittleEndian(bytes);
     file.ignore(cueDataSize);
 
-    file.read(reinterpret_cast<char*>(bytes.data()), 4); // "data"
+    file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'data'
   }
 
   if (bytes[0] != 'd' && bytes[1] != 'a' && bytes[2] != 't' && bytes[3] != 'a')
@@ -131,40 +134,49 @@ inline WavInfo validateWav(std::ifstream& file) {
 
 } // namespace
 
-void Sound::loadWav(std::ifstream& file) {
+Sound load(const FilePath& filePath) {
+  Logger::debug("[WavLoad] Loading WAV file ('" + filePath + "')...");
+
+  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+
+  if (!file)
+    throw std::invalid_argument("Error: Couldn't open the WAV file '" + filePath + "'");
+
   const WavInfo info = validateWav(file);
 
   if (!info.isValid)
-    throw std::runtime_error("Error: Not a valid WAV audio file");
+    throw std::runtime_error("Error: '" + filePath + "' is not a valid WAV audio file");
+
+  Sound sound;
 
   // Determining the right audio format
   switch (info.bitsPerSample) {
     case 8:
       if (info.channelCount == 1)
-        m_format = SoundFormat::MONO_U8;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_U8;
       else if (info.channelCount == 2)
-        m_format = SoundFormat::STEREO_U8;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_U8;
       break;
 
     case 16:
       if (info.channelCount == 1)
-        m_format = SoundFormat::MONO_I16;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_I16;
       else if (info.channelCount == 2)
-        m_format = SoundFormat::STEREO_I16;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_I16;
       break;
 
     case 32:
       if (info.channelCount == 1)
-        m_format = SoundFormat::MONO_F32;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_F32;
       else if (info.channelCount == 2)
-        m_format = SoundFormat::STEREO_F32;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_F32;
       break;
 
     case 64:
       if (info.channelCount == 1)
-        m_format = SoundFormat::MONO_F64;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_F64;
       else if (info.channelCount == 2)
-        m_format = SoundFormat::STEREO_F64;
+        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_F64;
       break;
 
     default:
@@ -172,14 +184,21 @@ void Sound::loadWav(std::ifstream& file) {
   }
 
   // If the format is still unassigned, it is invalid
-  if (static_cast<int>(m_format) == 0)
+  if (static_cast<int>(Internal::SoundAccess::getFormat(sound)) == 0)
     throw std::runtime_error("Error: Unsupported WAV channel count");
 
-  m_frequency = static_cast<int>(info.frequency);
+  Internal::SoundAccess::getFrequency(sound) = static_cast<int>(info.frequency);
 
   // Reading the actual audio data from the file
-  m_data.resize(info.dataSize);
-  file.read(reinterpret_cast<char*>(m_data.data()), static_cast<std::streamsize>(m_data.size()));
+  std::vector<std::byte>& soundData = Internal::SoundAccess::getData(sound);
+  soundData.resize(info.dataSize);
+  file.read(reinterpret_cast<char*>(soundData.data()), static_cast<std::streamsize>(soundData.size()));
+
+  sound.load();
+
+  Logger::debug("[WavLoad] Loaded WAV file");
+
+  return sound;
 }
 
-} // namespace Raz
+} // namespace Raz::WavFormat

@@ -92,7 +92,7 @@ int main() {
 
   auto& audio = world.addSystem<Raz::AudioSystem>();
 
-  auto& meshSound = mesh.addComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
+  auto& meshSound = mesh.addComponent<Raz::Sound>(Raz::WavFormat::load(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s));
   meshSound.repeat(true);
   meshSound.play();
 
@@ -208,7 +208,7 @@ int main() {
 
   // Adding a new sound on the camera's position
   window.addKeyCallback(Raz::Keyboard::ADD, [&world, &cameraTrans] (float /* deltaTime */) {
-    Raz::Entity& newSound = world.addEntityWithComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
+    Raz::Entity& newSound = world.addEntityWithComponent<Raz::Sound>(Raz::WavFormat::load(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s));
     newSound.addComponent<Raz::Transform>(cameraTrans.getPosition());
   }, Raz::Input::ONCE);
 

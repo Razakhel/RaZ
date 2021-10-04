@@ -18,6 +18,7 @@
 #include "Data/ObjFormat.hpp"
 #include "Data/Mesh.hpp"
 #include "Data/Submesh.hpp"
+#include "Data/WavFormat.hpp"
 #include "Math/Angle.hpp"
 #include "Math/Constants.hpp"
 #include "Math/Matrix.hpp"

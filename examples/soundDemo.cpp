@@ -17,7 +17,7 @@ int main() {
   std::cout << "Current audio device: " << audio.recoverCurrentDevice() << std::endl;
 
   Raz::Entity& sound = world.addEntity();
-  auto& soundComp    = sound.addComponent<Raz::Sound>(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s);
+  auto& soundComp    = sound.addComponent<Raz::Sound>(Raz::WavFormat::load(RAZ_ROOT + "assets/sounds/wave_seagulls.wav"s));
   soundComp.play();
 
   float elapsedTime = 0.f;

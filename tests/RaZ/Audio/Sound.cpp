@@ -2,6 +2,7 @@
 
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Data/WavFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Threading.hpp"
 
@@ -14,7 +15,7 @@ TEST_CASE("Sound initialization") {
 
 TEST_CASE("Sound move") {
   Raz::AudioSystem audio;
-  Raz::Sound sound(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
+  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
 
   constexpr Raz::Vec3f position(1.f, 2.f, 3.f);
   constexpr Raz::Vec3f velocity(3.f, 2.f, 1.f);
@@ -46,8 +47,7 @@ TEST_CASE("Sound move") {
 }
 
 TEST_CASE("Sound WAV import") {
-  Raz::Sound sound;
-  sound.load(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
+  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
 
   CHECK(sound.getFormat() == Raz::SoundFormat::MONO_I16);
   CHECK(sound.getFrequency() == 48000);
@@ -55,7 +55,7 @@ TEST_CASE("Sound WAV import") {
 
 TEST_CASE("Sound operations") {
   Raz::AudioSystem audio;
-  Raz::Sound sound(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
+  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
   sound.setGain(0.f); // Nobody wants his ears assaulted by a wild sound when launching tests
 
   sound.play();
