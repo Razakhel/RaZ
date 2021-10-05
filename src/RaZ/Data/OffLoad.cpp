@@ -1,11 +1,22 @@
+#include "RaZ/Data/OffFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <fstream>
 
-namespace Raz {
+namespace Raz::OffFormat {
 
-void Mesh::importOff(std::ifstream& file) {
-  Submesh& submesh = m_submeshes.front();
+Mesh load(const FilePath& filePath) {
+  Logger::debug("[OffLoad] Loading OFF file ('" + filePath + "')...");
+
+  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+
+  if (!file)
+    throw std::invalid_argument("Error: Couldn't open the OFF file '" + filePath + '\'');
+
+  Mesh mesh;
+  Submesh& submesh = mesh.addSubmesh();
 
   std::size_t vertexCount {};
   std::size_t faceCount {};
@@ -46,6 +57,11 @@ void Mesh::importOff(std::ifstream& file) {
   }
 
   indices.shrink_to_fit();
+
+  Logger::debug("[OffLoad] Loaded OFF file (" + std::to_string(mesh.recoverVertexCount()) + " vertices, "
+                                              + std::to_string(mesh.recoverTriangleCount()) + " triangles)");
+
+  return mesh;
 }
 
-} // namespace Raz
+} // namespace Raz::OffFormat

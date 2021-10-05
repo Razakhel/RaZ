@@ -21,7 +21,6 @@ enum class SphereMeshType {
 class Mesh : public Component {
 public:
   Mesh() = default;
-  explicit Mesh(const FilePath& filePath) { import(filePath); }
   Mesh(const Plane& plane, float width, float depth);
   /// Creates a mesh from a Sphere.
   /// \param sphere Sphere to create the mesh with.
@@ -40,7 +39,6 @@ public:
   std::size_t recoverVertexCount() const;
   std::size_t recoverTriangleCount() const;
 
-  void import(const FilePath& filePath);
   template <typename... Args> Submesh& addSubmesh(Args&&... args) { return m_submeshes.emplace_back(std::forward<Args>(args)...); }
   /// Computes & updates the mesh's bounding box by computing the submeshes' ones.
   /// \return Mesh's bounding box.
@@ -72,8 +70,6 @@ private:
   /// \param sphere Sphere to create the mesh with.
   /// \param subdivCount Amount of subdivisions to apply to the mesh.
   void createIcosphere(const Sphere& sphere, uint32_t subdivCount);
-
-  void importOff(std::ifstream& file);
 
   std::vector<Submesh> m_submeshes {};
   AABB m_boundingBox = AABB(Vec3f(), Vec3f());

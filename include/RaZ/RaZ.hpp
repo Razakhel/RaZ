@@ -16,6 +16,7 @@
 #include "Audio/Sound.hpp"
 #include "Data/FbxFormat.hpp"
 #include "Data/ObjFormat.hpp"
+#include "Data/OffFormat.hpp"
 #include "Data/Mesh.hpp"
 #include "Data/Submesh.hpp"
 #include "Data/WavFormat.hpp"
