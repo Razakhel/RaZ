@@ -186,6 +186,8 @@ if (RAZ_COMPILER_GCC)
 endif ()
 
 if (RAZ_USE_EMSCRIPTEN)
+    target_compile_options(RaZ PRIVATE "SHELL:-s USE_LIBPNG=1")
+
     target_link_options(
         RaZ
 
