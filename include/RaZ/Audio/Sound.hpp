@@ -53,9 +53,15 @@ public:
   /// Sets the sound's pitch multiplier.
   /// \param pitch Sound's pitch multiplier; must be positive. 1 is the default.
   void setPitch(float pitch) const noexcept;
+  /// Recovers the sound's pitch multiplier.
+  /// \return Sound's pitch multiplier.
+  float recoverPitch() const noexcept;
   /// Sets the sound's gain (volume).
   /// \param gain Sound's gain; must be positive. 1 is the default.
   void setGain(float gain) const noexcept;
+  /// Recovers the source's gain (volume).
+  /// \return Source's gain.
+  float recoverGain() const noexcept;
   /// Sets the audio source's position.
   /// \param position New source's position.
   void setPosition(const Vec3f& position) const noexcept { setPosition(position[0], position[1], position[2]); }

@@ -75,11 +75,29 @@ void Sound::setPitch(float pitch) const noexcept {
   checkError("Failed to set the source's pitch");
 }
 
+float Sound::recoverPitch() const noexcept {
+  float pitch {};
+
+  alGetSourcef(m_source, AL_PITCH, &pitch);
+  checkError("Failed to recover the source's pitch");
+
+  return pitch;
+}
+
 void Sound::setGain(float gain) const noexcept {
   assert("Error: The source's gain must be positive." && gain >= 0.f);
 
   alSourcef(m_source, AL_GAIN, gain);
   checkError("Failed to set the source's gain");
+}
+
+float Sound::recoverGain() const noexcept {
+  float gain {};
+
+  alGetSourcef(m_source, AL_GAIN, &gain);
+  checkError("Failed to recover the source's gain");
+
+  return gain;
 }
 
 void Sound::setPosition(float x, float y, float z) const noexcept {
