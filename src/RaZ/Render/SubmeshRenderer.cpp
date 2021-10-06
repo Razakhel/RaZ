@@ -58,7 +58,7 @@ void SubmeshRenderer::draw() const {
   m_renderFunc(m_vbo, m_ibo);
 }
 
-void SubmeshRenderer::loadVertices(const Submesh& submesh) const {
+void SubmeshRenderer::loadVertices(const Submesh& submesh) {
   Logger::debug("[SubmeshRenderer] Loading submesh vertices...");
 
   m_vao.bind();
@@ -70,6 +70,8 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) const {
                            static_cast<std::ptrdiff_t>(sizeof(vertices.front()) * vertices.size()),
                            vertices.data(),
                            BufferDataUsage::STATIC_DRAW);
+
+  m_vbo.vertexCount = static_cast<unsigned int>(vertices.size());
 
   constexpr uint8_t stride = sizeof(vertices.front());
 

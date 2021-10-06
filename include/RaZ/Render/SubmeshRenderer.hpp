@@ -44,7 +44,7 @@ public:
   void draw() const;
 
 private:
-  void loadVertices(const Submesh& submesh) const;
+  void loadVertices(const Submesh& submesh);
   void loadIndices(const Submesh& submesh);
 
   VertexArray m_vao {};
