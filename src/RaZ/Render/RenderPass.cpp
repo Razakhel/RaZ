@@ -15,7 +15,7 @@ bool RenderPass::isValid() const {
   for (const Texture* readTexture : m_readTextures) {
     // If the same depth buffer exists both in read & write, the pass is invalid
     if (readTexture->getImage().getColorspace() == ImageColorspace::DEPTH && m_writeFramebuffer.hasDepthBuffer()) {
-      if (&m_writeFramebuffer.getDepthBuffer() == readTexture)
+      if (readTexture == &m_writeFramebuffer.getDepthBuffer())
         return false;
     }
 

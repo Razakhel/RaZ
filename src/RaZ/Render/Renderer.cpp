@@ -574,9 +574,14 @@ std::vector<unsigned int> Renderer::recoverAttachedShaders(unsigned int programI
     return {};
 
   std::vector<unsigned int> shaderIndices(static_cast<std::size_t>(attachedShaderCount));
-  glGetAttachedShaders(programIndex, attachedShaderCount, nullptr, shaderIndices.data());
+
+  int recoveredShaderCount {};
+  glGetAttachedShaders(programIndex, attachedShaderCount, &recoveredShaderCount, shaderIndices.data());
 
   printConditionalErrors();
+
+  if (recoveredShaderCount == 0)
+    return {};
 
   return shaderIndices;
 }
