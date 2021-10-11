@@ -47,6 +47,9 @@ public:
   /// \param material Material to be added.
   /// \return Reference to the newly added material.
   Material& addMaterial(MaterialPtr material) { return *m_materials.emplace_back(std::move(material)); }
+  /// Removes an existing material.
+  /// \param materialIndex Index of the material to remove.
+  void removeMaterial(std::size_t materialIndex);
   /// Adds a new submesh renderer to render a submesh with.
   /// \tparam Args Types of the arguments to be forwarded to the submesh renderer.
   /// \param args Arguments to be forwarded to the submesh renderer.

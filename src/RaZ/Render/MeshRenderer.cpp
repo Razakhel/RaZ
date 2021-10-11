@@ -63,6 +63,24 @@ void MeshRenderer::setMaterial(MaterialPreset materialPreset, float roughnessFac
   }
 }
 
+void MeshRenderer::removeMaterial(std::size_t materialIndex) {
+  assert("Error: Cannot remove a material that doesn't exist." && materialIndex < m_materials.size());
+
+  m_materials.erase(m_materials.begin() + static_cast<std::ptrdiff_t>(materialIndex));
+
+  for (SubmeshRenderer& submeshRenderer : m_submeshRenderers) {
+    const std::size_t submeshMaterialIndex = submeshRenderer.getMaterialIndex();
+
+    if (submeshMaterialIndex == std::numeric_limits<std::size_t>::max())
+      continue;
+
+    if (submeshMaterialIndex == materialIndex)
+      submeshRenderer.setMaterialIndex(0);
+    else if (submeshMaterialIndex > materialIndex)
+      submeshRenderer.setMaterialIndex(submeshMaterialIndex - 1);
+  }
+}
+
 MeshRenderer MeshRenderer::clone() const {
   MeshRenderer meshRenderer;
 
@@ -78,6 +96,11 @@ MeshRenderer MeshRenderer::clone() const {
 }
 
 void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
+  if (mesh.getSubmeshes().empty()) {
+    Logger::error("[MeshRenderer] Cannot load an empty mesh.");
+    return;
+  }
+
   Logger::debug("[MeshRenderer] Loading mesh data...");
 
   m_submeshRenderers.clear();
