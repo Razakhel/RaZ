@@ -75,6 +75,12 @@ public:
   explicit MaterialBlinnPhong(TexturePtr diffuseMap) : Material(std::move(diffuseMap)) {}
   explicit MaterialBlinnPhong(const FilePath& filePath, int bindingIndex, bool flipVertically = true)
     : MaterialBlinnPhong(Texture::create(filePath, bindingIndex, flipVertically)) {}
+  explicit MaterialBlinnPhong(const Vec3f& baseColor,
+                              const Vec3f& ambient  = Vec3f(1.f),
+                              const Vec3f& specular = Vec3f(1.f),
+                              const Vec3f& emissive = Vec3f(0.f),
+                              float transparency    = 1.f)
+    : m_ambient{ ambient }, m_specular{ specular }, m_emissive{ emissive }, m_transparency{ transparency } { setBaseColor(baseColor); }
 
   MaterialType getType() const override { return MaterialType::BLINN_PHONG; }
   const Vec3f& getAmbient() const { return m_ambient; }

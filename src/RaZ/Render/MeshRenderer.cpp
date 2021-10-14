@@ -103,11 +103,10 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
 
   Logger::debug("[MeshRenderer] Loading mesh data...");
 
-  m_submeshRenderers.clear();
-  m_submeshRenderers.reserve(mesh.getSubmeshes().size());
+  m_submeshRenderers.resize(mesh.getSubmeshes().size());
 
-  for (const Submesh& submesh : mesh.getSubmeshes())
-    m_submeshRenderers.emplace_back(submesh, renderMode);
+  for (std::size_t submeshIndex = 0; submeshIndex < mesh.getSubmeshes().size(); ++submeshIndex)
+    m_submeshRenderers[submeshIndex].load(mesh.getSubmeshes()[submeshIndex], renderMode);
 
   // If no material exists, create a default one
   if (m_materials.empty())
