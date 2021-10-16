@@ -64,11 +64,11 @@ void Overlay::destroy() const {
 }
 
 void OverlayWindow::addLabel(std::string label) {
-  m_elements.emplace_back(Overlay::OverlayLabel::create(std::move(label)));
+  m_elements.emplace_back(std::make_unique<OverlayLabel>(std::move(label)));
 }
 
 void OverlayWindow::addColoredLabel(std::string label, Vec4f color) {
-  m_elements.emplace_back(Overlay::OverlayColoredLabel::create(std::move(label), color));
+  m_elements.emplace_back(std::make_unique<OverlayColoredLabel>(std::move(label), color));
 }
 
 void OverlayWindow::addColoredLabel(std::string label, float red, float green, float blue, float alpha) {
@@ -76,20 +76,20 @@ void OverlayWindow::addColoredLabel(std::string label, float red, float green, f
 }
 
 void OverlayWindow::addButton(std::string label, std::function<void()> actionClick) {
-  m_elements.emplace_back(Overlay::OverlayButton::create(std::move(label), std::move(actionClick)));
+  m_elements.emplace_back(std::make_unique<OverlayButton>(std::move(label), std::move(actionClick)));
 }
 
 void OverlayWindow::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
-  m_elements.emplace_back(Overlay::OverlayCheckbox::create(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
+  m_elements.emplace_back(std::make_unique<OverlayCheckbox>(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
 }
 
 void OverlayWindow::addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue) {
-  m_elements.emplace_back(Overlay::OverlaySlider::create(std::move(label), std::move(actionSlide), minValue, maxValue, initValue));
+  m_elements.emplace_back(std::make_unique<OverlaySlider>(std::move(label), std::move(actionSlide), minValue, maxValue, initValue));
 }
 
 void OverlayWindow::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
-  m_elements.emplace_back(Overlay::OverlayTextbox::create(std::move(label), std::move(callback)));
-  static_cast<Overlay::OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
+  m_elements.emplace_back(std::make_unique<OverlayTextbox>(std::move(label), std::move(callback)));
+  static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
 }
 
 void OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
@@ -100,7 +100,7 @@ void OverlayWindow::addListBox(std::string label, std::vector<std::string> entri
   }
 
   assert("Error: A list box's initial index cannot reference a non-existing entry." && initId < entries.size());
-  m_elements.emplace_back(Overlay::OverlayListBox::create(std::move(label), std::move(entries), std::move(actionChanged), initId));
+  m_elements.emplace_back(std::make_unique<OverlayListBox>(std::move(label), std::move(entries), std::move(actionChanged), initId));
 }
 
 void OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
@@ -111,27 +111,31 @@ void OverlayWindow::addDropdown(std::string label, std::vector<std::string> entr
   }
 
   assert("Error: A dropdown's initial index cannot reference a non-existing entry." && initId < entries.size());
-  m_elements.emplace_back(Overlay::OverlayDropdown::create(std::move(label), std::move(entries), std::move(actionChanged), initId));
+  m_elements.emplace_back(std::make_unique<OverlayDropdown>(std::move(label), std::move(entries), std::move(actionChanged), initId));
 }
 
 void OverlayWindow::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
-  m_elements.emplace_back(Overlay::OverlayTexture::create(texture, maxWidth, maxHeight));
+  m_elements.emplace_back(std::make_unique<OverlayTexture>(texture, maxWidth, maxHeight));
 }
 
 void OverlayWindow::addTexture(const Texture& texture) {
-  m_elements.emplace_back(Overlay::OverlayTexture::create(texture));
+  m_elements.emplace_back(std::make_unique<OverlayTexture>(texture));
+}
+
+OverlayProgressBar& OverlayWindow::addProgressBar(int minVal, int maxVal, bool showValues) {
+  return static_cast<OverlayProgressBar&>(*m_elements.emplace_back(std::make_unique<OverlayProgressBar>(minVal, maxVal, showValues)));
 }
 
 void OverlayWindow::addSeparator() {
-  m_elements.emplace_back(Overlay::OverlaySeparator::create());
+  m_elements.emplace_back(std::make_unique<OverlaySeparator>());
 }
 
 void OverlayWindow::addFrameTime(std::string formattedLabel) {
-  m_elements.emplace_back(Overlay::OverlayFrameTime::create(std::move(formattedLabel)));
+  m_elements.emplace_back(std::make_unique<OverlayFrameTime>(std::move(formattedLabel)));
 }
 
 void OverlayWindow::addFpsCounter(std::string formattedLabel) {
-  m_elements.emplace_back(Overlay::OverlayFpsCounter::create(std::move(formattedLabel)));
+  m_elements.emplace_back(std::make_unique<OverlayFpsCounter>(std::move(formattedLabel)));
 }
 
 void OverlayWindow::render() const {
@@ -145,14 +149,14 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::COLORED_LABEL:
       {
-        const auto& label = static_cast<Overlay::OverlayColoredLabel&>(*element);
+        const auto& label = static_cast<OverlayColoredLabel&>(*element);
         ImGui::TextColored(ImVec4(label.m_color.x(), label.m_color.y(), label.m_color.z(), label.m_color.w()), "%s", element->m_label.c_str());
         break;
       }
 
       case OverlayElementType::BUTTON:
       {
-        const auto& button = static_cast<Overlay::OverlayButton&>(*element);
+        const auto& button = static_cast<OverlayButton&>(*element);
 
         if (ImGui::Button(button.m_label.c_str()))
           button.m_actionClick();
@@ -162,7 +166,7 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::CHECKBOX:
       {
-        auto& checkbox = static_cast<Overlay::OverlayCheckbox&>(*element);
+        auto& checkbox = static_cast<OverlayCheckbox&>(*element);
         const bool prevValue = checkbox.m_isChecked;
 
         ImGui::Checkbox(checkbox.m_label.c_str(), &checkbox.m_isChecked);
@@ -179,7 +183,7 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::SLIDER:
       {
-        auto& slider = static_cast<Overlay::OverlaySlider&>(*element);
+        auto& slider = static_cast<OverlaySlider&>(*element);
 
         if (ImGui::SliderFloat(slider.m_label.c_str(), &slider.m_currentValue, slider.m_minValue, slider.m_maxValue))
           slider.m_actionSlide(slider.m_currentValue);
@@ -190,7 +194,7 @@ void OverlayWindow::render() const {
       case OverlayElementType::TEXTBOX:
       {
         static auto callback = [] (ImGuiInputTextCallbackData* data) {
-          auto& textbox = *static_cast<Overlay::OverlayTextbox*>(data->UserData);
+          auto& textbox = *static_cast<OverlayTextbox*>(data->UserData);
 
           textbox.m_text += static_cast<char>(data->EventChar);
 
@@ -200,7 +204,7 @@ void OverlayWindow::render() const {
           return 0;
         };
 
-        auto& textbox = static_cast<Overlay::OverlayTextbox&>(*element);
+        auto& textbox = static_cast<OverlayTextbox&>(*element);
 
         ImGui::InputText(textbox.m_label.c_str(),
                          &textbox.m_text,
@@ -213,7 +217,7 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::LIST_BOX:
       {
-        auto& listBox = static_cast<Overlay::OverlayListBox&>(*element);
+        auto& listBox = static_cast<OverlayListBox&>(*element);
 
         if (ImGui::BeginListBox(listBox.m_label.c_str())) {
           for (std::size_t i = 0; i < listBox.m_entries.size(); ++i) {
@@ -238,7 +242,7 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::DROPDOWN:
       {
-        auto& dropdown = static_cast<Overlay::OverlayDropdown&>(*element);
+        auto& dropdown = static_cast<OverlayDropdown&>(*element);
 
         if (ImGui::BeginCombo(dropdown.m_label.c_str(), dropdown.m_entries[dropdown.m_currentId].c_str())) {
           for (std::size_t i = 0; i < dropdown.m_entries.size(); ++i) {
@@ -263,7 +267,7 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::TEXTURE:
       {
-        auto& texture = static_cast<Overlay::OverlayTexture&>(*element);
+        auto& texture = static_cast<OverlayTexture&>(*element);
         assert("Error: The given texture is invalid." && Renderer::isTexture(texture.m_index));
 
         const float minRatio = std::min(ImGui::GetWindowWidth() / texture.m_width, ImGui::GetWindowHeight() / texture.m_height);
@@ -275,6 +279,18 @@ void OverlayWindow::render() const {
         const ImVec2 bottomCoords(1.f, 0.f);
 
         ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(texture.m_index)), textureSize, topCoords, bottomCoords);
+
+        break;
+      }
+
+      case OverlayElementType::PROGRESS_BAR:
+      {
+        auto& progressBar = static_cast<OverlayProgressBar&>(*element);
+
+        const std::string text = (progressBar.m_showValues ? std::to_string(progressBar.m_curVal) + '/' + std::to_string(progressBar.m_maxVal) : std::string());
+        ImGui::ProgressBar(static_cast<float>(progressBar.m_minVal + progressBar.m_curVal) / static_cast<float>(progressBar.m_maxVal),
+                           ImVec2(-1.f, 0.f),
+                           (text.empty() ? nullptr : text.c_str()));
 
         break;
       }

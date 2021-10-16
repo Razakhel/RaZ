@@ -31,6 +31,7 @@ enum class OverlayElementType {
   LIST_BOX,
   DROPDOWN,
   TEXTURE,
+  PROGRESS_BAR,
   SEPARATOR,
   FRAME_TIME,
   FPS_COUNTER
@@ -72,245 +73,198 @@ public:
   Overlay& operator=(Overlay&&) noexcept = default;
 
 private:
-  class OverlayElement;
-  using OverlayElementPtr = std::unique_ptr<OverlayElement>;
-
-  class OverlayLabel;
-  using OverlayLabelPtr = std::unique_ptr<OverlayLabel>;
-
-  class OverlayColoredLabel;
-  using OverlayColoredLabelPtr = std::unique_ptr<OverlayColoredLabel>;
-
-  class OverlayButton;
-  using OverlayButtonPtr = std::unique_ptr<OverlayButton>;
-
-  class OverlayCheckbox;
-  using OverlayCheckboxPtr = std::unique_ptr<OverlayCheckbox>;
-
-  class OverlaySlider;
-  using OverlaySliderPtr = std::unique_ptr<OverlaySlider>;
-
-  class OverlayTextbox;
-  using OverlayTextboxPtr = std::unique_ptr<OverlayTextbox>;
-
-  class OverlayListBox;
-  using OverlayListBoxPtr = std::unique_ptr<OverlayListBox>;
-
-  class OverlayDropdown;
-  using OverlayDropdownPtr = std::unique_ptr<OverlayDropdown>;
-
-  class OverlayTexture;
-  using OverlayTexturePtr = std::unique_ptr<OverlayTexture>;
-
-  class OverlaySeparator;
-  using OverlaySeparatorPtr = std::unique_ptr<OverlaySeparator>;
-
-  class OverlayFrameTime;
-  using OverlayFrameTimePtr = std::unique_ptr<OverlayFrameTime>;
-
-  class OverlayFpsCounter;
-  using OverlayFpsCounterPtr = std::unique_ptr<OverlayFpsCounter>;
-
-  class OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlayElement() = default;
-    explicit OverlayElement(std::string label) : m_label{ std::move(label) } {}
-
-    virtual OverlayElementType getType() const = 0;
-
-    virtual ~OverlayElement() = default;
-
-  private:
-    std::string m_label {};
-  };
-
-  class OverlayLabel final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    explicit OverlayLabel(std::string label) : OverlayElement(std::move(label)) {}
-
-    OverlayElementType getType() const override { return OverlayElementType::LABEL; }
-
-    template <typename... Args>
-    static OverlayLabelPtr create(Args&&... args) { return std::make_unique<OverlayLabel>(std::forward<Args>(args)...); }
-  };
-
-  class OverlayColoredLabel final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    explicit OverlayColoredLabel(std::string label, Vec4f color) : OverlayElement(std::move(label)), m_color{ color } {}
-
-    OverlayElementType getType() const override { return OverlayElementType::COLORED_LABEL; }
-
-    template <typename... Args>
-    static OverlayColoredLabelPtr create(Args&&... args) { return std::make_unique<OverlayColoredLabel>(std::forward<Args>(args)...); }
-
-  private:
-    Vec4f m_color {};
-  };
-
-  class OverlayButton final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlayButton(std::string label, std::function<void()> actionClick) : OverlayElement(std::move(label)), m_actionClick{ std::move(actionClick) } {}
-
-    OverlayElementType getType() const override { return OverlayElementType::BUTTON; }
-
-    template <typename... Args>
-    static OverlayButtonPtr create(Args&&... args) { return std::make_unique<OverlayButton>(std::forward<Args>(args)...); }
-
-  private:
-    std::function<void()> m_actionClick {};
-  };
-
-  class OverlayCheckbox final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal)
-      : OverlayElement(std::move(label)), m_actionOn{ std::move(actionOn) }, m_actionOff{ std::move(actionOff) }, m_isChecked{ initVal } {}
-
-    OverlayElementType getType() const override { return OverlayElementType::CHECKBOX; }
-
-    template <typename... Args>
-    static OverlayCheckboxPtr create(Args&&... args) { return std::make_unique<OverlayCheckbox>(std::forward<Args>(args)...); }
-
-  private:
-    std::function<void()> m_actionOn {};
-    std::function<void()> m_actionOff {};
-    bool m_isChecked {};
-  };
-
-  class OverlaySlider final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue)
-      : OverlayElement(std::move(label)), m_actionSlide{ std::move(actionSlide) }, m_minValue{ minValue }, m_maxValue{ maxValue }, m_currentValue{ initValue } {}
-
-    OverlayElementType getType() const override { return OverlayElementType::SLIDER; }
-
-    template <typename... Args>
-    static OverlaySliderPtr create(Args&&... args) { return std::make_unique<OverlaySlider>(std::forward<Args>(args)...); }
-
-  private:
-    std::function<void(float)> m_actionSlide {};
-    float m_minValue {};
-    float m_maxValue {};
-    float m_currentValue {};
-  };
-
-  class OverlayTextbox final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlayTextbox(std::string label, std::function<void(const std::string&)> callback) : OverlayElement(std::move(label)), m_callback{ std::move(callback) } {}
-
-    OverlayElementType getType() const override { return OverlayElementType::TEXTBOX; }
-
-    template <typename... Args>
-    static OverlayTextboxPtr create(Args&&... args) { return std::make_unique<OverlayTextbox>(std::forward<Args>(args)...); }
-
-  private:
-    std::string m_text {};
-    std::function<void(const std::string&)> m_callback {};
-  };
-
-  class OverlayListBox final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlayListBox(std::string label, std::vector<std::string> entries,
-                   std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-      : OverlayElement(std::move(label)),
-        m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
-
-    OverlayElementType getType() const override { return OverlayElementType::LIST_BOX; }
-
-    template <typename... Args>
-    static OverlayListBoxPtr create(Args&&... args) { return std::make_unique<OverlayListBox>(std::forward<Args>(args)...); }
-
-  private:
-    std::vector<std::string> m_entries {};
-    std::function<void(const std::string&, std::size_t)> m_actionChanged {};
-    std::size_t m_currentId {};
-    const char* m_currentVal {};
-  };
-
-  class OverlayDropdown final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlayDropdown(std::string label, std::vector<std::string> entries,
-                    std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-      : OverlayElement(std::move(label)),
-        m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
-
-    OverlayElementType getType() const override { return OverlayElementType::DROPDOWN; }
-
-    template <typename... Args>
-    static OverlayDropdownPtr create(Args&&... args) { return std::make_unique<OverlayDropdown>(std::forward<Args>(args)...); }
-
-  private:
-    std::vector<std::string> m_entries {};
-    std::function<void(const std::string&, std::size_t)> m_actionChanged {};
-    std::size_t m_currentId {};
-    const char* m_currentVal {};
-  };
-
-  class OverlayTexture final : public OverlayElement {
-    friend OverlayWindow;
-
-  public:
-    OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight)
-      : OverlayElement(), m_index{ texture.getIndex() }, m_width{ static_cast<float>(maxWidth) }, m_height{ static_cast<float>(maxHeight) } {}
-    explicit OverlayTexture(const Texture& texture) : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
-
-    OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
-
-    template <typename... Args>
-    static OverlayTexturePtr create(Args&&... args) { return std::make_unique<OverlayTexture>(std::forward<Args>(args)...); }
-
-  private:
-    unsigned int m_index {};
-    float m_width {};
-    float m_height {};
-  };
-
-  class OverlaySeparator final : public OverlayElement {
-  public:
-    OverlayElementType getType() const override { return OverlayElementType::SEPARATOR; }
-
-    template <typename... Args>
-    static OverlaySeparatorPtr create(Args&&... args) { return std::make_unique<OverlaySeparator>(std::forward<Args>(args)...); }
-  };
-
-  class OverlayFrameTime final : public OverlayElement {
-  public:
-    explicit OverlayFrameTime(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
-
-    OverlayElementType getType() const override { return OverlayElementType::FRAME_TIME; }
-
-    template <typename... Args>
-    static OverlayFrameTimePtr create(Args&&... args) { return std::make_unique<OverlayFrameTime>(std::forward<Args>(args)...); }
-  };
-
-  class OverlayFpsCounter final : public OverlayElement {
-  public:
-    explicit OverlayFpsCounter(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
-
-    OverlayElementType getType() const override { return OverlayElementType::FPS_COUNTER; }
-
-    template <typename... Args>
-    static OverlayFpsCounterPtr create(Args&&... args) { return std::make_unique<OverlayFpsCounter>(std::forward<Args>(args)...); }
-  };
-
   std::vector<OverlayWindow> m_windows {};
+};
+
+class OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayElement() = default;
+  explicit OverlayElement(std::string label) : m_label{ std::move(label) } {}
+
+  virtual OverlayElementType getType() const = 0;
+
+  virtual ~OverlayElement() = default;
+
+private:
+  std::string m_label {};
+};
+
+class OverlayLabel final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  explicit OverlayLabel(std::string label) : OverlayElement(std::move(label)) {}
+
+  OverlayElementType getType() const override { return OverlayElementType::LABEL; }
+};
+
+class OverlayColoredLabel final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  explicit OverlayColoredLabel(std::string label, Vec4f color) : OverlayElement(std::move(label)), m_color{ color } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::COLORED_LABEL; }
+
+private:
+  Vec4f m_color {};
+};
+
+class OverlayButton final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayButton(std::string label, std::function<void()> actionClick) : OverlayElement(std::move(label)), m_actionClick{ std::move(actionClick) } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::BUTTON; }
+
+private:
+  std::function<void()> m_actionClick {};
+};
+
+class OverlayCheckbox final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal)
+    : OverlayElement(std::move(label)), m_actionOn{ std::move(actionOn) }, m_actionOff{ std::move(actionOff) }, m_isChecked{ initVal } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::CHECKBOX; }
+
+private:
+  std::function<void()> m_actionOn {};
+  std::function<void()> m_actionOff {};
+  bool m_isChecked {};
+};
+
+class OverlaySlider final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue)
+    : OverlayElement(std::move(label)), m_actionSlide{ std::move(actionSlide) }, m_minValue{ minValue }, m_maxValue{ maxValue }, m_currentValue{ initValue } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::SLIDER; }
+
+private:
+  std::function<void(float)> m_actionSlide {};
+  float m_minValue {};
+  float m_maxValue {};
+  float m_currentValue {};
+};
+
+class OverlayTextbox final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayTextbox(std::string label, std::function<void(const std::string&)> callback) : OverlayElement(std::move(label)), m_callback{ std::move(callback) } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::TEXTBOX; }
+
+private:
+  std::string m_text {};
+  std::function<void(const std::string&)> m_callback {};
+};
+
+class OverlayListBox final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayListBox(std::string label, std::vector<std::string> entries,
+                 std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
+    : OverlayElement(std::move(label)),
+      m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::LIST_BOX; }
+
+private:
+  std::vector<std::string> m_entries {};
+  std::function<void(const std::string&, std::size_t)> m_actionChanged {};
+  std::size_t m_currentId {};
+  const char* m_currentVal {};
+};
+
+class OverlayDropdown final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayDropdown(std::string label, std::vector<std::string> entries,
+                  std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
+    : OverlayElement(std::move(label)),
+      m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::DROPDOWN; }
+
+private:
+  std::vector<std::string> m_entries {};
+  std::function<void(const std::string&, std::size_t)> m_actionChanged {};
+  std::size_t m_currentId {};
+  const char* m_currentVal {};
+};
+
+class OverlayTexture final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight)
+    : m_index{ texture.getIndex() }, m_width{ static_cast<float>(maxWidth) }, m_height{ static_cast<float>(maxHeight) } {}
+  explicit OverlayTexture(const Texture& texture) : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
+
+  OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
+
+private:
+  unsigned int m_index {};
+  float m_width {};
+  float m_height {};
+};
+
+class OverlayProgressBar final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayProgressBar(int minVal, int maxVal, bool showValues = false)
+    : m_minVal{ minVal }, m_maxVal{ maxVal }, m_curVal{ minVal }, m_showValues{ showValues } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::PROGRESS_BAR; }
+  int getCurrentValue() const noexcept { return m_curVal; }
+  bool hasStarted() const noexcept { return m_curVal > m_minVal; }
+  bool hasFinished() const noexcept { return m_curVal >= m_maxVal; }
+
+  void setCurrentValue(int curVal) noexcept { m_curVal = curVal; }
+
+  int operator++() noexcept { return ++m_curVal; }
+  int operator++(int) noexcept { return m_curVal++; }
+  int& operator+=(int val) noexcept { return m_curVal += val; }
+  int operator--() noexcept { return --m_curVal; }
+  int operator--(int) noexcept { return m_curVal--; }
+  int& operator-=(int val) noexcept { return m_curVal -= val; }
+
+private:
+  int m_minVal {};
+  int m_maxVal {};
+  int m_curVal {};
+  bool m_showValues {};
+};
+
+class OverlaySeparator final : public OverlayElement {
+public:
+  OverlayElementType getType() const override { return OverlayElementType::SEPARATOR; }
+};
+
+class OverlayFrameTime final : public OverlayElement {
+public:
+  explicit OverlayFrameTime(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
+
+  OverlayElementType getType() const override { return OverlayElementType::FRAME_TIME; }
+};
+
+class OverlayFpsCounter final : public OverlayElement {
+public:
+  explicit OverlayFpsCounter(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
+
+  OverlayElementType getType() const override { return OverlayElementType::FPS_COUNTER; }
 };
 
 /// OverlayWindow class, representing a specific window in the Overlay.
@@ -374,6 +328,12 @@ public:
   /// \param maxWidth Maximum texture's width.
   /// \param maxHeight Maximum texture's height.
   void addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  /// Adds a progress bar on the overlay window.
+  /// \param minVal Minimum value.
+  /// \param maxVal Maximum value.
+  /// \param showValues Show values ("<current>/<maximum>") instead of percentage.
+  /// \return Reference to the newly added progress bar.
+  [[nodiscard]] OverlayProgressBar& addProgressBar(int minVal, int maxVal, bool showValues = false);
   /// Adds a texture on the overlay window. The maximum width & height will be those of the texture.
   /// \param texture Texture to be displayed.
   void addTexture(const Texture& texture);
@@ -393,7 +353,7 @@ public:
 
 private:
   std::string m_title {};
-  std::vector<Overlay::OverlayElementPtr> m_elements {};
+  std::vector<std::unique_ptr<OverlayElement>> m_elements {};
 };
 
 } // namespace Raz
