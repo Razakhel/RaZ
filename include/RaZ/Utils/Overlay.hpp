@@ -81,9 +81,14 @@ class OverlayElement {
 
 public:
   OverlayElement() = default;
+  OverlayElement(const OverlayElement&) = delete;
+  OverlayElement(OverlayElement&&) noexcept = delete;
   explicit OverlayElement(std::string label) : m_label{ std::move(label) } {}
 
   virtual OverlayElementType getType() const = 0;
+
+  OverlayElement& operator=(const OverlayElement&) = delete;
+  OverlayElement& operator=(OverlayElement&&) noexcept = delete;
 
   virtual ~OverlayElement() = default;
 
