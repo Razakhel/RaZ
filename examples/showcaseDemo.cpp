@@ -79,8 +79,7 @@ inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -2.f, 5.f);
-  meshTrans.setRotation(180.0_deg, Raz::Axis::Y);
-  meshTrans.setScale(0.015f);
+  meshTrans.setScale(5.f);
 }
 #endif
 

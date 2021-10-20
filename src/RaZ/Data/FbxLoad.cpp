@@ -10,42 +10,42 @@ namespace Raz::FbxFormat {
 
 namespace {
 
-void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const FilePath& filePath) {
+void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials, const FilePath& filePath) {
   for (int matIndex = 0; matIndex < scene->GetMaterialCount(); ++matIndex) {
-    const FbxSurfaceMaterial* fbxMaterial = scene->GetMaterial(matIndex);
+    const fbxsdk::FbxSurfaceMaterial* fbxMaterial = scene->GetMaterial(matIndex);
     auto material = MaterialBlinnPhong::create();
 
     // Recovering properties
 
-    const FbxPropertyT<FbxDouble3>& diffuse = fbxMaterial->FindProperty(FbxSurfaceMaterial::sDiffuse);
+    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& diffuse = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuse);
     if (diffuse.IsValid()) {
       material->setDiffuse(static_cast<float>(diffuse.Get()[0]),
                            static_cast<float>(diffuse.Get()[1]),
                            static_cast<float>(diffuse.Get()[2]));
     }
 
-    const FbxPropertyT<FbxDouble3>& ambient = fbxMaterial->FindProperty(FbxSurfaceMaterial::sAmbient);
+    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& ambient = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sAmbient);
     if (ambient.IsValid()) {
       material->setAmbient(static_cast<float>(ambient.Get()[0]),
                            static_cast<float>(ambient.Get()[1]),
                            static_cast<float>(ambient.Get()[2]));
     }
 
-    const FbxPropertyT<FbxDouble3>& specular = fbxMaterial->FindProperty(FbxSurfaceMaterial::sSpecular);
+    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& specular = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sSpecular);
     if (specular.IsValid()) {
       material->setSpecular(static_cast<float>(specular.Get()[0]),
                             static_cast<float>(specular.Get()[1]),
                             static_cast<float>(specular.Get()[2]));
     }
 
-    const FbxPropertyT<FbxDouble3>& emissive = fbxMaterial->FindProperty(FbxSurfaceMaterial::sEmissive);
+    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& emissive = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sEmissive);
     if (emissive.IsValid()) {
       material->setEmissive(static_cast<float>(emissive.Get()[0]),
                             static_cast<float>(emissive.Get()[1]),
                             static_cast<float>(emissive.Get()[2]));
     }
 
-    const FbxPropertyT<FbxDouble>& transparency = fbxMaterial->FindProperty(FbxSurfaceMaterial::sTransparencyFactor);
+    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble>& transparency = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sTransparencyFactor);
     if (transparency.IsValid())
       material->setTransparency(static_cast<float>(transparency.Get()));
 
@@ -53,7 +53,7 @@ void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const F
 
     const FilePath texturePath = filePath.recoverPathToFile();
 
-    const auto* diffuseTexture = static_cast<FbxFileTexture*>(diffuse.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    const auto* diffuseTexture = static_cast<fbxsdk::FbxFileTexture*>(diffuse.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (diffuseTexture) {
       const std::string diffuseTexturePath = texturePath + diffuseTexture->GetRelativeFileName();
 
@@ -64,7 +64,7 @@ void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const F
       }
     }
 
-    const auto* ambientTexture = static_cast<FbxFileTexture*>(ambient.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    const auto* ambientTexture = static_cast<fbxsdk::FbxFileTexture*>(ambient.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (ambientTexture) {
       const std::string ambientTexturePath = texturePath + ambientTexture->GetRelativeFileName();
 
@@ -75,7 +75,7 @@ void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const F
       }
     }
 
-    const auto* specularTexture = static_cast<FbxFileTexture*>(specular.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    const auto* specularTexture = static_cast<fbxsdk::FbxFileTexture*>(specular.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (specularTexture) {
       const std::string specularTexturePath = texturePath + specularTexture->GetRelativeFileName();
 
@@ -86,7 +86,7 @@ void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const F
       }
     }
 
-    const auto* emissiveTexture = static_cast<FbxFileTexture*>(emissive.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+    const auto* emissiveTexture = static_cast<fbxsdk::FbxFileTexture*>(emissive.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (emissiveTexture) {
       const std::string emissiveTexturePath = texturePath + emissiveTexture->GetRelativeFileName();
 
@@ -99,9 +99,9 @@ void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const F
 
     // Normal map not yet handled for standard materials
     /*
-    const auto normMapProp = fbxMaterial->FindProperty(FbxSurfaceMaterial::sNormalMap);
+    const auto normMapProp = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sNormalMap);
     if (normMapProp.IsValid()) {
-      const auto* normalMap = static_cast<FbxFileTexture*>(normMapProp.GetSrcObject(FbxCriteria::ObjectType(FbxFileTexture::ClassId)));
+      const auto* normalMap = static_cast<fbxsdk::FbxFileTexture*>(normMapProp.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
       if (normalMap) {
         const std::string normalMapPath = texturePath + normalMap->GetRelativeFileName();
 
@@ -121,18 +121,23 @@ void loadMaterials(FbxScene* scene, std::vector<MaterialPtr>& materials, const F
 } // namespace
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
-  FbxManager* manager = FbxManager::Create();
-  manager->SetIOSettings(FbxIOSettings::Create(manager, IOSROOT));
+  fbxsdk::FbxManager* manager = fbxsdk::FbxManager::Create();
+  manager->SetIOSettings(fbxsdk::FbxIOSettings::Create(manager, IOSROOT));
 
-  FbxScene* scene = FbxScene::Create(manager, filePath.recoverFileName().toUtf8().c_str());
+  fbxsdk::FbxScene* scene = fbxsdk::FbxScene::Create(manager, filePath.recoverFileName().toUtf8().c_str());
 
   // Importing the contents of the file into the scene
   {
-    FbxImporter* importer = FbxImporter::Create(manager, "");
+    fbxsdk::FbxImporter* importer = fbxsdk::FbxImporter::Create(manager, "");
     importer->Initialize(filePath.toUtf8().c_str(), -1, manager->GetIOSettings());
     importer->Import(scene);
     importer->Destroy();
   }
+
+  // Overriding the coordinates system & scene unit to match what we expect
+  // See: https://help.autodesk.com/view/FBX/2020/ENU/?guid=FBX_Developer_Help_nodes_and_scene_graph_fbx_scenes_scene_axis_and_unit_conversion_html
+  fbxsdk::FbxAxisSystem::OpenGL.ConvertScene(scene); // OpenGL basis
+  fbxsdk::FbxSystemUnit::m.ConvertScene(scene); // Units in meters
 
   Mesh mesh;
   MeshRenderer meshRenderer;
@@ -142,9 +147,13 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
   // Recovering geometry
   for (int meshIndex = 0; meshIndex < scene->GetGeometryCount(); ++meshIndex) {
-    auto* fbxMesh = static_cast<FbxMesh*>(scene->GetGeometry(meshIndex));
+    auto* fbxMesh = static_cast<fbxsdk::FbxMesh*>(scene->GetGeometry(meshIndex));
     Submesh submesh;
     SubmeshRenderer submeshRenderer;
+
+    // Recovering the mesh's global transform
+    // See: https://help.autodesk.com/view/FBX/2020/ENU/?guid=FBX_Developer_Help_nodes_and_scene_graph_fbx_nodes_html#transformation-data
+    const fbxsdk::FbxAMatrix globalTransform = fbxMesh->GetNode()->EvaluateGlobalTransform();
 
     ////////////
     // Values //
@@ -156,21 +165,20 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
     vertices.resize(fbxMesh->GetControlPointsCount());
 
     for (int posIndex = 0; posIndex < fbxMesh->GetControlPointsCount(); ++posIndex) {
-      const FbxVector4& pos = fbxMesh->GetControlPointAt(posIndex);
+      const fbxsdk::FbxVector4 pos = globalTransform.MultT(fbxMesh->GetControlPointAt(posIndex));
 
-      // The FBX has a Z-up, but we expect a Y-up: positions', normals' & tangents' components are reordered
       vertices[posIndex].position.x() = static_cast<float>(pos[0]);
-      vertices[posIndex].position.y() = static_cast<float>(pos[2]);
-      vertices[posIndex].position.z() = static_cast<float>(pos[1]);
+      vertices[posIndex].position.y() = static_cast<float>(pos[1]);
+      vertices[posIndex].position.z() = static_cast<float>(pos[2]);
     }
 
     // Recovering texture coordinates (UVs)
     fbxMesh->InitTextureUV(fbxMesh->GetControlPointsCount());
-    const FbxGeometryElementUV* meshTexcoords = fbxMesh->GetElementUV();
+    const fbxsdk::FbxGeometryElementUV* meshTexcoords = fbxMesh->GetElementUV();
 
     if (meshTexcoords) {
       for (int texIndex = 0; texIndex < meshTexcoords->GetDirectArray().GetCount(); ++texIndex) {
-        const FbxVector2& tex = meshTexcoords->GetDirectArray()[texIndex];
+        const fbxsdk::FbxVector2& tex = meshTexcoords->GetDirectArray()[texIndex];
 
         vertices[texIndex].texcoords.x() = static_cast<float>(tex[0]);
         vertices[texIndex].texcoords.y() = static_cast<float>(tex[1]);
@@ -179,15 +187,15 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
     // Recovering normals
     fbxMesh->GenerateNormals(true, true); // Re-generate normals by vertex
-    const FbxGeometryElementNormal* meshNormals = fbxMesh->GetElementNormal();
+    const fbxsdk::FbxGeometryElementNormal* meshNormals = fbxMesh->GetElementNormal();
 
     if (meshNormals) {
       for (int normIndex = 0; normIndex < meshNormals->GetDirectArray().GetCount(); ++normIndex) {
-        const FbxVector4& norm = meshNormals->GetDirectArray()[normIndex];
+        const fbxsdk::FbxVector4 norm = globalTransform.Inverse().MultT(meshNormals->GetDirectArray()[normIndex]);
 
         vertices[normIndex].normal.x() = static_cast<float>(norm[0]);
-        vertices[normIndex].normal.y() = static_cast<float>(norm[2]);
-        vertices[normIndex].normal.z() = static_cast<float>(norm[1]);
+        vertices[normIndex].normal.y() = static_cast<float>(norm[1]);
+        vertices[normIndex].normal.z() = static_cast<float>(norm[2]);
       }
     }
 
@@ -195,15 +203,15 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
     // Not working yet, fetching/calculating way too many tangents (around 4x the amount of vertices)
     /*
     fbxMesh->GenerateTangentsData(meshTexcoords->GetName()); // Generate tangents using UVs
-    const FbxGeometryElementTangent* meshTangents = fbxMesh->GetElementTangent();
+    const fbxsdk::FbxGeometryElementTangent* meshTangents = fbxMesh->GetElementTangent();
 
     if (meshTangents) {
       for (int tanIndex = 0; tanIndex < meshTangents->GetDirectArray().GetCount(); ++tanIndex) {
-        const FbxVector4& tan = meshTangents->GetDirectArray()[tanIndex];
+        const fbxsdk::FbxVector4 tan = globalTransform.MultR(meshTangents->GetDirectArray()[tanIndex]);
 
         vertices[tanIndex].tangent.x() = static_cast<float>(tan[0]);
-        vertices[tanIndex].tangent.y() = static_cast<float>(tan[2]);
-        vertices[tanIndex].tangent.z() = static_cast<float>(tan[1]);
+        vertices[tanIndex].tangent.y() = static_cast<float>(tan[1]);
+        vertices[tanIndex].tangent.z() = static_cast<float>(tan[2]);
       }
     }
     */
@@ -215,13 +223,13 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
     for (int polyIndex = 0; polyIndex < fbxMesh->GetPolygonCount(); ++polyIndex) {
       indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
-      indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 1));
       indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 2));
+      indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 1));
 
       for (int polyVertIndex = 3; polyVertIndex < fbxMesh->GetPolygonSize(polyIndex); ++polyVertIndex) {
         indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
-        indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex - 1));
         indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex));
+        indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex - 1));
       }
     }
 

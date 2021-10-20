@@ -12,11 +12,8 @@ if (MSVC)
 
     # Checking that .lib & .dll exist, either in debug or release
     if ((EXISTS "${FBX_DEBUG_LIB}.lib" AND EXISTS "${FBX_DEBUG_LIB}.dll") OR (EXISTS "${FBX_RELEASE_LIB}.lib" AND EXISTS "${FBX_RELEASE_LIB}.dll"))
-        # The $(Configuration) macro is later replaced by VS automatically according to the current configuration (Debug, Release, etc)
-        set(FBX_LIB "${FBX_LIB_DIR}/$(Configuration)/${FBX_LIB_NAME}.lib")
-
-        set(FBX_MSVC_DLL "${FBX_LIB_DIR}/$(Configuration)/${FBX_LIB_NAME}.dll")
-        set(FBX_CONFIG_DLL "${FBX_LIB_DIR}/$<CONFIG>/${FBX_LIB_NAME}.dll")
+        set(FBX_LIB "${FBX_LIB_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>/${FBX_LIB_NAME}.lib")
+        set(FBX_DLL "${FBX_LIB_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>/${FBX_LIB_NAME}.dll")
 
         set(FBX_FOUND TRUE)
     endif ()

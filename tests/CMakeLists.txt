@@ -85,7 +85,7 @@ file(
 # If FBX SDK used with MSVC, copy the DLL into the tests/ folder to link it properly
 if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)
     add_custom_command(TARGET RaZ_Tests PRE_LINK
-                       COMMAND ${CMAKE_COMMAND} -E copy "${FBX_CONFIG_DLL}" "${CMAKE_BINARY_DIR}/tests/${FBX_LIB_NAME}.dll")
+                       COMMAND ${CMAKE_COMMAND} -E copy "${FBX_DLL}" "${CMAKE_BINARY_DIR}/tests/${FBX_LIB_NAME}.dll")
 else ()
     list(
         REMOVE_ITEM
