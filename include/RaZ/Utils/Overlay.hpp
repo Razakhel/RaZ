@@ -81,9 +81,9 @@ class OverlayElement {
 
 public:
   OverlayElement() = default;
+  explicit OverlayElement(std::string label) : m_label{ std::move(label) } {}
   OverlayElement(const OverlayElement&) = delete;
   OverlayElement(OverlayElement&&) noexcept = delete;
-  explicit OverlayElement(std::string label) : m_label{ std::move(label) } {}
 
   virtual OverlayElementType getType() const = 0;
 
@@ -167,6 +167,14 @@ public:
   OverlayTextbox(std::string label, std::function<void(const std::string&)> callback) : OverlayElement(std::move(label)), m_callback{ std::move(callback) } {}
 
   OverlayElementType getType() const override { return OverlayElementType::TEXTBOX; }
+  const std::string& getText() const noexcept { return m_text; }
+
+  void setText(std::string text);
+
+  OverlayTextbox& append(const std::string& text);
+  void clear();
+
+  OverlayTextbox& operator+=(const std::string& text) { return append(text); }
 
 private:
   std::string m_text {};
@@ -313,7 +321,8 @@ public:
   /// Adds a texbox on the overlay window.
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.
-  void addTextbox(std::string label, std::function<void(const std::string&)> callback);
+  /// \return Reference to the newly added textbox.
+  OverlayTextbox& addTextbox(std::string label, std::function<void(const std::string&)> callback);
   /// Adds a list box on the overlay window.
   /// \param label Text to be displayed beside the list.
   /// \param entries Texts to fill the list with.

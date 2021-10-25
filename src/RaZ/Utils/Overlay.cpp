@@ -63,6 +63,23 @@ void Overlay::destroy() const {
   Logger::debug("[Overlay] Destroyed");
 }
 
+void OverlayTextbox::setText(std::string text) {
+  m_text = std::move(text);
+  m_callback(m_text);
+}
+
+OverlayTextbox& OverlayTextbox::append(const std::string& text) {
+  m_text += text;
+  m_callback(m_text);
+
+  return *this;
+}
+
+void OverlayTextbox::clear() {
+  m_text.clear();
+  m_callback(m_text);
+}
+
 void OverlayWindow::addLabel(std::string label) {
   m_elements.emplace_back(std::make_unique<OverlayLabel>(std::move(label)));
 }
@@ -87,9 +104,13 @@ void OverlayWindow::addSlider(std::string label, std::function<void(float)> acti
   m_elements.emplace_back(std::make_unique<OverlaySlider>(std::move(label), std::move(actionSlide), minValue, maxValue, initValue));
 }
 
-void OverlayWindow::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
+OverlayTextbox& OverlayWindow::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
   m_elements.emplace_back(std::make_unique<OverlayTextbox>(std::move(label), std::move(callback)));
-  static_cast<OverlayTextbox&>(*m_elements.back()).m_text.reserve(64);
+
+  auto& textbox = static_cast<OverlayTextbox&>(*m_elements.back());
+  textbox.m_text.reserve(64);
+
+  return textbox;
 }
 
 void OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
