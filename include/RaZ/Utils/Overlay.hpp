@@ -92,7 +92,7 @@ public:
 
   virtual ~OverlayElement() = default;
 
-private:
+protected:
   std::string m_label {};
 };
 
@@ -103,6 +103,9 @@ public:
   explicit OverlayLabel(std::string label) : OverlayElement(std::move(label)) {}
 
   OverlayElementType getType() const override { return OverlayElementType::LABEL; }
+  const std::string& getText() const noexcept { return m_label; }
+
+  void setText(std::string text) { m_label = std::move(text); }
 };
 
 class OverlayColoredLabel final : public OverlayElement {
@@ -112,6 +115,11 @@ public:
   explicit OverlayColoredLabel(std::string label, Vec4f color) : OverlayElement(std::move(label)), m_color{ color } {}
 
   OverlayElementType getType() const override { return OverlayElementType::COLORED_LABEL; }
+  const std::string& getText() const noexcept { return m_label; }
+  const Vec4f& getColor() const noexcept { return m_color; }
+
+  void setText(std::string text) { m_label = std::move(text); }
+  void setText(std::string text, Vec4f color);
 
 private:
   Vec4f m_color {};
@@ -289,18 +297,21 @@ public:
 
   /// Adds a label on the overlay window.
   /// \param label Text to be displayed.
-  void addLabel(std::string label);
+  /// \return Reference to the newly added label.
+  OverlayLabel& addLabel(std::string label);
   /// Adds a colored label on the overlay window.
   /// \param label Text to be displayed.
   /// \param color Color to display the text with.
-  void addColoredLabel(std::string label, Vec4f color);
+  /// \return Reference to the newly added colored label.
+  OverlayColoredLabel& addColoredLabel(std::string label, Vec4f color);
   /// Adds a colored label on the overlay window.
   /// \param label Text to be displayed.
   /// \param red Text color's red component.
   /// \param green Text color's green component.
   /// \param blue Text color's blue component.
   /// \param alpha Text color's alpha component.
-  void addColoredLabel(std::string label, float red, float green, float blue, float alpha = 1.f);
+  /// \return Reference to the newly added colored label.
+  OverlayColoredLabel& addColoredLabel(std::string label, float red, float green, float blue, float alpha = 1.f);
   /// Adds a button on the overlay window.
   /// \param label Text to be displayed beside the button.
   /// \param actionClick Action to be executed when clicked.

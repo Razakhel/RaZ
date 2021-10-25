@@ -63,6 +63,11 @@ void Overlay::destroy() const {
   Logger::debug("[Overlay] Destroyed");
 }
 
+void OverlayColoredLabel::setText(std::string text, Vec4f color) {
+  m_label = std::move(text);
+  m_color = color;
+}
+
 void OverlayTextbox::setText(std::string text) {
   m_text = std::move(text);
   m_callback(m_text);
@@ -80,16 +85,16 @@ void OverlayTextbox::clear() {
   m_callback(m_text);
 }
 
-void OverlayWindow::addLabel(std::string label) {
-  m_elements.emplace_back(std::make_unique<OverlayLabel>(std::move(label)));
+OverlayLabel& OverlayWindow::addLabel(std::string label) {
+  return static_cast<OverlayLabel&>(*m_elements.emplace_back(std::make_unique<OverlayLabel>(std::move(label))));
 }
 
-void OverlayWindow::addColoredLabel(std::string label, Vec4f color) {
-  m_elements.emplace_back(std::make_unique<OverlayColoredLabel>(std::move(label), color));
+OverlayColoredLabel& OverlayWindow::addColoredLabel(std::string label, Vec4f color) {
+  return static_cast<OverlayColoredLabel&>(*m_elements.emplace_back(std::make_unique<OverlayColoredLabel>(std::move(label), color)));
 }
 
-void OverlayWindow::addColoredLabel(std::string label, float red, float green, float blue, float alpha) {
-  addColoredLabel(std::move(label), Vec4f(red, green, blue, alpha));
+OverlayColoredLabel& OverlayWindow::addColoredLabel(std::string label, float red, float green, float blue, float alpha) {
+  return addColoredLabel(std::move(label), Vec4f(red, green, blue, alpha));
 }
 
 void OverlayWindow::addButton(std::string label, std::function<void()> actionClick) {
