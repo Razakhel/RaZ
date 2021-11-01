@@ -7,7 +7,9 @@
 namespace Raz {
 
 Framebuffer::Framebuffer() {
+  Logger::debug("[Framebuffer] Creating...");
   Renderer::generateFramebuffer(m_index);
+  Logger::debug("[Framebuffer] Created (ID: " + std::to_string(m_index) + ')');
 }
 
 Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
@@ -70,27 +72,36 @@ void Framebuffer::addTextureBuffer(const Texture& texture) {
 }
 
 void Framebuffer::mapBuffers() const {
-  bind();
+  Logger::debug("[Framebuffer] Mapping buffers (ID: " + std::to_string(m_index) + ")...");
 
-  if (m_depthBuffer)
+  Renderer::bindFramebuffer(m_index);
+
+  if (m_depthBuffer) {
+    Logger::debug("[Framebuffer] Mapping depth buffer...");
     Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, TextureType::TEXTURE_2D, m_depthBuffer->getIndex(), 0);
-
-  std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size());
-
-  for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
-    const std::size_t colorBuffer = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0)
-                                  + static_cast<unsigned int>(m_colorBuffers[bufferIndex]->getBindingIndex());
-
-    Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorBuffer), TextureType::TEXTURE_2D, m_colorBuffers[bufferIndex]->getIndex(), 0);
-    drawBuffers[bufferIndex] = static_cast<DrawBuffer>(colorBuffer);
   }
 
-  Renderer::setDrawBuffers(static_cast<unsigned int>(drawBuffers.size()), drawBuffers.data());
+  if (!m_colorBuffers.empty()) {
+    std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size());
+
+    for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
+      Logger::debug("[Framebuffer] Mapping color buffer " + std::to_string(bufferIndex) + "...");
+
+      const std::size_t colorBuffer = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0) + bufferIndex;
+
+      Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorBuffer), TextureType::TEXTURE_2D, m_colorBuffers[bufferIndex]->getIndex(), 0);
+      drawBuffers[bufferIndex] = static_cast<DrawBuffer>(colorBuffer);
+    }
+
+    Renderer::setDrawBuffers(static_cast<unsigned int>(drawBuffers.size()), drawBuffers.data());
+  }
 
   if (!Renderer::isFramebufferComplete())
     Logger::error("Framebuffer is not complete.");
 
   unbind();
+
+  Logger::debug("[Framebuffer] Mapped buffers");
 }
 
 void Framebuffer::bind() const {
@@ -144,7 +155,9 @@ Framebuffer::~Framebuffer() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
+  Logger::debug("[Framebuffer] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteFramebuffer(m_index);
+  Logger::debug("[Framebuffer] Destroyed");
 }
 
 } // namespace Raz

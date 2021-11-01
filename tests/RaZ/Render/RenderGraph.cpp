@@ -6,7 +6,7 @@ TEST_CASE("RenderGraph validity") {
   Raz::RenderGraph graph;
   CHECK(graph.isValid());
 
-  const Raz::Texture& depthTexture = graph.addTextureBuffer(1, 1, 0, Raz::ImageColorspace::DEPTH);
+  const Raz::Texture& depthTexture = graph.addTextureBuffer(1, 1, Raz::ImageColorspace::DEPTH);
   CHECK(graph.isValid());
 
   // Adding a write texture to the geometry pass without an associated read texture: it is invalid

@@ -184,6 +184,8 @@ int main() {
   Raz::Application app;
   Raz::World& world = app.addWorld(2);
 
+  Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
+
   auto& render = world.addSystem<Raz::RenderSystem>(sceneWidth, sceneHeight, "RaZ");
   render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s),
                                          Raz::FragmentShader::loadFromSource(geomFragSource));
@@ -195,9 +197,9 @@ int main() {
   ///////////////////
 
   // Creating the render graph's texture buffers
-  const Raz::Texture& geomDepthBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, 0, Raz::ImageColorspace::DEPTH);
-  const Raz::Texture& geomColorBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, 1, Raz::ImageColorspace::RGBA);
-  const Raz::Texture& geomNormalBuffer = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, 2, Raz::ImageColorspace::RGBA);
+  const Raz::Texture& geomDepthBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
+  const Raz::Texture& geomColorBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+  const Raz::Texture& geomNormalBuffer = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
 
   // Setting geometry pass' shaders & defining its write buffers
   Raz::RenderPass& geomPass = render.getGeometryPass();

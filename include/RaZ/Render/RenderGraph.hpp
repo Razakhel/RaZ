@@ -22,7 +22,7 @@ public:
   const RenderPass& getGeometryPass() const { return m_geometryPass; }
   RenderPass& getGeometryPass() { return m_geometryPass; }
 
-  const Texture& addTextureBuffer(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace);
+  const Texture& addTextureBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace);
   void resizeViewport(unsigned int width, unsigned int height);
   void updateShaders() const;
   /// Executes the render graph, launching all passes followed by their respective children, starting with the geometry pass.
