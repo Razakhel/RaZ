@@ -28,9 +28,9 @@ public:
   /// Runs the application.
   void run();
   /// Runs the application and call the given callable between each cycle.
+  /// \tparam FuncT Type of the callback to call between each cycle.
   /// \param callback Callback to call between each cycle.
-  template <typename F>
-  void run(F&& callback);
+  template <typename FuncT> void run(FuncT&& callback);
   /// Runs one cycle of the application.
   /// \return True if the application is still running, false otherwise.
   bool runOnce();

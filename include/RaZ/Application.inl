@@ -12,10 +12,10 @@ World& Application::addWorld(Args&&... args) {
   return m_worlds.back();
 }
 
-template <typename F>
-void Application::run(F&& callback) {
+template <typename FuncT>
+void Application::run(FuncT&& callback) {
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
-  auto emCallback = [callback = std::forward<F>(callback), this] {
+  static auto emCallback = [this, callback = std::forward<FuncT>(callback)] () {
     runOnce();
     callback();
   };
