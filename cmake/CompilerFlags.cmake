@@ -7,7 +7,22 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         set(DEFINITIONS_SCOPE "PUBLIC")
     endif ()
 
-    if (RAZ_COMPILER_GCC)
+    # Determining the compiler used
+
+    if (CMAKE_CXX_COMPILER MATCHES "/em\\+\\+.*$") # Emscripten
+        set(COMPILER_EMSCRIPTEN ON)
+    elseif (MSVC AND NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang") # MSVC
+        set(COMPILER_MSVC ON)
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang
+        set(COMPILER_CLANG ON)
+        if (MSVC) # Clang-cl
+            set(COMPILER_CLANG_CL ON)
+        endif ()
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU") # GCC
+        set(COMPILER_GCC ON)
+    endif ()
+
+    if (COMPILER_GCC)
         set(
             COMPILER_FLAGS
 
@@ -90,7 +105,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
                 -Wshadow
             )
         endif ()
-    elseif (RAZ_COMPILER_CLANG)
+    elseif (COMPILER_CLANG)
         set(
             COMPILER_FLAGS
 
@@ -114,7 +129,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             -Wno-weak-vtables
         )
 
-        if (RAZ_COMPILER_CLANG_CL)
+        if (COMPILER_CLANG_CL)
             set(
                 COMPILER_FLAGS
 
@@ -144,7 +159,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
                 -Wno-unused-template
             )
         endif ()
-    elseif (RAZ_COMPILER_MSVC)
+    elseif (COMPILER_MSVC)
         set(
             COMPILER_FLAGS
 
@@ -187,7 +202,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     endif ()
 
-    if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG_CL)
+    if (COMPILER_MSVC OR COMPILER_CLANG_CL)
         set(
             COMPILER_FLAGS
 
@@ -207,26 +222,20 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         )
     endif ()
 
-    if (NOT RAZ_COMPILER_MSVC)
+    if (NOT COMPILER_MSVC)
         # Defining the compiler flags only for C++; this doesn't work with MSVC
         set(COMPILER_FLAGS $<$<COMPILE_LANGUAGE:CXX>:${COMPILER_FLAGS}>)
     endif ()
 
-    if (RAZ_PLATFORM_WINDOWS)
-        target_compile_definitions(
-            ${TARGET_NAME}
-
-            ${DEFINITIONS_SCOPE}
-
-            NOGDI # Preventing definition of the 'ERROR' macro
-        )
+    if (WIN32 OR CYGWIN)
+        target_compile_definitions(${TARGET_NAME} ${DEFINITIONS_SCOPE} NOGDI) # Preventing definition of the 'ERROR' macro
     endif ()
 
-    if (RAZ_USE_EMSCRIPTEN)
+    if (COMPILER_EMSCRIPTEN)
         # List of all compiler & linker options: https://emscripten.org/docs/tools_reference/emcc.html
         # List of all -s options: https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
 
-        if (RAZ_CONFIG_DEBUG)
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             set(
                 COMPILER_FLAGS
 
