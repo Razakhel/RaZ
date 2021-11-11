@@ -138,36 +138,30 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
     saveMtl(mtlFilePath, meshRenderer->getMaterials());
   }
 
-  std::map<std::array<float, 3>, std::size_t> posCorrespIndices;
-  std::map<std::array<float, 2>, std::size_t> texCorrespIndices;
-  std::map<std::array<float, 3>, std::size_t> normCorrespIndices;
+  std::map<Vec3f, std::size_t> posCorrespIndices;
+  std::map<Vec2f, std::size_t> texCorrespIndices;
+  std::map<Vec3f, std::size_t> normCorrespIndices;
 
   for (const Submesh& submesh : mesh.getSubmeshes()) {
     for (const Vertex& vertex : submesh.getVertices()) {
-      const std::array<float, 3> pos = { vertex.position[0], vertex.position[1], vertex.position[2] };
-
-      if (posCorrespIndices.find(pos) == posCorrespIndices.cend()) {
+      if (posCorrespIndices.find(vertex.position) == posCorrespIndices.cend()) {
         file << "v " << vertex.position[0] << ' '
                      << vertex.position[1] << ' '
                      << vertex.position[2] << '\n';
-        posCorrespIndices.emplace(pos, posCorrespIndices.size() + 1);
+        posCorrespIndices.emplace(vertex.position, posCorrespIndices.size() + 1);
       }
 
-      const std::array<float, 2> tex = { vertex.texcoords[0], vertex.texcoords[1] };
-
-      if (texCorrespIndices.find(tex) == texCorrespIndices.cend()) {
+      if (texCorrespIndices.find(vertex.texcoords) == texCorrespIndices.cend()) {
         file << "vt " << vertex.texcoords[0] << ' '
                       << vertex.texcoords[1] << '\n';
-        texCorrespIndices.emplace(tex, texCorrespIndices.size() + 1);
+        texCorrespIndices.emplace(vertex.texcoords, texCorrespIndices.size() + 1);
       }
 
-      const std::array<float, 3> norm = { vertex.normal[0], vertex.normal[1], vertex.normal[2] };
-
-      if (normCorrespIndices.find(norm) == normCorrespIndices.cend()) {
+      if (normCorrespIndices.find(vertex.normal) == normCorrespIndices.cend()) {
         file << "vn " << vertex.normal[0] << ' '
                       << vertex.normal[1] << ' '
                       << vertex.normal[2] << '\n';
-        normCorrespIndices.emplace(norm, normCorrespIndices.size() + 1);
+        normCorrespIndices.emplace(vertex.normal, normCorrespIndices.size() + 1);
       }
     }
   }
@@ -188,39 +182,27 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
       // First vertex
       Vertex vertex = submesh.getVertices()[submesh.getTriangleIndices()[i + 1]];
 
-      std::array<float, 3> pos  = { vertex.position[0], vertex.position[1], vertex.position[2] };
-      std::array<float, 2> tex  = { vertex.texcoords[0], vertex.texcoords[1] };
-      std::array<float, 3> norm = { vertex.normal[0], vertex.normal[1], vertex.normal[2] };
-
-      auto posIndex  = posCorrespIndices.find(pos)->second;
-      auto texIndex  = texCorrespIndices.find(tex)->second;
-      auto normIndex = normCorrespIndices.find(norm)->second;
+      auto posIndex  = posCorrespIndices.find(vertex.position)->second;
+      auto texIndex  = texCorrespIndices.find(vertex.texcoords)->second;
+      auto normIndex = normCorrespIndices.find(vertex.normal)->second;
 
       file << posIndex  << '/' << texIndex  << '/' << normIndex << ' ';
 
       // Second vertex
       vertex = submesh.getVertices()[submesh.getTriangleIndices()[i]];
 
-      pos  = { vertex.position[0], vertex.position[1], vertex.position[2] };
-      tex  = { vertex.texcoords[0], vertex.texcoords[1] };
-      norm = { vertex.normal[0], vertex.normal[1], vertex.normal[2] };
-
-      posIndex  = posCorrespIndices.find(pos)->second;
-      texIndex  = texCorrespIndices.find(tex)->second;
-      normIndex = normCorrespIndices.find(norm)->second;
+      posIndex  = posCorrespIndices.find(vertex.position)->second;
+      texIndex  = texCorrespIndices.find(vertex.texcoords)->second;
+      normIndex = normCorrespIndices.find(vertex.normal)->second;
 
       file << posIndex  << '/' << texIndex  << '/' << normIndex << ' ';
 
       // Third vertex
       vertex = submesh.getVertices()[submesh.getTriangleIndices()[i + 2]];
 
-      pos  = std::array<float, 3>({ vertex.position[0], vertex.position[1], vertex.position[2] });
-      tex  = std::array<float, 2>({ vertex.texcoords[0], vertex.texcoords[1] });
-      norm = std::array<float, 3>({ vertex.normal[0], vertex.normal[1], vertex.normal[2] });
-
-      posIndex  = posCorrespIndices.find(pos)->second;
-      texIndex  = texCorrespIndices.find(tex)->second;
-      normIndex = normCorrespIndices.find(norm)->second;
+      posIndex  = posCorrespIndices.find(vertex.position)->second;
+      texIndex  = texCorrespIndices.find(vertex.texcoords)->second;
+      normIndex = normCorrespIndices.find(vertex.normal)->second;
 
       file << posIndex  << '/' << texIndex  << '/' << normIndex << '\n';
     }

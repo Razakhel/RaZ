@@ -260,6 +260,20 @@ TEST_CASE("Matrix strict equality") {
   CHECK_FALSE(std::equal(matrices.cbegin(), matrices.cend(), swappedMatrices.cbegin(), std::equal_to<Raz::Mat3f>()));
 }
 
+TEST_CASE("Matrix less-than") {
+  CHECK(std::less<Raz::Mat3f>()(mat31, mat32));
+  CHECK_FALSE(std::less<Raz::Mat3f>()(mat32, mat31));
+  CHECK_FALSE(std::less<Raz::Mat3f>()(mat31, mat31)); // Equal matrices are not strictly less than the other
+  CHECK(std::less<Raz::Mat3f>()(mat31, mat31 + std::numeric_limits<float>::epsilon()));
+  CHECK_FALSE(std::less<Raz::Mat3f>()(mat31 + std::numeric_limits<float>::epsilon(), mat31)); // Performs a strict check, no tolerance allowed
+
+  CHECK(std::less<Raz::Mat4f>()(mat41, mat42));
+  CHECK_FALSE(std::less<Raz::Mat4f>()(mat42, mat41));
+  CHECK_FALSE(std::less<Raz::Mat4f>()(mat41, mat41));
+  CHECK(std::less<Raz::Mat4f>()(mat41, mat41 + std::numeric_limits<float>::epsilon()));
+  CHECK_FALSE(std::less<Raz::Mat4f>()(mat41 + std::numeric_limits<float>::epsilon(), mat41));
+}
+
 TEST_CASE("Matrix printing") {
   std::stringstream stream;
 

@@ -294,8 +294,8 @@ struct std::hash<Raz::Vector<T, Size>> {
 };
 
 /// Specialization of std::equal_to for Vector. This performs a strict equality check.
-/// \tparam T Type of the vector's data.
-/// \tparam Size Vector's size.
+/// \tparam T Type of the vectors' data.
+/// \tparam Size Vectors' size.
 template <typename T, std::size_t Size>
 struct std::equal_to<Raz::Vector<T, Size>> {
   /// Checks that the two given vectors are strictly equal to each other.
@@ -304,6 +304,27 @@ struct std::equal_to<Raz::Vector<T, Size>> {
   /// \return True if vectors are strictly equal to each other, false otherwise.
   constexpr bool operator()(const Raz::Vector<T, Size>& vec1, const Raz::Vector<T, Size>& vec2) const noexcept {
     return vec1.strictlyEquals(vec2);
+  }
+};
+
+/// Specialization of std::less for Vector.
+/// \tparam T Type of the vectors' data.
+/// \tparam Size Vectors' size.
+template <typename T, std::size_t Size>
+struct std::less<Raz::Vector<T, Size>> {
+  /// Checks that the first given vector is strictly less than the other.
+  /// \param vec1 First vector to be compared.
+  /// \param vec2 Second vector to be compared.
+  /// \return True if the first vector is strictly less than the other, false otherwise.
+  constexpr bool operator()(const Raz::Vector<T, Size>& vec1, const Raz::Vector<T, Size>& vec2) const noexcept {
+    for (std::size_t i = 0; i < Size; ++i) {
+      if (vec1[i] == vec2[i])
+        continue;
+
+      return (vec1[i] < vec2[i]);
+    }
+
+    return false;
   }
 };
 

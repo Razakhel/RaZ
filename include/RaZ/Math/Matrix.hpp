@@ -247,9 +247,9 @@ struct std::hash<Raz::Matrix<T, W, H>> {
 };
 
 /// Specialization of std::equal_to for Matrix. This performs a strict equality check.
-/// \tparam T Type of the matrix's data.
-/// \tparam W Matrix's width.
-/// \tparam H Matrix's height.
+/// \tparam T Type of the matrices' data.
+/// \tparam W Matrices' width.
+/// \tparam H Matrices' height.
 template <typename T, std::size_t W, std::size_t H>
 struct std::equal_to<Raz::Matrix<T, W, H>> {
   /// Checks that the two given matrices are strictly equal to each other.
@@ -258,6 +258,28 @@ struct std::equal_to<Raz::Matrix<T, W, H>> {
   /// \return True if matrices are strictly equal to each other, false otherwise.
   constexpr bool operator()(const Raz::Matrix<T, W, H>& mat1, const Raz::Matrix<T, W, H>& mat2) const noexcept {
     return mat1.strictlyEquals(mat2);
+  }
+};
+
+/// Specialization of std::less for Matrix.
+/// \tparam T Type of the matrices' data.
+/// \tparam W Matrices' width.
+/// \tparam H Matrices' height.
+template <typename T, std::size_t W, std::size_t H>
+struct std::less<Raz::Matrix<T, W, H>> {
+  /// Checks that the first given matrix is strictly less than the other.
+  /// \param mat1 First matrix to be compared.
+  /// \param mat2 Second matrix to be compared.
+  /// \return True if the first matrix is strictly less than the other, false otherwise.
+  constexpr bool operator()(const Raz::Matrix<T, W, H>& mat1, const Raz::Matrix<T, W, H>& mat2) const noexcept {
+    for (std::size_t i = 0; i < W * H; ++i) {
+      if (mat1[i] == mat2[i])
+        continue;
+
+      return (mat1[i] < mat2[i]);
+    }
+
+    return false;
   }
 };
 

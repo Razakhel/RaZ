@@ -247,6 +247,20 @@ TEST_CASE("Vector strict equality") {
   CHECK_FALSE(std::equal(vectors.cbegin(), vectors.cend(), swappedVectors.cbegin(), std::equal_to<Raz::Vec3f>()));
 }
 
+TEST_CASE("Vector less-than") {
+  CHECK(std::less<Raz::Vec3f>()(vec31, vec32));
+  CHECK_FALSE(std::less<Raz::Vec3f>()(vec32, vec31));
+  CHECK_FALSE(std::less<Raz::Vec3f>()(vec31, vec31)); // Equal vectors are not strictly less than the other
+  CHECK(std::less<Raz::Vec3f>()(vec31, vec31 + std::numeric_limits<float>::epsilon()));
+  CHECK_FALSE(std::less<Raz::Vec3f>()(vec31 + std::numeric_limits<float>::epsilon(), vec31)); // Performs a strict check, no tolerance allowed
+
+  CHECK_FALSE(std::less<Raz::Vec4f>()(vec41, vec42));
+  CHECK(std::less<Raz::Vec4f>()(vec42, vec41));
+  CHECK_FALSE(std::less<Raz::Vec4f>()(vec41, vec41));
+  CHECK(std::less<Raz::Vec4f>()(vec41, vec41 + std::numeric_limits<float>::epsilon()));
+  CHECK_FALSE(std::less<Raz::Vec4f>()(vec41 + std::numeric_limits<float>::epsilon(), vec41));
+}
+
 TEST_CASE("Vector printing") {
   std::stringstream stream;
 

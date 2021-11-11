@@ -21,7 +21,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath);
 /// Saves an OBJ mesh to a file.
 /// \param filePath File to which to save the mesh.
 /// \param mesh Mesh to export data from.
-/// \param meshRenderer Optional mesh renderer to export material & textures from.
+/// \param meshRenderer Optional mesh renderer to export materials & textures from.
 void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRenderer = nullptr);
 
 } // namespace ObjFormat
