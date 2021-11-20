@@ -1,58 +1,67 @@
+#include "RaZ/Utils/ThreadPool.hpp"
+
 #include <cassert>
 #include <vector>
 
 namespace Raz::Threading {
 
-template <typename Func, typename... Args, typename ResultType>
-std::future<ResultType> launchAsync(Func&& action, Args&&... args) {
-  return std::async(std::forward<Func>(action), std::forward<Args>(args)...);
+template <typename FuncT, typename... Args, typename ResultT>
+std::future<ResultT> launchAsync(FuncT&& action, Args&&... args) {
+  return std::async(std::forward<FuncT>(action), std::forward<Args>(args)...);
 }
 
-template <typename ContainerType, typename Func, typename>
-void parallelize(const ContainerType& collection, Func&& action, std::size_t threadCount) {
+template <typename ContainerT, typename FuncT, typename>
+void parallelize(const ContainerT& collection, FuncT&& action, unsigned int threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
-  std::vector<std::thread> threads(std::min(threadCount, std::size(collection)));
+  ThreadPool& threadPool = getDefaultThreadPool();
 
-  // This performs a mathematical round: if the result of the division gives a number below X.5, ceil it; otherwise, round it
-  const std::size_t rangeCount = (std::size(collection) + threadCount / 2) / threadCount;
+  const std::size_t maxThreadCount = std::min(static_cast<std::size_t>(threadCount), std::size(collection));
+  const std::size_t rangeCount     = (std::size(collection) + maxThreadCount / 2) / maxThreadCount;
 
-  std::size_t beginIndex = 0;
-  std::size_t endIndex   = rangeCount;
+  std::vector<std::promise<void>> promises;
+  promises.resize(maxThreadCount);
 
-  // Creating one thread per slice, minus one to avoid getting one more element in the last thread if the size is indivisible
-  for (std::size_t threadIndex = 0; threadIndex < threads.size() - 1; ++threadIndex) {
-    threads[threadIndex] = std::thread(action, IndexRange{ beginIndex, endIndex });
+  for (std::size_t threadIndex = 0; threadIndex < maxThreadCount; ++threadIndex) {
+    const std::size_t beginIndex = rangeCount * threadIndex;
+    const std::size_t endIndex   = std::min(beginIndex + rangeCount, std::size(collection));
 
-    beginIndex = endIndex;
-    endIndex  += rangeCount;
+    threadPool.addAction([&action, beginIndex, endIndex, &promises, threadIndex] () noexcept(std::is_nothrow_invocable_v<FuncT, IndexRange>) {
+      action(IndexRange{ beginIndex, endIndex });
+      promises[threadIndex].set_value();
+    });
   }
 
-  // The last thread is created independently with just the remaining number of elements
-  threads.back() = std::thread(action, IndexRange{ beginIndex, std::min(endIndex, std::size(collection)) });
-
-  for (std::thread& thread : threads)
-    thread.join();
+  // Blocking here to wait for all threads to finish their action
+  for (std::promise<void>& promise : promises)
+    promise.get_future().wait();
 }
 
-template <typename ContainerType, typename Func, typename>
-void parallelize(ContainerType& collection, Func&& action, std::size_t threadCount) {
+template <typename ContainerT, typename FuncT, typename>
+void parallelize(ContainerT& collection, FuncT&& action, unsigned int threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
-  std::vector<std::thread> threads(std::min(threadCount, std::size(collection)));
+  ThreadPool& threadPool = getDefaultThreadPool();
 
-  // This performs a mathematical round: if the result of the division gives a number below X.5, ceil it; otherwise, round it
-  const std::size_t rangeCount = (std::size(collection) + threadCount / 2) / threadCount;
+  const std::size_t maxThreadCount = std::min(static_cast<std::size_t>(threadCount), std::size(collection));
+  const std::size_t rangeCount     = (std::size(collection) + maxThreadCount / 2) / maxThreadCount;
 
-  for (std::size_t threadIndex = 0; threadIndex < threads.size(); ++threadIndex) {
-    typename ContainerType::iterator beginIter = std::begin(collection) + rangeCount * threadIndex;
-    typename ContainerType::iterator endIter   = beginIter + rangeCount;
+  std::vector<std::promise<void>> promises;
+  promises.resize(maxThreadCount);
 
-    threads[threadIndex] = std::thread(action, IterRange<ContainerType>(beginIter, endIter));
+  for (std::size_t threadIndex = 0; threadIndex < maxThreadCount; ++threadIndex) {
+    typename ContainerT::iterator beginIter = std::begin(collection) + rangeCount * threadIndex;
+    typename ContainerT::iterator endIter   = beginIter + std::min(static_cast<std::ptrdiff_t>(rangeCount), std::distance(beginIter, std::end(collection)));
+
+    threadPool.addAction([&action, beginIter, endIter, &promises, threadIndex] () noexcept(std::is_nothrow_invocable_v<FuncT, IterRange<ContainerT>>) {
+      action(IterRange<ContainerT>(beginIter, endIter));
+      promises[threadIndex].set_value();
+    });
   }
 
-  for (std::thread& thread : threads)
-    thread.join();
+  // Blocking here to wait for all threads to finish their action
+  for (std::promise<void>& promise : promises)
+    promise.get_future().wait();
 }
 
 } // namespace Raz::Threading

@@ -4,21 +4,29 @@
 
 namespace Raz::Threading {
 
-unsigned int getSystemThreadCount() noexcept {
-  const unsigned int threadCount = std::thread::hardware_concurrency();
-  return std::max(threadCount, 1u); // threadCount is 0 if undefined; returning 1 thread available in this case
+ThreadPool& getDefaultThreadPool() {
+  static ThreadPool threadPool;
+  return threadPool;
 }
 
-void parallelize(const std::function<void()>& action, std::size_t threadCount) {
+void parallelize(const std::function<void()>& action, unsigned int threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
-  std::vector<std::thread> threads(threadCount);
+  ThreadPool& threadPool = getDefaultThreadPool();
 
-  for (std::thread& thread : threads)
-    thread = std::thread(action);
+  std::vector<std::promise<void>> promises;
+  promises.resize(threadCount);
 
-  for (std::thread& thread : threads)
-    thread.join();
+  for (unsigned int i = 0; i < threadCount; ++i) {
+    threadPool.addAction([&action, &promises, i] () {
+      action();
+      promises[i].set_value();
+    });
+  }
+
+  // Blocking here to wait for all threads to finish their action
+  for (std::promise<void>& promise : promises)
+    promise.get_future().wait();
 }
 
 } // namespace Raz::Threading
