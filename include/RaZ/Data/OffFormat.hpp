@@ -10,7 +10,7 @@ class Mesh;
 
 namespace OffFormat {
 
-/// Loads an OFF mesh from a file.
+/// Loads a mesh from an OFF file.
 /// \param filePath File from which to load the mesh.
 /// \return Loaded mesh's data (vertices & indices).
 Mesh load(const FilePath& filePath);

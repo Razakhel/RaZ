@@ -1,11 +1,12 @@
-#include "RaZ/Utils/BvhFormat.hpp"
+#include "RaZ/Animation/Skeleton.hpp"
+#include "RaZ/Data/BvhFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <fstream>
 #include <unordered_map>
 
-namespace Raz {
+namespace Raz::BvhFormat {
 
 namespace {
 
@@ -86,7 +87,7 @@ void loadJoint(std::ifstream& file, std::unordered_map<std::string, SkeletonJoin
 
 } // namespace
 
-void BvhFormat::import(const FilePath& filePath) {
+Skeleton load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)
@@ -107,6 +108,7 @@ void BvhFormat::import(const FilePath& filePath) {
   if (token != "ROOT")
     throw std::invalid_argument("Error: Invalid BVH root joint");
 
+  Skeleton skeleton;
   std::unordered_map<std::string, SkeletonJoint&> joints;
 
   file >> token;
@@ -141,6 +143,8 @@ void BvhFormat::import(const FilePath& filePath) {
   std::getline(file, token); // Root joint's closing scope
 
   // TODO: import animation
+
+  return skeleton;
 }
 
-} // namespace Raz
+} // namespace Raz::BvhFormat

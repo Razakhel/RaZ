@@ -13,7 +13,7 @@ class MeshRenderer;
 
 namespace FbxFormat {
 
-/// Loads an FBX mesh from a file.
+/// Loads a mesh from an FBX file.
 /// \param filePath File from which to load the mesh.
 /// \return Pair containing respectively the mesh's data (vertices & indices) and rendering information (materials, textures, ...).
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath);
