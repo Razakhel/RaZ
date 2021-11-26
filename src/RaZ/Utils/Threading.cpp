@@ -12,6 +12,7 @@ ThreadPool& getDefaultThreadPool() {
 void parallelize(const std::function<void()>& action, unsigned int threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   std::vector<std::promise<void>> promises;
@@ -27,6 +28,10 @@ void parallelize(const std::function<void()>& action, unsigned int threadCount) 
   // Blocking here to wait for all threads to finish their action
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
+#else
+  for (unsigned int i = 0; i < threadCount; ++i)
+    action();
+#endif
 }
 
 } // namespace Raz::Threading

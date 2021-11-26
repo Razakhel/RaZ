@@ -61,6 +61,7 @@ ThreadPool& getDefaultThreadPool();
 inline void sleep(uint64_t milliseconds) { std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds)); }
 
 /// Calls a function asynchronously, to be executed without blocking the calling thread.
+/// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam FuncT Type of the action to be executed.
 /// \tparam Args Types of the arguments to be forwarded to the given function.
 /// \tparam ResultT Return type of the given function.
@@ -71,6 +72,7 @@ template <typename FuncT, typename... Args, typename ResultT = std::invoke_resul
 [[nodiscard]] std::future<ResultT> launchAsync(FuncT&& action, Args&&... args);
 
 /// Calls a function in parallel on a given number of separate threads of execution.
+/// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \param action Action to be performed by each thread.
 /// \param threadCount Amount of threads to start an instance on.
 void parallelize(const std::function<void()>& action, unsigned int threadCount = getSystemThreadCount());
@@ -78,6 +80,7 @@ void parallelize(const std::function<void()>& action, unsigned int threadCount =
 /// Calls a function in parallel on a given number of separate threads of execution.
 /// The collection is automatically split by indices, giving a separate start/past-the-end range to each thread.
 /// \note The container must either be a constant-size C array or have a size() function.
+/// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam ContainerT Type of the collection to iterate over.
 /// \tparam FuncT Type of the action to be executed.
 /// \param collection Collection to iterate over on multiple threads.
@@ -89,6 +92,7 @@ void parallelize(const ContainerT& collection, FuncT&& action, unsigned int thre
 /// Calls a function in parallel on a given number of separate threads of execution.
 /// The collection is automatically split by iterator ranges, giving a separate start/past-the-end range to each thread.
 /// \note The container must either be a constant-size C array, or have a public ContainerT::iterator type and begin() & size() functions.
+/// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam ContainerT Type of the collection to iterate over.
 /// \tparam FuncT Type of the action to be executed.
 /// \param collection Collection to iterate over on multiple threads.

@@ -63,6 +63,7 @@
 #include "Utils/Shape.hpp"
 #include "Utils/StrUtils.hpp"
 #include "Utils/Threading.hpp"
+#include "Utils/ThreadPool.hpp"
 #include "Utils/TypeUtils.hpp"
 #include "Utils/Window.hpp"
 

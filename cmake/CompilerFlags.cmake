@@ -268,11 +268,15 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             set(COMPILER_FLAGS ${COMPILER_FLAGS} -O3)
         endif ()
 
+        # Threading is available on Emscripten's side (see arguments below), but may not be on the browser's. This will need to be checked again in the future
+        # See: https://emscripten.org/docs/porting/pthreads.html
+
         set(
             COMPILER_FLAGS
 
             ${COMPILER_FLAGS}
             -c # Emit object files (may be unrequired)
+            #-pthread # Enabling pthread
             "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
         )
 
@@ -281,6 +285,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
             ${SCOPE}
 
+            #-pthread # Enabling pthread
+            #"SHELL:-s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency" # Setting the initial thread pool size to the system's thread count
+            #"SHELL:-s PROXY_TO_PTHREAD" # Runs the whole program into a separate thread
             "SHELL:-s USE_WEBGL2=1" # Force the use of WebGL2
             "SHELL:-s OFFSCREEN_FRAMEBUFFER=1" # Enable rendering to offscreen targets
             "SHELL:-s OFFSCREENCANVAS_SUPPORT=1" # Allow creating multiple GL contexts on separate threads & swapping between them

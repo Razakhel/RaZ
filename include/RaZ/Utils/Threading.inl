@@ -7,13 +7,20 @@ namespace Raz::Threading {
 
 template <typename FuncT, typename... Args, typename ResultT>
 std::future<ResultT> launchAsync(FuncT&& action, Args&&... args) {
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   return std::async(std::forward<FuncT>(action), std::forward<Args>(args)...);
+#else
+  std::promise<ResultT> promise;
+  promise.set_value(action(std::forward<Args>(args)...));
+  return promise.get_future();
+#endif
 }
 
 template <typename ContainerT, typename FuncT, typename>
 void parallelize(const ContainerT& collection, FuncT&& action, unsigned int threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   const std::size_t maxThreadCount = std::min(static_cast<std::size_t>(threadCount), std::size(collection));
@@ -35,12 +42,16 @@ void parallelize(const ContainerT& collection, FuncT&& action, unsigned int thre
   // Blocking here to wait for all threads to finish their action
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
+#else
+  action(IndexRange{ 0, collection.size() });
+#endif
 }
 
 template <typename ContainerT, typename FuncT, typename>
 void parallelize(ContainerT& collection, FuncT&& action, unsigned int threadCount) {
   assert("Error: The number of threads can't be 0." && threadCount != 0);
 
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   const std::size_t maxThreadCount = std::min(static_cast<std::size_t>(threadCount), std::size(collection));
@@ -62,6 +73,9 @@ void parallelize(ContainerT& collection, FuncT&& action, unsigned int threadCoun
   // Blocking here to wait for all threads to finish their action
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
+#else
+  action(IterRange<ContainerT>(collection.begin(), collection.end()));
+#endif
 }
 
 } // namespace Raz::Threading
