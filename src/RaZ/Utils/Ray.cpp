@@ -157,17 +157,17 @@ bool Ray::intersects(const AABB& aabb, RayHit* hit) const {
   //  - https://tavianator.com/fast-branchless-raybounding-box-intersections/
   //  - https://tavianator.com/cgit/dimension.git/tree/libdimension/bvh/bvh.c#n196
 
-  const Vec3f minDist = (aabb.getLeftBottomBackPos() - m_origin) * m_invDirection;
-  const Vec3f maxDist = (aabb.getRightTopFrontPos() - m_origin) * m_invDirection;
+  const Vec3f minDist = (aabb.getMinPosition() - m_origin) * m_invDirection;
+  const Vec3f maxDist = (aabb.getMaxPosition() - m_origin) * m_invDirection;
 
-  const float minDistX = std::min(minDist[0], maxDist[0]);
-  const float maxDistX = std::max(minDist[0], maxDist[0]);
+  const float minDistX = std::min(minDist.x(), maxDist.x());
+  const float maxDistX = std::max(minDist.x(), maxDist.x());
 
-  const float minDistY = std::min(minDist[1], maxDist[1]);
-  const float maxDistY = std::max(minDist[1], maxDist[1]);
+  const float minDistY = std::min(minDist.y(), maxDist.y());
+  const float maxDistY = std::max(minDist.y(), maxDist.y());
 
-  const float minDistZ = std::min(minDist[2], maxDist[2]);
-  const float maxDistZ = std::max(minDist[2], maxDist[2]);
+  const float minDistZ = std::min(minDist.z(), maxDist.z());
+  const float maxDistZ = std::max(minDist.z(), maxDist.z());
 
   const float minHitDist = std::max(minDistX, std::max(minDistY, minDistZ));
   const float maxHitDist = std::min(maxDistX, std::min(maxDistY, maxDistZ));
@@ -183,7 +183,7 @@ bool Ray::intersects(const AABB& aabb, RayHit* hit) const {
 
     // Normal computing method based on John Novak's: http://blog.johnnovak.net/2016/10/22/the-nim-raytracer-project-part-4-calculating-box-normals/
     const Vec3f hitDir = (hit->position - aabb.computeCentroid()) / aabb.computeHalfExtents();
-    hit->normal = Vec3f(std::trunc(hitDir[0]), std::trunc(hitDir[1]), std::trunc(hitDir[2])).normalize();
+    hit->normal = Vec3f(std::trunc(hitDir.x()), std::trunc(hitDir.y()), std::trunc(hitDir.z())).normalize();
 
     hit->distance = minHitDist;
   }

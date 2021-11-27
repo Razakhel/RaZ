@@ -321,8 +321,8 @@ TEST_CASE("AABB point containment") {
   // See: https://www.geogebra.org/m/kwkkt9ry
 
   CHECK(aabb1.contains(aabb1.computeCentroid()));
-  CHECK(aabb1.contains(aabb1.getLeftBottomBackPos()));
-  CHECK(aabb1.contains(aabb1.getRightTopFrontPos()));
+  CHECK(aabb1.contains(aabb1.getMinPosition()));
+  CHECK(aabb1.contains(aabb1.getMaxPosition()));
 
   const Raz::Vec3f point1(-0.25f, -0.5f, -0.5f); // Should be contained by aabb1
   const Raz::Vec3f point2(   4.f,   3.f,   0.f); // Should be contained by aabb2 (lying on a face)

@@ -157,48 +157,48 @@ Mesh::Mesh(const Quad& quad) {
 }
 
 Mesh::Mesh(const AABB& box) {
-  const Vec3f& rightTopFrontPos  = box.getRightTopFrontPos();
-  const Vec3f& leftBottomBackPos = box.getLeftBottomBackPos();
+  const Vec3f& minPos = box.getMinPosition();
+  const Vec3f& maxPos = box.getMaxPosition();
 
-  const float rightPos  = rightTopFrontPos[0];
-  const float leftPos   = leftBottomBackPos[0];
-  const float topPos    = rightTopFrontPos[1];
-  const float bottomPos = leftBottomBackPos[1];
-  const float frontPos  = rightTopFrontPos[2];
-  const float backPos   = leftBottomBackPos[2];
+  const float minX = minPos.x();
+  const float maxX = maxPos.x();
+  const float minY = minPos.y();
+  const float maxY = maxPos.y();
+  const float minZ = minPos.z();
+  const float maxZ = maxPos.z();
 
   // TODO: texcoords should not exist for simple display cubes like a skybox
 
   Vertex rightTopBack {};
-  rightTopBack.position  = Vec3f(rightPos, topPos, backPos);
+  rightTopBack.position  = Vec3f(maxX, maxY, minZ);
   rightTopBack.texcoords = Vec2f(0.f, 1.f);
 
   Vertex rightTopFront {};
-  rightTopFront.position  = rightTopFrontPos;
+  rightTopFront.position  = maxPos;
   rightTopFront.texcoords = Vec2f(1.f, 1.f);
 
   Vertex rightBottomBack {};
-  rightBottomBack.position  = Vec3f(rightPos, bottomPos, backPos);
+  rightBottomBack.position  = Vec3f(maxX, minY, minZ);
   rightBottomBack.texcoords = Vec2f(0.f, 0.f);
 
   Vertex rightBottomFront {};
-  rightBottomFront.position  = Vec3f(rightPos, bottomPos, frontPos);
+  rightBottomFront.position  = Vec3f(maxX, minY, maxZ);
   rightBottomFront.texcoords = Vec2f(1.f, 0.f);
 
   Vertex leftTopBack {};
-  leftTopBack.position  = Vec3f(leftPos, topPos, backPos);
+  leftTopBack.position  = Vec3f(minX, maxY, minZ);
   leftTopBack.texcoords = Vec2f(1.f, 1.f);
 
   Vertex leftTopFront {};
-  leftTopFront.position  = Vec3f(leftPos, topPos, frontPos);
+  leftTopFront.position  = Vec3f(minX, maxY, maxZ);
   leftTopFront.texcoords = Vec2f(0.f, 1.f);
 
   Vertex leftBottomBack {};
-  leftBottomBack.position  = leftBottomBackPos;
+  leftBottomBack.position  = minPos;
   leftBottomBack.texcoords = Vec2f(1.f, 0.f);
 
   Vertex leftBottomFront {};
-  leftBottomFront.position  = Vec3f(leftPos, bottomPos, frontPos);
+  leftBottomFront.position  = Vec3f(minX, minY, maxZ);
   leftBottomFront.texcoords = Vec2f(0.f, 0.f);
 
   // Computing normals
@@ -305,13 +305,13 @@ const AABB& Mesh::computeBoundingBox() {
   for (Submesh& submesh : m_submeshes) {
     const AABB& boundingBox = submesh.computeBoundingBox();
 
-    maxPos.x() = std::max(maxPos.x(), boundingBox.getRightTopFrontPos().x());
-    maxPos.y() = std::max(maxPos.y(), boundingBox.getRightTopFrontPos().y());
-    maxPos.z() = std::max(maxPos.z(), boundingBox.getRightTopFrontPos().z());
+    minPos.x() = std::min(minPos.x(), boundingBox.getMinPosition().x());
+    minPos.y() = std::min(minPos.y(), boundingBox.getMinPosition().y());
+    minPos.z() = std::min(minPos.z(), boundingBox.getMinPosition().z());
 
-    minPos.x() = std::min(minPos.x(), boundingBox.getLeftBottomBackPos().x());
-    minPos.y() = std::min(minPos.y(), boundingBox.getLeftBottomBackPos().y());
-    minPos.z() = std::min(minPos.z(), boundingBox.getLeftBottomBackPos().z());
+    maxPos.x() = std::max(maxPos.x(), boundingBox.getMaxPosition().x());
+    maxPos.y() = std::max(maxPos.y(), boundingBox.getMaxPosition().y());
+    maxPos.z() = std::max(maxPos.z(), boundingBox.getMaxPosition().z());
   }
 
   m_boundingBox = AABB(minPos, maxPos);

@@ -421,41 +421,28 @@ private:
   Vec3f m_leftBottomPos {};
 };
 
-/// Axis-aligned bounding box defined by its left bottom back and right top front vertices' positions.
+/// Axis-aligned bounding box defined by its minimal and maximal vertices' positions.
 ///
 ///          _______________________
 ///         /|                    /|
 ///        / |                   / |
-///       |---------------------| < rightTopFront
+///       |---------------------| < maxPos
 ///       |  |                  |  |
 ///       |  |                  |  |
 ///       |  |                  |  |
 ///       |  |                  |  |
 ///       | /-------------------|-/
-///       |/ ^ leftBottomBack   |/
+///       |/ ^ minPos           |/
 ///       -----------------------
 ///
-/// The extremities are called with such names according to the axes:
-///
-///                  Y
-///                  ^
-///                  |
-///                  |
-///                  |-------> X
-///                 /
-///                /
-///               v
-///               Z
-///
-/// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
+/// The min position designates the point in [ -X; -Y; -Z ], and the max the point in [ +X; +Y; +Z ].
 class AABB final : public Shape {
 public:
-  AABB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos) noexcept
-    : m_leftBottomBackPos{ leftBottomBackPos }, m_rightTopFrontPos{ rightTopFrontPos } {}
+  AABB(const Vec3f& minPos, const Vec3f& maxPos) noexcept : m_minPos{ minPos }, m_maxPos{ maxPos } {}
 
   ShapeType getType() const noexcept override { return ShapeType::AABB; }
-  const Vec3f& getLeftBottomBackPos() const { return m_leftBottomBackPos; }
-  const Vec3f& getRightTopFrontPos() const { return m_rightTopFrontPos; }
+  const Vec3f& getMinPosition() const { return m_minPos; }
+  const Vec3f& getMaxPosition() const { return m_maxPos; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -501,55 +488,43 @@ public:
   Vec3f computeProjection(const Vec3f& point) const override;
   /// Computes the AABB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return (m_rightTopFrontPos + m_leftBottomBackPos) * 0.5f; }
+  Vec3f computeCentroid() const override { return (m_maxPos + m_minPos) * 0.5f; }
   /// Computes the half extents of the box, starting from its centroid.
   ///
   ///          _______________________
   ///         /|          ^         /|
-  ///        / |        y |        / |
+  ///        / |          |        / |
   ///       |---------------------|  |
-  ///       |  |          |    x  |  |
+  ///       |  |          |       |  |
   ///       |  |          --------|->|
-  ///       |  |       z /        |  |
+  ///       |  |         /        |  |
   ///       |  |        v         |  |
   ///       | /-------------------|-/
   ///       |/                    |/
   ///       -----------------------
   /// \return AABB's half extents.
-  Vec3f computeHalfExtents() const { return (m_rightTopFrontPos - m_leftBottomBackPos) * 0.5f; }
+  Vec3f computeHalfExtents() const { return (m_maxPos - m_minPos) * 0.5f; }
 
 private:
-  Vec3f m_leftBottomBackPos {};
-  Vec3f m_rightTopFrontPos {};
+  Vec3f m_minPos {};
+  Vec3f m_maxPos {};
 };
 
-/// Oriented bounding box defined by its left bottom back and right top front vertices' positions, as well as a rotation.
+/// Oriented bounding box defined by its minimal and maximal vertices' positions, as well as a rotation.
 ///
 ///          _______________________
 ///         /|                    /|
 ///        / |                   / |
-///       |---------------------| < rightTopFront
+///       |---------------------| < maxPos
 ///       |  |                  |  |
 ///       |  |                  |  |
 ///       |  |                  |  |
 ///       |  |                  |  |
 ///       | /-------------------|-/
-///       |/ ^ leftBottomBack   |/
+///       |/ ^ minPos           |/
 ///       -----------------------
 ///
-/// The extremities are called with such names according to the axes:
-///
-///                  Y
-///                  ^
-///                  |
-///                  |
-///                  |-------> X
-///                 /
-///                /
-///               v
-///               Z
-///
-/// As such, leftBottomBack designs the point in [ -X; -Y; -Z ], and rightTopFront designs the point in [ +X; +Y; +Z ].
+/// The min position designates the point in [ -X; -Y; -Z ], and the max the point in [ +X; +Y; +Z ].
 ///
 /// Beyond that, an OBB differs from an AABB in that it contains a rotation giving its orientation.
 ///
@@ -572,13 +547,12 @@ private:
 ///
 class OBB final : public Shape {
 public:
-  OBB(const Vec3f& leftBottomBackPos, const Vec3f& rightTopFrontPos, const Mat3f& rotation = Mat3f::identity())
-    : m_aabb(leftBottomBackPos, rightTopFrontPos), m_rotation{ rotation } {}
+  OBB(const Vec3f& minPos, const Vec3f& maxPos, const Mat3f& rotation = Mat3f::identity()) : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
   explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
 
   ShapeType getType() const noexcept override { return ShapeType::OBB; }
-  const Vec3f& getLeftBottomBackPos() const { return m_aabb.getLeftBottomBackPos(); }
-  const Vec3f& getRightTopFrontPos() const { return m_aabb.getRightTopFrontPos(); }
+  const Vec3f& getMinPosition() const { return m_aabb.getMinPosition(); }
+  const Vec3f& getMaxPosition() const { return m_aabb.getMaxPosition(); }
   const Mat3f& getRotation() const { return m_rotation; }
 
   void setRotation(const Mat3f& rotation);
@@ -633,11 +607,11 @@ public:
   ///
   ///          _______________________
   ///         /|          ^         /|
-  ///        / |        y |        / |
+  ///        / |          |        / |
   ///       |---------------------|  |
-  ///       |  |          |    x  |  |
+  ///       |  |          |       |  |
   ///       |  |          --------|->|
-  ///       |  |       z /        |  |
+  ///       |  |         /        |  |
   ///       |  |        v         |  |
   ///       | /-------------------|-/
   ///       |/                    |/

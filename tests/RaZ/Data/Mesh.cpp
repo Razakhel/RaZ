@@ -18,11 +18,11 @@ TEST_CASE("Mesh UV sphere") {
     CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
 
     // The bounding box's Z coordinate is not exactly radius/-radius, due to the approximation made by the low longitude count
-    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius(), sphere.getRadius(), 2.3776417f) + sphere.getCenter();
     const Raz::Vec3f expectedMinPos = Raz::Vec3f(-sphere.getRadius(), -sphere.getRadius(), -2.3776412f) + sphere.getCenter();
+    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius(), sphere.getRadius(), 2.3776417f) + sphere.getCenter();
 
-    CHECK_THAT(boundingBox.getRightTopFrontPos(), IsNearlyEqualToVector(expectedMaxPos));
-    CHECK_THAT(boundingBox.getLeftBottomBackPos(), IsNearlyEqualToVector(expectedMinPos));
+    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
+    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
 
     const Raz::Vec3f expectedHalfExtents = Raz::Vec3f(Raz::Vec2f(sphere.getRadius()), 2.3776414f);
     CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(expectedHalfExtents));
@@ -41,11 +41,11 @@ TEST_CASE("Mesh UV sphere") {
     CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
 
     // With 100 splits, the bounding box's Z is now equal to radius/-radius as expected
-    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius()) + sphere.getCenter();
     const Raz::Vec3f expectedMinPos = Raz::Vec3f(-sphere.getRadius()) + sphere.getCenter();
+    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius()) + sphere.getCenter();
 
-    CHECK_THAT(boundingBox.getRightTopFrontPos(), IsNearlyEqualToVector(expectedMaxPos));
-    CHECK_THAT(boundingBox.getLeftBottomBackPos(), IsNearlyEqualToVector(expectedMinPos));
+    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
+    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
 
     CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(sphere.getRadius())));
   }
@@ -67,11 +67,11 @@ TEST_CASE("Mesh icosphere") {
     CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
 
     // The bounding box's components are not exactly radius/-radius, due to the approximation made by the low subdivision count
-    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(2.1266272f) + sphere.getCenter();
     const Raz::Vec3f expectedMinPos = Raz::Vec3f(-2.1266272f) + sphere.getCenter();
+    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(2.1266272f) + sphere.getCenter();
 
-    CHECK_THAT(boundingBox.getRightTopFrontPos(), IsNearlyEqualToVector(expectedMaxPos));
-    CHECK_THAT(boundingBox.getLeftBottomBackPos(), IsNearlyEqualToVector(expectedMinPos));
+    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
+    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
 
     CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(2.1266272f)));
   }
@@ -91,11 +91,11 @@ TEST_CASE("Mesh icosphere") {
 //    CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
 //
 //    // With 2 subdivisions, the bounding box's components are now equal to radius/-radius as expected
-//    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius()) + sphere.getCenter();
 //    const Raz::Vec3f expectedMinPos = Raz::Vec3f(-sphere.getRadius()) + sphere.getCenter();
+//    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius()) + sphere.getCenter();
 //
-//    CHECK_THAT(boundingBox.getRightTopFrontPos(), IsNearlyEqualToVector(expectedMaxPos));
-//    CHECK_THAT(boundingBox.getLeftBottomBackPos(), IsNearlyEqualToVector(expectedMinPos));
+//    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
+//    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
 //
 //    CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(sphere.getRadius())));
 //  }
