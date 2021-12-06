@@ -3,23 +3,19 @@
 #ifndef RAZ_OVERLAY_HPP
 #define RAZ_OVERLAY_HPP
 
-#include "RaZ/Render/Texture.hpp"
+#include "RaZ/Math/Vector.hpp"
 
 #include <functional>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 struct GLFWwindow;
 
 namespace Raz {
 
-class Overlay;
-using OverlayPtr = std::unique_ptr<Overlay>;
-
 class OverlayWindow;
-using OverlayWindowPtr = std::unique_ptr<OverlayWindow>;
+class Texture;
 
 enum class OverlayElementType {
   LABEL,
@@ -48,16 +44,15 @@ public:
 
   bool isEmpty() const noexcept { return m_windows.empty(); }
 
-  template <typename... Args>
-  static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
-
   /// Initializes ImGui with the containing window.
   /// \param windowHandle Handle to initialize the overlay with.
   void initialize(GLFWwindow* windowHandle) const;
   /// Adds a new overlay window.
   /// \param title Window title.
+  /// \param initSize Initial window size. If both X & Y are strictly lower than 0, automatically resizes the window from its content.
+  /// \param initPos Initial window position.
   /// \return The newly added window.
-  [[nodiscard]] OverlayWindow& addWindow(std::string title);
+  [[nodiscard]] OverlayWindow& addWindow(std::string title, const Vec2f& initSize = Vec2f(0.f), const Vec2f& initPos = Vec2f(0.f));
   /// Checks if the overlay is currently requesting the keyboard inputs.
   /// \return True if the keyboard focus is taken, false otherwise.
   bool hasKeyboardFocus() const;
@@ -229,9 +224,8 @@ class OverlayTexture final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight)
-    : m_index{ texture.getIndex() }, m_width{ static_cast<float>(maxWidth) }, m_height{ static_cast<float>(maxHeight) } {}
-  explicit OverlayTexture(const Texture& texture) : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
+  OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  explicit OverlayTexture(const Texture& texture);
 
   OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
 
@@ -291,7 +285,11 @@ public:
 /// OverlayWindow class, representing a specific window in the Overlay.
 class OverlayWindow final {
 public:
-  explicit OverlayWindow(std::string title) noexcept : m_title{ std::move(title) } {}
+  /// Creates an overlay window.
+  /// \param title Window title.
+  /// \param initSize Initial window size. If both X & Y are strictly lower than 0, automatically resizes the window from its content.
+  /// \param initPos Initial window position.
+  explicit OverlayWindow(std::string title, const Vec2f& initSize = Vec2f(0.f), const Vec2f& initPos = Vec2f(0.f)) noexcept;
   OverlayWindow(const OverlayWindow&) = delete;
   OverlayWindow(OverlayWindow&&) noexcept = default;
 
@@ -303,7 +301,7 @@ public:
   /// \param label Text to be displayed.
   /// \param color Color to display the text with.
   /// \return Reference to the newly added colored label.
-  OverlayColoredLabel& addColoredLabel(std::string label, Vec4f color);
+  OverlayColoredLabel& addColoredLabel(std::string label, const Vec4f& color);
   /// Adds a colored label on the overlay window.
   /// \param label Text to be displayed.
   /// \param red Text color's red component.
@@ -378,6 +376,8 @@ public:
 
 private:
   std::string m_title {};
+  Vec2f m_currentSize {};
+  Vec2f m_currentPos {};
   std::vector<std::unique_ptr<OverlayElement>> m_elements {};
 };
 

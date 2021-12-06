@@ -290,7 +290,7 @@ int main() {
   /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  Raz::OverlayWindow& overlay = window.addOverlayWindow("RaZ - Deferred demo");
+  Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Deferred demo", Raz::Vec2f(sceneWidth / 4, sceneHeight));
 
   overlay.addTexture(geomDepthBuffer, sceneWidth / 3, sceneHeight / 3);
   overlay.addTexture(geomColorBuffer, sceneWidth / 3, sceneHeight / 3);

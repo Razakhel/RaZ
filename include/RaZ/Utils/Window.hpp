@@ -9,6 +9,7 @@
 #include "RaZ/Utils/Input.hpp"
 
 #include <functional>
+#include <unordered_map>
 #include <vector>
 
 namespace Raz {
@@ -68,6 +69,9 @@ public:
   InputCallbacks& getCallbacks() { return m_callbacks; }
   const CloseCallback& getCloseCallback() const { return m_closeCallback; }
   CloseCallback& getCloseCallback() { return m_closeCallback; }
+#if !defined(RAZ_NO_OVERLAY)
+  Overlay& getOverlay() noexcept { return m_overlay; }
+#endif
 
   void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
   void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f(red, green, blue, alpha)); }
@@ -139,10 +143,6 @@ public:
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
 #if !defined(RAZ_NO_OVERLAY)
-  /// Adds a new overlay window.
-  /// \param title Window title.
-  /// \return The newly added window.
-  [[nodiscard]] OverlayWindow& addOverlayWindow(std::string title) { return m_overlay.addWindow(std::move(title)); }
   /// Changes the overlay's enabled state.
   /// \param enable True if it should be enabled, false otherwise.
   void enableOverlay(bool enable = true) { m_isOverlayEnabled = enable; }

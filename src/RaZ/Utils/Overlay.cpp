@@ -3,6 +3,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/misc/cpp/imgui_stdlib.h"
+#include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/CompilerUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/Overlay.hpp"
@@ -28,8 +29,8 @@ void Overlay::initialize(GLFWwindow* windowHandle) const {
   Logger::debug("[Overlay] Initialized");
 }
 
-OverlayWindow& Overlay::addWindow(std::string title) {
-  return m_windows.emplace_back(std::move(title));
+OverlayWindow& Overlay::addWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) {
+  return m_windows.emplace_back(std::move(title), initSize, initPos);
 }
 
 bool Overlay::hasKeyboardFocus() const {
@@ -85,11 +86,20 @@ void OverlayTextbox::clear() {
   m_callback(m_text);
 }
 
+OverlayTexture::OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight)
+  : m_index{ texture.getIndex() }, m_width{ static_cast<float>(maxWidth) }, m_height{ static_cast<float>(maxHeight) } {}
+
+OverlayTexture::OverlayTexture(const Texture& texture)
+  : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
+
+OverlayWindow::OverlayWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) noexcept
+  : m_title{ std::move(title) }, m_currentSize{ initSize }, m_currentPos{ initPos } {}
+
 OverlayLabel& OverlayWindow::addLabel(std::string label) {
   return static_cast<OverlayLabel&>(*m_elements.emplace_back(std::make_unique<OverlayLabel>(std::move(label))));
 }
 
-OverlayColoredLabel& OverlayWindow::addColoredLabel(std::string label, Vec4f color) {
+OverlayColoredLabel& OverlayWindow::addColoredLabel(std::string label, const Vec4f& color) {
   return static_cast<OverlayColoredLabel&>(*m_elements.emplace_back(std::make_unique<OverlayColoredLabel>(std::move(label), color)));
 }
 
@@ -165,7 +175,9 @@ void OverlayWindow::addFpsCounter(std::string formattedLabel) {
 }
 
 void OverlayWindow::render() const {
-  ImGui::Begin(m_title.c_str());
+  ImGui::SetNextWindowSize(ImVec2(m_currentSize.x(), m_currentSize.y()), ImGuiCond_Once);
+  ImGui::SetNextWindowPos(ImVec2(m_currentPos.x(), m_currentPos.y()), ImGuiCond_Once);
+  ImGui::Begin(m_title.c_str(), nullptr, (m_currentSize.x() < 0.f && m_currentSize.y() < 0.f ? ImGuiWindowFlags_AlwaysAutoResize : ImGuiWindowFlags_None));
 
   for (const auto& element : m_elements) {
     switch (element->getType()) {

@@ -254,7 +254,7 @@ int main() {
   /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  Raz::OverlayWindow& overlay = window.addOverlayWindow("RaZ - Full demo");
+  Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Full demo", Raz::Vec2f(window.getWidth() / 4, window.getHeight()));
 
   overlay.addCheckbox("Enable face culling",
                       [&window] () { window.enableFaceCulling(); },

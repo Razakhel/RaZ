@@ -146,7 +146,7 @@ int main() {
   /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  Raz::OverlayWindow& overlay = window.addOverlayWindow("RaZ - Showcase demo");
+  Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Showcase demo", Raz::Vec2f(-1.f));
 
   std::vector<std::string> scenes = { "Sponza", "Ball", "Shield", "Cerberus" };
 #if defined(FBX_ENABLED)

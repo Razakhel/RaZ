@@ -43,6 +43,7 @@ void parallelize(const ContainerT& collection, FuncT&& action, unsigned int thre
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
 #else
+  static_cast<void>(threadCount);
   action(IndexRange{ 0, collection.size() });
 #endif
 }
@@ -74,6 +75,7 @@ void parallelize(ContainerT& collection, FuncT&& action, unsigned int threadCoun
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
 #else
+  static_cast<void>(threadCount);
   action(IterRange<ContainerT>(collection.begin(), collection.end()));
 #endif
 }
