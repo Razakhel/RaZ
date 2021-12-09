@@ -60,7 +60,7 @@ void AudioSystem::openDevice(const char* deviceName) {
     alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
   }
 
-  Logger::debug("[AudioSystem] Opened device");
+  Logger::debug("[AudioSystem] Opened device '" + recoverCurrentDevice() + '\'');
 }
 
 std::string AudioSystem::recoverCurrentDevice() const {

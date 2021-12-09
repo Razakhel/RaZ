@@ -119,7 +119,20 @@ inline WavInfo validateWav(std::ifstream& file) {
     const uint32_t cueDataSize = fromLittleEndian(bytes);
     file.ignore(cueDataSize);
 
-    file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'data'
+    file.read(reinterpret_cast<char*>(bytes.data()), 4);
+  }
+
+  // A 'LIST' field can be specified; if so, the given amount of bytes will be ignored
+  // See:
+  // - https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#list
+  // - https://en.wikipedia.org/wiki/WAV#RIFF_WAVE
+  if (bytes[0] == 'L' && bytes[1] == 'I' && bytes[2] == 'S' && bytes[3] == 'T') {
+    file.read(reinterpret_cast<char*>(bytes.data()), 4); // List data size
+
+    const uint32_t listDataSize = fromLittleEndian(bytes);
+    file.ignore(listDataSize);
+
+    file.read(reinterpret_cast<char*>(bytes.data()), 4);
   }
 
   if (bytes[0] != 'd' && bytes[1] != 'a' && bytes[2] != 't' && bytes[3] != 'a')
