@@ -107,79 +107,82 @@ OverlayColoredLabel& OverlayWindow::addColoredLabel(std::string label, float red
   return addColoredLabel(std::move(label), Vec4f(red, green, blue, alpha));
 }
 
-void OverlayWindow::addButton(std::string label, std::function<void()> actionClick) {
-  m_elements.emplace_back(std::make_unique<OverlayButton>(std::move(label), std::move(actionClick)));
+OverlayButton& OverlayWindow::addButton(std::string label, std::function<void()> actionClick) {
+  return static_cast<OverlayButton&>(*m_elements.emplace_back(std::make_unique<OverlayButton>(std::move(label), std::move(actionClick))));
 }
 
-void OverlayWindow::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
-  m_elements.emplace_back(std::make_unique<OverlayCheckbox>(std::move(label), std::move(actionOn), std::move(actionOff), initVal));
+OverlayCheckbox& OverlayWindow::addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal) {
+  return static_cast<OverlayCheckbox&>(*m_elements.emplace_back(std::make_unique<OverlayCheckbox>(std::move(label), std::move(actionOn), std::move(actionOff),
+                                                                                                  initVal)));
 }
 
-void OverlayWindow::addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue) {
-  m_elements.emplace_back(std::make_unique<OverlaySlider>(std::move(label), std::move(actionSlide), minValue, maxValue, initValue));
+OverlaySlider& OverlayWindow::addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue) {
+  return static_cast<OverlaySlider&>(*m_elements.emplace_back(std::make_unique<OverlaySlider>(std::move(label), std::move(actionSlide),
+                                                                                              minValue, maxValue, initValue)));
 }
 
 OverlayTextbox& OverlayWindow::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
-  m_elements.emplace_back(std::make_unique<OverlayTextbox>(std::move(label), std::move(callback)));
-
-  auto& textbox = static_cast<OverlayTextbox&>(*m_elements.back());
+  auto& textbox = static_cast<OverlayTextbox&>(*m_elements.emplace_back(std::make_unique<OverlayTextbox>(std::move(label), std::move(callback))));
   textbox.m_text.reserve(64);
-
   return textbox;
 }
 
-void OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
-                               std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
-  if (entries.empty()) {
-    Logger::error("[Overlay] Cannot create a list box with no entry.");
-    return;
-  }
+OverlayListBox& OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
+                                          std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+  if (entries.empty())
+    throw std::invalid_argument("[Overlay] Cannot create a list box with no entry");
 
   assert("Error: A list box's initial index cannot reference a non-existing entry." && initId < entries.size());
-  m_elements.emplace_back(std::make_unique<OverlayListBox>(std::move(label), std::move(entries), std::move(actionChanged), initId));
+  return static_cast<OverlayListBox&>(*m_elements.emplace_back(std::make_unique<OverlayListBox>(std::move(label), std::move(entries),
+                                                                                                std::move(actionChanged), initId)));
 }
 
-void OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
-                                std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
-  if (entries.empty()) {
-    Logger::error("[Overlay] Cannot create a dropdown list with no entry.");
-    return;
-  }
+OverlayDropdown& OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
+                                            std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+  if (entries.empty())
+    throw std::invalid_argument("[Overlay] Cannot create a dropdown list with no entry");
 
   assert("Error: A dropdown's initial index cannot reference a non-existing entry." && initId < entries.size());
-  m_elements.emplace_back(std::make_unique<OverlayDropdown>(std::move(label), std::move(entries), std::move(actionChanged), initId));
+  return static_cast<OverlayDropdown&>(*m_elements.emplace_back(std::make_unique<OverlayDropdown>(std::move(label), std::move(entries),
+                                                                                                  std::move(actionChanged), initId)));
 }
 
-void OverlayWindow::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
-  m_elements.emplace_back(std::make_unique<OverlayTexture>(texture, maxWidth, maxHeight));
+OverlayTexture& OverlayWindow::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
+  return static_cast<OverlayTexture&>(*m_elements.emplace_back(std::make_unique<OverlayTexture>(texture, maxWidth, maxHeight)));
 }
 
-void OverlayWindow::addTexture(const Texture& texture) {
-  m_elements.emplace_back(std::make_unique<OverlayTexture>(texture));
+OverlayTexture& OverlayWindow::addTexture(const Texture& texture) {
+  return static_cast<OverlayTexture&>(*m_elements.emplace_back(std::make_unique<OverlayTexture>(texture)));
 }
 
 OverlayProgressBar& OverlayWindow::addProgressBar(int minVal, int maxVal, bool showValues) {
   return static_cast<OverlayProgressBar&>(*m_elements.emplace_back(std::make_unique<OverlayProgressBar>(minVal, maxVal, showValues)));
 }
 
-void OverlayWindow::addSeparator() {
-  m_elements.emplace_back(std::make_unique<OverlaySeparator>());
+OverlaySeparator& OverlayWindow::addSeparator() {
+  return static_cast<OverlaySeparator&>(*m_elements.emplace_back(std::make_unique<OverlaySeparator>()));
 }
 
-void OverlayWindow::addFrameTime(std::string formattedLabel) {
-  m_elements.emplace_back(std::make_unique<OverlayFrameTime>(std::move(formattedLabel)));
+OverlayFrameTime& OverlayWindow::addFrameTime(std::string formattedLabel) {
+  return static_cast<OverlayFrameTime&>(*m_elements.emplace_back(std::make_unique<OverlayFrameTime>(std::move(formattedLabel))));
 }
 
-void OverlayWindow::addFpsCounter(std::string formattedLabel) {
-  m_elements.emplace_back(std::make_unique<OverlayFpsCounter>(std::move(formattedLabel)));
+OverlayFpsCounter& OverlayWindow::addFpsCounter(std::string formattedLabel) {
+  return static_cast<OverlayFpsCounter&>(*m_elements.emplace_back(std::make_unique<OverlayFpsCounter>(std::move(formattedLabel))));
 }
 
 void OverlayWindow::render() const {
+  if (!m_enabled)
+    return;
+
   ImGui::SetNextWindowSize(ImVec2(m_currentSize.x(), m_currentSize.y()), ImGuiCond_Once);
   ImGui::SetNextWindowPos(ImVec2(m_currentPos.x(), m_currentPos.y()), ImGuiCond_Once);
   ImGui::Begin(m_title.c_str(), nullptr, (m_currentSize.x() < 0.f && m_currentSize.y() < 0.f ? ImGuiWindowFlags_AlwaysAutoResize : ImGuiWindowFlags_None));
 
   for (const auto& element : m_elements) {
+    if (!element->isEnabled())
+      continue;
+
     switch (element->getType()) {
       case OverlayElementType::LABEL:
         ImGui::PushTextWrapPos();

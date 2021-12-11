@@ -81,6 +81,10 @@ public:
   OverlayElement(OverlayElement&&) noexcept = delete;
 
   virtual OverlayElementType getType() const = 0;
+  bool isEnabled() const noexcept { return m_enabled; }
+
+  void enable(bool enabled = true) { m_enabled = enabled; }
+  void disable() { enable(false); }
 
   OverlayElement& operator=(const OverlayElement&) = delete;
   OverlayElement& operator=(OverlayElement&&) noexcept = delete;
@@ -89,6 +93,7 @@ public:
 
 protected:
   std::string m_label {};
+  bool m_enabled = true;
 };
 
 class OverlayLabel final : public OverlayElement {
@@ -283,7 +288,7 @@ public:
 };
 
 /// OverlayWindow class, representing a specific window in the Overlay.
-class OverlayWindow final {
+class OverlayWindow {
 public:
   /// Creates an overlay window.
   /// \param title Window title.
@@ -293,6 +298,13 @@ public:
   OverlayWindow(const OverlayWindow&) = delete;
   OverlayWindow(OverlayWindow&&) noexcept = default;
 
+  bool isEnabled() const noexcept { return m_enabled; }
+
+  /// Changes the window's visibility state.
+  /// \param enabled True if the window should be shown, false otherwise.
+  void enable(bool enabled = true) { m_enabled = enabled; }
+  /// Hides the window.
+  void disable() { enable(false); }
   /// Adds a label on the overlay window.
   /// \param label Text to be displayed.
   /// \return Reference to the newly added label.
@@ -313,20 +325,23 @@ public:
   /// Adds a button on the overlay window.
   /// \param label Text to be displayed beside the button.
   /// \param actionClick Action to be executed when clicked.
-  void addButton(std::string label, std::function<void()> actionClick);
+  /// \return Reference to the newly added button.
+  OverlayButton& addButton(std::string label, std::function<void()> actionClick);
   /// Adds a checkbox on the overlay window.
   /// \param label Text to be displayed beside the checkbox.
   /// \param actionOn Action to be executed when toggled on.
   /// \param actionOff Action to be executed when toggled off.
   /// \param initVal Initial value, checked or not.
-  void addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
+  /// \return Reference to the newly added checkbox.
+  OverlayCheckbox& addCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
   /// Adds a floating-point slider on the overlay window.
   /// \param label Text to be displayed beside the slider.
   /// \param actionSlide Action to be executed on a value change.
   /// \param minValue Lower value bound.
   /// \param maxValue Upper value bound.
   /// \param initValue Initial value.
-  void addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
+  /// \return Reference to the newly added slider.
+  OverlaySlider& addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
   /// Adds a texbox on the overlay window.
   /// \param label Text to be displayed beside the checkbox.
   /// \param callback Function to be called every time the content is modified.
@@ -337,37 +352,44 @@ public:
   /// \param entries Texts to fill the list with.
   /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
   /// \param initId Index of the element to select at initialization. Must be less than the entry count.
-  void addListBox(std::string label, std::vector<std::string> entries,
-                  std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
+  /// \return Reference to the newly added listbox.
+  OverlayListBox& addListBox(std::string label, std::vector<std::string> entries,
+                             std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
   /// Adds a dropdown list on the overlay window.
   /// \param label Text to be displayed beside the dropdown.
   /// \param entries Texts to fill the dropdown with.
   /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
   /// \param initId Index of the element to select at initialization. Must be less than the entry count.
-  void addDropdown(std::string label, std::vector<std::string> entries,
-                   std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
+  /// \return Reference to the newly added dropdown list.
+  OverlayDropdown& addDropdown(std::string label, std::vector<std::string> entries,
+                               std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
   /// Adds a texture on the overlay window.
   /// \param texture Texture to be displayed.
   /// \param maxWidth Maximum texture's width.
   /// \param maxHeight Maximum texture's height.
-  void addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  /// \return Reference to the newly added texture.
+  OverlayTexture& addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  /// Adds a texture on the overlay window. The maximum width & height will be those of the texture.
+  /// \param texture Texture to be displayed.
+  /// \return Reference to the newly added texture.
+  OverlayTexture& addTexture(const Texture& texture);
   /// Adds a progress bar on the overlay window.
   /// \param minVal Minimum value.
   /// \param maxVal Maximum value.
   /// \param showValues Show values ("<current>/<maximum>") instead of percentage.
   /// \return Reference to the newly added progress bar.
   [[nodiscard]] OverlayProgressBar& addProgressBar(int minVal, int maxVal, bool showValues = false);
-  /// Adds a texture on the overlay window. The maximum width & height will be those of the texture.
-  /// \param texture Texture to be displayed.
-  void addTexture(const Texture& texture);
   /// Adds an horizontal separator on the overlay window.
-  void addSeparator();
+  /// \return Reference to the newly added separator.
+  OverlaySeparator& addSeparator();
   /// Adds a frame time display on the overlay window.
   /// \param formattedLabel Text with a formatting placeholder to display the frame time (%.Xf, X being the precision after the comma).
-  void addFrameTime(std::string formattedLabel);
+  /// \return Reference to the newly added frame time.
+  OverlayFrameTime& addFrameTime(std::string formattedLabel);
   /// Adds a FPS (frames per second) counter on the overlay window.
   /// \param formattedLabel Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
-  void addFpsCounter(std::string formattedLabel);
+  /// \return Reference to the newly added FPS counter.
+  OverlayFpsCounter& addFpsCounter(std::string formattedLabel);
   /// Renders the window's elements.
   void render() const;
 
@@ -378,6 +400,7 @@ private:
   std::string m_title {};
   Vec2f m_currentSize {};
   Vec2f m_currentPos {};
+  bool m_enabled = true;
   std::vector<std::unique_ptr<OverlayElement>> m_elements {};
 };
 
