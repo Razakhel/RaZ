@@ -182,13 +182,17 @@ void OverlayWindow::render() const {
   for (const auto& element : m_elements) {
     switch (element->getType()) {
       case OverlayElementType::LABEL:
+        ImGui::PushTextWrapPos();
         ImGui::TextUnformatted(element->m_label.c_str());
+        ImGui::PopTextWrapPos();
         break;
 
       case OverlayElementType::COLORED_LABEL:
       {
         const auto& label = static_cast<OverlayColoredLabel&>(*element);
+        ImGui::PushTextWrapPos();
         ImGui::TextColored(ImVec4(label.m_color.x(), label.m_color.y(), label.m_color.z(), label.m_color.w()), "%s", element->m_label.c_str());
+        ImGui::PopTextWrapPos();
         break;
       }
 
