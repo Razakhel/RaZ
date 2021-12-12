@@ -238,24 +238,10 @@ void OverlayWindow::render() const {
 
       case OverlayElementType::TEXTBOX:
       {
-        static auto callback = [] (ImGuiInputTextCallbackData* data) {
-          auto& textbox = *static_cast<OverlayTextbox*>(data->UserData);
-
-          textbox.m_text += static_cast<char>(data->EventChar);
-
-          if (textbox.m_callback)
-            textbox.m_callback(textbox.m_text);
-
-          return 0;
-        };
-
         auto& textbox = static_cast<OverlayTextbox&>(*element);
 
-        ImGui::InputText(textbox.m_label.c_str(),
-                         &textbox.m_text,
-                         ImGuiInputTextFlags_CallbackCharFilter,
-                         callback,
-                         &textbox);
+        if (ImGui::InputText(textbox.m_label.c_str(), &textbox.m_text))
+          textbox.m_callback(textbox.m_text);
 
         break;
       }
