@@ -30,7 +30,7 @@ void Overlay::initialize(GLFWwindow* windowHandle) const {
 }
 
 OverlayWindow& Overlay::addWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) {
-  return m_windows.emplace_back(std::move(title), initSize, initPos);
+  return *m_windows.emplace_back(std::make_unique<OverlayWindow>(std::move(title), initSize, initPos));
 }
 
 bool Overlay::hasKeyboardFocus() const {
@@ -46,8 +46,8 @@ void Overlay::render() const {
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  for (const OverlayWindow& window : m_windows)
-    window.render();
+  for (const std::unique_ptr<OverlayWindow>& window : m_windows)
+    window->render();
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

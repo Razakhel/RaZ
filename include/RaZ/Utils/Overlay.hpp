@@ -68,7 +68,7 @@ public:
   Overlay& operator=(Overlay&&) noexcept = default;
 
 private:
-  std::vector<OverlayWindow> m_windows {};
+  std::vector<std::unique_ptr<OverlayWindow>> m_windows {};
 };
 
 class OverlayElement {
