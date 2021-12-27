@@ -73,7 +73,7 @@ public:
   /// Scales by the given values.
   /// The scaling is a coefficient: scaling by a value of 2 doubles the size, while a value of 0.5 shrinks it by half.
   /// \param values Values to be scaled by.
-  void scale(const Vec3f& values) { scale(values[0], values[1], values[2]); }
+  void scale(const Vec3f& values) { scale(values.x(), values.y(), values.z()); }
   /// Computes the translation matrix (identity matrix with the translation in the last row).
   /// \param reverseTranslation True if the translation should be reversed (negated), false otherwise.
   /// \return Translation matrix.

@@ -55,9 +55,9 @@ const Mat4f& Camera::computeLookAt(const Vec3f& position) {
   const Vec3f xAxis = zAxis.cross(m_upAxis).normalize();
   const Vec3f yAxis = xAxis.cross(zAxis);
 
-  m_viewMat = Mat4f(xAxis[0],             yAxis[0],             -zAxis[0],            0.f,
-                    xAxis[1],             yAxis[1],             -zAxis[1],            0.f,
-                    xAxis[2],             yAxis[2],             -zAxis[2],            0.f,
+  m_viewMat = Mat4f(xAxis.x(),            yAxis.x(),            -zAxis.x(),           0.f,
+                    xAxis.y(),            yAxis.y(),            -zAxis.y(),           0.f,
+                    xAxis.z(),            yAxis.z(),            -zAxis.z(),           0.f,
                     xAxis.dot(-position), yAxis.dot(-position),  zAxis.dot(position), 1.f);
 
   return m_viewMat;

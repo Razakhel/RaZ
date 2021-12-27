@@ -210,27 +210,27 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
     file >> line;
 
     if (line[0] == 'v') {
-      if (line[1] == 'n') { // Normals
-        Vec3f normalsTriplet {};
+      if (line[1] == 'n') { // Normal
+        Vec3f normalTriplet;
 
-        file >> normalsTriplet[0]
-             >> normalsTriplet[1]
-             >> normalsTriplet[2];
+        file >> normalTriplet.x()
+             >> normalTriplet.y()
+             >> normalTriplet.z();
 
-        normals.push_back(normalsTriplet);
+        normals.push_back(normalTriplet);
       } else if (line[1] == 't') { // Texcoords
-        Vec2f texcoordsTriplet {};
+        Vec2f texcoordsTriplet;
 
-        file >> texcoordsTriplet[0]
-             >> texcoordsTriplet[1];
+        file >> texcoordsTriplet.x()
+             >> texcoordsTriplet.y();
 
         texcoords.push_back(texcoordsTriplet);
-      } else { // Vertices
-        Vec3f positionTriplet {};
+      } else { // Position
+        Vec3f positionTriplet;
 
-        file >> positionTriplet[0]
-             >> positionTriplet[1]
-             >> positionTriplet[2];
+        file >> positionTriplet.x()
+             >> positionTriplet.y()
+             >> positionTriplet.z();
 
         positions.push_back(positionTriplet);
       }
@@ -377,7 +377,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
                                                    positions[vertIndices[1][0]],
                                                    positions[vertIndices[2][0]] };
 
-      Vec3f faceTangent {};
+      Vec3f faceTangent;
       std::array<Vec2f, 3> faceTexcoords {};
       if (!texcoords.empty()) {
         faceTexcoords[0] = texcoords[vertIndices[0][1]];

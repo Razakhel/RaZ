@@ -64,7 +64,7 @@ public:
   float recoverGain() const noexcept;
   /// Sets the audio source's position.
   /// \param position New source's position.
-  void setPosition(const Vec3f& position) const noexcept { setPosition(position[0], position[1], position[2]); }
+  void setPosition(const Vec3f& position) const noexcept { setPosition(position.x(), position.y(), position.z()); }
   /// Sets the audio source's position.
   /// \param x New source's X position.
   /// \param y New source's Y position.
@@ -75,7 +75,7 @@ public:
   Vec3f recoverPosition() const noexcept;
   /// Sets the audio source's velocity.
   /// \param velocity New source's velocity.
-  void setVelocity(const Vec3f& velocity) const noexcept { setVelocity(velocity[0], velocity[1], velocity[2]); }
+  void setVelocity(const Vec3f& velocity) const noexcept { setVelocity(velocity.x(), velocity.y(), velocity.z()); }
   /// Sets the audio source's velocity.
   /// \param x New source's X velocity.
   /// \param y New source's Y velocity.

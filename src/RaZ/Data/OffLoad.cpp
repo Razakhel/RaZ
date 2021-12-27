@@ -32,9 +32,9 @@ Mesh load(const FilePath& filePath) {
   indices.reserve(faceCount * 3);
 
   for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
-    file >> vertices[vertexIndex].position[0]
-         >> vertices[vertexIndex].position[1]
-         >> vertices[vertexIndex].position[2];
+    file >> vertices[vertexIndex].position.x()
+         >> vertices[vertexIndex].position.y()
+         >> vertices[vertexIndex].position.z();
 
   for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex) {
     uint16_t partCount {};

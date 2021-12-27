@@ -145,22 +145,22 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
   for (const Submesh& submesh : mesh.getSubmeshes()) {
     for (const Vertex& vertex : submesh.getVertices()) {
       if (posCorrespIndices.find(vertex.position) == posCorrespIndices.cend()) {
-        file << "v " << vertex.position[0] << ' '
-                     << vertex.position[1] << ' '
-                     << vertex.position[2] << '\n';
+        file << "v " << vertex.position.x() << ' '
+                     << vertex.position.y() << ' '
+                     << vertex.position.z() << '\n';
         posCorrespIndices.emplace(vertex.position, posCorrespIndices.size() + 1);
       }
 
       if (texCorrespIndices.find(vertex.texcoords) == texCorrespIndices.cend()) {
-        file << "vt " << vertex.texcoords[0] << ' '
-                      << vertex.texcoords[1] << '\n';
+        file << "vt " << vertex.texcoords.x() << ' '
+                      << vertex.texcoords.y() << '\n';
         texCorrespIndices.emplace(vertex.texcoords, texCorrespIndices.size() + 1);
       }
 
       if (normCorrespIndices.find(vertex.normal) == normCorrespIndices.cend()) {
-        file << "vn " << vertex.normal[0] << ' '
-                      << vertex.normal[1] << ' '
-                      << vertex.normal[2] << '\n';
+        file << "vn " << vertex.normal.x() << ' '
+                      << vertex.normal.y() << ' '
+                      << vertex.normal.z() << '\n';
         normCorrespIndices.emplace(vertex.normal, normCorrespIndices.size() + 1);
       }
     }

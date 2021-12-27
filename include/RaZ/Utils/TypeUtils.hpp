@@ -125,7 +125,7 @@ constexpr std::string_view getEnumStr() noexcept {
 // TODO: this implementation doesn't work with MSVC (which always returns true for every attribute)
 // See: https://stackoverflow.com/a/35755737/3292304
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) || defined(__clang__) // Ignoring exclusively MSVC, not clang-cl
 
 namespace Details {
 
