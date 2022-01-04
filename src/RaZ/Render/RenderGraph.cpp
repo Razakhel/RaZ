@@ -78,6 +78,9 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
     if (!meshRenderer.isEnabled())
       continue;
 
+    //if (meshRenderer.getInstanceCount() > 1)
+      meshRenderer.updateInstancesMatrices();
+
     renderSystem.m_modelUbo.sendData(entity->getComponent<Transform>().computeTransformMatrix(), 0);
     meshRenderer.draw(geometryProgram);
   }

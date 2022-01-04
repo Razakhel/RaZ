@@ -1,3 +1,4 @@
+#include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/SubmeshRenderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -9,29 +10,28 @@ void SubmeshRenderer::setRenderMode(RenderMode renderMode, const Submesh& submes
 
   switch (m_renderMode) {
     case RenderMode::POINT:
-      m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&) {
-        Renderer::drawArrays(PrimitiveType::POINTS, vertexBuffer.vertexCount);
+      m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&, unsigned int instanceCount) {
+        Renderer::drawArraysInstanced(PrimitiveType::POINTS, vertexBuffer.vertexCount, instanceCount);
       };
       break;
 
-//    case RenderMode::LINE: {
-//      m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer) {
-//        Renderer::drawElements(PrimitiveType::LINES, indexBuffer.lineIndexCount);
+//    case RenderMode::LINE:
+//      m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer, unsigned int instanceCount) {
+//        Renderer::drawElementsInstanced(PrimitiveType::LINES, indexBuffer.lineIndexCount, instanceCount);
 //      };
 //      break;
-//    }
 
     case RenderMode::TRIANGLE:
     default:
-      m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer) {
-        Renderer::drawElements(PrimitiveType::TRIANGLES, indexBuffer.triangleIndexCount);
+      m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer, unsigned int instanceCount) {
+        Renderer::drawElementsInstanced(PrimitiveType::TRIANGLES, indexBuffer.triangleIndexCount, instanceCount);
       };
       break;
 
 #if !defined(USE_OPENGL_ES)
     case RenderMode::PATCH:
-      m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&) {
-        Renderer::drawArrays(PrimitiveType::PATCHES, vertexBuffer.vertexCount);
+      m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&, unsigned int instanceCount) {
+        Renderer::drawArraysInstanced(PrimitiveType::PATCHES, vertexBuffer.vertexCount, instanceCount);
       };
       Renderer::setPatchVertexCount(3); // Should be the default, but just in case
       break;
@@ -56,17 +56,18 @@ void SubmeshRenderer::load(const Submesh& submesh, RenderMode renderMode) {
   setRenderMode(renderMode, submesh);
 }
 
-void SubmeshRenderer::draw() const {
+void SubmeshRenderer::draw(unsigned int instanceCount) const {
   m_vao.bind();
   m_ibo.bind();
 
-  m_renderFunc(m_vbo, m_ibo);
+  m_renderFunc(m_vbo, m_ibo, instanceCount);
 }
 
 void SubmeshRenderer::loadVertices(const Submesh& submesh) {
   Logger::debug("[SubmeshRenderer] Loading submesh vertices...");
 
   m_vao.bind();
+
   m_vbo.bind();
 
   const std::vector<Vertex>& vertices = submesh.getVertices();
@@ -107,7 +108,24 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
                             stride, tangentOffset);
   Renderer::enableVertexAttribArray(3);
 
-  m_vbo.unbind();
+  // Instance matrix (4 rows of vec4)
+
+  const VertexBuffer& instanceBuffer = MeshRenderer::getInstanceBuffer();
+
+  instanceBuffer.bind();
+
+  for (uint8_t i = 0; i < 4; ++i) {
+    const unsigned int newIndex = 4 + i;
+
+    Renderer::setVertexAttrib(newIndex,
+                              AttribDataType::FLOAT, 4, // vec4
+                              sizeof(Mat4f), sizeof(Vec4f) * i);
+    Renderer::setVertexAttribDivisor(newIndex, 1);
+    Renderer::enableVertexAttribArray(newIndex);
+  }
+
+  instanceBuffer.unbind();
+
   m_vao.unbind();
 
   Logger::debug("[SubmeshRenderer] Loaded submesh vertices (" + std::to_string(vertices.size()) + " vertices loaded)");

@@ -33,6 +33,14 @@ void MeshRenderer::setRenderMode(RenderMode renderMode, const Mesh& mesh) {
     m_submeshRenderers[i].setRenderMode(renderMode, mesh.getSubmeshes()[i]);
 }
 
+void MeshRenderer::setInstanceCount(unsigned int instanceCount) {
+  if (m_instanceMatrices.size() == instanceCount) // If we already have the wanted instance count, do nothing
+    return;
+
+  m_instanceMatrices.resize(instanceCount, Mat4f::identity());
+  s_maxBufferSize = std::max(s_maxBufferSize, static_cast<unsigned int>(instanceCount * sizeof(m_instanceMatrices.front())));
+}
+
 void MeshRenderer::setMaterial(MaterialPtr&& material) {
   m_materials.clear();
   m_materials.emplace_back(std::move(material));
@@ -103,9 +111,23 @@ void MeshRenderer::load(const Mesh& mesh, const RenderShaderProgram& program, Re
   load(program);
 }
 
+void MeshRenderer::updateInstancesMatrices() const {
+  const VertexBuffer& instanceBuffer = getInstanceBuffer();
+
+  instanceBuffer.bind();
+
+  Renderer::sendBufferData(BufferType::ARRAY_BUFFER, s_maxBufferSize, nullptr, BufferDataUsage::STREAM_DRAW); // Buffer orphaning
+  Renderer::sendBufferSubData(BufferType::ARRAY_BUFFER,
+                              0,
+                              static_cast<std::ptrdiff_t>(sizeof(m_instanceMatrices.front()) * m_instanceMatrices.size()),
+                              m_instanceMatrices.data());
+
+  instanceBuffer.unbind();
+}
+
 void MeshRenderer::draw() const {
   for (const SubmeshRenderer& submeshRenderer : m_submeshRenderers)
-    submeshRenderer.draw();
+    submeshRenderer.draw(static_cast<unsigned int>(m_instanceMatrices.size()));
 }
 
 void MeshRenderer::draw(const RenderShaderProgram& program) const {
@@ -121,8 +143,13 @@ void MeshRenderer::draw(const RenderShaderProgram& program) const {
       }
     }
 
-    submeshRenderer.draw();
+    submeshRenderer.draw(static_cast<unsigned int>(m_instanceMatrices.size()));
   }
+}
+
+const VertexBuffer& MeshRenderer::getInstanceBuffer() {
+  static VertexBuffer instanceBuffer;
+  return instanceBuffer;
 }
 
 } // namespace Raz

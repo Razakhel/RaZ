@@ -1,5 +1,7 @@
 #include "RaZ/RaZ.hpp"
 
+#include <random>
+
 using namespace std::literals;
 
 int main() {
@@ -78,6 +80,17 @@ int main() {
     auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj");
     auto& meshComp       = mesh.addComponent<Raz::Mesh>(std::move(meshData));
     auto& meshRenderComp = mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
+
+    meshRenderComp.setInstanceCount(1000);
+
+    std::mt19937 randGenerator(0);
+    std::uniform_real_distribution<float> randDistrib(0.f, 10.f);
+    for (Raz::Mat4f& matrix : meshRenderComp.getInstancesMatrices()) {
+      matrix = Raz::Transform((Raz::Vec3f(randDistrib(randGenerator), randDistrib(randGenerator), randDistrib(randGenerator)) - 5) * 5,
+                              Raz::Quaternion(Raz::Radiansf(randDistrib(randGenerator) * 36),
+                                              (Raz::Vec3f(randDistrib(randGenerator), randDistrib(randGenerator), randDistrib(randGenerator))) - 5).normalize(),
+                              Raz::Vec3f(randDistrib(randGenerator) / 20.f + 0.5f)).computeTransformMatrix();
+    }
 
     auto& meshTrans = mesh.addComponent<Raz::Transform>();
     meshTrans.scale(0.2f);
