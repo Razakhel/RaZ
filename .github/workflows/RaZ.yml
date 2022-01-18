@@ -234,7 +234,7 @@ jobs:
       fail-fast: false
       matrix:
         compiler:
-          - { c: emcc, cpp: em++ }
+          - { c: emcc, cpp: em++, version: 3.1.0 } # The 'latest' version may fail to build
         build_type:
           - Debug
           - Release
@@ -264,9 +264,9 @@ jobs:
         id: emsdk
         with:
           path: ~/emsdk
-          key: emsdk-${{ hashFiles('~/emsdk/**') }}
+          key: emsdk-${{ matrix.compiler.version }}
           restore-keys: |
-            emsdk-
+            emsdk-${{ matrix.compiler.version }}
 
       # Downloading & installing Emscripten; only done when failed to find its cached installation
       - name: Emscripten setup
@@ -274,7 +274,7 @@ jobs:
         shell: bash
         run: |
           git clone --depth 1 https://github.com/emscripten-core/emsdk.git ~/emsdk &&
-          ~/emsdk/emsdk install latest && ~/emsdk/emsdk activate latest
+          ~/emsdk/emsdk install ${{ matrix.compiler.version }} && ~/emsdk/emsdk activate ${{ matrix.compiler.version }}
 
       # Downloading & installing Emscripten, to build RaZ in WebAssembly
       - name: Build setup
