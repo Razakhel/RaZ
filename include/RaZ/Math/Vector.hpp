@@ -148,10 +148,9 @@ public:
   /// \return Result of the multiplied vectors.
   constexpr Vector operator*(const Vector& vec) const noexcept;
   /// Element-wise vector-value multiplication operator.
-  /// \tparam T2 Type of the given value.
   /// \param val Value to be multiplied by.
   /// \return Result of the vector multiplied by the value.
-  template <typename T2> constexpr Vector operator*(T2 val) const noexcept;
+  constexpr Vector operator*(T val) const noexcept;
   /// Element-wise vector-vector division operator.
   /// \param vec Vector to be divided by.
   /// \return Result of the summed vectors.
@@ -161,9 +160,10 @@ public:
   /// \return Result of the vector divided by the value.
   constexpr Vector operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
   /// Vector-matrix multiplication operator (assumes the vector to be horizontal).
+  /// \tparam W Width of the input matrix.
   /// \param mat Matrix to be multiplied by.
   /// \return Result of the vector-matrix multiplication.
-  template <std::size_t H> constexpr Vector operator*(const Matrix<T, Size, H>& mat) const noexcept;
+  template <std::size_t W> constexpr Vector<T, W> operator*(const Matrix<T, W, Size>& mat) const noexcept;
   /// Element-wise vector-vector addition assignment operator.
   /// \param vec Vector to be added.
   /// \return Reference to the modified original vector.

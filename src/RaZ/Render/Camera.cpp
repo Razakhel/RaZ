@@ -1,3 +1,4 @@
+#include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 
 namespace Raz {
@@ -45,8 +46,8 @@ void Camera::setProjectionType(ProjectionType projType) {
   computeInverseProjectionMatrix();
 }
 
-const Mat4f& Camera::computeViewMatrix(const Mat4f& translationMatrix, const Mat4f& inverseRotation) {
-  m_viewMat = translationMatrix * inverseRotation;
+const Mat4f& Camera::computeViewMatrix(const Transform& cameraTransform) {
+  m_viewMat = cameraTransform.getRotation().computeMatrix() * cameraTransform.computeTranslationMatrix(true);
   return m_viewMat;
 }
 
@@ -55,10 +56,10 @@ const Mat4f& Camera::computeLookAt(const Vec3f& position) {
   const Vec3f xAxis = zAxis.cross(m_upAxis).normalize();
   const Vec3f yAxis = xAxis.cross(zAxis);
 
-  m_viewMat = Mat4f(xAxis.x(),            yAxis.x(),            -zAxis.x(),           0.f,
-                    xAxis.y(),            yAxis.y(),            -zAxis.y(),           0.f,
-                    xAxis.z(),            yAxis.z(),            -zAxis.z(),           0.f,
-                    xAxis.dot(-position), yAxis.dot(-position),  zAxis.dot(position), 1.f);
+  m_viewMat = Mat4f( xAxis.x(),  xAxis.y(),  xAxis.z(), -xAxis.dot(position),
+                     yAxis.x(),  yAxis.y(),  yAxis.z(), -yAxis.dot(position),
+                    -zAxis.x(), -zAxis.y(), -zAxis.z(),  zAxis.dot(position),
+                     0.f,        0.f,        0.f,        1.f);
 
   return m_viewMat;
 }
@@ -70,14 +71,14 @@ const Mat4f& Camera::computeInverseViewMatrix() {
 
 const Mat4f& Camera::computePerspectiveMatrix() {
   const float halfFovTangent = std::tan(m_fieldOfView.value * 0.5f);
-  const float planeDist      = m_farPlane - m_nearPlane;
-  const float planeMult      = m_farPlane * m_nearPlane;
   const float fovRatio       = m_frameRatio * halfFovTangent;
+  const float planeMult      = m_farPlane * m_nearPlane;
+  const float invDist        = 1.f / (m_farPlane - m_nearPlane);
 
-  m_projMat = Mat4f(1.f / fovRatio, 0.f,                   0.f,                    0.f,
-                    0.f,            1.f / halfFovTangent,  0.f,                    0.f,
-                    0.f,            0.f,                   m_farPlane / planeDist, 1.f,
-                    0.f,            0.f,                  -planeMult / planeDist,  0.f);
+  m_projMat = Mat4f(1.f / fovRatio, 0.f,                   0.f,                   0.f,
+                    0.f,            1.f / halfFovTangent,  0.f,                   0.f,
+                    0.f,            0.f,                   m_farPlane * invDist, -planeMult * invDist,
+                    0.f,            0.f,                   1.f,                   0.f);
 
   return m_projMat;
 }

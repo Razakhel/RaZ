@@ -87,9 +87,9 @@ constexpr Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const noexce
 
   Vector<T, Size> res;
 
-  res[0] =   m_data[1] * vec[2] - m_data[2] * vec[1];
-  res[1] = -(m_data[0] * vec[2] - m_data[2] * vec[0]);
-  res[2] =   m_data[0] * vec[1] - m_data[1] * vec[0];
+  res.m_data[0] =   m_data[1] * vec.m_data[2] - m_data[2] * vec.m_data[1];
+  res.m_data[1] = -(m_data[0] * vec.m_data[2] - m_data[2] * vec.m_data[0]);
+  res.m_data[2] =   m_data[0] * vec.m_data[1] - m_data[1] * vec.m_data[0];
 
   return res;
 }
@@ -159,8 +159,7 @@ constexpr Vector<T, Size> Vector<T, Size>::operator*(const Vector& vec) const no
 }
 
 template <typename T, std::size_t Size>
-template <typename T2>
-constexpr Vector<T, Size> Vector<T, Size>::operator*(T2 val) const noexcept {
+constexpr Vector<T, Size> Vector<T, Size>::operator*(T val) const noexcept {
   Vector<T, Size> res = *this;
   res *= val;
   return res;
@@ -181,14 +180,16 @@ constexpr Vector<T, Size> Vector<T, Size>::operator/(T val) const noexcept(std::
 }
 
 template <typename T, std::size_t Size>
-template <std::size_t H>
-constexpr Vector<T, Size> Vector<T, Size>::operator*(const Matrix<T, Size, H>& mat) const noexcept {
+template <std::size_t W>
+constexpr Vector<T, W> Vector<T, Size>::operator*(const Matrix<T, W, Size>& mat) const noexcept {
   // This multiplication is made assuming the vector to be horizontal
-  Vector<T, Size> res {};
+  Vector<T, W> res;
 
-  for (std::size_t widthIndex = 0; widthIndex < Size; ++widthIndex) {
-    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex)
-      res[widthIndex] += m_data[heightIndex] * mat[heightIndex * Size + widthIndex];
+  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
+    const std::size_t finalWidthIndex = widthIndex * Size;
+
+    for (std::size_t heightIndex = 0; heightIndex < Size; ++heightIndex)
+      res[widthIndex] += m_data[heightIndex] * mat[finalWidthIndex + heightIndex];
   }
 
   return res;
@@ -264,7 +265,7 @@ std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec) {
   stream << "[ " << vec[0];
 
   for (std::size_t i = 1; i < Size; ++i)
-    stream << "; " << vec[i];
+    stream << ", " << vec[i];
 
   stream << " ]";
 

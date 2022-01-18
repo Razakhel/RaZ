@@ -265,13 +265,13 @@ TEST_CASE("Vector printing") {
   std::stringstream stream;
 
   stream << vec31;
-  CHECK(stream.str() == "[ 3.18; 42; 0.874 ]");
+  CHECK(stream.str() == "[ 3.18, 42, 0.874 ]");
 
   stream.str(std::string()); // Resetting the stream
   stream << vec32;
-  CHECK(stream.str() == "[ 541.41; 47.25; 6.321 ]");
+  CHECK(stream.str() == "[ 541.41, 47.25, 6.321 ]");
 
   stream.str(std::string());
   stream << vec41;
-  CHECK(stream.str() == "[ 84.47; 2; 0.001; 847.12 ]");
+  CHECK(stream.str() == "[ 84.47, 2, 0.001, 847.12 ]");
 }

@@ -114,8 +114,6 @@ constexpr Mat4<T> Quaternion<T>::computeMatrix() const noexcept(std::is_integral
   const T yw = (2 * m_complexes.y() * m_real) * invSqNorm;
   const T zw = (2 * m_complexes.z() * m_real) * invSqNorm;
 
-  // Since RaZ's matrices are of a different majorness (row-major) than the usual (column-major),
-  //  the following matrix is transposed compared to the common implementations & usages (like glm)
   return Mat4<T>(1 - yy - zz,       xy - zw,           xz + yw,           static_cast<T>(0),
                  xy + zw,           1 - xx - zz,       yz - xw,           static_cast<T>(0),
                  xz - yw,           yz + xw,           1 - xx - yy,       static_cast<T>(0),

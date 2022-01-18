@@ -190,7 +190,7 @@ void Cubemap::draw(const Camera& camera) const {
   bind();
 
   m_viewProjUbo.bind();
-  sendViewProjectionMatrix(Mat4f(Mat3f(camera.getViewMatrix())) * camera.getProjectionMatrix());
+  sendViewProjectionMatrix(camera.getProjectionMatrix() * Mat4f(Mat3f(camera.getViewMatrix())));
 
   MeshRenderer::drawUnitCube();
 
@@ -200,7 +200,7 @@ void Cubemap::draw(const Camera& camera) const {
 
 Cubemap& Cubemap::operator=(Cubemap&& cubemap) noexcept {
   std::swap(m_index, cubemap.m_index);
-  m_program = std::move(cubemap.m_program);
+  m_program     = std::move(cubemap.m_program);
   m_viewProjUbo = std::move(cubemap.m_viewProjUbo);
 
   return *this;

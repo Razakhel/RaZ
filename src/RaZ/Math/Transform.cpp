@@ -18,18 +18,9 @@ void Transform::setScale(const Vec3f& scale) {
 }
 
 void Transform::translate(float x, float y, float z) {
-  m_position[0] += x;
-  m_position[1] += y;
-  m_position[2] += z;
-
-  m_updated = true;
-}
-
-void Transform::rotate(Radiansf angle, const Vec3f& axis) {
-  assert("Error: Rotation axis must be normalized." && FloatUtils::areNearlyEqual(axis.computeLength(), 1.f));
-
-  const Quaternionf quaternion(angle, axis);
-  m_rotation = quaternion * m_rotation;
+  m_position.x() += x;
+  m_position.y() += y;
+  m_position.z() += z;
 
   m_updated = true;
 }
@@ -51,31 +42,40 @@ void Transform::rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle) {
   m_updated = true;
 }
 
+void Transform::rotate(Radiansf angle, const Vec3f& axis) {
+  assert("Error: Rotation axis must be normalized." && FloatUtils::areNearlyEqual(axis.computeLength(), 1.f));
+
+  const Quaternionf quaternion(angle, axis);
+  m_rotation = quaternion * m_rotation;
+
+  m_updated = true;
+}
+
 void Transform::scale(float x, float y, float z) {
-  m_scale[0] *= x;
-  m_scale[1] *= y;
-  m_scale[2] *= z;
+  m_scale.x() *= x;
+  m_scale.y() *= y;
+  m_scale.z() *= z;
 
   m_updated = true;
 }
 
 Mat4f Transform::computeTranslationMatrix(bool reverseTranslation) const {
   const Vec3f translation = (reverseTranslation ? -m_position : m_position);
-  const Mat4f translationMat(1.f,            0.f,            0.f,            0.f,
-                             0.f,            1.f,            0.f,            0.f,
-                             0.f,            0.f,            1.f,            0.f,
-                             translation[0], translation[1], translation[2], 1.f);
+  const Mat4f translationMat(1.f, 0.f, 0.f, translation.x(),
+                             0.f, 1.f, 0.f, translation.y(),
+                             0.f, 0.f, 1.f, translation.z(),
+                             0.f, 0.f, 0.f,             1.f);
 
   return translationMat;
 }
 
 Mat4f Transform::computeTransformMatrix() const {
-  const Mat4f scale(m_scale[0], 0.f,        0.f,        0.f,
-                    0.f,        m_scale[1], 0.f,        0.f,
-                    0.f,        0.f,        m_scale[2], 0.f,
-                    0.f,        0.f,        0.f,        1.f);
+  const Mat4f scale(m_scale.x(), 0.f,         0.f,         0.f,
+                    0.f,         m_scale.y(), 0.f,         0.f,
+                    0.f,         0.f,         m_scale.z(), 0.f,
+                    0.f,         0.f,         0.f,         1.f);
 
-  return scale * m_rotation.computeMatrix() * computeTranslationMatrix();
+  return computeTranslationMatrix() * m_rotation.computeMatrix() * scale;
 }
 
 } // namespace Raz

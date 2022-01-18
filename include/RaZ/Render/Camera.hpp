@@ -13,6 +13,8 @@
 
 namespace Raz {
 
+class Transform;
+
 enum class CameraType : uint8_t {
   FREE_FLY = 0,
   LOOK_AT
@@ -49,10 +51,9 @@ public:
   void setTarget(const Vec3f& target) { m_target = target; }
 
   /// Standard 'free fly' view matrix computation.
-  /// \param translationMatrix Translation matrix.
-  /// \param inverseRotation Inverse rotation matrix.
+  /// \param cameraTransform Transform component of the camera.
   /// \return Reference to the computed view matrix.
-  const Mat4f& computeViewMatrix(const Mat4f& translationMatrix, const Mat4f& inverseRotation);
+  const Mat4f& computeViewMatrix(const Transform& cameraTransform);
   /// 'Look at' view matrix computation.
   /// \param position Position of the camera.
   /// \return Reference to the computed view matrix.
@@ -88,7 +89,7 @@ public:
   /// Unprojects to world space the given 3D point in homogeneous coordinates.
   /// \param point Point to unproject.
   /// \return Given point in world space.
-  Vec4f unproject(const Vec4f& point) const { return point * m_invViewMat * m_invProjMat; }
+  Vec4f unproject(const Vec4f& point) const { return m_invProjMat * m_invViewMat * point; }
   /// Unprojects to world space the given 3D point.
   /// \param point Point to unproject.
   /// \return Given point in world space.

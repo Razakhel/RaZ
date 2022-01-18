@@ -51,20 +51,17 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
     if (camera.getCameraType() == CameraType::LOOK_AT) {
       camera.computeLookAt(camTransform.getPosition());
     } else {
-      camera.computeViewMatrix(camTransform.computeTranslationMatrix(true),
-                               camTransform.getRotation().inverse());
+      camera.computeViewMatrix(camTransform);
     }
 
     camera.computeInverseViewMatrix();
-
-    const Mat4f& viewMat = camera.getViewMatrix();
-    viewProjMat = viewMat * camera.getProjectionMatrix();
+    viewProjMat = camera.getProjectionMatrix() * camera.getViewMatrix();
 
     renderSystem.sendCameraMatrices(viewProjMat);
 
     camTransform.setUpdated(false);
   } else {
-    viewProjMat = camera.getViewMatrix() * camera.getProjectionMatrix();
+    viewProjMat = camera.getProjectionMatrix() * camera.getViewMatrix();
   }
 
   for (const Entity* entity : renderSystem.m_entities) {
@@ -75,7 +72,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
         const ShaderProgram& geometryProgram = m_geometryPass.getProgram();
 
         geometryProgram.sendUniform("uniModelMatrix", modelMat);
-        geometryProgram.sendUniform("uniMvpMatrix", modelMat * viewProjMat);
+        geometryProgram.sendUniform("uniMvpMatrix", viewProjMat * modelMat);
 
         entity->getComponent<MeshRenderer>().draw(geometryProgram);
       }

@@ -132,11 +132,11 @@ public:
     std::ostringstream stream;
     stream.precision(std::numeric_limits<T>::digits10 + 3);
 
-    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
-      const std::size_t finalHeightIndex = heightIndex * W;
+    for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
+      const std::size_t finalWidthIndex = widthIndex * H;
 
-      for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
-        const std::size_t finalIndex = finalHeightIndex + widthIndex;
+      for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
+        const std::size_t finalIndex = finalWidthIndex + heightIndex;
 
         if (!Raz::FloatUtils::areNearlyEqual(m_base[finalIndex], m_comparison[finalIndex], m_absTol))
           stream << "\n\tAt [" << widthIndex << "][" << heightIndex << "]: " << m_base[finalIndex] << " is not nearly equal to " << m_comparison[finalIndex];

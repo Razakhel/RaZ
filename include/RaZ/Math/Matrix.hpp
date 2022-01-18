@@ -30,18 +30,12 @@ public:
   constexpr explicit Matrix(const Matrix<T, W - 1, H - 1>& mat) noexcept;
   /// Constructs a matrix from the given values.
   /// \note All values must be of the same type as the matrix's inner one, and there must be exactly as many values as the matrix can hold (width * height).
-  /// \tparam Args Values to construct the matrix with.
+  /// \tparam T2 Type of the first value. Must be the same as T.
+  /// \tparam Args Types of the other values. Must be the same as T.
   /// \param val First value.
   /// \param args Other values.
-  template <typename... Args>
-  constexpr explicit Matrix(T val, Args&&... args) noexcept;
-  /// Constructs a matrix from the given row vectors.
-  /// \note All vectors must be of the same inner type as the matrix's, and must have a size equal to the matrix's width.
-  /// \tparam Vecs Vectors to construct the matrix with.
-  /// \param vec First row vector.
-  /// \param vecs Other row vectors.
-  template <typename... Vecs>
-  constexpr explicit Matrix(const Vector<T, W>& vec, Vecs&&... vecs) noexcept;
+  template <typename T2, typename... Args, typename = std::enable_if_t<std::is_same_v<T, std::decay_t<T2>>>>
+  constexpr explicit Matrix(T2&& val, Args&&... args) noexcept;
   constexpr Matrix(const Matrix&) noexcept = default;
   constexpr Matrix(Matrix&&) noexcept = default;
 
@@ -55,16 +49,29 @@ public:
   /// \param widthIndex Element's width index.
   /// \param heightIndex Element's height index.
   /// \return Constant reference to the fetched element.
-  constexpr const T& getElement(std::size_t widthIndex, std::size_t heightIndex) const noexcept { return m_data[heightIndex * W + widthIndex]; }
+  constexpr const T& getElement(std::size_t widthIndex, std::size_t heightIndex) const noexcept { return m_data[widthIndex * H + heightIndex]; }
   /// Gets an element given its width & height indices.
   /// \param widthIndex Element's width index.
   /// \param heightIndex Element's height index.
   /// \return Reference to the fetched element.
-  constexpr T& getElement(std::size_t widthIndex, std::size_t heightIndex) noexcept { return m_data[heightIndex * W + widthIndex]; }
+  constexpr T& getElement(std::size_t widthIndex, std::size_t heightIndex) noexcept { return m_data[widthIndex * H + heightIndex]; }
 
-  /// Identity matrix static creation; needs to be called with a square matrix type.
+  /// Creates an identity matrix; needs to be called with a square matrix type.
   /// \return Identity matrix.
   static constexpr Matrix identity() noexcept;
+  /// Constructs a matrix from the given row vectors.
+  /// \note All vectors must be of the same inner type as the matrix's, and must have a size equal to the matrix's width.
+  /// \tparam Vecs Types of the vectors to construct the matrix with.
+  /// \param vecs Row vectors to construct the matrix with.
+  template <typename... Vecs>
+  static constexpr Matrix fromRows(Vecs&&... vecs) noexcept;
+  /// Constructs a matrix from the given column vectors.
+  /// \note All vectors must be of the same inner type as the matrix's, and must have a size equal to the matrix's height.
+  /// \tparam Vecs Types of the vectors to construct the matrix with.
+  /// \param vecs Column vectors to construct the matrix with.
+  template <typename... Vecs>
+  static constexpr Matrix fromColumns(Vecs&&... vecs) noexcept;
+
   /// Transposed matrix computation.
   /// \return Transposed matrix.
   constexpr Matrix<T, H, W> transpose() const noexcept;
@@ -73,7 +80,7 @@ public:
   constexpr T computeDeterminant() const noexcept;
   /// Inverse matrix computation.
   /// \return Matrix's inverse.
-  constexpr Matrix inverse() const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Matrix inverse() const noexcept;
   /// Recovers the values in the row at the given index.
   /// \param rowIndex Index of the row to recover.
   /// \return Vector containing the row elements.
@@ -132,7 +139,7 @@ public:
   /// Matrix-vector multiplication operator (assumes the vector to be vertical).
   /// \param vec Vector to be multiplied by.
   /// \return Result of the matrix-vector multiplication.
-  constexpr Vector<T, H> operator*(const Vector<T, H>& vec) const noexcept;
+  constexpr Vector<T, H> operator*(const Vector<T, W>& vec) const noexcept;
   /// Matrix-matrix multiplication operator.
   /// \tparam WI Input matrix's width.
   /// \tparam HI Input matrix's height.
@@ -177,10 +184,22 @@ public:
   /// \return Reference to the modified original matrix.
   constexpr Matrix& operator*=(const Matrix& mat) noexcept;
   /// Element fetching operator with a single index.
+  /// \warning Matrices being in column-major layout, this must be used with caution. For example, with a 3x3 matrix, the indices are laid out as follows:
+  ///
+  ///     0 3 6
+  ///     1 4 7
+  ///     2 5 8
+  /// For readability and ease of use, you may prefer using getElement() instead.
   /// \param index Element's index.
   /// \return Constant reference to the fetched element.
   constexpr const T& operator[](std::size_t index) const noexcept { return m_data[index]; }
   /// Element fetching operator with a single index.
+  /// \warning Matrices being in a column-major layout, this must be used with caution. For example, with a 3x3 matrix, the indices are laid out as follows:
+  ///
+  ///     0 3 6
+  ///     1 4 7
+  ///     2 5 8
+  /// For readability and ease of use, you may prefer using getElement() instead.
   /// \param index Element's index.
   /// \return Reference to the fetched element.
   constexpr T& operator[](std::size_t index) noexcept { return m_data[index]; }
@@ -200,8 +219,14 @@ public:
   friend std::ostream& operator<< <>(std::ostream& stream, const Matrix& mat);
 
 private:
+  template <std::size_t WI, std::size_t HI, typename T2, typename... Args>
+  constexpr void setValues(T2&& val, Args&&... args) noexcept;
+
   template <typename Vec, typename... Vecs>
   constexpr void setRows(Vec&& vec, Vecs&&... args) noexcept;
+
+  template <typename Vec, typename... Vecs>
+  constexpr void setColumns(Vec&& vec, Vecs&&... args) noexcept;
 
   std::array<T, W * H> m_data {};
 };
