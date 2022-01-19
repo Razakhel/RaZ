@@ -29,8 +29,11 @@ struct IndexRange {
   std::size_t endIndex;
 };
 
+template <typename ContainerT, typename = void>
+class IterRange {};
+
 template <typename ContainerT>
-class IterRange {
+class IterRange<ContainerT, std::void_t<typename ContainerT::iterator, typename ContainerT::const_iterator>> {
   using ContainerIter      = typename ContainerT::iterator;
   using ContainerConstIter = typename ContainerT::const_iterator;
 
@@ -86,7 +89,7 @@ void parallelize(const std::function<void()>& action, unsigned int threadCount =
 /// \param collection Collection to iterate over on multiple threads.
 /// \param action Action to be performed by each thread, giving an index range as boundaries.
 /// \param threadCount Amount of threads to start an instance on.
-template <typename ContainerT, typename FuncT, typename = std::enable_if_t<std::is_constructible_v<std::function<void(IndexRange)>, FuncT>>>
+template <typename ContainerT, typename FuncT, typename = std::enable_if_t<std::is_invocable_v<FuncT, IndexRange>>>
 void parallelize(const ContainerT& collection, FuncT&& action, unsigned int threadCount = getSystemThreadCount());
 
 /// Calls a function in parallel on a given number of separate threads of execution.
@@ -100,7 +103,7 @@ void parallelize(const ContainerT& collection, FuncT&& action, unsigned int thre
 /// \param threadCount Amount of threads to start an instance on.
 template <typename ContainerT,
           typename FuncT,
-          typename = std::enable_if_t<std::is_constructible_v<std::function<void(IterRange<std::common_type_t<ContainerT>>)>, FuncT>>>
+          typename = std::enable_if_t<std::is_invocable_v<FuncT, IterRange<ContainerT>>>>
 void parallelize(ContainerT& collection, FuncT&& action, unsigned int threadCount = getSystemThreadCount());
 
 } // namespace Threading
