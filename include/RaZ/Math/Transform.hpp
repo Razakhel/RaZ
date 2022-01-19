@@ -37,13 +37,13 @@ public:
   void move(float x, float y, float z) { move(Vec3f(x, y, z)); }
   /// Moves by the given values in relative coordinates (takes rotation into account).
   /// \param displacement Displacement to be moved by.
-  void move(const Vec3f& displacement) { translate(displacement * Mat3f(m_rotation)); }
-  /// Translates by the given values in absolute coordinates (doesn't take rotation into account).
+  void move(const Vec3f& displacement) { translate(displacement * m_rotation); }
+  /// Translates by the given values in absolute coordinates (does not take rotation into account).
   /// \param x Value of X to be translated by.
   /// \param y Value of Y to be translated by.
   /// \param z Value of Z to be translated by.
   void translate(float x, float y, float z);
-  /// Translates by the given values in absolute coordinates (doesn't take rotation into account).
+  /// Translates by the given values in absolute coordinates (does not take rotation into account).
   /// \param displacement Displacement to be translated by.
   void translate(const Vec3f& displacement) { translate(displacement.x(), displacement.y(), displacement.z()); }
   /// Rotates around the given axes. This locks the up vector, preventing any rolling effect.

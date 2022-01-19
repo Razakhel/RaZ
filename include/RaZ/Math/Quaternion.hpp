@@ -91,6 +91,10 @@ public:
   /// Default move assignment operator.
   /// \return Reference to the moved quaternion.
   constexpr Quaternion& operator=(Quaternion&&) noexcept = default;
+  /// Quaternion-vector multiplication. Rotates a given vector from the current quaternion's rotation. The quaternion must be normalized.
+  /// \param vec Vector to be rotated.
+  /// \return Rotated vector.
+  constexpr Vec3<T> operator*(const Vec3<T>& vec) const noexcept;
   /// Quaternions multiplication.
   /// \param quat Quaternion to be multiplied by.
   /// \return Result of the multiplied quaternions.
@@ -123,6 +127,11 @@ private:
   T m_real {};
   Vec3<T> m_complexes {};
 };
+
+template <typename T>
+Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat);
+
+// Aliases
 
 using Quaternionf = Quaternion<float>;
 using Quaterniond = Quaternion<double>;

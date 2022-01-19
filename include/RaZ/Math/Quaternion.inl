@@ -121,6 +121,17 @@ constexpr Mat4<T> Quaternion<T>::computeMatrix() const noexcept(std::is_integral
 }
 
 template <typename T>
+constexpr Vec3<T> Quaternion<T>::operator*(const Vec3<T>& vec) const noexcept {
+  // Quaternion/vector multiplications are supposed to be made with unit quaternions only, hence the conjugation instead of the inversion
+  // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
+  // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
+
+  Quaternion vecQuat(0.f, vec.x(), vec.y(), vec.z());
+  vecQuat = *this * vecQuat * conjugate();
+  return vecQuat.m_complexes;
+}
+
+template <typename T>
 constexpr Quaternion<T> Quaternion<T>::operator*(const Quaternion& quat) const noexcept {
   Quaternion<T> res = *this;
   res *= quat;
@@ -129,27 +140,27 @@ constexpr Quaternion<T> Quaternion<T>::operator*(const Quaternion& quat) const n
 
 template <typename T>
 constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion& quat) noexcept {
-  const Quaternion<T> res = *this;
+  const Quaternion<T> copy = *this;
 
-  m_real = res.m_real          * quat.m_real
-         - res.m_complexes.x() * quat.m_complexes.x()
-         - res.m_complexes.y() * quat.m_complexes.y()
-         - res.m_complexes.z() * quat.m_complexes.z();
+  m_real = copy.m_real          * quat.m_real
+         - copy.m_complexes.x() * quat.m_complexes.x()
+         - copy.m_complexes.y() * quat.m_complexes.y()
+         - copy.m_complexes.z() * quat.m_complexes.z();
 
-  m_complexes.x() = res.m_real          * quat.m_complexes.x()
-                  + res.m_complexes.x() * quat.m_real
-                  + res.m_complexes.y() * quat.m_complexes.z()
-                  - res.m_complexes.z() * quat.m_complexes.y();
+  m_complexes.x() = copy.m_real          * quat.m_complexes.x()
+                  + copy.m_complexes.x() * quat.m_real
+                  + copy.m_complexes.y() * quat.m_complexes.z()
+                  - copy.m_complexes.z() * quat.m_complexes.y();
 
-  m_complexes.y() = res.m_real          * quat.m_complexes.y()
-                  - res.m_complexes.x() * quat.m_complexes.z()
-                  + res.m_complexes.y() * quat.m_real
-                  + res.m_complexes.z() * quat.m_complexes.x();
+  m_complexes.y() = copy.m_real          * quat.m_complexes.y()
+                  - copy.m_complexes.x() * quat.m_complexes.z()
+                  + copy.m_complexes.y() * quat.m_real
+                  + copy.m_complexes.z() * quat.m_complexes.x();
 
-  m_complexes.z() = res.m_real          * quat.m_complexes.z()
-                  + res.m_complexes.x() * quat.m_complexes.y()
-                  - res.m_complexes.y() * quat.m_complexes.x()
-                  + res.m_complexes.z() * quat.m_real;
+  m_complexes.z() = copy.m_real          * quat.m_complexes.z()
+                  + copy.m_complexes.x() * quat.m_complexes.y()
+                  - copy.m_complexes.y() * quat.m_complexes.x()
+                  + copy.m_complexes.z() * quat.m_real;
 
   return *this;
 }
@@ -171,6 +182,17 @@ constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T currCoeff,
                     m_complexes.x() * currCoeff + quat.m_complexes.x() * otherCoeff,
                     m_complexes.y() * currCoeff + quat.m_complexes.y() * otherCoeff,
                     m_complexes.z() * currCoeff + quat.m_complexes.z() * otherCoeff);
+}
+
+template <typename T>
+Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat) {
+  // Quaternion/vector multiplications are supposed to be made with unit quaternions only, hence the conjugation instead of the inversion
+  // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
+  // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
+
+  Quaternion vecQuat(0.f, vec.x(), vec.y(), vec.z());
+  vecQuat = quat.conjugate() * vecQuat * quat;
+  return Vec3<T>(vecQuat.x(), vecQuat.y(), vecQuat.z());
 }
 
 } // namespace Raz

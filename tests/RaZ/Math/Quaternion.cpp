@@ -6,9 +6,9 @@ using namespace Raz::Literals;
 
 namespace {
 
-const Raz::Quaternionf quat1(10.0_deg, Raz::Axis::X);
-const Raz::Quaternionf quat2(90.0_deg, 1.f, -2.f, 5.f);
-const Raz::Quaternionf quat3(180.0_deg, 1.f, -2.f, 5.f);
+const Raz::Quaternionf quat1(10_deg, Raz::Axis::X);
+const Raz::Quaternionf quat2(90_deg, 1.f, -2.f, 5.f);
+const Raz::Quaternionf quat3(180_deg, 1.f, -2.f, 5.f);
 
 } // namespace
 
@@ -105,12 +105,51 @@ TEST_CASE("Quaternion matrix computation") {
                                                                       0.f,           0.f,           0.f,          1.f)));
 }
 
-TEST_CASE("Quaternion multiplication") {
-  const Raz::Quaternionf unitQuat = Raz::Quaternionf::identity();
-  const Raz::Mat4f unitQuatMat    = unitQuat.computeMatrix();
+TEST_CASE("Quaternion/vector multiplication") {
+  // See: https://www.geogebra.org/m/aderzasm
+
+  const Raz::Quaternionf quatRotX(45_deg, Raz::Axis::X);
+  CHECK(quatRotX * Raz::Axis::X == Raz::Axis::X);
+  CHECK(Raz::Axis::X * quatRotX == Raz::Axis::X);
+
+  const Raz::Quaternionf quatRotY(45_deg, Raz::Axis::Y);
+  CHECK(quatRotY * Raz::Axis::X == Raz::Vec3f(0.70710677f, 0.f, -0.70710677f));
+  CHECK(Raz::Axis::X * quatRotY == Raz::Vec3f(0.70710677f, 0.f, 0.70710677f));
+
+  const Raz::Quaternionf quatRotZ(45_deg, Raz::Axis::Z);
+  CHECK(quatRotZ * Raz::Axis::X == Raz::Vec3f(0.70710677f, 0.70710677f, 0.f));
+  CHECK(Raz::Axis::X * quatRotZ == Raz::Vec3f(0.70710677f, -0.70710677f, 0.f));
+
+  CHECK(Raz::Axis::Z * Raz::Quaternionf(90_deg, Raz::Axis::Y) == -Raz::Axis::X);
+  CHECK(Raz::Axis::Z * Raz::Mat3f(Raz::Quaternionf(90_deg, Raz::Axis::Y).computeMatrix()) == -Raz::Axis::X);
+
+  constexpr Raz::Vec3f pos(0.123f, 14.51145f, 7.58413f);
+
+  CHECK(quatRotX * pos == Raz::Vec3f(pos.x(), 4.89835405f, 15.6239338f));
+  CHECK(quatRotY * pos == Raz::Vec3f(5.44976425f, pos.y(), 5.27581501f));
+  CHECK(quatRotZ * pos == Raz::Vec3f(-10.1741714f, 10.3481178f, pos.z()));
+
+  CHECK(pos * quatRotX == Raz::Vec3f(pos.x(), 15.6239338f, -4.89835596f));
+  CHECK(pos * quatRotY == Raz::Vec3f(-5.27581596f, pos.y(), 5.4497633f));
+  CHECK(pos * quatRotZ == Raz::Vec3f(10.3481188f, 10.1741686f, pos.z()));
+
+  // Checking that the matrix multiplication behaves the same way
+
+  CHECK(quatRotX * pos == Raz::Mat3f(quatRotX.computeMatrix()) * pos);
+  CHECK(quatRotY * pos == Raz::Mat3f(quatRotY.computeMatrix()) * pos);
+  CHECK(quatRotZ * pos == Raz::Mat3f(quatRotZ.computeMatrix()) * pos);
+
+  CHECK(pos * quatRotX == pos * Raz::Mat3f(quatRotX.computeMatrix()));
+  CHECK(pos * quatRotY == pos * Raz::Mat3f(quatRotY.computeMatrix()));
+  CHECK(pos * quatRotZ == pos * Raz::Mat3f(quatRotZ.computeMatrix()));
+}
+
+TEST_CASE("Quaternion/quaternion multiplication") {
+  constexpr Raz::Quaternionf unitQuat = Raz::Quaternionf::identity();
+  constexpr Raz::Mat4f unitQuatMat    = unitQuat.computeMatrix();
   CHECK(unitQuatMat == Raz::Mat4f::identity());
 
-  const Raz::Quaternionf squareUnitQuat = unitQuat * unitQuat;
+  constexpr Raz::Quaternionf squareUnitQuat = unitQuat * unitQuat;
   CHECK(squareUnitQuat.computeMatrix() == unitQuatMat);
 
   const Raz::Quaternionf quatRotX(45.0_deg, Raz::Axis::X);
@@ -128,13 +167,28 @@ TEST_CASE("Quaternion multiplication") {
   const Raz::Quaternionf quat12 = quat1 * quat2;
 
   // Results taken from Wolfram Alpha: https://tinyurl.com/rxavw82
-  // The matrix computation applies a transposition for consistency; the resulting matrix is thus transposed compared to Wolfram's
-
+  CHECK(quat12.w() == 0.642787635f);
+  CHECK(quat12.x() == 0.766044438f);
+  CHECK(quat12.y() == -1.716974139f);
+  CHECK(quat12.z() == 3.398823261f);
   CHECK_THAT(quat12.computeNorm(), IsNearlyEqualTo(3.9370039f));
   CHECK_THAT(quat12.computeMatrix(), IsNearlyEqualToMatrix(Raz::Mat4f(-0.870968f,  -0.451613f,   0.1935484f, 0.f,
                                                                        0.1121862f, -0.5663f,    -0.8165285f, 0.f,
                                                                        0.4783612f, -0.6894565f,  0.5438936f, 0.f,
                                                                        0.f,         0.f,         0.f,        1.f)));
+
+  const Raz::Quaternionf quat21 = quat2 * quat1;
+
+  // Results taken from Wolfram Alpha: https://tinyurl.com/426hupnb
+  CHECK(quat21.w() == 0.642787635f);
+  CHECK(quat21.x() == 0.766044438f);
+  CHECK(quat21.y() == -1.10069f);
+  CHECK(quat21.z() == 3.645337105f);
+  CHECK_THAT(quat21.computeNorm(), IsNearlyEqualTo(3.9370039f));
+  CHECK_THAT(quat21.computeMatrix(), IsNearlyEqualToMatrix(Raz::Mat4f(-0.870968f,    -0.411142588f,  0.269029707f, 0.f,
+                                                                       0.193548396f, -0.790362f,    -0.581263244f, 0.f,
+                                                                       0.451613f,    -0.454191267f,  0.76795578f,  0.f,
+                                                                       0.f,           0.f,           0.f,          1.f)));
 }
 
 TEST_CASE("Quaternion near-equality") {
