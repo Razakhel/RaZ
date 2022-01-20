@@ -65,7 +65,7 @@ void RenderSystem::sendCameraMatrices() const {
   assert("Error: A camera must be given to a RenderSystem to send its matrices." && (m_cameraEntity != nullptr));
 
   const auto& camera = m_cameraEntity->getComponent<Camera>();
-  sendCameraMatrices(camera.getViewMatrix() * camera.getProjectionMatrix());
+  sendCameraMatrices(camera.getProjectionMatrix() * camera.getViewMatrix());
 }
 
 void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
@@ -84,7 +84,7 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
   Vec4f homogeneousPos(entity->getComponent<Transform>().getPosition(), 1.f);
 
   if (lightComp.getType() == LightType::DIRECTIONAL) {
-    homogeneousPos[3] = 0.f;
+    homogeneousPos.w() = 0.f;
     geometryProgram.sendUniform(strBase + "direction", lightComp.getDirection());
   }
 

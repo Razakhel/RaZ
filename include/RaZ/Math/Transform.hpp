@@ -37,7 +37,7 @@ public:
   void move(float x, float y, float z) { move(Vec3f(x, y, z)); }
   /// Moves by the given values in relative coordinates (takes rotation into account).
   /// \param displacement Displacement to be moved by.
-  void move(const Vec3f& displacement) { translate(displacement * m_rotation); }
+  void move(const Vec3f& displacement) { translate(m_rotation * displacement); }
   /// Translates by the given values in absolute coordinates (does not take rotation into account).
   /// \param x Value of X to be translated by.
   /// \param y Value of Y to be translated by.

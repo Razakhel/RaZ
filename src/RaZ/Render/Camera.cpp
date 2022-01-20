@@ -47,7 +47,8 @@ void Camera::setProjectionType(ProjectionType projType) {
 }
 
 const Mat4f& Camera::computeViewMatrix(const Transform& cameraTransform) {
-  m_viewMat = cameraTransform.getRotation().computeMatrix() * cameraTransform.computeTranslationMatrix(true);
+  // TODO: the rotation quaternion being supposedly a unit one, the inversion could be replaced by a conjugation
+  m_viewMat = cameraTransform.getRotation().inverse().computeMatrix() * cameraTransform.computeTranslationMatrix(true);
   return m_viewMat;
 }
 
@@ -75,10 +76,10 @@ const Mat4f& Camera::computePerspectiveMatrix() {
   const float planeMult      = m_farPlane * m_nearPlane;
   const float invDist        = 1.f / (m_farPlane - m_nearPlane);
 
-  m_projMat = Mat4f(1.f / fovRatio, 0.f,                   0.f,                   0.f,
-                    0.f,            1.f / halfFovTangent,  0.f,                   0.f,
-                    0.f,            0.f,                   m_farPlane * invDist, -planeMult * invDist,
-                    0.f,            0.f,                   1.f,                   0.f);
+  m_projMat = Mat4f(1.f / fovRatio, 0.f,                   0.f,                                   0.f,
+                    0.f,            1.f / halfFovTangent,  0.f,                                   0.f,
+                    0.f,            0.f,                  -(m_farPlane + m_nearPlane) * invDist, -2.f * planeMult * invDist,
+                    0.f,            0.f,                  -1.f,                                   0.f);
 
   return m_projMat;
 }
