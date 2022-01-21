@@ -2,6 +2,55 @@
 
 #include "RaZ/Data/Mesh.hpp"
 
+TEST_CASE("Mesh plane") {
+  const Raz::Plane plane(1.5f, Raz::Axis::Y);
+
+  constexpr float width = 1.f;
+  constexpr float depth = 1.f;
+  Raz::Mesh mesh(plane, width, depth);
+
+  CHECK(mesh.getSubmeshes().size() == 1);
+  CHECK(mesh.recoverVertexCount() == 4);
+  CHECK(mesh.recoverTriangleCount() == 2);
+
+  const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+  CHECK(submesh.getVertices()[0].position == Raz::Vec3f(-width, plane.getDistance(), depth));
+  CHECK(submesh.getVertices()[0].normal == plane.getNormal());
+  CHECK(submesh.getVertices()[0].texcoords == Raz::Vec2f(0.f));
+
+  CHECK(submesh.getVertices()[1].position == Raz::Vec3f(width, plane.getDistance(), depth));
+  CHECK(submesh.getVertices()[1].normal == plane.getNormal());
+  CHECK(submesh.getVertices()[1].texcoords == Raz::Vec2f(1.f, 0.f));
+
+  CHECK(submesh.getVertices()[2].position == Raz::Vec3f(width, plane.getDistance(), -depth));
+  CHECK(submesh.getVertices()[2].normal == plane.getNormal());
+  CHECK(submesh.getVertices()[2].texcoords == Raz::Vec2f(1.f, 1.f));
+
+  CHECK(submesh.getVertices()[3].position == Raz::Vec3f(-width, plane.getDistance(), -depth));
+  CHECK(submesh.getVertices()[3].normal == plane.getNormal());
+  CHECK(submesh.getVertices()[3].texcoords == Raz::Vec2f(0.f, 1.f));
+
+  // Checking that the mesh's triangles are constructed in a counter-clockwise order according to the plane's normal
+  CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[0]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[1]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[2]].position).isCounterClockwise(plane.getNormal()));
+
+  CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[3]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[4]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[5]].position).isCounterClockwise(plane.getNormal()));
+
+  const Raz::AABB& boundingBox = mesh.computeBoundingBox();
+
+  CHECK(boundingBox.computeCentroid() == Raz::Vec3f(0.f, 1.5f, 0.f));
+
+  constexpr Raz::Vec3f expectedMinPos(-1.f, 1.5f, -1.f);
+  constexpr Raz::Vec3f expectedMaxPos(1.f, 1.5f, 1.f);
+
+  CHECK(boundingBox.getMinPosition() == expectedMinPos);
+  CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
+}
+
 TEST_CASE("Mesh UV sphere") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 

@@ -46,12 +46,12 @@ Mesh::Mesh(const Plane& plane, float width, float depth) {
   std::vector<unsigned int>& indices = submesh.getTriangleIndices();
   indices.resize(6);
 
-  indices[0] = 1;
-  indices[1] = 0;
+  indices[0] = 0;
+  indices[1] = 1;
   indices[2] = 2;
 
-  indices[3] = 2;
-  indices[4] = 0;
+  indices[3] = 0;
+  indices[4] = 2;
   indices[5] = 3;
 }
 
