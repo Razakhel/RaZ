@@ -178,3 +178,38 @@ TEST_CASE("Mesh icosphere") {
 //    CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(sphere.getRadius())));
 //  }
 }
+
+TEST_CASE("Mesh AABB") {
+  const Raz::AABB box(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
+
+  Raz::Mesh mesh(box);
+
+  CHECK(mesh.getSubmeshes().size() == 1);
+  CHECK(mesh.recoverVertexCount() == 8);
+  CHECK(mesh.recoverTriangleCount() == 12);
+
+  const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+  auto checkWindingOrder = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal) {
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
+
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 3]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
+  };
+
+  checkWindingOrder(0, Raz::Axis::X);
+  checkWindingOrder(6, -Raz::Axis::X);
+  checkWindingOrder(12, Raz::Axis::Y);
+  checkWindingOrder(18, -Raz::Axis::Y);
+  checkWindingOrder(24, Raz::Axis::Z);
+  checkWindingOrder(30, -Raz::Axis::Z);
+
+  const Raz::AABB& boundingBox = mesh.computeBoundingBox();
+
+  CHECK(boundingBox.computeCentroid() == box.computeCentroid());
+  CHECK(boundingBox.getMinPosition() == box.getMinPosition());
+  CHECK(boundingBox.getMaxPosition() == box.getMaxPosition());
+}

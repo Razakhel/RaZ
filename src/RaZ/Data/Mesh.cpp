@@ -226,57 +226,57 @@ Mesh::Mesh(const AABB& box) {
   indices.resize(36);
 
   // Right face
-  indices[0] = 1;
-  indices[1] = 0;
+  indices[0] = 0;
+  indices[1] = 1;
   indices[2] = 2;
 
-  indices[3] = 1;
-  indices[4] = 2;
+  indices[3] = 2;
+  indices[4] = 1;
   indices[5] = 3;
 
   // Left face
-  indices[6] = 4;
-  indices[7] = 5;
+  indices[6] = 5;
+  indices[7] = 4;
   indices[8] = 7;
 
-  indices[9]  = 4;
-  indices[10] = 7;
+  indices[9]  = 7;
+  indices[10] = 4;
   indices[11] = 6;
 
   // Top face
-  indices[12] = 4;
-  indices[13] = 0;
+  indices[12] = 0;
+  indices[13] = 4;
   indices[14] = 1;
 
-  indices[15] = 4;
-  indices[16] = 1;
+  indices[15] = 1;
+  indices[16] = 4;
   indices[17] = 5;
 
   // Bottom face
-  indices[18] = 7;
-  indices[19] = 3;
+  indices[18] = 3;
+  indices[19] = 7;
   indices[20] = 2;
 
-  indices[21] = 7;
-  indices[22] = 2;
+  indices[21] = 2;
+  indices[22] = 7;
   indices[23] = 6;
 
   // Front face
-  indices[24] = 5;
-  indices[25] = 1;
+  indices[24] = 1;
+  indices[25] = 5;
   indices[26] = 3;
 
-  indices[27] = 5;
-  indices[28] = 3;
+  indices[27] = 3;
+  indices[28] = 5;
   indices[29] = 7;
 
   // Back face
-  indices[30] = 0;
-  indices[31] = 4;
+  indices[30] = 4;
+  indices[31] = 0;
   indices[32] = 6;
 
-  indices[33] = 0;
-  indices[34] = 6;
+  indices[33] = 6;
+  indices[34] = 0;
   indices[35] = 2;
 }
 
