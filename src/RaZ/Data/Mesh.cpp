@@ -81,7 +81,7 @@ Mesh::Mesh(const Triangle& triangle) {
   Vertex secondVert {};
   secondVert.position  = secondPos;
   secondVert.texcoords = Vec2f(0.5f, 1.f);
-  secondVert.normal   = normal;
+  secondVert.normal    = normal;
 
   Vertex thirdVert {};
   thirdVert.position  = thirdPos;
@@ -100,8 +100,8 @@ Mesh::Mesh(const Triangle& triangle) {
   std::vector<unsigned int>& indices = submesh.getTriangleIndices();
   indices.resize(3);
 
-  indices[0] = 1;
-  indices[1] = 0;
+  indices[0] = 0;
+  indices[1] = 1;
   indices[2] = 2;
 }
 

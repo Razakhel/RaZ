@@ -51,6 +51,35 @@ TEST_CASE("Mesh plane") {
   CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
+TEST_CASE("Mesh triangle") {
+  const Raz::Triangle triangle(Raz::Vec3f(-1.f, 0.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 1.f, 0.f));
+  CHECK(triangle.computeNormal() == Raz::Axis::Z);
+  CHECK(triangle.isCounterClockwise(Raz::Axis::Z));
+
+  Raz::Mesh mesh(triangle);
+
+  CHECK(mesh.getSubmeshes().size() == 1);
+  CHECK(mesh.recoverVertexCount() == 3);
+  CHECK(mesh.recoverTriangleCount() == 1);
+
+  const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+  // Checking that the mesh is constructed with the same winding order
+  CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[0]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[1]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[2]].position).isCounterClockwise(Raz::Axis::Z));
+
+  const Raz::AABB& boundingBox = mesh.computeBoundingBox();
+
+  CHECK(boundingBox.computeCentroid() == Raz::Vec3f(0.f, 0.5f, 0.f));
+
+  const Raz::Vec3f expectedMinPos(-1.f, 0.f, 0.f);
+  const Raz::Vec3f expectedMaxPos(1.f, 1.f, 0.f);
+
+  CHECK(boundingBox.getMinPosition() == expectedMinPos);
+  CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
+}
+
 TEST_CASE("Mesh UV sphere") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
