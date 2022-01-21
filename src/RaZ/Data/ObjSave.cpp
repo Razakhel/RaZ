@@ -180,7 +180,7 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
       file << "f ";
 
       // First vertex
-      Vertex vertex = submesh.getVertices()[submesh.getTriangleIndices()[i + 1]];
+      Vertex vertex = submesh.getVertices()[submesh.getTriangleIndices()[i]];
 
       auto posIndex  = posCorrespIndices.find(vertex.position)->second;
       auto texIndex  = texCorrespIndices.find(vertex.texcoords)->second;
@@ -189,7 +189,7 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
       file << posIndex  << '/' << texIndex  << '/' << normIndex << ' ';
 
       // Second vertex
-      vertex = submesh.getVertices()[submesh.getTriangleIndices()[i]];
+      vertex = submesh.getVertices()[submesh.getTriangleIndices()[i + 1]];
 
       posIndex  = posCorrespIndices.find(vertex.position)->second;
       texIndex  = texCorrespIndices.find(vertex.texcoords)->second;

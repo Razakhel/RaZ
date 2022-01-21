@@ -262,31 +262,31 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
       }
 
       if (quadFaces) {
-        posIndices.back().emplace_back(partIndices[2]);
         posIndices.back().emplace_back(partIndices[0]);
+        posIndices.back().emplace_back(partIndices[2]);
         posIndices.back().emplace_back(partIndices[3]);
 
-        texcoordsIndices.back().emplace_back(partIndices[6]);
         texcoordsIndices.back().emplace_back(partIndices[4]);
+        texcoordsIndices.back().emplace_back(partIndices[6]);
         texcoordsIndices.back().emplace_back(partIndices[7]);
 
-        normalsIndices.back().emplace_back(partIndices[10]);
         normalsIndices.back().emplace_back(partIndices[8]);
+        normalsIndices.back().emplace_back(partIndices[10]);
         normalsIndices.back().emplace_back(partIndices[11]);
       }
 
-      posIndices.back().emplace_back(partIndices[1]);
       posIndices.back().emplace_back(partIndices[0]);
+      posIndices.back().emplace_back(partIndices[1]);
       posIndices.back().emplace_back(partIndices[2]);
 
-      texcoordsIndices.back().emplace_back(partIndices[4 + quadFaces]);
       texcoordsIndices.back().emplace_back(partIndices[3 + quadFaces]);
+      texcoordsIndices.back().emplace_back(partIndices[4 + quadFaces]);
       texcoordsIndices.back().emplace_back(partIndices[5 + quadFaces]);
 
       const auto quadStride = static_cast<uint8_t>(quadFaces * 2);
 
-      normalsIndices.back().emplace_back(partIndices[7 + quadStride]);
       normalsIndices.back().emplace_back(partIndices[6 + quadStride]);
+      normalsIndices.back().emplace_back(partIndices[7 + quadStride]);
       normalsIndices.back().emplace_back(partIndices[8 + quadStride]);
     } else if (line[0] == 'm') { // Material import (mtllib)
       std::string mtlFileName;
@@ -424,10 +424,10 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
       vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
     }
-
-    // Creating the submesh renderer from the submesh's data
-    meshRenderer.getSubmeshRenderers()[submeshIndex].load(submesh);
   }
+
+  // Creating the mesh renderer from the mesh's data
+  meshRenderer.load(mesh);
 
   Logger::debug("[ObjLoad] Loaded OBJ file (" + std::to_string(mesh.getSubmeshes().size()) + " submesh(es), "
                                               + std::to_string(mesh.recoverVertexCount()) + " vertices, "

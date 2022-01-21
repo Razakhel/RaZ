@@ -78,7 +78,7 @@ TEST_CASE("ObjFormat load quad faces") {
 
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
-  CHECK(meshRenderer.getMaterials().empty());
+  CHECK(meshRenderer.getMaterials().size() == 1);
 }
 
 TEST_CASE("ObjFormat load Blinn-Phong") {
@@ -87,6 +87,25 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.recoverTriangleCount() == 12);
+
+  const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+  auto checkWindingOrder = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal) {
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
+
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 3]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
+  };
+
+  checkWindingOrder(0, Raz::Axis::Y);
+  checkWindingOrder(6, -Raz::Axis::X);
+  checkWindingOrder(12, Raz::Axis::X);
+  checkWindingOrder(18, -Raz::Axis::Z);
+  checkWindingOrder(24, Raz::Axis::Z);
+  checkWindingOrder(30, -Raz::Axis::Y);
 
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
@@ -309,6 +328,25 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.recoverTriangleCount() == 12);
+
+  const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+  auto checkWindingOrder = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal) {
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
+
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 3]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
+  };
+
+  checkWindingOrder(0, Raz::Axis::Y);
+  checkWindingOrder(6, -Raz::Axis::X);
+  checkWindingOrder(12, Raz::Axis::X);
+  checkWindingOrder(18, -Raz::Axis::Z);
+  checkWindingOrder(24, Raz::Axis::Z);
+  checkWindingOrder(30, -Raz::Axis::Y);
 
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
@@ -535,7 +573,16 @@ TEST_CASE("ObjFormat save") {
     CHECK(meshRendererData.getSubmeshRenderers().size() == 2);
 
     CHECK(meshRendererData.getSubmeshRenderers()[0].getMaterialIndex() == 0);
-    CHECK(meshRendererData.getSubmeshRenderers()[1].getMaterialIndex() == std::numeric_limits<std::size_t>::max());
+    CHECK(meshRendererData.getSubmeshRenderers()[1].getMaterialIndex() == 0);
+
+    // A default Cook-Torrance material is added if none has been imported
+    CHECK(meshRendererData.getMaterials().size() == 1);
+    CHECK(meshRendererData.getMaterials().front()->getType() == Raz::MaterialType::COOK_TORRANCE);
+
+    auto& material = static_cast<Raz::MaterialCookTorrance&>(*meshRendererData.getMaterials().front());
+    CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f)));
+    CHECK(material.getMetallicFactor() == 1.f);
+    CHECK(material.getRoughnessFactor() == 1.f);
   }
 
   const Raz::MeshRenderer meshRenderer = createMeshRenderer();
