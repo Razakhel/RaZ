@@ -83,6 +83,28 @@ TEST_CASE("Mesh triangle") {
 TEST_CASE("Mesh UV sphere") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
+  auto checkWindingOrder = [&sphere] (const Raz::Mesh& mesh) {
+    const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+    // Checking that all normals are pointing outside the sphere
+    for (const Raz::Vertex& vertex : submesh.getVertices()) {
+      CHECK_THAT(vertex.normal.computeLength(), IsNearlyEqualTo(1.f));
+      // A simple epsilon is not enough for all compilers except MinGW: the X component of a single vector has a difference
+      //  beyond tolerance, although very small; the origin of this discrepancy between compilers is unknown
+      CHECK_THAT(vertex.normal, IsNearlyEqualToVector((vertex.position - sphere.getCenter()).normalize(), 0.000001f));
+    }
+
+    // Checking that the mesh's triangles are constructed in a counter-clockwise order
+    for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
+        const Raz::Vec3f normal = (submesh.getVertices()[submesh.getTriangleIndices()[i]].normal
+                                 + submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].normal
+                                 + submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].normal).normalize();
+        CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[i]].position,
+                            submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].position,
+                            submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].position).isCounterClockwise(normal));
+    }
+  };
+
   // UV sphere mesh with 10 splits in latitude/longitude
   {
     Raz::Mesh mesh(sphere, 10, Raz::SphereMeshType::UV);
@@ -90,6 +112,8 @@ TEST_CASE("Mesh UV sphere") {
     CHECK(mesh.getSubmeshes().size() == 1);
     CHECK(mesh.recoverVertexCount() == 121);
     CHECK(mesh.recoverTriangleCount() == 180);
+
+    checkWindingOrder(mesh);
 
     const Raz::AABB& boundingBox = mesh.computeBoundingBox();
 
@@ -114,6 +138,8 @@ TEST_CASE("Mesh UV sphere") {
     CHECK(mesh.recoverVertexCount() == 10201);
     CHECK(mesh.recoverTriangleCount() == 19800);
 
+    checkWindingOrder(mesh);
+
     const Raz::AABB& boundingBox = mesh.computeBoundingBox();
 
     CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
@@ -132,6 +158,26 @@ TEST_CASE("Mesh UV sphere") {
 TEST_CASE("Mesh icosphere") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
+  auto checkWindingOrder = [&sphere] (const Raz::Mesh& mesh) {
+    const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+    // Checking that all normals are pointing outside the sphere
+    for (const Raz::Vertex& vertex : submesh.getVertices()) {
+      CHECK_THAT(vertex.normal.computeLength(), IsNearlyEqualTo(1.f));
+      CHECK_THAT(vertex.normal, IsNearlyEqualToVector((vertex.position - sphere.getCenter()).normalize()));
+    }
+
+    // Checking that the mesh's triangles are constructed in a counter-clockwise order
+    for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
+      const Raz::Vec3f normal = (submesh.getVertices()[submesh.getTriangleIndices()[i]].normal
+                               + submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].normal
+                               + submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].normal).normalize();
+      CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[i]].position,
+                          submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].position,
+                          submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].position).isCounterClockwise(normal));
+    }
+  };
+
   // Icosphere mesh with 1 subdivision
   {
     Raz::Mesh mesh(sphere, 1, Raz::SphereMeshType::ICO);
@@ -139,6 +185,8 @@ TEST_CASE("Mesh icosphere") {
     CHECK(mesh.getSubmeshes().size() == 1);
     CHECK(mesh.recoverVertexCount() == 12);
     CHECK(mesh.recoverTriangleCount() == 20);
+
+    checkWindingOrder(mesh);
 
     const Raz::AABB& boundingBox = mesh.computeBoundingBox();
 
@@ -163,6 +211,8 @@ TEST_CASE("Mesh icosphere") {
 //    CHECK(mesh.getSubmeshes().size() == 1);
 //    CHECK(mesh.recoverVertexCount() == 24);
 //    CHECK(mesh.recoverTriangleCount() == 180);
+//
+//    checkWindingOrder(mesh);
 //
 //    const Raz::AABB& boundingBox = mesh.computeBoundingBox();
 //

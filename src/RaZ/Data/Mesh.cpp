@@ -328,7 +328,6 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
 
   const float widthStep  = 2 * Pi<float> / static_cast<float>(widthCount);
   const float heightStep = Pi<float> / static_cast<float>(heightCount);
-  const float invLength  = 1.f / sphere.getRadius();
   const Vec3f center     = sphere.getCenter();
 
   for (unsigned int heightIndex = 0; heightIndex <= heightCount; ++heightIndex) {
@@ -344,11 +343,11 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
       const float z = xz * std::sin(widthAngle);
 
       Vertex vert;
-      vert.position  = Vec3f(x + center[0], y + center[1], z + center[2]);
+      vert.position  = Vec3f(x + center.x(), y + center.y(), z + center.z());
       vert.texcoords = Vec2f(static_cast<float>(widthIndex) / static_cast<float>(widthCount),
                              static_cast<float>(heightIndex) / static_cast<float>(heightCount));
-      vert.normal    = Vec3f(x * invLength, y * invLength, z * invLength);
-      vert.tangent   = Vec3f(vert.normal[1], vert.normal[0], vert.normal[2]); // TODO: how does this give seemingly accurate results in basic cases?
+      vert.normal    = Vec3f(x, y, z).normalize(); // Dividing by the inverse radius does not give a perfectly unit vector; normalizing directly
+      vert.tangent   = Vec3f(vert.normal.y(), vert.normal.x(), vert.normal.z()); // TODO: how does this give seemingly accurate results in basic cases?
 
       vertices.emplace_back(vert);
     }
@@ -361,8 +360,8 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
   for (unsigned int widthIndex = 0; widthIndex < widthCount; ++widthIndex) {
     const unsigned int widthStride = widthCount + widthIndex;
 
-    indices.push_back(widthIndex + 1);
     indices.push_back(widthStride + 1);
+    indices.push_back(widthIndex + 1);
     indices.push_back(widthStride + 2);
   }
 
@@ -371,12 +370,12 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
     unsigned int nextHeightStride = curHeightStride + widthCount + 1;
 
     for (unsigned int widthIndex = 0; widthIndex < widthCount; ++widthIndex, ++curHeightStride, ++nextHeightStride) {
-      indices.push_back(curHeightStride);
       indices.push_back(nextHeightStride);
+      indices.push_back(curHeightStride);
       indices.push_back(curHeightStride + 1);
 
-      indices.push_back(curHeightStride + 1);
       indices.push_back(nextHeightStride);
+      indices.push_back(curHeightStride + 1);
       indices.push_back(nextHeightStride + 1);
     }
   }
@@ -387,8 +386,8 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
     unsigned int nextHeightStride = curHeightStride + widthCount + 1;
 
     for (unsigned int widthIndex = 0; widthIndex < widthCount; ++widthIndex, ++curHeightStride, ++nextHeightStride) {
-      indices.push_back(curHeightStride);
       indices.push_back(nextHeightStride);
+      indices.push_back(curHeightStride);
       indices.push_back(curHeightStride + 1);
     }
   }
@@ -478,84 +477,84 @@ void Mesh::createIcosphere(const Sphere& sphere, uint32_t /* subdivCount */) {
   std::vector<unsigned int>& indices = submesh.getTriangleIndices();
   indices.resize(60);
 
-  indices[0] = 0;
-  indices[1] = 5;
+  indices[0] = 5;
+  indices[1] = 0;
   indices[2] = 11;
 
-  indices[3] = 0;
-  indices[4] = 1;
+  indices[3] = 1;
+  indices[4] = 0;
   indices[5] = 5;
 
-  indices[6] = 0;
-  indices[7] = 7;
+  indices[6] = 7;
+  indices[7] = 0;
   indices[8] = 1;
 
-  indices[9]  = 0;
-  indices[10] = 10;
+  indices[9]  = 10;
+  indices[10] = 0;
   indices[11] = 7;
 
-  indices[12] = 0;
-  indices[13] = 11;
+  indices[12] = 11;
+  indices[13] = 0;
   indices[14] = 10;
 
-  indices[15] = 1;
-  indices[16] = 9;
+  indices[15] = 9;
+  indices[16] = 1;
   indices[17] = 5;
 
-  indices[18] = 5;
-  indices[19] = 4;
+  indices[18] = 4;
+  indices[19] = 5;
   indices[20] = 11;
 
-  indices[21] = 11;
-  indices[22] = 2;
+  indices[21] = 2;
+  indices[22] = 11;
   indices[23] = 10;
 
-  indices[24] = 10;
-  indices[25] = 6;
+  indices[24] = 6;
+  indices[25] = 10;
   indices[26] = 7;
 
-  indices[27] = 7;
-  indices[28] = 8;
+  indices[27] = 8;
+  indices[28] = 7;
   indices[29] = 1;
 
-  indices[30] = 3;
-  indices[31] = 4;
+  indices[30] = 4;
+  indices[31] = 3;
   indices[32] = 9;
 
-  indices[33] = 3;
-  indices[34] = 2;
+  indices[33] = 2;
+  indices[34] = 3;
   indices[35] = 4;
 
-  indices[36] = 3;
-  indices[37] = 6;
+  indices[36] = 6;
+  indices[37] = 3;
   indices[38] = 2;
 
-  indices[39] = 3;
-  indices[40] = 8;
+  indices[39] = 8;
+  indices[40] = 3;
   indices[41] = 6;
 
-  indices[42] = 3;
-  indices[43] = 9;
+  indices[42] = 9;
+  indices[43] = 3;
   indices[44] = 8;
 
-  indices[45] = 4;
-  indices[46] = 5;
+  indices[45] = 5;
+  indices[46] = 4;
   indices[47] = 9;
 
-  indices[48] = 2;
-  indices[49] = 11;
+  indices[48] = 11;
+  indices[49] = 2;
   indices[50] = 4;
 
-  indices[51] = 6;
-  indices[52] = 10;
+  indices[51] = 10;
+  indices[52] = 6;
   indices[53] = 2;
 
-  indices[54] = 8;
-  indices[55] = 7;
+  indices[54] = 7;
+  indices[55] = 8;
   indices[56] = 6;
 
-  indices[57] = 9;
-  indices[58] = 1;
+  indices[57] = 1;
+  indices[58] = 9;
   indices[59] = 8;
 
   // Applying subdivisions
