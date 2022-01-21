@@ -129,10 +129,10 @@ Mesh::Mesh(const Quad& quad) {
 
   // Computing normals
   // TODO: normals should not be computed (or even exist) for simple display quads like a framebuffer
-  leftTop.normal     = (leftTopPos - rightTopPos).cross(leftTopPos - leftBottomPos).normalize();
-  rightTop.normal    = (rightTopPos - rightBottomPos).cross(rightTopPos - leftTopPos).normalize();
-  rightBottom.normal = (rightBottomPos - leftBottomPos).cross(rightBottomPos - rightTopPos).normalize();
-  leftBottom.normal  = (leftBottomPos - leftTopPos).cross(leftBottomPos - rightBottomPos).normalize();
+  leftTop.normal     = (leftTopPos - rightTopPos).cross(leftBottomPos - leftTopPos).normalize();
+  rightTop.normal    = (rightTopPos - rightBottomPos).cross(leftTopPos - rightTopPos).normalize();
+  rightBottom.normal = (rightBottomPos - leftBottomPos).cross(rightTopPos - rightBottomPos).normalize();
+  leftBottom.normal  = (leftBottomPos - leftTopPos).cross(rightBottomPos - leftBottomPos).normalize();
 
   Submesh& submesh = m_submeshes.emplace_back();
 

@@ -80,6 +80,40 @@ TEST_CASE("Mesh triangle") {
   CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
+TEST_CASE("Mesh quad") {
+  const Raz::Quad quad(Raz::Vec3f(0.f, 2.f, 0.f), Raz::Vec3f(1.f, 2.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 0.f, 0.f));
+
+  Raz::Mesh mesh(quad);
+
+  CHECK(mesh.getSubmeshes().size() == 1);
+  CHECK(mesh.recoverVertexCount() == 4);
+  CHECK(mesh.recoverTriangleCount() == 2);
+
+  const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+  for (const Raz::Vertex& vertex : submesh.getVertices())
+    CHECK(vertex.normal == Raz::Axis::Z);
+
+  // Checking that the mesh's triangles are constructed in a counter-clockwise order
+  CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[0]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[1]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[2]].position).isCounterClockwise(Raz::Axis::Z));
+
+  CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[3]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[4]].position,
+                      submesh.getVertices()[submesh.getTriangleIndices()[5]].position).isCounterClockwise(Raz::Axis::Z));
+
+  const Raz::AABB& boundingBox = mesh.computeBoundingBox();
+
+  CHECK(boundingBox.computeCentroid() == Raz::Vec3f(0.5f, 1.f, 0.f));
+
+  const Raz::Vec3f expectedMinPos(0.f, 0.f, 0.f);
+  const Raz::Vec3f expectedMaxPos(1.f, 2.f, 0.f);
+
+  CHECK(boundingBox.getMinPosition() == expectedMinPos);
+  CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
+}
+
 TEST_CASE("Mesh UV sphere") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
