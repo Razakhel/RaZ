@@ -172,7 +172,7 @@ constexpr bool Quaternion<T>::operator==(const Quaternion& quat) const noexcept 
 
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat) {
-  stream << "[ " << quat.w() << "; " << quat.x() << "; " << quat.y() << "; " << quat.z() << " ]";
+  stream << "[ " << quat.w() << ", " << quat.x() << ", " << quat.y() << ", " << quat.z() << " ]";
   return stream;
 }
 

@@ -55,6 +55,9 @@ public:
   /// \param yAngle Value of Y to rotate around.
   /// \param zAngle Value of Z to rotate around.
   void rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle);
+  /// Rotates by the given quaternion.
+  /// \param rotation Rotation quaternion to rotate by.
+  void rotate(const Quaternionf& rotation);
   /// Rotates by the given angle around the given axis.
   /// The axis must be a normalized vector for this function to work properly.
   /// \param angle Angle to rotate by.

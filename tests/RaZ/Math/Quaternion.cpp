@@ -226,13 +226,13 @@ TEST_CASE("Quaternion printing") {
   std::stringstream stream;
 
   stream << quat1;
-  CHECK(stream.str() == "[ 0.996195; 0.0871557; 0; 0 ]");
+  CHECK(stream.str() == "[ 0.996195, 0.0871557, 0, 0 ]");
 
   stream.str(std::string()); // Resetting the stream
   stream << quat2;
-  CHECK(stream.str() == "[ 0.707107; 0.707107; -1.41421; 3.53553 ]");
+  CHECK(stream.str() == "[ 0.707107, 0.707107, -1.41421, 3.53553 ]");
 
   stream.str(std::string());
   stream << quat3;
-  CHECK(stream.str() == "[ -4.37114e-08; 1; -2; 5 ]");
+  CHECK(stream.str() == "[ -4.37114e-08, 1, -2, 5 ]");
 }

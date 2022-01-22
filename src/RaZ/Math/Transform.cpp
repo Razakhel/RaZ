@@ -42,13 +42,15 @@ void Transform::rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle) {
   m_updated = true;
 }
 
+void Transform::rotate(const Quaternionf& rotation) {
+  m_rotation *= rotation;
+  m_updated   = true;
+}
+
 void Transform::rotate(Radiansf angle, const Vec3f& axis) {
   assert("Error: Rotation axis must be normalized." && FloatUtils::areNearlyEqual(axis.computeLength(), 1.f));
 
-  const Quaternionf quaternion(angle, axis);
-  m_rotation *= quaternion;
-
-  m_updated = true;
+  rotate(Quaternionf(angle, axis));
 }
 
 void Transform::scale(float x, float y, float z) {
