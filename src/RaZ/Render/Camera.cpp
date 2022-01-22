@@ -54,13 +54,13 @@ const Mat4f& Camera::computeViewMatrix(const Transform& cameraTransform) {
 
 const Mat4f& Camera::computeLookAt(const Vec3f& position) {
   const Vec3f zAxis = (position - m_target).normalize();
-  const Vec3f xAxis = zAxis.cross(m_upAxis).normalize();
-  const Vec3f yAxis = xAxis.cross(zAxis);
+  const Vec3f xAxis = m_upAxis.cross(zAxis).normalize();
+  const Vec3f yAxis = zAxis.cross(xAxis);
 
-  m_viewMat = Mat4f( xAxis.x(),  xAxis.y(),  xAxis.z(), -xAxis.dot(position),
-                     yAxis.x(),  yAxis.y(),  yAxis.z(), -yAxis.dot(position),
-                    -zAxis.x(), -zAxis.y(), -zAxis.z(),  zAxis.dot(position),
-                     0.f,        0.f,        0.f,        1.f);
+  m_viewMat = Mat4f(xAxis.x(), xAxis.y(), xAxis.z(), -xAxis.dot(position),
+                    yAxis.x(), yAxis.y(), yAxis.z(), -yAxis.dot(position),
+                    zAxis.x(), zAxis.y(), zAxis.z(), -zAxis.dot(position),
+                    0.f,       0.f,       0.f,        1.f);
 
   return m_viewMat;
 }
