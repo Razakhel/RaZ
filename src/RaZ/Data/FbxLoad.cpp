@@ -223,13 +223,13 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
     for (int polyIndex = 0; polyIndex < fbxMesh->GetPolygonCount(); ++polyIndex) {
       indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
-      indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 2));
       indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 1));
+      indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 2));
 
       for (int polyVertIndex = 3; polyVertIndex < fbxMesh->GetPolygonSize(polyIndex); ++polyVertIndex) {
         indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, 0));
-        indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex));
         indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex - 1));
+        indices.emplace_back(fbxMesh->GetPolygonVertex(polyIndex, polyVertIndex));
       }
     }
 
