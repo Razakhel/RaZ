@@ -46,7 +46,7 @@ inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
-  meshTrans.setRotation(180.0_deg, Raz::Axis::Y);
+  meshTrans.setRotation(Raz::Quaternionf::identity());
   meshTrans.setScale(0.15f);
 }
 
@@ -78,7 +78,8 @@ inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   meshRenderComp.load(render.getGeometryProgram());
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
-  meshTrans.setPosition(0.f, -2.f, 5.f);
+  meshTrans.setPosition(0.f, -2.f, -5.f);
+  meshTrans.setRotation(Raz::Quaternionf::identity());
   meshTrans.setScale(5.f);
 }
 #endif
@@ -128,7 +129,7 @@ int main() {
   mesh.addComponent<Raz::MeshRenderer>();
 
   Raz::Entity& camera = world.addEntity();
-  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f));
+  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
   camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
   //////////////////
@@ -136,10 +137,10 @@ int main() {
   //////////////////
 
   Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
-  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                 Raz::Vec3f(0.f, -0.2f, 1.f), // Direction
-                                 1.f,                         // Energy
-                                 Raz::Vec3f(1.f));            // Color (RGB)
+  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,  // Type
+                                 Raz::Vec3f(0.f, -0.2f, -1.f), // Direction
+                                 1.f,                          // Energy
+                                 Raz::Vec3f(1.f));             // Color (RGB)
 
   /////////////
   // Overlay //
@@ -199,7 +200,7 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::L, [&render] (float /* deltaTime */) { loadLakeSkybox(render); }, Raz::Input::ONCE);
 
   window.addMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {
-    cameraTrans.translate(0.f, 0.f, 0.5f * static_cast<float>(yOffset));
+    cameraTrans.translate(0.f, 0.f, -0.5f * static_cast<float>(yOffset));
   });
 
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });

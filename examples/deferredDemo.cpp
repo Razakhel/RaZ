@@ -224,7 +224,6 @@ int main() {
 
   auto& meshTrans = mesh.addComponent<Raz::Transform>();
   meshTrans.scale(0.2f);
-  meshTrans.rotate(180_deg, Raz::Axis::Y);
 
   ////////////
   // Camera //
@@ -232,7 +231,7 @@ int main() {
 
   Raz::Entity& camera = world.addEntity();
   auto& cameraComp    = camera.addComponent<Raz::Camera>(sceneWidth, sceneHeight);
-  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f));
+  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
 
   float cameraSpeed = 1.f;
   window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
@@ -246,10 +245,10 @@ int main() {
     cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
   });
   window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f, 0.f, (10.f * deltaTime) * cameraSpeed);
+    cameraTrans.move(0.f, 0.f, (-10.f * deltaTime) * cameraSpeed);
   });
   window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f,  0.f, (-10.f * deltaTime) * cameraSpeed);
+    cameraTrans.move(0.f,  0.f, (10.f * deltaTime) * cameraSpeed);
   });
   window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
     cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);

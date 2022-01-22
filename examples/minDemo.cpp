@@ -9,7 +9,7 @@ int main() {
   auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
   render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
 
-  Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f));
+  Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
   camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());
 
   Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
@@ -20,7 +20,7 @@ int main() {
 
   Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
   light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                 Raz::Vec3f(0.f, 0.f, 1.f),   // Direction
+                                 Raz::Vec3f(0.f, 0.f, -1.f),  // Direction
                                  1.f,                         // Energy
                                  Raz::Vec3f(1.f));            // Color (R/G/B)
 

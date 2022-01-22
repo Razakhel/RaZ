@@ -66,7 +66,7 @@ int main() {
 
   Raz::Entity& camera = world.addEntity();
   auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
-  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f));
+  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
 
   /////////////////
   // Mesh entity //
@@ -80,7 +80,6 @@ int main() {
 
   auto& meshTrans = mesh.addComponent<Raz::Transform>();
   meshTrans.scale(0.2f);
-  meshTrans.rotate(180_deg, Raz::Axis::Y);
 
   window.addKeyCallback(Raz::Keyboard::R, [&mesh] (float /* deltaTime */) noexcept { mesh.disable(); },
                         Raz::Input::ONCE,
@@ -110,7 +109,7 @@ int main() {
                                                    1.f,                   // Energy
                                                    Raz::Vec3f(1.f));      // Color(RGB)*/
   auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                                   Raz::Vec3f(0.f, 0.f, 1.f),   // Direction
+                                                   Raz::Vec3f(0.f, 0.f, -1.f),  // Direction
                                                    1.f,                         // Energy
                                                    Raz::Vec3f(1.f));            // Color (RGB)
   auto& lightTrans = light.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 1.f, 0.f));
@@ -131,18 +130,18 @@ int main() {
     cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
   });
   window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraComp, &cameraSpeed] (float deltaTime) {
-    const float moveVal = (10.f * deltaTime) * cameraSpeed;
-
-    cameraTrans.move(0.f, 0.f, moveVal);
-    cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() - moveVal);
-    cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() - moveVal);
-  });
-  window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraComp, &cameraSpeed] (float deltaTime) {
     const float moveVal = (-10.f * deltaTime) * cameraSpeed;
 
     cameraTrans.move(0.f, 0.f, moveVal);
-    cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() - moveVal);
-    cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() - moveVal);
+    cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() + moveVal);
+    cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() + moveVal);
+  });
+  window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraComp, &cameraSpeed] (float deltaTime) {
+    const float moveVal = (10.f * deltaTime) * cameraSpeed;
+
+    cameraTrans.move(0.f, 0.f, moveVal);
+    cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() + moveVal);
+    cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() + moveVal);
   });
   window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
     cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
@@ -188,10 +187,10 @@ int main() {
   window.addKeyCallback(Raz::Keyboard::X, [&meshTrans] (float /* deltaTime */) { meshTrans.scale(0.5f); }, Raz::Input::ONCE);
   window.addKeyCallback(Raz::Keyboard::C, [&meshTrans] (float /* deltaTime */) { meshTrans.scale(2.f); }, Raz::Input::ONCE);
 
-  window.addKeyCallback(Raz::Keyboard::UP,    [&meshTrans] (float deltaTime) { meshTrans.rotate(-90_deg * deltaTime, Raz::Axis::X); });
-  window.addKeyCallback(Raz::Keyboard::DOWN,  [&meshTrans] (float deltaTime) { meshTrans.rotate(90_deg * deltaTime, Raz::Axis::X); });
-  window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTrans] (float deltaTime) { meshTrans.rotate(-90_deg * deltaTime, Raz::Axis::Y); });
-  window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTrans] (float deltaTime) { meshTrans.rotate(90_deg * deltaTime, Raz::Axis::Y); });
+  window.addKeyCallback(Raz::Keyboard::UP,    [&meshTrans] (float deltaTime) { meshTrans.rotate(90_deg * deltaTime, Raz::Axis::X); });
+  window.addKeyCallback(Raz::Keyboard::DOWN,  [&meshTrans] (float deltaTime) { meshTrans.rotate(-90_deg * deltaTime, Raz::Axis::X); });
+  window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTrans] (float deltaTime) { meshTrans.rotate(90_deg * deltaTime, Raz::Axis::Y); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTrans] (float deltaTime) { meshTrans.rotate(-90_deg * deltaTime, Raz::Axis::Y); });
 
   // Toggling play/pause
   window.addKeyCallback(Raz::Keyboard::NUM0, [&meshSound] (float /* deltaTime */) {
@@ -217,11 +216,11 @@ int main() {
   ////////////////////
 
   window.addKeyCallback(Raz::Keyboard::I, [&lightTrans, &renderSystem] (float deltaTime) {
-    lightTrans.translate(0.f, 0.f, 10.f * deltaTime);
+    lightTrans.translate(0.f, 0.f, -10.f * deltaTime);
     renderSystem.updateLights();
   });
   window.addKeyCallback(Raz::Keyboard::K, [&lightTrans, &renderSystem] (float deltaTime) {
-    lightTrans.translate(0.f, 0.f, -10.f * deltaTime);
+    lightTrans.translate(0.f, 0.f, 10.f * deltaTime);
     renderSystem.updateLights();
   });
   window.addKeyCallback(Raz::Keyboard::J, [&lightTrans, &renderSystem] (float deltaTime) {

@@ -13,7 +13,7 @@ int main() {
 
   Raz::Entity& camera = world.addEntity();
   auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
-  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 10.f, -25.f));
+  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 10.f, 25.f));
   cameraComp.setCameraType(Raz::CameraType::LOOK_AT);
 
   auto& physics = world.addSystem<Raz::PhysicsSystem>();
@@ -55,7 +55,7 @@ int main() {
   floor.addComponent<Raz::Collider>(Raz::Plane(0.f));
 
   Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
-  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -1.f, 1.f), 1.f, Raz::Vec3f(1.f));
+  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -1.f, -1.f), 1.f, Raz::Vec3f(1.f));
 
   render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
   render.getWindow().setCloseCallback([&app] () noexcept { app.quit(); });
