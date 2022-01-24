@@ -95,8 +95,7 @@ void Image::readPng(std::ifstream& file, bool flipVertically) {
 
   png_read_update_info(readStruct, infoStruct);
 
-  ImageDataBPtr imgData = ImageDataB::create();
-  imgData->data.resize(m_width * m_height * m_channelCount);
+  ImageDataBPtr imgData = ImageDataB::create(m_width * m_height * m_channelCount);
 
   std::vector<png_bytep> rowPtrs(m_height);
 

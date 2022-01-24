@@ -19,7 +19,11 @@ bool RenderGraph::isValid() const {
 }
 
 const Texture& RenderGraph::addTextureBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace) {
-  return *m_buffers.emplace_back(std::make_unique<Texture>(width, height, m_buffers.size(), colorspace));
+  return addTextureBuffer(width, height, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE));
+}
+
+const Texture& RenderGraph::addTextureBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) {
+  return *m_buffers.emplace_back(std::make_unique<Texture>(width, height, static_cast<int>(m_buffers.size()), colorspace, dataType));
 }
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {

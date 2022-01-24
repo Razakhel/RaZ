@@ -96,8 +96,7 @@ void Image::readTga(std::ifstream& file, bool flipVertically) {
   // Bits 3-0 give the alpha channel depth, bits 5-4 give direction
   file.read(reinterpret_cast<char*>(bytes.data()), 1);
 
-  auto imgData = ImageDataB::create();
-  imgData->data.resize(m_width * m_height * m_channelCount);
+  auto imgData = ImageDataB::create(m_width * m_height * m_channelCount);
 
   if (!runLengthEncoding) {
     std::vector<uint8_t> values(imgData->data.size());

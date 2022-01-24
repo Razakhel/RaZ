@@ -20,7 +20,10 @@ bool ImageDataF::operator==(const ImageData& imgData) const {
   return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataF*>(&imgData)->data.cbegin());
 }
 
-Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace) : m_width{ width }, m_height{ height }, m_colorspace{ colorspace } {
+Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) : m_width{ width }, m_height{ height },
+                                                                                                            m_colorspace{ colorspace }, m_dataType{ dataType } {
+  assert("Error: A depth image must have a floating-point data type." && (m_colorspace != ImageColorspace::DEPTH || m_dataType == ImageDataType::FLOAT));
+
   switch (colorspace) {
     case ImageColorspace::DEPTH:
     case ImageColorspace::GRAY:
@@ -41,27 +44,26 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
       break;
   }
 
-  m_bitDepth = 8;
+  m_bitDepth = 8; // TODO: the bit depth should most likely differ if using a floating-point data type
 
   const std::size_t imageDataSize = width * height * m_channelCount;
 
-  if (colorspace == ImageColorspace::DEPTH)
-    m_data = ImageDataF::create();
+  if (dataType == ImageDataType::FLOAT || colorspace == ImageColorspace::DEPTH)
+    m_data = ImageDataF::create(imageDataSize);
   else
-    m_data = ImageDataB::create();
-
-  m_data->resize(imageDataSize);
+    m_data = ImageDataB::create(imageDataSize);
 }
 
 Image::Image(const Image& image) : m_width{ image.m_width },
                                    m_height{ image.m_height },
                                    m_colorspace{ image.m_colorspace },
+                                   m_dataType{ image.m_dataType },
                                    m_channelCount{ image.m_channelCount },
                                    m_bitDepth{ image.m_bitDepth } {
   if (image.m_data == nullptr)
     return;
 
-  switch (image.m_data->getDataType()) {
+  switch (image.m_dataType) {
     case ImageDataType::BYTE:
       m_data = ImageDataB::create(*static_cast<ImageDataB*>(image.m_data.get()));
       break;
@@ -113,11 +115,12 @@ Image& Image::operator=(const Image& image) {
   m_width        = image.m_width;
   m_height       = image.m_height;
   m_colorspace   = image.m_colorspace;
+  m_dataType     = image.m_dataType;
   m_channelCount = image.m_channelCount;
   m_bitDepth     = image.m_bitDepth;
 
   if (image.m_data) {
-    switch (image.m_data->getDataType()) {
+    switch (image.m_dataType) {
       case ImageDataType::BYTE:
         m_data = ImageDataB::create(*static_cast<ImageDataB*>(image.m_data.get()));
         break;
@@ -137,7 +140,7 @@ bool Image::operator==(const Image& img) const {
   if (m_data == nullptr || img.m_data == nullptr)
     return false;
 
-  assert("Error: Image equality check requires having images of the same type." && getDataType() == img.getDataType());
+  assert("Error: Image equality check requires having images of the same type." && m_dataType == img.m_dataType);
 
   return (*m_data == *img.m_data);
 }

@@ -160,10 +160,11 @@ constexpr std::string_view displayFragSource = R"(#version 300 es
   layout(location = 0) out vec4 fragColor;
 
   void main() {
-    float depth     = texture(uniSceneBuffers.depth, fragTexcoords).r;
-    vec4 color      = texture(uniSceneBuffers.color, fragTexcoords).rgba;
-    vec3 normal     = texture(uniSceneBuffers.normal, fragTexcoords).rgb;
-    float roughness = texture(uniSceneBuffers.normal, fragTexcoords).a;
+    float depth      = texture(uniSceneBuffers.depth, fragTexcoords).r;
+    vec4 color       = texture(uniSceneBuffers.color, fragTexcoords).rgba;
+    vec4 normalRough = texture(uniSceneBuffers.normal, fragTexcoords).rgba;
+    vec3 normal      = normalRough.rgb;
+    float roughness  = normalRough.a;
 
     if (int(gl_FragCoord.y) > 360) {
       if (int(gl_FragCoord.x) < 640)
@@ -197,21 +198,21 @@ int main() {
   ///////////////////
 
   // Creating the render graph's texture buffers
-  const Raz::Texture& geomDepthBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
-  const Raz::Texture& geomColorBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
-  const Raz::Texture& geomNormalBuffer = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+  const Raz::Texture& depthBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
+  const Raz::Texture& colorBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+  const Raz::Texture& normalBuffer = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
 
   // Setting geometry pass' shaders & defining its write buffers
   Raz::RenderPass& geomPass = render.getGeometryPass();
-  geomPass.addWriteTexture(geomDepthBuffer);
-  geomPass.addWriteTexture(geomColorBuffer);
-  geomPass.addWriteTexture(geomNormalBuffer);
+  geomPass.addWriteTexture(depthBuffer);
+  geomPass.addWriteTexture(colorBuffer);
+  geomPass.addWriteTexture(normalBuffer);
 
   // Adding the second pass & defining its read buffers
   Raz::RenderPass& renderPass = render.addRenderPass(Raz::FragmentShader::loadFromSource(displayFragSource));
-  renderPass.addReadTexture(geomDepthBuffer, "uniSceneBuffers.depth");
-  renderPass.addReadTexture(geomColorBuffer, "uniSceneBuffers.color");
-  renderPass.addReadTexture(geomNormalBuffer, "uniSceneBuffers.normal");
+  renderPass.addReadTexture(depthBuffer, "uniSceneBuffers.depth");
+  renderPass.addReadTexture(colorBuffer, "uniSceneBuffers.color");
+  renderPass.addReadTexture(normalBuffer, "uniSceneBuffers.normal");
 
   geomPass.addChildren(renderPass);
 
@@ -291,9 +292,9 @@ int main() {
 #if !defined(RAZ_NO_OVERLAY)
   Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Deferred demo", Raz::Vec2f(sceneWidth / 4, sceneHeight));
 
-  overlay.addTexture(geomDepthBuffer, sceneWidth / 3, sceneHeight / 3);
-  overlay.addTexture(geomColorBuffer, sceneWidth / 3, sceneHeight / 3);
-  overlay.addTexture(geomNormalBuffer, sceneWidth / 3, sceneHeight / 3);
+  overlay.addTexture(depthBuffer, sceneWidth / 4, sceneHeight / 4);
+  overlay.addTexture(colorBuffer, sceneWidth / 4, sceneHeight / 4);
+  overlay.addTexture(normalBuffer, sceneWidth / 4, sceneHeight / 4);
 
   overlay.addSeparator();
 

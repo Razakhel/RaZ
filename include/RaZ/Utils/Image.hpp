@@ -25,6 +25,14 @@ using ImageDataFPtr = std::unique_ptr<ImageDataF>;
 class Image;
 using ImagePtr = std::unique_ptr<Image>;
 
+enum class ImageColorspace : unsigned int {
+  GRAY       = static_cast<unsigned int>(TextureFormat::RED),
+  GRAY_ALPHA = static_cast<unsigned int>(TextureFormat::RG),
+  RGB        = static_cast<unsigned int>(TextureFormat::RGB),
+  RGBA       = static_cast<unsigned int>(TextureFormat::RGBA),
+  DEPTH      = static_cast<unsigned int>(TextureFormat::DEPTH)
+};
+
 enum class ImageDataType : uint8_t {
   BYTE = 0,
   FLOAT
@@ -65,6 +73,8 @@ struct ImageData {
 
 /// ImageData in bytes.
 struct ImageDataB final : public ImageData {
+  ImageDataB(std::size_t dataSize) { resize(dataSize); }
+
   ImageDataType getDataType() const override { return ImageDataType::BYTE; }
   const void* getDataPtr() const override { return data.data(); }
   void* getDataPtr() override { return data.data(); }
@@ -90,6 +100,8 @@ struct ImageDataB final : public ImageData {
 
 /// ImageData in floating point values (for High Dynamic Range (HDR) images).
 struct ImageDataF final : public ImageData {
+  ImageDataF(std::size_t dataSize) { resize(dataSize); }
+
   ImageDataType getDataType() const override { return ImageDataType::FLOAT; }
   const void* getDataPtr() const override { return data.data(); }
   void* getDataPtr() override { return data.data(); }
@@ -113,21 +125,13 @@ struct ImageDataF final : public ImageData {
   std::vector<float> data;
 };
 
-enum class ImageColorspace : unsigned int {
-  GRAY       = static_cast<unsigned int>(TextureFormat::RED),
-  GRAY_ALPHA = static_cast<unsigned int>(TextureFormat::RG),
-  RGB        = static_cast<unsigned int>(TextureFormat::RGB),
-  RGBA       = static_cast<unsigned int>(TextureFormat::RGBA),
-  DEPTH      = static_cast<unsigned int>(TextureFormat::DEPTH)
-};
-
 /// Image class, handling images of different formats.
 class Image {
   friend class Texture;
 
 public:
   Image() = default;
-  Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB);
+  Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB, ImageDataType dataType = ImageDataType::BYTE);
   explicit Image(const FilePath& filePath, bool flipVertically = false) { read(filePath, flipVertically); }
   Image(const Image& image);
   Image(Image&&) noexcept = default;
@@ -135,7 +139,7 @@ public:
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
   ImageColorspace getColorspace() const { return m_colorspace; }
-  ImageDataType getDataType() const { return m_data->getDataType(); }
+  ImageDataType getDataType() const { return m_dataType; }
   const void* getDataPtr() const { return m_data->getDataPtr(); }
   void* getDataPtr() { return m_data->getDataPtr(); }
 
@@ -189,6 +193,7 @@ private:
   unsigned int m_width {};
   unsigned int m_height {};
   ImageColorspace m_colorspace {};
+  ImageDataType m_dataType {};
   uint8_t m_channelCount {};
   uint8_t m_bitDepth {};
 

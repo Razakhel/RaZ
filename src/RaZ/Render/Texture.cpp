@@ -4,6 +4,42 @@
 
 namespace Raz {
 
+namespace {
+
+TextureInternalFormat recoverInternalFormat(const Image& image) {
+  // Default internal format is the image's own colorspace; modified if the image is a floating point one
+  auto colorFormat = static_cast<TextureInternalFormat>(image.getColorspace());
+
+  if (image.getDataType() == ImageDataType::FLOAT) {
+    switch (image.getColorspace()) {
+      case ImageColorspace::GRAY:
+        colorFormat = TextureInternalFormat::RED16F;
+        break;
+
+      case ImageColorspace::GRAY_ALPHA:
+        colorFormat = TextureInternalFormat::RG16F;
+        break;
+
+      case ImageColorspace::RGB:
+      default:
+        colorFormat = TextureInternalFormat::RGB16F;
+        break;
+
+      case ImageColorspace::RGBA:
+        colorFormat = TextureInternalFormat::RGBA16F;
+        break;
+
+      case ImageColorspace::DEPTH:
+        colorFormat = TextureInternalFormat::DEPTH32F;
+        break;
+    }
+  }
+
+  return colorFormat;
+}
+
+} // namespace
+
 Texture::Texture() {
   Renderer::generateTexture(m_index);
 }
@@ -16,18 +52,15 @@ Texture::Texture(ColorPreset preset, int bindingIndex) : Texture(bindingIndex) {
   makePlainColored(Vec3b(red, green, blue));
 }
 
-Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace) : Texture(bindingIndex) {
+Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, ImageDataType dataType) : Texture(bindingIndex) {
   m_image.m_colorspace = colorspace;
+  m_image.m_dataType   = dataType;
 
   bind();
 
-  if (colorspace == ImageColorspace::DEPTH) {
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, TextureParamValue::NEAREST);
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::NEAREST);
-  } else {
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR);
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
-  }
+  const TextureParamValue textureParam = (colorspace == ImageColorspace::DEPTH ? TextureParamValue::NEAREST : TextureParamValue::LINEAR);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, textureParam);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, textureParam);
 
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::CLAMP_TO_EDGE);
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
@@ -67,25 +100,14 @@ void Texture::unbind() const {
 }
 
 void Texture::resize(unsigned int width, unsigned int height) const {
-  if (m_image.m_colorspace == ImageColorspace::DEPTH) {
-    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
-                              0,
-                              TextureInternalFormat::DEPTH32F,
-                              width,
-                              height,
-                              static_cast<TextureFormat>(m_image.m_colorspace),
-                              TextureDataType::FLOAT,
-                              (m_image.isEmpty() ? nullptr : m_image.getDataPtr()));
-  } else {
-    Renderer::sendImageData2D(TextureType::TEXTURE_2D,
-                              0,
-                              static_cast<TextureInternalFormat>(m_image.m_colorspace),
-                              width,
-                              height,
-                              static_cast<TextureFormat>(m_image.m_colorspace),
-                              TextureDataType::UBYTE,
-                              (m_image.isEmpty() ? nullptr : m_image.getDataPtr()));
-  }
+  Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                            0,
+                            recoverInternalFormat(m_image),
+                            width,
+                            height,
+                            static_cast<TextureFormat>(m_image.m_colorspace),
+                            (m_image.m_dataType == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
+                            (m_image.isEmpty() ? nullptr : m_image.getDataPtr()));
 }
 
 Texture& Texture::operator=(Texture&& texture) noexcept {
@@ -126,37 +148,9 @@ void Texture::load(bool createMipmaps) {
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_RGBA, swizzle.data());
   }
 
-  // Default internal format is the image's own colorspace; modified if the image is a floating point one
-  auto colorFormat = static_cast<TextureInternalFormat>(m_image.getColorspace());
-
-  if (m_image.getDataType() == ImageDataType::FLOAT) {
-    switch (m_image.getColorspace()) {
-      case ImageColorspace::GRAY:
-        colorFormat = TextureInternalFormat::RED16F;
-        break;
-
-      case ImageColorspace::GRAY_ALPHA:
-        colorFormat = TextureInternalFormat::RG16F;
-        break;
-
-      case ImageColorspace::RGB:
-      default:
-        colorFormat = TextureInternalFormat::RGB16F;
-        break;
-
-      case ImageColorspace::RGBA:
-        colorFormat = TextureInternalFormat::RGBA16F;
-        break;
-
-      case ImageColorspace::DEPTH:
-        // Unhandled here
-        break;
-    }
-  }
-
   Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                             0,
-                            colorFormat,
+                            recoverInternalFormat(m_image),
                             m_image.getWidth(),
                             m_image.getHeight(),
                             static_cast<TextureFormat>(m_image.m_colorspace),
