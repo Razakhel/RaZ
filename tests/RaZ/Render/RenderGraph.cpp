@@ -7,18 +7,20 @@ TEST_CASE("RenderGraph validity") {
   CHECK(graph.isValid());
 
   const Raz::Texture& depthTexture = graph.addTextureBuffer(1, 1, Raz::ImageColorspace::DEPTH);
-  CHECK(graph.isValid());
+  CHECK(graph.isValid()); // Adding a buffer does not change the graph's validity
 
-  // Adding a write texture to the geometry pass without an associated read texture: it is invalid
   graph.getGeometryPass().addWriteTexture(depthTexture);
-  CHECK_FALSE(graph.isValid());
+  CHECK(graph.isValid()); // A pass does not need matching buffers with its children
 
   Raz::RenderPass& nextPass = graph.addNode();
-  CHECK_FALSE(graph.isValid()); // The next pass doesn't have any texture, the graph is still invalid
-
-  nextPass.addReadTexture(depthTexture, ""); // Unnecessary uniform name
-  CHECK_FALSE(graph.isValid()); // The geometry & the next pass have a matching texture buffer, but they aren't linked
+  CHECK(graph.isValid()); // An empty pass is always valid
 
   graph.getGeometryPass().addChildren(nextPass);
-  CHECK(graph.isValid()); // The passes are linked & their buffers match, the graph is now valid
+  CHECK(graph.isValid()); // Since matching buffers between passes is not required, the graph remains valid
+
+  nextPass.addReadTexture(depthTexture, ""); // Unnecessary uniform name
+  CHECK(graph.isValid()); // Same as the above
+
+  graph.getGeometryPass().addReadTexture(depthTexture, "");
+  CHECK_FALSE(graph.isValid()); // The depth texture is set as both read & write usages in the geometry buffer; at least one pass is invalid, thus the graph is
 }

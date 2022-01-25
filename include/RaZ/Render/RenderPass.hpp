@@ -18,16 +18,15 @@ public:
   RenderPass(RenderPass&&) noexcept = default;
 
   bool isEnabled() const { return m_enabled; }
-  /// Checks that every write buffer has an associated read buffer in each of its children.
-  /// \note This doesn't check for precedency; if no subsequent pass exist, it is considered valid.
-  /// \return True if no child pass or if the render pass is valid, false otherwise.
+  /// Checks that the current render pass is valid, that is, if none of its buffer has been defined as both read & write.
+  /// \return True if the render pass is valid, false otherwise.
   /// \see RenderGraph::isValid()
   bool isValid() const;
   const ShaderProgram& getProgram() const { return m_program; }
   ShaderProgram& getProgram() { return m_program; }
   const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
 
-  void setProgram(ShaderProgram program) { m_program = std::move(program); }
+  void setProgram(ShaderProgram&& program) { m_program = std::move(program); }
 
   void addReadTexture(const Texture& texture, const std::string& uniformName);
   void addWriteTexture(const Texture& texture) { m_writeFramebuffer.addTextureBuffer(texture); }

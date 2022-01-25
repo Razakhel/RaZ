@@ -23,10 +23,11 @@ public:
   Framebuffer(const Framebuffer&) = delete;
   Framebuffer(Framebuffer&& fbo) noexcept;
 
-  bool hasDepthBuffer() const { return (m_depthBuffer != nullptr); }
-  bool isEmpty() const { return (!hasDepthBuffer() && m_colorBuffers.empty()); }
-  const Texture& getDepthBuffer() const { assert("Error: Framebuffer doesn't contain a depth buffer." && hasDepthBuffer()); return *m_depthBuffer; }
-  const Texture& getColorBuffer(std::size_t bufferIndex) const { return *m_colorBuffers[bufferIndex]; }
+  bool isEmpty() const noexcept { return (!hasDepthBuffer() && m_colorBuffers.empty()); }
+  bool hasDepthBuffer() const noexcept { return (m_depthBuffer != nullptr); }
+  const Texture& getDepthBuffer() const noexcept { assert("Error: Framebuffer doesn't contain a depth buffer." && hasDepthBuffer()); return *m_depthBuffer; }
+  std::size_t getColorBufferCount() const noexcept { return m_colorBuffers.size(); }
+  const Texture& getColorBuffer(std::size_t bufferIndex) const noexcept { return *m_colorBuffers[bufferIndex]; }
 
   /// Gives a basic vertex shader, to display the framebuffer.
   /// \return Basic display vertex shader.

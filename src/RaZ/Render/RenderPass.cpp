@@ -4,11 +4,8 @@
 namespace Raz {
 
 bool RenderPass::isValid() const {
-  const std::size_t currentBufferCount = m_writeFramebuffer.m_colorBuffers.size() + m_writeFramebuffer.hasDepthBuffer();
-
-  // If the current pass has any buffer and no child pass, the buffers obviously can't match
-  if (m_children.empty())
-    return (currentBufferCount == 0);
+  // Since a pass can get read & write buffers from other sources than the previous pass, one may have more or less
+  //  buffers than those its parent write to. Direct buffer compatibility is thus not checked
 
   const std::vector<const Texture*>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
 
@@ -22,29 +19,6 @@ bool RenderPass::isValid() const {
     // Likewise for the color buffers: if any has been added as both read & write, the pass is invalid
     if (std::find(writeColorBuffers.cbegin(), writeColorBuffers.cend(), readTexture) != writeColorBuffers.cend())
       return false;
-  }
-
-  for (const RenderPass* nextPass : m_children) {
-    // If the amount of read textures doesn't match the write's (colors + depth), the pass necessarily isn't valid
-    if (nextPass->m_readTextures.size() != currentBufferCount)
-      return false;
-
-    for (const Texture* nextReadTexture : nextPass->m_readTextures) {
-      // If the following pass contains a read depth buffer, it is invalid...
-      if (nextReadTexture->getImage().getColorspace() == ImageColorspace::DEPTH) {
-        // ... if the current pass has either no local write counterpart...
-        if (!m_writeFramebuffer.hasDepthBuffer())
-          return false;
-
-        // ... or has a different one
-        if (nextReadTexture != &m_writeFramebuffer.getDepthBuffer())
-          return false;
-      } else {
-        // If any of the color buffers don't match, the pass is invalid
-        if (std::find(writeColorBuffers.cbegin(), writeColorBuffers.cend(), nextReadTexture) == writeColorBuffers.cend())
-          return false;
-      }
-    }
   }
 
   return true;
