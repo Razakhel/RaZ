@@ -3,6 +3,28 @@
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
+TEST_CASE("Texture dimensions creation") {
+  const Raz::Texture textureEmpty(0, 0, 42, Raz::ImageColorspace::RGBA);
+  CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(textureEmpty.getBindingIndex() == 42);
+  CHECK(textureEmpty.getImage().getWidth() == 0);
+  CHECK(textureEmpty.getImage().getHeight() == 0);
+  CHECK(textureEmpty.getImage().getColorspace() == Raz::ImageColorspace::RGBA);
+  CHECK(textureEmpty.getImage().getDataType() == Raz::ImageDataType::BYTE);
+  CHECK(textureEmpty.getImage().getChannelCount() == 4);
+  CHECK(textureEmpty.getImage().isEmpty());
+
+  const Raz::Texture textureSmall(1, 1, 42, Raz::ImageColorspace::DEPTH);
+  CHECK(textureSmall.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(textureSmall.getBindingIndex() == 42);
+  CHECK(textureSmall.getImage().getWidth() == 0); // A texture does not initialize the underlying image
+  CHECK(textureSmall.getImage().getHeight() == 0);
+  CHECK(textureSmall.getImage().getColorspace() == Raz::ImageColorspace::DEPTH);
+  CHECK(textureSmall.getImage().getDataType() == Raz::ImageDataType::FLOAT); // A depth texture is always floating-point
+  CHECK(textureSmall.getImage().getChannelCount() == 1);
+  CHECK(textureSmall.getImage().isEmpty());
+}
+
 TEST_CASE("Texture move") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 

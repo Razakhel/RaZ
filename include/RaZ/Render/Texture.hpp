@@ -42,7 +42,8 @@ public:
   /// \param preset Color preset to create the texture with.
   /// \param bindingIndex Index of the texture's binding point.
   explicit Texture(ColorPreset preset, int bindingIndex = std::numeric_limits<int>::max());
-  Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, ImageDataType dataType = ImageDataType::BYTE);
+  Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace);
+  Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, ImageDataType dataType);
   Texture(Image image, int bindingIndex, bool createMipmaps = true) : Texture(bindingIndex) { load(std::move(image), createMipmaps); }
   explicit Texture(const FilePath& filePath, int bindingIndex, bool flipVertically = false, bool createMipmaps = true)
     : Texture(bindingIndex) { load(filePath, flipVertically, createMipmaps); }

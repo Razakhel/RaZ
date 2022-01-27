@@ -52,9 +52,11 @@ Texture::Texture(ColorPreset preset, int bindingIndex) : Texture(bindingIndex) {
   makePlainColored(Vec3b(red, green, blue));
 }
 
+Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace)
+  : Texture(width, height, bindingIndex, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
+
 Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, ImageDataType dataType) : Texture(bindingIndex) {
-  m_image.m_colorspace = colorspace;
-  m_image.m_dataType   = dataType;
+  m_image = Image(colorspace, dataType);
 
   bind();
 

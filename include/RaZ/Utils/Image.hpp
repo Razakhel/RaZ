@@ -73,7 +73,7 @@ struct ImageData {
 
 /// ImageData in bytes.
 struct ImageDataB final : public ImageData {
-  ImageDataB(std::size_t dataSize) { resize(dataSize); }
+  explicit ImageDataB(std::size_t dataSize) { resize(dataSize); }
 
   ImageDataType getDataType() const override { return ImageDataType::BYTE; }
   const void* getDataPtr() const override { return data.data(); }
@@ -100,7 +100,7 @@ struct ImageDataB final : public ImageData {
 
 /// ImageData in floating point values (for High Dynamic Range (HDR) images).
 struct ImageDataF final : public ImageData {
-  ImageDataF(std::size_t dataSize) { resize(dataSize); }
+  explicit ImageDataF(std::size_t dataSize) { resize(dataSize); }
 
   ImageDataType getDataType() const override { return ImageDataType::FLOAT; }
   const void* getDataPtr() const override { return data.data(); }
@@ -131,17 +131,21 @@ class Image {
 
 public:
   Image() = default;
-  Image(unsigned int width, unsigned int height, ImageColorspace colorspace = ImageColorspace::RGB, ImageDataType dataType = ImageDataType::BYTE);
+  explicit Image(ImageColorspace colorspace) : Image(colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
+  Image(ImageColorspace colorspace, ImageDataType dataType);
+  Image(unsigned int width, unsigned int height, ImageColorspace colorspace);
+  Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
   explicit Image(const FilePath& filePath, bool flipVertically = false) { read(filePath, flipVertically); }
   Image(const Image& image);
   Image(Image&&) noexcept = default;
 
-  unsigned int getWidth() const { return m_width; }
-  unsigned int getHeight() const { return m_height; }
-  ImageColorspace getColorspace() const { return m_colorspace; }
-  ImageDataType getDataType() const { return m_dataType; }
-  const void* getDataPtr() const { return m_data->getDataPtr(); }
-  void* getDataPtr() { return m_data->getDataPtr(); }
+  unsigned int getWidth() const noexcept { return m_width; }
+  unsigned int getHeight() const noexcept { return m_height; }
+  ImageColorspace getColorspace() const noexcept { return m_colorspace; }
+  ImageDataType getDataType() const noexcept { return m_dataType; }
+  uint8_t getChannelCount() const noexcept { return m_channelCount; }
+  const void* getDataPtr() const noexcept { return m_data->getDataPtr(); }
+  void* getDataPtr() noexcept { return m_data->getDataPtr(); }
 
   template <typename... Args> static ImagePtr create(Args&&... args) { return std::make_unique<Image>(std::forward<Args>(args)...); }
 

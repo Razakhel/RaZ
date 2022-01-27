@@ -20,8 +20,7 @@ bool ImageDataF::operator==(const ImageData& imgData) const {
   return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataF*>(&imgData)->data.cbegin());
 }
 
-Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) : m_width{ width }, m_height{ height },
-                                                                                                            m_colorspace{ colorspace }, m_dataType{ dataType } {
+Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{ colorspace }, m_dataType{ dataType } {
   assert("Error: A depth image must have a floating-point data type." && (m_colorspace != ImageColorspace::DEPTH || m_dataType == ImageDataType::FLOAT));
 
   switch (colorspace) {
@@ -45,10 +44,18 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
   }
 
   m_bitDepth = 8; // TODO: the bit depth should most likely differ if using a floating-point data type
+}
 
-  const std::size_t imageDataSize = width * height * m_channelCount;
+Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace)
+  : Image(width, height, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
 
-  if (dataType == ImageDataType::FLOAT || colorspace == ImageColorspace::DEPTH)
+Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) : Image(colorspace, dataType) {
+  m_width  = width;
+  m_height = height;
+
+  const std::size_t imageDataSize = m_width * m_height * m_channelCount;
+
+  if (m_dataType == ImageDataType::FLOAT || m_colorspace == ImageColorspace::DEPTH)
     m_data = ImageDataF::create(imageDataSize);
   else
     m_data = ImageDataB::create(imageDataSize);
