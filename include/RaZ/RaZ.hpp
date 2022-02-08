@@ -49,6 +49,7 @@
 #include "Render/Renderer.hpp"
 #include "Render/RenderGraph.hpp"
 #include "Render/RenderPass.hpp"
+#include "Render/RenderProcess.hpp"
 #include "Render/RenderSystem.hpp"
 #include "Render/Shader.hpp"
 #include "Render/ShaderProgram.hpp"

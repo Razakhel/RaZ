@@ -17,7 +17,10 @@ bool RenderGraph::isValid() const {
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
   for (std::unique_ptr<RenderPass>& renderPass : m_nodes)
-    renderPass->resizeWriteBuffers(width, height);
+    renderPass->resizeWriteBuffers(width, height); // TODO: resizing all write buffers will only work if they have all been created with equal dimensions
+
+  for (std::unique_ptr<RenderProcess>& renderProcess : m_renderProcesses)
+    renderProcess->resizeBuffers(width, height);
 }
 
 void RenderGraph::updateShaders() const {

@@ -60,8 +60,6 @@ public:
   void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
 #endif
   void resizeViewport(unsigned int width, unsigned int height);
-  RenderPass& addRenderPass(VertexShader vertShader, FragmentShader fragShader);
-  RenderPass& addRenderPass(FragmentShader fragShader);
   bool update(float deltaTime) override;
   void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
   void sendInverseViewMatrix(const Mat4f& invViewMat) const { m_cameraUbo.sendData(invViewMat, sizeof(Mat4f)); }

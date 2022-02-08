@@ -30,14 +30,6 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   m_renderGraph.resizeViewport(width, height);
 }
 
-RenderPass& RenderSystem::addRenderPass(VertexShader vertShader, FragmentShader fragShader) {
-  return m_renderGraph.addNode(std::move(vertShader), std::move(fragShader));
-}
-
-RenderPass& RenderSystem::addRenderPass(FragmentShader fragShader) {
-  return m_renderGraph.addNode(std::move(fragShader));
-}
-
 bool RenderSystem::update([[maybe_unused]] float deltaTime) {
   m_cameraUbo.bindBase(0);
   m_lightsUbo.bindBase(1);
