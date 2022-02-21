@@ -34,6 +34,9 @@ endif ()
 
 target_compile_options(RaZ_Examples INTERFACE ${RAZ_EXAMPLES_DISABLED_WARNINGS})
 
+add_executable(RaZ_BloomDemo bloomDemo.cpp)
+target_link_libraries(RaZ_BloomDemo RaZ_Examples)
+
 if (NOT RAZ_USE_EMSCRIPTEN)
     add_executable(RaZ_ComputeDemo computeDemo.cpp)
     target_link_libraries(RaZ_ComputeDemo RaZ_Examples)
@@ -63,6 +66,7 @@ if (NOT RAZ_USE_EMSCRIPTEN)
 endif ()
 
 if (RAZ_USE_EMSCRIPTEN)
+    set_target_properties(RaZ_BloomDemo    PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_DeferredDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_FullDemo     PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_MinDemo      PROPERTIES SUFFIX ".html")

@@ -1,3 +1,31 @@
+######################
+# Assets - BloomDemo #
+######################
+
+set(
+    RaZ_BloomDemo_ASSETS
+
+    assets/meshes/ball.obj
+    assets/materials/test.mtl
+    assets/textures/rustediron_albedo.png
+    assets/textures/rustediron_normal.png
+    assets/textures/rustediron_metallic.png
+    assets/textures/rustediron_roughness.png
+)
+
+foreach (ASSET_PATH ${RaZ_BloomDemo_ASSETS})
+    target_link_options(RaZ_BloomDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+endforeach ()
+
+target_link_options(
+    RaZ_BloomDemo
+
+    PRIVATE
+
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+)
+
 #########################
 # Assets - DeferredDemo #
 #########################

@@ -38,6 +38,7 @@
 #include "Physics/Collider.hpp"
 #include "Physics/PhysicsSystem.hpp"
 #include "Physics/RigidBody.hpp"
+#include "Render/BloomRenderProcess.hpp"
 #include "Render/Camera.hpp"
 #include "Render/Cubemap.hpp"
 #include "Render/Framebuffer.hpp"
