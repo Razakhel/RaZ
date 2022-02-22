@@ -69,18 +69,22 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
   }
 
   for (const Entity* entity : renderSystem.m_entities) {
-    if (entity->isEnabled()) {
-      if (entity->hasComponent<MeshRenderer>() && entity->hasComponent<Transform>()) {
-        const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
+    if (!entity->isEnabled() || !entity->hasComponent<MeshRenderer>() || !entity->hasComponent<Transform>())
+      continue;
 
-        const ShaderProgram& geometryProgram = m_geometryPass.getProgram();
+    const auto& meshRenderer = entity->getComponent<MeshRenderer>();
 
-        geometryProgram.sendUniform("uniModelMatrix", modelMat);
-        geometryProgram.sendUniform("uniMvpMatrix", viewProjMat * modelMat);
+    if (!meshRenderer.isEnabled())
+      continue;
 
-        entity->getComponent<MeshRenderer>().draw(geometryProgram);
-      }
-    }
+    const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
+
+    const ShaderProgram& geometryProgram = m_geometryPass.getProgram();
+
+    geometryProgram.sendUniform("uniModelMatrix", modelMat);
+    geometryProgram.sendUniform("uniMvpMatrix", viewProjMat * modelMat);
+
+    meshRenderer.draw(geometryProgram);
   }
 
   if (renderSystem.hasCubemap())

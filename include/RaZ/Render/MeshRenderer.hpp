@@ -20,6 +20,7 @@ public:
   MeshRenderer(const MeshRenderer&) = delete;
   MeshRenderer(MeshRenderer&&) noexcept = default;
 
+  bool isEnabled() const noexcept { return m_enabled; }
   const std::vector<SubmeshRenderer>& getSubmeshRenderers() const { return m_submeshRenderers; }
   std::vector<SubmeshRenderer>& getSubmeshRenderers() { return m_submeshRenderers; }
   const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
@@ -30,6 +31,15 @@ public:
   static void drawUnitQuad();
   static void drawUnitCube();
 
+  /// Changes the mesh renderer's state.
+  /// \note Only the rendering will be affected, not the entity itself.
+  /// \param enabled True if the mesh should be rendered, false otherwise.
+  /// \see Entity::enable()
+  void enable(bool enabled = true) noexcept { m_enabled = enabled; }
+  /// Disables the rendering of the mesh.
+  /// \note Only the rendering will be affected, not the entity itself.
+  /// \see Entity::disable()
+  void disable() noexcept { enable(false); }
   /// Sets a specific mode to render the mesh into.
   /// \param renderMode Render mode to apply.
   /// \param mesh Mesh to load the render mode's indices from.
@@ -82,6 +92,8 @@ public:
   MeshRenderer& operator=(MeshRenderer&&) noexcept = default;
 
 private:
+  bool m_enabled = true;
+
   std::vector<SubmeshRenderer> m_submeshRenderers {};
   std::vector<MaterialPtr> m_materials {};
 };
