@@ -229,10 +229,13 @@ class OverlayTexture final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) { setTexture(texture, maxWidth, maxHeight); }
   explicit OverlayTexture(const Texture& texture);
 
   OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
+
+  void setTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept;
+  void setTexture(const Texture& texture) noexcept;
 
 private:
   unsigned int m_index {};
@@ -302,9 +305,9 @@ public:
 
   /// Changes the window's visibility state.
   /// \param enabled True if the window should be shown, false otherwise.
-  void enable(bool enabled = true) { m_enabled = enabled; }
+  void enable(bool enabled = true) noexcept { m_enabled = enabled; }
   /// Hides the window.
-  void disable() { enable(false); }
+  void disable() noexcept { enable(false); }
   /// Adds a label on the overlay window.
   /// \param label Text to be displayed.
   /// \return Reference to the newly added label.

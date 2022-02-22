@@ -86,11 +86,18 @@ void OverlayTextbox::clear() {
   m_callback(m_text);
 }
 
-OverlayTexture::OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight)
-  : m_index{ texture.getIndex() }, m_width{ static_cast<float>(maxWidth) }, m_height{ static_cast<float>(maxHeight) } {}
-
 OverlayTexture::OverlayTexture(const Texture& texture)
   : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
+
+void OverlayTexture::setTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept {
+  m_index  = texture.getIndex();
+  m_width  = static_cast<float>(maxWidth);
+  m_height = static_cast<float>(maxHeight);
+}
+
+void OverlayTexture::setTexture(const Texture& texture) noexcept {
+  setTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight());
+}
 
 OverlayWindow::OverlayWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) noexcept
   : m_title{ std::move(title) }, m_currentSize{ initSize }, m_currentPos{ initPos } {}
