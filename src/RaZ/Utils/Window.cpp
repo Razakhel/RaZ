@@ -45,14 +45,6 @@ Window::Window(unsigned int width, unsigned int height,
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 #endif
 
-#if defined(RAZ_USE_GL4)
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-#else
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-#endif
-
   glfwWindowHint(GLFW_FOCUSED, static_cast<int>(settings & WindowSetting::FOCUSED));
   glfwWindowHint(GLFW_RESIZABLE, static_cast<int>(settings & WindowSetting::RESIZABLE));
   glfwWindowHint(GLFW_VISIBLE, static_cast<int>(settings & WindowSetting::VISIBLE));
@@ -68,11 +60,39 @@ Window::Window(unsigned int width, unsigned int height,
 
   glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
 
-  m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
-  if (!m_windowHandle) {
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  static constexpr std::array<std::pair<int, int>, 8> glVersions = {{
+    { 4, 6 },
+    { 4, 5 },
+    { 4, 4 },
+    { 4, 3 },
+    { 4, 2 },
+    { 4, 1 },
+    { 4, 0 },
+    { 3, 3 },
+  }};
+
+  for (auto [major, minor] : glVersions) {
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
+
+    m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
+
+    if (m_windowHandle)
+      break;
+
+    if (glfwGetError(nullptr) == GLFW_VERSION_UNAVAILABLE) {
+      // GLFW's debug callback has already output an error message saying that the driver does not support the required version
+      Logger::error("[Window] Attempting to fallback to a lower version.");
+      continue;
+    }
+
     close();
     throw std::runtime_error("Error: Failed to create GLFW Window");
   }
+#else
+  m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
+#endif
 
   glfwMakeContextCurrent(m_windowHandle);
 

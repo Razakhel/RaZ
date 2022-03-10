@@ -10,7 +10,7 @@ namespace Raz {
 
 namespace {
 
-#ifdef RAZ_USE_GL4
+#if !defined(USE_OPENGL_ES)
 inline void GLAPIENTRY callbackDebugLog(GLenum source,
                                         GLenum type,
                                         unsigned int id,
@@ -40,7 +40,7 @@ inline void GLAPIENTRY callbackDebugLog(GLenum source,
     default: break;
   }
 
-  errorMsg += "ID: " + id + '\t';
+  errorMsg += "ID: " + std::to_string(id) + '\t';
 
   switch (severity) {
     case GL_DEBUG_SEVERITY_HIGH:   errorMsg += "Severity: High\t"; break;
@@ -49,7 +49,7 @@ inline void GLAPIENTRY callbackDebugLog(GLenum source,
     default: break;
   }
 
-  errorMsg += "Message: " + message;
+  errorMsg += "Message: " + std::string(message);
 
   Logger::error(errorMsg);
 }
@@ -64,9 +64,7 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
     case GL_STACK_OVERFLOW:                return "Stack overflow";
     case GL_STACK_UNDERFLOW:               return "Stack underflow";
     case GL_OUT_OF_MEMORY:                 return "Not enough memory left (Out of memory)";
-#ifdef RAZ_USE_GL4
     case GL_CONTEXT_LOST:                  return "OpenGL context has been lost due to a graphics card reset (Context lost)";
-#endif
     case GL_NO_ERROR:                      return "No error";
     default:                               return "Unknown error";
   }
@@ -84,16 +82,27 @@ void Renderer::initialize() {
 
   if (glewInit() != GLEW_OK) {
     Logger::error("Failed to initialize GLEW.");
-  } else {
-    s_isInitialized = true;
+    return;
+  }
 
-#if !defined(RAZ_PLATFORM_MAC) && defined(RAZ_USE_GL4) // Setting the debug message callback provokes a crash on macOS
-    glDebugMessageCallback(&callbackDebugLog, nullptr);
+  s_isInitialized = true;
+
+  getParameter(StateParameter::MAJOR_VERSION, &s_majorVersion);
+  getParameter(StateParameter::MINOR_VERSION, &s_minorVersion);
+
+#if !defined(RAZ_PLATFORM_MAC) && !defined(USE_OPENGL_ES) // Setting the debug message callback provokes a crash on macOS & isn't available on OpenGL ES
+  if (s_majorVersion >= 4 && s_minorVersion >= 3) {
+    enable(Capability::DEBUG_OUTPUT);
     enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(&callbackDebugLog, nullptr);
+  }
 #endif
 
-    Logger::debug("[Renderer] Initialized");
-  }
+  Logger::debug("[Renderer] Initialized; using OpenGL "
+#if defined(USE_OPENGL_ES)
+    "ES "
+#endif
+    + std::to_string(s_majorVersion) + '.' + std::to_string(s_minorVersion));
 }
 
 void Renderer::enable(Capability capability) {
@@ -385,9 +394,9 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
   printConditionalErrors();
 }
 
-#ifdef RAZ_USE_GL4
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
 
   glTextureParameteri(textureIndex, static_cast<unsigned int>(param), value);
 
@@ -396,6 +405,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, float value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
 
   glTextureParameterf(textureIndex, static_cast<unsigned int>(param), value);
 
@@ -404,6 +414,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
 
   glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), values);
 
@@ -412,12 +423,12 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
 
   glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), values);
 
   printConditionalErrors();
 }
-#endif
 
 void Renderer::sendImageData2D(TextureType type,
                                unsigned int mipmapLevel,
@@ -506,15 +517,14 @@ void Renderer::generateMipmap(TextureType type) {
   printConditionalErrors();
 }
 
-#ifdef RAZ_USE_GL4
 void Renderer::generateMipmap(unsigned int textureIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: OpenGL 4.5+ is needed to generate mipmap with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
 
   glGenerateTextureMipmap(textureIndex);
 
   printConditionalErrors();
 }
-#endif
 
 void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());

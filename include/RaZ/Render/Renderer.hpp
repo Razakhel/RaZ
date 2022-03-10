@@ -46,32 +46,40 @@ enum class Capability : unsigned int {
 };
 
 enum class StateParameter : unsigned int {
-  ACTIVE_TEXTURE                = 34016                                                 /* GL_ACTIVE_TEXTURE                */, ///< Currently active texture.
-  ALIASED_LINE_WIDTH_RANGE      = 33902                                                 /* GL_ALIASED_LINE_WIDTH_RANGE      */, ///<
-  SMOOTH_LINE_WIDTH_RANGE       = 2850                                                  /* GL_SMOOTH_LINE_WIDTH_RANGE       */, ///<
-  SMOOTH_LINE_WIDTH_GRANULARITY = 2851                                                  /* GL_SMOOTH_LINE_WIDTH_GRANULARITY */, ///<
-  ARRAY_BUFFER_BINDING          = 34964                                                 /* GL_ARRAY_BUFFER_BINDING          */, ///<
-  BLEND                         = static_cast<unsigned int>(Capability::BLEND)          /* GL_BLEND                         */, ///< Blending.
-  BLEND_COLOR                   = 32773                                                 /* GL_BLEND_COLOR                   */, ///<
-  BLEND_DST_RGB                 = 32968                                                 /* GL_BLEND_DST_RGB                 */, ///<
-  BLEND_DST_ALPHA               = 32970                                                 /* GL_BLEND_DST_ALPHA               */, ///<
-  BLEND_SRC_RGB                 = 32969                                                 /* GL_BLEND_SRC_RGB                 */, ///<
-  BLEND_SRC_ALPHA               = 32971                                                 /* GL_BLEND_SRC_ALPHA               */, ///<
-  BLEND_EQUATION_RGB            = 32777                                                 /* GL_BLEND_EQUATION_RGB            */, ///<
-  BLEND_EQUATION_ALPHA          = 34877                                                 /* GL_BLEND_EQUATION_ALPHA          */, ///<
-  COLOR_CLEAR_VALUE             = 3106                                                  /* GL_COLOR_CLEAR_VALUE             */, ///< Clear color.
-  COLOR_LOGIC_OP                = static_cast<unsigned int>(Capability::COLOR_LOGIC_OP) /* GL_COLOR_LOGIC_OP                */, ///<
-  COLOR_WRITEMASK               = 3107                                                  /* GL_COLOR_WRITEMASK               */, ///< Color write mask.
-  COMPRESSED_TEXTURE_FORMATS    = 34467                                                 /* GL_COMPRESSED_TEXTURE_FORMATS    */, ///<
-  CULL_FACE                     = static_cast<unsigned int>(Capability::CULL)           /* GL_CULL_FACE                     */, ///< Polygon culling.
-  CURRENT_PROGRAM               = 35725                                                 /* GL_CURRENT_PROGRAM               */, ///< Currently used program.
-  DEPTH_CLEAR_VALUE             = 2931                                                  /* GL_DEPTH_CLEAR_VALUE             */, ///< Depth clear value.
-  DEPTH_FUNC                    = 2932                                                  /* GL_DEPTH_FUNC                    */, ///< Depth function.
-  DEPTH_RANGE                   = 2928                                                  /* GL_DEPTH_RANGE                   */, ///< Depth range.
-  DEPTH_TEST                    = static_cast<unsigned int>(Capability::DEPTH_TEST)     /* GL_DEPTH_TEST                    */, ///< Depth testing.
-  DEPTH_WRITEMASK               = 2930                                                  /* GL_DEPTH_WRITEMASK               */, ///< Depth write mask.
-  DITHER                        = static_cast<unsigned int>(Capability::DITHER)         /* GL_DITHER                        */, ///< Dithering.
-  POINT_SIZE                    = static_cast<unsigned int>(Capability::POINT_SIZE)     /* GL_POINT_SIZE                    */  ///< Point size.
+  MAJOR_VERSION = 33307 /* GL_MAJOR_VERSION */, ///< OpenGL major version (in the form major.minor).
+  MINOR_VERSION = 33308 /* GL_MINOR_VERSION */, ///< OpenGL minor version (in the form major.minor).
+
+  ACTIVE_TEXTURE  = 34016 /* GL_ACTIVE_TEXTURE  */, ///< Currently active texture.
+  CURRENT_PROGRAM = 35725 /* GL_CURRENT_PROGRAM */, ///< Currently used program.
+
+  DEPTH_CLEAR_VALUE = 2931                                              /* GL_DEPTH_CLEAR_VALUE */, ///< Depth clear value.
+  DEPTH_FUNC        = 2932                                              /* GL_DEPTH_FUNC        */, ///< Depth function.
+  DEPTH_RANGE       = 2928                                              /* GL_DEPTH_RANGE       */, ///< Depth range.
+  DEPTH_TEST        = static_cast<unsigned int>(Capability::DEPTH_TEST) /* GL_DEPTH_TEST        */, ///< Depth testing.
+  DEPTH_WRITEMASK   = 2930                                              /* GL_DEPTH_WRITEMASK   */, ///< Depth write mask.
+
+  COLOR_CLEAR_VALUE = 3106                                                  /* GL_COLOR_CLEAR_VALUE */, ///< Clear color.
+  COLOR_LOGIC_OP    = static_cast<unsigned int>(Capability::COLOR_LOGIC_OP) /* GL_COLOR_LOGIC_OP    */, ///<
+  COLOR_WRITEMASK   = 3107                                                  /* GL_COLOR_WRITEMASK   */, ///< Color write mask.
+
+  BLEND                = static_cast<unsigned int>(Capability::BLEND) /* GL_BLEND                */, ///< Blending.
+  BLEND_COLOR          = 32773                                        /* GL_BLEND_COLOR          */, ///<
+  BLEND_DST_RGB        = 32968                                        /* GL_BLEND_DST_RGB        */, ///<
+  BLEND_DST_ALPHA      = 32970                                        /* GL_BLEND_DST_ALPHA      */, ///<
+  BLEND_SRC_RGB        = 32969                                        /* GL_BLEND_SRC_RGB        */, ///<
+  BLEND_SRC_ALPHA      = 32971                                        /* GL_BLEND_SRC_ALPHA      */, ///<
+  BLEND_EQUATION_RGB   = 32777                                        /* GL_BLEND_EQUATION_RGB   */, ///<
+  BLEND_EQUATION_ALPHA = 34877                                        /* GL_BLEND_EQUATION_ALPHA */, ///<
+
+  ALIASED_LINE_WIDTH_RANGE      = 33902 /* GL_ALIASED_LINE_WIDTH_RANGE      */, ///<
+  SMOOTH_LINE_WIDTH_RANGE       = 2850  /* GL_SMOOTH_LINE_WIDTH_RANGE       */, ///<
+  SMOOTH_LINE_WIDTH_GRANULARITY = 2851  /* GL_SMOOTH_LINE_WIDTH_GRANULARITY */, ///<
+
+  DITHER                     = static_cast<unsigned int>(Capability::DITHER)     /* GL_DITHER                     */, ///< Dithering.
+  CULL_FACE                  = static_cast<unsigned int>(Capability::CULL)       /* GL_CULL_FACE                  */, ///< Polygon culling.
+  POINT_SIZE                 = static_cast<unsigned int>(Capability::POINT_SIZE) /* GL_POINT_SIZE                 */, ///< Point size.
+  COMPRESSED_TEXTURE_FORMATS = 34467                                             /* GL_COMPRESSED_TEXTURE_FORMATS */, ///<
+  ARRAY_BUFFER_BINDING       = 34964                                             /* GL_ARRAY_BUFFER_BINDING       */  ///<
 };
 
 enum class MaskType : unsigned int {
@@ -262,9 +270,7 @@ enum class ShaderStatus : unsigned int {
 enum class UniformType : unsigned int {
   // Primitive types
   FLOAT  = 5126,  // GL_FLOAT
-#if defined(RAZ_USE_GL4)
   DOUBLE = 5130,  // GL_DOUBLE
-#endif
   INT    = 5124,  // GL_INT
   UINT   = 5125,  // GL_UNSIGNED_INT
   BOOL   = 35670, // GL_BOOL
@@ -273,11 +279,9 @@ enum class UniformType : unsigned int {
   VEC2  = 35664, // GL_FLOAT_VEC2
   VEC3  = 35665, // GL_FLOAT_VEC3
   VEC4  = 35666, // GL_FLOAT_VEC4
-#if defined(RAZ_USE_GL4)
   DVEC2 = 36860, // GL_DOUBLE_VEC2
   DVEC3 = 36861, // GL_DOUBLE_VEC3
   DVEC4 = 36862, // GL_DOUBLE_VEC4
-#endif
   IVEC2 = 35667, // GL_INT_VEC2
   IVEC3 = 35668, // GL_INT_VEC3
   IVEC4 = 35669, // GL_INT_VEC4
@@ -298,7 +302,6 @@ enum class UniformType : unsigned int {
   MAT3x4  = 35688, // GL_FLOAT_MAT3x4
   MAT4x2  = 35689, // GL_FLOAT_MAT4x2
   MAT4x3  = 35690, // GL_FLOAT_MAT4x3
-#if defined(RAZ_USE_GL4)
   DMAT2   = 36678, // GL_DOUBLE_MAT2
   DMAT3   = 36679, // GL_DOUBLE_MAT3
   DMAT4   = 36680, // GL_DOUBLE_MAT4
@@ -308,7 +311,6 @@ enum class UniformType : unsigned int {
   DMAT3x4 = 36684, // GL_DOUBLE_MAT3x4
   DMAT4x2 = 36685, // GL_DOUBLE_MAT4x2
   DMAT4x3 = 36686, // GL_DOUBLE_MAT4x3
-#endif
 
   // Samplers
   SAMPLER_1D                                = 35677, // GL_SAMPLER_1D
@@ -404,18 +406,18 @@ enum class BlitFilter : unsigned int {
   LINEAR  = static_cast<unsigned int>(TextureParamValue::LINEAR)
 };
 
+/// Possible errors obtained after any renderer call; see https://www.khronos.org/opengl/wiki/OpenGL_Error#Meaning_of_errors for a more detailed description.
+/// \see Renderer::recoverErrors()
 enum class ErrorCode : unsigned int {
-  INVALID_ENUM                  = 1280, // GL_INVALID_ENUM
-  INVALID_VALUE                 = 1281, // GL_INVALID_VALUE
-  INVALID_OPERATION             = 1282, // GL_INVALID_OPERATION
-  STACK_OVERFLOW                = 1283, // GL_STACK_OVERFLOW
-  STACK_UNDERFLOW               = 1284, // GL_STACK_UNDERFLOW
-  OUT_OF_MEMORY                 = 1285, // GL_OUT_OF_MEMORY
-  INVALID_FRAMEBUFFER_OPERATION = 1286, // GL_INVALID_FRAMEBUFFER_OPERATION
-#if defined(RAZ_USE_GL4)
-  CONTEXT_LOST                  = 1287, // GL_CONTEXT_LOST
-#endif
-  NONE                          = 0     // GL_NO_ERROR
+  NONE                          = 0    /* GL_NO_ERROR                      */, ///< No error.
+  INVALID_ENUM                  = 1280 /* GL_INVALID_ENUM                  */, ///< Invalid enumeration value given.
+  INVALID_VALUE                 = 1281 /* GL_INVALID_VALUE                 */, ///< Invalid value given.
+  INVALID_OPERATION             = 1282 /* GL_INVALID_OPERATION             */, ///< Invalid parameters combination given.
+  STACK_OVERFLOW                = 1283 /* GL_STACK_OVERFLOW                */, ///< Stack overflow.
+  STACK_UNDERFLOW               = 1284 /* GL_STACK_UNDERFLOW               */, ///< Stack underflow.
+  OUT_OF_MEMORY                 = 1285 /* GL_OUT_OF_MEMORY                 */, ///< Out of memory; the result of the required operation is undefined.
+  INVALID_FRAMEBUFFER_OPERATION = 1286 /* GL_INVALID_FRAMEBUFFER_OPERATION */, ///< Operation asked on an incomplete framebuffer.
+  CONTEXT_LOST                  = 1287 /* GL_CONTEXT_LOST                  */  ///< Context lost due to a GPU reset. Requires OpenGL 4.5+.
 };
 
 /// ErrorCodes structure, holding codes of errors that may have happened on prior Renderer calls.
@@ -432,11 +434,7 @@ struct ErrorCodes {
   /// \return True if the code has been set, false otherwise.
   constexpr bool operator[](ErrorCode code) const { return get(code); }
 
-#if defined(RAZ_USE_GL4)
   std::bitset<8> codes {};
-#else
-  std::bitset<7> codes {};
-#endif
 };
 
 class Renderer {
@@ -495,19 +493,62 @@ public:
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void activateTexture(unsigned int index);
+  /// Sets a parameter to the currently bound texture.
+  /// \param type Type of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
   static void setTextureParameter(TextureType type, TextureParam param, int value);
+  /// Sets a parameter to the currently bound texture.
+  /// \param type Type of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
   static void setTextureParameter(TextureType type, TextureParam param, float value);
+  /// Sets a parameter to the currently bound texture.
+  /// \param type Type of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param values Values to be set.
   static void setTextureParameter(TextureType type, TextureParam param, const int* values);
+  /// Sets a parameter to the currently bound texture.
+  /// \param type Type of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param values Values to be set.
   static void setTextureParameter(TextureType type, TextureParam param, const float* values);
+  /// Sets a parameter to the currently bound texture.
+  /// \param type Type of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
   static void setTextureParameter(TextureType type, TextureParam param, TextureParamValue value) { setTextureParameter(type, param, static_cast<int>(value)); }
-#if defined(RAZ_USE_GL4)
+  /// Sets a parameter to the given texture.
+  /// \note Requires OpenGL 4.5+.
+  /// \param textureIndex Index of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, int value);
+  /// Sets a parameter to the given texture.
+  /// \note Requires OpenGL 4.5+.
+  /// \param textureIndex Index of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, float value);
+  /// Sets a parameter to the given texture.
+  /// \note Requires OpenGL 4.5+.
+  /// \param textureIndex Index of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param values Values to be set.
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values);
+  /// Sets a parameter to the given texture.
+  /// \note Requires OpenGL 4.5+.
+  /// \param textureIndex Index of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param values Values to be set.
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values);
+  /// Sets a parameter to the given texture.
+  /// \note Requires OpenGL 4.5+.
+  /// \param textureIndex Index of the texture to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param,
                                                                                                                                 static_cast<int>(value)); }
-#endif
   /// Sends the image's data corresponding to the currently bound texture.
   /// \param type Type of the texture.
   /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
@@ -532,12 +573,13 @@ public:
   static TextureInternalFormat recoverTextureInternalFormat(TextureType type, unsigned int mipmapLevel = 0);
   static void recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data);
 #endif
-  /// Generate mipmaps (levels of detail) of the currently bound texture.
-  /// \param type Type of the texture to generate mipmaps from.
+  /// Generate mipmaps (levels of detail) for the currently bound texture.
+  /// \param type Type of the texture to generate mipmaps for.
   static void generateMipmap(TextureType type);
-#if defined(RAZ_USE_GL4)
+  /// Generate mipmaps (levels of detail) for the given texture.
+  /// \note Requires OpenGL 4.5+.
+  /// \param textureIndex Index of the texture to generate mipmaps for.
   static void generateMipmap(unsigned int textureIndex);
-#endif
   static void deleteTextures(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteTextures(unsigned int (&indices)[N]) { deleteTextures(N, indices); }
   static void deleteTexture(unsigned int& index) { deleteTextures(1, &index); }
@@ -662,6 +704,9 @@ private:
   }
 
   static inline bool s_isInitialized = false;
+
+  static inline int s_majorVersion {};
+  static inline int s_minorVersion {};
 };
 
 } // namespace Raz
