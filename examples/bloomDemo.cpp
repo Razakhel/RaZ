@@ -20,6 +20,12 @@ int main() {
     ///////////////
 
     auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
+    render.setCubemap(Raz::Cubemap(Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_right.png"),
+                                   Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_left.png"),
+                                   Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_top.png"),
+                                   Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_bottom.png"),
+                                   Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_front.png"),
+                                   Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_back.png")));
 
     Raz::Window& window = render.getWindow();
 
@@ -55,11 +61,13 @@ int main() {
 
     const auto depthBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
     const auto colorBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
+    const auto bloomBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, depthBuffer->getIndex(), "Depth buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, colorBuffer->getIndex(), "Color buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, bloomBuffer->getIndex(), "Bloom result buffer");
     }
 #endif
 
@@ -71,6 +79,18 @@ int main() {
     auto& bloom = renderGraph.addRenderProcess<Raz::BloomRenderProcess>();
     bloom.addParent(geometryPass);
     bloom.setInputColorBuffer(colorBuffer);
+    bloom.setOutputBuffer(bloomBuffer);
+
+    // Tone mapping
+
+    // The default shader applies the tone mapping applied at the end; we must use the "pure" one to preserve the color ranges
+    Raz::RenderShaderProgram& materialProgram = meshRenderer.getMaterials().front().getProgram();
+    materialProgram.setFragmentShader(Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
+    materialProgram.link();
+
+    auto& toneMapping = renderGraph.addRenderProcess<Raz::ReinhardToneMapping>();
+    toneMapping.addParent(bloom);
+    toneMapping.setInputBuffer(bloomBuffer);
 
     /////////////
     // Overlay //
@@ -119,7 +139,11 @@ int main() {
 
     overlay.addSlider("Threshold value", [&bloom] (float value) {
       bloom.setThresholdValue(value);
-    }, 0.15f, 1.f, 0.75f);
+    }, 0.15f, 5.f, 1.f);
+
+    overlay.addSlider("Tone mapping strength", [&toneMapping] (float value) {
+      toneMapping.setMaxWhiteValue(value);
+    }, 0.f, 10.f, 1.f);
 
     overlay.addSeparator();
 

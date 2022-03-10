@@ -24,7 +24,7 @@ constexpr std::string_view thresholdSource = R"(
 
     // Thresholding pixels according to their luminance: https://en.wikipedia.org/wiki/Luma_(video)#Use_of_relative_luminance
     float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-    fragColor        = vec4(color * float(brightness >= uniThreshold), 1.0);
+    fragColor        = vec4(color * float(brightness > uniThreshold), 1.0);
   }
 )";
 
@@ -114,9 +114,10 @@ constexpr std::string_view finalSource = R"(
     vec3 blurredColor  = texture(uniFinalUpscaledBuffer, fragTexcoords).rgb;
 
     // The following is technically incorrect, since tone mapping must be done on the whole scene at the very end of the rendering. This will be removed later
-    blurredColor = blurredColor / (blurredColor + vec3(1.0)); // Tone mapping
-    blurredColor = pow(blurredColor, vec3(1.0 / 2.2)); // Gamma correction
+    //blurredColor = blurredColor / (blurredColor + vec3(1.0)); // Tone mapping
+    //blurredColor = pow(blurredColor, vec3(1.0 / 2.2)); // Gamma correction
 
+    // TODO: divide the result by the amount of passes (https://www.froyok.fr/blog/2021-12-ue4-custom-bloom/#upsample_shader)
     fragColor = vec4(originalColor + blurredColor, 1.0);
   }
 )";
@@ -132,7 +133,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph) : RenderProcess
   //////////////////
 
   m_thresholdPass = &renderGraph.addNode(FragmentShader::loadFromSource(thresholdSource), "Bloom thresholding");
-  setThresholdValue(0.75f); // Tone mapping is applied before the bloom, thus no value above 1 exist here. This value will be changed later
+  setThresholdValue(1.f);
 
   const auto thresholdBuffer = Texture2D::create(TextureColorspace::RGB, TextureDataType::FLOAT16);
   m_thresholdPass->addWriteColorTexture(thresholdBuffer, 0);
@@ -350,6 +351,7 @@ void BloomRenderProcess::setInputColorBuffer(Texture2DPtr colorBuffer) {
 }
 
 void BloomRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer) {
+  // TODO: if the input buffer has a floating-point data type, the output should too
   m_finalPass->addWriteColorTexture(std::move(outputBuffer), 0);
 
 #if !defined(USE_OPENGL_ES)

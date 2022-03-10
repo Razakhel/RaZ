@@ -9,6 +9,7 @@
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Render/SsrRenderProcess.hpp"
+#include "RaZ/Render/ToneMappingRenderProcess.hpp"
 #include "RaZ/Render/VignetteRenderProcess.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
@@ -198,6 +199,18 @@ void LuaWrapper::registerRenderGraphTypes() {
       vignetteRenderProcess["setStrength"]     = &VignetteRenderProcess::setStrength;
       vignetteRenderProcess["setOpacity"]      = &VignetteRenderProcess::setOpacity;
       vignetteRenderProcess["setColor"]        = &VignetteRenderProcess::setColor;
+    }
+
+    // Tone mapping
+    {
+      {
+        auto reinhardToneMapping = state.new_usertype<ReinhardToneMapping>("ReinhardToneMapping",
+                                                                           sol::constructors<ReinhardToneMapping(RenderGraph&)>(),
+                                                                           sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+        reinhardToneMapping["setInputBuffer"] = &ReinhardToneMapping::setInputBuffer;
+        reinhardToneMapping["setOutputBuffer"] = &ReinhardToneMapping::setOutputBuffer;
+        reinhardToneMapping["setMaxWhiteValue"] = &ReinhardToneMapping::setMaxWhiteValue;
+      }
     }
   }
 }

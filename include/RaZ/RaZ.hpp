@@ -68,6 +68,7 @@
 #include "Render/SsrRenderProcess.hpp"
 #include "Render/SubmeshRenderer.hpp"
 #include "Render/Texture.hpp"
+#include "Render/ToneMappingRenderProcess.hpp"
 #include "Render/UniformBuffer.hpp"
 #include "Render/VignetteRenderProcess.hpp"
 #include "Render/Window.hpp"

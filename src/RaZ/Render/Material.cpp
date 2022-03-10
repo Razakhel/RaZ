@@ -11,7 +11,7 @@ constexpr std::string_view vertShaderSource = {
 };
 
 constexpr std::string_view cookTorranceShaderSource = {
-#include "cook-torrance.frag.embed"
+#include "cook-torrance_tone_mapped.frag.embed"
 };
 
 constexpr std::string_view blinnPhongShaderSource = {

@@ -117,8 +117,8 @@ void main() {
     if (uniLights[lightIndex].position.w != 0.0) {
       fullLightDir = uniLights[lightIndex].position.xyz - vertMeshInfo.vertPosition;
 
-      float sqDist = dot(fullLightDir, fullLightDir);
-      attenuation /= sqDist;
+      float sqrDist = dot(fullLightDir, fullLightDir);
+      attenuation  /= sqrDist;
     } else {
       fullLightDir = -uniLights[lightIndex].direction.xyz;
     }
@@ -150,7 +150,11 @@ void main() {
   vec3 ambient  = vec3(0.03) * albedo * ambOcc;
   vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
   vec3 color    = ambient + lightRadiance + emissive;
-  color         = pow(color, vec3(1.0 / 2.2)); // Gamma correction
+
+  // HDR tone mapping
+  color = color / (color + vec3(1.0));
+  // Gamma correction
+  color = pow(color, vec3(1.0 / 2.2));
 
   fragColor    = vec4(color, 1.0);
   fragNormal   = normal * 0.5 + 0.5;
