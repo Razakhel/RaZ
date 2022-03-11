@@ -18,34 +18,38 @@ inline void GLAPIENTRY callbackDebugLog(GLenum source,
                                         int /* length */,
                                         const char* message,
                                         const void* /* userParam */) {
-  std::string errorMsg = "OpenGL Debug - ";
+  if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+    return;
+
+  std::string errorMsg = "[OpenGL]\n\t";
 
   switch (source) {
-    case GL_DEBUG_SOURCE_API:             errorMsg += "Source: OpenGL\t"; break;
-    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   errorMsg += "Source: Windows\t"; break;
-    case GL_DEBUG_SOURCE_SHADER_COMPILER: errorMsg += "Source: Shader compiler\t"; break;
-    case GL_DEBUG_SOURCE_THIRD_PARTY:     errorMsg += "Source: Third party\t"; break;
-    case GL_DEBUG_SOURCE_APPLICATION:     errorMsg += "Source: Application\t"; break;
-    case GL_DEBUG_SOURCE_OTHER:           errorMsg += "Source: Other\t"; break;
+    case GL_DEBUG_SOURCE_API:             errorMsg += "Source: OpenGL\n\t"; break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   errorMsg += "Source: Window system\n\t"; break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER: errorMsg += "Source: Shader compiler\n\t"; break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:     errorMsg += "Source: Third party\n\t"; break;
+    case GL_DEBUG_SOURCE_APPLICATION:     errorMsg += "Source: Application\n\t"; break;
+    case GL_DEBUG_SOURCE_OTHER:           errorMsg += "Source: Other\n\t"; break;
     default: break;
   }
 
   switch (type) {
-    case GL_DEBUG_TYPE_ERROR:               errorMsg += "Type: Error\t"; break;
-    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: errorMsg += "Type: Deprecated behavior\t"; break;
-    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  errorMsg += "Type: Undefined behavior\t"; break;
-    case GL_DEBUG_TYPE_PORTABILITY:         errorMsg += "Type: Portability\t"; break;
-    case GL_DEBUG_TYPE_PERFORMANCE:         errorMsg += "Type: Performance\t"; break;
-    case GL_DEBUG_TYPE_OTHER:               errorMsg += "Type: Other\t"; break;
+    case GL_DEBUG_TYPE_ERROR:               errorMsg += "Type: Error\n\t"; break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: errorMsg += "Type: Deprecated behavior\n\t"; break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  errorMsg += "Type: Undefined behavior\n\t"; break;
+    case GL_DEBUG_TYPE_PORTABILITY:         errorMsg += "Type: Portability\n\t"; break;
+    case GL_DEBUG_TYPE_PERFORMANCE:         errorMsg += "Type: Performance\n\t"; break;
+    case GL_DEBUG_TYPE_OTHER:               errorMsg += "Type: Other\n\t"; break;
     default: break;
   }
 
-  errorMsg += "ID: " + std::to_string(id) + '\t';
+  errorMsg += "ID: " + std::to_string(id) + "\n\t";
 
   switch (severity) {
-    case GL_DEBUG_SEVERITY_HIGH:   errorMsg += "Severity: High\t"; break;
-    case GL_DEBUG_SEVERITY_MEDIUM: errorMsg += "Severity: Medium\t"; break;
-    case GL_DEBUG_SEVERITY_LOW:    errorMsg += "Severity: Low\t"; break;
+    case GL_DEBUG_SEVERITY_HIGH:   errorMsg += "Severity: High\n\t"; break;
+    case GL_DEBUG_SEVERITY_MEDIUM: errorMsg += "Severity: Medium\n\t"; break;
+    case GL_DEBUG_SEVERITY_LOW:    errorMsg += "Severity: Low\n\t"; break;
+    // Messages with a GL_DEBUG_SEVERITY_NOTIFICATION severity are ignored at the beginning of this function
     default: break;
   }
 
