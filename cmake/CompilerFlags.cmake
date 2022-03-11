@@ -181,6 +181,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd4355 # 'this' used in base member initializing list
             /wd4514 # Unreferenced inline function has been removed
             /wd4548 # Expression before comma has no effect
+            /wd4623 # Default constructor was implicitly defined as deleted
             /wd4668 # Preprocessor macro not defined
             /wd4710 # Function not inlined
             /wd4711 # Function inlined
@@ -213,15 +214,6 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /Zc:__cplusplus # Forcing the __cplusplus definition to be of the proper value
             #/Zc:lambda # Forcing lambdas' parsing to be standard compliant; to be removed in C++20 (implied by /std:c++20)
         )
-
-        target_compile_definitions(
-            ${TARGET_NAME}
-
-            ${DEFINITIONS_SCOPE}
-
-            NOMINMAX # Preventing definitions of min & max macros
-            _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING # Ignoring std::codecvt deprecation warnings
-        )
     endif ()
 
     if (NOT COMPILER_MSVC)
@@ -230,7 +222,15 @@ function(add_compiler_flags TARGET_NAME SCOPE)
     endif ()
 
     if (WIN32 OR CYGWIN)
-        target_compile_definitions(${TARGET_NAME} ${DEFINITIONS_SCOPE} NOGDI) # Preventing definition of the 'ERROR' macro
+        target_compile_definitions(
+            ${TARGET_NAME}
+
+            ${DEFINITIONS_SCOPE}
+
+            NOMINMAX # Preventing definitions of min & max macros
+            NOGDI # Preventing definition of the 'ERROR' macro
+            _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING # Ignoring std::codecvt deprecation warnings
+        )
     endif ()
 
     if (COMPILER_EMSCRIPTEN)

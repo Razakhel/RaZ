@@ -2,7 +2,7 @@
 
 namespace Raz {
 
-bool System::containsEntity(const EntityPtr& entity) {
+bool System::containsEntity(const EntityPtr& entity) const noexcept {
   for (const Entity* entityPtr : m_entities) {
     if (entityPtr->getId() == entity->getId())
       return true;

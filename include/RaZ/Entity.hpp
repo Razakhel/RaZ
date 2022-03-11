@@ -22,10 +22,10 @@ public:
   Entity(const Entity&) = delete;
   Entity(Entity&&) noexcept = delete;
 
-  std::size_t getId() const { return m_id; }
-  bool isEnabled() const { return m_enabled; }
-  const std::vector<ComponentPtr>& getComponents() const { return m_components; }
-  const Bitset& getEnabledComponents() const { return m_enabledComponents; }
+  std::size_t getId() const noexcept { return m_id; }
+  bool isEnabled() const noexcept { return m_enabled; }
+  const std::vector<ComponentPtr>& getComponents() const noexcept { return m_components; }
+  const Bitset& getEnabledComponents() const noexcept { return m_enabledComponents; }
 
   template <typename... Args> static EntityPtr create(Args&&... args) { return std::make_unique<Entity>(std::forward<Args>(args)...); }
 

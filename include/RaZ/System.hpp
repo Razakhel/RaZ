@@ -33,7 +33,7 @@ public:
   /// Checks if the system contains the given entity.
   /// \param entity Entity to be checked.
   /// \return True if the system contains the entity, false otherwise.
-  bool containsEntity(const EntityPtr& entity);
+  bool containsEntity(const EntityPtr& entity) const noexcept;
   /// Updates the system with a variable time step. For a constant step update, use step().
   /// \param deltaTime Time elapsed since the last update.
   /// \return True if the system is still active, false otherwise.

@@ -322,12 +322,6 @@ if (RAZ_FORCE_DEBUG_LOG)
     target_compile_definitions(RaZ PUBLIC RAZ_FORCE_DEBUG_LOG)
 endif ()
 
-# OpenGL version
-option(RAZ_USE_GL4 "Use OpenGL 4" OFF)
-if (RAZ_USE_GL4)
-    target_compile_definitions(RaZ PRIVATE RAZ_USE_GL4)
-endif ()
-
 target_link_libraries(RaZ PRIVATE ${RAZ_LINKER_FLAGS})
 
 # Cygwin's Clang needs to use GCC's standard library
