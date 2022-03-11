@@ -35,6 +35,16 @@ TEST_CASE("Shader validity") {
     CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK_FALSE(fragShader.isValid());
   }
+
+  {
+    Raz::ComputeShader compShader;
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+    CHECK(compShader.isValid());
+
+    compShader.destroy();
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+    CHECK_FALSE(compShader.isValid());
+  }
 }
 
 TEST_CASE("Vertex shader from source") {
@@ -79,6 +89,30 @@ TEST_CASE("Fragment shader from source") {
   CHECK(fragShader.isCompiled());
 }
 
+TEST_CASE("Compute shader from source") {
+  Raz::Renderer::recoverErrors(); // Flushing errors
+
+  const std::string compSource = R"(
+    #version 430
+
+    layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+    layout(rgba32f, binding = 0) uniform image2D uniOutput;
+
+    void main() {
+      imageStore(uniOutput, ivec2(0), vec4(0.0));
+    }
+  )";
+
+  const Raz::ComputeShader compShader = Raz::ComputeShader::loadFromSource(compSource);
+  CHECK_FALSE(Raz::Renderer::hasErrors());
+  CHECK(compShader.isValid());
+
+  compShader.compile();
+  CHECK_FALSE(Raz::Renderer::hasErrors());
+  CHECK(compShader.isCompiled());
+}
+
 TEST_CASE("Vertex shader imported") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
@@ -107,4 +141,19 @@ TEST_CASE("Fragment shader imported") {
   fragShader.compile();
   CHECK_FALSE(Raz::Renderer::hasErrors());
   CHECK(fragShader.isCompiled());
+}
+
+TEST_CASE("Compute shader imported") {
+  Raz::Renderer::recoverErrors(); // Flushing errors
+
+  const std::string compShaderPath = RAZ_TESTS_ROOT + "assets/shaders/test.comp"s;
+
+  const Raz::ComputeShader compShader(compShaderPath);
+  CHECK_FALSE(Raz::Renderer::hasErrors());
+  CHECK(compShader.isValid());
+  CHECK(compShader.getPath() == compShaderPath);
+
+  compShader.compile();
+  CHECK_FALSE(Raz::Renderer::hasErrors());
+  CHECK(compShader.isCompiled());
 }

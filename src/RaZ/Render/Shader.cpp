@@ -113,4 +113,16 @@ GeometryShader GeometryShader::loadFromSource(const std::string& source) {
   return geomShader;
 }
 
+ComputeShader::ComputeShader() {
+  Logger::debug("[Shader] Creating compute shader...");
+  m_index = Renderer::createShader(ShaderType::COMPUTE);
+  Logger::debug("[Shader] Created compute shader (ID: " + std::to_string(m_index) + ')');
+}
+
+ComputeShader ComputeShader::loadFromSource(const std::string& source) {
+  ComputeShader compShader;
+  compShader.loadSource(source);
+  return compShader;
+}
+
 } // namespace Raz

@@ -39,31 +39,40 @@ protected:
   FilePath m_path {};
 };
 
-class VertexShader : public Shader {
+class VertexShader final : public Shader {
 public:
   VertexShader();
   explicit VertexShader(FilePath filePath) : VertexShader() { import(std::move(filePath)); }
 
   static VertexShader loadFromSource(const std::string& source);
-  static VertexShader loadFromSource(const std::string_view& source) { return loadFromSource(std::string(source)); }
+  static VertexShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
 };
 
-class FragmentShader : public Shader {
+class FragmentShader final : public Shader {
 public:
   FragmentShader();
   explicit FragmentShader(FilePath filePath) : FragmentShader() { import(std::move(filePath)); }
 
   static FragmentShader loadFromSource(const std::string& source);
-  static FragmentShader loadFromSource(const std::string_view& source) { return loadFromSource(std::string(source)); }
+  static FragmentShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
 };
 
-class GeometryShader : public Shader {
+class GeometryShader final : public Shader {
 public:
   GeometryShader();
   explicit GeometryShader(FilePath filePath) : GeometryShader() { import(std::move(filePath)); }
 
   static GeometryShader loadFromSource(const std::string& source);
-  static GeometryShader loadFromSource(const std::string_view& source) { return loadFromSource(std::string(source)); }
+  static GeometryShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+};
+
+class ComputeShader final : public Shader {
+public:
+  ComputeShader();
+  explicit ComputeShader(FilePath filePath) : ComputeShader() { import(std::move(filePath)); }
+
+  static ComputeShader loadFromSource(const std::string& source);
+  static ComputeShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
 };
 
 } // namespace Raz

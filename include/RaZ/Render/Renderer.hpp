@@ -13,36 +13,36 @@
 namespace Raz {
 
 enum class Capability : unsigned int {
-  CULL           = 2884,  // GL_CULL_FACE
-  DITHER         = 3024,  // GL_DITHER
-  BLEND          = 3042,  // GL_BLEND
-  COLOR_LOGIC_OP = 3058,  // GL_COLOR_LOGIC_OP
+  CULL           = 2884 /* GL_CULL_FACE      */, ///<
+  DITHER         = 3024 /* GL_DITHER         */, ///<
+  BLEND          = 3042 /* GL_BLEND          */, ///<
+  COLOR_LOGIC_OP = 3058 /* GL_COLOR_LOGIC_OP */, ///<
 
-  DEPTH_CLAMP  = 34383, // GL_DEPTH_CLAMP
-  DEPTH_TEST   = 2929,  // GL_DEPTH_TEST
-  SCISSOR_TEST = 3089,  // GL_SCISSOR_TEST
-  STENCIL_TEST = 2960,  // GL_STENCIL_TEST
+  DEPTH_CLAMP  = 34383 /* GL_DEPTH_CLAMP  */, ///<
+  DEPTH_TEST   = 2929  /* GL_DEPTH_TEST   */, ///<
+  SCISSOR_TEST = 3089  /* GL_SCISSOR_TEST */, ///<
+  STENCIL_TEST = 2960  /* GL_STENCIL_TEST */, ///<
 
-  LINE_SMOOTH          = 2848,  // GL_LINE_SMOOTH
-  POLYGON_SMOOTH       = 2881,  // GL_POLYGON_SMOOTH
-  POLYGON_OFFSET_POINT = 10753, // GL_POLYGON_OFFSET_POINT
-  POLYGON_OFFSET_LINE  = 10754, // GL_POLYGON_OFFSET_LINE
-  POLYGON_OFFSET_FILL  = 32823, // GL_POLYGON_OFFSET_FILL
+  LINE_SMOOTH          = 2848  /* GL_LINE_SMOOTH          */, ///<
+  POLYGON_SMOOTH       = 2881  /* GL_POLYGON_SMOOTH       */, ///<
+  POLYGON_OFFSET_POINT = 10753 /* GL_POLYGON_OFFSET_POINT */, ///<
+  POLYGON_OFFSET_LINE  = 10754 /* GL_POLYGON_OFFSET_LINE  */, ///<
+  POLYGON_OFFSET_FILL  = 32823 /* GL_POLYGON_OFFSET_FILL  */, ///<
 
-  MULTISAMPLE              = 32925, // GL_MULTISAMPLE
-  SAMPLE_ALPHA_TO_COVERAGE = 32926, // GL_SAMPLE_ALPHA_TO_COVERAGE
-  SAMPLE_ALPHA_TO_ONE      = 32927, // GL_SAMPLE_ALPHA_TO_ONE
-  SAMPLE_COVERAGE          = 32928, // GL_SAMPLE_COVERAGE
-  SAMPLE_SHADING           = 35894, // GL_SAMPLE_SHADING
-  SAMPLE_MASK              = 36433, // GL_SAMPLE_MASK
+  MULTISAMPLE              = 32925 /* GL_MULTISAMPLE              */, ///<
+  SAMPLE_ALPHA_TO_COVERAGE = 32926 /* GL_SAMPLE_ALPHA_TO_COVERAGE */, ///<
+  SAMPLE_ALPHA_TO_ONE      = 32927 /* GL_SAMPLE_ALPHA_TO_ONE      */, ///<
+  SAMPLE_COVERAGE          = 32928 /* GL_SAMPLE_COVERAGE          */, ///<
+  SAMPLE_SHADING           = 35894 /* GL_SAMPLE_SHADING           */, ///<
+  SAMPLE_MASK              = 36433 /* GL_SAMPLE_MASK              */, ///<
 
-  POINT_SIZE        = 34370, // GL_PROGRAM_POINT_SIZE
-  CUBEMAP_SEAMLESS  = 34895, // GL_TEXTURE_CUBE_MAP_SEAMLESS
-  FRAMEBUFFER_SRGB  = 36281, // GL_FRAMEBUFFER_SRGB
-  PRIMITIVE_RESTART = 36765, // GL_PRIMITIVE_RESTART
+  POINT_SIZE        = 34370 /* GL_PROGRAM_POINT_SIZE        */, ///<
+  CUBEMAP_SEAMLESS  = 34895 /* GL_TEXTURE_CUBE_MAP_SEAMLESS */, ///<
+  FRAMEBUFFER_SRGB  = 36281 /* GL_FRAMEBUFFER_SRGB          */, ///<
+  PRIMITIVE_RESTART = 36765 /* GL_PRIMITIVE_RESTART         */, ///<
 
-  DEBUG_OUTPUT             = 37600, // GL_DEBUG_OUTPUT
-  DEBUG_OUTPUT_SYNCHRONOUS = 33346  // GL_DEBUG_OUTPUT_SYNCHRONOUS
+  DEBUG_OUTPUT             = 37600 /* GL_DEBUG_OUTPUT             */, ///<
+  DEBUG_OUTPUT_SYNCHRONOUS = 33346 /* GL_DEBUG_OUTPUT_SYNCHRONOUS */  ///<
 };
 
 enum class StateParameter : unsigned int {
@@ -83,133 +83,133 @@ enum class StateParameter : unsigned int {
 };
 
 enum class MaskType : unsigned int {
-  COLOR   = 16384, // GL_COLOR_BUFFER_BIT
-  DEPTH   = 256,   // GL_DEPTH_BUFFER_BIT
-  STENCIL = 1024   // GL_STENCIL_BUFFER_BIT
+  COLOR   = 16384 /* GL_COLOR_BUFFER_BIT   */, ///<
+  DEPTH   = 256   /* GL_DEPTH_BUFFER_BIT   */, ///<
+  STENCIL = 1024  /* GL_STENCIL_BUFFER_BIT */  ///<
 };
 MAKE_ENUM_FLAG(MaskType)
 
 enum class DepthFunction : unsigned int {
-  NEVER         = 512, // GL_NEVER
-  EQUAL         = 514, // GL_EQUAL
-  NOT_EQUAL     = 517, // GL_NOTEQUAL
-  LESS          = 513, // GL_LESS
-  LESS_EQUAL    = 515, // GL_LEQUAL
-  GREATER       = 516, // GL_GREATER
-  GREATER_EQUAL = 518, // GL_GEQUAL
-  ALWAYS        = 519  // GL_ALWAYS
+  NEVER         = 512 /* GL_NEVER    */, ///<
+  EQUAL         = 514 /* GL_EQUAL    */, ///<
+  NOT_EQUAL     = 517 /* GL_NOTEQUAL */, ///<
+  LESS          = 513 /* GL_LESS     */, ///<
+  LESS_EQUAL    = 515 /* GL_LEQUAL   */, ///<
+  GREATER       = 516 /* GL_GREATER  */, ///<
+  GREATER_EQUAL = 518 /* GL_GEQUAL   */, ///<
+  ALWAYS        = 519 /* GL_ALWAYS   */  ///<
 };
 
 enum class FaceOrientation : unsigned int {
-  FRONT      = 1028, // GL_FRONT
-  BACK       = 1029, // GL_BACK
-  FRONT_BACK = 1032  // GL_FRONT_AND_BACK
+  FRONT      = 1028 /* GL_FRONT          */, ///<
+  BACK       = 1029 /* GL_BACK           */, ///<
+  FRONT_BACK = 1032 /* GL_FRONT_AND_BACK */  ///<
 };
 
 enum class PolygonMode : unsigned int {
-  POINT = 6912, // GL_POINT
-  LINE  = 6913, // GL_LINE
-  FILL  = 6914  // GL_FILL
+  POINT = 6912 /* GL_POINT */, ///<
+  LINE  = 6913 /* GL_LINE  */, ///<
+  FILL  = 6914 /* GL_FILL  */  ///<
 };
 
 enum class PixelStorage : unsigned int {
-  UNPACK_SWAP_BYTES   = 3312,  // GL_UNPACK_SWAP_BYTES
-  UNPACK_LSB_FIRST    = 3313,  // GL_UNPACK_LSB_FIRST
-  UNPACK_ROW_LENGTH   = 3314,  // GL_UNPACK_ROW_LENGTH
-  UNPACK_SKIP_ROWS    = 3315,  // GL_UNPACK_SKIP_ROWS
-  UNPACK_SKIP_PIXELS  = 3316,  // GL_UNPACK_SKIP_PIXELS
-  UNPACK_SKIP_IMAGES  = 32877, // GL_PACK_SKIP_IMAGES
-  UNPACK_IMAGE_HEIGHT = 32878, // GL_PACK_IMAGE_HEIGHT
-  UNPACK_ALIGNMENT    = 3317,  // GL_UNPACK_ALIGNMENT
+  UNPACK_SWAP_BYTES   = 3312  /* GL_UNPACK_SWAP_BYTES  */, ///<
+  UNPACK_LSB_FIRST    = 3313  /* GL_UNPACK_LSB_FIRST   */, ///<
+  UNPACK_ROW_LENGTH   = 3314  /* GL_UNPACK_ROW_LENGTH  */, ///<
+  UNPACK_SKIP_ROWS    = 3315  /* GL_UNPACK_SKIP_ROWS   */, ///<
+  UNPACK_SKIP_PIXELS  = 3316  /* GL_UNPACK_SKIP_PIXELS */, ///<
+  UNPACK_SKIP_IMAGES  = 32877 /* GL_PACK_SKIP_IMAGES   */, ///<
+  UNPACK_IMAGE_HEIGHT = 32878 /* GL_PACK_IMAGE_HEIGHT  */, ///<
+  UNPACK_ALIGNMENT    = 3317  /* GL_UNPACK_ALIGNMENT   */, ///<
 
-  PACK_SWAP_BYTES     = 3328,  // GL_PACK_SWAP_BYTES
-  PACK_LSB_FIRST      = 3329,  // GL_PACK_LSB_FIRST
-  PACK_ROW_LENGTH     = 3330,  // GL_PACK_ROW_LENGTH
-  PACK_SKIP_ROWS      = 3331,  // GL_PACK_SKIP_ROWS
-  PACK_SKIP_PIXELS    = 3332,  // GL_PACK_SKIP_PIXELS
-  PACK_SKIP_IMAGES    = 32875, // GL_PACK_SKIP_IMAGES
-  PACK_IMAGE_HEIGHT   = 32876, // GL_PACK_IMAGE_HEIGHT
-  PACK_ALIGNMENT      = 3333   // GL_PACK_ALIGNMENT
+  PACK_SWAP_BYTES     = 3328  /* GL_PACK_SWAP_BYTES   */, ///<
+  PACK_LSB_FIRST      = 3329  /* GL_PACK_LSB_FIRST    */, ///<
+  PACK_ROW_LENGTH     = 3330  /* GL_PACK_ROW_LENGTH   */, ///<
+  PACK_SKIP_ROWS      = 3331  /* GL_PACK_SKIP_ROWS    */, ///<
+  PACK_SKIP_PIXELS    = 3332  /* GL_PACK_SKIP_PIXELS  */, ///<
+  PACK_SKIP_IMAGES    = 32875 /* GL_PACK_SKIP_IMAGES  */, ///<
+  PACK_IMAGE_HEIGHT   = 32876 /* GL_PACK_IMAGE_HEIGHT */, ///<
+  PACK_ALIGNMENT      = 3333  /* GL_PACK_ALIGNMENT    */  ///<
 };
 
 enum class BufferType : unsigned int {
-  ARRAY_BUFFER   = 34962, // GL_ARRAY_BUFFER
-  ELEMENT_BUFFER = 34963, // GL_ELEMENT_ARRAY_BUFFER
-  UNIFORM_BUFFER = 35345  // GL_UNIFORM_BUFFER
+  ARRAY_BUFFER   = 34962 /* GL_ARRAY_BUFFER         */, ///<
+  ELEMENT_BUFFER = 34963 /* GL_ELEMENT_ARRAY_BUFFER */, ///<
+  UNIFORM_BUFFER = 35345 /* GL_UNIFORM_BUFFER       */  ///<
 };
 
 enum class BufferDataUsage : unsigned int {
-  STREAM_DRAW  = 35040, // GL_STREAM_DRAW
-  STREAM_READ  = 35041, // GL_STREAM_READ
-  STREAM_COPY  = 35042, // GL_STREAM_COPY
+  STREAM_DRAW  = 35040 /* GL_STREAM_DRAW */, ///<
+  STREAM_READ  = 35041 /* GL_STREAM_READ */, ///<
+  STREAM_COPY  = 35042 /* GL_STREAM_COPY */, ///<
 
-  STATIC_DRAW  = 35044, // GL_STATIC_DRAW
-  STATIC_READ  = 35045, // GL_STATIC_READ
-  STATIC_COPY  = 35046, // GL_STATIC_COPY
+  STATIC_DRAW  = 35044 /* GL_STATIC_DRAW */, ///<
+  STATIC_READ  = 35045 /* GL_STATIC_READ */, ///<
+  STATIC_COPY  = 35046 /* GL_STATIC_COPY */, ///<
 
-  DYNAMIC_DRAW = 35048, // GL_DYNAMIC_DRAW
-  DYNAMIC_READ = 35049, // GL_DYNAMIC_READ
-  DYNAMIC_COPY = 35050, // GL_DYNAMIC_COPY
+  DYNAMIC_DRAW = 35048 /* GL_DYNAMIC_DRAW */, ///<
+  DYNAMIC_READ = 35049 /* GL_DYNAMIC_READ */, ///<
+  DYNAMIC_COPY = 35050 /* GL_DYNAMIC_COPY */  ///<
 };
 
 enum class TextureType : unsigned int {
-  TEXTURE_2D    = 3553,  // GL_TEXTURE_2D
-  CUBEMAP       = 34067, // GL_TEXTURE_CUBE_MAP
-  CUBEMAP_POS_X = 34069, // GL_TEXTURE_CUBE_MAP_POSITIVE_X
-  CUBEMAP_NEG_X = 34070, // GL_TEXTURE_CUBE_MAP_NEGATIVE_X
-  CUBEMAP_POS_Y = 34071, // GL_TEXTURE_CUBE_MAP_POSITIVE_Y
-  CUBEMAP_NEG_Y = 34072, // GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
-  CUBEMAP_POS_Z = 34073, // GL_TEXTURE_CUBE_MAP_POSITIVE_Z
-  CUBEMAP_NEG_Z = 34074  // GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+  TEXTURE_2D    = 3553  /* GL_TEXTURE_2D                  */, ///<
+  CUBEMAP       = 34067 /* GL_TEXTURE_CUBE_MAP            */, ///<
+  CUBEMAP_POS_X = 34069 /* GL_TEXTURE_CUBE_MAP_POSITIVE_X */, ///<
+  CUBEMAP_NEG_X = 34070 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_X */, ///<
+  CUBEMAP_POS_Y = 34071 /* GL_TEXTURE_CUBE_MAP_POSITIVE_Y */, ///<
+  CUBEMAP_NEG_Y = 34072 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Y */, ///<
+  CUBEMAP_POS_Z = 34073 /* GL_TEXTURE_CUBE_MAP_POSITIVE_Z */, ///<
+  CUBEMAP_NEG_Z = 34074 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Z */  ///<
 };
 
 enum class TextureParam : unsigned int {
-  MINIFY_FILTER  = 10241, // GL_TEXTURE_MIN_FILTER
-  MAGNIFY_FILTER = 10240, // GL_TEXTURE_MAG_FILTER
-  WRAP_S         = 10242, // GL_TEXTURE_WRAP_S
-  WRAP_T         = 10243, // GL_TEXTURE_WRAP_T
-  WRAP_R         = 32882, // GL_TEXTURE_WRAP_R
-  SWIZZLE_RGBA   = 36422  // GL_TEXTURE_SWIZZLE_RGBA
+  MINIFY_FILTER  = 10241 /* GL_TEXTURE_MIN_FILTER   */, ///<
+  MAGNIFY_FILTER = 10240 /* GL_TEXTURE_MAG_FILTER   */, ///<
+  WRAP_S         = 10242 /* GL_TEXTURE_WRAP_S       */, ///<
+  WRAP_T         = 10243 /* GL_TEXTURE_WRAP_T       */, ///<
+  WRAP_R         = 32882 /* GL_TEXTURE_WRAP_R       */, ///<
+  SWIZZLE_RGBA   = 36422 /* GL_TEXTURE_SWIZZLE_RGBA */  ///<
 };
 
 enum class TextureParamValue : unsigned int {
-  NEAREST                = 9728,  // GL_NEAREST
-  LINEAR                 = 9729,  // GL_LINEAR
-  NEAREST_MIPMAP_NEAREST = 9984,  // GL_NEAREST_MIPMAP_NEAREST
-  LINEAR_MIPMAP_NEAREST  = 9985,  // GL_LINEAR_MIPMAP_NEAREST
-  NEAREST_MIPMAP_LINEAR  = 9986,  // GL_NEAREST_MIPMAP_LINEAR
-  LINEAR_MIPMAP_LINEAR   = 9987,  // GL_LINEAR_MIPMAP_LINEAR
-  REPEAT                 = 10497, // GL_REPEAT
-  CLAMP_TO_EDGE          = 33071  // GL_CLAMP_TO_EDGE
+  NEAREST                = 9728  /* GL_NEAREST                */, ///<
+  LINEAR                 = 9729  /* GL_LINEAR                 */, ///<
+  NEAREST_MIPMAP_NEAREST = 9984  /* GL_NEAREST_MIPMAP_NEAREST */, ///<
+  LINEAR_MIPMAP_NEAREST  = 9985  /* GL_LINEAR_MIPMAP_NEAREST  */, ///<
+  NEAREST_MIPMAP_LINEAR  = 9986  /* GL_NEAREST_MIPMAP_LINEAR  */, ///<
+  LINEAR_MIPMAP_LINEAR   = 9987  /* GL_LINEAR_MIPMAP_LINEAR   */, ///<
+  REPEAT                 = 10497 /* GL_REPEAT                 */, ///<
+  CLAMP_TO_EDGE          = 33071 /* GL_CLAMP_TO_EDGE          */  ///<
 };
 
 enum class TextureAttribute : unsigned int {
-  WIDTH                 = 4096,  // GL_TEXTURE_WIDTH
-  HEIGHT                = 4097,  // GL_TEXTURE_HEIGHT
-  DEPTH                 = 32881, // GL_TEXTURE_DEPTH
-  INTERNAL_FORMAT       = 4099,  // GL_TEXTURE_INTERNAL_FORMAT
-  RED_SIZE              = 32860, // GL_TEXTURE_RED_SIZE
-  GREEN_SIZE            = 32861, // GL_TEXTURE_GREEN_SIZE
-  BLUE_SIZE             = 32862, // GL_TEXTURE_BLUE_SIZE
-  ALPHA_SIZE            = 32863, // GL_TEXTURE_ALPHA_SIZE
-  DEPTH_SIZE            = 34890, // GL_TEXTURE_DEPTH_SIZE
-  COMPRESSED            = 34465, // GL_TEXTURE_COMPRESSED
-  COMPRESSED_IMAGE_SIZE = 34464  // GL_TEXTURE_COMPRESSED_IMAGE_SIZE
+  WIDTH                 = 4096  /* GL_TEXTURE_WIDTH                 */, ///<
+  HEIGHT                = 4097  /* GL_TEXTURE_HEIGHT                */, ///<
+  DEPTH                 = 32881 /* GL_TEXTURE_DEPTH                 */, ///<
+  INTERNAL_FORMAT       = 4099  /* GL_TEXTURE_INTERNAL_FORMAT       */, ///<
+  RED_SIZE              = 32860 /* GL_TEXTURE_RED_SIZE              */, ///<
+  GREEN_SIZE            = 32861 /* GL_TEXTURE_GREEN_SIZE            */, ///<
+  BLUE_SIZE             = 32862 /* GL_TEXTURE_BLUE_SIZE             */, ///<
+  ALPHA_SIZE            = 32863 /* GL_TEXTURE_ALPHA_SIZE            */, ///<
+  DEPTH_SIZE            = 34890 /* GL_TEXTURE_DEPTH_SIZE            */, ///<
+  COMPRESSED            = 34465 /* GL_TEXTURE_COMPRESSED            */, ///<
+  COMPRESSED_IMAGE_SIZE = 34464 /* GL_TEXTURE_COMPRESSED_IMAGE_SIZE */  ///<
 };
 
 enum class TextureFormat : unsigned int {
-  RED           = 6403,  // GL_RED
-  GREEN         = 6404,  // GL_GREEN
-  BLUE          = 6405,  // GL_BLUE
-  RG            = 33319, // GL_RG
-  RGB           = 6407,  // GL_RGB
-  BGR           = 32992, // GL_BGR
-  RGBA          = 6408,  // GL_RGBA
-  BGRA          = 32993, // GL_BGRA
-  SRGB          = 35904, // GL_SRGB
-  DEPTH         = 6402,  // GL_DEPTH_COMPONENT
-  STENCIL       = 6401,  // GL_STENCIL_INDEX
-  DEPTH_STENCIL = 34041  // GL_DEPTH_STENCIL
+  RED           = 6403  /* GL_RED             */, ///<
+  GREEN         = 6404  /* GL_GREEN           */, ///<
+  BLUE          = 6405  /* GL_BLUE            */, ///<
+  RG            = 33319 /* GL_RG              */, ///<
+  RGB           = 6407  /* GL_RGB             */, ///<
+  BGR           = 32992 /* GL_BGR             */, ///<
+  RGBA          = 6408  /* GL_RGBA            */, ///<
+  BGRA          = 32993 /* GL_BGRA            */, ///<
+  SRGB          = 35904 /* GL_SRGB            */, ///<
+  DEPTH         = 6402  /* GL_DEPTH_COMPONENT */, ///<
+  STENCIL       = 6401  /* GL_STENCIL_INDEX   */, ///<
+  DEPTH_STENCIL = 34041 /* GL_DEPTH_STENCIL   */  ///<
 };
 
 enum class TextureInternalFormat : unsigned int {
@@ -225,185 +225,191 @@ enum class TextureInternalFormat : unsigned int {
   DEPTH_STENCIL = static_cast<unsigned int>(TextureFormat::DEPTH_STENCIL),
 
   // Sized formats
-  RED16F   = 33325, // GL_R16F
-  RG16F    = 33327, // GL_RG16F
-  RGB16F   = 34843, // GL_RGB16F
-  RGBA16F  = 34842, // GL_RGBA16F
-  DEPTH32F = 36012, // GL_DEPTH_COMPONENT32F
+  RED16F   = 33325 /* GL_R16F               */, ///<
+  RG16F    = 33327 /* GL_RG16F              */, ///<
+  RGB16F   = 34843 /* GL_RGB16F             */, ///<
+  RGBA16F  = 34842 /* GL_RGBA16F            */, ///<
+  DEPTH32F = 36012 /* GL_DEPTH_COMPONENT32F */  ///<
 };
 
 enum class TextureDataType : unsigned int {
-  UBYTE = 5121, // GL_UNSIGNED_BYTE
-  FLOAT = 5126  // GL_FLOAT
+  UBYTE = 5121 /* GL_UNSIGNED_BYTE */, ///<
+  FLOAT = 5126 /* GL_FLOAT         */  ///<
 };
 
 enum class ProgramParameter : unsigned int {
-  DELETE_STATUS                         = 35712, // GL_DELETE_STATUS
-  LINK_STATUS                           = 35714, // GL_LINK_STATUS
-  VALIDATE_STATUS                       = 35715, // GL_VALIDATE_STATUS
-  INFO_LOG_LENGTH                       = 35716, // GL_INFO_LOG_LENGTH
-  ATTACHED_SHADERS                      = 35717, // GL_ATTACHED_SHADERS
-  ACTIVE_ATTRIBUTES                     = 35721, // GL_ACTIVE_ATTRIBUTES
-  ACTIVE_ATTRIBUTE_MAX_LENGTH           = 35722, // GL_ACTIVE_ATTRIBUTE_MAX_LENGTH
-  ACTIVE_UNIFORMS                       = 35718, // GL_ACTIVE_UNIFORMS
-  ACTIVE_UNIFORM_MAX_LENGTH             = 35719, // GL_ACTIVE_UNIFORM_MAX_LENGTH
-  ACTIVE_UNIFORM_BLOCKS                 = 35382, // GL_ACTIVE_UNIFORM_BLOCKS
-  ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH  = 35381, // GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH
-  TRANSFORM_FEEDBACK_BUFFER_MODE        = 35967, // GL_TRANSFORM_FEEDBACK_BUFFER_MODE
-  TRANSFORM_FEEDBACK_VARYINGS           = 35971, // GL_TRANSFORM_FEEDBACK_VARYINGS
-  TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH = 35958, // GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH
-  GEOMETRY_VERTICES_OUT                 = 35094, // GL_GEOMETRY_VERTICES_OUT
-  GEOMETRY_INPUT_TYPE                   = 35095, // GL_GEOMETRY_INPUT_TYPE
-  GEOMETRY_OUTPUT_TYPE                  = 35096  // GL_GEOMETRY_OUTPUT_TYPE
+  DELETE_STATUS                         = 35712 /* GL_DELETE_STATUS                         */, ///<
+  LINK_STATUS                           = 35714 /* GL_LINK_STATUS                           */, ///<
+  VALIDATE_STATUS                       = 35715 /* GL_VALIDATE_STATUS                       */, ///<
+  INFO_LOG_LENGTH                       = 35716 /* GL_INFO_LOG_LENGTH                       */, ///<
+  ATTACHED_SHADERS                      = 35717 /* GL_ATTACHED_SHADERS                      */, ///<
+  ACTIVE_ATTRIBUTES                     = 35721 /* GL_ACTIVE_ATTRIBUTES                     */, ///<
+  ACTIVE_ATTRIBUTE_MAX_LENGTH           = 35722 /* GL_ACTIVE_ATTRIBUTE_MAX_LENGTH           */, ///<
+  ACTIVE_UNIFORMS                       = 35718 /* GL_ACTIVE_UNIFORMS                       */, ///<
+  ACTIVE_UNIFORM_MAX_LENGTH             = 35719 /* GL_ACTIVE_UNIFORM_MAX_LENGTH             */, ///<
+  ACTIVE_UNIFORM_BLOCKS                 = 35382 /* GL_ACTIVE_UNIFORM_BLOCKS                 */, ///<
+  ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH  = 35381 /* GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH  */, ///<
+  TRANSFORM_FEEDBACK_BUFFER_MODE        = 35967 /* GL_TRANSFORM_FEEDBACK_BUFFER_MODE        */, ///<
+  TRANSFORM_FEEDBACK_VARYINGS           = 35971 /* GL_TRANSFORM_FEEDBACK_VARYINGS           */, ///<
+  TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH = 35958 /* GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH */, ///<
+  GEOMETRY_VERTICES_OUT                 = 35094 /* GL_GEOMETRY_VERTICES_OUT                 */, ///<
+  GEOMETRY_INPUT_TYPE                   = 35095 /* GL_GEOMETRY_INPUT_TYPE                   */, ///<
+  GEOMETRY_OUTPUT_TYPE                  = 35096 /* GL_GEOMETRY_OUTPUT_TYPE                  */  ///<
 };
 
 enum class ShaderType : unsigned int {
-  VERTEX   = 35633, // GL_VERTEX_SHADER
-  FRAGMENT = 35632, // GL_FRAGMENT_SHADER
-  GEOMETRY = 36313  // GL_GEOMETRY_SHADER
+  VERTEX   = 35633 /* GL_VERTEX_SHADER   */, ///< Vertex shader.
+  FRAGMENT = 35632 /* GL_FRAGMENT_SHADER */, ///< Fragment shader.
+  GEOMETRY = 36313 /* GL_GEOMETRY_SHADER */, ///< Geometry shader.
+  COMPUTE  = 37305 /* GL_COMPUTE_SHADER  */  ///< Compute shader. Requires OpenGL 4.3+.
 };
 
 enum class ShaderStatus : unsigned int {
-  COMPILE = 35713 // GL_COMPILE_STATUS
+  COMPILE = 35713 /* GL_COMPILE_STATUS */ ///<
 };
 
 enum class UniformType : unsigned int {
   // Primitive types
-  FLOAT  = 5126,  // GL_FLOAT
-  DOUBLE = 5130,  // GL_DOUBLE
-  INT    = 5124,  // GL_INT
-  UINT   = 5125,  // GL_UNSIGNED_INT
-  BOOL   = 35670, // GL_BOOL
+  FLOAT  = 5126  /* GL_FLOAT        */, ///<
+  DOUBLE = 5130  /* GL_DOUBLE       */, ///<
+  INT    = 5124  /* GL_INT          */, ///<
+  UINT   = 5125  /* GL_UNSIGNED_INT */, ///<
+  BOOL   = 35670 /* GL_BOOL         */, ///<
 
   // Vectors
-  VEC2  = 35664, // GL_FLOAT_VEC2
-  VEC3  = 35665, // GL_FLOAT_VEC3
-  VEC4  = 35666, // GL_FLOAT_VEC4
-  DVEC2 = 36860, // GL_DOUBLE_VEC2
-  DVEC3 = 36861, // GL_DOUBLE_VEC3
-  DVEC4 = 36862, // GL_DOUBLE_VEC4
-  IVEC2 = 35667, // GL_INT_VEC2
-  IVEC3 = 35668, // GL_INT_VEC3
-  IVEC4 = 35669, // GL_INT_VEC4
-  UVEC2 = 36294, // GL_UNSIGNED_INT_VEC2
-  UVEC3 = 36295, // GL_UNSIGNED_INT_VEC3
-  UVEC4 = 36296, // GL_UNSIGNED_INT_VEC4
-  BVEC2 = 35671, // GL_BOOL_VEC2
-  BVEC3 = 35672, // GL_BOOL_VEC3
-  BVEC4 = 35673, // GL_BOOL_VEC4
+  VEC2  = 35664 /* GL_FLOAT_VEC2        */, ///<
+  VEC3  = 35665 /* GL_FLOAT_VEC3        */, ///<
+  VEC4  = 35666 /* GL_FLOAT_VEC4        */, ///<
+  DVEC2 = 36860 /* GL_DOUBLE_VEC2       */, ///<
+  DVEC3 = 36861 /* GL_DOUBLE_VEC3       */, ///<
+  DVEC4 = 36862 /* GL_DOUBLE_VEC4       */, ///<
+  IVEC2 = 35667 /* GL_INT_VEC2          */, ///<
+  IVEC3 = 35668 /* GL_INT_VEC3          */, ///<
+  IVEC4 = 35669 /* GL_INT_VEC4          */, ///<
+  UVEC2 = 36294 /* GL_UNSIGNED_INT_VEC2 */, ///<
+  UVEC3 = 36295 /* GL_UNSIGNED_INT_VEC3 */, ///<
+  UVEC4 = 36296 /* GL_UNSIGNED_INT_VEC4 */, ///<
+  BVEC2 = 35671 /* GL_BOOL_VEC2         */, ///<
+  BVEC3 = 35672 /* GL_BOOL_VEC3         */, ///<
+  BVEC4 = 35673 /* GL_BOOL_VEC4         */, ///<
 
   // Matrices
-  MAT2    = 35674, // GL_FLOAT_MAT2
-  MAT3    = 35675, // GL_FLOAT_MAT3
-  MAT4    = 35676, // GL_FLOAT_MAT4
-  MAT2x3  = 35685, // GL_FLOAT_MAT2x3
-  MAT2x4  = 35686, // GL_FLOAT_MAT2x4
-  MAT3x2  = 35687, // GL_FLOAT_MAT3x2
-  MAT3x4  = 35688, // GL_FLOAT_MAT3x4
-  MAT4x2  = 35689, // GL_FLOAT_MAT4x2
-  MAT4x3  = 35690, // GL_FLOAT_MAT4x3
-  DMAT2   = 36678, // GL_DOUBLE_MAT2
-  DMAT3   = 36679, // GL_DOUBLE_MAT3
-  DMAT4   = 36680, // GL_DOUBLE_MAT4
-  DMAT2x3 = 36681, // GL_DOUBLE_MAT2x3
-  DMAT2x4 = 36682, // GL_DOUBLE_MAT2x4
-  DMAT3x2 = 36683, // GL_DOUBLE_MAT3x2
-  DMAT3x4 = 36684, // GL_DOUBLE_MAT3x4
-  DMAT4x2 = 36685, // GL_DOUBLE_MAT4x2
-  DMAT4x3 = 36686, // GL_DOUBLE_MAT4x3
+  MAT2    = 35674 /* GL_FLOAT_MAT2    */, ///<
+  MAT3    = 35675 /* GL_FLOAT_MAT3    */, ///<
+  MAT4    = 35676 /* GL_FLOAT_MAT4    */, ///<
+  MAT2x3  = 35685 /* GL_FLOAT_MAT2x3  */, ///<
+  MAT2x4  = 35686 /* GL_FLOAT_MAT2x4  */, ///<
+  MAT3x2  = 35687 /* GL_FLOAT_MAT3x2  */, ///<
+  MAT3x4  = 35688 /* GL_FLOAT_MAT3x4  */, ///<
+  MAT4x2  = 35689 /* GL_FLOAT_MAT4x2  */, ///<
+  MAT4x3  = 35690 /* GL_FLOAT_MAT4x3  */, ///<
+  DMAT2   = 36678 /* GL_DOUBLE_MAT2   */, ///<
+  DMAT3   = 36679 /* GL_DOUBLE_MAT3   */, ///<
+  DMAT4   = 36680 /* GL_DOUBLE_MAT4   */, ///<
+  DMAT2x3 = 36681 /* GL_DOUBLE_MAT2x3 */, ///<
+  DMAT2x4 = 36682 /* GL_DOUBLE_MAT2x4 */, ///<
+  DMAT3x2 = 36683 /* GL_DOUBLE_MAT3x2 */, ///<
+  DMAT3x4 = 36684 /* GL_DOUBLE_MAT3x4 */, ///<
+  DMAT4x2 = 36685 /* GL_DOUBLE_MAT4x2 */, ///<
+  DMAT4x3 = 36686 /* GL_DOUBLE_MAT4x3 */, ///<
 
   // Samplers
-  SAMPLER_1D                                = 35677, // GL_SAMPLER_1D
-  SAMPLER_2D                                = 35678, // GL_SAMPLER_2D
-  SAMPLER_3D                                = 35679, // GL_SAMPLER_3D
-  SAMPLER_CUBE                              = 35680, // GL_SAMPLER_CUBE
-  SAMPLER_1D_SHADOW                         = 35681, // GL_SAMPLER_1D_SHADOW
-  SAMPLER_2D_SHADOW                         = 35682, // GL_SAMPLER_2D_SHADOW
-  SAMPLER_1D_ARRAY                          = 36288, // GL_SAMPLER_1D_ARRAY
-  SAMPLER_2D_ARRAY                          = 36289, // GL_SAMPLER_2D_ARRAY
-  SAMPLER_1D_ARRAY_SHADOW                   = 36291, // GL_SAMPLER_1D_ARRAY_SHADOW
-  SAMPLER_2D_ARRAY_SHADOW                   = 36292, // GL_SAMPLER_2D_ARRAY_SHADOW
-  SAMPLER_2D_MULTISAMPLE                    = 37128, // GL_SAMPLER_2D_MULTISAMPLE
-  SAMPLER_2D_MULTISAMPLE_ARRAY              = 37131, // GL_SAMPLER_2D_MULTISAMPLE_ARRAY
-  SAMPLER_CUBE_SHADOW                       = 36293, // GL_SAMPLER_CUBE_SHADOW
-  SAMPLER_BUFFER                            = 36290, // GL_SAMPLER_BUFFER
-  SAMPLER_2D_RECT                           = 35683, // GL_SAMPLER_2D_RECT
-  SAMPLER_2D_RECT_SHADOW                    = 35684, // GL_SAMPLER_2D_RECT_SHADOW
-  INT_SAMPLER_1D                            = 36297, // GL_INT_SAMPLER_1D
-  INT_SAMPLER_2D                            = 36298, // GL_INT_SAMPLER_2D
-  INT_SAMPLER_3D                            = 36299, // GL_INT_SAMPLER_3D
-  INT_SAMPLER_CUBE                          = 36300, // GL_INT_SAMPLER_CUBE
-  INT_SAMPLER_1D_ARRAY                      = 36302, // GL_INT_SAMPLER_1D_ARRAY
-  INT_SAMPLER_2D_ARRAY                      = 36303, // GL_INT_SAMPLER_2D_ARRAY
-  INT_SAMPLER_2D_MULTISAMPLE                = 37129, // GL_INT_SAMPLER_2D_MULTISAMPLE
-  INT_SAMPLER_2D_MULTISAMPLE_ARRAY          = 37132, // GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY
-  INT_SAMPLER_BUFFER                        = 36304, // GL_INT_SAMPLER_BUFFER
-  INT_SAMPLER_2D_RECT                       = 36301, // GL_INT_SAMPLER_2D_RECT
-  UNSIGNED_INT_SAMPLER_1D                   = 36305, // GL_UNSIGNED_INT_SAMPLER_1D
-  UNSIGNED_INT_SAMPLER_2D                   = 36306, // GL_UNSIGNED_INT_SAMPLER_2D
-  UNSIGNED_INT_SAMPLER_3D                   = 36307, // GL_UNSIGNED_INT_SAMPLER_3D
-  UNSIGNED_INT_SAMPLER_CUBE                 = 36308, // GL_UNSIGNED_INT_SAMPLER_CUBE
-  UNSIGNED_INT_SAMPLER_1D_ARRAY             = 36310, // GL_UNSIGNED_INT_SAMPLER_1D_ARRAY
-  UNSIGNED_INT_SAMPLER_2D_ARRAY             = 36311, // GL_UNSIGNED_INT_SAMPLER_2D_ARRAY
-  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE       = 37130, // GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE
-  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY = 37133, // GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY
-  UNSIGNED_INT_SAMPLER_BUFFER               = 36312, // GL_UNSIGNED_INT_SAMPLER_BUFFER
-  UNSIGNED_INT_SAMPLER_2D_RECT              = 36309  // GL_UNSIGNED_INT_SAMPLER_2D_RECT
+  SAMPLER_1D                                = 35677 /* GL_SAMPLER_1D                                */, ///<
+  SAMPLER_2D                                = 35678 /* GL_SAMPLER_2D                                */, ///<
+  SAMPLER_3D                                = 35679 /* GL_SAMPLER_3D                                */, ///<
+  SAMPLER_CUBE                              = 35680 /* GL_SAMPLER_CUBE                              */, ///<
+  SAMPLER_1D_SHADOW                         = 35681 /* GL_SAMPLER_1D_SHADOW                         */, ///<
+  SAMPLER_2D_SHADOW                         = 35682 /* GL_SAMPLER_2D_SHADOW                         */, ///<
+  SAMPLER_1D_ARRAY                          = 36288 /* GL_SAMPLER_1D_ARRAY                          */, ///<
+  SAMPLER_2D_ARRAY                          = 36289 /* GL_SAMPLER_2D_ARRAY                          */, ///<
+  SAMPLER_1D_ARRAY_SHADOW                   = 36291 /* GL_SAMPLER_1D_ARRAY_SHADOW                   */, ///<
+  SAMPLER_2D_ARRAY_SHADOW                   = 36292 /* GL_SAMPLER_2D_ARRAY_SHADOW                   */, ///<
+  SAMPLER_2D_MULTISAMPLE                    = 37128 /* GL_SAMPLER_2D_MULTISAMPLE                    */, ///<
+  SAMPLER_2D_MULTISAMPLE_ARRAY              = 37131 /* GL_SAMPLER_2D_MULTISAMPLE_ARRAY              */, ///<
+  SAMPLER_CUBE_SHADOW                       = 36293 /* GL_SAMPLER_CUBE_SHADOW                       */, ///<
+  SAMPLER_BUFFER                            = 36290 /* GL_SAMPLER_BUFFER                            */, ///<
+  SAMPLER_2D_RECT                           = 35683 /* GL_SAMPLER_2D_RECT                           */, ///<
+  SAMPLER_2D_RECT_SHADOW                    = 35684 /* GL_SAMPLER_2D_RECT_SHADOW                    */, ///<
+  INT_SAMPLER_1D                            = 36297 /* GL_INT_SAMPLER_1D                            */, ///<
+  INT_SAMPLER_2D                            = 36298 /* GL_INT_SAMPLER_2D                            */, ///<
+  INT_SAMPLER_3D                            = 36299 /* GL_INT_SAMPLER_3D                            */, ///<
+  INT_SAMPLER_CUBE                          = 36300 /* GL_INT_SAMPLER_CUBE                          */, ///<
+  INT_SAMPLER_1D_ARRAY                      = 36302 /* GL_INT_SAMPLER_1D_ARRAY                      */, ///<
+  INT_SAMPLER_2D_ARRAY                      = 36303 /* GL_INT_SAMPLER_2D_ARRAY                      */, ///<
+  INT_SAMPLER_2D_MULTISAMPLE                = 37129 /* GL_INT_SAMPLER_2D_MULTISAMPLE                */, ///<
+  INT_SAMPLER_2D_MULTISAMPLE_ARRAY          = 37132 /* GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY          */, ///<
+  INT_SAMPLER_BUFFER                        = 36304 /* GL_INT_SAMPLER_BUFFER                        */, ///<
+  INT_SAMPLER_2D_RECT                       = 36301 /* GL_INT_SAMPLER_2D_RECT                       */, ///<
+  UNSIGNED_INT_SAMPLER_1D                   = 36305 /* GL_UNSIGNED_INT_SAMPLER_1D                   */, ///<
+  UNSIGNED_INT_SAMPLER_2D                   = 36306 /* GL_UNSIGNED_INT_SAMPLER_2D                   */, ///<
+  UNSIGNED_INT_SAMPLER_3D                   = 36307 /* GL_UNSIGNED_INT_SAMPLER_3D                   */, ///<
+  UNSIGNED_INT_SAMPLER_CUBE                 = 36308 /* GL_UNSIGNED_INT_SAMPLER_CUBE                 */, ///<
+  UNSIGNED_INT_SAMPLER_1D_ARRAY             = 36310 /* GL_UNSIGNED_INT_SAMPLER_1D_ARRAY             */, ///<
+  UNSIGNED_INT_SAMPLER_2D_ARRAY             = 36311 /* GL_UNSIGNED_INT_SAMPLER_2D_ARRAY             */, ///<
+  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE       = 37130 /* GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE       */, ///<
+  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY = 37133 /* GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY */, ///<
+  UNSIGNED_INT_SAMPLER_BUFFER               = 36312 /* GL_UNSIGNED_INT_SAMPLER_BUFFER               */, ///<
+  UNSIGNED_INT_SAMPLER_2D_RECT              = 36309 /* GL_UNSIGNED_INT_SAMPLER_2D_RECT              */  ///<
 };
 
 enum class FramebufferType : unsigned int {
-  READ_FRAMEBUFFER = 36008, // GL_READ_FRAMEBUFFER
-  DRAW_FRAMEBUFFER = 36009, // GL_DRAW_FRAMEBUFFER
-  FRAMEBUFFER      = 36160  // GL_FRAMEBUFFER
+  READ_FRAMEBUFFER = 36008 /* GL_READ_FRAMEBUFFER */, ///<
+  DRAW_FRAMEBUFFER = 36009 /* GL_DRAW_FRAMEBUFFER */, ///<
+  FRAMEBUFFER      = 36160 /* GL_FRAMEBUFFER      */  ///<
 };
 
 enum class FramebufferStatus : unsigned int {
-  COMPLETE                      = 36053, // GL_FRAMEBUFFER_COMPLETE
-  UNDEFINED                     = 33305, // GL_FRAMEBUFFER_UNDEFINED
-  INCOMPLETE_ATTACHMENT         = 36054, // GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT
-  INCOMPLETE_MISSING_ATTACHMENT = 36055, // GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
-  INCOMPLETE_DRAW_BUFFER        = 36059, // GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
-  INCOMPLETE_READ_BUFFER        = 36060, // GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
-  UNSUPPORTED                   = 36061, // GL_FRAMEBUFFER_UNSUPPORTED
-  INCOMPLETE_MULTISAMPLE        = 36182, // GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
-  INCOMPLETE_LAYER_TARGETS      = 36264  // GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS
+  COMPLETE                      = 36053 /* GL_FRAMEBUFFER_COMPLETE                      */, ///<
+  UNDEFINED                     = 33305 /* GL_FRAMEBUFFER_UNDEFINED                     */, ///<
+  INCOMPLETE_ATTACHMENT         = 36054 /* GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT         */, ///<
+  INCOMPLETE_MISSING_ATTACHMENT = 36055 /* GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT */, ///<
+  INCOMPLETE_DRAW_BUFFER        = 36059 /* GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER        */, ///<
+  INCOMPLETE_READ_BUFFER        = 36060 /* GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER        */, ///<
+  UNSUPPORTED                   = 36061 /* GL_FRAMEBUFFER_UNSUPPORTED                   */, ///<
+  INCOMPLETE_MULTISAMPLE        = 36182 /* GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE        */, ///<
+  INCOMPLETE_LAYER_TARGETS      = 36264 /* GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS      */  ///<
 };
 
 enum class FramebufferAttachment : unsigned int {
-  DEPTH         = 36096, // GL_DEPTH_ATTACHMENT
-  STENCIL       = 36128, // GL_STENCIL_ATTACHMENT
-  DEPTH_STENCIL = 33306, // GL_DEPTH_STENCIL_ATTACHMENT
+  DEPTH         = 36096 /* GL_DEPTH_ATTACHMENT         */, ///< Depth attachment.
+  STENCIL       = 36128 /* GL_STENCIL_ATTACHMENT       */, ///< Stencil attachment.
+  DEPTH_STENCIL = 33306 /* GL_DEPTH_STENCIL_ATTACHMENT */, ///< Depth & stencil attachment.
 
-  COLOR0 = 36064, // GL_COLOR_ATTACHMENT0
-  COLOR1 = 36065, // GL_COLOR_ATTACHMENT1
-  COLOR2 = 36066, // GL_COLOR_ATTACHMENT2
-  COLOR3 = 36067, // GL_COLOR_ATTACHMENT3
-  COLOR4 = 36068, // GL_COLOR_ATTACHMENT4
-  COLOR5 = 36069, // GL_COLOR_ATTACHMENT5
-  COLOR6 = 36070, // GL_COLOR_ATTACHMENT6
-  COLOR7 = 36071  // GL_COLOR_ATTACHMENT7
+  COLOR0 = 36064 /* GL_COLOR_ATTACHMENT0 */, ///< Color attachment 0.
+  COLOR1 = 36065 /* GL_COLOR_ATTACHMENT1 */, ///< Color attachment 1.
+  COLOR2 = 36066 /* GL_COLOR_ATTACHMENT2 */, ///< Color attachment 2.
+  COLOR3 = 36067 /* GL_COLOR_ATTACHMENT3 */, ///< Color attachment 3.
+  COLOR4 = 36068 /* GL_COLOR_ATTACHMENT4 */, ///< Color attachment 4.
+  COLOR5 = 36069 /* GL_COLOR_ATTACHMENT5 */, ///< Color attachment 5.
+  COLOR6 = 36070 /* GL_COLOR_ATTACHMENT6 */, ///< Color attachment 6.
+  COLOR7 = 36071 /* GL_COLOR_ATTACHMENT7 */  ///< Color attachment 7.
 };
 
 enum class DrawBuffer : unsigned int {
-  NONE        = 0,     // GL_NONE
-  FRONT_LEFT  = 1024,  // GL_FRONT_LEFT
-  FRONT_RIGHT = 1025,  // GL_FRONT_RIGHT
-  BACK_LEFT   = 1026,  // GL_BACK_LEFT
-  BACK_RIGHT  = 1027,  // GL_BACK_RIGHT
+  NONE = 0 /* GL_NONE */, ///<
 
-  COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0),
-  COLOR_ATTACHMENT1 = static_cast<unsigned int>(FramebufferAttachment::COLOR1),
-  COLOR_ATTACHMENT2 = static_cast<unsigned int>(FramebufferAttachment::COLOR2),
-  COLOR_ATTACHMENT3 = static_cast<unsigned int>(FramebufferAttachment::COLOR3),
-  COLOR_ATTACHMENT4 = static_cast<unsigned int>(FramebufferAttachment::COLOR4),
-  COLOR_ATTACHMENT5 = static_cast<unsigned int>(FramebufferAttachment::COLOR5),
-  COLOR_ATTACHMENT6 = static_cast<unsigned int>(FramebufferAttachment::COLOR6),
-  COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)
+#if !defined(USE_OPENGL_ES)
+  FRONT_LEFT  = 1024 /* GL_FRONT_LEFT  */, ///<
+  FRONT_RIGHT = 1025 /* GL_FRONT_RIGHT */, ///<
+  BACK_LEFT   = 1026 /* GL_BACK_LEFT   */, ///<
+  BACK_RIGHT  = 1027 /* GL_BACK_RIGHT  */, ///<
+#else
+  BACK        = 1029 /* GL_BACK        */, ///<
+#endif
+
+  COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0), ///<
+  COLOR_ATTACHMENT1 = static_cast<unsigned int>(FramebufferAttachment::COLOR1), ///<
+  COLOR_ATTACHMENT2 = static_cast<unsigned int>(FramebufferAttachment::COLOR2), ///<
+  COLOR_ATTACHMENT3 = static_cast<unsigned int>(FramebufferAttachment::COLOR3), ///<
+  COLOR_ATTACHMENT4 = static_cast<unsigned int>(FramebufferAttachment::COLOR4), ///<
+  COLOR_ATTACHMENT5 = static_cast<unsigned int>(FramebufferAttachment::COLOR5), ///<
+  COLOR_ATTACHMENT6 = static_cast<unsigned int>(FramebufferAttachment::COLOR6), ///<
+  COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)  ///<
 };
 
 enum class BlitFilter : unsigned int {
-  NEAREST = static_cast<unsigned int>(TextureParamValue::NEAREST),
-  LINEAR  = static_cast<unsigned int>(TextureParamValue::LINEAR)
+  NEAREST = static_cast<unsigned int>(TextureParamValue::NEAREST), ///<
+  LINEAR  = static_cast<unsigned int>(TextureParamValue::LINEAR)   ///<
 };
 
 /// Possible errors obtained after any renderer call; see https://www.khronos.org/opengl/wiki/OpenGL_Error#Meaning_of_errors for a more detailed description.
@@ -597,6 +603,7 @@ public:
   static bool isShaderCompiled(unsigned int index);
   static void sendShaderSource(unsigned int index, const char* source, int length);
   static void sendShaderSource(unsigned int index, const std::string& source) { sendShaderSource(index, source.c_str(), static_cast<int>(source.size())); }
+  static void sendShaderSource(unsigned int index, std::string_view source) { sendShaderSource(index, source.data(), static_cast<int>(source.size())); }
   static void compileShader(unsigned int index);
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);

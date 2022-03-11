@@ -645,6 +645,7 @@ void Renderer::deleteProgram(unsigned int index) {
 
 unsigned int Renderer::createShader(ShaderType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Creating a compute shader requires OpenGL 4.3+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 4 && s_minorVersion >= 3)));
 
   const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
 
