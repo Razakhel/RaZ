@@ -524,6 +524,7 @@ public:
   /// \param param Parameter to set.
   /// \param value Value to be set.
   static void setTextureParameter(TextureType type, TextureParam param, TextureParamValue value) { setTextureParameter(type, param, static_cast<int>(value)); }
+#if !defined(USE_OPENGL_ES)
   /// Sets a parameter to the given texture.
   /// \note Requires OpenGL 4.5+.
   /// \param textureIndex Index of the texture to set the parameter to.
@@ -555,6 +556,7 @@ public:
   /// \param value Value to be set.
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param,
                                                                                                                                 static_cast<int>(value)); }
+#endif
   /// Sends the image's data corresponding to the currently bound texture.
   /// \param type Type of the texture.
   /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
@@ -582,10 +584,12 @@ public:
   /// Generate mipmaps (levels of detail) for the currently bound texture.
   /// \param type Type of the texture to generate mipmaps for.
   static void generateMipmap(TextureType type);
+#if !defined(USE_OPENGL_ES)
   /// Generate mipmaps (levels of detail) for the given texture.
   /// \note Requires OpenGL 4.5+.
   /// \param textureIndex Index of the texture to generate mipmaps for.
   static void generateMipmap(unsigned int textureIndex);
+#endif
   static void deleteTextures(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteTextures(unsigned int (&indices)[N]) { deleteTextures(N, indices); }
   static void deleteTexture(unsigned int& index) { deleteTextures(1, &index); }

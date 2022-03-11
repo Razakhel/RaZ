@@ -398,6 +398,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
   printConditionalErrors();
 }
 
+#if !defined(USE_OPENGL_ES)
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
@@ -433,6 +434,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
   printConditionalErrors();
 }
+#endif
 
 void Renderer::sendImageData2D(TextureType type,
                                unsigned int mipmapLevel,
@@ -521,6 +523,7 @@ void Renderer::generateMipmap(TextureType type) {
   printConditionalErrors();
 }
 
+#if !defined(USE_OPENGL_ES)
 void Renderer::generateMipmap(unsigned int textureIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: OpenGL 4.5+ is needed to generate mipmap with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
@@ -529,6 +532,7 @@ void Renderer::generateMipmap(unsigned int textureIndex) {
 
   printConditionalErrors();
 }
+#endif
 
 void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
@@ -649,7 +653,12 @@ void Renderer::deleteProgram(unsigned int index) {
 
 unsigned int Renderer::createShader(ShaderType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
   assert("Error: Creating a compute shader requires OpenGL 4.3+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 4 && s_minorVersion >= 3)));
+#else
+  assert("Error: Geometry shaders are unsupported with OpenGL ES." && type != ShaderType::GEOMETRY);
+  assert("Error: Creating a compute shader requires OpenGL ES 3.1+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 3 && s_minorVersion >= 1)));
+#endif
 
   const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
 
@@ -961,7 +970,7 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
 
 ErrorCodes Renderer::recoverErrors() noexcept {
   static constexpr auto recoverErrorCodeIndex = [] (ErrorCode code) constexpr noexcept -> uint8_t {
-    return (static_cast<uint8_t>(static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM)));
+    return static_cast<uint8_t>(static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM));
   };
 
   ErrorCodes errorCodes;
