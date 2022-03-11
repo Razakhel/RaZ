@@ -258,10 +258,12 @@ enum class ProgramParameter : unsigned int {
 };
 
 enum class ShaderType : unsigned int {
-  VERTEX   = 35633 /* GL_VERTEX_SHADER   */, ///< Vertex shader.
-  FRAGMENT = 35632 /* GL_FRAGMENT_SHADER */, ///< Fragment shader.
-  GEOMETRY = 36313 /* GL_GEOMETRY_SHADER */, ///< Geometry shader.
-  COMPUTE  = 37305 /* GL_COMPUTE_SHADER  */  ///< Compute shader. Requires OpenGL 4.3+.
+  VERTEX                  = 35633 /* GL_VERTEX_SHADER          */, ///< Vertex shader.
+  TESSELLATION_CONTROL    = 36488 /* GL_TESS_CONTROL_SHADER    */, ///< Tessellation control shader. Requires OpenGL 4.0+.
+  TESSELLATION_EVALUATION = 36487 /* GL_TESS_EVALUATION_SHADER */, ///< Tessellation evaluation shader. Requires OpenGL 4.0+.
+  FRAGMENT                = 35632 /* GL_FRAGMENT_SHADER        */, ///< Fragment shader.
+  GEOMETRY                = 36313 /* GL_GEOMETRY_SHADER        */, ///< Geometry shader.
+  COMPUTE                 = 37305 /* GL_COMPUTE_SHADER         */  ///< Compute shader. Requires OpenGL 4.3+.
 };
 
 enum class ShaderStatus : unsigned int {
@@ -451,6 +453,8 @@ public:
 
   static void initialize();
   static bool isInitialized() { return s_isInitialized; }
+  static int getMajorVersion() { return s_majorVersion; }
+  static int getMinorVersion() { return s_minorVersion; }
   static void enable(Capability capability);
   static void disable(Capability capability);
   static bool isEnabled(Capability capability);

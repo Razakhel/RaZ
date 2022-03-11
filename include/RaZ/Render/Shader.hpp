@@ -48,13 +48,22 @@ public:
   static VertexShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
 };
 
-class FragmentShader final : public Shader {
+class TessellationControlShader final : public Shader {
 public:
-  FragmentShader();
-  explicit FragmentShader(FilePath filePath) : FragmentShader() { import(std::move(filePath)); }
+  TessellationControlShader();
+  explicit TessellationControlShader(FilePath filePath) : TessellationControlShader() { import(std::move(filePath)); }
 
-  static FragmentShader loadFromSource(const std::string& source);
-  static FragmentShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+  static TessellationControlShader loadFromSource(const std::string& source);
+  static TessellationControlShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+};
+
+class TessellationEvaluationShader final : public Shader {
+public:
+  TessellationEvaluationShader();
+  explicit TessellationEvaluationShader(FilePath filePath) : TessellationEvaluationShader() { import(std::move(filePath)); }
+
+  static TessellationEvaluationShader loadFromSource(const std::string& source);
+  static TessellationEvaluationShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
 };
 
 class GeometryShader final : public Shader {
@@ -64,6 +73,15 @@ public:
 
   static GeometryShader loadFromSource(const std::string& source);
   static GeometryShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+};
+
+class FragmentShader final : public Shader {
+public:
+  FragmentShader();
+  explicit FragmentShader(FilePath filePath) : FragmentShader() { import(std::move(filePath)); }
+
+  static FragmentShader loadFromSource(const std::string& source);
+  static FragmentShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
 };
 
 class ComputeShader final : public Shader {

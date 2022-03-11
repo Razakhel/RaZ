@@ -654,9 +654,13 @@ void Renderer::deleteProgram(unsigned int index) {
 unsigned int Renderer::createShader(ShaderType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
+  assert("Error: Creating a tessellation shader requires OpenGL 4.0+."
+         && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION) || (s_majorVersion >= 4 && s_minorVersion >= 0)));
   assert("Error: Creating a compute shader requires OpenGL 4.3+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 4 && s_minorVersion >= 3)));
 #else
   assert("Error: Geometry shaders are unsupported with OpenGL ES." && type != ShaderType::GEOMETRY);
+  assert("Error: Tessellation shaders are unsupported with OpenGL ES."
+         && type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION);
   assert("Error: Creating a compute shader requires OpenGL ES 3.1+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 3 && s_minorVersion >= 1)));
 #endif
 

@@ -27,10 +27,17 @@ public:
   unsigned int getIndex() const { return m_index; }
 
   void setVertexShader(VertexShader&& vertShader);
+  void setTessellationControlShader(TessellationControlShader&& tessCtrlShader);
+  void setTessellationEvaluationShader(TessellationEvaluationShader&& tessEvalShader);
   void setGeometryShader(GeometryShader&& geomShader);
   void setFragmentShader(FragmentShader&& fragShader);
   void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader);
   void setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader);
+  void setShaders(VertexShader&& vertShader, TessellationEvaluationShader&& tessEvalShader, FragmentShader&& fragShader);
+  void setShaders(VertexShader&& vertShader,
+                  TessellationControlShader&& tessCtrlShader,
+                  TessellationEvaluationShader&& tessEvalShader,
+                  FragmentShader&& fragShader);
 
   /// Loads all the shaders contained by the program.
   void loadShaders() const;
@@ -130,6 +137,10 @@ public:
   void sendUniform(const std::string& uniformName, const Mat4f& mat) const { sendUniform(recoverUniformLocation(uniformName), mat); }
   /// Destroys the vertex shader, detaching it from the program & deleting it.
   void destroyVertexShader();
+  /// Destroys the tessellation control shader (if any), detaching it from the program & deleting it.
+  void destroyTessellationControlShader();
+  /// Destroys the tessellation evaluation shader (if any), detaching it from the program & deleting it.
+  void destroyTessellationEvaluationShader();
   /// Destroys the geometry shader (if any), detaching it from the program & deleting it.
   void destroyGeometryShader();
   /// Destroys the fragment shader, detaching it from the program & deleting it.
@@ -144,6 +155,8 @@ private:
   unsigned int m_index {};
 
   VertexShader m_vertShader {};
+  std::optional<TessellationControlShader> m_tessCtrlShader {};
+  std::optional<TessellationEvaluationShader> m_tessEvalShader {};
   std::optional<GeometryShader> m_geomShader {};
   FragmentShader m_fragShader {};
 

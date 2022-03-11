@@ -89,16 +89,28 @@ VertexShader VertexShader::loadFromSource(const std::string& source) {
   return vertShader;
 }
 
-FragmentShader::FragmentShader() {
-  Logger::debug("[Shader] Creating fragment shader...");
-  m_index = Renderer::createShader(ShaderType::FRAGMENT);
-  Logger::debug("[Shader] Created fragment shader (ID: " + std::to_string(m_index) + ')');
+TessellationControlShader::TessellationControlShader() {
+  Logger::debug("[Shader] Creating tessellation control shader...");
+  m_index = Renderer::createShader(ShaderType::TESSELLATION_CONTROL);
+  Logger::debug("[Shader] Created tessellation control shader (ID: " + std::to_string(m_index) + ')');
 }
 
-FragmentShader FragmentShader::loadFromSource(const std::string& source) {
-  FragmentShader fragShader;
-  fragShader.loadSource(source);
-  return fragShader;
+TessellationControlShader TessellationControlShader::loadFromSource(const std::string& source) {
+  TessellationControlShader tessCtrlShader;
+  tessCtrlShader.loadSource(source);
+  return tessCtrlShader;
+}
+
+TessellationEvaluationShader::TessellationEvaluationShader() {
+  Logger::debug("[Shader] Creating tessellation evaluation shader...");
+  m_index = Renderer::createShader(ShaderType::TESSELLATION_EVALUATION);
+  Logger::debug("[Shader] Created tessellation evaluation shader (ID: " + std::to_string(m_index) + ')');
+}
+
+TessellationEvaluationShader TessellationEvaluationShader::loadFromSource(const std::string& source) {
+  TessellationEvaluationShader tessEvalShader;
+  tessEvalShader.loadSource(source);
+  return tessEvalShader;
 }
 
 GeometryShader::GeometryShader() {
@@ -111,6 +123,18 @@ GeometryShader GeometryShader::loadFromSource(const std::string& source) {
   GeometryShader geomShader;
   geomShader.loadSource(source);
   return geomShader;
+}
+
+FragmentShader::FragmentShader() {
+  Logger::debug("[Shader] Creating fragment shader...");
+  m_index = Renderer::createShader(ShaderType::FRAGMENT);
+  Logger::debug("[Shader] Created fragment shader (ID: " + std::to_string(m_index) + ')');
+}
+
+FragmentShader FragmentShader::loadFromSource(const std::string& source) {
+  FragmentShader fragShader;
+  fragShader.loadSource(source);
+  return fragShader;
 }
 
 ComputeShader::ComputeShader() {
