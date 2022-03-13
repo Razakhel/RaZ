@@ -427,6 +427,20 @@ enum class BlitFilter : unsigned int {
   LINEAR  = static_cast<unsigned int>(TextureParamValue::LINEAR)   ///<
 };
 
+enum class RenderObjectType : unsigned int {
+  BUFFER             = 33504                                                   /* GL_BUFFER             */, ///<
+  TEXTURE            = 5890                                                    /* GL_TEXTURE            */, ///<
+  SAMPLER            = 33510                                                   /* GL_SAMPLER            */, ///<
+  SHADER             = 33505                                                   /* GL_SHADER             */, ///<
+  PROGRAM            = 33506                                                   /* GL_PROGRAM            */, ///<
+  QUERY              = 33507                                                   /* GL_QUERY              */, ///<
+  FRAMEBUFFER        = static_cast<unsigned int>(FramebufferType::FRAMEBUFFER) /* GL_FRAMEBUFFER        */, ///<
+  RENDERBUFFER       = 36161                                                   /* GL_RENDERBUFFER       */, ///<
+  VERTEX_ARRAY       = 32884                                                   /* GL_VERTEX_ARRAY       */, ///<
+  PROGRAM_PIPELINE   = 33508                                                   /* GL_PROGRAM_PIPELINE   */, ///<
+  TRANSFORM_FEEDBACK = 36386                                                   /* GL_TRANSFORM_FEEDBACK */  ///<
+};
+
 /// Possible errors obtained after any renderer call; see https://www.khronos.org/opengl/wiki/OpenGL_Error#Meaning_of_errors for a more detailed description.
 /// \see Renderer::recoverErrors()
 enum class ErrorCode : unsigned int {
@@ -723,6 +737,22 @@ public:
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
+#if !defined (USE_OPENGL_ES)
+  /// Assigns a label to a graphic object.
+  /// \param type Type of the object to assign the label to.
+  /// \param objectIndex Index of the object to assign the label to.
+  /// \param label Label to assign; must be null-terminated.
+  static void setLabel(RenderObjectType type, unsigned int objectIndex, const char* label);
+  /// Assigns a label to a graphic object.
+  /// \param type Type of the object to assign the label to.
+  /// \param objectIndex Index of the object to assign the label to.
+  /// \param label Label to assign.
+  static void setLabel(RenderObjectType type, unsigned int objectIndex, const std::string& label) { setLabel(type, objectIndex, label.c_str()); }
+  /// Removes label from a graphic object.
+  /// \param type Type of the object to remove the label from.
+  /// \param objectIndex Index of the object to remove the label from.
+  static void resetLabel(RenderObjectType type, unsigned int objectIndex) { setLabel(type, objectIndex, nullptr); }
+#endif
   static ErrorCodes recoverErrors() noexcept;
   static bool hasErrors() noexcept { return !recoverErrors().isEmpty(); }
   static void printErrors();

@@ -23,6 +23,7 @@ public:
   Framebuffer(const Framebuffer&) = delete;
   Framebuffer(Framebuffer&& fbo) noexcept;
 
+  unsigned int getIndex() const noexcept { return m_index; }
   bool isEmpty() const noexcept { return (!hasDepthBuffer() && m_colorBuffers.empty()); }
   bool hasDepthBuffer() const noexcept { return (m_depthBuffer != nullptr); }
   const Texture& getDepthBuffer() const noexcept { assert("Error: Framebuffer doesn't contain a depth buffer." && hasDepthBuffer()); return *m_depthBuffer; }

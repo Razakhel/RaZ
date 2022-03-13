@@ -1029,6 +1029,17 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
   printConditionalErrors();
 }
 
+#if !defined(USE_OPENGL_ES)
+void Renderer::setLabel(RenderObjectType type, unsigned int objectIndex, const char* label) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Setting an object label requires OpenGL 4.3+." && s_majorVersion >= 4 && s_minorVersion >= 3);
+
+  glObjectLabel(static_cast<unsigned int>(type), objectIndex, -1, label);
+
+  printConditionalErrors();
+}
+#endif
+
 ErrorCodes Renderer::recoverErrors() noexcept {
   static constexpr auto recoverErrorCodeIndex = [] (ErrorCode code) constexpr noexcept -> uint8_t {
     return static_cast<uint8_t>(static_cast<unsigned int>(code) - static_cast<unsigned int>(ErrorCode::INVALID_ENUM));

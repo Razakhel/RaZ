@@ -197,24 +197,30 @@ int main() {
   // Render passes //
   ///////////////////
 
+  Raz::RenderGraph& renderGraph = render.getRenderGraph();
+
   // Creating the render graph's texture buffers
-  const Raz::Texture& depthBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
-  const Raz::Texture& colorBuffer  = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
-  const Raz::Texture& normalBuffer = render.getRenderGraph().addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+  const Raz::Texture& depthBuffer  = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
+  const Raz::Texture& colorBuffer  = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+  const Raz::Texture& normalBuffer = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
 
   // Setting geometry pass' shaders & defining its write buffers
-  Raz::RenderPass& geomPass = render.getGeometryPass();
+  Raz::RenderPass& geomPass = renderGraph.getGeometryPass();
   geomPass.addWriteTexture(depthBuffer);
   geomPass.addWriteTexture(colorBuffer);
   geomPass.addWriteTexture(normalBuffer);
 
   // Adding the second pass & defining its read buffers
-  Raz::RenderPass& renderPass = render.addRenderPass(Raz::FragmentShader::loadFromSource(displayFragSource));
-  renderPass.addReadTexture(depthBuffer, "uniSceneBuffers.depth");
-  renderPass.addReadTexture(colorBuffer, "uniSceneBuffers.color");
-  renderPass.addReadTexture(normalBuffer, "uniSceneBuffers.normal");
+  Raz::RenderPass& splitPass = renderGraph.addNode(Raz::FragmentShader::loadFromSource(displayFragSource));
+  splitPass.addReadTexture(depthBuffer, "uniSceneBuffers.depth");
+  splitPass.addReadTexture(colorBuffer, "uniSceneBuffers.color");
+  splitPass.addReadTexture(normalBuffer, "uniSceneBuffers.normal");
 
-  geomPass.addChildren(renderPass);
+  geomPass.addChildren(splitPass);
+
+  //////////
+  // Mesh //
+  //////////
 
   // Importing the mesh & transforming it so that it can be fully visible
   Raz::Entity& mesh = world.addEntity();
@@ -278,7 +284,7 @@ int main() {
 #endif
 
   // Toggling the render pass' enabled state
-  window.addKeyCallback(Raz::Keyboard::R, [&renderPass] (float /* deltaTime */) noexcept { renderPass.enable(!renderPass.isEnabled()); }, Raz::Input::ONCE);
+  window.addKeyCallback(Raz::Keyboard::R, [&splitPass] (float /* deltaTime */) noexcept { splitPass.enable(!splitPass.isEnabled()); }, Raz::Input::ONCE);
 
   // Allowing to quit the application by pressing the Esc key
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
