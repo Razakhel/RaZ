@@ -45,9 +45,17 @@ enum class Capability : unsigned int {
   DEBUG_OUTPUT_SYNCHRONOUS = 33346 /* GL_DEBUG_OUTPUT_SYNCHRONOUS */  ///<
 };
 
+enum class ContextInfo : unsigned int {
+  VENDOR                   = 7936  /* GL_VENDOR                   */, ///< Graphics card vendor.
+  RENDERER                 = 7937  /* GL_RENDERER                 */, ///< Graphics card model.
+  VERSION                  = 7938  /* GL_VERSION                  */, ///< OpenGL version.
+  SHADING_LANGUAGE_VERSION = 35724 /* GL_SHADING_LANGUAGE_VERSION */  ///< GLSL version.
+};
+
 enum class StateParameter : unsigned int {
-  MAJOR_VERSION = 33307 /* GL_MAJOR_VERSION */, ///< OpenGL major version (in the form major.minor).
-  MINOR_VERSION = 33308 /* GL_MINOR_VERSION */, ///< OpenGL minor version (in the form major.minor).
+  MAJOR_VERSION   = 33307 /* GL_MAJOR_VERSION  */, ///< OpenGL major version (in the form major.minor).
+  MINOR_VERSION   = 33308 /* GL_MINOR_VERSION  */, ///< OpenGL minor version (in the form major.minor).
+  EXTENSION_COUNT = 33309 /* GL_NUM_EXTENSIONS */, ///< Number of extensions supported for the current context.
 
   ACTIVE_TEXTURE  = 34016 /* GL_ACTIVE_TEXTURE  */, ///< Currently active texture.
   CURRENT_PROGRAM = 35725 /* GL_CURRENT_PROGRAM */, ///< Currently used program.
@@ -458,6 +466,12 @@ public:
   static void enable(Capability capability);
   static void disable(Capability capability);
   static bool isEnabled(Capability capability);
+  static std::string getContextInfo(ContextInfo info);
+  /// Gets the name of the extension located at the given index.
+  /// \see getParameter(StateParameter::EXTENSION_COUNT)
+  /// \param extIndex Index of the extension. Must be less than the total number of extensions.
+  /// \return Name of the extension.
+  static std::string getExtension(unsigned int extIndex);
   static void getParameter(StateParameter parameter, unsigned char* values);
   static void getParameter(StateParameter parameter, int* values);
   static void getParameter(StateParameter parameter, int64_t* values);

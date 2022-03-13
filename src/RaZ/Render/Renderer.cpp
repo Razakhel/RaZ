@@ -135,6 +135,31 @@ bool Renderer::isEnabled(Capability capability) {
   return isEnabled;
 }
 
+std::string Renderer::getContextInfo(ContextInfo info) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  std::string res = reinterpret_cast<const char*>(glGetString(static_cast<unsigned int>(info)));
+
+  printConditionalErrors();
+
+  return res;
+}
+
+std::string Renderer::getExtension(unsigned int extIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if defined(RAZ_CONFIG_DEBUG)
+  int extCount {};
+  getParameter(StateParameter::EXTENSION_COUNT, &extCount);
+  assert("Error: Extension index must be less than the total extension count." && static_cast<int>(extIndex) < extCount);
+#endif
+
+  std::string extension = reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, extIndex));
+
+  printConditionalErrors();
+
+  return extension;
+}
+
 void Renderer::getParameter(StateParameter parameter, unsigned char* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
