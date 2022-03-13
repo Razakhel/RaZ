@@ -278,6 +278,25 @@ void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
 
   printConditionalErrors();
 }
+
+void Renderer::setPatchVertexCount(int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Setting patch vertices requires OpenGL 4.0+." && s_majorVersion >= 4);
+  assert("Error: A patch needs at least one vertex." && value > 0);
+
+  glPatchParameteri(GL_PATCH_VERTICES, value);
+
+  printConditionalErrors();
+}
+
+void Renderer::setPatchParameter(PatchParameter param, const float* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Setting a patch parameter requires OpenGL 4.0+." && s_majorVersion >= 4);
+
+  glPatchParameterfv(static_cast<unsigned int>(param), values);
+
+  printConditionalErrors();
+}
 #endif
 
 void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
@@ -680,7 +699,7 @@ unsigned int Renderer::createShader(ShaderType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
   assert("Error: Creating a tessellation shader requires OpenGL 4.0+."
-         && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION) || (s_majorVersion >= 4 && s_minorVersion >= 0)));
+         && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION) || s_majorVersion >= 4));
   assert("Error: Creating a compute shader requires OpenGL 4.3+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 4 && s_minorVersion >= 3)));
 #else
   assert("Error: Geometry shaders are unsupported with OpenGL ES." && type != ShaderType::GEOMETRY);
@@ -765,6 +784,19 @@ void Renderer::deleteShader(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDeleteShader(index);
+
+  printConditionalErrors();
+}
+
+void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
+  assert("Error: Launching a compute operation requires OpenGL 4.3+." && s_majorVersion >= 4 && s_minorVersion >= 3);
+#else
+  assert("Error: Launching a compute operation requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+#endif
+
+  glDispatchCompute(groupCountX, groupCountY, groupCountZ);
 
   printConditionalErrors();
 }

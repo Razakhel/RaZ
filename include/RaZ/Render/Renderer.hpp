@@ -120,6 +120,11 @@ enum class PolygonMode : unsigned int {
   FILL  = 6914 /* GL_FILL  */  ///<
 };
 
+enum class PatchParameter : unsigned int {
+  DEFAULT_OUTER_LEVEL = 36468 /* GL_PATCH_DEFAULT_OUTER_LEVEL */, ///< Default outer level used if no tessellation control shader exists.
+  DEFAULT_INNER_LEVEL = 36467 /* GL_PATCH_DEFAULT_INNER_LEVEL */  ///< Default inner level used if no tessellation control shader exists.
+};
+
 enum class PixelStorage : unsigned int {
   UNPACK_SWAP_BYTES   = 3312  /* GL_UNPACK_SWAP_BYTES  */, ///<
   UNPACK_LSB_FIRST    = 3313  /* GL_UNPACK_LSB_FIRST   */, ///<
@@ -494,6 +499,8 @@ public:
   static void setFaceCulling(FaceOrientation orientation);
 #if !defined(USE_OPENGL_ES)
   static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
+  static void setPatchVertexCount(int value);
+  static void setPatchParameter(PatchParameter param, const float* values);
 #endif
   static void setPixelStorage(PixelStorage storage, unsigned int value);
   static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
@@ -631,6 +638,7 @@ public:
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static bool isShaderAttached(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
+  static void dispatchCompute(unsigned int groupCountX, unsigned int groupCountY = 1, unsigned int groupCountZ = 1);
   /// Gets the uniform's location (ID) corresponding to the given name.
   /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).
   /// \param programIndex Index of the shader program to which is bound the uniform.
