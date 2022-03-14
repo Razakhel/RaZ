@@ -12,7 +12,7 @@ namespace Raz {
 class RenderPass : public GraphNode<RenderPass> {
 public:
   RenderPass() = default;
-  RenderPass(VertexShader vertShader, FragmentShader fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
+  RenderPass(VertexShader&& vertShader, FragmentShader&& fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
   explicit RenderPass(FragmentShader fragShader) : RenderPass(Framebuffer::recoverVertexShader(), std::move(fragShader)) {}
   RenderPass(const RenderPass&) = delete;
   RenderPass(RenderPass&&) noexcept = default;

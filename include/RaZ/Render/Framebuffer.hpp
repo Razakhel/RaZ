@@ -3,8 +3,6 @@
 #ifndef RAZ_FRAMEBUFFER_HPP
 #define RAZ_FRAMEBUFFER_HPP
 
-#include "RaZ/Render/Shader.hpp"
-
 #include <cassert>
 #include <vector>
 
@@ -12,6 +10,7 @@ namespace Raz {
 
 class ShaderProgram;
 class Texture;
+class VertexShader;
 
 /// Framebuffer class, handling buffers used for deferred rendering.
 class Framebuffer {

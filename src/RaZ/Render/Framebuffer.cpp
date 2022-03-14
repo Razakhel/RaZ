@@ -1,3 +1,4 @@
+#include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
@@ -5,6 +6,29 @@
 #include "RaZ/Utils/Logger.hpp"
 
 namespace Raz {
+
+namespace {
+
+inline const MeshRenderer& getDisplaySurface() {
+  // Creating a triangle large enough to cover the whole render frame:
+  //
+  //   3 | \                                3 | \
+  //     |    \                               |  \
+  //   2 |       \                          2 |    \
+  //     |          \                         |     \
+  //   1 ------------- \                    1 -------\
+  //     |           |    \                   |     | \
+  //   0 |           |       \              0 |     |   \
+  //     |           |          \             |     |    \
+  //  -1 -------------------------         -1 -------------
+  //    -1     0     1     2     3           -1  0  1  2  3
+
+  static const MeshRenderer surface(Mesh(Triangle(Vec3f(-1.f, -1.f, 0.f), Vec3f(3.f, -1.f, 0.f), Vec3f(-1.f, 3.f, 0.f)),
+                                         Vec2f(0.f, 0.f), Vec2f(2.f, 0.f), Vec2f(0.f, 2.f)));
+  return surface;
+}
+
+} // namespace
 
 Framebuffer::Framebuffer() {
   Logger::debug("[Framebuffer] Creating...");
@@ -128,7 +152,7 @@ void Framebuffer::display(const ShaderProgram& program) const {
     colorBuffer->bind();
   }
 
-  MeshRenderer::drawUnitQuad();
+  getDisplaySurface().draw();
 }
 
 void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
