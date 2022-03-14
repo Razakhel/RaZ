@@ -27,7 +27,7 @@ public:
   /// \param subdivCount Amount of subdivisions (for an UV sphere, represents both the amount of vertical & horizontal lines to be created).
   /// \param type Type of the sphere mesh to create.
   Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type);
-  explicit Mesh(const Triangle& triangle);
+  explicit Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords);
   explicit Mesh(const Quad& quad);
   explicit Mesh(const AABB& box);
   Mesh(const Mesh&) = delete;

@@ -67,7 +67,7 @@ Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
   }
 }
 
-Mesh::Mesh(const Triangle& triangle) {
+Mesh::Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
   const Vec3f& firstPos  = triangle.getFirstPos();
   const Vec3f& secondPos = triangle.getSecondPos();
   const Vec3f& thirdPos  = triangle.getThirdPos();
@@ -75,17 +75,17 @@ Mesh::Mesh(const Triangle& triangle) {
 
   Vertex firstVert {};
   firstVert.position  = firstPos;
-  firstVert.texcoords = Vec2f(0.f, 0.f);
+  firstVert.texcoords = firstTexcoords;
   firstVert.normal    = normal;
 
   Vertex secondVert {};
   secondVert.position  = secondPos;
-  secondVert.texcoords = Vec2f(0.5f, 1.f);
+  secondVert.texcoords = secondTexcoords;
   secondVert.normal    = normal;
 
   Vertex thirdVert {};
   thirdVert.position  = thirdPos;
-  thirdVert.texcoords = Vec2f(1.f, 0.f);
+  thirdVert.texcoords = thirdTexcoords;
   thirdVert.normal    = normal;
 
   Submesh& submesh = m_submeshes.emplace_back();

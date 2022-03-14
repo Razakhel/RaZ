@@ -56,13 +56,26 @@ TEST_CASE("Mesh triangle") {
   CHECK(triangle.computeNormal() == Raz::Axis::Z);
   CHECK(triangle.isCounterClockwise(Raz::Axis::Z));
 
-  Raz::Mesh mesh(triangle);
+  Raz::Mesh mesh(triangle, Raz::Vec2f(0.f, 0.f), Raz::Vec2f(0.5f, 0.5f), Raz::Vec2f(1.f, 1.f));
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 3);
   CHECK(mesh.recoverTriangleCount() == 1);
 
   const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+
+  CHECK(submesh.getVertices()[0].position == triangle.getFirstPos());
+  CHECK(submesh.getVertices()[1].position == triangle.getSecondPos());
+  CHECK(submesh.getVertices()[2].position == triangle.getThirdPos());
+
+  CHECK(submesh.getVertices()[0].texcoords == Raz::Vec2f(0.f, 0.f));
+  CHECK(submesh.getVertices()[1].texcoords == Raz::Vec2f(0.5f, 0.5f));
+  CHECK(submesh.getVertices()[2].texcoords == Raz::Vec2f(1.f, 1.f));
+
+  const Raz::Vec3f normal = triangle.computeNormal();
+  CHECK(submesh.getVertices()[0].normal == normal);
+  CHECK(submesh.getVertices()[1].normal == normal);
+  CHECK(submesh.getVertices()[2].normal == normal);
 
   // Checking that the mesh is constructed with the same winding order
   CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[0]].position,
