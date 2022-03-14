@@ -13,14 +13,12 @@ void SubmeshRenderer::setRenderMode(RenderMode renderMode, const Submesh& submes
       m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&) {
         glDrawArrays(GL_POINTS, 0, static_cast<int>(vertexBuffer.vertexCount));
       };
-
       break;
 
 //    case RenderMode::LINE: {
 //      m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer) {
 //        glDrawElements(GL_LINES, static_cast<int>(indexBuffer.lineIndexCount), GL_UNSIGNED_INT, nullptr);
 //      };
-//
 //      break;
 //    }
 
@@ -29,8 +27,16 @@ void SubmeshRenderer::setRenderMode(RenderMode renderMode, const Submesh& submes
       m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer) {
         glDrawElements(GL_TRIANGLES, static_cast<int>(indexBuffer.triangleIndexCount), GL_UNSIGNED_INT, nullptr);
       };
-
       break;
+
+#if !defined(USE_OPENGL_ES)
+    case RenderMode::PATCH:
+      m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&) {
+        glDrawArrays(GL_PATCHES, 0, static_cast<int>(vertexBuffer.vertexCount));
+      };
+      Renderer::setPatchVertexCount(3); // Should be the default, but just in case
+      break;
+#endif
   }
 
   loadIndices(submesh);

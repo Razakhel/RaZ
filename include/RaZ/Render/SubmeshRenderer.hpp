@@ -13,9 +13,12 @@
 namespace Raz {
 
 enum class RenderMode : unsigned int {
-  POINT    = 0, // GL_POINTS
-  //LINE     = 1, // GL_LINES
-  TRIANGLE = 4  // GL_TRIANGLES
+  POINT   , ///< Renders the submesh as points.
+  //LINE    , ///< Renders the submesh as lines.
+  TRIANGLE, ///< Renders the submesh as triangles.
+#if !defined(USE_OPENGL_ES)
+  PATCH     ///< Renders the submesh as patches, used for tessellation. Requires OpenGL 4.3+; unavailable with OpenGL ES.
+#endif
 };
 
 class SubmeshRenderer {
