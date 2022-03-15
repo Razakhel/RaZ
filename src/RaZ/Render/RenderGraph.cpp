@@ -79,7 +79,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
 
     const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
 
-    const ShaderProgram& geometryProgram = m_geometryPass.getProgram();
+    const RenderShaderProgram& geometryProgram = m_geometryPass.getProgram();
 
     geometryProgram.sendUniform("uniModelMatrix", modelMat);
     geometryProgram.sendUniform("uniMvpMatrix", viewProjMat * modelMat);

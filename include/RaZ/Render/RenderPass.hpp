@@ -13,7 +13,7 @@ class RenderPass : public GraphNode<RenderPass> {
 public:
   RenderPass() = default;
   RenderPass(VertexShader&& vertShader, FragmentShader&& fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
-  explicit RenderPass(FragmentShader fragShader) : RenderPass(Framebuffer::recoverVertexShader(), std::move(fragShader)) {}
+  explicit RenderPass(FragmentShader&& fragShader) : RenderPass(Framebuffer::recoverVertexShader(), std::move(fragShader)) {}
   RenderPass(const RenderPass&) = delete;
   RenderPass(RenderPass&&) noexcept = default;
 
@@ -22,11 +22,11 @@ public:
   /// \return True if the render pass is valid, false otherwise.
   /// \see RenderGraph::isValid()
   bool isValid() const;
-  const ShaderProgram& getProgram() const { return m_program; }
-  ShaderProgram& getProgram() { return m_program; }
+  const RenderShaderProgram& getProgram() const { return m_program; }
+  RenderShaderProgram& getProgram() { return m_program; }
   const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
 
-  void setProgram(ShaderProgram&& program) { m_program = std::move(program); }
+  void setProgram(RenderShaderProgram&& program) { m_program = std::move(program); }
 
   void addReadTexture(const Texture& texture, const std::string& uniformName);
   void addWriteTexture(const Texture& texture) { m_writeFramebuffer.addTextureBuffer(texture); }
@@ -50,7 +50,7 @@ public:
 
 protected:
   bool m_enabled = true;
-  ShaderProgram m_program {};
+  RenderShaderProgram m_program {};
 
   std::vector<const Texture*> m_readTextures {};
   Framebuffer m_writeFramebuffer {};

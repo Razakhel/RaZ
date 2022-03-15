@@ -17,32 +17,15 @@ namespace Raz {
 class ShaderProgram {
 public:
   ShaderProgram();
-  ShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader)
-    : ShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
-  ShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader)
-    : ShaderProgram() { setShaders(std::move(vertShader), std::move(geomShader), std::move(fragShader)); }
   ShaderProgram(const ShaderProgram&) = delete;
   ShaderProgram(ShaderProgram&& program) noexcept;
 
   unsigned int getIndex() const { return m_index; }
 
-  void setVertexShader(VertexShader&& vertShader);
-  void setTessellationControlShader(TessellationControlShader&& tessCtrlShader);
-  void setTessellationEvaluationShader(TessellationEvaluationShader&& tessEvalShader);
-  void setGeometryShader(GeometryShader&& geomShader);
-  void setFragmentShader(FragmentShader&& fragShader);
-  void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader);
-  void setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader);
-  void setShaders(VertexShader&& vertShader, TessellationEvaluationShader&& tessEvalShader, FragmentShader&& fragShader);
-  void setShaders(VertexShader&& vertShader,
-                  TessellationControlShader&& tessCtrlShader,
-                  TessellationEvaluationShader&& tessEvalShader,
-                  FragmentShader&& fragShader);
-
   /// Loads all the shaders contained by the program.
-  void loadShaders() const;
+  virtual void loadShaders() const = 0;
   /// Compiles all the shaders contained by the program.
-  void compileShaders() const;
+  virtual void compileShaders() const = 0;
   /// Links the program to the graphics card.
   void link() const;
   /// Checks if the program has been successfully linked.
@@ -135,6 +118,50 @@ public:
   /// \param uniformName Name of the uniform to retrieve the location from.
   /// \param mat Matrix to be sent.
   void sendUniform(const std::string& uniformName, const Mat4f& mat) const { sendUniform(recoverUniformLocation(uniformName), mat); }
+
+  ShaderProgram& operator=(const ShaderProgram&) = delete;
+  ShaderProgram& operator=(ShaderProgram&& program) noexcept;
+
+  virtual ~ShaderProgram();
+
+protected:
+  unsigned int m_index {};
+
+private:
+  std::unordered_map<std::string, int> m_uniforms {};
+};
+
+class RenderShaderProgram final : public ShaderProgram {
+public:
+  RenderShaderProgram() : ShaderProgram() {}
+  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader)
+    : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
+  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader)
+    : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(geomShader), std::move(fragShader)); }
+
+  const VertexShader& getVertexShader() const noexcept { return m_vertShader; }
+  const TessellationControlShader& getTessellationControlShader() const noexcept { assert(m_tessCtrlShader); return *m_tessCtrlShader; }
+  const TessellationEvaluationShader& getTessellationEvaluationShader() const noexcept { assert(m_tessEvalShader); return *m_tessEvalShader; }
+  const GeometryShader& getGeometryShader() const noexcept { assert(m_geomShader); return *m_geomShader; }
+  const FragmentShader& getFragmentShader() const noexcept { return m_fragShader; }
+
+  void setVertexShader(VertexShader&& vertShader);
+  void setTessellationControlShader(TessellationControlShader&& tessCtrlShader);
+  void setTessellationEvaluationShader(TessellationEvaluationShader&& tessEvalShader);
+  void setGeometryShader(GeometryShader&& geomShader);
+  void setFragmentShader(FragmentShader&& fragShader);
+  void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader);
+  void setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader);
+  void setShaders(VertexShader&& vertShader, TessellationEvaluationShader&& tessEvalShader, FragmentShader&& fragShader);
+  void setShaders(VertexShader&& vertShader,
+                  TessellationControlShader&& tessCtrlShader,
+                  TessellationEvaluationShader&& tessEvalShader,
+                  FragmentShader&& fragShader);
+
+  /// Loads all the shaders contained by the program.
+  void loadShaders() const override;
+  /// Compiles all the shaders contained by the program.
+  void compileShaders() const override;
   /// Destroys the vertex shader, detaching it from the program & deleting it.
   void destroyVertexShader();
   /// Destroys the tessellation control shader (if any), detaching it from the program & deleting it.
@@ -146,21 +173,33 @@ public:
   /// Destroys the fragment shader, detaching it from the program & deleting it.
   void destroyFragmentShader();
 
-  ShaderProgram& operator=(const ShaderProgram&) = delete;
-  ShaderProgram& operator=(ShaderProgram&& program) noexcept;
-
-  ~ShaderProgram();
-
 private:
-  unsigned int m_index {};
-
   VertexShader m_vertShader {};
   std::optional<TessellationControlShader> m_tessCtrlShader {};
   std::optional<TessellationEvaluationShader> m_tessEvalShader {};
   std::optional<GeometryShader> m_geomShader {};
   FragmentShader m_fragShader {};
+};
 
-  std::unordered_map<std::string, int> m_uniforms {};
+class ComputeShaderProgram final : public ShaderProgram {
+public:
+  ComputeShaderProgram() : ShaderProgram() {}
+  explicit ComputeShaderProgram(ComputeShader&& compShader) : ComputeShaderProgram() { setShader(std::move(compShader)); }
+
+  const ComputeShader& getShader() const noexcept { return m_compShader; }
+
+  void setShader(ComputeShader&& compShader);
+
+  /// Loads the compute shader contained by the program.
+  void loadShaders() const override;
+  /// Compiles the compute shader contained by the program.
+  void compileShaders() const override;
+  void execute(unsigned int groupCountX, unsigned int groupCountY = 1, unsigned int groupCountZ = 1) const;
+  /// Destroys the compute shader, detaching it from the program & deleting it.
+  void destroyShader();
+
+private:
+  ComputeShader m_compShader {};
 };
 
 } // namespace Raz

@@ -25,7 +25,7 @@ public:
   Cubemap(Cubemap&& cubemap) noexcept;
 
   unsigned int getIndex() const { return m_index; }
-  const ShaderProgram& getProgram() const { return m_program; }
+  const RenderShaderProgram& getProgram() const { return m_program; }
 
   /// Imports 6 textures and loads them onto the graphics card.
   /// \param rightTexturePath Path to the texture located on the right of the cube.
@@ -55,7 +55,7 @@ public:
 
 private:
   unsigned int m_index {};
-  ShaderProgram m_program {};
+  RenderShaderProgram m_program {};
   UniformBuffer m_viewProjUbo = UniformBuffer(sizeof(Mat4f), 1);
 };
 

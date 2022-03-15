@@ -47,8 +47,8 @@ public:
 #endif
   const RenderPass& getGeometryPass() const { return m_renderGraph.getGeometryPass(); }
   RenderPass& getGeometryPass() { return m_renderGraph.getGeometryPass(); }
-  const ShaderProgram& getGeometryProgram() const { return getGeometryPass().getProgram(); }
-  ShaderProgram& getGeometryProgram() { return getGeometryPass().getProgram(); }
+  const RenderShaderProgram& getGeometryProgram() const { return getGeometryPass().getProgram(); }
+  RenderShaderProgram& getGeometryProgram() { return getGeometryPass().getProgram(); }
   const RenderGraph& getRenderGraph() const { return m_renderGraph; }
   RenderGraph& getRenderGraph() { return m_renderGraph; }
   bool hasCubemap() const { return m_cubemap.has_value(); }

@@ -55,7 +55,7 @@ void MaterialBlinnPhong::loadBumpMap(const FilePath& filePath, int bindingIndex,
   m_bumpMap = Texture::create(filePath, bindingIndex, flipVertically);
 }
 
-void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
+void MaterialBlinnPhong::initTextures(const RenderShaderProgram& program) const {
   static const std::string locationBase = "uniMaterial.";
 
   static const std::string diffuseMapLocation      = locationBase + "diffuseMap";
@@ -74,7 +74,7 @@ void MaterialBlinnPhong::initTextures(const ShaderProgram& program) const {
   program.sendUniform(bumpMapLocation,         m_bumpMap->getBindingIndex());
 }
 
-void MaterialBlinnPhong::bindAttributes(const ShaderProgram& program) const {
+void MaterialBlinnPhong::bindAttributes(const RenderShaderProgram& program) const {
   static const std::string locationBase = "uniMaterial.";
 
   static const std::string diffuseLocation      = locationBase + "diffuse";
@@ -129,7 +129,7 @@ void MaterialCookTorrance::loadAmbientOcclusionMap(const FilePath& filePath, int
   m_ambientOcclusionMap = Texture::create(filePath, bindingIndex, flipVertically);
 }
 
-void MaterialCookTorrance::initTextures(const ShaderProgram& program) const {
+void MaterialCookTorrance::initTextures(const RenderShaderProgram& program) const {
   static const std::string locationBase = "uniMaterial.";
 
   static const std::string albedoMapLocation           = locationBase + "albedoMap";
@@ -146,7 +146,7 @@ void MaterialCookTorrance::initTextures(const ShaderProgram& program) const {
   program.sendUniform(ambientOcclusionMapLocation, m_ambientOcclusionMap->getBindingIndex());
 }
 
-void MaterialCookTorrance::bindAttributes(const ShaderProgram& program) const {
+void MaterialCookTorrance::bindAttributes(const RenderShaderProgram& program) const {
   static const std::string locationBase = "uniMaterial.";
 
   static const std::string baseColorLocation       = locationBase + "baseColor";

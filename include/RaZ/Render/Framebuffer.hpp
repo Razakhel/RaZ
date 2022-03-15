@@ -8,7 +8,7 @@
 
 namespace Raz {
 
-class ShaderProgram;
+class RenderShaderProgram;
 class Texture;
 class VertexShader;
 
@@ -44,7 +44,7 @@ public:
   void unbind() const;
   /// Binds the buffers textures & displays the framebuffer.
   /// \param program Shader program to display with.
-  void display(const ShaderProgram& program) const;
+  void display(const RenderShaderProgram& program) const;
   /// Resizes the buffer textures.
   /// \param width Width to be resized to.
   /// \param height Height to be resized to.

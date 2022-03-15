@@ -22,144 +22,9 @@ ShaderProgram::ShaderProgram()
 
 ShaderProgram::ShaderProgram(ShaderProgram&& program) noexcept
   : m_index{ std::exchange(program.m_index, std::numeric_limits<unsigned int>::max()) },
-    m_vertShader{ std::move(program.m_vertShader) },
-    m_geomShader{ std::move(program.m_geomShader) },
-    m_fragShader{ std::move(program.m_fragShader) },
     m_uniforms{ std::move(program.m_uniforms) } {}
 
-void ShaderProgram::setVertexShader(VertexShader&& vertShader) {
-  Logger::debug("[ShaderProgram] Setting vertex shader (ID: " + std::to_string(vertShader.getIndex()) + ", path: '" + vertShader.getPath() + "')");
-
-  if (Renderer::isShaderAttached(m_index, m_vertShader.getIndex()))
-    Renderer::detachShader(m_index, m_vertShader.getIndex());
-
-  m_vertShader = std::move(vertShader);
-  m_vertShader.compile();
-
-  Renderer::attachShader(m_index, m_vertShader.getIndex());
-}
-
-void ShaderProgram::setTessellationControlShader(TessellationControlShader&& tessCtrlShader) {
-  Logger::debug("[ShaderProgram] Setting tessellation control shader (ID: "
-                + std::to_string(tessCtrlShader.getIndex()) + ", path: '" + tessCtrlShader.getPath() + "')");
-
-  if (m_tessCtrlShader && Renderer::isShaderAttached(m_index, m_tessCtrlShader->getIndex()))
-    Renderer::detachShader(m_index, m_tessCtrlShader->getIndex());
-
-  m_tessCtrlShader = std::move(tessCtrlShader);
-  m_tessCtrlShader->compile();
-
-  Renderer::attachShader(m_index, m_tessCtrlShader->getIndex());
-}
-
-void ShaderProgram::setTessellationEvaluationShader(TessellationEvaluationShader&& tessEvalShader) {
-  Logger::debug("[ShaderProgram] Setting tessellation evaluation shader (ID: "
-                + std::to_string(tessEvalShader.getIndex()) + ", path: '" + tessEvalShader.getPath() + "')");
-
-  if (m_tessEvalShader && Renderer::isShaderAttached(m_index, m_tessEvalShader->getIndex()))
-    Renderer::detachShader(m_index, m_tessEvalShader->getIndex());
-
-  m_tessEvalShader = std::move(tessEvalShader);
-  m_tessEvalShader->compile();
-
-  Renderer::attachShader(m_index, m_tessEvalShader->getIndex());
-}
-
-void ShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
-  Logger::debug("[ShaderProgram] Setting geometry shader (ID: " + std::to_string(geomShader.getIndex()) + ", path: '" + geomShader.getPath() + "')");
-
-  if (m_geomShader && Renderer::isShaderAttached(m_index, m_geomShader->getIndex()))
-    Renderer::detachShader(m_index, m_geomShader->getIndex());
-
-  m_geomShader = std::move(geomShader);
-  m_geomShader->compile();
-
-  Renderer::attachShader(m_index, m_geomShader->getIndex());
-}
-
-void ShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
-  Logger::debug("[ShaderProgram] Setting fragment shader (ID: " + std::to_string(fragShader.getIndex()) + ", path: '" + fragShader.getPath() + "')");
-
-  if (Renderer::isShaderAttached(m_index, m_fragShader.getIndex()))
-    Renderer::detachShader(m_index, m_fragShader.getIndex());
-
-  m_fragShader = std::move(fragShader);
-  m_fragShader.compile();
-
-  Renderer::attachShader(m_index, m_fragShader.getIndex());
-}
-
-void ShaderProgram::setShaders(VertexShader&& vertShader, FragmentShader&& fragShader) {
-  setVertexShader(std::move(vertShader));
-  setFragmentShader(std::move(fragShader));
-
-  updateShaders();
-}
-
-void ShaderProgram::setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader) {
-  setVertexShader(std::move(vertShader));
-  setGeometryShader(std::move(geomShader));
-  setFragmentShader(std::move(fragShader));
-
-  updateShaders();
-}
-
-void ShaderProgram::setShaders(VertexShader&& vertShader, TessellationEvaluationShader&& tessEvalShader, FragmentShader&& fragShader) {
-  setVertexShader(std::move(vertShader));
-  setTessellationEvaluationShader(std::move(tessEvalShader));
-  setFragmentShader(std::move(fragShader));
-
-  updateShaders();
-}
-void ShaderProgram::setShaders(VertexShader&& vertShader,
-                               TessellationControlShader&& tessCtrlShader,
-                               TessellationEvaluationShader&& tessEvalShader,
-                               FragmentShader&& fragShader) {
-  setVertexShader(std::move(vertShader));
-  setTessellationControlShader(std::move(tessCtrlShader));
-  setTessellationEvaluationShader(std::move(tessEvalShader));
-  setFragmentShader(std::move(fragShader));
-
-  updateShaders();
-}
-
-void ShaderProgram::loadShaders() const {
-  Logger::debug("[ShaderProgram] Loading shaders...");
-
-  m_vertShader.load();
-  if (m_tessCtrlShader) m_tessCtrlShader->load();
-  if (m_tessEvalShader) m_tessEvalShader->load();
-  if (m_geomShader) m_geomShader->load();
-  m_fragShader.load();
-
-  Logger::debug("[ShaderProgram] Loaded shaders");
-}
-
-void ShaderProgram::compileShaders() const {
-  Logger::debug("[ShaderProgram] Compiling shaders...");
-
-  m_vertShader.compile();
-  if (m_tessCtrlShader) m_tessCtrlShader->compile();
-  if (m_tessEvalShader) m_tessEvalShader->compile();
-  if (m_geomShader) m_geomShader->compile();
-  m_fragShader.compile();
-
-  Logger::debug("[ShaderProgram] Compiled shaders");
-}
-
 void ShaderProgram::link() const {
-  assert("Error: A shader program needs at least one shader for it to be linked." && (m_vertShader.isValid()
-                                                                                   || (m_geomShader && m_geomShader->isValid())
-                                                                                   || m_fragShader.isValid()));
-  assert("Error: A shader program's vertex shader must be compiled before being linked." && (m_vertShader.isValid() ? m_vertShader.isCompiled() : true));
-  assert("Error: A shader program's tessellation control shader must be compiled before being linked."
-         && (m_tessCtrlShader && m_tessCtrlShader->isValid() ? m_tessCtrlShader->isCompiled() : true));
-  assert("Error: A shader program's tessellation evaluation shader must be compiled before being linked."
-         && (m_tessEvalShader && m_tessEvalShader->isValid() ? m_tessEvalShader->isCompiled() : true));
-  assert("Error: A shader program's geometry shader must be compiled before being linked."
-         && (m_geomShader && m_geomShader->isValid() ? m_geomShader->isCompiled() : true));
-  assert("Error: A shader program's fragment shader must be compiled before being linked." && (m_fragShader.isValid() ? m_fragShader.isCompiled() : true));
-
   Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
   Renderer::linkProgram(m_index);
   Logger::debug("[ShaderProgram] Linked");
@@ -246,49 +111,9 @@ void ShaderProgram::sendUniform(int uniformIndex, const Mat4f& mat) const {
   Renderer::sendUniformMatrix4x4(uniformIndex, mat.getDataPtr());
 }
 
-void ShaderProgram::destroyVertexShader() {
-  Renderer::detachShader(m_index, m_vertShader.getIndex());
-  m_vertShader.destroy();
-}
-
-void ShaderProgram::destroyTessellationControlShader() {
-  if (!m_tessCtrlShader)
-    return;
-
-  Renderer::detachShader(m_index, m_tessCtrlShader->getIndex());
-  m_tessCtrlShader->destroy();
-  m_tessCtrlShader.reset();
-}
-
-void ShaderProgram::destroyTessellationEvaluationShader() {
-  if (!m_tessEvalShader)
-    return;
-
-  Renderer::detachShader(m_index, m_tessEvalShader->getIndex());
-  m_tessEvalShader->destroy();
-  m_tessEvalShader.reset();
-}
-
-void ShaderProgram::destroyGeometryShader() {
-  if (!m_geomShader)
-    return;
-
-  Renderer::detachShader(m_index, m_geomShader->getIndex());
-  m_geomShader->destroy();
-  m_geomShader.reset();
-}
-
-void ShaderProgram::destroyFragmentShader() {
-  Renderer::detachShader(m_index, m_fragShader.getIndex());
-  m_fragShader.destroy();
-}
-
 ShaderProgram& ShaderProgram::operator=(ShaderProgram&& program) noexcept {
   std::swap(m_index, program.m_index);
-  m_vertShader = std::move(program.m_vertShader);
-  m_geomShader = std::move(program.m_geomShader);
-  m_fragShader = std::move(program.m_fragShader);
-  m_uniforms   = std::move(program.m_uniforms);
+  m_uniforms = std::move(program.m_uniforms);
 
   return *this;
 }
@@ -300,6 +125,200 @@ ShaderProgram::~ShaderProgram() {
   Logger::debug("[ShaderProgram] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteProgram(m_index);
   Logger::debug("[ShaderProgram] Destroyed");
+}
+
+void RenderShaderProgram::setVertexShader(VertexShader&& vertShader) {
+  Logger::debug("[RenderShaderProgram] Setting vertex shader (ID: " + std::to_string(vertShader.getIndex()) + ", path: '" + vertShader.getPath() + "')");
+
+  if (Renderer::isShaderAttached(m_index, m_vertShader.getIndex()))
+    Renderer::detachShader(m_index, m_vertShader.getIndex());
+
+  m_vertShader = std::move(vertShader);
+  m_vertShader.compile();
+
+  Renderer::attachShader(m_index, m_vertShader.getIndex());
+}
+
+void RenderShaderProgram::setTessellationControlShader(TessellationControlShader&& tessCtrlShader) {
+  Logger::debug("[RenderShaderProgram] Setting tessellation control shader (ID: "
+                + std::to_string(tessCtrlShader.getIndex()) + ", path: '" + tessCtrlShader.getPath() + "')");
+
+  if (m_tessCtrlShader && Renderer::isShaderAttached(m_index, m_tessCtrlShader->getIndex()))
+    Renderer::detachShader(m_index, m_tessCtrlShader->getIndex());
+
+  m_tessCtrlShader = std::move(tessCtrlShader);
+  m_tessCtrlShader->compile();
+
+  Renderer::attachShader(m_index, m_tessCtrlShader->getIndex());
+}
+
+void RenderShaderProgram::setTessellationEvaluationShader(TessellationEvaluationShader&& tessEvalShader) {
+  Logger::debug("[RenderShaderProgram] Setting tessellation evaluation shader (ID: "
+                + std::to_string(tessEvalShader.getIndex()) + ", path: '" + tessEvalShader.getPath() + "')");
+
+  if (m_tessEvalShader && Renderer::isShaderAttached(m_index, m_tessEvalShader->getIndex()))
+    Renderer::detachShader(m_index, m_tessEvalShader->getIndex());
+
+  m_tessEvalShader = std::move(tessEvalShader);
+  m_tessEvalShader->compile();
+
+  Renderer::attachShader(m_index, m_tessEvalShader->getIndex());
+}
+
+void RenderShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
+  Logger::debug("[RenderShaderProgram] Setting geometry shader (ID: " + std::to_string(geomShader.getIndex()) + ", path: '" + geomShader.getPath() + "')");
+
+  if (m_geomShader && Renderer::isShaderAttached(m_index, m_geomShader->getIndex()))
+    Renderer::detachShader(m_index, m_geomShader->getIndex());
+
+  m_geomShader = std::move(geomShader);
+  m_geomShader->compile();
+
+  Renderer::attachShader(m_index, m_geomShader->getIndex());
+}
+
+void RenderShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
+  Logger::debug("[RenderShaderProgram] Setting fragment shader (ID: " + std::to_string(fragShader.getIndex()) + ", path: '" + fragShader.getPath() + "')");
+
+  if (Renderer::isShaderAttached(m_index, m_fragShader.getIndex()))
+    Renderer::detachShader(m_index, m_fragShader.getIndex());
+
+  m_fragShader = std::move(fragShader);
+  m_fragShader.compile();
+
+  Renderer::attachShader(m_index, m_fragShader.getIndex());
+}
+
+void RenderShaderProgram::setShaders(VertexShader&& vertShader, FragmentShader&& fragShader) {
+  setVertexShader(std::move(vertShader));
+  setFragmentShader(std::move(fragShader));
+
+  updateShaders();
+}
+
+void RenderShaderProgram::setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader) {
+  setVertexShader(std::move(vertShader));
+  setGeometryShader(std::move(geomShader));
+  setFragmentShader(std::move(fragShader));
+
+  updateShaders();
+}
+
+void RenderShaderProgram::setShaders(VertexShader&& vertShader, TessellationEvaluationShader&& tessEvalShader, FragmentShader&& fragShader) {
+  setVertexShader(std::move(vertShader));
+  setTessellationEvaluationShader(std::move(tessEvalShader));
+  setFragmentShader(std::move(fragShader));
+
+  updateShaders();
+}
+void RenderShaderProgram::setShaders(VertexShader&& vertShader,
+                                     TessellationControlShader&& tessCtrlShader,
+                                     TessellationEvaluationShader&& tessEvalShader,
+                                     FragmentShader&& fragShader) {
+  setVertexShader(std::move(vertShader));
+  setTessellationControlShader(std::move(tessCtrlShader));
+  setTessellationEvaluationShader(std::move(tessEvalShader));
+  setFragmentShader(std::move(fragShader));
+
+  updateShaders();
+}
+
+void RenderShaderProgram::loadShaders() const {
+  Logger::debug("[RenderShaderProgram] Loading shaders...");
+
+  m_vertShader.load();
+  if (m_tessCtrlShader) m_tessCtrlShader->load();
+  if (m_tessEvalShader) m_tessEvalShader->load();
+  if (m_geomShader) m_geomShader->load();
+  m_fragShader.load();
+
+  Logger::debug("[RenderShaderProgram] Loaded shaders");
+}
+
+void RenderShaderProgram::compileShaders() const {
+  Logger::debug("[RenderShaderProgram] Compiling shaders...");
+
+  m_vertShader.compile();
+  if (m_tessCtrlShader) m_tessCtrlShader->compile();
+  if (m_tessEvalShader) m_tessEvalShader->compile();
+  if (m_geomShader) m_geomShader->compile();
+  m_fragShader.compile();
+
+  Logger::debug("[RenderShaderProgram] Compiled shaders");
+}
+
+void RenderShaderProgram::destroyVertexShader() {
+  Renderer::detachShader(m_index, m_vertShader.getIndex());
+  m_vertShader.destroy();
+}
+
+void RenderShaderProgram::destroyTessellationControlShader() {
+  if (!m_tessCtrlShader)
+    return;
+
+  Renderer::detachShader(m_index, m_tessCtrlShader->getIndex());
+  m_tessCtrlShader->destroy();
+  m_tessCtrlShader.reset();
+}
+
+void RenderShaderProgram::destroyTessellationEvaluationShader() {
+  if (!m_tessEvalShader)
+    return;
+
+  Renderer::detachShader(m_index, m_tessEvalShader->getIndex());
+  m_tessEvalShader->destroy();
+  m_tessEvalShader.reset();
+}
+
+void RenderShaderProgram::destroyGeometryShader() {
+  if (!m_geomShader)
+    return;
+
+  Renderer::detachShader(m_index, m_geomShader->getIndex());
+  m_geomShader->destroy();
+  m_geomShader.reset();
+}
+
+void RenderShaderProgram::destroyFragmentShader() {
+  Renderer::detachShader(m_index, m_fragShader.getIndex());
+  m_fragShader.destroy();
+}
+
+void ComputeShaderProgram::setShader(ComputeShader&& compShader) {
+  Logger::debug("[ComputeShaderProgram] Setting shader (ID: " + std::to_string(compShader.getIndex()) + ", path: '" + compShader.getPath() + "')");
+
+  if (Renderer::isShaderAttached(m_index, m_compShader.getIndex()))
+    Renderer::detachShader(m_index, m_compShader.getIndex());
+
+  m_compShader = std::move(compShader);
+  m_compShader.compile();
+
+  Renderer::attachShader(m_index, m_compShader.getIndex());
+
+  link();
+}
+
+void ComputeShaderProgram::loadShaders() const {
+  Logger::debug("[ComputeShaderProgram] Loading shader...");
+  m_compShader.load();
+  Logger::debug("[ComputeShaderProgram] Loaded shader");
+}
+
+void ComputeShaderProgram::compileShaders() const {
+  Logger::debug("[ComputeShaderProgram] Compiling shader...");
+  m_compShader.compile();
+  Logger::debug("[ComputeShaderProgram] Compiled shader");
+}
+
+void ComputeShaderProgram::execute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) const {
+  use();
+  Renderer::dispatchCompute(groupCountX, groupCountY, groupCountZ);
+  Renderer::setMemoryBarrier(BarrierType::ALL);
+}
+
+void ComputeShaderProgram::destroyShader() {
+  Renderer::detachShader(m_index, m_compShader.getIndex());
+  m_compShader.destroy();
 }
 
 } // namespace Raz

@@ -51,8 +51,8 @@ public:
 
   static MaterialCookTorrancePtr recoverMaterial(MaterialPreset preset, float roughnessFactor);
   virtual MaterialPtr clone() const = 0;
-  virtual void initTextures(const ShaderProgram& program) const = 0;
-  virtual void bindAttributes(const ShaderProgram& program) const = 0;
+  virtual void initTextures(const RenderShaderProgram& program) const = 0;
+  virtual void bindAttributes(const RenderShaderProgram& program) const = 0;
 
   Material& operator=(Material&&) noexcept = default;
 
@@ -60,9 +60,9 @@ public:
 
 protected:
   Material() = default;
-  Material(const Material&) noexcept = default;
   explicit Material(TexturePtr baseColorMap) : m_baseColorMap{ std::move(baseColorMap) } {}
   explicit Material(const FilePath& filePath, bool flipVertically = true) : Material(Texture::create(filePath, flipVertically)) {}
+  Material(const Material&) noexcept = default;
 
   Vec3f m_baseColor = Vec3f(1.f);
 
@@ -123,8 +123,8 @@ public:
   void loadBumpMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
 
   MaterialPtr clone() const override { return MaterialBlinnPhong::create(*this); }
-  void initTextures(const ShaderProgram& program) const override;
-  void bindAttributes(const ShaderProgram& program) const override;
+  void initTextures(const RenderShaderProgram& program) const override;
+  void bindAttributes(const RenderShaderProgram& program) const override;
 
 private:
   Vec3f m_ambient      = Vec3f(1.f);
@@ -177,8 +177,8 @@ public:
   void loadAmbientOcclusionMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
 
   MaterialPtr clone() const override { return MaterialCookTorrance::create(*this); }
-  void initTextures(const ShaderProgram& program) const override;
-  void bindAttributes(const ShaderProgram& program) const override;
+  void initTextures(const RenderShaderProgram& program) const override;
+  void bindAttributes(const RenderShaderProgram& program) const override;
 
 private:
   float m_metallicFactor  = 1.f;

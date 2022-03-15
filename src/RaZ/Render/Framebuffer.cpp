@@ -137,7 +137,7 @@ void Framebuffer::unbind() const {
   Renderer::unbindFramebuffer();
 }
 
-void Framebuffer::display(const ShaderProgram& program) const {
+void Framebuffer::display(const RenderShaderProgram& program) const {
   Renderer::clear(MaskType::COLOR);
 
   program.use();

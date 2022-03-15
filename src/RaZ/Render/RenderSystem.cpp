@@ -69,7 +69,7 @@ void RenderSystem::sendCameraMatrices() const {
 }
 
 void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
-  const ShaderProgram& geometryProgram = getGeometryProgram();
+  const RenderShaderProgram& geometryProgram = getGeometryProgram();
 
   geometryProgram.use();
 
