@@ -801,6 +801,32 @@ void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCount
   printConditionalErrors();
 }
 
+void Renderer::setMemoryBarrier(BarrierType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
+  assert("Error: Setting a memory barrier requires OpenGL 4.2+." && s_majorVersion >= 4 && s_minorVersion >= 2);
+#else
+  assert("Error: Setting a memory barrier requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+#endif
+
+  glMemoryBarrier(static_cast<unsigned int>(type));
+
+  printConditionalErrors();
+}
+
+void Renderer::setMemoryBarrierByRegion(RegionBarrierType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
+  assert("Error: Setting a memory barrier by region requires OpenGL 4.5+." && s_majorVersion >= 4 && s_minorVersion >= 5);
+#else
+  assert("Error: Setting a memory barrier by region requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+#endif
+
+  glMemoryBarrierByRegion(static_cast<unsigned int>(type));
+
+  printConditionalErrors();
+}
+
 int Renderer::recoverUniformLocation(unsigned int programIndex, const char* uniformName) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

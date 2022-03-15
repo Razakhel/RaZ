@@ -283,21 +283,54 @@ enum class ShaderStatus : unsigned int {
   COMPILE = 35713 /* GL_COMPILE_STATUS */ ///<
 };
 
+enum class BarrierType : unsigned int {
+  VERTEX_ATTRIB_ARRAY = 1          /* GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT */, ///<
+  ELEMENT_ARRAY       = 2          /* GL_ELEMENT_ARRAY_BARRIER_BIT       */, ///<
+  UNIFORM             = 4          /* GL_UNIFORM_BARRIER_BIT             */, ///<
+  TEXTURE_FETCH       = 8          /* GL_TEXTURE_FETCH_BARRIER_BIT       */, ///<
+  SHADER_IMAGE_ACCESS = 32         /* GL_SHADER_IMAGE_ACCESS_BARRIER_BIT */, ///<
+  COMMAND             = 64         /* GL_COMMAND_BARRIER_BIT             */, ///<
+  PIXEL_BUFFER        = 128        /* GL_PIXEL_BUFFER_BARRIER_BIT        */, ///<
+  TEXTURE_UPDATE      = 256        /* GL_TEXTURE_UPDATE_BARRIER_BIT      */, ///<
+  BUFFER_UPDATE       = 512        /* GL_BUFFER_UPDATE_BARRIER_BIT       */, ///<
+  FRAMEBUFFER         = 1024       /* GL_FRAMEBUFFER_BARRIER_BIT         */, ///<
+  TRANSFORM_FEEDBACK  = 2048       /* GL_TRANSFORM_FEEDBACK_BARRIER_BIT  */, ///<
+  ATOMIC_COUNTER      = 4096       /* GL_ATOMIC_COUNTER_BARRIER_BIT      */, ///<
+  SHADER_STORAGE      = 8192       /* GL_SHADER_STORAGE_BARRIER_BIT      */, ///<
+  ALL                 = 4294967295 /* GL_ALL_BARRIER_BITS                */  ///<
+};
+MAKE_ENUM_FLAG(BarrierType)
+
+enum class RegionBarrierType : unsigned int {
+  ATOMIC_COUNTER      = static_cast<unsigned int>(BarrierType::ATOMIC_COUNTER),      ///<
+  FRAMEBUFFER         = static_cast<unsigned int>(BarrierType::FRAMEBUFFER),         ///<
+  SHADER_IMAGE_ACCESS = static_cast<unsigned int>(BarrierType::SHADER_IMAGE_ACCESS), ///<
+  SHADER_STORAGE      = static_cast<unsigned int>(BarrierType::SHADER_STORAGE),      ///<
+  TEXTURE_FETCH       = static_cast<unsigned int>(BarrierType::TEXTURE_FETCH),       ///<
+  UNIFORM             = static_cast<unsigned int>(BarrierType::UNIFORM),             ///<
+  ALL                 = static_cast<unsigned int>(BarrierType::ALL)                  ///<
+};
+MAKE_ENUM_FLAG(RegionBarrierType)
+
 enum class UniformType : unsigned int {
   // Primitive types
-  FLOAT  = 5126  /* GL_FLOAT        */, ///<
-  DOUBLE = 5130  /* GL_DOUBLE       */, ///<
-  INT    = 5124  /* GL_INT          */, ///<
-  UINT   = 5125  /* GL_UNSIGNED_INT */, ///<
-  BOOL   = 35670 /* GL_BOOL         */, ///<
+  FLOAT  = 5126  /* GL_FLOAT        */, ///< Single precision floating-point value.
+#if !defined(USE_OPENGL_ES)
+  DOUBLE = 5130  /* GL_DOUBLE       */, ///< Double precision floating-point value. Requires OpenGL 4.1+.
+#endif
+  INT    = 5124  /* GL_INT          */, ///< Integer value.
+  UINT   = 5125  /* GL_UNSIGNED_INT */, ///< Unsigned integer value.
+  BOOL   = 35670 /* GL_BOOL         */, ///< Boolean value.
 
   // Vectors
-  VEC2  = 35664 /* GL_FLOAT_VEC2        */, ///<
-  VEC3  = 35665 /* GL_FLOAT_VEC3        */, ///<
-  VEC4  = 35666 /* GL_FLOAT_VEC4        */, ///<
-  DVEC2 = 36860 /* GL_DOUBLE_VEC2       */, ///<
-  DVEC3 = 36861 /* GL_DOUBLE_VEC3       */, ///<
-  DVEC4 = 36862 /* GL_DOUBLE_VEC4       */, ///<
+  VEC2  = 35664 /* GL_FLOAT_VEC2        */, ///< Single precision floating-point 2D vector.
+  VEC3  = 35665 /* GL_FLOAT_VEC3        */, ///< Single precision floating-point 3D vector.
+  VEC4  = 35666 /* GL_FLOAT_VEC4        */, ///< Single precision floating-point 4D vector.
+#if !defined(USE_OPENGL_ES)
+  DVEC2 = 36860 /* GL_DOUBLE_VEC2       */, ///< Double precision floating-point 2D vector. Requires OpenGL 4.1+.
+  DVEC3 = 36861 /* GL_DOUBLE_VEC3       */, ///< Double precision floating-point 3D vector. Requires OpenGL 4.1+.
+  DVEC4 = 36862 /* GL_DOUBLE_VEC4       */, ///< Double precision floating-point 4D vector. Requires OpenGL 4.1+.
+#endif
   IVEC2 = 35667 /* GL_INT_VEC2          */, ///<
   IVEC3 = 35668 /* GL_INT_VEC3          */, ///<
   IVEC4 = 35669 /* GL_INT_VEC4          */, ///<
@@ -309,62 +342,123 @@ enum class UniformType : unsigned int {
   BVEC4 = 35673 /* GL_BOOL_VEC4         */, ///<
 
   // Matrices
-  MAT2    = 35674 /* GL_FLOAT_MAT2    */, ///<
-  MAT3    = 35675 /* GL_FLOAT_MAT3    */, ///<
-  MAT4    = 35676 /* GL_FLOAT_MAT4    */, ///<
-  MAT2x3  = 35685 /* GL_FLOAT_MAT2x3  */, ///<
-  MAT2x4  = 35686 /* GL_FLOAT_MAT2x4  */, ///<
-  MAT3x2  = 35687 /* GL_FLOAT_MAT3x2  */, ///<
-  MAT3x4  = 35688 /* GL_FLOAT_MAT3x4  */, ///<
-  MAT4x2  = 35689 /* GL_FLOAT_MAT4x2  */, ///<
-  MAT4x3  = 35690 /* GL_FLOAT_MAT4x3  */, ///<
-  DMAT2   = 36678 /* GL_DOUBLE_MAT2   */, ///<
-  DMAT3   = 36679 /* GL_DOUBLE_MAT3   */, ///<
-  DMAT4   = 36680 /* GL_DOUBLE_MAT4   */, ///<
-  DMAT2x3 = 36681 /* GL_DOUBLE_MAT2x3 */, ///<
-  DMAT2x4 = 36682 /* GL_DOUBLE_MAT2x4 */, ///<
-  DMAT3x2 = 36683 /* GL_DOUBLE_MAT3x2 */, ///<
-  DMAT3x4 = 36684 /* GL_DOUBLE_MAT3x4 */, ///<
-  DMAT4x2 = 36685 /* GL_DOUBLE_MAT4x2 */, ///<
-  DMAT4x3 = 36686 /* GL_DOUBLE_MAT4x3 */, ///<
+  MAT2    = 35674 /* GL_FLOAT_MAT2    */, ///< Single precision floating-point 2x2 matrix.
+  MAT3    = 35675 /* GL_FLOAT_MAT3    */, ///< Single precision floating-point 3x3 matrix.
+  MAT4    = 35676 /* GL_FLOAT_MAT4    */, ///< Single precision floating-point 4x4 matrix.
+  MAT2x3  = 35685 /* GL_FLOAT_MAT2x3  */, ///< Single precision floating-point 2x3 matrix.
+  MAT2x4  = 35686 /* GL_FLOAT_MAT2x4  */, ///< Single precision floating-point 2x4 matrix.
+  MAT3x2  = 35687 /* GL_FLOAT_MAT3x2  */, ///< Single precision floating-point 3x2 matrix.
+  MAT3x4  = 35688 /* GL_FLOAT_MAT3x4  */, ///< Single precision floating-point 3x4 matrix.
+  MAT4x2  = 35689 /* GL_FLOAT_MAT4x2  */, ///< Single precision floating-point 4x2 matrix.
+  MAT4x3  = 35690 /* GL_FLOAT_MAT4x3  */, ///< Single precision floating-point 4x3 matrix.
+#if !defined(USE_OPENGL_ES)
+  DMAT2   = 36678 /* GL_DOUBLE_MAT2   */, ///< Double precision floating-point 2x2 matrix. Requires OpenGL 4.1+.
+  DMAT3   = 36679 /* GL_DOUBLE_MAT3   */, ///< Double precision floating-point 3x3 matrix. Requires OpenGL 4.1+.
+  DMAT4   = 36680 /* GL_DOUBLE_MAT4   */, ///< Double precision floating-point 4x4 matrix. Requires OpenGL 4.1+.
+  DMAT2x3 = 36681 /* GL_DOUBLE_MAT2x3 */, ///< Double precision floating-point 2x3 matrix. Requires OpenGL 4.1+.
+  DMAT2x4 = 36682 /* GL_DOUBLE_MAT2x4 */, ///< Double precision floating-point 2x4 matrix. Requires OpenGL 4.1+.
+  DMAT3x2 = 36683 /* GL_DOUBLE_MAT3x2 */, ///< Double precision floating-point 3x2 matrix. Requires OpenGL 4.1+.
+  DMAT3x4 = 36684 /* GL_DOUBLE_MAT3x4 */, ///< Double precision floating-point 3x4 matrix. Requires OpenGL 4.1+.
+  DMAT4x2 = 36685 /* GL_DOUBLE_MAT4x2 */, ///< Double precision floating-point 4x2 matrix. Requires OpenGL 4.1+.
+  DMAT4x3 = 36686 /* GL_DOUBLE_MAT4x3 */, ///< Double precision floating-point 4x3 matrix. Requires OpenGL 4.1+.
+#endif
 
   // Samplers
-  SAMPLER_1D                                = 35677 /* GL_SAMPLER_1D                                */, ///<
-  SAMPLER_2D                                = 35678 /* GL_SAMPLER_2D                                */, ///<
-  SAMPLER_3D                                = 35679 /* GL_SAMPLER_3D                                */, ///<
-  SAMPLER_CUBE                              = 35680 /* GL_SAMPLER_CUBE                              */, ///<
-  SAMPLER_1D_SHADOW                         = 35681 /* GL_SAMPLER_1D_SHADOW                         */, ///<
-  SAMPLER_2D_SHADOW                         = 35682 /* GL_SAMPLER_2D_SHADOW                         */, ///<
-  SAMPLER_1D_ARRAY                          = 36288 /* GL_SAMPLER_1D_ARRAY                          */, ///<
-  SAMPLER_2D_ARRAY                          = 36289 /* GL_SAMPLER_2D_ARRAY                          */, ///<
-  SAMPLER_1D_ARRAY_SHADOW                   = 36291 /* GL_SAMPLER_1D_ARRAY_SHADOW                   */, ///<
-  SAMPLER_2D_ARRAY_SHADOW                   = 36292 /* GL_SAMPLER_2D_ARRAY_SHADOW                   */, ///<
-  SAMPLER_2D_MULTISAMPLE                    = 37128 /* GL_SAMPLER_2D_MULTISAMPLE                    */, ///<
-  SAMPLER_2D_MULTISAMPLE_ARRAY              = 37131 /* GL_SAMPLER_2D_MULTISAMPLE_ARRAY              */, ///<
-  SAMPLER_CUBE_SHADOW                       = 36293 /* GL_SAMPLER_CUBE_SHADOW                       */, ///<
-  SAMPLER_BUFFER                            = 36290 /* GL_SAMPLER_BUFFER                            */, ///<
-  SAMPLER_2D_RECT                           = 35683 /* GL_SAMPLER_2D_RECT                           */, ///<
-  SAMPLER_2D_RECT_SHADOW                    = 35684 /* GL_SAMPLER_2D_RECT_SHADOW                    */, ///<
-  INT_SAMPLER_1D                            = 36297 /* GL_INT_SAMPLER_1D                            */, ///<
-  INT_SAMPLER_2D                            = 36298 /* GL_INT_SAMPLER_2D                            */, ///<
-  INT_SAMPLER_3D                            = 36299 /* GL_INT_SAMPLER_3D                            */, ///<
-  INT_SAMPLER_CUBE                          = 36300 /* GL_INT_SAMPLER_CUBE                          */, ///<
-  INT_SAMPLER_1D_ARRAY                      = 36302 /* GL_INT_SAMPLER_1D_ARRAY                      */, ///<
-  INT_SAMPLER_2D_ARRAY                      = 36303 /* GL_INT_SAMPLER_2D_ARRAY                      */, ///<
-  INT_SAMPLER_2D_MULTISAMPLE                = 37129 /* GL_INT_SAMPLER_2D_MULTISAMPLE                */, ///<
-  INT_SAMPLER_2D_MULTISAMPLE_ARRAY          = 37132 /* GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY          */, ///<
-  INT_SAMPLER_BUFFER                        = 36304 /* GL_INT_SAMPLER_BUFFER                        */, ///<
-  INT_SAMPLER_2D_RECT                       = 36301 /* GL_INT_SAMPLER_2D_RECT                       */, ///<
-  UNSIGNED_INT_SAMPLER_1D                   = 36305 /* GL_UNSIGNED_INT_SAMPLER_1D                   */, ///<
-  UNSIGNED_INT_SAMPLER_2D                   = 36306 /* GL_UNSIGNED_INT_SAMPLER_2D                   */, ///<
-  UNSIGNED_INT_SAMPLER_3D                   = 36307 /* GL_UNSIGNED_INT_SAMPLER_3D                   */, ///<
-  UNSIGNED_INT_SAMPLER_CUBE                 = 36308 /* GL_UNSIGNED_INT_SAMPLER_CUBE                 */, ///<
-  UNSIGNED_INT_SAMPLER_1D_ARRAY             = 36310 /* GL_UNSIGNED_INT_SAMPLER_1D_ARRAY             */, ///<
-  UNSIGNED_INT_SAMPLER_2D_ARRAY             = 36311 /* GL_UNSIGNED_INT_SAMPLER_2D_ARRAY             */, ///<
-  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE       = 37130 /* GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE       */, ///<
-  UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY = 37133 /* GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY */, ///<
-  UNSIGNED_INT_SAMPLER_BUFFER               = 36312 /* GL_UNSIGNED_INT_SAMPLER_BUFFER               */, ///<
-  UNSIGNED_INT_SAMPLER_2D_RECT              = 36309 /* GL_UNSIGNED_INT_SAMPLER_2D_RECT              */  ///<
+#if !defined(USE_OPENGL_ES)
+  SAMPLER_1D                        = 35677 /* GL_SAMPLER_1D                                */, ///<
+#endif
+  SAMPLER_2D                        = 35678 /* GL_SAMPLER_2D                                */, ///<
+  SAMPLER_3D                        = 35679 /* GL_SAMPLER_3D                                */, ///<
+  SAMPLER_CUBE                      = 35680 /* GL_SAMPLER_CUBE                              */, ///<
+#if !defined(USE_OPENGL_ES)
+  SAMPLER_1D_SHADOW                 = 35681 /* GL_SAMPLER_1D_SHADOW                         */, ///<
+#endif
+  SAMPLER_2D_SHADOW                 = 35682 /* GL_SAMPLER_2D_SHADOW                         */, ///<
+#if !defined(USE_OPENGL_ES)
+  SAMPLER_1D_ARRAY                  = 36288 /* GL_SAMPLER_1D_ARRAY                          */, ///<
+#endif
+  SAMPLER_2D_ARRAY                  = 36289 /* GL_SAMPLER_2D_ARRAY                          */, ///<
+#if !defined(USE_OPENGL_ES)
+  SAMPLER_1D_ARRAY_SHADOW           = 36291 /* GL_SAMPLER_1D_ARRAY_SHADOW                   */, ///<
+#endif
+  SAMPLER_2D_ARRAY_SHADOW           = 36292 /* GL_SAMPLER_2D_ARRAY_SHADOW                   */, ///<
+#if !defined(USE_OPENGL_ES)
+  SAMPLER_2D_MULTISAMPLE            = 37128 /* GL_SAMPLER_2D_MULTISAMPLE                    */, ///<
+  SAMPLER_2D_MULTISAMPLE_ARRAY      = 37131 /* GL_SAMPLER_2D_MULTISAMPLE_ARRAY              */, ///<
+#endif
+  SAMPLER_CUBE_SHADOW               = 36293 /* GL_SAMPLER_CUBE_SHADOW                       */, ///<
+#if !defined(USE_OPENGL_ES)
+  SAMPLER_BUFFER                    = 36290 /* GL_SAMPLER_BUFFER                            */, ///<
+  SAMPLER_2D_RECT                   = 35683 /* GL_SAMPLER_2D_RECT                           */, ///<
+  SAMPLER_2D_RECT_SHADOW            = 35684 /* GL_SAMPLER_2D_RECT_SHADOW                    */, ///<
+  INT_SAMPLER_1D                    = 36297 /* GL_INT_SAMPLER_1D                            */, ///<
+#endif
+  INT_SAMPLER_2D                    = 36298 /* GL_INT_SAMPLER_2D                            */, ///<
+  INT_SAMPLER_3D                    = 36299 /* GL_INT_SAMPLER_3D                            */, ///<
+  INT_SAMPLER_CUBE                  = 36300 /* GL_INT_SAMPLER_CUBE                          */, ///<
+#if !defined(USE_OPENGL_ES)
+  INT_SAMPLER_1D_ARRAY              = 36302 /* GL_INT_SAMPLER_1D_ARRAY                      */, ///<
+#endif
+  INT_SAMPLER_2D_ARRAY              = 36303 /* GL_INT_SAMPLER_2D_ARRAY                      */, ///<
+#if !defined(USE_OPENGL_ES)
+  INT_SAMPLER_2D_MULTISAMPLE        = 37129 /* GL_INT_SAMPLER_2D_MULTISAMPLE                */, ///<
+  INT_SAMPLER_2D_MULTISAMPLE_ARRAY  = 37132 /* GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY          */, ///<
+  INT_SAMPLER_BUFFER                = 36304 /* GL_INT_SAMPLER_BUFFER                        */, ///<
+  INT_SAMPLER_2D_RECT               = 36301 /* GL_INT_SAMPLER_2D_RECT                       */, ///<
+  UINT_SAMPLER_1D                   = 36305 /* GL_UNSIGNED_INT_SAMPLER_1D                   */, ///<
+#endif
+  UINT_SAMPLER_2D                   = 36306 /* GL_UNSIGNED_INT_SAMPLER_2D                   */, ///<
+  UINT_SAMPLER_3D                   = 36307 /* GL_UNSIGNED_INT_SAMPLER_3D                   */, ///<
+  UINT_SAMPLER_CUBE                 = 36308 /* GL_UNSIGNED_INT_SAMPLER_CUBE                 */, ///<
+#if !defined(USE_OPENGL_ES)
+  UINT_SAMPLER_1D_ARRAY             = 36310 /* GL_UNSIGNED_INT_SAMPLER_1D_ARRAY             */, ///<
+#endif
+  UINT_SAMPLER_2D_ARRAY             = 36311 /* GL_UNSIGNED_INT_SAMPLER_2D_ARRAY             */, ///<
+#if !defined(USE_OPENGL_ES)
+  UINT_SAMPLER_2D_MULTISAMPLE       = 37130 /* GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE       */, ///<
+  UINT_SAMPLER_2D_MULTISAMPLE_ARRAY = 37133 /* GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY */, ///<
+  UINT_SAMPLER_BUFFER               = 36312 /* GL_UNSIGNED_INT_SAMPLER_BUFFER               */, ///<
+  UINT_SAMPLER_2D_RECT              = 36309 /* GL_UNSIGNED_INT_SAMPLER_2D_RECT              */, ///<
+#endif
+
+  // Images
+#if !defined(USE_OPENGL_ES)
+  IMAGE_1D                        = 36940 /* GL_IMAGE_1D                                */, ///< 1D image. Requires OpenGL 4.2+.
+  IMAGE_2D                        = 36941 /* GL_IMAGE_2D                                */, ///< 2D image. Requires OpenGL 4.2+.
+  IMAGE_3D                        = 36942 /* GL_IMAGE_3D                                */, ///< 3D image. Requires OpenGL 4.2+.
+  IMAGE_2D_RECT                   = 36943 /* GL_IMAGE_2D_RECT                           */, ///< 2D rectangle image. Requires OpenGL 4.2+.
+  IMAGE_CUBE                      = 36944 /* GL_IMAGE_CUBE                              */, ///< Cube image. Requires OpenGL 4.2+.
+  IMAGE_BUFFER                    = 36945 /* GL_IMAGE_BUFFER                            */, ///< Buffer image. Requires OpenGL 4.2+.
+  IMAGE_1D_ARRAY                  = 36946 /* GL_IMAGE_1D_ARRAY                          */, ///< 1D array image. Requires OpenGL 4.2+.
+  IMAGE_2D_ARRAY                  = 36947 /* GL_IMAGE_2D_ARRAY                          */, ///< 2D array image. Requires OpenGL 4.2+.
+  IMAGE_2D_MULTISAMPLE            = 36949 /* GL_IMAGE_2D_MULTISAMPLE                    */, ///< 2D multisample image. Requires OpenGL 4.2+.
+  IMAGE_2D_MULTISAMPLE_ARRAY      = 36950 /* GL_IMAGE_2D_MULTISAMPLE_ARRAY              */, ///< 2D array multisample image. Requires OpenGL 4.2+.
+  INT_IMAGE_1D                    = 36951 /* GL_INT_IMAGE_1D                            */, ///< 1D integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_2D                    = 36952 /* GL_INT_IMAGE_2D                            */, ///< 2D integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_3D                    = 36953 /* GL_INT_IMAGE_3D                            */, ///< 3D integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_2D_RECT               = 36954 /* GL_INT_IMAGE_2D_RECT                       */, ///< 2D rectangle integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_CUBE                  = 36955 /* GL_INT_IMAGE_CUBE                          */, ///< Cube integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_BUFFER                = 36956 /* GL_INT_IMAGE_BUFFER                        */, ///< Integer buffer image. Requires OpenGL 4.2+.
+  INT_IMAGE_1D_ARRAY              = 36957 /* GL_INT_IMAGE_1D_ARRAY                      */, ///< 1D array integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_2D_ARRAY              = 36958 /* GL_INT_IMAGE_2D_ARRAY                      */, ///< 2D array integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_2D_MULTISAMPLE        = 36960 /* GL_INT_IMAGE_2D_MULTISAMPLE                */, ///< 2D multisample integer image. Requires OpenGL 4.2+.
+  INT_IMAGE_2D_MULTISAMPLE_ARRAY  = 36961 /* GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY          */, ///< 2D array multisample integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_1D                   = 36962 /* GL_UNSIGNED_INT_IMAGE_1D                   */, ///< 1D unsigned integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_2D                   = 36963 /* GL_UNSIGNED_INT_IMAGE_2D                   */, ///< 2D unsigned integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_3D                   = 36964 /* GL_UNSIGNED_INT_IMAGE_3D                   */, ///< 3D unsigned integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_2D_RECT              = 36965 /* GL_UNSIGNED_INT_IMAGE_2D_RECT              */, ///< 2D rectangle unsigned int image. Requires OpenGL 4.2+.
+  UINT_IMAGE_CUBE                 = 36966 /* GL_UNSIGNED_INT_IMAGE_CUBE                 */, ///< Cube unsigned integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_BUFFER               = 36967 /* GL_UNSIGNED_INT_IMAGE_BUFFER               */, ///< Unsigned integer buffer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_1D_ARRAY             = 36968 /* GL_UNSIGNED_INT_IMAGE_1D_ARRAY             */, ///< 1D array unsigned integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_2D_ARRAY             = 36969 /* GL_UNSIGNED_INT_IMAGE_2D_ARRAY             */, ///< 2D array unsigned integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_2D_MULTISAMPLE       = 36971 /* GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE       */, ///< 2D multisample unsigned integer image. Requires OpenGL 4.2+.
+  UINT_IMAGE_2D_MULTISAMPLE_ARRAY = 36972 /* GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY */, ///< 2D array multisample unsigned integer image. Requires OpenGL 4.2+.
+#endif
+
+  // Misc
+#if !defined(USE_OPENGL_ES)
+  UINT_ATOMIC_COUNTER = 37595 /* GL_UNSIGNED_INT_ATOMIC_COUNTER */ ///< . Requires OpenGL 4.2+.
+#endif
 };
 
 enum class FramebufferType : unsigned int {
@@ -653,6 +747,14 @@ public:
   static bool isShaderAttached(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
   static void dispatchCompute(unsigned int groupCountX, unsigned int groupCountY = 1, unsigned int groupCountZ = 1);
+  /// Sets a memory synchronization barrier.
+  /// \note Requires OpenGL 4.2+ or ES 3.1+.
+  /// \param type Type of the barrier to be set.
+  static void setMemoryBarrier(BarrierType type);
+  /// Sets a localized memory synchronization barrier.
+  /// \note Requires OpenGL 4.5+ or ES 3.1+.
+  /// \param type Type of the barrier to be set.
+  static void setMemoryBarrierByRegion(RegionBarrierType type);
   /// Gets the uniform's location (ID) corresponding to the given name.
   /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).
   /// \param programIndex Index of the shader program to which is bound the uniform.
