@@ -31,12 +31,18 @@ void RenderPass::addReadTexture(const Texture& texture, const std::string& unifo
   m_program.sendUniform(uniformName, texture.getBindingIndex());
 }
 
+void RenderPass::bindTextures() const noexcept {
+  m_program.use();
+
+  for (const Texture* texture : m_readTextures) {
+    texture->activate();
+    texture->bind();
+  }
+}
+
 void RenderPass::execute(const Framebuffer& prevFramebuffer) const {
   if (m_enabled) {
-    for (const Texture* texture : m_readTextures) {
-      texture->activate();
-      texture->bind();
-    }
+    bindTextures();
 
     if (!m_writeFramebuffer.isEmpty())
       m_writeFramebuffer.bind();

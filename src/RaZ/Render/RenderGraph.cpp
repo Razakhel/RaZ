@@ -39,8 +39,6 @@ void RenderGraph::updateShaders() const {
 void RenderGraph::execute(RenderSystem& renderSystem) const {
   assert("Error: The render system needs a camera for the render graph to be executed." && (renderSystem.m_cameraEntity != nullptr));
 
-  m_geometryPass.getProgram().use();
-
   const Framebuffer& geometryFramebuffer = m_geometryPass.getFramebuffer();
 
   if (!geometryFramebuffer.isEmpty())
@@ -68,6 +66,11 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
     viewProjMat = camera.getProjectionMatrix() * camera.getViewMatrix();
   }
 
+  // Binding textures marks the pass' program as used
+  m_geometryPass.bindTextures();
+
+  const RenderShaderProgram& geometryProgram = m_geometryPass.getProgram();
+
   for (const Entity* entity : renderSystem.m_entities) {
     if (!entity->isEnabled() || !entity->hasComponent<MeshRenderer>() || !entity->hasComponent<Transform>())
       continue;
@@ -78,8 +81,6 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
       continue;
 
     const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
-
-    const RenderShaderProgram& geometryProgram = m_geometryPass.getProgram();
 
     geometryProgram.sendUniform("uniModelMatrix", modelMat);
     geometryProgram.sendUniform("uniMvpMatrix", viewProjMat * modelMat);

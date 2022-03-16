@@ -24,6 +24,8 @@ public:
   bool isValid() const;
   const RenderShaderProgram& getProgram() const { return m_program; }
   RenderShaderProgram& getProgram() { return m_program; }
+  std::size_t getReadTextureCount() const noexcept { return m_readTextures.size(); }
+  const Texture& getReadTexture(std::size_t textureIndex) const noexcept { return *m_readTextures[textureIndex]; }
   const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
 
   void setProgram(RenderShaderProgram&& program) { m_program = std::move(program); }
@@ -39,6 +41,8 @@ public:
   void enable(bool enabled = true) { m_enabled = enabled; }
   /// Disables the render pass.
   void disable() { enable(false); }
+  /// Binds the pass' read textures to its program.
+  void bindTextures() const noexcept;
   /// Executes the render pass.
   /// \param prevFramebuffer Framebuffer written by the previous render pass.
   void execute(const Framebuffer& prevFramebuffer) const;

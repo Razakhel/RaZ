@@ -68,8 +68,6 @@ Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, Imag
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
 
   resize(width, height);
-
-  unbind();
 }
 
 Texture::Texture(Texture&& texture) noexcept
@@ -102,6 +100,7 @@ void Texture::unbind() const {
 }
 
 void Texture::resize(unsigned int width, unsigned int height) const {
+  bind();
   Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                             0,
                             recoverInternalFormat(m_image),
@@ -110,6 +109,7 @@ void Texture::resize(unsigned int width, unsigned int height) const {
                             static_cast<TextureFormat>(m_image.m_colorspace),
                             (m_image.m_dataType == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
                             (m_image.isEmpty() ? nullptr : m_image.getDataPtr()));
+  unbind();
 }
 
 Texture& Texture::operator=(Texture&& texture) noexcept {
