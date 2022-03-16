@@ -13,7 +13,7 @@ TextureInternalFormat recoverInternalFormat(const Image& image) {
   if (image.getDataType() == ImageDataType::FLOAT) {
     switch (image.getColorspace()) {
       case ImageColorspace::GRAY:
-        colorFormat = TextureInternalFormat::RED16F;
+        colorFormat = TextureInternalFormat::R16F;
         break;
 
       case ImageColorspace::GRAY_ALPHA:

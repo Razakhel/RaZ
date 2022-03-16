@@ -402,6 +402,21 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
   printConditionalErrors();
 }
 
+void Renderer::bindImageTexture(unsigned int imageUnitIndex, unsigned int textureIndex, int textureLevel,
+                                bool isLayered, int layer,
+                                ImageAccess imgAccess, ImageFormat imgFormat) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
+  assert("Error: Binding an image texture requires OpenGL 4.2+." && s_majorVersion >= 4 && s_minorVersion >= 2);
+#else
+  assert("Error: Binding an image texture requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+#endif
+
+  glBindImageTexture(imageUnitIndex, textureIndex, textureLevel, isLayered, layer, static_cast<unsigned int>(imgAccess), static_cast<unsigned int>(imgFormat));
+
+  printConditionalErrors();
+}
+
 void Renderer::activateTexture(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

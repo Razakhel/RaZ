@@ -238,16 +238,146 @@ enum class TextureInternalFormat : unsigned int {
   DEPTH_STENCIL = static_cast<unsigned int>(TextureFormat::DEPTH_STENCIL),
 
   // Sized formats
-  RED16F   = 33325 /* GL_R16F               */, ///<
-  RG16F    = 33327 /* GL_RG16F              */, ///<
-  RGB16F   = 34843 /* GL_RGB16F             */, ///<
-  RGBA16F  = 34842 /* GL_RGBA16F            */, ///<
-  DEPTH32F = 36012 /* GL_DEPTH_COMPONENT32F */  ///<
+  R8          = 33321 /* GL_R8          */, ///<
+  RG8         = 33323 /* GL_RG8         */, ///<
+  RGB8        = 32849 /* GL_RGB8        */, ///<
+  SRGB8       = 35905 /* GL_SRGB8       */, ///<
+  RGBA8       = 32856 /* GL_RGBA8       */, ///<
+  R8I         = 33329 /* GL_R8I         */, ///<
+  RG8I        = 33335 /* GL_RG8I        */, ///<
+  RGB8I       = 36239 /* GL_RGB8I       */, ///<
+  RGBA8I      = 36238 /* GL_RGBA8I      */, ///<
+  R8UI        = 33330 /* GL_R8UI        */, ///<
+  RG8UI       = 33336 /* GL_RG8UI       */, ///<
+  RGB8UI      = 36221 /* GL_RGB8UI      */, ///<
+  RGBA8UI     = 36220 /* GL_RGBA8UI     */, ///<
+  R8_SNORM    = 36756 /* GL_R8_SNORM    */, ///<
+  RG8_SNORM   = 36757 /* GL_RG8_SNORM   */, ///<
+  RGB8_SNORM  = 36758 /* GL_RGB8_SNORM  */, ///<
+  RGBA8_SNORM = 36759 /* GL_RGBA8_SNORM */, ///<
+
+  R16          = 33322 /* GL_R16          */, ///<
+  RG16         = 33324 /* GL_RG16         */, ///<
+  RGBA16       = 32859 /* GL_RGBA16       */, ///<
+  R16I         = 33331 /* GL_R16I         */, ///<
+  RG16I        = 33337 /* GL_RG16I        */, ///<
+  RGB16I       = 36233 /* GL_RGB16I       */, ///<
+  RGBA16I      = 36232 /* GL_RGBA16I      */, ///<
+  R16UI        = 33332 /* GL_R16UI        */, ///<
+  RG16UI       = 33338 /* GL_RG16UI       */, ///<
+  RGB16UI      = 36215 /* GL_RGB16UI      */, ///<
+  RGBA16UI     = 36214 /* GL_RGBA16UI     */, ///<
+  R16F         = 33325 /* GL_R16F         */, ///<
+  RG16F        = 33327 /* GL_RG16F        */, ///<
+  RGB16F       = 34843 /* GL_RGB16F       */, ///<
+  RGBA16F      = 34842 /* GL_RGBA16F      */, ///<
+  R16_SNORM    = 36760 /* GL_R16_SNORM    */, ///<
+  RG16_SNORM   = 36761 /* GL_RG16_SNORM   */, ///<
+  RGB16_SNORM  = 36762 /* GL_RGB16_SNORM  */, ///<
+  RGBA16_SNORM = 36763 /* GL_RGBA16_SNORM */, ///<
+
+  R32I     = 33333 /* GL_R32I               */, ///<
+  RG32I    = 33339 /* GL_RG32I              */, ///<
+  RGB32I   = 36227 /* GL_RGB32I             */, ///<
+  RGBA32I  = 36226 /* GL_RGBA32I            */, ///<
+  R32UI    = 33334 /* GL_R32UI              */, ///<
+  RG32UI   = 33340 /* GL_RG32UI             */, ///<
+  RGB32UI  = 36209 /* GL_RGB32UI            */, ///<
+  RGBA32UI = 36208 /* GL_RGBA32UI           */, ///<
+  R32F     = 33326 /* GL_R32F               */, ///<
+  RG32F    = 33328 /* GL_RG32F              */, ///<
+  RGB32F   = 34837 /* GL_RGB32F             */, ///<
+  RGBA32F  = 34836 /* GL_RGBA32F            */, ///<
+
+  DEPTH16           = 33189 /* GL_DEPTH_COMPONENT16  */, ///<
+  DEPTH24           = 33190 /* GL_DEPTH_COMPONENT24  */, ///<
+  DEPTH24_STENCIL8  = 35056 /* GL_DEPTH24_STENCIL8   */, ///<
+  DEPTH32F          = 36012 /* GL_DEPTH_COMPONENT32F */, ///<
+  DEPTH32F_STENCIL8 = 36013 /* GL_DEPTH32F_STENCIL8  */, ///<
+
+  RGB10_A2       = 32857 /* GL_RGB10_A2       */, ///<
+  RGB10_A2UI     = 36975 /* GL_RGB10_A2UI     */, ///<
+  R11F_G11F_B10F = 35898 /* GL_R11F_G11F_B10F */  ///<
 };
 
 enum class TextureDataType : unsigned int {
-  UBYTE = 5121 /* GL_UNSIGNED_BYTE */, ///<
-  FLOAT = 5126 /* GL_FLOAT         */  ///<
+  UBYTE = 5121 /* GL_UNSIGNED_BYTE */, ///< Unsigned byte data type.
+  FLOAT = 5126 /* GL_FLOAT         */  ///< Single precision floating-point data type.
+};
+
+enum class ImageAccess : unsigned int {
+  READ       = 35000 /* GL_READ_ONLY  */, ///< Read-only image access.
+  WRITE      = 35001 /* GL_WRITE_ONLY */, ///< Write-only image access.
+  READ_WRITE = 35002 /* GL_READ_WRITE */  ///< Both read & write image access.
+};
+
+enum class ImageFormat : unsigned int {
+#if !defined(USE_OPENGL_ES)
+  R8          = static_cast<unsigned int>(TextureInternalFormat::R8),          ///<
+  RG8         = static_cast<unsigned int>(TextureInternalFormat::RG8),         ///<
+#endif
+  RGBA8       = static_cast<unsigned int>(TextureInternalFormat::RGBA8),       ///<
+#if !defined(USE_OPENGL_ES)
+  R8I         = static_cast<unsigned int>(TextureInternalFormat::R8I),         ///<
+  RG8I        = static_cast<unsigned int>(TextureInternalFormat::RG8I),        ///<
+#endif
+  RGBA8I      = static_cast<unsigned int>(TextureInternalFormat::RGBA8I),      ///<
+#if !defined(USE_OPENGL_ES)
+  R8UI        = static_cast<unsigned int>(TextureInternalFormat::R8UI),        ///<
+  RG8UI       = static_cast<unsigned int>(TextureInternalFormat::RG8UI),       ///<
+#endif
+  RGBA8UI     = static_cast<unsigned int>(TextureInternalFormat::RGBA8UI),     ///<
+#if !defined(USE_OPENGL_ES)
+  R8_SNORM    = static_cast<unsigned int>(TextureInternalFormat::R8_SNORM),    ///<
+  RG8_SNORM   = static_cast<unsigned int>(TextureInternalFormat::RG8_SNORM),   ///<
+#endif
+  RGBA8_SNORM = static_cast<unsigned int>(TextureInternalFormat::RGBA8_SNORM), ///<
+
+#if !defined(USE_OPENGL_ES)
+  R16          = static_cast<unsigned int>(TextureInternalFormat::R16),          ///<
+  RG16         = static_cast<unsigned int>(TextureInternalFormat::RG16),         ///<
+  RGBA16       = static_cast<unsigned int>(TextureInternalFormat::RGBA16),       ///<
+  R16I         = static_cast<unsigned int>(TextureInternalFormat::R16I),         ///<
+  RG16I        = static_cast<unsigned int>(TextureInternalFormat::RG16I),        ///<
+#endif
+  RGBA16I      = static_cast<unsigned int>(TextureInternalFormat::RGBA16I),      ///<
+#if !defined(USE_OPENGL_ES)
+  R16UI        = static_cast<unsigned int>(TextureInternalFormat::R16UI),        ///<
+  RG16UI       = static_cast<unsigned int>(TextureInternalFormat::RG16UI),       ///<
+#endif
+  RGBA16UI     = static_cast<unsigned int>(TextureInternalFormat::RGBA16UI),     ///<
+#if !defined(USE_OPENGL_ES)
+  R16F         = static_cast<unsigned int>(TextureInternalFormat::R16F),         ///<
+  RG16F        = static_cast<unsigned int>(TextureInternalFormat::RG16F),        ///<
+#endif
+  RGBA16F      = static_cast<unsigned int>(TextureInternalFormat::RGBA16F),      ///<
+#if !defined(USE_OPENGL_ES)
+  R16_SNORM    = static_cast<unsigned int>(TextureInternalFormat::R16_SNORM),    ///<
+  RG16_SNORM   = static_cast<unsigned int>(TextureInternalFormat::RG16_SNORM),   ///<
+  RGBA16_SNORM = static_cast<unsigned int>(TextureInternalFormat::RGBA16_SNORM), ///<
+#endif
+
+  R32I     = static_cast<unsigned int>(TextureInternalFormat::R32I),     ///<
+#if !defined(USE_OPENGL_ES)
+  RG32I    = static_cast<unsigned int>(TextureInternalFormat::RG32I),    ///<
+#endif
+  RGBA32I  = static_cast<unsigned int>(TextureInternalFormat::RGBA32I),  ///<
+  R32UI    = static_cast<unsigned int>(TextureInternalFormat::R32UI),    ///<
+#if !defined(USE_OPENGL_ES)
+  RG32UI   = static_cast<unsigned int>(TextureInternalFormat::RG32UI),   ///<
+#endif
+  RGBA32UI = static_cast<unsigned int>(TextureInternalFormat::RGBA32UI), ///<
+  R32F     = static_cast<unsigned int>(TextureInternalFormat::R32F),     ///<
+#if !defined(USE_OPENGL_ES)
+  RG32F    = static_cast<unsigned int>(TextureInternalFormat::RG32F),    ///<
+#endif
+  RGBA32F  = static_cast<unsigned int>(TextureInternalFormat::RGBA32F),  ///<
+
+#if !defined(USE_OPENGL_ES)
+  RGB10_A2       = static_cast<unsigned int>(TextureInternalFormat::RGB10_A2),      ///<
+  RGB10_A2UI     = static_cast<unsigned int>(TextureInternalFormat::RGB10_A2UI),    ///<
+  R11F_G11F_B10F = static_cast<unsigned int>(TextureInternalFormat::R11F_G11F_B10F) ///<
+#endif
 };
 
 enum class ProgramParameter : unsigned int {
@@ -631,6 +761,9 @@ public:
   static void generateTexture(unsigned int& index) { generateTextures(1, &index); }
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
+  static void bindImageTexture(unsigned int imageUnitIndex, unsigned int textureIndex, int textureLevel,
+                               bool isLayered, int layer,
+                               ImageAccess imgAccess, ImageFormat imgFormat);
   static void activateTexture(unsigned int index);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.
