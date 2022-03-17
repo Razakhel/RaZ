@@ -17,7 +17,7 @@ TEST_CASE("Shader validity") {
   }
 
   // Tessellation shaders are only available in OpenGL 4.0+
-  if (Raz::Renderer::getMajorVersion() >= 4) {
+  if (Raz::Renderer::checkVersion(4, 0)) {
     {
       Raz::TessellationControlShader tessCtrlShader;
       CHECK_FALSE(Raz::Renderer::hasErrors());
@@ -60,7 +60,7 @@ TEST_CASE("Shader validity") {
   }
 
   // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::getMajorVersion() >= 4 && Raz::Renderer::getMinorVersion() >= 3) {
+  if (Raz::Renderer::checkVersion(4, 3)) {
     Raz::ComputeShader compShader;
     CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK(compShader.isValid());
@@ -93,7 +93,7 @@ TEST_CASE("Vertex shader from source") {
 
 TEST_CASE("Tessellation control shader from source") {
   // Tessellation shaders are only available in OpenGL 4.0+
-  if (Raz::Renderer::getMajorVersion() < 4)
+  if (!Raz::Renderer::checkVersion(4, 0))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -125,7 +125,7 @@ TEST_CASE("Tessellation control shader from source") {
 
 TEST_CASE("Tessellation evaluation shader from source") {
   // Tessellation shaders are only available in OpenGL 4.0+
-  if (Raz::Renderer::getMajorVersion() < 4)
+  if (!Raz::Renderer::checkVersion(4, 0))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -173,7 +173,7 @@ TEST_CASE("Fragment shader from source") {
 
 TEST_CASE("Compute shader from source") {
   // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::getMajorVersion() < 4 || Raz::Renderer::getMinorVersion() < 3)
+  if (!Raz::Renderer::checkVersion(4, 3))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -216,7 +216,7 @@ TEST_CASE("Vertex shader imported") {
 
 TEST_CASE("Tessellation control shader imported") {
   // Tessellation shaders are only available in OpenGL 4.0+
-  if (Raz::Renderer::getMajorVersion() < 4)
+  if (!Raz::Renderer::checkVersion(4, 0))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -235,7 +235,7 @@ TEST_CASE("Tessellation control shader imported") {
 
 TEST_CASE("Tessellation evaluation shader imported") {
   // Tessellation shaders are only available in OpenGL 4.0+
-  if (Raz::Renderer::getMajorVersion() < 4)
+  if (!Raz::Renderer::checkVersion(4, 0))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -269,7 +269,7 @@ TEST_CASE("Fragment shader imported") {
 
 TEST_CASE("Compute shader imported") {
   // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::getMajorVersion() < 4 || Raz::Renderer::getMinorVersion() < 3)
+  if (!Raz::Renderer::checkVersion(4, 3))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors

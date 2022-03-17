@@ -116,7 +116,7 @@ void checkUniformInfo(const std::unordered_map<std::string, UniformInfo>& corres
 TEST_CASE("ShaderProgram move") {
   {
     // Tessellation shaders are only available in OpenGL 4.0+
-    const bool isTessellationSupported = (Raz::Renderer::getMajorVersion() >= 4);
+    const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0);
 
     Raz::RenderShaderProgram programBase;
 
@@ -161,7 +161,7 @@ TEST_CASE("ShaderProgram move") {
   }
 
   // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::getMajorVersion() >= 4 && Raz::Renderer::getMinorVersion() >= 3) {
+  if (Raz::Renderer::checkVersion(4, 3)) {
     Raz::ComputeShaderProgram programBase;
     programBase.setShader(Raz::ComputeShader());
     programBase.updateShaders();
@@ -254,7 +254,7 @@ TEST_CASE("RenderShaderProgram uniforms") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   // Tessellation shaders are only available in OpenGL 4.0+
-  const bool isTessellationSupported = (Raz::Renderer::getMajorVersion() >= 4);
+  const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0);
 
   Raz::RenderShaderProgram program(Raz::VertexShader::loadFromSource(vertSource), Raz::FragmentShader::loadFromSource(fragSource));
   if (isTessellationSupported) {
@@ -299,7 +299,7 @@ TEST_CASE("RenderShaderProgram uniforms") {
 
 TEST_CASE("ComputeShaderProgram creation") {
   // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::getMajorVersion() < 4 || Raz::Renderer::getMinorVersion() < 3)
+  if (!Raz::Renderer::checkVersion(4, 3))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -336,7 +336,7 @@ TEST_CASE("ComputeShaderProgram creation") {
 
 TEST_CASE("ComputeShaderProgram uniforms") {
   // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::getMajorVersion() < 4 || Raz::Renderer::getMinorVersion() < 3)
+  if (!Raz::Renderer::checkVersion(4, 3))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors

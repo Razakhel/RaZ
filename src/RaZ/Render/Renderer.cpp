@@ -95,7 +95,7 @@ void Renderer::initialize() {
   getParameter(StateParameter::MINOR_VERSION, &s_minorVersion);
 
 #if !defined(RAZ_PLATFORM_MAC) && !defined(USE_OPENGL_ES) // Setting the debug message callback provokes a crash on macOS & isn't available on OpenGL ES
-  if (s_majorVersion >= 4 && s_minorVersion >= 3) {
+  if (checkVersion(4, 3)) {
     enable(Capability::DEBUG_OUTPUT);
     enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(&callbackDebugLog, nullptr);
@@ -281,7 +281,7 @@ void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
 
 void Renderer::setPatchVertexCount(int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: Setting patch vertices requires OpenGL 4.0+." && s_majorVersion >= 4);
+  assert("Error: Setting patch vertices requires OpenGL 4.0+." && checkVersion(4, 0));
   assert("Error: A patch needs at least one vertex." && value > 0);
 
   glPatchParameteri(GL_PATCH_VERTICES, value);
@@ -291,7 +291,7 @@ void Renderer::setPatchVertexCount(int value) {
 
 void Renderer::setPatchParameter(PatchParameter param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: Setting a patch parameter requires OpenGL 4.0+." && s_majorVersion >= 4);
+  assert("Error: Setting a patch parameter requires OpenGL 4.0+." && checkVersion(4, 0));
 
   glPatchParameterfv(static_cast<unsigned int>(param), values);
 
@@ -407,9 +407,9 @@ void Renderer::bindImageTexture(unsigned int imageUnitIndex, unsigned int textur
                                 ImageAccess imgAccess, ImageFormat imgFormat) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
-  assert("Error: Binding an image texture requires OpenGL 4.2+." && s_majorVersion >= 4 && s_minorVersion >= 2);
+  assert("Error: Binding an image texture requires OpenGL 4.2+." && checkVersion(4, 2));
 #else
-  assert("Error: Binding an image texture requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+  assert("Error: Binding an image texture requires OpenGL ES 3.1+." && checkVersion(3, 1));
 #endif
 
   glBindImageTexture(imageUnitIndex, textureIndex, textureLevel, isLayered, layer, static_cast<unsigned int>(imgAccess), static_cast<unsigned int>(imgFormat));
@@ -460,7 +460,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
 #if !defined(USE_OPENGL_ES)
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
   glTextureParameteri(textureIndex, static_cast<unsigned int>(param), value);
 
@@ -469,7 +469,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, float value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
   glTextureParameterf(textureIndex, static_cast<unsigned int>(param), value);
 
@@ -478,7 +478,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
   glTextureParameteriv(textureIndex, static_cast<unsigned int>(param), values);
 
@@ -487,7 +487,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
 void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
+  assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
   glTextureParameterfv(textureIndex, static_cast<unsigned int>(param), values);
 
@@ -585,7 +585,7 @@ void Renderer::generateMipmap(TextureType type) {
 #if !defined(USE_OPENGL_ES)
 void Renderer::generateMipmap(unsigned int textureIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: OpenGL 4.5+ is needed to generate mipmap with a texture index." && s_majorVersion >= 4 && s_minorVersion >= 5);
+  assert("Error: OpenGL 4.5+ is needed to generate mipmap with a texture index." && checkVersion(4, 5));
 
   glGenerateTextureMipmap(textureIndex);
 
@@ -714,13 +714,13 @@ unsigned int Renderer::createShader(ShaderType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
   assert("Error: Creating a tessellation shader requires OpenGL 4.0+."
-         && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION) || s_majorVersion >= 4));
-  assert("Error: Creating a compute shader requires OpenGL 4.3+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 4 && s_minorVersion >= 3)));
+         && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION) || checkVersion(4, 0)));
+  assert("Error: Creating a compute shader requires OpenGL 4.3+." && (type != ShaderType::COMPUTE || (checkVersion(4, 3))));
 #else
   assert("Error: Geometry shaders are unsupported with OpenGL ES." && type != ShaderType::GEOMETRY);
   assert("Error: Tessellation shaders are unsupported with OpenGL ES."
          && type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION);
-  assert("Error: Creating a compute shader requires OpenGL ES 3.1+." && (type != ShaderType::COMPUTE || (s_majorVersion >= 3 && s_minorVersion >= 1)));
+  assert("Error: Creating a compute shader requires OpenGL ES 3.1+." && (type != ShaderType::COMPUTE || (checkVersion(3, 1))));
 #endif
 
   const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
@@ -806,9 +806,9 @@ void Renderer::deleteShader(unsigned int index) {
 void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
-  assert("Error: Launching a compute operation requires OpenGL 4.3+." && s_majorVersion >= 4 && s_minorVersion >= 3);
+  assert("Error: Launching a compute operation requires OpenGL 4.3+." && checkVersion(4, 3));
 #else
-  assert("Error: Launching a compute operation requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+  assert("Error: Launching a compute operation requires OpenGL ES 3.1+." && checkVersion(3, 1));
 #endif
 
   glDispatchCompute(groupCountX, groupCountY, groupCountZ);
@@ -819,9 +819,9 @@ void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCount
 void Renderer::setMemoryBarrier(BarrierType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
-  assert("Error: Setting a memory barrier requires OpenGL 4.2+." && s_majorVersion >= 4 && s_minorVersion >= 2);
+  assert("Error: Setting a memory barrier requires OpenGL 4.2+." && checkVersion(4, 2));
 #else
-  assert("Error: Setting a memory barrier requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+  assert("Error: Setting a memory barrier requires OpenGL ES 3.1+." && checkVersion(3, 1));
 #endif
 
   glMemoryBarrier(static_cast<unsigned int>(type));
@@ -832,9 +832,9 @@ void Renderer::setMemoryBarrier(BarrierType type) {
 void Renderer::setMemoryBarrierByRegion(RegionBarrierType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
-  assert("Error: Setting a memory barrier by region requires OpenGL 4.5+." && s_majorVersion >= 4 && s_minorVersion >= 5);
+  assert("Error: Setting a memory barrier by region requires OpenGL 4.5+." && checkVersion(4, 5));
 #else
-  assert("Error: Setting a memory barrier by region requires OpenGL ES 3.1+." && s_majorVersion >= 3 && s_minorVersion >= 1);
+  assert("Error: Setting a memory barrier by region requires OpenGL ES 3.1+." && checkVersion(3, 1));
 #endif
 
   glMemoryBarrierByRegion(static_cast<unsigned int>(type));
@@ -1073,7 +1073,7 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
 #if !defined(USE_OPENGL_ES)
 void Renderer::setLabel(RenderObjectType type, unsigned int objectIndex, const char* label) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: Setting an object label requires OpenGL 4.3+." && s_majorVersion >= 4 && s_minorVersion >= 3);
+  assert("Error: Setting an object label requires OpenGL 4.3+." && checkVersion(4, 3));
 
   glObjectLabel(static_cast<unsigned int>(type), objectIndex, -1, label);
 

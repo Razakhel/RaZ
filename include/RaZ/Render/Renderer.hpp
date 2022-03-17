@@ -703,9 +703,14 @@ public:
   Renderer(Renderer&&) noexcept = delete;
 
   static void initialize();
-  static bool isInitialized() { return s_isInitialized; }
-  static int getMajorVersion() { return s_majorVersion; }
-  static int getMinorVersion() { return s_minorVersion; }
+  static bool isInitialized() noexcept { return s_isInitialized; }
+  static int getMajorVersion() noexcept { return s_majorVersion; }
+  static int getMinorVersion() noexcept { return s_minorVersion; }
+  /// Checks that the current version is higher than or equal to the given one.
+  /// \param major Major version.
+  /// \param minor Minor version.
+  /// \return True if the given version is higher than or equal to the current one, false otherwise.
+  static bool checkVersion(int major, int minor) noexcept { return (s_majorVersion > major || (s_majorVersion == major && s_minorVersion >= minor)); }
   static void enable(Capability capability);
   static void disable(Capability capability);
   static bool isEnabled(Capability capability);
