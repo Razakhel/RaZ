@@ -979,19 +979,28 @@ public:
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
 #if !defined (USE_OPENGL_ES)
   /// Assigns a label to a graphic object.
+  /// \note Requires OpenGL 4.3+.
   /// \param type Type of the object to assign the label to.
   /// \param objectIndex Index of the object to assign the label to.
   /// \param label Label to assign; must be null-terminated.
   static void setLabel(RenderObjectType type, unsigned int objectIndex, const char* label);
   /// Assigns a label to a graphic object.
+  /// \note Requires OpenGL 4.3+.
   /// \param type Type of the object to assign the label to.
   /// \param objectIndex Index of the object to assign the label to.
   /// \param label Label to assign.
   static void setLabel(RenderObjectType type, unsigned int objectIndex, const std::string& label) { setLabel(type, objectIndex, label.c_str()); }
   /// Removes label from a graphic object.
+  /// \note Requires OpenGL 4.3+.
   /// \param type Type of the object to remove the label from.
   /// \param objectIndex Index of the object to remove the label from.
   static void resetLabel(RenderObjectType type, unsigned int objectIndex) { setLabel(type, objectIndex, nullptr); }
+  /// Retrieves a previously assigned label on a given object.
+  /// \note Requires OpenGL 4.3+.
+  /// \param type Type of the object to retrieve the label from.
+  /// \param objectIndex Index of the object to retrieve the label from.
+  /// \return Label of the object.
+  static std::string recoverLabel(RenderObjectType type, unsigned int objectIndex);
 #endif
   static ErrorCodes recoverErrors() noexcept;
   static bool hasErrors() noexcept { return !recoverErrors().isEmpty(); }

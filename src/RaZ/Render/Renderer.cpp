@@ -1079,6 +1079,24 @@ void Renderer::setLabel(RenderObjectType type, unsigned int objectIndex, const c
 
   printConditionalErrors();
 }
+
+std::string Renderer::recoverLabel(RenderObjectType type, unsigned int objectIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Recovering an object label requires OpenGL 4.3+." && checkVersion(4, 3));
+
+  int labelLength {};
+  std::array<char, 256> labelName {};
+
+  glGetObjectLabel(static_cast<unsigned int>(type), objectIndex, static_cast<int>(labelName.size()), &labelLength, labelName.data());
+
+  std::string label;
+  label.resize(static_cast<std::size_t>(labelLength));
+  std::copy(labelName.cbegin(), labelName.cbegin() + labelLength, label.begin());
+
+  printConditionalErrors();
+
+  return label;
+}
 #endif
 
 ErrorCodes Renderer::recoverErrors() noexcept {
