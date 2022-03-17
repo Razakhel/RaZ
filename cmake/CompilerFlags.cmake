@@ -214,6 +214,14 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /Zc:__cplusplus # Forcing the __cplusplus definition to be of the proper value
             #/Zc:lambda # Forcing lambdas' parsing to be standard compliant; to be removed in C++20 (implied by /std:c++20)
         )
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16.5)
+            set(COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                /Zc:preprocessor # Forcing the preprocessor to be compliant with C++11 and above
+            )
+        endif ()
     endif ()
 
     if (NOT COMPILER_MSVC)
