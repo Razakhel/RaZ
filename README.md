@@ -33,14 +33,14 @@
     <tbody>
         <tr>
             <th align="center">Compilation</th>
-            <td align="center"><a alt="Linux build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=linux" /></a></td>
-            <td align="center"><a alt="Windows build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=windows" /></a></td>
-            <td align="center"><a alt="macOS build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=osx" /></a></td>
-            <td align="center"><a alt="WASM build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=wasm" /></a></td>
+            <td align="center"><a alt="Linux build status" href="https://github.com/Razakhel/RaZ/actions"><img src="https://github.com/Razakhel/RaZ/actions/workflows/RaZ.yml/badge.svg?branch=master" /></a></td>
+            <td align="center"><a alt="Windows build status" href="https://github.com/Razakhel/RaZ/actions"><img src="https://github.com/Razakhel/RaZ/actions/workflows/RaZ.yml/badge.svg?branch=master" /></a></td>
+            <td align="center"><a alt="macOS build status" href="https://github.com/Razakhel/RaZ/actions"><img src="https://github.com/Razakhel/RaZ/actions/workflows/RaZ.yml/badge.svg?branch=master" /></a></td>
+            <td align="center"><a alt="WASM build status" href="https://github.com/Razakhel/RaZ/actions"><img src="https://github.com/Razakhel/RaZ/actions/workflows/RaZ.yml/badge.svg?branch=master" /></a></td>
         </tr>
         <tr>
             <th align="center">Unit tests</th>
-            <td align="center"><a alt="Linux tests build status" href="https://travis-ci.com/Razakhel/RaZ"><img src="http://badges.herokuapp.com/travis/razakhel/raz?branch=master&label=build&env=BADGE=linux_tests" /></a></td>
+            <td align="center"><a alt="Linux tests build status" href="https://github.com/Razakhel/RaZ/actions"><img src="https://github.com/Razakhel/RaZ/actions/workflows/RaZ.yml/badge.svg?branch=master" /></a></td>
             <td align="center">No CI yet</td>
             <td align="center">No CI yet</td>
             <td align="center">N/A</td>
@@ -49,8 +49,8 @@
 </table>
 
 | <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy | <img alt="Coveralls" src="https://avatars3.githubusercontent.com/ml/318?s=140&v=4" align="center" height="30" width="30" /><br />Coveralls |
-| :------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------: |
-| [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://www.codacy.com/app/Razakhel/RaZ)            | [![Coverage Status](https://coveralls.io/repos/github/Razakhel/RaZ/badge.svg)](https://coveralls.io/github/Razakhel/RaZ)                   |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------:|
+|      [![Codacy status](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://app.codacy.com/gh/Razakhel/RaZ)       |          [![Coverage status](https://coveralls.io/repos/github/Razakhel/RaZ/badge.svg)](https://coveralls.io/github/Razakhel/RaZ)          |
 
 ## Summary
 
@@ -66,18 +66,29 @@ The engine is available under Windows, Linux & macOS; it can also run in a web b
 
 ### Gallery
 
-| Crytek Sponza                                                                        | Hylian shield (PBR)                                                                  |
-| :----------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: |
+|                                    Crytek Sponza                                     |                                 Hylian shield (PBR)                                  |
+|:------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------:|
 | [![Crytek Sponza](https://i.imgur.com/Tr1nnjV.jpg)](https://i.imgur.com/Tr1nnjV.jpg) | [![Hylian shield](https://i.imgur.com/UZ90KKJ.jpg)](https://i.imgur.com/UZ90KKJ.jpg) |
 
 More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples).
 
+### Projects using RaZ
+
+|                        Name                        |           Maintainer/creator            | Description                          |
+|:--------------------------------------------------:|:---------------------------------------:|--------------------------------------|
+|     [Atmos](https://github.com/Razakhel/Atmos)     | [Razakhel](https://github.com/Razakhel) | Atmospheric simulation               |
+|   [Midgard](https://github.com/Razakhel/Midgard)   | [Razakhel](https://github.com/Razakhel) | Terrain procedural generation        |
+| [Yggdrasil](https://github.com/Razakhel/Yggdrasil) | [Razakhel](https://github.com/Razakhel) | Tree & foliage procedural generation |
+
+If you also are working on some on your own, feel free to get in touch so that I can add them to the list.
+
 ## Features
 
-| Module        | Features                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| :-----------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Audio**     | - Playing/pausing/stopping/repeating sounds<br/> - WAV import<br/>                                                                                                                                                                                                                                                                                                                                                             |
-| **Math**      | - Vectors<br/>- Matrices<br/>- Quaternions<br/>- Angles (degrees/radians)<br/>- Transformations (translation, rotation, scale)                                                                                                                                                                                                                                                                                                 |
-| **Rendering** | - OpenGL (3.3 or 4.5)<br/>- Vulkan _(in progress)_<br/>- Standard (Blinn-Phong) & PBR (Cook-Torrance) material models<br/>- Deferred rendering, using a custom render graph<br/>- Camera (perspective/orthographic)<br/>- Light sources (point & directional)<br/>- Cubemap<br/>- Normal mapping                                                                                                                               |
-| **Physics**   | - Shapes (line, plane, sphere, triangle, quad, AABB, OBB)<br/>- Shape/shape collision checks _(in progress)_<br/>- Ray/shape intersection checks _(in progress)_<br/>- Rigid body simulation _(in progress)_                                                                                                                                                                                                                   |
-| **Misc**      | - ECS (Entity Component System) implementation<br/>- Dynamic bitset<br/>- Uniformized platform-dependant path strings<br/>- Directed graph structure<br/>- Meshes (OBJ import/export, FBX import, OFF import)<br/>- Images (PNG import/export, TGA import, HDR import _(in progress)_)<br/>- Windowing (window, overlay, keyboard/mouse inputs with custom callbacks)<br/>- Compiler, enum, string, type & threading utilities |
+|    Module     | Features                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+|:-------------:|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Animation** | - Skeleton data structure<br/>- Animation support _(in progress)_<br/>- BVH import _(in progress)_                                                                                                                                                                                                                                                                                                                                                                                              |
+|   **Audio**   | - Playing/pausing/stopping/repeating sounds<br/>- Positional audio<br/>- WAV import                                                                                                                                                                                                                                                                                                                                                                                                             |
+|   **Math**    | - Vectors, matrices & quaternions<br/>- Angles (degrees/radians)<br/>- Transformations (translation, rotation, scale)<br/>- Noise (Perlin)                                                                                                                                                                                                                                                                                                                                                      |
+| **Rendering** | - OpenGL (4.6-3.3)<br/>- Vulkan _(in progress)_<br/>- Standard (Blinn-Phong) & PBR (Cook-Torrance) material models<br/>- Deferred rendering, using a custom render graph<br/>- Tessellation & compute shaders support<br/>- Camera (perspective/orthographic)<br/>- Light sources (point & directional)<br/>- Cubemap<br/>- Normal mapping                                                                                                                                                      |
+|  **Physics**  | - Shapes (line, plane, sphere, triangle, quad, AABB, OBB)<br/>- Shape/shape collision checks _(in progress)_<br/>- Ray/shape intersection checks _(in progress)_<br/>- Rigid body simulation _(in progress)_                                                                                                                                                                                                                                                                                    |
+|   **Misc**    | - Custom ECS (Entity Component System) implementation<br/>- Dynamic bitset<br/>- Uniformized platform-dependant path strings<br/>- Directed graph structure<br/>- Meshes (OBJ import/export, FBX import, OFF import)<br/>- Images (PNG import/export, TGA import, HDR import _(in progress)_)<br/>- Windowing (window, keyboard/mouse inputs with custom callbacks)<br/>- Overlay using [ImGui](https://github.com/ocornut/imgui)<br/>- Multithreading, compiler, enum, string & type utilities |
