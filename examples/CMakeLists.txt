@@ -34,6 +34,11 @@ endif ()
 
 target_compile_options(RaZ_Examples INTERFACE ${RAZ_EXAMPLES_DISABLED_WARNINGS})
 
+if (NOT RAZ_USE_EMSCRIPTEN)
+    add_executable(RaZ_ComputeDemo computeDemo.cpp)
+    target_link_libraries(RaZ_ComputeDemo RaZ_Examples)
+endif ()
+
 add_executable(RaZ_DeferredDemo deferredDemo.cpp)
 target_link_libraries(RaZ_DeferredDemo RaZ_Examples)
 
