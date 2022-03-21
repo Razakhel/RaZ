@@ -1,12 +1,20 @@
+#include "RaZ/Data/TgaFormat.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Image.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include <array>
 #include <fstream>
 #include <sstream>
 
-namespace Raz {
+namespace Raz::TgaFormat {
 
-void Image::readTga(std::ifstream& file, bool flipVertically) {
+Image load(const FilePath& filePath, bool flipVertically) {
+  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+
+  if (!file)
+    throw std::invalid_argument("Error: Could not open the PNG file '" + filePath + "'");
+
   // Declaring a single array of unsigned char, reused everywhere later
   std::array<unsigned char, 2> bytes {};
 
@@ -19,35 +27,32 @@ void Image::readTga(std::ifstream& file, bool flipVertically) {
   const bool hasColormap = (bytes[0] == 1);
 
   // Image type
-  bool runLengthEncoding = false;
   file.read(reinterpret_cast<char*>(bytes.data()), 1);
+
+  bool runLengthEncoding = false;
+  uint8_t channelCount {};
+  ImageColorspace colorspace {};
 
   switch (bytes[0]) {
     case 0: // No image data available
-      return;
-
-    case 1:   // Uncompressed color-mapped
-    case 2:   // Uncompressed true-color
-      m_colorspace = ImageColorspace::RGB;
-      m_channelCount = 3;
-      break;
-
-    case 3:   // Uncompressed gray
-      m_colorspace = ImageColorspace::GRAY;
-      m_channelCount = 1;
-      break;
+      throw std::runtime_error("Error: Invalid TGA image, no data available");
 
     case 9:   // RLE color-mapped
     case 10:  // RLE true-color
-      m_colorspace = ImageColorspace::RGB;
-      m_channelCount = 3;
       runLengthEncoding = true;
+      [[fallthrough]];
+    case 1:   // Uncompressed color-mapped
+    case 2:   // Uncompressed true-color
+      channelCount = 3;
+      colorspace = ImageColorspace::RGB;
       break;
 
     case 11:  // RLE gray
-      m_colorspace = ImageColorspace::GRAY;
-      m_channelCount = 1;
       runLengthEncoding = true;
+      [[fallthrough]];
+    case 3:   // Uncompressed gray
+      channelCount = 1;
+      colorspace = ImageColorspace::GRAY;
       break;
 
     default:
@@ -73,61 +78,56 @@ void Image::readTga(std::ifstream& file, bool flipVertically) {
 
   // X- & Y-origin (2 bytes each) - TODO: handle origins
   // It is expected to have 0 for both origins
-  uint16_t xOrigin = 0;
+  uint16_t xOrigin {};
   file.read(reinterpret_cast<char*>(&xOrigin), 2);
 
-  uint16_t yOrigin = 0;
+  uint16_t yOrigin {};
   file.read(reinterpret_cast<char*>(&yOrigin), 2);
 
   // Width & height (2 bytes each)
-  uint16_t width;
+  uint16_t width {};
   file.read(reinterpret_cast<char*>(&width), 2);
-  m_width = width;
 
-  uint16_t height;
+  uint16_t height {};
   file.read(reinterpret_cast<char*>(&height), 2);
-  m_height = height;
 
   // Bit depth (1 byte)
   file.read(reinterpret_cast<char*>(bytes.data()), 1);
-  m_bitDepth = bytes[0] / m_channelCount;
+  [[maybe_unused]] const uint8_t bitDepth = bytes[0] / channelCount;
 
   // Image descriptor (1 byte) - TODO: handle image descriptor
   // Bits 3-0 give the alpha channel depth, bits 5-4 give direction
   file.read(reinterpret_cast<char*>(bytes.data()), 1);
 
-  auto imgData = ImageDataB::create(m_width * m_height * m_channelCount);
+  Image image(width, height, colorspace, ImageDataType::BYTE);
+  auto* imgData = static_cast<uint8_t*>(image.getDataPtr());
 
   if (!runLengthEncoding) {
-    std::vector<uint8_t> values(imgData->data.size());
+    std::vector<uint8_t> values(width * height * channelCount);
     file.read(reinterpret_cast<char*>(values.data()), static_cast<std::streamsize>(values.size()));
 
-    if (m_channelCount == 3) { // 3 channels, RGB
-      for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex) {
-        const std::size_t finalHeightIndex = (flipVertically ? heightIndex : m_height - 1 - heightIndex);
+    if (channelCount == 3) { // 3 channels, RGB
+      for (std::size_t heightIndex = 0; heightIndex < height; ++heightIndex) {
+        const std::size_t finalHeightIndex = (flipVertically ? heightIndex : height - 1 - heightIndex);
 
-        for (std::size_t widthIndex = 0; widthIndex < m_width; ++widthIndex) {
-          const std::size_t inPixelIndex = (heightIndex * m_width + widthIndex) * m_channelCount;
-          const std::size_t outPixelIndex = (finalHeightIndex * m_width + widthIndex) * m_channelCount;
+        for (std::size_t widthIndex = 0; widthIndex < width; ++widthIndex) {
+          const std::size_t inPixelIndex = (heightIndex * width + widthIndex) * channelCount;
+          const std::size_t outPixelIndex = (finalHeightIndex * width + widthIndex) * channelCount;
 
           // Values are laid out as BGR, they need to be reordered to RGB
-          imgData->data[outPixelIndex + 2] = values[inPixelIndex];
-          imgData->data[outPixelIndex + 1] = values[inPixelIndex + 1];
-          imgData->data[outPixelIndex]     = values[inPixelIndex + 2];
+          imgData[outPixelIndex + 2] = values[inPixelIndex];
+          imgData[outPixelIndex + 1] = values[inPixelIndex + 1];
+          imgData[outPixelIndex]     = values[inPixelIndex + 2];
         }
       }
     } else { // 1 channel, grayscale
-      std::move(values.begin(), values.end(), imgData->data.begin());
+      std::move(values.begin(), values.end(), imgData);
     }
   } else {
-    throw std::runtime_error("Error: RLE on TGA images not yet handled");
+    throw std::runtime_error("Error: RLE on TGA images is not handled yet");
   }
 
-  m_data = std::move(imgData);
+  return image;
 }
 
-/*void Image::saveTga(std::ofstream& file) const {
-
-}*/
-
-} // namespace Raz
+} // namespace Raz::TgaFormat

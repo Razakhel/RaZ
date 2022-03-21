@@ -42,8 +42,6 @@ Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{
       m_channelCount = 4;
       break;
   }
-
-  m_bitDepth = 8; // TODO: the bit depth should most likely differ if using a floating-point data type
 }
 
 Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace)
@@ -65,8 +63,7 @@ Image::Image(const Image& image) : m_width{ image.m_width },
                                    m_height{ image.m_height },
                                    m_colorspace{ image.m_colorspace },
                                    m_dataType{ image.m_dataType },
-                                   m_channelCount{ image.m_channelCount },
-                                   m_bitDepth{ image.m_bitDepth } {
+                                   m_channelCount{ image.m_channelCount } {
   if (image.m_data == nullptr)
     return;
 
@@ -81,50 +78,12 @@ Image::Image(const Image& image) : m_width{ image.m_width },
   }
 }
 
-void Image::read(const FilePath& filePath, bool flipVertically) {
-  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
-
-  if (!file)
-    throw std::invalid_argument("Error: Couldn't open the image file '" + filePath + "'");
-
-  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
-
-  if (format == "png")
-    readPng(file, flipVertically);
-  else if (format == "tga")
-    readTga(file, flipVertically);
-  else
-    throw std::invalid_argument("Error: '" + format + "' image format is not supported");
-}
-
-void Image::save(const FilePath& filePath, bool flipVertically) const {
-  if (isEmpty()) {
-    Logger::error("[Image] Cannot save empty image to '" + filePath + "'.");
-    return;
-  }
-
-  std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
-
-  if (!file)
-    throw std::invalid_argument("Error: Unable to create an image file as '" + filePath + "'; path to file must exist");
-
-  const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
-
-  if (format == "png")
-    savePng(file, flipVertically);
-  /*else if (format == "tga")
-    saveTga(file, flipVertically);*/
-  else
-    throw std::invalid_argument("Error: '" + format + "' image format is not supported");
-}
-
 Image& Image::operator=(const Image& image) {
   m_width        = image.m_width;
   m_height       = image.m_height;
   m_colorspace   = image.m_colorspace;
   m_dataType     = image.m_dataType;
   m_channelCount = image.m_channelCount;
-  m_bitDepth     = image.m_bitDepth;
 
   if (image.m_data) {
     switch (image.m_dataType) {

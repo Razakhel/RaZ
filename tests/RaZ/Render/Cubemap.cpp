@@ -1,5 +1,6 @@
 #include "Catch.hpp"
 
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Image.hpp"
@@ -43,18 +44,18 @@ TEST_CASE("Cubemap move") {
 TEST_CASE("Cubemap textures") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::Image refImgPosX(RAZ_TESTS_ROOT + "assets/textures/₀₀₀₀.png"s);
-  const Raz::Image refImgNegX(RAZ_TESTS_ROOT + "assets/textures/₁₀₀₁.png"s);
+  const Raz::Image refImgPosX = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/₀₀₀₀.png");
+  const Raz::Image refImgNegX = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/₁₀₀₁.png");
 
-  const Raz::Image refImgPosY(RAZ_TESTS_ROOT + "assets/textures/₁₁₁₁.png"s);
-  const Raz::Image refImgNegY(RAZ_TESTS_ROOT + "assets/textures/ŔŖȒȐ.png"s);
+  const Raz::Image refImgPosY = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/₁₁₁₁.png");
+  const Raz::Image refImgNegY = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png");
 
-  const Raz::Image refImgPosZ(RAZ_TESTS_ROOT + "assets/textures/BƁḂɃ.png"s);
-  const Raz::Image refImgNegZ(RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s);
+  const Raz::Image refImgPosZ = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png");
+  const Raz::Image refImgNegZ = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
 
-  Raz::Cubemap cubemap(RAZ_TESTS_ROOT + "assets/textures/₀₀₀₀.png"s, RAZ_TESTS_ROOT + "assets/textures/₁₀₀₁.png"s,
-                       RAZ_TESTS_ROOT + "assets/textures/₁₁₁₁.png"s, RAZ_TESTS_ROOT + "assets/textures/ŔŖȒȐ.png"s,
-                       RAZ_TESTS_ROOT + "assets/textures/BƁḂɃ.png"s, RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s);
+  Raz::Cubemap cubemap(RAZ_TESTS_ROOT "assets/textures/₀₀₀₀.png", RAZ_TESTS_ROOT "assets/textures/₁₀₀₁.png",
+                       RAZ_TESTS_ROOT "assets/textures/₁₁₁₁.png", RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png",
+                       RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png", RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES

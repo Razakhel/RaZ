@@ -1,5 +1,6 @@
 #include "Catch.hpp"
 
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
@@ -28,9 +29,9 @@ TEST_CASE("Texture dimensions creation") {
 TEST_CASE("Texture move") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::Image refImg(RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s);
+  const Raz::Image refImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
 
-  Raz::Texture texture(RAZ_TESTS_ROOT + "assets/textures/ŔĜBŖĀ.png"s, 42);
+  Raz::Texture texture(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png"), 42);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   const unsigned int textureIndex = texture.getIndex();

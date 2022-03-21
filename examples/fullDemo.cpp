@@ -25,7 +25,7 @@ int main() {
                                        RAZ_ROOT + "assets/skyboxes/clouds_front.png"s, RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
 
   Raz::Window& window = renderSystem.getWindow();
-  window.setIcon(RAZ_ROOT + "assets/icons/RaZ_logo_128.png"s);
+  window.setIcon(Raz::ImageFormat::load(RAZ_ROOT "assets/icons/RaZ_logo_128.png"));
 
 #if !defined(USE_OPENGL_ES)
   // Allow wireframe toggling

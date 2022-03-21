@@ -80,11 +80,6 @@ void Texture::load(Image image, bool createMipmaps) {
   load(createMipmaps);
 }
 
-void Texture::load(const FilePath& filePath, bool flipVertically, bool createMipmaps) {
-  m_image.read(filePath, flipVertically);
-  load(createMipmaps);
-}
-
 void Texture::activate() const {
   assert("Error: The texture trying to be activated has an invalid binding index." && m_bindingIndex != std::numeric_limits<int>::max());
 

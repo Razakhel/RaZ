@@ -45,8 +45,6 @@ public:
   Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace);
   Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, ImageDataType dataType);
   Texture(Image image, int bindingIndex, bool createMipmaps = true) : Texture(bindingIndex) { load(std::move(image), createMipmaps); }
-  explicit Texture(const FilePath& filePath, int bindingIndex, bool flipVertically = false, bool createMipmaps = true)
-    : Texture(bindingIndex) { load(filePath, flipVertically, createMipmaps); }
   Texture(const Texture&) = delete;
   Texture(Texture&& texture) noexcept;
 
@@ -63,15 +61,6 @@ public:
   /// \param image Image to be set as a texture.
   /// \param createMipmaps True to generate texture mipmaps, false otherwise.
   void load(Image image, bool createMipmaps = true);
-  /// Reads the texture in memory & loads it onto the graphics card.
-  /// \param filePath Path to the texture to load.
-  /// \param flipVertically Flip vertically the texture when loading.
-  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
-  void load(const FilePath& filePath, bool flipVertically = false, bool createMipmaps = true);
-  /// Saves the texture on disk.
-  /// \param filePath Path to where to save the texture.
-  /// \param flipVertically Flip vertically the texture when saving.
-  void save(const FilePath& filePath, bool flipVertically = false) const { m_image.save(filePath, flipVertically); }
   /// Sets active the current texture.
   void activate() const;
   /// Binds the current texture.

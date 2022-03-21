@@ -1,10 +1,11 @@
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/Renderer.hpp"
 
 namespace Raz {
 
 void Material::loadBaseColorMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_baseColorMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_baseColorMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 MaterialCookTorrancePtr Material::recoverMaterial(MaterialPreset preset, float roughnessFactor) {
@@ -36,23 +37,23 @@ void MaterialBlinnPhong::loadDiffuseMap(const FilePath& filePath, int bindingInd
 }
 
 void MaterialBlinnPhong::loadAmbientMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_ambientMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_ambientMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialBlinnPhong::loadSpecularMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_specularMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_specularMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialBlinnPhong::loadEmissiveMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_emissiveMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_emissiveMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialBlinnPhong::loadTransparencyMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_transparencyMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_transparencyMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialBlinnPhong::loadBumpMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_bumpMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_bumpMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialBlinnPhong::initTextures(const RenderShaderProgram& program) const {
@@ -114,19 +115,19 @@ void MaterialCookTorrance::loadAlbedoMap(const FilePath& filePath, int bindingIn
 }
 
 void MaterialCookTorrance::loadNormalMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_normalMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_normalMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialCookTorrance::loadMetallicMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_metallicMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_metallicMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialCookTorrance::loadRoughnessMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_roughnessMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_roughnessMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialCookTorrance::loadAmbientOcclusionMap(const FilePath& filePath, int bindingIndex, bool flipVertically) {
-  m_ambientOcclusionMap = Texture::create(filePath, bindingIndex, flipVertically);
+  m_ambientOcclusionMap = Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex);
 }
 
 void MaterialCookTorrance::initTextures(const RenderShaderProgram& program) const {

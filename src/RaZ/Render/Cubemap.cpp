@@ -1,3 +1,4 @@
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
@@ -103,65 +104,21 @@ void Cubemap::load(const FilePath& rightTexturePath, const FilePath& leftTexture
                    const FilePath& frontTexturePath, const FilePath& backTexturePath) const {
   bind();
 
-  Image img(rightTexturePath);
-  Renderer::sendImageData2D(TextureType::CUBEMAP_POS_X,
-                            0,
-                            static_cast<TextureInternalFormat>(img.getColorspace()),
-                            img.getWidth(),
-                            img.getHeight(),
-                            static_cast<TextureFormat>(img.getColorspace()),
-                            TextureDataType::UBYTE,
-                            img.getDataPtr());
+  constexpr auto mapImage = [] (const Image& img, TextureType type) {
+    Renderer::sendImageData2D(type,
+                              0,
+                              static_cast<TextureInternalFormat>(img.getColorspace()),
+                              img.getWidth(), img.getHeight(),
+                              static_cast<TextureFormat>(img.getColorspace()), TextureDataType::UBYTE,
+                              img.getDataPtr());
+  };
 
-  img.read(leftTexturePath);
-  Renderer::sendImageData2D(TextureType::CUBEMAP_NEG_X,
-                            0,
-                            static_cast<TextureInternalFormat>(img.getColorspace()),
-                            img.getWidth(),
-                            img.getHeight(),
-                            static_cast<TextureFormat>(img.getColorspace()),
-                            TextureDataType::UBYTE,
-                            img.getDataPtr());
-
-  img.read(topTexturePath);
-  Renderer::sendImageData2D(TextureType::CUBEMAP_POS_Y,
-                            0,
-                            static_cast<TextureInternalFormat>(img.getColorspace()),
-                            img.getWidth(),
-                            img.getHeight(),
-                            static_cast<TextureFormat>(img.getColorspace()),
-                            TextureDataType::UBYTE,
-                            img.getDataPtr());
-
-  img.read(bottomTexturePath);
-  Renderer::sendImageData2D(TextureType::CUBEMAP_NEG_Y,
-                            0,
-                            static_cast<TextureInternalFormat>(img.getColorspace()),
-                            img.getWidth(),
-                            img.getHeight(),
-                            static_cast<TextureFormat>(img.getColorspace()),
-                            TextureDataType::UBYTE,
-                            img.getDataPtr());
-
-  img.read(frontTexturePath);
-  Renderer::sendImageData2D(TextureType::CUBEMAP_POS_Z,
-                            0,
-                            static_cast<TextureInternalFormat>(img.getColorspace()),
-                            img.getWidth(),
-                            img.getHeight(),
-                            static_cast<TextureFormat>(img.getColorspace()),
-                            TextureDataType::UBYTE,
-                            img.getDataPtr());
-
-  img.read(backTexturePath);
-  Renderer::sendImageData2D(TextureType::CUBEMAP_NEG_Z,
-                            0,
-                            static_cast<TextureInternalFormat>(img.getColorspace()),
-                            img.getWidth(),
-                            img.getHeight(),
-                            static_cast<TextureFormat>(img.getColorspace()),
-                            TextureDataType::UBYTE,
-                            img.getDataPtr());
+  mapImage(ImageFormat::load(rightTexturePath), TextureType::CUBEMAP_POS_X);
+  mapImage(ImageFormat::load(leftTexturePath), TextureType::CUBEMAP_NEG_X);
+  mapImage(ImageFormat::load(topTexturePath), TextureType::CUBEMAP_POS_Y);
+  mapImage(ImageFormat::load(bottomTexturePath), TextureType::CUBEMAP_NEG_Y);
+  mapImage(ImageFormat::load(frontTexturePath), TextureType::CUBEMAP_POS_Z);
+  mapImage(ImageFormat::load(backTexturePath), TextureType::CUBEMAP_NEG_Z);
 
   Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR);
   Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);

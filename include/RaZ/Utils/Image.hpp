@@ -135,7 +135,6 @@ public:
   Image(ImageColorspace colorspace, ImageDataType dataType);
   Image(unsigned int width, unsigned int height, ImageColorspace colorspace);
   Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
-  explicit Image(const FilePath& filePath, bool flipVertically = false) { read(filePath, flipVertically); }
   Image(const Image& image);
   Image(Image&&) noexcept = default;
 
@@ -152,14 +151,6 @@ public:
   /// Checks if the image doesn't contain data.
   /// \return True if the image has no data, false otherwise.
   bool isEmpty() const { return (!m_data || m_data->isEmpty()); }
-  /// Reads the image to memory.
-  /// \param filePath Path to the image to read.
-  /// \param flipVertically Flip vertically the image when reading.
-  void read(const FilePath& filePath, bool flipVertically = false);
-  /// Saves the image on disk.
-  /// \param filePath Path to where to save the image.
-  /// \param flipVertically Flip vertically the image when saving.
-  void save(const FilePath& filePath, bool flipVertically = false) const;
 
   Image& operator=(const Image& image);
   Image& operator=(Image&&) noexcept = default;
@@ -175,31 +166,11 @@ public:
   bool operator!=(const Image& img) const { return !(*this == img); }
 
 private:
-  /// Reads a PNG image to memory.
-  /// \param file File to read.
-  /// \param flipVertically Flip vertically the image when reading.
-  void readPng(std::ifstream& file, bool flipVertically);
-  /// Saves the image on disk in PNG format.
-  /// \param file File to save.
-  /// \param flipVertically Flip vertically the image when saving.
-  void savePng(std::ofstream& file, bool flipVertically) const;
-  /// Reads a TGA image to memory.
-  /// \param file File to read.
-  /// \param flipVertically Flip vertically the image when reading.
-  void readTga(std::ifstream& file, bool flipVertically);
-  /*
-  /// Saves the image on disk in TGA format.
-  /// \param file File to save.
-  /// \param flipVertically Flip vertically the image when saving.
-  void saveTga(std::ofstream& file, bool flipVertically) const;
-  */
-
   unsigned int m_width {};
   unsigned int m_height {};
   ImageColorspace m_colorspace {};
   ImageDataType m_dataType {};
   uint8_t m_channelCount {};
-  uint8_t m_bitDepth {};
 
   ImageDataPtr m_data {};
 };

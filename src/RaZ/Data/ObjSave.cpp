@@ -1,3 +1,4 @@
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/ObjFormat.hpp"
 #include "RaZ/Render/Material.hpp"
@@ -36,35 +37,35 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
         const auto albedoMapPath = materialName + "_albedo.png";
 
         mtlFile << "\tmap_Kd " << albedoMapPath << '\n';
-        matCT->getAlbedoMap()->save(albedoMapPath, true);
+        ImageFormat::save(albedoMapPath, matCT->getAlbedoMap()->getImage(), true);
       }
 
       if (matCT->getNormalMap() && !matCT->getNormalMap()->getImage().isEmpty()) {
         const auto normalMapPath = materialName + "_normal.png";
 
         mtlFile << "\tnorm " << normalMapPath << '\n';
-        matCT->getNormalMap()->save(normalMapPath, true);
+        ImageFormat::save(normalMapPath, matCT->getNormalMap()->getImage(), true);
       }
 
       if (matCT->getMetallicMap() && !matCT->getMetallicMap()->getImage().isEmpty()) {
         const auto metallicMapPath = materialName + "_metallic.png";
 
         mtlFile << "\tmap_Pm " << metallicMapPath << '\n';
-        matCT->getMetallicMap()->save(metallicMapPath, true);
+        ImageFormat::save(metallicMapPath, matCT->getMetallicMap()->getImage(), true);
       }
 
       if (matCT->getRoughnessMap() && !matCT->getRoughnessMap()->getImage().isEmpty()) {
         const auto roughnessMapPath = materialName + "_roughness.png";
 
         mtlFile << "\tmap_Pr " << roughnessMapPath << '\n';
-        matCT->getRoughnessMap()->save(roughnessMapPath, true);
+        ImageFormat::save(roughnessMapPath, matCT->getRoughnessMap()->getImage(), true);
       }
 
       if (matCT->getAmbientOcclusionMap() && !matCT->getAmbientOcclusionMap()->getImage().isEmpty()) {
         const auto ambOccMapPath = materialName + "_ambient_occlusion.png";
 
         mtlFile << "\tmap_Ka " << ambOccMapPath << '\n';
-        matCT->getAmbientOcclusionMap()->save(ambOccMapPath, true);
+        ImageFormat::save(ambOccMapPath, matCT->getAmbientOcclusionMap()->getImage(), true);
       }
     } else {
       const auto* matBP = static_cast<MaterialBlinnPhong*>(material.get());
@@ -78,42 +79,42 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
         const auto diffuseMapPath = materialName + "_diffuse.png";
 
         mtlFile << "\tmap_Kd " << diffuseMapPath << '\n';
-        matBP->getDiffuseMap()->save(diffuseMapPath, true);
+        ImageFormat::save(diffuseMapPath, matBP->getDiffuseMap()->getImage(), true);
       }
 
       if (matBP->getAmbientMap() && !matBP->getAmbientMap()->getImage().isEmpty()) {
         const auto ambientMapPath = materialName + "_ambient.png";
 
         mtlFile << "\tmap_Ka " << ambientMapPath << '\n';
-        matBP->getAmbientMap()->save(ambientMapPath, true);
+        ImageFormat::save(ambientMapPath, matBP->getAmbientMap()->getImage(), true);
       }
 
       if (matBP->getSpecularMap() && !matBP->getSpecularMap()->getImage().isEmpty()) {
         const auto specularMapPath = materialName + "_specular.png";
 
         mtlFile << "\tmap_Ks " << specularMapPath << '\n';
-        matBP->getSpecularMap()->save(specularMapPath, true);
+        ImageFormat::save(specularMapPath, matBP->getSpecularMap()->getImage(), true);
       }
 
       if (matBP->getEmissiveMap() && !matBP->getEmissiveMap()->getImage().isEmpty()) {
         const auto emissiveMapPath = materialName + "_emissive.png";
 
         mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
-        matBP->getEmissiveMap()->save(emissiveMapPath, true);
+        ImageFormat::save(emissiveMapPath, matBP->getEmissiveMap()->getImage(), true);
       }
 
       if (matBP->getTransparencyMap() && !matBP->getTransparencyMap()->getImage().isEmpty()) {
         const auto transparencyMapPath = materialName + "_transparency.png";
 
         mtlFile << "\tmap_d " << transparencyMapPath << '\n';
-        matBP->getTransparencyMap()->save(transparencyMapPath, true);
+        ImageFormat::save(transparencyMapPath, matBP->getTransparencyMap()->getImage(), true);
       }
 
       if (matBP->getBumpMap() && !matBP->getBumpMap()->getImage().isEmpty()) {
-        const auto ambOccMapPath = materialName + "_bump.png";
+        const auto bumpMapPath = materialName + "_bump.png";
 
-        mtlFile << "\tmap_bump " << ambOccMapPath << '\n';
-        matBP->getBumpMap()->save(ambOccMapPath, true);
+        mtlFile << "\tmap_bump " << bumpMapPath << '\n';
+        ImageFormat::save(bumpMapPath, matBP->getBumpMap()->getImage(), true);
       }
     }
   }

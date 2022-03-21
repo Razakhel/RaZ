@@ -1,5 +1,6 @@
-#include "RaZ/Data/ObjFormat.hpp"
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Data/ObjFormat.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -30,7 +31,7 @@ constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, co
 
 inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath, int bindingIndex = 0) {
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-  return Texture::create(mtlFilePath.recoverPathToFile() + textureFilePath, bindingIndex, true);
+  return Texture::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), bindingIndex);
 }
 
 inline void loadMtl(const FilePath& mtlFilePath,

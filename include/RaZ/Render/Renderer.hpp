@@ -311,7 +311,7 @@ enum class ImageAccess : unsigned int {
   READ_WRITE = 35002 /* GL_READ_WRITE */  ///< Both read & write image access.
 };
 
-enum class ImageFormat : unsigned int {
+enum class ImageInternalFormat : unsigned int {
 #if !defined(USE_OPENGL_ES)
   R8          = static_cast<unsigned int>(TextureInternalFormat::R8),          ///<
   RG8         = static_cast<unsigned int>(TextureInternalFormat::RG8),         ///<
@@ -768,7 +768,7 @@ public:
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
   static void bindImageTexture(unsigned int imageUnitIndex, unsigned int textureIndex, int textureLevel,
                                bool isLayered, int layer,
-                               ImageAccess imgAccess, ImageFormat imgFormat);
+                               ImageAccess imgAccess, ImageInternalFormat imgFormat);
   static void activateTexture(unsigned int index);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.

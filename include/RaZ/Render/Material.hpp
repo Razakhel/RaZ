@@ -61,7 +61,6 @@ public:
 protected:
   Material() = default;
   explicit Material(TexturePtr baseColorMap) : m_baseColorMap{ std::move(baseColorMap) } {}
-  explicit Material(const FilePath& filePath, bool flipVertically = true) : Material(Texture::create(filePath, flipVertically)) {}
   Material(const Material&) noexcept = default;
 
   Vec3f m_baseColor = Vec3f(1.f);
@@ -73,8 +72,6 @@ class MaterialBlinnPhong final : public Material {
 public:
   MaterialBlinnPhong() = default;
   explicit MaterialBlinnPhong(TexturePtr diffuseMap) : Material(std::move(diffuseMap)) {}
-  explicit MaterialBlinnPhong(const FilePath& filePath, int bindingIndex, bool flipVertically = true)
-    : MaterialBlinnPhong(Texture::create(filePath, bindingIndex, flipVertically)) {}
   explicit MaterialBlinnPhong(const Vec3f& baseColor,
                               const Vec3f& ambient  = Vec3f(1.f),
                               const Vec3f& specular = Vec3f(1.f),
@@ -143,8 +140,6 @@ class MaterialCookTorrance final : public Material {
 public:
   MaterialCookTorrance() = default;
   explicit MaterialCookTorrance(TexturePtr albedoMap) : Material(std::move(albedoMap)) {}
-  explicit MaterialCookTorrance(const FilePath& filePath, int bindingIndex, bool flipVertically = true)
-    : MaterialCookTorrance(Texture::create(filePath, bindingIndex, flipVertically)) {}
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor)
     : m_metallicFactor{ metallicFactor }, m_roughnessFactor{ roughnessFactor } { setBaseColor(baseColor); }
 

@@ -1,3 +1,4 @@
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
@@ -141,7 +142,7 @@ void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format) c
   Image img(m_sceneWidth, m_sceneHeight, colorspace);
   Renderer::recoverFrame(m_sceneWidth, m_sceneHeight, format, dataType, img.getDataPtr());
 
-  img.save(filePath, true);
+  ImageFormat::save(filePath, img, true);
 }
 
 void RenderSystem::destroy() {

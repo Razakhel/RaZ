@@ -44,7 +44,7 @@ int main() {
     /////////////////////
 
     Raz::Texture texture(textureSize, textureSize, 0, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
-    Raz::Renderer::bindImageTexture(0, texture.getIndex(), 0, false, 0, Raz::ImageAccess::WRITE, Raz::ImageFormat::R16F);
+    Raz::Renderer::bindImageTexture(0, texture.getIndex(), 0, false, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
     Raz::ComputeShaderProgram compProgram(Raz::ComputeShader(RAZ_ROOT + "shaders/perlin_noise.comp"s));
     compProgram.execute(textureSize, textureSize);

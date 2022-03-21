@@ -404,7 +404,7 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
 
 void Renderer::bindImageTexture(unsigned int imageUnitIndex, unsigned int textureIndex, int textureLevel,
                                 bool isLayered, int layer,
-                                ImageAccess imgAccess, ImageFormat imgFormat) {
+                                ImageAccess imgAccess, ImageInternalFormat imgFormat) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
   assert("Error: Binding an image texture requires OpenGL 4.2+." && checkVersion(4, 2));
