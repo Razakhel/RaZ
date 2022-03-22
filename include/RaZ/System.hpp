@@ -4,7 +4,7 @@
 #define RAZ_SYSTEM_HPP
 
 #include "RaZ/Entity.hpp"
-#include "RaZ/Utils/Bitset.hpp"
+#include "RaZ/Data/Bitset.hpp"
 
 #include <vector>
 

@@ -1,6 +1,6 @@
 #include "Catch.hpp"
 
-#include "RaZ/Utils/Bitset.hpp"
+#include "RaZ/Data/Bitset.hpp"
 
 #include <sstream>
 

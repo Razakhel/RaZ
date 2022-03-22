@@ -1,4 +1,4 @@
-#include "RaZ/Utils/Bitset.hpp"
+#include "RaZ/Data/Bitset.hpp"
 
 #include <iostream>
 
