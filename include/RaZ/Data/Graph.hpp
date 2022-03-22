@@ -89,6 +89,6 @@ protected:
 
 } // namespace Raz
 
-#include "RaZ/Utils/Graph.inl"
+#include "RaZ/Data/Graph.inl"
 
 #endif // RAZ_GRAPH_HPP

@@ -1,6 +1,6 @@
 #include "Catch.hpp"
 
-#include "RaZ/Utils/Graph.hpp"
+#include "RaZ/Data/Graph.hpp"
 
 namespace {
 

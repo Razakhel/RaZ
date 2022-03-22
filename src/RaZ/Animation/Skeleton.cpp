@@ -4,9 +4,9 @@ namespace Raz {
 
 Mat4f SkeletonJoint::computeTransformMatrix() const {
   Mat4f transformMat = m_rotation.computeMatrix();
-  transformMat[12]   = m_translation[0];
-  transformMat[13]   = m_translation[1];
-  transformMat[14]   = m_translation[2];
+  transformMat[12]   = m_translation.x();
+  transformMat[13]   = m_translation.y();
+  transformMat[14]   = m_translation.z();
 
   return transformMat;
 }

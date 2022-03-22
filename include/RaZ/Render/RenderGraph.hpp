@@ -3,9 +3,9 @@
 #ifndef RAZ_RENDERGRAPH_HPP
 #define RAZ_RENDERGRAPH_HPP
 
+#include "RaZ/Data/Graph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Render/Texture.hpp"
-#include "RaZ/Utils/Graph.hpp"
 
 namespace Raz {
 

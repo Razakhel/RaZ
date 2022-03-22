@@ -3,9 +3,9 @@
 #ifndef RAZ_SKELETON_HPP
 #define RAZ_SKELETON_HPP
 
+#include "RaZ/Data/Graph.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Quaternion.hpp"
-#include "RaZ/Utils/Graph.hpp"
 
 namespace Raz {
 

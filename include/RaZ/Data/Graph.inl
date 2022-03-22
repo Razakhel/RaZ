@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <cassert>
+
 namespace Raz {
 
 template <typename T>

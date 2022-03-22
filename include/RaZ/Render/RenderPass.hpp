@@ -3,9 +3,9 @@
 #ifndef RAZ_RENDERPASS_HPP
 #define RAZ_RENDERPASS_HPP
 
+#include "RaZ/Data/Graph.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
-#include "RaZ/Utils/Graph.hpp"
 
 namespace Raz {
 
