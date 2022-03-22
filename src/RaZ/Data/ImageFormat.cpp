@@ -1,8 +1,8 @@
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/PngFormat.hpp"
 #include "RaZ/Data/TgaFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
-#include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
 namespace Raz::ImageFormat {

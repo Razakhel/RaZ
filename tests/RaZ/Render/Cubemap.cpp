@@ -1,9 +1,9 @@
 #include "Catch.hpp"
 
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Utils/FilePath.hpp"
-#include "RaZ/Utils/Image.hpp"
 
 TEST_CASE("Cubemap move") {
   Raz::Cubemap cubemap;

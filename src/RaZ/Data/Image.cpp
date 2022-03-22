@@ -1,5 +1,5 @@
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Utils/FilePath.hpp"
-#include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 

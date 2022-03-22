@@ -1,6 +1,6 @@
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/PngFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
-#include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <png.h>

@@ -1,8 +1,8 @@
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
-#include "RaZ/Utils/Image.hpp"
 
 namespace Raz {
 

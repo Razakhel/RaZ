@@ -3,8 +3,8 @@
 #ifndef RAZ_WINDOW_HPP
 #define RAZ_WINDOW_HPP
 
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Math/Vector.hpp"
-#include "RaZ/Utils/Image.hpp"
 #include "RaZ/Utils/Overlay.hpp"
 #include "RaZ/Utils/Input.hpp"
 

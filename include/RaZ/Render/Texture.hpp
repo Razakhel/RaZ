@@ -3,8 +3,8 @@
 #ifndef RAZ_TEXTURE_HPP
 #define RAZ_TEXTURE_HPP
 
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Math/Vector.hpp"
-#include "RaZ/Utils/Image.hpp"
 
 #include <memory>
 

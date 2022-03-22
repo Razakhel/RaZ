@@ -1,7 +1,7 @@
 #include "Catch.hpp"
 
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Utils/FilePath.hpp"
-#include "RaZ/Utils/Image.hpp"
 
 #include <numeric>
 
