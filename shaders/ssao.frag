@@ -1,5 +1,3 @@
-#version 330 core
-
 struct Buffers {
   sampler2D depth;
   sampler2D color;

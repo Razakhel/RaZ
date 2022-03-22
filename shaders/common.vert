@@ -1,5 +1,3 @@
-#version 330 core
-
 layout(location = 0) in vec3 vertPosition;
 layout(location = 1) in vec2 vertTexcoords;
 layout(location = 2) in vec3 vertNormal;
@@ -8,7 +6,7 @@ layout(location = 3) in vec3 vertTangent;
 uniform mat4 uniModelMatrix;
 uniform mat4 uniMvpMatrix;
 
-out MeshInfo {
+out struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;

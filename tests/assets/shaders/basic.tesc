@@ -1,5 +1,3 @@
-#version 400 core
-
 layout(vertices = 3) out;
 
 void main() {

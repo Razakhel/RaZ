@@ -6,8 +6,6 @@
 namespace {
 
 constexpr std::string_view vertSource = R"(
-  #version 330 core
-
   uniform int uniUnused;
 
   struct Test {
@@ -24,8 +22,6 @@ constexpr std::string_view vertSource = R"(
 )";
 
 constexpr std::string_view tessCtrlSource = R"(
-  #version 400 core
-
   uniform int uniInt[2];
   uniform bool uniBool;
 
@@ -45,8 +41,6 @@ constexpr std::string_view tessCtrlSource = R"(
 )";
 
 constexpr std::string_view tessEvalSource = R"(
-  #version 400 core
-
   layout(quads, equal_spacing, ccw) in;
 
   uniform uint uniUint[3];
@@ -58,8 +52,6 @@ constexpr std::string_view tessEvalSource = R"(
 )";
 
 constexpr std::string_view fragSource = R"(
-  #version 330 core
-
   uniform vec3 uniVec3[2];
   uniform sampler2D uniSampler2D;
 
@@ -71,8 +63,6 @@ constexpr std::string_view fragSource = R"(
 )";
 
 constexpr std::string_view compSource = R"(
-  #version 430 core
-
   layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
   uniform int uniUnused;

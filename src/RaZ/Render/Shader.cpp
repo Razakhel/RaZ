@@ -1,12 +1,10 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
-#include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
+#include "RaZ/Utils/StrUtils.hpp"
 
-#include <fstream>
 #include <limits>
-#include <sstream>
-#include <vector>
 
 namespace Raz {
 
@@ -28,18 +26,7 @@ void Shader::load() const {
 
   Logger::debug("[Shader] Loading (ID: " + std::to_string(m_index) + ", path: '" + m_path + "')...");
 
-  std::ifstream shaderSource(m_path, std::ios::in | std::ios::binary | std::ios::ate);
-
-  if (!shaderSource)
-    throw std::runtime_error("Error: Couldn't open the file '" + m_path + "'");
-
-  const auto fileSize = static_cast<std::size_t>(shaderSource.tellg());
-  shaderSource.seekg(0, std::ios::beg);
-
-  std::vector<char> bytes(fileSize);
-  shaderSource.read(bytes.data(), static_cast<std::streamsize>(fileSize));
-
-  Renderer::sendShaderSource(m_index, bytes.data(), static_cast<int>(fileSize));
+  loadSource(FileUtils::readFile(m_path));
 
   Logger::debug("[Shader] Loaded");
 }
@@ -56,7 +43,26 @@ bool Shader::isCompiled() const {
 
 void Shader::loadSource(const std::string& source) const {
   Logger::debug("[Shader] Loading source (ID: " + std::to_string(m_index) + ")...");
-  Renderer::sendShaderSource(m_index, source);
+
+  // Removing spaces in front so that we can directly check the header tags
+  std::string shaderSource = StrUtils::trimLeftCopy(source);
+
+  // If the #version tag is missing, add it with the current version
+  if (!StrUtils::startsWith(shaderSource, "#version")) {
+    std::string header = "#version " + std::to_string(Renderer::getMajorVersion()) + std::to_string(Renderer::getMinorVersion()) + '0';
+
+#if defined(USE_OPENGL_ES)
+    header += " es";
+
+    if (!StrUtils::startsWith(shaderSource, "precision"))
+      header += "\nprecision highp float;\nprecision highp int;";
+#endif
+
+    shaderSource = header + '\n' + shaderSource;
+  }
+
+  Renderer::sendShaderSource(m_index, shaderSource);
+
   Logger::debug("[Shader] Loaded source");
 }
 

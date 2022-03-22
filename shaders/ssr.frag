@@ -1,5 +1,3 @@
-#version 330 core
-
 struct Buffers {
   sampler2D depth;
   sampler2D color;
@@ -94,5 +92,5 @@ void main() {
     reflectColor += recoverReflectColor(vec3(reflectDir.xy, -reflectDir.z) * max(0.1, -viewPos.z), viewPos.xyz) * reflectFactor;
   }
 
-  fragColor = vec4(reflectColor.xyz, 1.0);
+  fragColor = vec4(reflectColor, 1.0);
 }

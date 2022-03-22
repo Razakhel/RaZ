@@ -1,5 +1,3 @@
-#version 330 core
-
 #define MAX_LIGHT_COUNT 10
 
 struct Light {
@@ -24,7 +22,7 @@ struct Material {
   sampler2D bumpMap;
 };
 
-in MeshInfo {
+in struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;

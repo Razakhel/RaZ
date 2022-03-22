@@ -17,10 +17,8 @@ TEST_CASE("FileUtils read file") {
   CHECK(fileContent == "НΣļlõ ωθяŁĐ!\n");
 
   fileContent = Raz::FileUtils::readFile(RAZ_TESTS_ROOT "assets/shaders/basic.tese");
-  CHECK(fileContent.size() == 105);
-  CHECK(fileContent == "#version 400 core\n"
-                       "\n"
-                       "layout(triangles, equal_spacing, ccw) in;\n"
+  CHECK(fileContent.size() == 86);
+  CHECK(fileContent == "layout(triangles, equal_spacing, ccw) in;\n"
                        "\n"
                        "void main() {\n"
                        "  gl_Position = vec4(0.0);\n"

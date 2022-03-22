@@ -3,6 +3,20 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
 
+namespace {
+
+inline void checkShader(const Raz::Shader& shader, const Raz::FilePath& path = {}) {
+  CHECK_FALSE(Raz::Renderer::hasErrors());
+  CHECK(shader.isValid());
+  CHECK(shader.getPath() == path);
+
+  shader.compile();
+  CHECK_FALSE(Raz::Renderer::hasErrors());
+  CHECK(shader.isCompiled());
+}
+
+} // namespace
+
 TEST_CASE("Shader validity") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
@@ -75,20 +89,14 @@ TEST_CASE("Vertex shader from source") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string vertSource = R"(
-    #version 330 core
-
     void main() {
       gl_Position = vec4(1.0);
     }
   )";
 
-  const Raz::VertexShader vertShader = Raz::VertexShader::loadFromSource(vertSource);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(vertShader.isValid());
-
-  vertShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(vertShader.isCompiled());
+  // The #version tag is automatically added if not present; if it is, nothing is changed to the source
+  checkShader(Raz::VertexShader::loadFromSource(vertSource));
+  checkShader(Raz::VertexShader::loadFromSource("#version 330\n" + vertSource));
 }
 
 TEST_CASE("Tessellation control shader from source") {
@@ -99,8 +107,6 @@ TEST_CASE("Tessellation control shader from source") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string tessCtrlSource = R"(
-    #version 400 core
-
     layout(vertices = 3) out;
 
     void main() {
@@ -114,13 +120,9 @@ TEST_CASE("Tessellation control shader from source") {
     }
   )";
 
-  const Raz::TessellationControlShader tessCtrlShader = Raz::TessellationControlShader::loadFromSource(tessCtrlSource);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessCtrlShader.isValid());
-
-  tessCtrlShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessCtrlShader.isCompiled());
+  // The #version tag is automatically added if not present; if it is, nothing is changed to the source
+  checkShader(Raz::TessellationControlShader::loadFromSource(tessCtrlSource));
+  checkShader(Raz::TessellationControlShader::loadFromSource("#version 400\n" + tessCtrlSource));
 }
 
 TEST_CASE("Tessellation evaluation shader from source") {
@@ -131,8 +133,6 @@ TEST_CASE("Tessellation evaluation shader from source") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string tessEvalSource = R"(
-    #version 400 core
-
     layout(triangles, equal_spacing, ccw) in;
 
     void main() {
@@ -140,21 +140,15 @@ TEST_CASE("Tessellation evaluation shader from source") {
     }
   )";
 
-  const Raz::TessellationEvaluationShader tessEvalShader = Raz::TessellationEvaluationShader::loadFromSource(tessEvalSource);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessEvalShader.isValid());
-
-  tessEvalShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessEvalShader.isCompiled());
+  // The #version tag is automatically added if not present; if it is, nothing is changed to the source
+  checkShader(Raz::TessellationEvaluationShader::loadFromSource(tessEvalSource));
+  checkShader(Raz::TessellationEvaluationShader::loadFromSource("#version 400\n" + tessEvalSource));
 }
 
 TEST_CASE("Fragment shader from source") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string fragSource = R"(
-    #version 330 core
-
     layout(location = 0) out vec4 fragColor;
 
     void main() {
@@ -162,13 +156,9 @@ TEST_CASE("Fragment shader from source") {
     }
   )";
 
-  const Raz::FragmentShader fragShader = Raz::FragmentShader::loadFromSource(fragSource);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(fragShader.isValid());
-
-  fragShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(fragShader.isCompiled());
+  // The #version tag is automatically added if not present; if it is, nothing is changed to the source
+  checkShader(Raz::FragmentShader::loadFromSource(fragSource));
+  checkShader(Raz::FragmentShader::loadFromSource("#version 330\n" + fragSource));
 }
 
 TEST_CASE("Compute shader from source") {
@@ -179,8 +169,6 @@ TEST_CASE("Compute shader from source") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string compSource = R"(
-    #version 430
-
     layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
     layout(rgba32f, binding = 0) uniform image2D uniOutput;
@@ -190,28 +178,18 @@ TEST_CASE("Compute shader from source") {
     }
   )";
 
-  const Raz::ComputeShader compShader = Raz::ComputeShader::loadFromSource(compSource);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(compShader.isValid());
-
-  compShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(compShader.isCompiled());
+  // The #version tag is automatically added if not present; if it is, nothing is changed to the source
+  checkShader(Raz::ComputeShader::loadFromSource(compSource));
+  checkShader(Raz::ComputeShader::loadFromSource("#version 430\n" + compSource));
 }
 
 TEST_CASE("Vertex shader imported") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const std::string vertShaderPath = RAZ_TESTS_ROOT + "../shaders/common.vert"s;
+  const Raz::FilePath vertShaderPath = RAZ_TESTS_ROOT "../shaders/common.vert";
 
   const Raz::VertexShader vertShader(vertShaderPath);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(vertShader.isValid());
-  CHECK(vertShader.getPath() == vertShaderPath);
-
-  vertShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(vertShader.isCompiled());
+  checkShader(vertShader, vertShaderPath);
 }
 
 TEST_CASE("Tessellation control shader imported") {
@@ -221,16 +199,10 @@ TEST_CASE("Tessellation control shader imported") {
 
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const std::string tessCtrlShaderPath = RAZ_TESTS_ROOT + "assets/shaders/basic.tesc"s;
+  const Raz::FilePath tessCtrlShaderPath = RAZ_TESTS_ROOT "assets/shaders/basic.tesc";
 
   const Raz::TessellationControlShader tessCtrlShader(tessCtrlShaderPath);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessCtrlShader.isValid());
-  CHECK(tessCtrlShader.getPath() == tessCtrlShaderPath);
-
-  tessCtrlShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessCtrlShader.isCompiled());
+  checkShader(tessCtrlShader, tessCtrlShaderPath);
 }
 
 TEST_CASE("Tessellation evaluation shader imported") {
@@ -240,31 +212,19 @@ TEST_CASE("Tessellation evaluation shader imported") {
 
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const std::string tessEvalShaderPath = RAZ_TESTS_ROOT + "assets/shaders/basic.tese"s;
+  const Raz::FilePath tessEvalShaderPath = RAZ_TESTS_ROOT "assets/shaders/basic.tese";
 
   const Raz::TessellationEvaluationShader tessEvalShader(tessEvalShaderPath);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessEvalShader.isValid());
-  CHECK(tessEvalShader.getPath() == tessEvalShaderPath);
-
-  tessEvalShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(tessEvalShader.isCompiled());
+  checkShader(tessEvalShader, tessEvalShaderPath);
 }
 
 TEST_CASE("Fragment shader imported") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const std::string fragShaderPath = RAZ_TESTS_ROOT + "../shaders/lambert.frag"s;
+  const Raz::FilePath fragShaderPath = RAZ_TESTS_ROOT "../shaders/lambert.frag";
 
   const Raz::FragmentShader fragShader(fragShaderPath);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(fragShader.isValid());
-  CHECK(fragShader.getPath() == fragShaderPath);
-
-  fragShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(fragShader.isCompiled());
+  checkShader(fragShader, fragShaderPath);
 }
 
 TEST_CASE("Compute shader imported") {
@@ -274,14 +234,8 @@ TEST_CASE("Compute shader imported") {
 
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const std::string compShaderPath = RAZ_TESTS_ROOT + "assets/shaders/basic.comp"s;
+  const Raz::FilePath compShaderPath = RAZ_TESTS_ROOT "assets/shaders/basic.comp";
 
   const Raz::ComputeShader compShader(compShaderPath);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(compShader.isValid());
-  CHECK(compShader.getPath() == compShaderPath);
-
-  compShader.compile();
-  CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(compShader.isCompiled());
+  checkShader(compShader, compShaderPath);
 }

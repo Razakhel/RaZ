@@ -44,10 +44,7 @@ Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
 }
 
 VertexShader Framebuffer::recoverVertexShader() {
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   static constexpr std::string_view vertSource = R"(
-    #version 330 core
-
     layout(location = 0) in vec2 vertPosition;
     layout(location = 1) in vec2 vertTexcoords;
 
@@ -59,22 +56,6 @@ VertexShader Framebuffer::recoverVertexShader() {
       gl_Position = vec4(vertPosition, 0.0, 1.0);
     }
   )";
-#else // Emscripten/OpenGL ES
-  // The version must be on the first line
-  static constexpr std::string_view vertSource = R"(#version 300 es
-
-    layout(location = 0) in vec2 vertPosition;
-    layout(location = 1) in vec2 vertTexcoords;
-
-    out vec2 fragTexcoords;
-
-    void main() {
-      fragTexcoords = vertTexcoords;
-
-      gl_Position = vec4(vertPosition, 0.0, 1.0);
-    }
-  )";
-#endif
 
   return VertexShader::loadFromSource(vertSource);
 }

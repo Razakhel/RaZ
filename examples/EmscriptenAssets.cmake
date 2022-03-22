@@ -23,7 +23,7 @@ target_link_options(
 
     PRIVATE
 
-    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
@@ -60,7 +60,7 @@ target_link_options(
 
     PRIVATE
 
-    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
@@ -88,7 +88,7 @@ target_link_options(
 
     PRIVATE
 
-    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
@@ -116,7 +116,7 @@ target_link_options(
 
     PRIVATE
 
-    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
@@ -246,7 +246,7 @@ target_link_options(
 
     PRIVATE
 
-    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders/opengles3@shaders"
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 

@@ -1,5 +1,3 @@
-#version 330 core
-
 #define MAX_LIGHT_COUNT 10
 #define PI 3.1415926535897932384626433832795
 
@@ -23,7 +21,7 @@ struct Material {
   sampler2D ambientOcclusionMap;
 };
 
-in MeshInfo {
+in struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;

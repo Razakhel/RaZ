@@ -1,9 +1,7 @@
-#version 330 core
-
 in vec2 fragTexcoords;
 
 uniform sampler2D uniBuffer;
-uniform int uniKernelSize = 2; // Technically half the size, but for name simplicity...
+uniform int uniKernelSize; // Technically half the size, but for name simplicity...
 
 layout(location = 0) out vec4 fragColor;
 
@@ -19,5 +17,5 @@ void main() {
   }
 
   int kernelFullSize = uniKernelSize * 2;
-  fragColor = result / (kernelFullSize * kernelFullSize);
+  fragColor = result / float(kernelFullSize * kernelFullSize);
 }

@@ -5,97 +5,7 @@ using namespace std::literals;
 constexpr unsigned int sceneWidth  = 1280;
 constexpr unsigned int sceneHeight = 720;
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
 constexpr std::string_view geomFragSource = R"(
-  #version 330 core
-
-  struct Material {
-    vec3 baseColor;
-    float metallicFactor;
-    float roughnessFactor;
-
-    sampler2D albedoMap;
-    sampler2D normalMap;
-    sampler2D metallicMap;
-    sampler2D roughnessMap;
-    sampler2D ambientOcclusionMap;
-  };
-
-  in MeshInfo {
-    vec3 vertPosition;
-    vec2 vertTexcoords;
-    mat3 vertTBNMatrix;
-  } fragMeshInfo;
-
-  layout(std140) uniform uboCameraMatrices {
-    mat4 viewMat;
-    mat4 invViewMat;
-    mat4 projectionMat;
-    mat4 invProjectionMat;
-    mat4 viewProjectionMat;
-    vec3 cameraPos;
-  };
-
-  uniform Material uniMaterial;
-
-  layout(location = 0) out vec4 fragColor;
-  layout(location = 1) out vec4 fragNormal;
-
-  void main() {
-    vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
-    float metallic  = texture(uniMaterial.metallicMap, fragMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
-    float roughness = texture(uniMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
-
-    vec3 normal = texture(uniMaterial.normalMap, fragMeshInfo.vertTexcoords).rgb;
-    normal      = normalize(normal * 2.0 - 1.0);
-    normal      = normalize(fragMeshInfo.vertTBNMatrix * normal);
-
-    fragColor  = vec4(albedo, metallic);
-    fragNormal = vec4(normal, roughness);
-  }
-)";
-
-constexpr std::string_view displayFragSource = R"(
-  #version 330 core
-
-  struct Buffers {
-    sampler2D depth;
-    sampler2D color;
-    sampler2D normal;
-  };
-
-  in vec2 fragTexcoords;
-
-  uniform Buffers uniSceneBuffers;
-
-  layout(location = 0) out vec4 fragColor;
-
-  void main() {
-    float depth     = texture(uniSceneBuffers.depth, fragTexcoords).r;
-    vec4 color      = texture(uniSceneBuffers.color, fragTexcoords).rgba;
-    vec3 normal     = texture(uniSceneBuffers.normal, fragTexcoords).rgb;
-    float roughness = texture(uniSceneBuffers.normal, fragTexcoords).a;
-
-    if (gl_FragCoord.y > 360) {
-      if (gl_FragCoord.x < 640)
-        fragColor = vec4(vec3(depth), 1.0);
-      else
-        fragColor = vec4(normal, 1.0);
-    } else {
-      if (gl_FragCoord.x < 640)
-        fragColor = vec4(vec3(roughness), 1.0);
-      else
-        fragColor = color;
-    }
-  }
-)";
-#else // Emscripten/OpenGL ES
-// The version must be on the first line
-constexpr std::string_view geomFragSource = R"(#version 300 es
-
-  precision highp float;
-  precision highp int;
-
   struct Material {
     vec3 baseColor;
     float metallicFactor;
@@ -142,11 +52,7 @@ constexpr std::string_view geomFragSource = R"(#version 300 es
   }
 )";
 
-constexpr std::string_view displayFragSource = R"(#version 300 es
-
-  precision highp float;
-  precision highp int;
-
+constexpr std::string_view displayFragSource = R"(
   struct Buffers {
     sampler2D depth;
     sampler2D color;
@@ -179,7 +85,6 @@ constexpr std::string_view displayFragSource = R"(#version 300 es
     }
   }
 )";
-#endif
 
 int main() {
   Raz::Application app;

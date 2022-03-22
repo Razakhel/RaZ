@@ -1,5 +1,3 @@
-#version 400 core
-
 layout(triangles, equal_spacing, ccw) in;
 
 void main() {
