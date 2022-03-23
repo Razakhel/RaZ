@@ -118,6 +118,30 @@ public:
   /// \param uniformName Name of the uniform to retrieve the location from.
   /// \param value Floating-point value to be sent.
   void sendUniform(const std::string& uniformName, float value) const { sendUniform(recoverUniformLocation(uniformName), value); }
+  /// Sends an integer 2D vector as uniform, which location will be retrieved with its name.
+  /// \param uniformName Name of the uniform to retrieve the location from.
+  /// \param vec Vector to be sent.
+  void sendUniform(const std::string& uniformName, const Vec2i& vec) const { sendUniform(recoverUniformLocation(uniformName), vec); }
+  /// Sends an integer 3D vector as uniform, which location will be retrieved with its name.
+  /// \param uniformName Name of the uniform to retrieve the location from.
+  /// \param vec Vector to be sent.
+  void sendUniform(const std::string& uniformName, const Vec3i& vec) const { sendUniform(recoverUniformLocation(uniformName), vec); }
+  /// Sends an integer 4D vector as uniform, which location will be retrieved with its name.
+  /// \param uniformName Name of the uniform to retrieve the location from.
+  /// \param vec Vector to be sent.
+  void sendUniform(const std::string& uniformName, const Vec4i& vec) const { sendUniform(recoverUniformLocation(uniformName), vec); }
+  /// Sends an unsigned integer 2D vector as uniform, which location will be retrieved with its name.
+  /// \param uniformName Name of the uniform to retrieve the location from.
+  /// \param vec Vector to be sent.
+  void sendUniform(const std::string& uniformName, const Vec2u& vec) const { sendUniform(recoverUniformLocation(uniformName), vec); }
+  /// Sends an unsigned integer 3D vector as uniform, which location will be retrieved with its name.
+  /// \param uniformName Name of the uniform to retrieve the location from.
+  /// \param vec Vector to be sent.
+  void sendUniform(const std::string& uniformName, const Vec3u& vec) const { sendUniform(recoverUniformLocation(uniformName), vec); }
+  /// Sends an unsigned integer 4D vector as uniform, which location will be retrieved with its name.
+  /// \param uniformName Name of the uniform to retrieve the location from.
+  /// \param vec Vector to be sent.
+  void sendUniform(const std::string& uniformName, const Vec4u& vec) const { sendUniform(recoverUniformLocation(uniformName), vec); }
   /// Sends a floating-point 2D vector as uniform, which location will be retrieved with its name.
   /// \param uniformName Name of the uniform to retrieve the location from.
   /// \param vec Vector to be sent.
