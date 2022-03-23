@@ -22,39 +22,47 @@ TEST_CASE("Graph linking test") {
   // root -> node1
   root.addChildren(node1);
 
-  CHECK(root.isRoot());
-  CHECK_FALSE(node1.isRoot());
-
+  CHECK(root.getParentCount() == 0);
   CHECK(root.getChildCount() == 1);
-  CHECK(node1.getChildCount() == 0);
   CHECK(&root.getChild(0) == &node1);
+
+  CHECK(node1.getParentCount() == 1);
+  CHECK(node1.getChildCount() == 0);
+  CHECK(&node1.getParent(0) == &root);
 
   // Unchanged, node1 is already a child of root
   node1.addParents(root);
 
-  CHECK(root.isRoot());
-  CHECK_FALSE(node1.isRoot());
-
+  CHECK(root.getParentCount() == 0);
   CHECK(root.getChildCount() == 1);
-  CHECK(node1.getChildCount() == 0);
   CHECK(&root.getChild(0) == &node1);
+
+  CHECK(node1.getParentCount() == 1);
+  CHECK(&node1.getParent(0) == &root);
+  CHECK(node1.getChildCount() == 0);
 
   //              / node11
   // root -> node1
   //              \ node12
   node1.addChildren(node11, node12);
 
-  CHECK(root.isRoot());
-  CHECK_FALSE(node1.isRoot());
-  CHECK_FALSE(node11.isRoot());
-  CHECK_FALSE(node12.isRoot());
-
+  CHECK(root.getParentCount() == 0);
   CHECK(root.getChildCount() == 1);
+  CHECK(&root.getChild(0) == &node1);
+
+  CHECK(node1.getParentCount() == 1);
+  CHECK(&node1.getParent(0) == &root);
   CHECK(node1.getChildCount() == 2);
-  CHECK(node11.getChildCount() == 0);
-  CHECK(node12.getChildCount() == 0);
   CHECK(&node1.getChild(0) == &node11);
   CHECK(&node1.getChild(1) == &node12);
+
+  CHECK(node11.getParentCount() == 1);
+  CHECK(&node11.getParent(0) == &node1);
+  CHECK(node11.getChildCount() == 0);
+
+  CHECK(node12.getParentCount() == 1);
+  CHECK(&node12.getParent(0) == &node1);
+  CHECK(node12.getChildCount() == 0);
 
   //            / node11
   //     / node1
@@ -62,22 +70,31 @@ TEST_CASE("Graph linking test") {
   //     \ node2
   node2.addParents(root);
 
-  CHECK(root.isRoot());
-  CHECK_FALSE(node1.isRoot());
-  CHECK_FALSE(node11.isRoot());
-  CHECK_FALSE(node12.isRoot());
-  CHECK_FALSE(node2.isRoot());
-
+  CHECK(root.getParentCount() == 0);
   CHECK(root.getChildCount() == 2);
-  CHECK(node1.getChildCount() == 2);
-  CHECK(node11.getChildCount() == 0);
-  CHECK(node12.getChildCount() == 0);
-  CHECK(node2.getChildCount() == 0);
   CHECK(&root.getChild(0) == &node1);
   CHECK(&root.getChild(1) == &node2);
+
+  CHECK(node1.getParentCount() == 1);
+  CHECK(&node1.getParent(0) == &root);
+  CHECK(node1.getChildCount() == 2);
+  CHECK(&node1.getChild(0) == &node11);
+  CHECK(&node1.getChild(1) == &node12);
+
+  CHECK(node11.getParentCount() == 1);
+  CHECK(&node11.getParent(0) == &node1);
+  CHECK(node11.getChildCount() == 0);
+
+  CHECK(node12.getParentCount() == 1);
+  CHECK(&node12.getParent(0) == &node1);
+  CHECK(node12.getChildCount() == 0);
+
+  CHECK(node2.getParentCount() == 1);
+  CHECK(&node2.getParent(0) == &root);
+  CHECK(node2.getChildCount() == 0);
 }
 
-TEST_CASE("Graph root test") {
+TEST_CASE("Graph extremities test") {
   Raz::Graph<TestNode> graph(5);
 
   TestNode& root  = graph.addNode();
@@ -86,12 +103,12 @@ TEST_CASE("Graph root test") {
   TestNode& node3 = graph.addNode();
   TestNode& leaf  = graph.addNode();
 
-  // All nodes are roots, since no parenting has been set up yet
-  CHECK(root.isRoot());
-  CHECK(node1.isRoot());
-  CHECK(node2.isRoot());
-  CHECK(node3.isRoot());
-  CHECK(leaf.isRoot());
+  // All nodes are isolated, since no parenting has been set up yet
+  CHECK(root.isIsolated());
+  CHECK(node1.isIsolated());
+  CHECK(node2.isIsolated());
+  CHECK(node3.isIsolated());
+  CHECK(leaf.isIsolated());
 
   // node1
   //       \
@@ -100,10 +117,17 @@ TEST_CASE("Graph root test") {
   // node3
   leaf.addParents(node1, node2, node3);
 
+  CHECK(root.isIsolated());
+
   CHECK(node1.isRoot());
   CHECK(node2.isRoot());
   CHECK(node3.isRoot());
   CHECK_FALSE(leaf.isRoot());
+
+  CHECK_FALSE(node1.isLeaf());
+  CHECK_FALSE(node2.isLeaf());
+  CHECK_FALSE(node3.isLeaf());
+  CHECK(leaf.isLeaf());
 
   //         node1
   //       /       \
@@ -117,4 +141,10 @@ TEST_CASE("Graph root test") {
   CHECK_FALSE(node2.isRoot());
   CHECK_FALSE(node3.isRoot());
   CHECK_FALSE(leaf.isRoot());
+
+  CHECK_FALSE(root.isLeaf());
+  CHECK_FALSE(node1.isLeaf());
+  CHECK_FALSE(node2.isLeaf());
+  CHECK_FALSE(node3.isLeaf());
+  CHECK(leaf.isLeaf());
 }

@@ -16,21 +16,24 @@ public:
   GraphNode(const GraphNode&) = delete;
   GraphNode(GraphNode&&) noexcept = default;
 
+  const std::vector<T*>& getParents() const noexcept { return m_parents; }
+  std::size_t getParentCount() const noexcept { return m_parents.size(); }
+  const T& getParent(std::size_t index) const noexcept;
+  T& getParent(std::size_t index) noexcept;
   const std::vector<T*>& getChildren() const noexcept { return m_children; }
   std::size_t getChildCount() const noexcept { return m_children.size(); }
   const T& getChild(std::size_t index) const noexcept;
   T& getChild(std::size_t index) noexcept;
   /// Checks if the current node is a root, that is, a node without any parent.
   /// \return True if it is a root node, false otherwise.
-  bool isRoot() const noexcept { return m_isRoot; }
+  bool isRoot() const noexcept { return m_parents.empty(); }
+  /// Checks if the current node is a leaf, that is, a node without any child.
+  /// \return True if it is a leaf node, false otherwise.
+  bool isLeaf() const noexcept { return m_children.empty(); }
+  /// Checks if the current node is isolated, that is, a node which is both a root & a leaf (without any parent or child).
+  /// \return True if it is an isolated node, false otherwise.
+  bool isIsolated() const noexcept { return isRoot() && isLeaf(); }
 
-  /// Links the given nodes as children of the current one.
-  /// \tparam NodeT Type of the first node to link.
-  /// \tparam OtherNodesTs Types of the other nodes to link.
-  /// \param node First node to link.
-  /// \param otherNodes Other nodes to link.
-  template<typename NodeT, typename... OtherNodesTs>
-  void addChildren(NodeT&& node, OtherNodesTs&&... otherNodes);
   /// Links the given nodes as parents of the current one.
   /// \tparam NodeT Type of the first node to link.
   /// \tparam OtherNodesTs Types of the other nodes to link.
@@ -38,6 +41,13 @@ public:
   /// \param otherNodes Other nodes to link.
   template<typename NodeT, typename... OtherNodesTs>
   void addParents(NodeT&& node, OtherNodesTs&&... otherNodes);
+  /// Links the given nodes as children of the current one.
+  /// \tparam NodeT Type of the first node to link.
+  /// \tparam OtherNodesTs Types of the other nodes to link.
+  /// \param node First node to link.
+  /// \param otherNodes Other nodes to link.
+  template<typename NodeT, typename... OtherNodesTs>
+  void addChildren(NodeT&& node, OtherNodesTs&&... otherNodes);
 
   GraphNode& operator=(const GraphNode&) = delete;
   GraphNode& operator=(GraphNode&&) noexcept = default;
@@ -47,8 +57,8 @@ public:
 protected:
   GraphNode() = default;
 
+  std::vector<T*> m_parents {};
   std::vector<T*> m_children {};
-  bool m_isRoot = true;
 };
 
 /// Graph class, representing a [directed graph](https://en.wikipedia.org/wiki/Directed_graph).
