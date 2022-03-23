@@ -5,7 +5,6 @@
 
 #include "RaZ/Utils/FilePath.hpp"
 
-#include <memory>
 #include <string>
 
 namespace Raz {

@@ -58,6 +58,30 @@ public:
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param value Floating-point value to be sent.
   void sendUniform(int uniformIndex, float value) const;
+  /// Sends an integer 2D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the vector's data to.
+  /// \param vec Vector to be sent.
+  void sendUniform(int uniformIndex, const Vec2i& vec) const;
+  /// Sends an integer 3D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the vector's data to.
+  /// \param vec Vector to be sent.
+  void sendUniform(int uniformIndex, const Vec3i& vec) const;
+  /// Sends an integer 4D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the vector's data to.
+  /// \param vec Vector to be sent.
+  void sendUniform(int uniformIndex, const Vec4i& vec) const;
+  /// Sends an unsigned integer 2D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the vector's data to.
+  /// \param vec Vector to be sent.
+  void sendUniform(int uniformIndex, const Vec2u& vec) const;
+  /// Sends an unsigned integer 3D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the vector's data to.
+  /// \param vec Vector to be sent.
+  void sendUniform(int uniformIndex, const Vec3u& vec) const;
+  /// Sends an unsigned integer 4D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the vector's data to.
+  /// \param vec Vector to be sent.
+  void sendUniform(int uniformIndex, const Vec4u& vec) const;
   /// Sends a floating-point 2D vector as uniform.
   /// \param uniformIndex Index of the uniform to send the vector's data to.
   /// \param vec Vector to be sent.

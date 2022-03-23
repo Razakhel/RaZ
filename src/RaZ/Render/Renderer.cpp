@@ -941,6 +941,70 @@ void Renderer::sendUniform(int uniformIndex, float value) {
   printConditionalErrors();
 }
 
+void Renderer::sendUniformVector1i(int uniformIndex, const int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1iv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendUniformVector2i(int uniformIndex, const int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform2iv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendUniformVector3i(int uniformIndex, const int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform3iv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendUniformVector4i(int uniformIndex, const int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform4iv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendUniformVector1ui(int uniformIndex, const unsigned int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform1uiv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendUniformVector2ui(int uniformIndex, const unsigned int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform2uiv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendUniformVector3ui(int uniformIndex, const unsigned int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform3uiv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendUniformVector4ui(int uniformIndex, const unsigned int* values, int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniform4uiv(uniformIndex, count, values);
+
+  printConditionalErrors();
+}
+
 void Renderer::sendUniformVector1(int uniformIndex, const float* values, int count) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

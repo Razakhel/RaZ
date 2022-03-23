@@ -921,6 +921,46 @@ public:
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param value Floating-point value to be sent.
   static void sendUniform(int uniformIndex, float value);
+  /// Sends an integer 1D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector1i(int uniformIndex, const int* values, int count = 1);
+  /// Sends an integer 2D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector2i(int uniformIndex, const int* values, int count = 1);
+  /// Sends an integer 3D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector3i(int uniformIndex, const int* values, int count = 1);
+  /// Sends an integer 4D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector4i(int uniformIndex, const int* values, int count = 1);
+  /// Sends an unsigned integer 1D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector1ui(int uniformIndex, const unsigned int* values, int count = 1);
+  /// Sends an unsigned integer 2D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector2ui(int uniformIndex, const unsigned int* values, int count = 1);
+  /// Sends an unsigned integer 3D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector3ui(int uniformIndex, const unsigned int* values, int count = 1);
+  /// Sends an unsigned integer 4D vector as uniform.
+  /// \param uniformIndex Index of the uniform to send the data to.
+  /// \param values Array of values to be sent.
+  /// \param count Number of vectors to be sent.
+  static void sendUniformVector4ui(int uniformIndex, const unsigned int* values, int count = 1);
   /// Sends a floating-point 1D vector as uniform.
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param values Array of values to be sent.
