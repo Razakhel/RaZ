@@ -26,7 +26,7 @@ in struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;
-} fragMeshInfo;
+} vertMeshInfo;
 
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
@@ -46,7 +46,7 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 bufferNormal;
 
 void main() {
-  vec3 normal = fragMeshInfo.vertTBNMatrix[2];
+  vec3 normal = vertMeshInfo.vertTBNMatrix[2];
 
   float lightHitAngle = 0.0;
 
@@ -55,7 +55,7 @@ void main() {
     vec3 lightDir;
 
     if (uniLights[lightIndex].position.w != 0.0) {
-      lightDir = normalize(lightPos - fragMeshInfo.vertPosition);
+      lightDir = normalize(lightPos - vertMeshInfo.vertPosition);
     } else {
       lightDir = normalize(-uniLights[lightIndex].direction);
     }
@@ -63,7 +63,7 @@ void main() {
     lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, normal), 0.0, 1.0));
   }
 
-  fragColor = vec4(lightHitAngle * texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb, 1.0);
+  fragColor = vec4(lightHitAngle * texture(uniMaterial.diffuseMap, vertMeshInfo.vertTexcoords).rgb, 1.0);
 
   // Sending fragment normal to next framebuffer(s), if any
   bufferNormal = normal;

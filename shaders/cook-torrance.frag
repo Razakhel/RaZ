@@ -25,7 +25,7 @@ in struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;
-} fragMeshInfo;
+} vertMeshInfo;
 
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
@@ -87,16 +87,16 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 
 void main() {
   // Gamma correction for albedo (sRGB presumed)
-  vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
-  float metallic  = texture(uniMaterial.metallicMap, fragMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
-  float roughness = texture(uniMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
-  float ambOcc    = texture(uniMaterial.ambientOcclusionMap, fragMeshInfo.vertTexcoords).r;
+  vec3 albedo     = pow(texture(uniMaterial.albedoMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+  float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
+  float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
+  float ambOcc    = texture(uniMaterial.ambientOcclusionMap, vertMeshInfo.vertTexcoords).r;
 
-  vec3 normal = texture(uniMaterial.normalMap, fragMeshInfo.vertTexcoords).rgb;
+  vec3 normal = texture(uniMaterial.normalMap, vertMeshInfo.vertTexcoords).rgb;
   normal      = normalize(normal * 2.0 - 1.0);
-  normal      = normalize(fragMeshInfo.vertTBNMatrix * normal);
+  normal      = normalize(vertMeshInfo.vertTBNMatrix * normal);
 
-  vec3 viewDir = normalize(cameraPos - fragMeshInfo.vertPosition);
+  vec3 viewDir = normalize(cameraPos - vertMeshInfo.vertPosition);
 
   // Base Fresnel (F)
   vec3 baseReflectivity = mix(vec3(0.04), albedo, metallic);
@@ -110,7 +110,7 @@ void main() {
     float attenuation = uniLights[lightIndex].energy;
 
     if (uniLights[lightIndex].position.w != 0.0) {
-      fullLightDir = uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition;
+      fullLightDir = uniLights[lightIndex].position.xyz - vertMeshInfo.vertPosition;
 
       float sqrDist = dot(fullLightDir, fullLightDir);
       attenuation  /= sqrDist;

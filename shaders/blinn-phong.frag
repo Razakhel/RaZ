@@ -27,7 +27,7 @@ in struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;
-} fragMeshInfo;
+} vertMeshInfo;
 
 uniform uint uniLightCount;
 uniform Light uniLights[MAX_LIGHT_COUNT];
@@ -47,15 +47,15 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 bufferNormal;
 
 void main() {
-  vec3 normal     = fragMeshInfo.vertTBNMatrix[2];
-  vec3 color      = texture(uniMaterial.diffuseMap, fragMeshInfo.vertTexcoords).rgb * uniMaterial.diffuse;
-  vec3 specFactor = texture(uniMaterial.specularMap, fragMeshInfo.vertTexcoords).r * uniMaterial.specular;
+  vec3 normal     = vertMeshInfo.vertTBNMatrix[2];
+  vec3 color      = texture(uniMaterial.diffuseMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.diffuse;
+  vec3 specFactor = texture(uniMaterial.specularMap, vertMeshInfo.vertTexcoords).r * uniMaterial.specular;
 
   vec3 ambient  = color * 0.05;
   vec3 diffuse  = vec3(0.0);
   vec3 specular = vec3(0.0);
 
-  vec3 viewDir = normalize(cameraPos - fragMeshInfo.vertPosition);
+  vec3 viewDir = normalize(cameraPos - vertMeshInfo.vertPosition);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
     // Diffuse
@@ -63,10 +63,10 @@ void main() {
     float attenuation = uniLights[lightIndex].energy;
 
     if (uniLights[lightIndex].position.w != 0.0) {
-      fullLightDir = uniLights[lightIndex].position.xyz - fragMeshInfo.vertPosition;
+      fullLightDir = uniLights[lightIndex].position.xyz - vertMeshInfo.vertPosition;
 
-      float sqrDist = dot(fullLightDir, fullLightDir);
-      attenuation  /= sqrDist;
+      float sqDist = dot(fullLightDir, fullLightDir);
+      attenuation  /= sqDist;
     } else {
       fullLightDir = -uniLights[lightIndex].direction;
     }
@@ -80,7 +80,7 @@ void main() {
     specular    += uniLights[lightIndex].color * pow(max(dot(halfDir, normal), 0.0), 32.0) * specFactor * attenuation;
   }
 
-  vec3 emissive = texture(uniMaterial.emissiveMap, fragMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
+  vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
 
   fragColor = vec4(ambient + diffuse + specular + emissive, specFactor);
 

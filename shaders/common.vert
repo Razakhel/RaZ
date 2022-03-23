@@ -10,18 +10,18 @@ out struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
   mat3 vertTBNMatrix;
-} fragMeshInfo;
+} vertMeshInfo;
 
 void main() {
-  fragMeshInfo.vertPosition  = (uniModelMatrix * vec4(vertPosition, 1.0)).xyz;
-  fragMeshInfo.vertTexcoords = vertTexcoords;
+  vertMeshInfo.vertPosition  = (uniModelMatrix * vec4(vertPosition, 1.0)).xyz;
+  vertMeshInfo.vertTexcoords = vertTexcoords;
 
   mat3 modelMat = mat3(uniModelMatrix);
 
   vec3 tangent   = normalize(modelMat * vertTangent);
   vec3 normal    = normalize(modelMat * vertNormal);
   vec3 bitangent = cross(normal, tangent);
-  fragMeshInfo.vertTBNMatrix = mat3(tangent, bitangent, normal);
+  vertMeshInfo.vertTBNMatrix = mat3(tangent, bitangent, normal);
 
   gl_Position = uniMvpMatrix * vec4(vertPosition, 1.0);
 }

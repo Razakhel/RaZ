@@ -22,7 +22,7 @@ constexpr std::string_view geomFragSource = R"(
     vec3 vertPosition;
     vec2 vertTexcoords;
     mat3 vertTBNMatrix;
-  } fragMeshInfo;
+  } vertMeshInfo;
 
   layout(std140) uniform uboCameraMatrices {
     mat4 viewMat;
@@ -39,13 +39,13 @@ constexpr std::string_view geomFragSource = R"(
   layout(location = 1) out vec4 fragNormal;
 
   void main() {
-    vec3 albedo     = pow(texture(uniMaterial.albedoMap, fragMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
-    float metallic  = texture(uniMaterial.metallicMap, fragMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
-    float roughness = texture(uniMaterial.roughnessMap, fragMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
+    vec3 albedo     = pow(texture(uniMaterial.albedoMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+    float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
+    float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
 
-    vec3 normal = texture(uniMaterial.normalMap, fragMeshInfo.vertTexcoords).rgb;
+    vec3 normal = texture(uniMaterial.normalMap, vertMeshInfo.vertTexcoords).rgb;
     normal      = normalize(normal * 2.0 - 1.0);
-    normal      = normalize(fragMeshInfo.vertTBNMatrix * normal);
+    normal      = normalize(vertMeshInfo.vertTBNMatrix * normal);
 
     fragColor  = vec4(albedo, metallic);
     fragNormal = vec4(normal, roughness);
