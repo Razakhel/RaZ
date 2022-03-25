@@ -306,6 +306,46 @@ if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
     )
 endif ()
 
+#########################
+# RaZ - Prepare shaders #
+#########################
+
+# Emptying the embedding script
+file(WRITE "${CMAKE_BINARY_DIR}/EmbedShaders.cmake" "")
+
+file(GLOB RAZ_SHADERS ${PROJECT_SOURCE_DIR}/shaders/*.*)
+
+# Creating a copy of each shader to enclose its content with a raw string literal R"(...)"
+foreach (SHADER_PATH ${RAZ_SHADERS})
+    get_filename_component(SHADER_FILE "${SHADER_PATH}" NAME)
+    set(EMBED_SHADER_PATH "${PROJECT_SOURCE_DIR}/shaders/embed/${SHADER_FILE}.embed")
+
+    # CMake cannot execute a script from a string and requires an actual file to be executed
+    # The embeddable shader will be written only if the original has been modified
+    file(
+        APPEND
+
+        "${CMAKE_BINARY_DIR}/EmbedShaders.cmake"
+        "
+            if (NOT EXISTS \"${EMBED_SHADER_PATH}\" OR \"${SHADER_PATH}\" IS_NEWER_THAN \"${EMBED_SHADER_PATH}\")
+                file(READ \"${SHADER_PATH}\" SHADER_CONTENT)
+                file(WRITE \"${EMBED_SHADER_PATH}\" \"R\\\"(\${SHADER_CONTENT})\\\"\")
+            endif ()
+        "
+    )
+endforeach ()
+
+add_custom_target(
+    RaZ_EmbedShaders
+    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/EmbedShaders.cmake" # Executing the previously created script
+    VERBATIM
+)
+
+add_dependencies(RaZ RaZ_EmbedShaders)
+
+# Adding the embedded shaders directory to the include dirs, so that we can include them directly in code
+target_include_directories(RaZ PRIVATE "${PROJECT_SOURCE_DIR}/shaders/embed")
+
 ###############
 # RaZ - Build #
 ###############
