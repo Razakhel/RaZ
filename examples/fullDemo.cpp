@@ -18,11 +18,6 @@ int main() {
     ///////////////
 
     auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280u, 720u, "RaZ", Raz::WindowSetting::DEFAULT, 2);
-
-    Raz::RenderPass& geometryPass = renderSystem.getGeometryPass();
-    geometryPass.getProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"),
-                                         Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
-
     renderSystem.setCubemap(Raz::Cubemap(RAZ_ROOT "assets/skyboxes/clouds_right.png", RAZ_ROOT "assets/skyboxes/clouds_left.png",
                                          RAZ_ROOT "assets/skyboxes/clouds_top.png",   RAZ_ROOT "assets/skyboxes/clouds_bottom.png",
                                          RAZ_ROOT "assets/skyboxes/clouds_front.png", RAZ_ROOT "assets/skyboxes/clouds_back.png"));
@@ -40,6 +35,7 @@ int main() {
     ///////////////
 
     Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
+    Raz::RenderPass& geometryPass = renderSystem.getGeometryPass();
 
     const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::DEPTH);
     const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGBA);

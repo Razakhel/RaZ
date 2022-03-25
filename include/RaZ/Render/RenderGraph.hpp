@@ -25,7 +25,7 @@ public:
 
   void resizeViewport(unsigned int width, unsigned int height);
   void updateShaders() const;
-  /// Executes the render graph, launching all passes followed by their respective children, starting with the geometry pass.
+  /// Executes the render graph, executing all passes starting with the geometry's.
   /// \param renderSystem Render system executing the render graph.
   void execute(RenderSystem& renderSystem);
 

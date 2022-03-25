@@ -120,12 +120,6 @@ int main() {
                                "please update your graphics drivers or try on another computer");
     }
 
-    Raz::RenderShaderProgram& geometryProgram = render.getGeometryProgram();
-    geometryProgram.setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"),
-                               Raz::TessellationControlShader::loadFromSource(tessCtrlSource),
-                               Raz::TessellationEvaluationShader::loadFromSource(tessEvalSource),
-                               Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
-
     Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
     camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());
 
@@ -194,9 +188,19 @@ int main() {
 
     Raz::Entity& entity = world.addEntity();
     auto& transform     = entity.addComponent<Raz::Transform>();
-    entity.addComponent<Raz::MeshRenderer>(mesh, Raz::RenderMode::PATCH);
+    auto& meshRenderer  = entity.addComponent<Raz::MeshRenderer>(mesh, Raz::RenderMode::PATCH);
 
     Raz::Renderer::setPatchVertexCount(4); // The vertex count is 3 by default, but we are using quads here
+
+    ///////////////////////////
+    // Tessellation material //
+    ///////////////////////////
+
+    Raz::RenderShaderProgram& materialProgram = meshRenderer.getMaterials().front().getProgram();
+
+    materialProgram.setTessellationControlShader(Raz::TessellationControlShader::loadFromSource(tessCtrlSource));
+    materialProgram.setTessellationEvaluationShader(Raz::TessellationEvaluationShader::loadFromSource(tessEvalSource));
+    materialProgram.link();
 
     /////////////
     // Overlay //
@@ -204,21 +208,21 @@ int main() {
 
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Tessellation demo", Raz::Vec2f(-1.f));
 
-    overlay.addSlider("Outer level", [&geometryProgram] (float newVal) {
-      geometryProgram.use();
-      geometryProgram.sendUniform("uniTessLevelOuter", newVal);
+    overlay.addSlider("Outer level", [&materialProgram] (float newVal) {
+      materialProgram.use();
+      materialProgram.sendUniform("uniTessLevelOuter", newVal);
     }, 1.f, 64.f, 4.f);
-    overlay.addSlider("Inner level", [&geometryProgram] (float newVal) {
-      geometryProgram.use();
-      geometryProgram.sendUniform("uniTessLevelInner", newVal);
+    overlay.addSlider("Inner level", [&materialProgram] (float newVal) {
+      materialProgram.use();
+      materialProgram.sendUniform("uniTessLevelInner", newVal);
     }, 1.f, 64.f, 4.f);
 
-    overlay.addCheckbox("Make sphere", [&geometryProgram] () {
-      geometryProgram.use();
-      geometryProgram.sendUniform("uniMakeSphere", true);
-    }, [&geometryProgram] () {
-      geometryProgram.use();
-      geometryProgram.sendUniform("uniMakeSphere", false);
+    overlay.addCheckbox("Make sphere", [&materialProgram] () {
+      materialProgram.use();
+      materialProgram.sendUniform("uniMakeSphere", true);
+    }, [&materialProgram] () {
+      materialProgram.use();
+      materialProgram.sendUniform("uniMakeSphere", false);
     }, false);
 
     overlay.addCheckbox("Enable wireframe", [] () {

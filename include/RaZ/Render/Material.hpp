@@ -25,6 +25,8 @@ public:
   explicit Material(MaterialType type) { loadType(type); }
   Material(Material&&) noexcept = default;
 
+  const RenderShaderProgram& getProgram() const noexcept { return m_program; }
+  RenderShaderProgram& getProgram() noexcept { return m_program; }
   /// Checks if the material has any attribute or texture.
   /// \return True if the material has neither an attribute nor a texture, false otherwise.
   bool isEmpty() const noexcept { return m_attributes.empty() && m_textures.empty(); }
@@ -58,17 +60,17 @@ public:
   void setTexture(TexturePtr texture, std::string uniformName);
 
   Material clone() const { return *this; }
-  /// Loads a predefined material type, adding all needed attributes & textures if they do not exist yet.
+  /// Loads a predefined material type, setting default shaders & adding all needed attributes & textures if they do not exist yet.
   /// \param type Material type to apply.
   void loadType(MaterialType type);
-  void sendAttributes(const RenderShaderProgram& program) const;
+  void sendAttributes() const;
   /// Removes an attribute given its uniform name.
   /// \param uniformName Uniform name of the attribute to remove.
   void removeAttribute(const std::string& uniformName);
   /// Removes all attributes in the material.
   void clearAttributes() { m_attributes.clear(); }
-  void initTextures(const RenderShaderProgram& program) const;
-  void bindTextures(const RenderShaderProgram& program) const;
+  void initTextures() const;
+  void bindTextures() const;
   /// Removes all entries associated with the given texture.
   /// \param texture Texture to remove the entries for.
   void removeTexture(const Texture& texture);
@@ -82,7 +84,9 @@ public:
   virtual ~Material() = default;
 
 private:
-  Material(const Material&) = default;
+  Material(const Material& material) : m_program{ material.m_program.clone() }, m_attributes{ material.m_attributes }, m_textures{ material.m_textures } {}
+
+  RenderShaderProgram m_program {};
 
   using Attribute = std::variant<int, unsigned int, float, Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f, Mat2f, Mat3f, Mat4f>;
   std::unordered_map<std::string, Attribute> m_attributes {};

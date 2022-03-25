@@ -2,15 +2,10 @@
 
 using namespace std::literals;
 
-inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/blinn-phong.frag"));
-  render.updateLights();
-
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj");
-  mesh.getComponent<Raz::Mesh>() = std::move(meshData);
-  auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderComp = std::move(meshRenderData);
-  meshRenderComp.load(render.getGeometryProgram());
+inline void loadSponzaScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
+  auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
+  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj").second;
+  render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -1.f, 0.f);
@@ -18,15 +13,10 @@ inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   meshTrans.setScale(0.01f);
 }
 
-inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
-  render.updateLights();
-
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj");
-  mesh.getComponent<Raz::Mesh>() = std::move(meshData);
-  auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderComp = std::move(meshRenderData);
-  meshRenderComp.load(render.getGeometryProgram());
+inline void loadBallScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
+  auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
+  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second;
+  render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -34,15 +24,10 @@ inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   meshTrans.setScale(1.f);
 }
 
-inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
-  render.updateLights();
-
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj");
-  mesh.getComponent<Raz::Mesh>() = std::move(meshData);
-  auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderComp = std::move(meshRenderData);
-  meshRenderComp.load(render.getGeometryProgram());
+inline void loadShieldScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
+  auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
+  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj").second;
+  render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -50,15 +35,10 @@ inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
   meshTrans.setScale(0.15f);
 }
 
-inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
-  render.updateLights();
-
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/cerberus.obj");
-  mesh.getComponent<Raz::Mesh>() = std::move(meshData);
-  auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderComp = std::move(meshRenderData);
-  meshRenderComp.load(render.getGeometryProgram());
+inline void loadCerberusScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
+  auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
+  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/cerberus.obj").second;
+  render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, 0.f, 0.f);
@@ -67,15 +47,10 @@ inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 #if defined(FBX_ENABLED)
-inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/blinn-phong.frag"));
-  render.updateLights();
-
-  auto [meshData, meshRenderData] = Raz::FbxFormat::load(RAZ_ROOT "assets/meshes/shaderBall.fbx");
-  mesh.getComponent<Raz::Mesh>() = std::move(meshData);
-  auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderComp = std::move(meshRenderData);
-  meshRenderComp.load(render.getGeometryProgram());
+inline void loadShaderBallScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
+  auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
+  meshRenderer       = Raz::FbxFormat::load(RAZ_ROOT "assets/meshes/shaderBall.fbx").second;
+  render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
   meshTrans.setPosition(0.f, -2.f, -5.f);
@@ -126,10 +101,8 @@ int main() {
     // Mesh entity //
     /////////////////
 
-    Raz::Entity& mesh = world.addEntity();
+    Raz::Entity& mesh = world.addEntityWithComponent<Raz::MeshRenderer>();
     auto& meshTrans   = mesh.addComponent<Raz::Transform>();
-    mesh.addComponent<Raz::Mesh>();
-    mesh.addComponent<Raz::MeshRenderer>();
 
     Raz::Entity& camera = world.addEntity();
     auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));

@@ -7,9 +7,6 @@
 namespace Raz {
 
 bool RenderGraph::isValid() const {
-  if (!m_geometryPass.isValid())
-    return false;
-
   for (const std::unique_ptr<RenderPass>& renderPass : m_nodes) {
     if (!renderPass->isValid())
       return false;
@@ -24,8 +21,6 @@ void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
 }
 
 void RenderGraph::updateShaders() const {
-  m_geometryPass.getProgram().updateShaders();
-
   for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->getProgram().updateShaders();
 }
@@ -64,11 +59,6 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
 
   renderSystem.m_modelUbo.bind();
 
-  // Binding textures marks the pass' program as used
-  m_geometryPass.bindTextures();
-
-  const RenderShaderProgram& geometryProgram = m_geometryPass.getProgram();
-
   for (const Entity* entity : renderSystem.m_entities) {
     if (!entity->isEnabled() || !entity->hasComponent<MeshRenderer>() || !entity->hasComponent<Transform>())
       continue;
@@ -79,7 +69,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
       continue;
 
     renderSystem.m_modelUbo.sendData(entity->getComponent<Transform>().computeTransformMatrix(), 0);
-    meshRenderer.draw(geometryProgram);
+    meshRenderer.draw();
   }
 
   if (renderSystem.hasCubemap())

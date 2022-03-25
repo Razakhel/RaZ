@@ -26,11 +26,6 @@ int main() {
                                "please update your graphics drivers or try on another computer");
     }
 
-    Raz::RenderShaderProgram& geometryProgram = render.getGeometryProgram();
-
-    geometryProgram.setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"),
-                               Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
-
     // A camera is needed by the RenderSystem, but since we won't render anything there is no need to initialize it
     world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>();
 

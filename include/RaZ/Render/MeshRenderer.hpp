@@ -69,20 +69,10 @@ public:
   /// \param mesh Mesh to be loaded.
   /// \param renderMode Render mode to apply.
   void load(const Mesh& mesh, RenderMode renderMode = RenderMode::TRIANGLE);
-  /// Binds the materials' textures to the given shader program.
-  /// \param program Shader program to bind the textures to.
-  void load(const RenderShaderProgram& program) const;
-  /// Loads a mesh onto the GPU and binds the materials' textures to the given shader program.
-  /// \param mesh Mesh to be loaded.
-  /// \param program Shader program to bind the textures to.
-  /// \param renderMode Render mode to apply.
-  void load(const Mesh& mesh, const RenderShaderProgram& program, RenderMode renderMode = RenderMode::TRIANGLE);
+  /// Loads the materials.
+  void loadMaterials() const;
   /// Renders the mesh.
-  /// \warning This requires to manually handle materials' uniforms updating and textures activation/binding; else, use the overload with a RenderShaderProgram.
   void draw() const;
-  /// Renders the mesh with the given shader program.
-  /// \param program Program to render the mesh with.
-  void draw(const RenderShaderProgram& program) const;
 
   MeshRenderer& operator=(const MeshRenderer&) = delete;
   MeshRenderer& operator=(MeshRenderer&&) noexcept = default;

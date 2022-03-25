@@ -10,7 +10,6 @@ int main() {
     Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
 
     auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
-    render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
 
     Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
     camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());

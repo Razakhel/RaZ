@@ -93,29 +93,18 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
   Logger::debug("[MeshRenderer] Loaded mesh data");
 }
 
-void MeshRenderer::load(const RenderShaderProgram& program) const {
-  for (const Material& material : m_materials)
-    material.initTextures(program);
-}
-
-void MeshRenderer::load(const Mesh& mesh, const RenderShaderProgram& program, RenderMode renderMode) {
-  load(mesh, renderMode);
-  load(program);
+void MeshRenderer::loadMaterials() const {
+  for (const Material& material : m_materials) {
+    material.sendAttributes();
+    material.initTextures();
+  }
 }
 
 void MeshRenderer::draw() const {
-  for (const SubmeshRenderer& submeshRenderer : m_submeshRenderers)
-    submeshRenderer.draw();
-}
-
-void MeshRenderer::draw(const RenderShaderProgram& program) const {
   for (const SubmeshRenderer& submeshRenderer : m_submeshRenderers) {
     if (submeshRenderer.getMaterialIndex() != std::numeric_limits<std::size_t>::max()) {
       assert("Error: The material index does not reference any existing material." && (submeshRenderer.getMaterialIndex() < m_materials.size()));
-
-      const Material& material = m_materials[submeshRenderer.getMaterialIndex()];
-      material.sendAttributes(program);
-      material.bindTextures(program);
+      m_materials[submeshRenderer.getMaterialIndex()].bindTextures();
     }
 
     submeshRenderer.draw();

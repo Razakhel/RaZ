@@ -10,7 +10,6 @@ int main() {
     Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
 
     auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
-    render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
 
     Raz::Window& window = render.getWindow();
 

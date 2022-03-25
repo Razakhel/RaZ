@@ -43,9 +43,6 @@ bool RenderSystem::update([[maybe_unused]] float deltaTime) {
   m_lightsUbo.bindBase(1);
   m_modelUbo.bindBase(2);
 
-  // TODO: binding the block is required whenever programs are updated, not every frame, but is done here for now for simplicity
-  m_modelUbo.bindUniformBlock(getGeometryProgram(), "uboModelInfo", 2);
-
   m_renderGraph.execute(*this);
 
 #if defined(RAZ_CONFIG_DEBUG) && !defined(SKIP_RENDERER_ERRORS)
@@ -72,9 +69,6 @@ void RenderSystem::sendCameraMatrices() const {
   sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
   sendCameraPosition(m_cameraEntity->getComponent<Transform>().getPosition());
-
-  // TODO: binding the block is required whenever programs are updated, not every time data is sent, but is done here for now for simplicity
-  m_cameraUbo.bindUniformBlock(getGeometryProgram(), "uboCameraInfo", 0);
 }
 
 void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) const {
@@ -108,20 +102,40 @@ void RenderSystem::updateLights() const {
   }
 
   m_lightsUbo.sendData(lightCount, sizeof(Vec4f) * 4 * 100);
-
-  // TODO: binding the block is required whenever programs are updated, not every time data is sent, but is done here for now for simplicity
-  m_lightsUbo.bindUniformBlock(getGeometryProgram(), "uboLightsInfo", 1);
 }
 
 void RenderSystem::updateShaders() const {
   m_renderGraph.updateShaders();
 
-  sendCameraMatrices();
-  updateLights();
+  for (const Entity* entity : m_entities) {
+    if (!entity->hasComponent<MeshRenderer>())
+      continue;
 
+    const auto& meshRenderer = entity->getComponent<MeshRenderer>();
+
+    for (const Material& material : meshRenderer.getMaterials())
+      material.getProgram().updateShaders();
+
+    updateMaterials(meshRenderer);
+  }
+}
+
+void RenderSystem::updateMaterials(const MeshRenderer& meshRenderer) const {
+  for (const Material& material : meshRenderer.getMaterials()) {
+    material.sendAttributes();
+    material.initTextures();
+
+    const RenderShaderProgram& materialProgram = material.getProgram();
+    m_cameraUbo.bindUniformBlock(materialProgram, "uboCameraInfo", 0);
+    m_lightsUbo.bindUniformBlock(materialProgram, "uboLightsInfo", 1);
+    m_modelUbo.bindUniformBlock(materialProgram, "uboModelInfo", 2);
+  }
+}
+
+void RenderSystem::updateMaterials() const {
   for (const Entity* entity : m_entities) {
     if (entity->hasComponent<MeshRenderer>())
-      entity->getComponent<MeshRenderer>().load(getGeometryProgram());
+      updateMaterials(entity->getComponent<MeshRenderer>());
   }
 }
 
@@ -166,7 +180,7 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
     updateLights();
 
   if (entity->hasComponent<MeshRenderer>())
-    entity->getComponent<MeshRenderer>().load(getGeometryProgram());
+    updateMaterials(entity->getComponent<MeshRenderer>());
 }
 
 void RenderSystem::initialize() {

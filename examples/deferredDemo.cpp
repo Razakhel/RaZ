@@ -106,8 +106,6 @@ int main() {
     ///////////////
 
     auto& render = world.addSystem<Raz::RenderSystem>(sceneWidth, sceneHeight, "RaZ");
-    render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"),
-                                           Raz::FragmentShader::loadFromSource(geomFragSource));
 
     Raz::Window& window = render.getWindow();
 
@@ -122,7 +120,7 @@ int main() {
     const auto colorBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
     const auto normalBuffer = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
 
-    // Setting geometry pass' shaders & defining its write buffers
+    // Setting the geometry pass' write buffers
     Raz::RenderPass& geomPass = renderGraph.getGeometryPass();
     geomPass.addWriteTexture(depthBuffer);
     geomPass.addWriteTexture(colorBuffer);

@@ -49,8 +49,6 @@ public:
 #endif
   const RenderPass& getGeometryPass() const { return m_renderGraph.getGeometryPass(); }
   RenderPass& getGeometryPass() { return m_renderGraph.getGeometryPass(); }
-  const RenderShaderProgram& getGeometryProgram() const { return getGeometryPass().getProgram(); }
-  RenderShaderProgram& getGeometryProgram() { return getGeometryPass().getProgram(); }
   const RenderGraph& getRenderGraph() const { return m_renderGraph; }
   RenderGraph& getRenderGraph() { return m_renderGraph; }
   bool hasCubemap() const { return m_cubemap.has_value(); }
@@ -81,6 +79,8 @@ public:
   /// Updates all lights referenced by the RenderSystem, sending their data to the GPU.
   void updateLights() const;
   void updateShaders() const;
+  void updateMaterials(const MeshRenderer& meshRenderer) const;
+  void updateMaterials() const;
   void saveToImage(const FilePath& filePath, TextureFormat format = TextureFormat::RGB, TextureDataType dataType = TextureDataType::UBYTE) const;
   void removeCubemap() { m_cubemap.reset(); }
   void destroy() override;

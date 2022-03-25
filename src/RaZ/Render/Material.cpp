@@ -4,6 +4,22 @@
 
 namespace Raz {
 
+namespace {
+
+constexpr std::string_view vertShaderSource = {
+#include "common.vert.embed"
+};
+
+constexpr std::string_view blinnPhongShaderSource = {
+#include "blinn-phong.frag.embed"
+};
+
+constexpr std::string_view cookTorranceShaderSource = {
+#include "cook-torrance.frag.embed"
+};
+
+} // namespace
+
 bool Material::hasAttribute(const std::string& uniformName) const noexcept {
   return (m_attributes.find(uniformName) != m_attributes.cend());
 }
@@ -70,6 +86,8 @@ void Material::removeTexture(const std::string& uniformName) {
 void Material::loadType(MaterialType type) {
   switch (type) {
     case MaterialType::COOK_TORRANCE:
+      m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(cookTorranceShaderSource));
+
       if (!hasAttribute("uniMaterial.baseColor"))
         setAttribute(Vec3f(1.f), "uniMaterial.baseColor");
       if (!hasAttribute("uniMaterial.emissive"))
@@ -95,6 +113,8 @@ void Material::loadType(MaterialType type) {
       break;
 
     case MaterialType::BLINN_PHONG:
+      m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(blinnPhongShaderSource));
+
       if (!hasAttribute("uniMaterial.baseColor"))
         setAttribute(Vec3f(1.f), "uniMaterial.baseColor");
       if (!hasAttribute("uniMaterial.emissive"))
@@ -126,25 +146,25 @@ void Material::loadType(MaterialType type) {
   }
 }
 
-void Material::sendAttributes(const RenderShaderProgram& program) const {
-  program.use();
+void Material::sendAttributes() const {
+  m_program.use();
 
   for (const auto& [name, attrib] : m_attributes)
-    std::visit([&program, &uniformName = name] (const auto& value) { program.sendUniform(uniformName, value); }, attrib);
+    std::visit([this, &uniformName = name] (const auto& value) { m_program.sendUniform(uniformName, value); }, attrib);
 }
 
-void Material::initTextures(const RenderShaderProgram& program) const {
-  program.use();
+void Material::initTextures() const {
+  m_program.use();
 
   // TODO: binding indices should be user-definable to allow the same texture to be bound to multiple uniforms
   int bindingIndex = 0;
 
   for (const auto& [texture, name] : m_textures)
-    program.sendUniform(name, bindingIndex++);
+    m_program.sendUniform(name, bindingIndex++);
 }
 
-void Material::bindTextures(const RenderShaderProgram& program) const {
-  program.use();
+void Material::bindTextures() const {
+  m_program.use();
 
   unsigned int textureIndex = 0;
 
