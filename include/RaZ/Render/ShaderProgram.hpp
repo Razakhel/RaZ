@@ -188,9 +188,12 @@ public:
     : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(geomShader), std::move(fragShader)); }
 
   const VertexShader& getVertexShader() const noexcept { return m_vertShader; }
-  const TessellationControlShader& getTessellationControlShader() const noexcept { assert(m_tessCtrlShader); return *m_tessCtrlShader; }
-  const TessellationEvaluationShader& getTessellationEvaluationShader() const noexcept { assert(m_tessEvalShader); return *m_tessEvalShader; }
-  const GeometryShader& getGeometryShader() const noexcept { assert(m_geomShader); return *m_geomShader; }
+  bool hasTessellationControlShader() const noexcept { return m_tessCtrlShader.has_value(); }
+  const TessellationControlShader& getTessellationControlShader() const noexcept { assert(hasTessellationControlShader()); return *m_tessCtrlShader; }
+  bool hasTessellationEvaluationShader() const noexcept { return m_tessEvalShader.has_value(); }
+  const TessellationEvaluationShader& getTessellationEvaluationShader() const noexcept { assert(hasTessellationEvaluationShader()); return *m_tessEvalShader; }
+  bool hasGeometryShader() const noexcept { return m_geomShader.has_value(); }
+  const GeometryShader& getGeometryShader() const noexcept { assert(hasGeometryShader()); return *m_geomShader; }
   const FragmentShader& getFragmentShader() const noexcept { return m_fragShader; }
 
   void setVertexShader(VertexShader&& vertShader);
