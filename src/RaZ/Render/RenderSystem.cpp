@@ -92,7 +92,7 @@ void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) con
   geometryProgram.sendUniform(posStr,    homogeneousPos);
   geometryProgram.sendUniform(energyStr, lightComp.getEnergy());
   geometryProgram.sendUniform(colorStr,  lightComp.getColor());
-  geometryProgram.sendUniform(angleStr,  lightComp.getAngle());
+  geometryProgram.sendUniform(angleStr,  lightComp.getAngle().value);
 }
 
 void RenderSystem::updateLights() const {
