@@ -8,10 +8,12 @@ constexpr unsigned int sceneHeight = 720;
 constexpr std::string_view geomFragSource = R"(
   struct Material {
     vec3 baseColor;
+    vec3 emissive;
     float metallicFactor;
     float roughnessFactor;
 
     sampler2D albedoMap;
+    sampler2D emissiveMap;
     sampler2D normalMap;
     sampler2D metallicMap;
     sampler2D roughnessMap;
@@ -40,6 +42,7 @@ constexpr std::string_view geomFragSource = R"(
 
   void main() {
     vec3 albedo     = pow(texture(uniMaterial.albedoMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+    vec3 emissive   = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
     float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
     float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
 
@@ -47,7 +50,8 @@ constexpr std::string_view geomFragSource = R"(
     normal      = normalize(normal * 2.0 - 1.0);
     normal      = normalize(vertMeshInfo.vertTBNMatrix * normal);
 
-    fragColor  = vec4(albedo, metallic);
+    // Using the emissive (which will always be 0 here) to avoid many warnings about unrecognized uniform names
+    fragColor  = vec4(albedo + emissive, metallic);
     fragNormal = vec4(normal, roughness);
   }
 )";

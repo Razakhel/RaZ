@@ -49,6 +49,7 @@ Raz::MeshRenderer createMeshRenderer() {
   {
     auto material = Raz::MaterialCookTorrance::create();
     material->setBaseColor(Raz::Vec3f(1.f, 0.f, 0.f));
+    material->setEmissive(Raz::Vec3f(0.f, 1.f, 0.f));
     material->setMetallicFactor(0.25f);
     material->setRoughnessFactor(0.75f);
     meshRenderer.addMaterial(std::move(material));
@@ -57,9 +58,9 @@ Raz::MeshRenderer createMeshRenderer() {
   {
     auto material = Raz::MaterialBlinnPhong::create();
     material->setDiffuse(Raz::Vec3f(1.f, 0.f, 0.f));
-    material->setAmbient(Raz::Vec3f(0.f, 1.f, 0.f));
-    material->setSpecular(Raz::Vec3f(0.f, 0.f, 1.f));
-    material->setEmissive(Raz::Vec3f(1.f, 1.f, 1.f));
+    material->setEmissive(Raz::Vec3f(0.f, 1.f, 0.f));
+    material->setAmbient(Raz::Vec3f(0.f, 0.f, 1.f));
+    material->setSpecular(Raz::Vec3f(1.f, 0.f, 1.f));
     material->setTransparency(0.5f);
     meshRenderer.addMaterial(std::move(material));
   }
@@ -70,7 +71,7 @@ Raz::MeshRenderer createMeshRenderer() {
 } // namespace
 
 TEST_CASE("ObjFormat load quad faces") {
-  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT + "../assets/meshes/ballQuads.obj"s);
+  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT "../assets/meshes/ballQuads.obj");
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 439);
@@ -82,7 +83,7 @@ TEST_CASE("ObjFormat load quad faces") {
 }
 
 TEST_CASE("ObjFormat load Blinn-Phong") {
-  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT + "assets/meshes/çûbè_BP.obj"s);
+  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè_BP.obj");
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
@@ -114,10 +115,10 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   const auto& material = static_cast<const Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials().front());
 
-  CHECK(material.getBaseColor() == Raz::Vec3f(1.f));
-  CHECK(material.getAmbient() == Raz::Vec3f(0.67f));
-  CHECK(material.getSpecular() == Raz::Vec3f(0.33f));
-  CHECK(material.getEmissive() == Raz::Vec3f(0.f));
+  CHECK(material.getBaseColor() == Raz::Vec3f(0.99f));
+  CHECK(material.getEmissive() == Raz::Vec3f(0.75f));
+  CHECK(material.getAmbient() == Raz::Vec3f(0.5f));
+  CHECK(material.getSpecular() == Raz::Vec3f(0.25f));
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -169,9 +170,46 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     CHECK(diffuseData[15] == 127);
   }
 
+  // Emissive map
+  {
+    CHECK(material.getEmissiveMap()->getBindingIndex() == 1);
+
+    REQUIRE_FALSE(material.getEmissiveMap()->getImage().isEmpty());
+
+    CHECK(material.getEmissiveMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
+    CHECK(material.getEmissiveMap()->getImage().getWidth() == 2);
+    CHECK(material.getEmissiveMap()->getImage().getHeight() == 2);
+
+    REQUIRE(material.getEmissiveMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* emissiveData = static_cast<const uint8_t*>(material.getEmissiveMap()->getImage().getDataPtr());
+
+    // ---------
+    // | R | R |
+    // |-------|
+    // | R | R |
+    // ---------
+
+    CHECK(emissiveData[0] == 255);
+    CHECK(emissiveData[1] == 0);
+    CHECK(emissiveData[2] == 0);
+
+    CHECK(emissiveData[3] == 255);
+    CHECK(emissiveData[4] == 0);
+    CHECK(emissiveData[5] == 0);
+
+    CHECK(emissiveData[6] == 255);
+    CHECK(emissiveData[7] == 0);
+    CHECK(emissiveData[8] == 0);
+
+    CHECK(emissiveData[9]  == 255);
+    CHECK(emissiveData[10] == 0);
+    CHECK(emissiveData[11] == 0);
+  }
+
   // Ambient map
   {
-    CHECK(material.getAmbientMap()->getBindingIndex() == 1);
+    CHECK(material.getAmbientMap()->getBindingIndex() == 2);
 
     REQUIRE_FALSE(material.getAmbientMap()->getImage().isEmpty());
 
@@ -208,7 +246,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Specular map
   {
-    CHECK(material.getSpecularMap()->getBindingIndex() == 2);
+    CHECK(material.getSpecularMap()->getBindingIndex() == 3);
 
     REQUIRE_FALSE(material.getSpecularMap()->getImage().isEmpty());
 
@@ -230,43 +268,6 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     CHECK(specularData[1] == 255);
     CHECK(specularData[2] == 255);
     CHECK(specularData[3] == 0);
-  }
-
-  // Emissive map
-  {
-    CHECK(material.getEmissiveMap()->getBindingIndex() == 3);
-
-    REQUIRE_FALSE(material.getEmissiveMap()->getImage().isEmpty());
-
-    CHECK(material.getEmissiveMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
-    CHECK(material.getEmissiveMap()->getImage().getWidth() == 2);
-    CHECK(material.getEmissiveMap()->getImage().getHeight() == 2);
-
-    REQUIRE(material.getEmissiveMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
-
-    const auto* emissiveData = static_cast<const uint8_t*>(material.getEmissiveMap()->getImage().getDataPtr());
-
-    // ---------
-    // | R | R |
-    // |-------|
-    // | R | R |
-    // ---------
-
-    CHECK(emissiveData[0] == 255);
-    CHECK(emissiveData[1] == 0);
-    CHECK(emissiveData[2] == 0);
-
-    CHECK(emissiveData[3] == 255);
-    CHECK(emissiveData[4] == 0);
-    CHECK(emissiveData[5] == 0);
-
-    CHECK(emissiveData[6] == 255);
-    CHECK(emissiveData[7] == 0);
-    CHECK(emissiveData[8] == 0);
-
-    CHECK(emissiveData[9]  == 255);
-    CHECK(emissiveData[10] == 0);
-    CHECK(emissiveData[11] == 0);
   }
 
   // Transparency map
@@ -323,7 +324,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 }
 
 TEST_CASE("ObjFormat load Cook-Torrance") {
-  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT + "assets/meshes/çûbè_CT.obj"s);
+  const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè_CT.obj");
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
@@ -355,9 +356,10 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   const auto& material = static_cast<const Raz::MaterialCookTorrance&>(*meshRenderer.getMaterials().front());
 
-  CHECK(material.getBaseColor() == Raz::Vec3f(1.f));
-  CHECK(material.getMetallicFactor() == 1.f);
-  CHECK(material.getRoughnessFactor() == 1.f);
+  CHECK(material.getBaseColor() == Raz::Vec3f(0.99f));
+  CHECK(material.getEmissive() == Raz::Vec3f(0.75f));
+  CHECK(material.getMetallicFactor() == 0.5f);
+  CHECK(material.getRoughnessFactor() == 0.25f);
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -409,9 +411,46 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     CHECK(albedoData[15] == 127);
   }
 
+  // Emissive map
+  {
+    CHECK(material.getEmissiveMap()->getBindingIndex() == 1);
+
+    REQUIRE_FALSE(material.getEmissiveMap()->getImage().isEmpty());
+
+    CHECK(material.getEmissiveMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
+    CHECK(material.getEmissiveMap()->getImage().getWidth() == 2);
+    CHECK(material.getEmissiveMap()->getImage().getHeight() == 2);
+
+    REQUIRE(material.getEmissiveMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* emissiveData = static_cast<const uint8_t*>(material.getEmissiveMap()->getImage().getDataPtr());
+
+    // ---------
+    // | R | R |
+    // |-------|
+    // | R | R |
+    // ---------
+
+    CHECK(emissiveData[0] == 255);
+    CHECK(emissiveData[1] == 0);
+    CHECK(emissiveData[2] == 0);
+
+    CHECK(emissiveData[3] == 255);
+    CHECK(emissiveData[4] == 0);
+    CHECK(emissiveData[5] == 0);
+
+    CHECK(emissiveData[6] == 255);
+    CHECK(emissiveData[7] == 0);
+    CHECK(emissiveData[8] == 0);
+
+    CHECK(emissiveData[9]  == 255);
+    CHECK(emissiveData[10] == 0);
+    CHECK(emissiveData[11] == 0);
+  }
+
   // Normal map
   {
-    CHECK(material.getNormalMap()->getBindingIndex() == 1);
+    CHECK(material.getNormalMap()->getBindingIndex() == 2);
 
     REQUIRE_FALSE(material.getNormalMap()->getImage().isEmpty());
 
@@ -448,7 +487,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Metallic map
   {
-    CHECK(material.getMetallicMap()->getBindingIndex() == 2);
+    CHECK(material.getMetallicMap()->getBindingIndex() == 3);
 
     REQUIRE_FALSE(material.getMetallicMap()->getImage().isEmpty());
 
@@ -474,7 +513,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Roughness map
   {
-    CHECK(material.getRoughnessMap()->getBindingIndex() == 3);
+    CHECK(material.getRoughnessMap()->getBindingIndex() == 4);
 
     REQUIRE_FALSE(material.getRoughnessMap()->getImage().isEmpty());
 
@@ -500,7 +539,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Ambient occlusion map
   {
-    CHECK(material.getAmbientOcclusionMap()->getBindingIndex() == 4);
+    CHECK(material.getAmbientOcclusionMap()->getBindingIndex() == 5);
 
     REQUIRE_FALSE(material.getAmbientOcclusionMap()->getImage().isEmpty());
 
@@ -580,7 +619,8 @@ TEST_CASE("ObjFormat save") {
     CHECK(meshRendererData.getMaterials().front()->getType() == Raz::MaterialType::COOK_TORRANCE);
 
     auto& material = static_cast<Raz::MaterialCookTorrance&>(*meshRendererData.getMaterials().front());
-    CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f)));
+    CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
+    CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(0.f, 0.f, 0.f)));
     CHECK(material.getMetallicFactor() == 1.f);
     CHECK(material.getRoughnessFactor() == 1.f);
   }
@@ -605,6 +645,7 @@ TEST_CASE("ObjFormat save") {
 
       auto& material = static_cast<Raz::MaterialCookTorrance&>(*meshRendererData.getMaterials()[0]);
       CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
       CHECK(material.getMetallicFactor() == 0.25f);
       CHECK(material.getRoughnessFactor() == 0.75f);
     }
@@ -614,9 +655,9 @@ TEST_CASE("ObjFormat save") {
 
       auto& material = static_cast<Raz::MaterialBlinnPhong&>(*meshRendererData.getMaterials()[1]);
       CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
-      CHECK(material.getAmbient().strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
-      CHECK(material.getSpecular().strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
-      CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
+      CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
+      CHECK(material.getAmbient().strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
+      CHECK(material.getSpecular().strictlyEquals(Raz::Vec3f(1.f, 0.f, 1.f)));
       CHECK(material.getTransparency() == 0.5f);
     }
   }

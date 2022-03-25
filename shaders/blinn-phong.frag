@@ -10,15 +10,15 @@ struct Light {
 
 struct Material {
   vec3 diffuse;
+  vec3 emissive;
   vec3 ambient;
   vec3 specular;
-  vec3 emissive;
   float transparency;
 
   sampler2D diffuseMap;
+  sampler2D emissiveMap;
   sampler2D ambientMap;
   sampler2D specularMap;
-  sampler2D emissiveMap;
   sampler2D transparencyMap;
   sampler2D bumpMap;
 };

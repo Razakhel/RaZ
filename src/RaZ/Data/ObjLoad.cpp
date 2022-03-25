@@ -29,9 +29,9 @@ constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, co
   return (firstEdge * secondUVDiff[1] - secondEdge * firstUVDiff[1]) / denominator;
 }
 
-inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath, int bindingIndex = 0) {
+inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-  return Texture::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), bindingIndex);
+  return Texture::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), 0);
 }
 
 inline void loadMtl(const FilePath& mtlFilePath,
@@ -47,17 +47,18 @@ inline void loadMtl(const FilePath& mtlFilePath,
   auto addLocalMaterial = [&blinnPhongMaterial, &cookTorranceMaterial, &materials] (bool isCookTorrance) {
     if (isCookTorrance) {
       cookTorranceMaterial->getAlbedoMap()->setBindingIndex(0);
-      cookTorranceMaterial->getNormalMap()->setBindingIndex(1);
-      cookTorranceMaterial->getMetallicMap()->setBindingIndex(2);
-      cookTorranceMaterial->getRoughnessMap()->setBindingIndex(3);
-      cookTorranceMaterial->getAmbientOcclusionMap()->setBindingIndex(4);
+      cookTorranceMaterial->getEmissiveMap()->setBindingIndex(1);
+      cookTorranceMaterial->getNormalMap()->setBindingIndex(2);
+      cookTorranceMaterial->getMetallicMap()->setBindingIndex(3);
+      cookTorranceMaterial->getRoughnessMap()->setBindingIndex(4);
+      cookTorranceMaterial->getAmbientOcclusionMap()->setBindingIndex(5);
 
       materials.emplace_back(std::move(cookTorranceMaterial));
     } else {
       blinnPhongMaterial->getDiffuseMap()->setBindingIndex(0);
-      blinnPhongMaterial->getAmbientMap()->setBindingIndex(1);
-      blinnPhongMaterial->getSpecularMap()->setBindingIndex(2);
-      blinnPhongMaterial->getEmissiveMap()->setBindingIndex(3);
+      blinnPhongMaterial->getEmissiveMap()->setBindingIndex(1);
+      blinnPhongMaterial->getAmbientMap()->setBindingIndex(2);
+      blinnPhongMaterial->getSpecularMap()->setBindingIndex(3);
       blinnPhongMaterial->getTransparencyMap()->setBindingIndex(4);
       blinnPhongMaterial->getBumpMap()->setBindingIndex(5);
 
@@ -97,6 +98,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
         blinnPhongMaterial->setSpecular(red, green, blue);
       } else if (tag[1] == 'e') {        // Emissive factor [Ke]
         blinnPhongMaterial->setEmissive(red, green, blue);
+        cookTorranceMaterial->setEmissive(red, green, blue);
       }
 
       isBlinnPhongMaterial = true;
@@ -124,6 +126,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
           isBlinnPhongMaterial = true;
         } else if (tag[5] == 'e') {      // Emissive map [map_Ke]
           blinnPhongMaterial->setEmissiveMap(map);
+          cookTorranceMaterial->setEmissiveMap(map);
         }
       }  else if (tag[4] == 'P') {       // PBR maps
         if (tag[5] == 'm')               // Metallic map [map_Pm]
@@ -151,11 +154,11 @@ inline void loadMtl(const FilePath& mtlFilePath,
         isBlinnPhongMaterial = true;
       }*/
     }  else if (tag[0] == 'b') {         // Bump map (alias) [bump]
-      blinnPhongMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue, 5));
+      blinnPhongMaterial->setBumpMap(loadTexture(mtlFilePath, nextValue));
       isBlinnPhongMaterial = true;
     } else if (tag[0] == 'n') {
       if (tag[1] == 'o') {               // Normal map [norm]
-        cookTorranceMaterial->setNormalMap(loadTexture(mtlFilePath, nextValue, 1));
+        cookTorranceMaterial->setNormalMap(loadTexture(mtlFilePath, nextValue));
       } else if (tag[1] == 'e') {        // New material [newmtl]
         materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
 

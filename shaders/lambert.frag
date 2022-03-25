@@ -9,14 +9,15 @@ struct Light {
 };
 
 struct Material {
-  vec3 ambient;
   vec3 diffuse;
-  vec3 specular;
   vec3 emissive;
+  vec3 ambient;
+  vec3 specular;
   float transparency;
 
-  sampler2D ambientMap;
   sampler2D diffuseMap;
+  sampler2D emissiveMap;
+  sampler2D ambientMap;
   sampler2D specularMap;
   sampler2D transparencyMap;
   sampler2D bumpMap;
@@ -54,16 +55,18 @@ void main() {
     vec3 lightPos = (viewProjectionMat * uniLights[lightIndex].position).xyz;
     vec3 lightDir;
 
-    if (uniLights[lightIndex].position.w != 0.0) {
+    if (uniLights[lightIndex].position.w != 0.0)
       lightDir = normalize(lightPos - vertMeshInfo.vertPosition);
-    } else {
+    else
       lightDir = normalize(-uniLights[lightIndex].direction);
-    }
 
     lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, normal), 0.0, 1.0));
   }
 
-  fragColor = vec4(lightHitAngle * texture(uniMaterial.diffuseMap, vertMeshInfo.vertTexcoords).rgb, 1.0);
+  vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
+
+  vec3 color = lightHitAngle * texture(uniMaterial.diffuseMap, vertMeshInfo.vertTexcoords).rgb + emissive;
+  fragColor  = vec4(color, 1.0);
 
   // Sending fragment normal to next framebuffer(s), if any
   bufferNormal = normal;

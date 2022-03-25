@@ -64,12 +64,23 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       }
     }
 
+    const auto* emissiveTexture = static_cast<fbxsdk::FbxFileTexture*>(emissive.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
+    if (emissiveTexture) {
+      const std::string emissiveTexturePath = texturePath + emissiveTexture->GetRelativeFileName();
+
+      try {
+        material->loadEmissiveMap(emissiveTexturePath, 1);
+      } catch (...) {
+        Logger::error("[FBX] Failed to load emissive map '" + emissiveTexturePath + "'.");
+      }
+    }
+
     const auto* ambientTexture = static_cast<fbxsdk::FbxFileTexture*>(ambient.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (ambientTexture) {
       const std::string ambientTexturePath = texturePath + ambientTexture->GetRelativeFileName();
 
       try {
-        material->loadAmbientMap(ambientTexturePath, 1);
+        material->loadAmbientMap(ambientTexturePath, 2);
       } catch (...) {
         Logger::error("[FBX] Failed to load ambient map '" + ambientTexturePath + "'.");
       }
@@ -80,20 +91,9 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string specularTexturePath = texturePath + specularTexture->GetRelativeFileName();
 
       try {
-        material->loadSpecularMap(specularTexturePath, 2);
+        material->loadSpecularMap(specularTexturePath, 3);
       } catch (...) {
         Logger::error("[FBX] Failed to load specular map '" + specularTexturePath + "'.");
-      }
-    }
-
-    const auto* emissiveTexture = static_cast<fbxsdk::FbxFileTexture*>(emissive.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
-    if (emissiveTexture) {
-      const std::string emissiveTexturePath = texturePath + emissiveTexture->GetRelativeFileName();
-
-      try {
-        material->loadEmissiveMap(emissiveTexturePath, 3);
-      } catch (...) {
-        Logger::error("[FBX] Failed to load emissive map '" + emissiveTexturePath + "'.");
       }
     }
 
@@ -106,7 +106,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
         const std::string normalMapPath = texturePath + normalMap->GetRelativeFileName();
 
         try {
-          material->loadNormalMap(normalMapPath);
+          material->loadNormalMap(normalMapPath, ?);
         } catch (...) {
           Logger::error("[FBX] Failed to load normal map '" + normalMapPath + "'.");
         }

@@ -26,6 +26,7 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
 
     mtlFile << "\nnewmtl " << materialName << '\n';
     mtlFile << "\tKd " << material->getBaseColor()[0] << ' ' << material->getBaseColor()[1] << ' ' << material->getBaseColor()[2] << '\n';
+    mtlFile << "\tKe " << material->getEmissive()[0] << ' ' << material->getEmissive()[1] << ' ' << material->getEmissive()[2] << '\n';
 
     if (material->getType() == MaterialType::COOK_TORRANCE) {
       const auto* matCT = static_cast<MaterialCookTorrance*>(material.get());
@@ -38,6 +39,13 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
 
         mtlFile << "\tmap_Kd " << albedoMapPath << '\n';
         ImageFormat::save(albedoMapPath, matCT->getAlbedoMap()->getImage(), true);
+      }
+
+      if (matCT->getEmissiveMap() && !matCT->getEmissiveMap()->getImage().isEmpty()) {
+        const auto emissiveMapPath = materialName + "_emissive.png";
+
+        mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
+        ImageFormat::save(emissiveMapPath, matCT->getEmissiveMap()->getImage(), true);
       }
 
       if (matCT->getNormalMap() && !matCT->getNormalMap()->getImage().isEmpty()) {
@@ -72,7 +80,6 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
 
       mtlFile << "\tKa " << matBP->getAmbient()[0] << ' ' << matBP->getAmbient()[1] << ' ' << matBP->getAmbient()[2] << '\n';
       mtlFile << "\tKs " << matBP->getSpecular()[0] << ' ' << matBP->getSpecular()[1] << ' ' << matBP->getSpecular()[2] << '\n';
-      mtlFile << "\tKe " << matBP->getEmissive()[0] << ' ' << matBP->getEmissive()[1] << ' ' << matBP->getEmissive()[2] << '\n';
       mtlFile << "\td  " << matBP->getTransparency() << '\n';
 
       if (matBP->getDiffuseMap() && !matBP->getDiffuseMap()->getImage().isEmpty()) {
@@ -80,6 +87,13 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
 
         mtlFile << "\tmap_Kd " << diffuseMapPath << '\n';
         ImageFormat::save(diffuseMapPath, matBP->getDiffuseMap()->getImage(), true);
+      }
+
+      if (matBP->getEmissiveMap() && !matBP->getEmissiveMap()->getImage().isEmpty()) {
+        const auto emissiveMapPath = materialName + "_emissive.png";
+
+        mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
+        ImageFormat::save(emissiveMapPath, matBP->getEmissiveMap()->getImage(), true);
       }
 
       if (matBP->getAmbientMap() && !matBP->getAmbientMap()->getImage().isEmpty()) {

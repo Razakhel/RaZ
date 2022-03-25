@@ -1,5 +1,11 @@
 newmtl cube_CT
+  Kd 0.99 0.99 0.99
+  Ke 0.75 0.75 0.75
+  Pm 0.50
+  Pr 0.25
+
   map_Kd ../textures/ŔĜBŖĀ.png
+  map_Ke ../textures/ŔŖȒȐ.png
   norm ../textures/BƁḂɃ.png
   map_Pm ../textures/₁₁₁₁.png
   map_Pr ../textures/₀₀₀₀.png

@@ -39,15 +39,21 @@ public:
 
   virtual MaterialType getType() const = 0;
   const Vec3f& getBaseColor() const { return m_baseColor; }
+  const Vec3f& getEmissive() const { return m_emissive; }
 
   const TexturePtr& getBaseColorMap() const { return m_baseColorMap; }
+  const TexturePtr& getEmissiveMap() const { return m_emissiveMap; }
 
   void setBaseColor(float red, float green, float blue) { setBaseColor(Vec3f(red, green, blue)); }
   void setBaseColor(const Vec3f& color) { m_baseColor = color; }
+  void setEmissive(float red, float green, float blue) { setEmissive(Vec3f(red, green, blue)); }
+  void setEmissive(const Vec3f& val) { m_emissive = val; }
 
   void setBaseColorMap(TexturePtr baseColorMap) { m_baseColorMap = std::move(baseColorMap); }
+  void setEmissiveMap(TexturePtr emissiveMap) { m_emissiveMap = std::move(emissiveMap); }
 
   void loadBaseColorMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
+  void loadEmissiveMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
 
   static MaterialCookTorrancePtr recoverMaterial(MaterialPreset preset, float roughnessFactor);
   virtual MaterialPtr clone() const = 0;
@@ -60,12 +66,15 @@ public:
 
 protected:
   Material() = default;
+  explicit Material(const Vec3f& baseColor, const Vec3f& emissive = Vec3f(0.f)) : m_baseColor{ baseColor }, m_emissive{ emissive } {}
   explicit Material(TexturePtr baseColorMap) : m_baseColorMap{ std::move(baseColorMap) } {}
   Material(const Material&) noexcept = default;
 
   Vec3f m_baseColor = Vec3f(1.f);
+  Vec3f m_emissive  = Vec3f(0.f);
 
   TexturePtr m_baseColorMap = Texture::create(ColorPreset::WHITE, 0);
+  TexturePtr m_emissiveMap  = Texture::create(ColorPreset::WHITE, 1);
 };
 
 class MaterialBlinnPhong final : public Material {
@@ -77,18 +86,16 @@ public:
                               const Vec3f& specular = Vec3f(1.f),
                               const Vec3f& emissive = Vec3f(0.f),
                               float transparency    = 1.f)
-    : m_ambient{ ambient }, m_specular{ specular }, m_emissive{ emissive }, m_transparency{ transparency } { setBaseColor(baseColor); }
+    : Material(baseColor, emissive), m_ambient{ ambient }, m_specular{ specular }, m_transparency{ transparency } {}
 
   MaterialType getType() const override { return MaterialType::BLINN_PHONG; }
   const Vec3f& getAmbient() const { return m_ambient; }
   const Vec3f& getSpecular() const { return m_specular; }
-  const Vec3f& getEmissive() const { return m_emissive; }
   float getTransparency() const { return m_transparency; }
 
   const TexturePtr& getDiffuseMap() const { return getBaseColorMap(); }
   const TexturePtr& getAmbientMap() const { return m_ambientMap; }
   const TexturePtr& getSpecularMap() const { return m_specularMap; }
-  const TexturePtr& getEmissiveMap() const { return m_emissiveMap; }
   const TexturePtr& getTransparencyMap() const { return m_transparencyMap; }
   const TexturePtr& getBumpMap() const { return m_bumpMap; }
 
@@ -98,14 +105,11 @@ public:
   void setAmbient(const Vec3f& val) { m_ambient = val; }
   void setSpecular(float red, float green, float blue) { setSpecular(Vec3f(red, green, blue)); }
   void setSpecular(const Vec3f& val) { m_specular = val; }
-  void setEmissive(float red, float green, float blue) { setEmissive(Vec3f(red, green, blue)); }
-  void setEmissive(const Vec3f& val) { m_emissive = val; }
   void setTransparency(float transparency) { m_transparency = transparency; }
 
   void setDiffuseMap(TexturePtr diffuseMap) { setBaseColorMap(std::move(diffuseMap)); }
   void setAmbientMap(TexturePtr ambientMap) { m_ambientMap = std::move(ambientMap); }
   void setSpecularMap(TexturePtr specularMap) { m_specularMap = std::move(specularMap); }
-  void setEmissiveMap(TexturePtr emissiveMap) { m_emissiveMap = std::move(emissiveMap); }
   void setTransparencyMap(TexturePtr transparencyMap) { m_transparencyMap = std::move(transparencyMap); }
   void setBumpMap(TexturePtr bumpMap) { m_bumpMap = std::move(bumpMap); }
 
@@ -115,7 +119,6 @@ public:
   void loadDiffuseMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
   void loadAmbientMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
   void loadSpecularMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
-  void loadEmissiveMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
   void loadTransparencyMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
   void loadBumpMap(const FilePath& filePath, int bindingIndex, bool flipVertically = true);
 
@@ -126,12 +129,10 @@ public:
 private:
   Vec3f m_ambient      = Vec3f(1.f);
   Vec3f m_specular     = Vec3f(1.f);
-  Vec3f m_emissive     = Vec3f(0.f);
   float m_transparency = 1.f;
 
-  TexturePtr m_ambientMap      = Texture::create(ColorPreset::WHITE, 1);
-  TexturePtr m_specularMap     = Texture::create(ColorPreset::WHITE, 2);
-  TexturePtr m_emissiveMap     = Texture::create(ColorPreset::WHITE, 3);
+  TexturePtr m_ambientMap      = Texture::create(ColorPreset::WHITE, 2);
+  TexturePtr m_specularMap     = Texture::create(ColorPreset::WHITE, 3);
   TexturePtr m_transparencyMap = Texture::create(ColorPreset::WHITE, 4);
   TexturePtr m_bumpMap         = Texture::create(ColorPreset::WHITE, 5);
 };
@@ -179,10 +180,10 @@ private:
   float m_metallicFactor  = 1.f;
   float m_roughnessFactor = 1.f;
 
-  TexturePtr m_normalMap           = Texture::create(ColorPreset::MEDIUM_BLUE, 1); // Representing a [ 0; 0; 1 ] vector
-  TexturePtr m_metallicMap         = Texture::create(ColorPreset::RED, 2);
-  TexturePtr m_roughnessMap        = Texture::create(ColorPreset::RED, 3);
-  TexturePtr m_ambientOcclusionMap = Texture::create(ColorPreset::RED, 4);
+  TexturePtr m_normalMap           = Texture::create(ColorPreset::MEDIUM_BLUE, 2); // Representing a [ 0; 0; 1 ] vector
+  TexturePtr m_metallicMap         = Texture::create(ColorPreset::RED, 3);
+  TexturePtr m_roughnessMap        = Texture::create(ColorPreset::RED, 4);
+  TexturePtr m_ambientOcclusionMap = Texture::create(ColorPreset::RED, 5);
 };
 
 } // namespace Raz
