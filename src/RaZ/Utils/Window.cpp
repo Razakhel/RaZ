@@ -98,6 +98,7 @@ Window::Window(unsigned int width, unsigned int height,
 
   Renderer::initialize();
   Renderer::enable(Capability::DEPTH_TEST);
+  Renderer::enable(Capability::STENCIL_TEST);
 
   glfwSetWindowUserPointer(m_windowHandle, this);
 
@@ -373,7 +374,7 @@ bool Window::run(float deltaTime) {
 #endif
 
   Renderer::clearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
-  Renderer::clear(MaskType::COLOR | MaskType::DEPTH);
+  Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
 
   return true;
 }

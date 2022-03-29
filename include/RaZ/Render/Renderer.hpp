@@ -20,8 +20,8 @@ enum class Capability : unsigned int {
 
   DEPTH_CLAMP  = 34383 /* GL_DEPTH_CLAMP  */, ///<
   DEPTH_TEST   = 2929  /* GL_DEPTH_TEST   */, ///<
-  SCISSOR_TEST = 3089  /* GL_SCISSOR_TEST */, ///<
   STENCIL_TEST = 2960  /* GL_STENCIL_TEST */, ///<
+  SCISSOR_TEST = 3089  /* GL_SCISSOR_TEST */, ///<
 
   LINE_SMOOTH          = 2848  /* GL_LINE_SMOOTH          */, ///<
   POLYGON_SMOOTH       = 2881  /* GL_POLYGON_SMOOTH       */, ///<
@@ -97,7 +97,7 @@ enum class MaskType : unsigned int {
 };
 MAKE_ENUM_FLAG(MaskType)
 
-enum class DepthFunction : unsigned int {
+enum class DepthStencilFunction : unsigned int {
   NEVER         = 512 /* GL_NEVER    */, ///<
   EQUAL         = 514 /* GL_EQUAL    */, ///<
   NOT_EQUAL     = 517 /* GL_NOTEQUAL */, ///<
@@ -106,6 +106,17 @@ enum class DepthFunction : unsigned int {
   GREATER       = 516 /* GL_GREATER  */, ///<
   GREATER_EQUAL = 518 /* GL_GEQUAL   */, ///<
   ALWAYS        = 519 /* GL_ALWAYS   */  ///<
+};
+
+enum class StencilOperation : unsigned int {
+  ZERO           = 0     /* GL_ZERO      */, ///<
+  KEEP           = 7680  /* GL_KEEP      */, ///<
+  REPLACE        = 7681  /* GL_REPLACE   */, ///<
+  INCREMENT      = 7682  /* GL_INCR      */, ///<
+  INCREMENT_WRAP = 34055 /* GL_INCR_WRAP */, ///<
+  DECREMENT      = 7683  /* GL_DECR      */, ///<
+  DECREMENT_WRAP = 34056 /* GL_DECR_WRAP */, ///<
+  INVERT         = 5386  /* GL_INVERT    */  ///<
 };
 
 enum class FaceOrientation : unsigned int {
@@ -738,7 +749,26 @@ public:
   static void clearColor(float red, float green, float blue, float alpha);
   static void clearColor(float values[4]) { clearColor(values[0], values[1], values[2], values[3]); }
   static void clear(MaskType mask);
-  static void setDepthFunction(DepthFunction func);
+  static void setDepthFunction(DepthStencilFunction func);
+  /// Sets the function to evaluate for stencil testing.
+  /// \param func Function to be evaluated.
+  /// \param ref Reference value to compare the stencil with.
+  /// \param mask Bitmask to compare the reference & the stencil with.
+  /// \param orientation Face orientation for which to evaluate the function.
+  static void setStencilFunction(DepthStencilFunction func, int ref, unsigned int mask, FaceOrientation orientation = FaceOrientation::FRONT_BACK);
+  /// Sets operations to perform on stencil tests.
+  /// \param stencilFailOp Action to be performed if the stencil test fails.
+  /// \param depthFailOp Action to be performed if the stencil test succeeds, but the depth test fails.
+  /// \param successOp Action to be performed if both stencil & depth tests succeed, or if only the former does and there is no depth testing or no depth buffer.
+  /// \param orientation Face orientation for which to set the operations.
+  static void setStencilOperations(StencilOperation stencilFailOp,
+                                   StencilOperation depthFailOp,
+                                   StencilOperation successOp,
+                                   FaceOrientation orientation = FaceOrientation::FRONT_BACK);
+  /// Enables overwriting stencil values to the bits represented by the given mask.
+  /// \param mask Bitmask defining which stencil bits can be written.
+  /// \param orientation Face orientation for which to set the mask.
+  static void setStencilMask(unsigned int mask, FaceOrientation orientation = FaceOrientation::FRONT_BACK);
   static void setFaceCulling(FaceOrientation orientation);
 #if !defined(USE_OPENGL_ES)
   static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);

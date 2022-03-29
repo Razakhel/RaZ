@@ -254,10 +254,37 @@ void Renderer::clear(MaskType mask) {
   printConditionalErrors();
 }
 
-void Renderer::setDepthFunction(DepthFunction func) {
+void Renderer::setDepthFunction(DepthStencilFunction func) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDepthFunc(static_cast<unsigned int>(func));
+
+  printConditionalErrors();
+}
+
+void Renderer::setStencilFunction(DepthStencilFunction func, int ref, unsigned int mask, FaceOrientation orientation) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glStencilFuncSeparate(static_cast<unsigned int>(orientation), static_cast<unsigned int>(func), ref, mask);
+
+  printConditionalErrors();
+}
+
+void Renderer::setStencilOperations(StencilOperation stencilFailOp, StencilOperation depthFailOp, StencilOperation successOp, FaceOrientation orientation) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glStencilOpSeparate(static_cast<unsigned int>(stencilFailOp),
+                      static_cast<unsigned int>(depthFailOp),
+                      static_cast<unsigned int>(successOp),
+                      static_cast<unsigned int>(orientation));
+
+  printConditionalErrors();
+}
+
+void Renderer::setStencilMask(unsigned int mask, FaceOrientation orientation) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glStencilMaskSeparate(static_cast<unsigned int>(orientation), mask);
 
   printConditionalErrors();
 }

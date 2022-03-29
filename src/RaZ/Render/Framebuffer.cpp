@@ -111,7 +111,7 @@ void Framebuffer::mapBuffers() const {
 
 void Framebuffer::bind() const {
   Renderer::bindFramebuffer(m_index);
-  Renderer::clear(MaskType::COLOR | MaskType::DEPTH);
+  Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
 }
 
 void Framebuffer::unbind() const {
