@@ -279,7 +279,7 @@ int main() {
 
   overlay.addSeparator();
 
-  overlay.addTexture(*meshRenderComp.getMaterials().front()->getBaseColorMap(), 256, 256);
+  overlay.addTexture(meshRenderComp.getMaterials().front()->getTexture(0), 256, 256);
 
   overlay.addSeparator();
 

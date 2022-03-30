@@ -110,13 +110,6 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
         ImageFormat::save(specularMapPath, matBP->getSpecularMap()->getImage(), true);
       }
 
-      if (matBP->getEmissiveMap() && !matBP->getEmissiveMap()->getImage().isEmpty()) {
-        const auto emissiveMapPath = materialName + "_emissive.png";
-
-        mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
-        ImageFormat::save(emissiveMapPath, matBP->getEmissiveMap()->getImage(), true);
-      }
-
       if (matBP->getTransparencyMap() && !matBP->getTransparencyMap()->getImage().isEmpty()) {
         const auto transparencyMapPath = materialName + "_transparency.png";
 

@@ -58,7 +58,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string diffuseTexturePath = texturePath + diffuseTexture->GetRelativeFileName();
 
       try {
-        material->loadDiffuseMap(diffuseTexturePath, 0);
+        material->loadDiffuseMap(diffuseTexturePath);
       } catch (...) {
         Logger::error("[FBX] Failed to load diffuse map '" + diffuseTexturePath + "'.");
       }
@@ -69,7 +69,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string emissiveTexturePath = texturePath + emissiveTexture->GetRelativeFileName();
 
       try {
-        material->loadEmissiveMap(emissiveTexturePath, 1);
+        material->loadEmissiveMap(emissiveTexturePath);
       } catch (...) {
         Logger::error("[FBX] Failed to load emissive map '" + emissiveTexturePath + "'.");
       }
@@ -80,7 +80,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string ambientTexturePath = texturePath + ambientTexture->GetRelativeFileName();
 
       try {
-        material->loadAmbientMap(ambientTexturePath, 2);
+        material->loadAmbientMap(ambientTexturePath);
       } catch (...) {
         Logger::error("[FBX] Failed to load ambient map '" + ambientTexturePath + "'.");
       }
@@ -91,7 +91,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string specularTexturePath = texturePath + specularTexture->GetRelativeFileName();
 
       try {
-        material->loadSpecularMap(specularTexturePath, 3);
+        material->loadSpecularMap(specularTexturePath);
       } catch (...) {
         Logger::error("[FBX] Failed to load specular map '" + specularTexturePath + "'.");
       }
@@ -106,7 +106,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
         const std::string normalMapPath = texturePath + normalMap->GetRelativeFileName();
 
         try {
-          material->loadNormalMap(normalMapPath, ?);
+          material->loadNormalMap(normalMapPath);
         } catch (...) {
           Logger::error("[FBX] Failed to load normal map '" + normalMapPath + "'.");
         }
