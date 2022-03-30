@@ -53,8 +53,8 @@ public:
 
   static MaterialCookTorrancePtr recoverMaterial(MaterialPreset preset, float roughnessFactor);
   virtual MaterialPtr clone() const = 0;
-  virtual void initTextures(const RenderShaderProgram& program) const;
-  virtual void bindTextures(const RenderShaderProgram& program) const;
+  void initTextures(const RenderShaderProgram& program) const;
+  void bindTextures(const RenderShaderProgram& program) const;
   virtual void bindAttributes(const RenderShaderProgram& program) const = 0;
 
   Material& operator=(Material&&) noexcept = default;

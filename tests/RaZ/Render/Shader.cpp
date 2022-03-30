@@ -85,6 +85,71 @@ TEST_CASE("Shader validity") {
   }
 }
 
+TEST_CASE("Shader clone") {
+  // The content of the shaders does not need to be valid for this test
+  const Raz::FilePath shaderPath = RAZ_TESTS_ROOT "assets/shaders/basic.comp";
+  constexpr std::string_view shaderSource = "Shader source test";
+
+  static constexpr auto areShadersEqual = [] (const Raz::Shader& shader1, const Raz::Shader& shader2) {
+    CHECK_FALSE(shader1.getIndex() == shader2.getIndex()); // Both shaders remain two different objects: their indices must be different
+    CHECK(shader1.getPath() == shader2.getPath());
+    CHECK(Raz::Renderer::recoverShaderType(shader1.getIndex()) == Raz::Renderer::recoverShaderType(shader2.getIndex()));
+    CHECK(Raz::Renderer::recoverShaderSource(shader1.getIndex()) == Raz::Renderer::recoverShaderSource(shader2.getIndex()));
+  };
+
+  {
+    const Raz::VertexShader shaderFromPath(shaderPath);
+    areShadersEqual(shaderFromPath, shaderFromPath.clone());
+
+    const Raz::VertexShader shaderFromSource = Raz::VertexShader::loadFromSource(shaderSource);
+    areShadersEqual(shaderFromSource, shaderFromSource.clone());
+  }
+
+  // Tessellation shaders are only available in OpenGL 4.0+
+  if (Raz::Renderer::checkVersion(4, 0)) {
+    {
+      const Raz::TessellationControlShader shaderFromPath(shaderPath);
+      areShadersEqual(shaderFromPath, shaderFromPath.clone());
+
+      const Raz::TessellationControlShader shaderFromSource = Raz::TessellationControlShader::loadFromSource(shaderSource);
+      areShadersEqual(shaderFromSource, shaderFromSource.clone());
+    }
+
+    {
+      const Raz::TessellationEvaluationShader shaderFromPath(shaderPath);
+      areShadersEqual(shaderFromPath, shaderFromPath.clone());
+
+      const Raz::TessellationEvaluationShader shaderFromSource = Raz::TessellationEvaluationShader::loadFromSource(shaderSource);
+      areShadersEqual(shaderFromSource, shaderFromSource.clone());
+    }
+  }
+
+  {
+    const Raz::GeometryShader shaderFromPath(shaderPath);
+    areShadersEqual(shaderFromPath, shaderFromPath.clone());
+
+    const Raz::GeometryShader shaderFromSource = Raz::GeometryShader::loadFromSource(shaderSource);
+    areShadersEqual(shaderFromSource, shaderFromSource.clone());
+  }
+
+  {
+    const Raz::FragmentShader shaderFromPath(shaderPath);
+    areShadersEqual(shaderFromPath, shaderFromPath.clone());
+
+    const Raz::FragmentShader shaderFromSource = Raz::FragmentShader::loadFromSource(shaderSource);
+    areShadersEqual(shaderFromSource, shaderFromSource.clone());
+  }
+
+  // Compute shaders are only available in OpenGL 4.3+
+  if (Raz::Renderer::checkVersion(4, 3)) {
+    const Raz::ComputeShader shaderFromPath(shaderPath);
+    areShadersEqual(shaderFromPath, shaderFromPath.clone());
+
+    const Raz::ComputeShader shaderFromSource = Raz::ComputeShader::loadFromSource(shaderSource);
+    areShadersEqual(shaderFromSource, shaderFromSource.clone());
+  }
+}
+
 TEST_CASE("Vertex shader from source") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 

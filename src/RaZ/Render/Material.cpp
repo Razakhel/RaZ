@@ -122,10 +122,10 @@ MaterialCookTorrance::MaterialCookTorrance() {
 
   m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 0), "uniMaterial.albedoMap");
   m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 1), "uniMaterial.emissiveMap");
-  m_textures.emplace_back(Texture::Texture::create(ColorPreset::MEDIUM_BLUE, 2), "uniMaterial.normalMap"); // Representing a [ 0; 0; 1 ] vector
-  m_textures.emplace_back(Texture::Texture::create(ColorPreset::RED, 3), "uniMaterial.metallicMap");
-  m_textures.emplace_back(Texture::Texture::create(ColorPreset::RED, 4), "uniMaterial.roughnessMap");
-  m_textures.emplace_back(Texture::Texture::create(ColorPreset::RED, 5), "uniMaterial.ambientOcclusionMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::MEDIUM_BLUE, 2), "uniMaterial.normalMap"); // Representing a [ 0; 0; 1 ] vector
+  m_textures.emplace_back(Texture::create(ColorPreset::RED, 3), "uniMaterial.metallicMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::RED, 4), "uniMaterial.roughnessMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::RED, 5), "uniMaterial.ambientOcclusionMap");
 }
 
 MaterialCookTorrance::MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor) : MaterialCookTorrance() {

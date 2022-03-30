@@ -11,7 +11,7 @@ namespace Raz {
 Shader::Shader(Shader&& shader) noexcept
   : m_index{ std::exchange(shader.m_index, std::numeric_limits<unsigned int>::max()) }, m_path{ std::move(shader.m_path) } {}
 
-bool Shader::isValid() const {
+bool Shader::isValid() const noexcept {
   return (m_index != std::numeric_limits<unsigned int>::max());
 }
 
@@ -37,7 +37,7 @@ void Shader::compile() const {
   Logger::debug("[Shader] Compiled");
 }
 
-bool Shader::isCompiled() const {
+bool Shader::isCompiled() const noexcept {
   return Renderer::isShaderCompiled(m_index);
 }
 
@@ -95,6 +95,17 @@ VertexShader VertexShader::loadFromSource(const std::string& source) {
   return vertShader;
 }
 
+VertexShader VertexShader::clone() const {
+  VertexShader res;
+
+  if (!m_path.isEmpty())
+    res.import(m_path);
+  else
+    res.loadSource(Renderer::recoverShaderSource(m_index));
+
+  return res;
+}
+
 TessellationControlShader::TessellationControlShader() {
   Logger::debug("[Shader] Creating tessellation control shader...");
   m_index = Renderer::createShader(ShaderType::TESSELLATION_CONTROL);
@@ -105,6 +116,17 @@ TessellationControlShader TessellationControlShader::loadFromSource(const std::s
   TessellationControlShader tessCtrlShader;
   tessCtrlShader.loadSource(source);
   return tessCtrlShader;
+}
+
+TessellationControlShader TessellationControlShader::clone() const {
+  TessellationControlShader res;
+
+  if (!m_path.isEmpty())
+    res.import(m_path);
+  else
+    res.loadSource(Renderer::recoverShaderSource(m_index));
+
+  return res;
 }
 
 TessellationEvaluationShader::TessellationEvaluationShader() {
@@ -119,6 +141,17 @@ TessellationEvaluationShader TessellationEvaluationShader::loadFromSource(const 
   return tessEvalShader;
 }
 
+TessellationEvaluationShader TessellationEvaluationShader::clone() const {
+  TessellationEvaluationShader res;
+
+  if (!m_path.isEmpty())
+    res.import(m_path);
+  else
+    res.loadSource(Renderer::recoverShaderSource(m_index));
+
+  return res;
+}
+
 GeometryShader::GeometryShader() {
   Logger::debug("[Shader] Creating geometry shader...");
   m_index = Renderer::createShader(ShaderType::GEOMETRY);
@@ -129,6 +162,17 @@ GeometryShader GeometryShader::loadFromSource(const std::string& source) {
   GeometryShader geomShader;
   geomShader.loadSource(source);
   return geomShader;
+}
+
+GeometryShader GeometryShader::clone() const {
+  GeometryShader res;
+
+  if (!m_path.isEmpty())
+    res.import(m_path);
+  else
+    res.loadSource(Renderer::recoverShaderSource(m_index));
+
+  return res;
 }
 
 FragmentShader::FragmentShader() {
@@ -143,6 +187,17 @@ FragmentShader FragmentShader::loadFromSource(const std::string& source) {
   return fragShader;
 }
 
+FragmentShader FragmentShader::clone() const {
+  FragmentShader res;
+
+  if (!m_path.isEmpty())
+    res.import(m_path);
+  else
+    res.loadSource(Renderer::recoverShaderSource(m_index));
+
+  return res;
+}
+
 ComputeShader::ComputeShader() {
   Logger::debug("[Shader] Creating compute shader...");
   m_index = Renderer::createShader(ShaderType::COMPUTE);
@@ -153,6 +208,17 @@ ComputeShader ComputeShader::loadFromSource(const std::string& source) {
   ComputeShader compShader;
   compShader.loadSource(source);
   return compShader;
+}
+
+ComputeShader ComputeShader::clone() const {
+  ComputeShader res;
+
+  if (!m_path.isEmpty())
+    res.import(m_path);
+  else
+    res.loadSource(Renderer::recoverShaderSource(m_index));
+
+  return res;
 }
 
 } // namespace Raz

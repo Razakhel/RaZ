@@ -14,14 +14,14 @@ public:
   Shader(const Shader&) = delete;
   Shader(Shader&& shader) noexcept;
 
-  unsigned int getIndex() const { return m_index; }
-  const FilePath& getPath() const { return m_path; }
+  unsigned int getIndex() const noexcept { return m_index; }
+  const FilePath& getPath() const noexcept { return m_path; }
 
-  bool isValid() const;
+  bool isValid() const noexcept;
   void import(FilePath filePath);
   void load() const;
   void compile() const;
-  bool isCompiled() const;
+  bool isCompiled() const noexcept;
   void destroy();
 
   Shader& operator=(const Shader&) = delete;
@@ -45,6 +45,8 @@ public:
 
   static VertexShader loadFromSource(const std::string& source);
   static VertexShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+
+  VertexShader clone() const;
 };
 
 class TessellationControlShader final : public Shader {
@@ -54,6 +56,8 @@ public:
 
   static TessellationControlShader loadFromSource(const std::string& source);
   static TessellationControlShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+
+  TessellationControlShader clone() const;
 };
 
 class TessellationEvaluationShader final : public Shader {
@@ -63,6 +67,8 @@ public:
 
   static TessellationEvaluationShader loadFromSource(const std::string& source);
   static TessellationEvaluationShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+
+  TessellationEvaluationShader clone() const;
 };
 
 class GeometryShader final : public Shader {
@@ -72,6 +78,8 @@ public:
 
   static GeometryShader loadFromSource(const std::string& source);
   static GeometryShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+
+  GeometryShader clone() const;
 };
 
 class FragmentShader final : public Shader {
@@ -81,6 +89,8 @@ public:
 
   static FragmentShader loadFromSource(const std::string& source);
   static FragmentShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+
+  FragmentShader clone() const;
 };
 
 class ComputeShader final : public Shader {
@@ -90,6 +100,8 @@ public:
 
   static ComputeShader loadFromSource(const std::string& source);
   static ComputeShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+
+  ComputeShader clone() const;
 };
 
 } // namespace Raz

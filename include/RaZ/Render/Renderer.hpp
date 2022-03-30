@@ -909,6 +909,7 @@ public:
   static void deleteProgram(unsigned int index);
   static unsigned int createShader(ShaderType type);
   static int recoverShaderInfo(unsigned int index, ShaderInfo info);
+  static ShaderType recoverShaderType(unsigned int index) { return static_cast<ShaderType>(recoverShaderInfo(index, ShaderInfo::TYPE)); }
   static bool isShaderCompiled(unsigned int index) { return (recoverShaderInfo(index, ShaderInfo::COMPILE_STATUS) == 1); }
   static void sendShaderSource(unsigned int index, const char* source, int length);
   static void sendShaderSource(unsigned int index, const std::string& source) { sendShaderSource(index, source.c_str(), static_cast<int>(source.size())); }
