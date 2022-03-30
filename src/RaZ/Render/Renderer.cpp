@@ -757,25 +757,15 @@ unsigned int Renderer::createShader(ShaderType type) {
   return shaderIndex;
 }
 
-int Renderer::getShaderStatus(unsigned int index, ShaderStatus status) {
+int Renderer::recoverShaderInfo(unsigned int index, ShaderInfo info) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   int res {};
-  glGetShaderiv(index, static_cast<unsigned int>(status), &res);
+  glGetShaderiv(index, static_cast<unsigned int>(info), &res);
 
   printConditionalErrors();
 
   return res;
-}
-
-bool Renderer::isShaderCompiled(unsigned int index) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-
-  const bool isCompiled = (getShaderStatus(index, ShaderStatus::COMPILE) == GL_TRUE);
-
-  printConditionalErrors();
-
-  return isCompiled;
 }
 
 void Renderer::sendShaderSource(unsigned int index, const char* source, int length) {
@@ -784,6 +774,22 @@ void Renderer::sendShaderSource(unsigned int index, const char* source, int leng
   glShaderSource(index, 1, &source, &length);
 
   printConditionalErrors();
+}
+
+std::string Renderer::recoverShaderSource(unsigned int index) {
+  const int sourceLength = recoverShaderInfo(index, ShaderInfo::SOURCE_LENGTH);
+
+  if (sourceLength == 0)
+    return {};
+
+  std::string source;
+  source.resize(static_cast<std::size_t>(sourceLength - 1)); // The recovered length includes the null terminator, hence the -1
+
+  glGetShaderSource(index, sourceLength, nullptr, source.data());
+
+  printConditionalErrors();
+
+  return source;
 }
 
 void Renderer::compileShader(unsigned int index) {

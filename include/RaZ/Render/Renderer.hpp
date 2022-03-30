@@ -420,8 +420,12 @@ enum class ShaderType : unsigned int {
   COMPUTE                 = 37305 /* GL_COMPUTE_SHADER         */  ///< Compute shader. Requires OpenGL 4.3+.
 };
 
-enum class ShaderStatus : unsigned int {
-  COMPILE = 35713 /* GL_COMPILE_STATUS */ ///<
+enum class ShaderInfo : unsigned int {
+  TYPE            = 35663 /* GL_SHADER_TYPE          */, ///<
+  DELETE_STATUS   = 35712 /* GL_DELETE_STATUS        */, ///<
+  COMPILE_STATUS  = 35713 /* GL_COMPILE_STATUS       */, ///<
+  INFO_LOG_LENGTH = 35716 /* GL_INFO_LOG_LENGTH      */, ///<
+  SOURCE_LENGTH   = 35720 /* GL_SHADER_SOURCE_LENGTH */  ///<
 };
 
 enum class BarrierType : unsigned int {
@@ -904,11 +908,12 @@ public:
   static void useProgram(unsigned int index);
   static void deleteProgram(unsigned int index);
   static unsigned int createShader(ShaderType type);
-  static int getShaderStatus(unsigned int index, ShaderStatus status);
-  static bool isShaderCompiled(unsigned int index);
+  static int recoverShaderInfo(unsigned int index, ShaderInfo info);
+  static bool isShaderCompiled(unsigned int index) { return (recoverShaderInfo(index, ShaderInfo::COMPILE_STATUS) == 1); }
   static void sendShaderSource(unsigned int index, const char* source, int length);
   static void sendShaderSource(unsigned int index, const std::string& source) { sendShaderSource(index, source.c_str(), static_cast<int>(source.size())); }
   static void sendShaderSource(unsigned int index, std::string_view source) { sendShaderSource(index, source.data(), static_cast<int>(source.size())); }
+  static std::string recoverShaderSource(unsigned int index);
   static void compileShader(unsigned int index);
   static void attachShader(unsigned int programIndex, unsigned int shaderIndex);
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
