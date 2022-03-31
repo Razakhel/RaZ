@@ -57,6 +57,11 @@ target_link_libraries(RaZ_ShowcaseDemo RaZ_Examples)
 add_executable(RaZ_SoundDemo soundDemo.cpp)
 target_link_libraries(RaZ_SoundDemo RaZ_Examples)
 
+if (NOT RAZ_USE_EMSCRIPTEN)
+    add_executable(RaZ_TessellationDemo tessellationDemo.cpp)
+    target_link_libraries(RaZ_TessellationDemo RaZ_Examples)
+endif ()
+
 if (RAZ_USE_EMSCRIPTEN)
     set_target_properties(RaZ_DeferredDemo PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_FullDemo     PROPERTIES SUFFIX ".html")
