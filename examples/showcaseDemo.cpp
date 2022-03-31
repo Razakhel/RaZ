@@ -3,10 +3,10 @@
 using namespace std::literals;
 
 inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.frag"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/blinn-phong.frag"));
   render.updateLights();
 
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/crytek_sponza.obj"s);
+  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj");
   mesh.getComponent<Raz::Mesh>() = std::move(meshData);
   auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
   meshRenderComp = std::move(meshRenderData);
@@ -19,10 +19,10 @@ inline void loadSponzaScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
   render.updateLights();
 
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/ball.obj"s);
+  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj");
   mesh.getComponent<Raz::Mesh>() = std::move(meshData);
   auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
   meshRenderComp = std::move(meshRenderData);
@@ -35,10 +35,10 @@ inline void loadBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
   render.updateLights();
 
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/shield.obj"s);
+  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj");
   mesh.getComponent<Raz::Mesh>() = std::move(meshData);
   auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
   meshRenderComp = std::move(meshRenderData);
@@ -51,10 +51,10 @@ inline void loadShieldScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 }
 
 inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
   render.updateLights();
 
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/cerberus.obj"s);
+  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/cerberus.obj");
   mesh.getComponent<Raz::Mesh>() = std::move(meshData);
   auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
   meshRenderComp = std::move(meshRenderData);
@@ -68,10 +68,10 @@ inline void loadCerberusScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 
 #if defined(FBX_ENABLED)
 inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/blinn-phong.frag"s));
+  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/blinn-phong.frag"));
   render.updateLights();
 
-  auto [meshData, meshRenderData] = Raz::FbxFormat::load(RAZ_ROOT + "assets/meshes/shaderBall.fbx"s);
+  auto [meshData, meshRenderData] = Raz::FbxFormat::load(RAZ_ROOT "assets/meshes/shaderBall.fbx");
   mesh.getComponent<Raz::Mesh>() = std::move(meshData);
   auto& meshRenderComp = mesh.getComponent<Raz::MeshRenderer>();
   meshRenderComp = std::move(meshRenderData);
@@ -85,160 +85,166 @@ inline void loadShaderBallScene(Raz::Entity& mesh, Raz::RenderSystem& render) {
 #endif
 
 inline void loadCloudsSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/clouds_right.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/clouds_left.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/clouds_top.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/clouds_bottom.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/clouds_front.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/clouds_back.png"s));
+  render.setCubemap(Raz::Cubemap(RAZ_ROOT "assets/skyboxes/clouds_right.png",
+                                 RAZ_ROOT "assets/skyboxes/clouds_left.png",
+                                 RAZ_ROOT "assets/skyboxes/clouds_top.png",
+                                 RAZ_ROOT "assets/skyboxes/clouds_bottom.png",
+                                 RAZ_ROOT "assets/skyboxes/clouds_front.png",
+                                 RAZ_ROOT "assets/skyboxes/clouds_back.png"));
 }
 
 inline void loadLakeSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap(RAZ_ROOT + "assets/skyboxes/lake_right.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/lake_left.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/lake_top.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/lake_bottom.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/lake_front.png"s,
-                                 RAZ_ROOT + "assets/skyboxes/lake_back.png"s));
+  render.setCubemap(Raz::Cubemap(RAZ_ROOT "assets/skyboxes/lake_right.png",
+                                 RAZ_ROOT "assets/skyboxes/lake_left.png",
+                                 RAZ_ROOT "assets/skyboxes/lake_top.png",
+                                 RAZ_ROOT "assets/skyboxes/lake_bottom.png",
+                                 RAZ_ROOT "assets/skyboxes/lake_front.png",
+                                 RAZ_ROOT "assets/skyboxes/lake_back.png"));
 }
 
 int main() {
-  ////////////////////
-  // Initialization //
-  ////////////////////
+  try {
+    ////////////////////
+    // Initialization //
+    ////////////////////
 
-  Raz::Application app;
-  Raz::World& world = app.addWorld(1);
+    Raz::Application app;
+    Raz::World& world = app.addWorld(1);
 
-  ///////////////
-  // Rendering //
-  ///////////////
+    Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
 
-  auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ - Showcase");
+    ///////////////
+    // Rendering //
+    ///////////////
 
-  Raz::Window& window = render.getWindow();
-  window.enableVerticalSync();
+    auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ - Showcase");
 
-  /////////////////
-  // Mesh entity //
-  /////////////////
+    Raz::Window& window = render.getWindow();
+    window.enableVerticalSync();
 
-  Raz::Entity& mesh = world.addEntity();
-  auto& meshTrans   = mesh.addComponent<Raz::Transform>();
-  mesh.addComponent<Raz::Mesh>();
-  mesh.addComponent<Raz::MeshRenderer>();
+    /////////////////
+    // Mesh entity //
+    /////////////////
 
-  Raz::Entity& camera = world.addEntity();
-  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-  camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    Raz::Entity& mesh = world.addEntity();
+    auto& meshTrans   = mesh.addComponent<Raz::Transform>();
+    mesh.addComponent<Raz::Mesh>();
+    mesh.addComponent<Raz::MeshRenderer>();
 
-  //////////////////
-  // Light entity //
-  //////////////////
+    Raz::Entity& camera = world.addEntity();
+    auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
+    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
-  Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
-  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,  // Type
-                                 Raz::Vec3f(0.f, -0.2f, -1.f), // Direction
-                                 1.f,                          // Energy
-                                 Raz::Vec3f(1.f));             // Color (RGB)
+    //////////////////
+    // Light entity //
+    //////////////////
 
-  /////////////
-  // Overlay //
-  /////////////
+    Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
+    light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,  // Type
+                                   Raz::Vec3f(0.f, -0.2f, -1.f), // Direction
+                                   1.f,                          // Energy
+                                   Raz::Vec3f(1.f));             // Color (RGB)
+
+    /////////////
+    // Overlay //
+    /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Showcase demo", Raz::Vec2f(-1.f));
+    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Showcase demo", Raz::Vec2f(-1.f));
 
-  std::vector<std::string> scenes = { "Sponza", "Ball", "Shield", "Cerberus" };
+    std::vector<std::string> scenes = { "Sponza", "Ball", "Shield", "Cerberus" };
 #if defined(FBX_ENABLED)
-  scenes.emplace_back("Shader ball");
+    scenes.emplace_back("Shader ball");
 #endif
 
-  overlay.addDropdown("Scene", std::move(scenes), [&mesh, &render] (const std::string&, std::size_t index) {
-    switch (index) {
-      case 0: loadSponzaScene(mesh, render); break;
-      case 1: loadBallScene(mesh, render); break;
-      case 2: loadShieldScene(mesh, render); break;
-      case 3: loadCerberusScene(mesh, render); break;
+    overlay.addDropdown("Scene", std::move(scenes), [&mesh, &render] (const std::string&, std::size_t index) {
+      switch (index) {
+        case 0: loadSponzaScene(mesh, render); break;
+        case 1: loadBallScene(mesh, render); break;
+        case 2: loadShieldScene(mesh, render); break;
+        case 3: loadCerberusScene(mesh, render); break;
 #if defined(FBX_ENABLED)
-      case 4: loadShaderBallScene(mesh, render); break;
+        case 4: loadShaderBallScene(mesh, render); break;
 #endif
-      default: break;
-    }
-  }, 1);
+        default: break;
+      }
+    }, 1);
 
-  overlay.addSeparator();
+    overlay.addSeparator();
 
-  overlay.addDropdown("Skybox", { "None", "Clouds", "Lake" }, [&render] (const std::string&, std::size_t index) {
-    switch (index) {
-      case 0: render.removeCubemap(); break;
-      case 1: loadCloudsSkybox(render); break;
-      case 2: loadLakeSkybox(render); break;
-      default: break;
-    }
-  });
+    overlay.addDropdown("Skybox", { "None", "Clouds", "Lake" }, [&render] (const std::string&, std::size_t index) {
+      switch (index) {
+        case 0: render.removeCubemap(); break;
+        case 1: loadCloudsSkybox(render); break;
+        case 2: loadLakeSkybox(render); break;
+        default: break;
+      }
+    });
 
-  overlay.addSeparator();
+    overlay.addSeparator();
 
-  overlay.addFpsCounter("FPS: %.1f");
+    overlay.addFpsCounter("FPS: %.1f");
 #endif
 
-  ///////////////////
-  // Key callbacks //
-  ///////////////////
+    ///////////////////
+    // Key callbacks //
+    ///////////////////
 
-  window.addKeyCallback(Raz::Keyboard::P, [&mesh, &render] (float /* deltaTime */) { loadSponzaScene(mesh, render); }, Raz::Input::ONCE);
-  window.addKeyCallback(Raz::Keyboard::B, [&mesh, &render] (float /* deltaTime */) { loadBallScene(mesh, render); }, Raz::Input::ONCE);
-  window.addKeyCallback(Raz::Keyboard::S, [&mesh, &render] (float /* deltaTime */) { loadShieldScene(mesh, render); }, Raz::Input::ONCE);
-  window.addKeyCallback(Raz::Keyboard::C, [&mesh, &render] (float /* deltaTime */) { loadCerberusScene(mesh, render); }, Raz::Input::ONCE);
+    window.addKeyCallback(Raz::Keyboard::P, [&mesh, &render] (float /* deltaTime */) { loadSponzaScene(mesh, render); }, Raz::Input::ONCE);
+    window.addKeyCallback(Raz::Keyboard::B, [&mesh, &render] (float /* deltaTime */) { loadBallScene(mesh, render); }, Raz::Input::ONCE);
+    window.addKeyCallback(Raz::Keyboard::S, [&mesh, &render] (float /* deltaTime */) { loadShieldScene(mesh, render); }, Raz::Input::ONCE);
+    window.addKeyCallback(Raz::Keyboard::C, [&mesh, &render] (float /* deltaTime */) { loadCerberusScene(mesh, render); }, Raz::Input::ONCE);
 #if defined(FBX_ENABLED)
-  window.addKeyCallback(Raz::Keyboard::D, [&mesh, &render] (float /* deltaTime */) { loadShaderBallScene(mesh, render); });
+    window.addKeyCallback(Raz::Keyboard::D, [&mesh, &render] (float /* deltaTime */) { loadShaderBallScene(mesh, render); });
 #endif
 
-  window.addKeyCallback(Raz::Keyboard::R, [&render] (float /* deltaTime */) noexcept { render.removeCubemap(); }, Raz::Input::ONCE);
-  window.addKeyCallback(Raz::Keyboard::O, [&render] (float /* deltaTime */) { loadCloudsSkybox(render); }, Raz::Input::ONCE);
-  window.addKeyCallback(Raz::Keyboard::L, [&render] (float /* deltaTime */) { loadLakeSkybox(render); }, Raz::Input::ONCE);
+    window.addKeyCallback(Raz::Keyboard::R, [&render] (float /* deltaTime */) noexcept { render.removeCubemap(); }, Raz::Input::ONCE);
+    window.addKeyCallback(Raz::Keyboard::O, [&render] (float /* deltaTime */) { loadCloudsSkybox(render); }, Raz::Input::ONCE);
+    window.addKeyCallback(Raz::Keyboard::L, [&render] (float /* deltaTime */) { loadLakeSkybox(render); }, Raz::Input::ONCE);
 
-  window.addMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {
-    cameraTrans.translate(0.f, 0.f, -0.5f * static_cast<float>(yOffset));
-  });
+    window.addMouseScrollCallback([&cameraTrans](double /* xOffset */, double yOffset) {
+      cameraTrans.translate(0.f, 0.f, -0.5f * static_cast<float>(yOffset));
+    });
 
-  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
-  window.setCloseCallback([&app] () noexcept { app.quit(); });
+    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+    window.setCloseCallback([&app] () noexcept { app.quit(); });
 
-  //////////////////
-  // Display help //
-  //////////////////
+    //////////////////
+    // Display help //
+    //////////////////
 
-  std::cout << "#######################\n";
-  std::cout << "# RaZ - Showcase demo #\n";
-  std::cout << "#######################\n\n";
+    std::cout << "#######################\n";
+    std::cout << "# RaZ - Showcase demo #\n";
+    std::cout << "#######################\n\n";
 
-  std::cout << "Keyboard shortcuts:\n";
-  std::cout << "\tP: Load Sponza scene\n";
-  std::cout << "\tB: Load Ball scene\n";
-  std::cout << "\tS: Load Shield scene\n";
-  std::cout << "\tC: Load Cerberus scene\n";
+    std::cout << "Keyboard shortcuts:\n";
+    std::cout << "\tP: Load Sponza scene\n";
+    std::cout << "\tB: Load Ball scene\n";
+    std::cout << "\tS: Load Shield scene\n";
+    std::cout << "\tC: Load Cerberus scene\n";
 #if defined(FBX_ENABLED)
-  std::cout << "\tD: Load ShaderBall scene\n";
+    std::cout << "\tD: Load ShaderBall scene\n";
 #endif
-  std::cout << '\n';
+    std::cout << '\n';
 
-  std::cout << "\tR: Remove skybox\n";
-  std::cout << "\tO: Load cloud skybox\n";
-  std::cout << "\tL: Load lake skybox\n\n";
+    std::cout << "\tR: Remove skybox\n";
+    std::cout << "\tO: Load cloud skybox\n";
+    std::cout << "\tL: Load lake skybox\n\n";
 
-  std::cout << "\tEsc: Exit the demo\n";
+    std::cout << "\tEsc: Exit the demo\n";
 
-  //////////////////////////
-  // Starting application //
-  //////////////////////////
+    //////////////////////////
+    // Starting application //
+    //////////////////////////
 
-  loadBallScene(mesh, render);
+    loadBallScene(mesh, render);
 
-  app.run([&] {
-    meshTrans.rotate(-45.0_deg * app.getDeltaTime(), Raz::Axis::Y);
-  });
+    app.run([&] {
+      meshTrans.rotate(-45.0_deg * app.getDeltaTime(), Raz::Axis::Y);
+    });
+  } catch (const std::exception& exception) {
+    Raz::Logger::error("Exception occured: "s + exception.what());
+  }
 
   return EXIT_SUCCESS;
 }

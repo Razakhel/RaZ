@@ -3,31 +3,37 @@
 using namespace std::literals;
 
 int main() {
-  Raz::Application app;
-  Raz::World& world = app.addWorld(2);
+  try {
+    Raz::Application app;
+    Raz::World& world = app.addWorld(2);
 
-  auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s), Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
+    Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
 
-  Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-  camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());
+    auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
+    render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"), Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
 
-  Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
+    Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
+    camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());
 
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/ball.obj"s);
-  mesh.addComponent<Raz::Mesh>(std::move(meshData));
-  mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
+    Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
 
-  Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
-  light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                 Raz::Vec3f(0.f, 0.f, -1.f),  // Direction
-                                 1.f,                         // Energy
-                                 Raz::Vec3f(1.f));            // Color (R/G/B)
+    auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj");
+    mesh.addComponent<Raz::Mesh>(std::move(meshData));
+    mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
 
-  render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
-  render.getWindow().setCloseCallback([&app] () noexcept { app.quit(); });
+    Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
+    light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
+                                   Raz::Vec3f(0.f, 0.f, -1.f),  // Direction
+                                   1.f,                         // Energy
+                                   Raz::Vec3f(1.f));            // Color (R/G/B)
 
-  app.run();
+    render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+    render.getWindow().setCloseCallback([&app] () noexcept { app.quit(); });
+
+    app.run();
+  } catch (const std::exception& exception) {
+    Raz::Logger::error("Exception occured: "s + exception.what());
+  }
 
   return EXIT_SUCCESS;
 }

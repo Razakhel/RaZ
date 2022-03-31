@@ -28,8 +28,8 @@ int main() {
 
     Raz::RenderShaderProgram& geometryProgram = render.getGeometryProgram();
 
-    geometryProgram.setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s),
-                               Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.frag"s));
+    geometryProgram.setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"),
+                               Raz::FragmentShader(RAZ_ROOT "shaders/cook-torrance.frag"));
 
     // A camera is needed by the RenderSystem, but since we won't render anything there is no need to initialize it
     world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>();
@@ -46,7 +46,7 @@ int main() {
     Raz::Texture texture(textureSize, textureSize, 0, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
     Raz::Renderer::bindImageTexture(0, texture.getIndex(), 0, false, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
-    Raz::ComputeShaderProgram compProgram(Raz::ComputeShader(RAZ_ROOT + "shaders/perlin_noise.comp"s));
+    Raz::ComputeShaderProgram compProgram(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise.comp"));
     compProgram.execute(textureSize, textureSize);
 
     /////////////

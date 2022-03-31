@@ -91,134 +91,149 @@ constexpr std::string_view displayFragSource = R"(
 )";
 
 int main() {
-  Raz::Application app;
-  Raz::World& world = app.addWorld(2);
+  try {
+    ////////////////////
+    // Initialization //
+    ////////////////////
 
-  Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
+    Raz::Application app;
+    Raz::World& world = app.addWorld(2);
 
-  auto& render = world.addSystem<Raz::RenderSystem>(sceneWidth, sceneHeight, "RaZ");
-  render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT + "shaders/common.vert"s),
-                                         Raz::FragmentShader::loadFromSource(geomFragSource));
+    Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
 
-  Raz::Window& window = render.getWindow();
+    ///////////////
+    // Rendering //
+    ///////////////
 
-  ///////////////////
-  // Render passes //
-  ///////////////////
+    auto& render = world.addSystem<Raz::RenderSystem>(sceneWidth, sceneHeight, "RaZ");
+    render.getGeometryProgram().setShaders(Raz::VertexShader(RAZ_ROOT "shaders/common.vert"),
+                                           Raz::FragmentShader::loadFromSource(geomFragSource));
 
-  Raz::RenderGraph& renderGraph = render.getRenderGraph();
+    Raz::Window& window = render.getWindow();
 
-  // Creating the render graph's texture buffers
-  const Raz::Texture& depthBuffer  = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
-  const Raz::Texture& colorBuffer  = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
-  const Raz::Texture& normalBuffer = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+    ///////////////////
+    // Render passes //
+    ///////////////////
 
-  // Setting geometry pass' shaders & defining its write buffers
-  Raz::RenderPass& geomPass = renderGraph.getGeometryPass();
-  geomPass.addWriteTexture(depthBuffer);
-  geomPass.addWriteTexture(colorBuffer);
-  geomPass.addWriteTexture(normalBuffer);
+    Raz::RenderGraph& renderGraph = render.getRenderGraph();
 
-  // Adding the second pass & defining its read buffers
-  Raz::RenderPass& splitPass = renderGraph.addNode(Raz::FragmentShader::loadFromSource(displayFragSource));
-  splitPass.addReadTexture(depthBuffer, "uniSceneBuffers.depth");
-  splitPass.addReadTexture(colorBuffer, "uniSceneBuffers.color");
-  splitPass.addReadTexture(normalBuffer, "uniSceneBuffers.normal");
+    // Creating the render graph's texture buffers
+    const Raz::Texture& depthBuffer  = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
+    const Raz::Texture& colorBuffer  = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+    const Raz::Texture& normalBuffer = renderGraph.addTextureBuffer(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
 
-  geomPass.addChildren(splitPass);
+    // Setting geometry pass' shaders & defining its write buffers
+    Raz::RenderPass& geomPass = renderGraph.getGeometryPass();
+    geomPass.addWriteTexture(depthBuffer);
+    geomPass.addWriteTexture(colorBuffer);
+    geomPass.addWriteTexture(normalBuffer);
 
-  //////////
-  // Mesh //
-  //////////
+    // Adding the second pass & defining its read buffers
+    Raz::RenderPass& splitPass = renderGraph.addNode(Raz::FragmentShader::loadFromSource(displayFragSource));
+    splitPass.addReadTexture(depthBuffer, "uniSceneBuffers.depth");
+    splitPass.addReadTexture(colorBuffer, "uniSceneBuffers.color");
+    splitPass.addReadTexture(normalBuffer, "uniSceneBuffers.normal");
 
-  // Importing the mesh & transforming it so that it can be fully visible
-  Raz::Entity& mesh = world.addEntity();
+    geomPass.addChildren(splitPass);
 
-  auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT + "assets/meshes/shield.obj"s);
-  mesh.addComponent<Raz::Mesh>(std::move(meshData));
-  mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
+    //////////
+    // Mesh //
+    //////////
 
-  auto& meshTrans = mesh.addComponent<Raz::Transform>();
-  meshTrans.scale(0.2f);
+    // Importing the mesh & transforming it so that it can be fully visible
+    Raz::Entity& mesh = world.addEntity();
 
-  ////////////
-  // Camera //
-  ////////////
+    auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj");
+    mesh.addComponent<Raz::Mesh>(std::move(meshData));
+    mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
 
-  Raz::Entity& camera = world.addEntity();
-  auto& cameraComp    = camera.addComponent<Raz::Camera>(sceneWidth, sceneHeight);
-  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
+    auto& meshTrans = mesh.addComponent<Raz::Transform>();
+    meshTrans.scale(0.2f);
 
-  float cameraSpeed = 1.f;
-  window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
-                        [&cameraSpeed] (float /* deltaTime */) noexcept { cameraSpeed = 2.f; },
-                        Raz::Input::ONCE,
-                        [&cameraSpeed] () noexcept { cameraSpeed = 1.f; });
-  window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
-  });
-  window.addKeyCallback(Raz::Keyboard::V, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
-  });
-  window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f, 0.f, (-10.f * deltaTime) * cameraSpeed);
-  });
-  window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move(0.f,  0.f, (10.f * deltaTime) * cameraSpeed);
-  });
-  window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
-  });
-  window.addKeyCallback(Raz::Keyboard::D, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-    cameraTrans.move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
-  });
+    ////////////
+    // Camera //
+    ////////////
 
-  window.addMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
-    // Dividing move by window size to scale between -1 and 1
-    cameraTrans.rotate(-90_deg * static_cast<float>(yMove) / window.getHeight(),
-                       -90_deg * static_cast<float>(xMove) / window.getWidth());
-  });
+    Raz::Entity& camera = world.addEntity();
+    auto& cameraComp    = camera.addComponent<Raz::Camera>(sceneWidth, sceneHeight);
+    auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
 
-  //////////////////////
-  // Window callbacks //
-  //////////////////////
+    float cameraSpeed = 1.f;
+    window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
+                          [&cameraSpeed] (float /* deltaTime */) noexcept { cameraSpeed = 2.f; },
+                          Raz::Input::ONCE,
+                          [&cameraSpeed] () noexcept { cameraSpeed = 1.f; });
+    window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+      cameraTrans.move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
+    });
+    window.addKeyCallback(Raz::Keyboard::V, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+      cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
+    });
+    window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+      cameraTrans.move(0.f, 0.f, (-10.f * deltaTime) * cameraSpeed);
+    });
+    window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+      cameraTrans.move(0.f,  0.f, (10.f * deltaTime) * cameraSpeed);
+    });
+    window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+      cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
+    });
+    window.addKeyCallback(Raz::Keyboard::D, [&cameraTrans, &cameraSpeed] (float deltaTime) {
+      cameraTrans.move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
+    });
+
+    window.addMouseMoveCallback([&cameraTrans, &window](double xMove, double yMove) {
+      // Dividing move by window size to scale between -1 and 1
+      cameraTrans.rotate(-90_deg * static_cast<float>(yMove) / window.getHeight(),
+                         -90_deg * static_cast<float>(xMove) / window.getWidth());
+    });
+
+    //////////////////////
+    // Window callbacks //
+    //////////////////////
 
 #if !defined(USE_OPENGL_ES)
-  // Toggling the wireframe rendering's state
-  bool isWireframe = false;
-  window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
-    isWireframe = !isWireframe;
-    Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
-  }, Raz::Input::ONCE);
+    // Toggling the wireframe rendering's state
+    bool isWireframe = false;
+    window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
+      isWireframe = !isWireframe;
+      Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
+    }, Raz::Input::ONCE);
 #endif
 
-  // Toggling the render pass' enabled state
-  window.addKeyCallback(Raz::Keyboard::R, [&splitPass] (float /* deltaTime */) noexcept { splitPass.enable(!splitPass.isEnabled()); }, Raz::Input::ONCE);
+    // Toggling the render pass' enabled state
+    window.addKeyCallback(Raz::Keyboard::R, [&splitPass] (float /* deltaTime */) noexcept { splitPass.enable(!splitPass.isEnabled()); }, Raz::Input::ONCE);
 
-  // Allowing to quit the application by pressing the Esc key
-  window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
-  // Allowing to quit the application when the close button is clicked
-  window.setCloseCallback([&app] () noexcept { app.quit(); });
+    // Allowing to quit the application by pressing the Esc key
+    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+    // Allowing to quit the application when the close button is clicked
+    window.setCloseCallback([&app] () noexcept { app.quit(); });
 
-  /////////////
-  // Overlay //
-  /////////////
+    /////////////
+    // Overlay //
+    /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-  Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Deferred demo", Raz::Vec2f(sceneWidth / 4, sceneHeight));
+    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Deferred demo", Raz::Vec2f(sceneWidth / 4, sceneHeight));
 
-  overlay.addTexture(depthBuffer, sceneWidth / 4, sceneHeight / 4);
-  overlay.addTexture(colorBuffer, sceneWidth / 4, sceneHeight / 4);
-  overlay.addTexture(normalBuffer, sceneWidth / 4, sceneHeight / 4);
+    overlay.addTexture(depthBuffer, sceneWidth / 4, sceneHeight / 4);
+    overlay.addTexture(colorBuffer, sceneWidth / 4, sceneHeight / 4);
+    overlay.addTexture(normalBuffer, sceneWidth / 4, sceneHeight / 4);
 
-  overlay.addSeparator();
+    overlay.addSeparator();
 
-  overlay.addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
-  overlay.addFpsCounter("FPS: %.1f");
+    overlay.addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+    overlay.addFpsCounter("FPS: %.1f");
 #endif
 
-  // Running the application
-  app.run();
+    //////////////////////////
+    // Starting application //
+    //////////////////////////
+
+    app.run();
+  } catch (const std::exception& exception) {
+    Raz::Logger::error("Exception occured: "s + exception.what());
+  }
 
   return EXIT_SUCCESS;
 }
