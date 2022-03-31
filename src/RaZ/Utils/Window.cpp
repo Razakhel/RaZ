@@ -144,6 +144,8 @@ bool Window::recoverVerticalSyncState() const {
 #if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT())
     return static_cast<bool>(wglGetSwapIntervalEXT());
+
+  return true;
 #elif defined(RAZ_PLATFORM_LINUX)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
     unsigned int interval;
@@ -151,12 +153,14 @@ bool Window::recoverVerticalSyncState() const {
 
     return static_cast<bool>(interval);
   }
+
+  return true;
 #elif defined(RAZ_PLATFORM_MAC)
   return true;
-#endif
-
+#else
   Logger::warn("Vertical synchronization unsupported.");
   return false;
+#endif
 }
 
 void Window::enableVerticalSync([[maybe_unused]] bool value) const {
@@ -173,12 +177,12 @@ void Window::enableVerticalSync([[maybe_unused]] bool value) const {
   }
 #elif defined(RAZ_PLATFORM_MAC)
   glfwSwapInterval(value);
-#endif
-
+#else
   Logger::warn("Vertical synchronization unsupported.");
+#endif
 }
 
-void Window::changeCursorState(Cursor::State state) const {
+void Window::setCursorState(Cursor::State state) const {
   glfwSetInputMode(m_windowHandle, GLFW_CURSOR, state);
 }
 
@@ -196,12 +200,12 @@ void Window::addMouseButtonCallback(Mouse::Button button, std::function<void(flo
   updateCallbacks();
 }
 
-void Window::addMouseScrollCallback(std::function<void(double, double)> func) {
+void Window::setMouseScrollCallback(std::function<void(double, double)> func) {
   std::get<2>(m_callbacks) = std::move(func);
   updateCallbacks();
 }
 
-void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
+void Window::setMouseMoveCallback(std::function<void(double, double)> func) {
   std::get<3>(m_callbacks) = std::make_tuple(m_width / 2, m_height / 2, std::move(func));
   updateCallbacks();
 }
@@ -209,8 +213,8 @@ void Window::addMouseMoveCallback(std::function<void(double, double)> func) {
 void Window::setCloseCallback(std::function<void()> func) {
   m_closeCallback = std::move(func);
 
-  glfwSetWindowCloseCallback(m_windowHandle, [](GLFWwindow* window) {
-    CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
+  glfwSetWindowCloseCallback(m_windowHandle, [] (GLFWwindow* window) {
+    const CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
     closeCallback();
   });
 }
@@ -218,44 +222,47 @@ void Window::setCloseCallback(std::function<void()> func) {
 void Window::updateCallbacks() const {
 #if !defined(RAZ_NO_OVERLAY)
   // Monitor events
-  glfwSetMonitorCallback([] (GLFWmonitor* monitor, int event) {
-    ImGui_ImplGlfw_MonitorCallback(monitor, event);
+  glfwSetMonitorCallback([] (GLFWmonitor* monitorHandle, int event) {
+    ImGui_ImplGlfw_MonitorCallback(monitorHandle, event);
   });
 #endif
 
 #if !defined(RAZ_NO_OVERLAY)
   // Window focus
-  glfwSetWindowFocusCallback(m_windowHandle, [] (GLFWwindow* window, int focused) {
-    ImGui_ImplGlfw_WindowFocusCallback(window, focused);
+  glfwSetWindowFocusCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int focused) {
+    ImGui_ImplGlfw_WindowFocusCallback(windowHandle, focused);
   });
 #endif
 
   // Keyboard inputs
   if (!std::get<0>(m_callbacks).empty()) {
-    glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* window, int key, int scancode, int action, int mods) {
+    glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int key, int scancode, int action, int mods) {
 #if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+      ImGui_ImplGlfw_KeyCallback(windowHandle, key, scancode, action, mods);
 
       // Key callbacks should not be executed if the overlay requested keyboard focus
       if (ImGui::GetIO().WantCaptureKeyboard)
         return;
 #endif
 
-      InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
+      InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks();
       const auto& keyCallbacks  = std::get<0>(callbacks);
 
       for (const auto& callback : keyCallbacks) {
-        if (key == std::get<0>(callback)) {
-          if (action == GLFW_PRESS) {
-            std::get<4>(callbacks).emplace(key, std::make_pair(std::get<1>(callback), std::get<2>(callback)));
-          } else if (action == GLFW_RELEASE) {
-            std::get<4>(callbacks).erase(key);
+        if (key != std::get<0>(callback))
+          continue;
 
-            const auto& actionRelease = std::get<3>(callback);
+        auto& actions = std::get<InputActions>(callbacks);
 
-            if (actionRelease)
-              actionRelease();
-          }
+        if (action == GLFW_PRESS) {
+          actions.emplace(key, std::make_pair(std::get<1>(callback), std::get<2>(callback)));
+        } else if (action == GLFW_RELEASE) {
+          actions.erase(key);
+
+          const auto& actionRelease = std::get<3>(callback);
+
+          if (actionRelease)
+            actionRelease();
         }
       }
     });
@@ -263,42 +270,47 @@ void Window::updateCallbacks() const {
 
 #if !defined(RAZ_NO_OVERLAY)
   // Unicode character inputs
-  glfwSetCharCallback(m_windowHandle, [] (GLFWwindow* window, unsigned int codePoint) {
-    ImGui_ImplGlfw_CharCallback(window, codePoint);
+  glfwSetCharCallback(m_windowHandle, [] (GLFWwindow* windowHandle, unsigned int codePoint) {
+    ImGui_ImplGlfw_CharCallback(windowHandle, codePoint);
   });
 #endif
 
 #if !defined(RAZ_NO_OVERLAY)
   // Cursor enter event
-  glfwSetCursorEnterCallback(m_windowHandle, [] (GLFWwindow* window, int entered) {
-    ImGui_ImplGlfw_CursorEnterCallback(window, entered);
+  glfwSetCursorEnterCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int entered) {
+    ImGui_ImplGlfw_CursorEnterCallback(windowHandle, entered);
   });
 #endif
 
   // Mouse buttons inputs
   if (!std::get<1>(m_callbacks).empty()) {
-    glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* window, int button, int action, int mods) {
+    glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int button, int action, int mods) {
 #if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+      ImGui_ImplGlfw_MouseButtonCallback(windowHandle, button, action, mods);
 
       // Mouse buttons callbacks should not be executed if the overlay requested mouse focus
       if (ImGui::GetIO().WantCaptureMouse)
         return;
 #endif
 
-      InputCallbacks& callbacks  = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks();
+      InputCallbacks& callbacks  = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks();
       const auto& mouseCallbacks = std::get<1>(callbacks);
 
       for (const auto& callback : mouseCallbacks) {
-        if (button == std::get<0>(callback)) {
-          if (action == GLFW_PRESS) {
-            std::get<4>(callbacks).emplace(button, std::make_pair(std::get<1>(callback), std::get<2>(callback)));
-          } else if (action == GLFW_RELEASE) {
-            std::get<4>(callbacks).erase(button);
+        if (button != std::get<0>(callback))
+          continue;
 
-            if (std::get<3>(callback))
-              std::get<3>(callback)();
-          }
+        auto& actions = std::get<InputActions>(callbacks);
+
+        if (action == GLFW_PRESS) {
+          actions.emplace(button, std::make_pair(std::get<1>(callback), std::get<2>(callback)));
+        } else if (action == GLFW_RELEASE) {
+          actions.erase(button);
+
+          const auto& actionRelease = std::get<3>(callback);
+
+          if (actionRelease)
+            actionRelease();
         }
       }
     });
@@ -306,24 +318,24 @@ void Window::updateCallbacks() const {
 
   // Mouse scroll input
   if (std::get<2>(m_callbacks)) {
-    glfwSetScrollCallback(m_windowHandle, [] (GLFWwindow* window, double xOffset, double yOffset) {
+    glfwSetScrollCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xOffset, double yOffset) {
 #if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_ScrollCallback(window, xOffset, yOffset);
+      ImGui_ImplGlfw_ScrollCallback(windowHandle, xOffset, yOffset);
 
       // Scroll callback should not be executed if the overlay requested mouse focus
       if (ImGui::GetIO().WantCaptureMouse)
         return;
 #endif
 
-      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
+      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks());
       scrollCallback(xOffset, yOffset);
     });
   }
 
   // Mouse move input
   if (std::get<2>(std::get<3>(m_callbacks))) {
-    glfwSetCursorPosCallback(m_windowHandle, [] (GLFWwindow* window, double xPosition, double yPosition) {
-      MouseMoveCallback& moveCallback = std::get<3>(static_cast<Window*>(glfwGetWindowUserPointer(window))->getCallbacks());
+    glfwSetCursorPosCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xPosition, double yPosition) {
+      MouseMoveCallback& moveCallback = std::get<3>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks());
 
       double& xPrevPos = std::get<0>(moveCallback);
       double& yPrevPos = std::get<1>(moveCallback);

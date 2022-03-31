@@ -153,7 +153,7 @@ int main() {
       cameraTrans.move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
     });
 
-    window.addMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
+    window.setMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
       const float newFovDeg = std::clamp(Raz::Degreesf(cameraComp.getFieldOfView()).value + static_cast<float>(-yOffset) * 2.f, 15.f, 90.f);
       cameraComp.setFieldOfView(Raz::Degreesf(newFovDeg));
     });
@@ -169,7 +169,7 @@ int main() {
       window.showCursor();
     });
 
-    window.addMouseMoveCallback([&isRightClicking, &cameraTrans, &window](double xMove, double yMove) {
+    window.setMouseMoveCallback([&isRightClicking, &cameraTrans, &window] (double xMove, double yMove) {
       if (!isRightClicking)
         return;
 

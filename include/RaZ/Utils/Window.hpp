@@ -56,7 +56,7 @@ public:
   /// \param settings Settings to create the window with.
   /// \param antiAliasingSampleCount Number of anti-aliasing samples.
   Window(unsigned int width, unsigned int height,
-         const std::string& title = "",
+         const std::string& title = {},
          WindowSetting settings = WindowSetting::DEFAULT,
          uint8_t antiAliasingSampleCount = 1);
   Window(const Window&) = delete;
@@ -104,17 +104,17 @@ public:
   /// Defines the new behavior of the mouse's cursor, if it should be shown, hidden or disabled.
   /// The functions showCursor(), hideCursor() & disableCursor() can be used instead.
   /// \param state State to apply.
-  void changeCursorState(Cursor::State state) const;
+  void setCursorState(Cursor::State state) const;
   /// Shows the mouse cursor.
   /// Default behavior.
-  void showCursor() const { changeCursorState(Cursor::State::NORMAL); }
+  void showCursor() const { setCursorState(Cursor::State::NORMAL); }
   /// Hides the mouse cursor.
   /// The cursor becomes invisible while being inside the window's frame. It can go out of the window.
-  void hideCursor() const { changeCursorState(Cursor::State::HIDDEN); }
+  void hideCursor() const { setCursorState(Cursor::State::HIDDEN); }
   /// Disables the mouse cursor.
   /// The cursor always goes back to the window's center and becomes totally invisible. It can't go out of the window.
-  void disableCursor() const { changeCursorState(Cursor::State::DISABLED); }
-  /// Defines an action on keyboard's key press & release.
+  void disableCursor() const { setCursorState(Cursor::State::DISABLED); }
+  /// Adds action(s) to be executed on keyboard's key press and/or release.
   /// \param key Key triggering the given action(s).
   /// \param actionPress Action to be executed when the given key is pressed.
   /// \param frequency Frequency at which to execute the actions.
@@ -122,7 +122,7 @@ public:
   void addKeyCallback(Keyboard::Key key, std::function<void(float)> actionPress,
                                          Input::ActionTrigger frequency = Input::ALWAYS,
                                          std::function<void()> actionRelease = nullptr);
-  /// Defines an action on mouse button click or release.
+  /// Adds action(s) to be executed on mouse button click and/or release.
   /// \param button Button triggering the given action(s).
   /// \param actionPress Action to be executed when the given mouse button is pressed.
   /// \param frequency Frequency at which to execute the actions.
@@ -130,13 +130,13 @@ public:
   void addMouseButtonCallback(Mouse::Button button, std::function<void(float)> actionPress,
                                                     Input::ActionTrigger frequency = Input::ALWAYS,
                                                     std::function<void()> actionRelease = nullptr);
-  /// Defines an action on mouse wheel scroll.
+  /// Sets the action to be executed on mouse wheel scroll.
   /// \param func Action to be executed when scrolling.
-  void addMouseScrollCallback(std::function<void(double, double)> func);
-  /// Defines an action on mouse move.
+  void setMouseScrollCallback(std::function<void(double, double)> func);
+  /// Sets the action to be executed on mouse move.
   /// \param func Action to be executed when the mouse is moved.
-  void addMouseMoveCallback(std::function<void(double, double)> func);
-  /// Defines an action on window close.
+  void setMouseMoveCallback(std::function<void(double, double)> func);
+  /// Sets the action to be executed on window close.
   /// \param func Action to be executed when the window is closed.
   void setCloseCallback(std::function<void()> func);
   /// Associates all of the callbacks, making them active.

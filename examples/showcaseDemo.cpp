@@ -202,7 +202,7 @@ int main() {
     window.addKeyCallback(Raz::Keyboard::O, [&render] (float /* deltaTime */) { loadCloudsSkybox(render); }, Raz::Input::ONCE);
     window.addKeyCallback(Raz::Keyboard::L, [&render] (float /* deltaTime */) { loadLakeSkybox(render); }, Raz::Input::ONCE);
 
-    window.addMouseScrollCallback([&cameraTrans](double /* xOffset */, double yOffset) {
+    window.setMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {
       cameraTrans.translate(0.f, 0.f, -0.5f * static_cast<float>(yOffset));
     });
 
