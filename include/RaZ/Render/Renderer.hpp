@@ -945,6 +945,8 @@ public:
   static void recoverUniformInfo(unsigned int programIndex, unsigned int uniformIndex, UniformType& type, std::string& name, int* size = nullptr);
   static UniformType recoverUniformType(unsigned int programIndex, unsigned int uniformIndex);
   static std::string recoverUniformName(unsigned int programIndex, unsigned int uniformIndex);
+  static void bindUniformBlock(unsigned int programIndex, unsigned int uniformBlockIndex, unsigned int bindingIndex);
+  static unsigned int recoverUniformBlockIndex(unsigned int programIndex, const char* uniformName);
   /// Sends an integer as uniform.
   /// \param uniformIndex Index of the uniform to send the data to.
   /// \param value Integer to be sent.

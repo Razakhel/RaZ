@@ -950,6 +950,24 @@ std::string Renderer::recoverUniformName(unsigned int programIndex, unsigned int
   return name;
 }
 
+void Renderer::bindUniformBlock(unsigned int programIndex, unsigned int uniformBlockIndex, unsigned int bindingIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glUniformBlockBinding(programIndex, uniformBlockIndex, bindingIndex);
+
+  printConditionalErrors();
+}
+
+unsigned int Renderer::recoverUniformBlockIndex(unsigned int programIndex, const char* uniformBlockName) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  const unsigned int index = glGetUniformBlockIndex(programIndex, uniformBlockName);
+
+  printConditionalErrors();
+
+  return index;
+}
+
 void Renderer::sendUniform(int uniformIndex, int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

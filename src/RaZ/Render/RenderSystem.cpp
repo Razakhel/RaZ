@@ -172,7 +172,7 @@ void RenderSystem::initialize() {
   m_acceptedComponents.setBit(Component::getId<Light>());
   m_acceptedComponents.setBit(Component::getId<MeshRenderer>());
 
-  m_cameraUbo.bindBufferBase(0);
+  m_cameraUbo.bindBase(0);
 }
 
 void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight) {
