@@ -32,6 +32,8 @@ void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
 }
 
 void RenderGraph::updateShaders() const {
+  m_geometryPass.getProgram().updateShaders();
+
   for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->getProgram().updateShaders();
 }

@@ -1,10 +1,10 @@
-#define MAX_LIGHT_COUNT 10
+#define MAX_LIGHT_COUNT 100
 
 struct Light {
   vec4 position;
-  vec3 direction;
+  vec4 direction;
+  vec4 color;
   float energy;
-  vec3 color;
   float angle;
 };
 
@@ -29,16 +29,18 @@ in struct MeshInfo {
   mat3 vertTBNMatrix;
 } vertMeshInfo;
 
-uniform uint uniLightCount;
-uniform Light uniLights[MAX_LIGHT_COUNT];
+layout(std140) uniform uboCameraInfo {
+  mat4 uniViewMat;
+  mat4 uniInvViewMat;
+  mat4 uniProjectionMat;
+  mat4 uniInvProjectionMat;
+  mat4 uniViewProjectionMat;
+  vec3 uniCameraPos;
+};
 
-layout(std140) uniform uboCameraMatrices {
-  mat4 viewMat;
-  mat4 invViewMat;
-  mat4 projectionMat;
-  mat4 invProjectionMat;
-  mat4 viewProjectionMat;
-  vec3 cameraPos;
+layout(std140) uniform uboLightsInfo {
+  Light uniLights[MAX_LIGHT_COUNT];
+  uint uniLightCount;
 };
 
 uniform Material uniMaterial;
@@ -52,13 +54,13 @@ void main() {
   float lightHitAngle = 0.0;
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
-    vec3 lightPos = (viewProjectionMat * uniLights[lightIndex].position).xyz;
+    vec3 lightPos = (uniViewProjectionMat * uniLights[lightIndex].position).xyz;
     vec3 lightDir;
 
     if (uniLights[lightIndex].position.w != 0.0)
       lightDir = normalize(lightPos - vertMeshInfo.vertPosition);
     else
-      lightDir = normalize(-uniLights[lightIndex].direction);
+      lightDir = normalize(-uniLights[lightIndex].direction.xyz);
 
     lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, normal), 0.0, 1.0));
   }

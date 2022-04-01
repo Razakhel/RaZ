@@ -1,10 +1,10 @@
-#define MAX_LIGHT_COUNT 10
+#define MAX_LIGHT_COUNT 100
 
 struct Light {
   vec4 position;
-  vec3 direction;
+  vec4 direction;
+  vec4 color;
   float energy;
-  vec3 color;
   float angle;
 };
 
@@ -29,16 +29,18 @@ in struct MeshInfo {
   mat3 vertTBNMatrix;
 } vertMeshInfo;
 
-uniform uint uniLightCount;
-uniform Light uniLights[MAX_LIGHT_COUNT];
+layout(std140) uniform uboCameraInfo {
+  mat4 uniViewMat;
+  mat4 uniInvViewMat;
+  mat4 uniProjectionMat;
+  mat4 uniInvProjectionMat;
+  mat4 uniViewProjectionMat;
+  vec3 uniCameraPos;
+};
 
-layout(std140) uniform uboCameraMatrices {
-  mat4 viewMat;
-  mat4 invViewMat;
-  mat4 projectionMat;
-  mat4 invProjectionMat;
-  mat4 viewProjectionMat;
-  vec3 cameraPos;
+layout(std140) uniform uboLightsInfo {
+  Light uniLights[MAX_LIGHT_COUNT];
+  uint uniLightCount;
 };
 
 uniform Material uniMaterial;
@@ -55,7 +57,7 @@ void main() {
   vec3 diffuse  = vec3(0.0);
   vec3 specular = vec3(0.0);
 
-  vec3 viewDir = normalize(cameraPos - vertMeshInfo.vertPosition);
+  vec3 viewDir = normalize(uniCameraPos - vertMeshInfo.vertPosition);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
     // Diffuse
@@ -68,7 +70,7 @@ void main() {
       float sqDist = dot(fullLightDir, fullLightDir);
       attenuation  /= sqDist;
     } else {
-      fullLightDir = -uniLights[lightIndex].direction;
+      fullLightDir = -uniLights[lightIndex].direction.xyz;
     }
 
     vec3 lightDir = normalize(fullLightDir);
@@ -77,7 +79,7 @@ void main() {
 
     // Specular
     vec3 halfDir = normalize(lightDir + viewDir);
-    specular    += uniLights[lightIndex].color * pow(max(dot(halfDir, normal), 0.0), 32.0) * specFactor * attenuation;
+    specular    += uniLights[lightIndex].color.rgb * pow(max(dot(halfDir, normal), 0.0), 32.0) * specFactor * attenuation;
   }
 
   vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;

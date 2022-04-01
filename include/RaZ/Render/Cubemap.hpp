@@ -56,7 +56,7 @@ public:
 private:
   unsigned int m_index {};
   RenderShaderProgram m_program {};
-  UniformBuffer m_viewProjUbo = UniformBuffer(sizeof(Mat4f), 1);
+  UniformBuffer m_viewProjUbo = UniformBuffer(sizeof(Mat4f));
 };
 
 } // namespace Raz

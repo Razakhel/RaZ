@@ -3,6 +3,7 @@
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 namespace Raz {
 
@@ -12,7 +13,7 @@ constexpr std::string_view vertSource = R"(
   layout(location = 0) in vec3 vertPosition;
 
   layout(std140) uniform uboCubemapMatrix {
-    mat4 viewProjMat;
+    mat4 uniViewProjMat;
   };
 
   out vec3 fragTexcoords;
@@ -20,7 +21,7 @@ constexpr std::string_view vertSource = R"(
   void main() {
     fragTexcoords = vertPosition;
 
-    vec4 pos = viewProjMat * vec4(vertPosition, 1.0);
+    vec4 pos = uniViewProjMat * vec4(vertPosition, 1.0);
     gl_Position = pos.xyww;
   }
 )";
@@ -40,6 +41,8 @@ constexpr std::string_view fragSource = R"(
 } // namespace
 
 Cubemap::Cubemap() {
+  Logger::debug("[Cubemap] Creating...");
+
   Renderer::generateTexture(m_index);
 
   m_program.setVertexShader(VertexShader::loadFromSource(vertSource));
@@ -50,8 +53,9 @@ Cubemap::Cubemap() {
   m_program.use();
   m_program.sendUniform("uniSkybox", 0);
 
-  m_viewProjUbo.bindUniformBlock(m_program, "uboCubemapMatrix", 1);
-  m_viewProjUbo.bindBase(1);
+  m_viewProjUbo.bindUniformBlock(m_program, "uboCubemapMatrix", 0);
+
+  Logger::debug("[Cubemap] Created (ID: " + std::to_string(m_index) + ')');
 }
 
 Cubemap::Cubemap(Cubemap&& cubemap) noexcept
@@ -106,7 +110,7 @@ void Cubemap::draw(const Camera& camera) const {
   Renderer::activateTexture(0);
   bind();
 
-  m_viewProjUbo.bind();
+  m_viewProjUbo.bindBase(0);
   sendViewProjectionMatrix(camera.getProjectionMatrix() * Mat4f(Mat3f(camera.getViewMatrix())));
 
   MeshRenderer::drawUnitCube();
@@ -127,7 +131,9 @@ Cubemap::~Cubemap() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
+  Logger::debug("[Cubemap] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteTexture(m_index);
+  Logger::debug("[Cubemap] Destroyed");
 }
 
 } // namespace Raz

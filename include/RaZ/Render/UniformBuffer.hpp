@@ -13,16 +13,16 @@ namespace Raz {
 class UniformBuffer {
 public:
   UniformBuffer();
-  explicit UniformBuffer(unsigned int size, unsigned int bindingIndex);
+  explicit UniformBuffer(unsigned int size);
   UniformBuffer(const UniformBuffer&) = delete;
   UniformBuffer(UniformBuffer&& ubo) noexcept;
 
   unsigned int getIndex() const { return m_index; }
 
-  void bindUniformBlock(const ShaderProgram& program, unsigned int uboIndex, unsigned int bindingIndex) const;
-  void bindUniformBlock(const ShaderProgram& program, const std::string& uboName, unsigned int bindingIndex) const;
-  void bindBase(unsigned int bindingIndex) const;
-  void bindRange(unsigned int bindingIndex, std::ptrdiff_t offset, std::ptrdiff_t size) const;
+  void bindUniformBlock(const ShaderProgram& program, unsigned int uboIndex, unsigned int shaderBindingIndex) const;
+  void bindUniformBlock(const ShaderProgram& program, const std::string& uboName, unsigned int shaderBindingIndex) const;
+  void bindBase(unsigned int bufferBindingIndex) const;
+  void bindRange(unsigned int bufferBindingIndex, std::ptrdiff_t offset, std::ptrdiff_t size) const;
   void bind() const;
   void unbind() const;
   template <typename T> void sendData(T data, unsigned int offset) const { Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER, offset, sizeof(T), &data); }

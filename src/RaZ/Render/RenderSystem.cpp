@@ -34,6 +34,9 @@ RenderPass& RenderSystem::addRenderPass(FragmentShader fragShader) {
 }
 
 bool RenderSystem::update([[maybe_unused]] float deltaTime) {
+  m_cameraUbo.bindBase(0);
+  m_lightsUbo.bindBase(1);
+
   m_renderGraph.execute(*this);
 
 #if defined(RAZ_CONFIG_DEBUG) && !defined(SKIP_RENDERER_ERRORS)
@@ -60,6 +63,9 @@ void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
   sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   sendViewProjectionMatrix(viewProjMat);
   sendCameraPosition(m_cameraEntity->getComponent<Transform>().getPosition());
+
+  // TODO: binding the block is required whenever programs are updated, not every time data is sent, but is done here for now for simplicity
+  m_cameraUbo.bindUniformBlock(getGeometryProgram(), "uboCameraInfo", 0);
 }
 
 void RenderSystem::sendCameraMatrices() const {
@@ -69,43 +75,40 @@ void RenderSystem::sendCameraMatrices() const {
   sendCameraMatrices(camera.getProjectionMatrix() * camera.getViewMatrix());
 }
 
-void RenderSystem::updateLight(const Entity* entity, std::size_t lightIndex) const {
-  const RenderShaderProgram& geometryProgram = getGeometryProgram();
+void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) const {
+  const auto& light = entity.getComponent<Light>();
+  const unsigned int dataStride = sizeof(Vec4f) * 4 * lightIndex;
 
-  geometryProgram.use();
-
-  const std::string strBase = "uniLights[" + std::to_string(lightIndex) + "].";
-
-  const std::string posStr    = strBase + "position";
-  const std::string energyStr = strBase + "energy";
-  const std::string colorStr  = strBase + "color";
-  const std::string angleStr  = strBase + "angle";
-
-  const auto& lightComp = entity->getComponent<Light>();
-  Vec4f homogeneousPos(entity->getComponent<Transform>().getPosition(), 1.f);
-
-  if (lightComp.getType() == LightType::DIRECTIONAL) {
-    homogeneousPos.w() = 0.f;
-    geometryProgram.sendUniform(strBase + "direction", lightComp.getDirection());
+  if (light.getType() == LightType::DIRECTIONAL) {
+    m_lightsUbo.sendData(Vec4f(0.f), dataStride);
+  } else {
+    assert("Error: A non-directional light needs to have a Transform component." && entity.hasComponent<Transform>());
+    m_lightsUbo.sendData(Vec4f(entity.getComponent<Transform>().getPosition(), 1.f), dataStride);
   }
 
-  geometryProgram.sendUniform(posStr,    homogeneousPos);
-  geometryProgram.sendUniform(energyStr, lightComp.getEnergy());
-  geometryProgram.sendUniform(colorStr,  lightComp.getColor());
-  geometryProgram.sendUniform(angleStr,  lightComp.getAngle().value);
+  m_lightsUbo.sendData(light.getDirection(), dataStride + sizeof(Vec4f));
+  m_lightsUbo.sendData(light.getColor(), dataStride + sizeof(Vec4f) * 2);
+  m_lightsUbo.sendData(light.getEnergy(), dataStride + sizeof(Vec4f) * 3);
+  m_lightsUbo.sendData(light.getAngle().value, dataStride + sizeof(Vec4f) * 3 + sizeof(float));
 }
 
 void RenderSystem::updateLights() const {
-  std::size_t lightCount = 0;
+  unsigned int lightCount = 0;
+
+  m_lightsUbo.bind();
 
   for (const Entity* entity : m_entities) {
-    if (entity->hasComponent<Light>() && entity->isEnabled()) {
-      updateLight(entity, lightCount);
-      ++lightCount;
-    }
+    if (!entity->isEnabled() || !entity->hasComponent<Light>())
+      continue;
+
+    updateLight(*entity, lightCount);
+    ++lightCount;
   }
 
-  getGeometryProgram().sendUniform("uniLightCount", static_cast<unsigned int>(lightCount));
+  m_lightsUbo.sendData(lightCount, sizeof(Vec4f) * 4 * 100);
+
+  // TODO: binding the block is required whenever programs are updated, not every time data is sent, but is done here for now for simplicity
+  m_lightsUbo.bindUniformBlock(getGeometryProgram(), "uboLightsInfo", 1);
 }
 
 void RenderSystem::updateShaders() const {
@@ -171,8 +174,6 @@ void RenderSystem::initialize() {
   m_acceptedComponents.setBit(Component::getId<Camera>());
   m_acceptedComponents.setBit(Component::getId<Light>());
   m_acceptedComponents.setBit(Component::getId<MeshRenderer>());
-
-  m_cameraUbo.bindBase(0);
 }
 
 void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight) {

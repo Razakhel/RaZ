@@ -6,13 +6,13 @@ struct Buffers {
 
 in vec2 fragTexcoords;
 
-layout(std140) uniform uboCameraMatrices {
-  mat4 viewMat;
-  mat4 invViewMat;
-  mat4 projectionMat;
-  mat4 invProjectionMat;
-  mat4 viewProjectionMat;
-  vec3 cameraPos;
+layout(std140) uniform uboCameraInfo {
+  mat4 uniViewMat;
+  mat4 uniInvViewMat;
+  mat4 uniProjectionMat;
+  mat4 uniInvProjectionMat;
+  mat4 uniViewProjectionMat;
+  vec3 uniCameraPos;
 };
 
 uniform Buffers uniSceneBuffers;
@@ -26,7 +26,7 @@ vec3 binaryRefinement(vec3 rayDir, vec3 viewPos) {
   vec4 projCoords;
 
   for (uint binStep = 0u; binStep < maxBinarySteps; ++binStep) {
-    projCoords     = projectionMat * vec4(viewPos, 1.0);
+    projCoords     = uniProjectionMat * vec4(viewPos, 1.0);
     projCoords.xy /= projCoords.w;
     projCoords.xy  = projCoords.xy * 0.5 + 0.5;
 
@@ -41,7 +41,7 @@ vec3 binaryRefinement(vec3 rayDir, vec3 viewPos) {
       viewPos -= rayDir;
   }
 
-  projCoords     = projectionMat * vec4(viewPos, 1.0);
+  projCoords     = uniProjectionMat * vec4(viewPos, 1.0);
   projCoords.xy /= projCoords.w;
   projCoords.xy  = projCoords.xy * 0.5 + 0.5;
 
@@ -54,7 +54,7 @@ vec3 recoverReflectColor(vec3 rayDir, vec3 viewPos) {
   for (uint rayStep = 0u; rayStep < maxRaySteps; ++rayStep) {
     viewPos += rayDir;
 
-    vec4 projCoords = projectionMat * vec4(viewPos, 1.0);
+    vec4 projCoords = uniProjectionMat * vec4(viewPos, 1.0);
     projCoords.xy  /= projCoords.w;
     projCoords.xy   = projCoords.xy * 0.5 + 0.5;
 
@@ -71,7 +71,7 @@ vec3 recoverReflectColor(vec3 rayDir, vec3 viewPos) {
 
 vec3 computeViewPosFromDepth(vec2 texcoords, float depth) {
   vec4 projPos = vec4(vec3(texcoords, depth) * 2.0 - 1.0, 1.0);
-  vec4 viewPos = invProjectionMat * projPos;
+  vec4 viewPos = uniInvProjectionMat * projPos;
 
   return viewPos.xyz / viewPos.w;
 }

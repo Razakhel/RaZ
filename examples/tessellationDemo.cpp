@@ -54,13 +54,13 @@ constexpr std::string_view tessEvalSource = R"(
 
   out MeshInfo vertMeshInfo;
 
-  layout(std140) uniform uboCameraMatrices {
-    mat4 viewMat;
-    mat4 invViewMat;
-    mat4 projectionMat;
-    mat4 invProjectionMat;
-    mat4 viewProjectionMat;
-    vec3 cameraPos;
+  layout(std140) uniform uboCameraInfo {
+    mat4 uniViewMat;
+    mat4 uniInvViewMat;
+    mat4 uniProjectionMat;
+    mat4 uniInvProjectionMat;
+    mat4 uniViewProjectionMat;
+    vec3 uniCameraPos;
   };
 
   void main() {
@@ -92,7 +92,7 @@ constexpr std::string_view tessEvalSource = R"(
     vertMeshInfo.vertTBNMatrix[0] = vertMeshInfo.vertTBNMatrix[2].zxy;
     vertMeshInfo.vertTBNMatrix[1] = cross(vertMeshInfo.vertTBNMatrix[0], vertMeshInfo.vertTBNMatrix[2]);
 
-    gl_Position = viewProjectionMat * vec4(vertPos, 1.0);
+    gl_Position = uniViewProjectionMat * vec4(vertPos, 1.0);
   }
 )";
 

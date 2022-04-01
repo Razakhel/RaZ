@@ -6,13 +6,13 @@ struct Buffers {
 
 in vec2 fragTexcoords;
 
-layout(std140) uniform uboCameraMatrices {
-  mat4 viewMat;
-  mat4 invViewMat;
-  mat4 projectionMat;
-  mat4 invProjectionMat;
-  mat4 viewProjectionMat;
-  vec3 cameraPos;
+layout(std140) uniform uboCameraInfo {
+  mat4 uniViewMat;
+  mat4 uniInvViewMat;
+  mat4 uniProjectionMat;
+  mat4 uniInvProjectionMat;
+  mat4 uniViewProjectionMat;
+  vec3 uniCameraPos;
 };
 
 uniform Buffers uniSceneBuffers;
@@ -70,7 +70,7 @@ float computeSsaoFactor(vec3 viewPos, vec3 worldNormal, float depth) {
     float randVal = rand(viewPos.xy * raySample) * 50;
     vec3 rayStep  = rayOrig + randVal * rayDir;
 
-    vec4 projCoords = projectionMat * vec4(rayStep, 1.0);
+    vec4 projCoords = uniProjectionMat * vec4(rayStep, 1.0);
     projCoords     /= projCoords.w;
 
     vec2 hitCoords = projCoords.xy * 0.5 + 0.5;
@@ -86,7 +86,7 @@ float computeSsaoFactor(vec3 viewPos, vec3 worldNormal, float depth) {
 
 vec3 computeViewPosFromDepth(vec2 texcoords, float depth) {
   vec4 projPos = vec4(vec3(texcoords, depth) * 2.0 - 1.0, 1.0);
-  vec4 viewPos = invProjectionMat * projPos;
+  vec4 viewPos = uniInvProjectionMat * projPos;
 
   return viewPos.xyz / viewPos.w;
 }
@@ -95,7 +95,7 @@ void main() {
   float depth = texture(uniSceneBuffers.depth, fragTexcoords).r;
 
   vec3 viewPos  = computeViewPosFromDepth(fragTexcoords, depth);
-  vec3 worldPos = vec3(invViewMat * vec4(viewPos, 1.0));
+  vec3 worldPos = vec3(uniInvViewMat * vec4(viewPos, 1.0));
 
   vec3 worldNormal = normalize(texture(uniSceneBuffers.normal, fragTexcoords).xyz * 2.0 - 1.0);
 

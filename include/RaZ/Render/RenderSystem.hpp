@@ -54,7 +54,7 @@ public:
   bool hasCubemap() const { return m_cubemap.has_value(); }
   const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && hasCubemap()); return *m_cubemap; }
 
-  void setCubemap(Cubemap cubemap) { m_cubemap = std::move(cubemap); }
+  void setCubemap(Cubemap&& cubemap) { m_cubemap = std::move(cubemap); }
 
 #if !defined(RAZ_NO_WINDOW)
   void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
@@ -71,7 +71,13 @@ public:
   void sendCameraPosition(const Vec3f& cameraPos) const { m_cameraUbo.sendData(cameraPos, sizeof(Mat4f) * 5); }
   void sendCameraMatrices(const Mat4f& viewProjMat) const;
   void sendCameraMatrices() const;
-  void updateLight(const Entity* entity, std::size_t lightIndex) const;
+  /// Updates a single light, sending its data to the GPU.
+  /// \warning The lights UBO needs to be bound before calling this function.
+  /// \note If resetting a removed light or updating one not yet known by the application, call updateLights() instead to fully take that change into account.
+  /// \param entity Light entity to be updated; if not a directional light, needs to have a Transform component.
+  /// \param lightIndex Index of the light to be updated.
+  void updateLight(const Entity& entity, unsigned int lightIndex) const;
+  /// Updates all lights referenced by the RenderSystem, sending their data to the GPU.
   void updateLights() const;
   void removeCubemap() { m_cubemap.reset(); }
   void updateShaders() const;
@@ -94,7 +100,8 @@ private:
 
   Entity* m_cameraEntity {};
   RenderGraph m_renderGraph {};
-  UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), 0);
+  UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f));
+  UniformBuffer m_lightsUbo = UniformBuffer(sizeof(Vec4f) * 4 * 100 + sizeof(Vec4u));
 
   std::optional<Cubemap> m_cubemap {};
 };

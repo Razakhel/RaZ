@@ -26,13 +26,13 @@ constexpr std::string_view geomFragSource = R"(
     mat3 vertTBNMatrix;
   } vertMeshInfo;
 
-  layout(std140) uniform uboCameraMatrices {
-    mat4 viewMat;
-    mat4 invViewMat;
-    mat4 projectionMat;
-    mat4 invProjectionMat;
-    mat4 viewProjectionMat;
-    vec3 cameraPos;
+  layout(std140) uniform uboCameraInfo {
+    mat4 uniViewMat;
+    mat4 uniInvViewMat;
+    mat4 uniProjectionMat;
+    mat4 uniInvProjectionMat;
+    mat4 uniViewProjectionMat;
+    vec3 uniCameraPos;
   };
 
   uniform Material uniMaterial;

@@ -1,11 +1,11 @@
-#define MAX_LIGHT_COUNT 10
+#define MAX_LIGHT_COUNT 100
 #define PI 3.1415926535897932384626433832795
 
 struct Light {
   vec4 position;
-  vec3 direction;
+  vec4 direction;
+  vec4 color;
   float energy;
-  vec3 color;
   float angle;
 };
 
@@ -29,16 +29,18 @@ in struct MeshInfo {
   mat3 vertTBNMatrix;
 } vertMeshInfo;
 
-uniform uint uniLightCount;
-uniform Light uniLights[MAX_LIGHT_COUNT];
+layout(std140) uniform uboCameraInfo {
+  mat4 uniViewMat;
+  mat4 uniInvViewMat;
+  mat4 uniProjectionMat;
+  mat4 uniInvProjectionMat;
+  mat4 uniViewProjectionMat;
+  vec3 uniCameraPos;
+};
 
-layout(std140) uniform uboCameraMatrices {
-  mat4 viewMat;
-  mat4 invViewMat;
-  mat4 projectionMat;
-  mat4 invProjectionMat;
-  mat4 viewProjectionMat;
-  vec3 cameraPos;
+layout(std140) uniform uboLightsInfo {
+  Light uniLights[MAX_LIGHT_COUNT];
+  uint uniLightCount;
 };
 
 uniform Material uniMaterial;
@@ -98,7 +100,7 @@ void main() {
   normal      = normalize(normal * 2.0 - 1.0);
   normal      = normalize(vertMeshInfo.vertTBNMatrix * normal);
 
-  vec3 viewDir = normalize(cameraPos - vertMeshInfo.vertPosition);
+  vec3 viewDir = normalize(uniCameraPos - vertMeshInfo.vertPosition);
 
   // Base Fresnel (F)
   vec3 baseReflectivity = mix(vec3(0.04), albedo, metallic);
@@ -117,12 +119,12 @@ void main() {
       float sqrDist = dot(fullLightDir, fullLightDir);
       attenuation  /= sqrDist;
     } else {
-      fullLightDir = -uniLights[lightIndex].direction;
+      fullLightDir = -uniLights[lightIndex].direction.xyz;
     }
 
     vec3 lightDir = normalize(fullLightDir);
     vec3 halfDir  = normalize(viewDir + lightDir);
-    vec3 radiance = uniLights[lightIndex].color * attenuation;
+    vec3 radiance = uniLights[lightIndex].color.rgb * attenuation;
 
     // Normal distrib (D)
     float normalDistrib = computeNormalDistrib(normal, halfDir, roughness);
