@@ -123,9 +123,8 @@ void RenderSystem::updateShaders() const {
   }
 }
 
-void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format) const {
+void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format, TextureDataType dataType) const {
   ImageColorspace colorspace = ImageColorspace::RGB;
-  TextureDataType dataType   = TextureDataType::UBYTE;
 
   switch (format) {
     case TextureFormat::DEPTH:
@@ -142,7 +141,7 @@ void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format) c
       break;
   }
 
-  Image img(m_sceneWidth, m_sceneHeight, colorspace);
+  Image img(m_sceneWidth, m_sceneHeight, colorspace, (dataType == TextureDataType::FLOAT ? ImageDataType::FLOAT : ImageDataType::BYTE));
   Renderer::recoverFrame(m_sceneWidth, m_sceneHeight, format, dataType, img.getDataPtr());
 
   ImageFormat::save(filePath, img, true);

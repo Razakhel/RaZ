@@ -79,9 +79,9 @@ public:
   void updateLight(const Entity& entity, unsigned int lightIndex) const;
   /// Updates all lights referenced by the RenderSystem, sending their data to the GPU.
   void updateLights() const;
-  void removeCubemap() { m_cubemap.reset(); }
   void updateShaders() const;
-  void saveToImage(const FilePath& filePath, TextureFormat format = TextureFormat::RGB) const;
+  void saveToImage(const FilePath& filePath, TextureFormat format = TextureFormat::RGB, TextureDataType dataType = TextureDataType::UBYTE) const;
+  void removeCubemap() { m_cubemap.reset(); }
   void destroy() override;
 
 protected:
