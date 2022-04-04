@@ -1,22 +1,24 @@
-#include "GL/glew.h"
 #include "RaZ/Render/GraphicObjects.hpp"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 namespace Raz {
 
 VertexArray::VertexArray() {
-  glGenVertexArrays(1, &m_index);
+  Logger::debug("[VertexArray] Creating...");
+  Renderer::generateVertexArray(m_index);
+  Logger::debug("[VertexArray] Created (ID: " + std::to_string(m_index) + ')');
 }
 
 VertexArray::VertexArray(VertexArray&& vertexArray) noexcept
   : m_index{ std::exchange(vertexArray.m_index, std::numeric_limits<unsigned int>::max()) } {}
 
 void VertexArray::bind() const {
-  glBindVertexArray(m_index);
+  Renderer::bindVertexArray(m_index);
 }
 
 void VertexArray::unbind() const {
-  glBindVertexArray(0);
+  Renderer::unbindVertexArray();
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& vertexArray) noexcept {
@@ -25,11 +27,18 @@ VertexArray& VertexArray::operator=(VertexArray&& vertexArray) noexcept {
 }
 
 VertexArray::~VertexArray() {
-  glDeleteVertexArrays(1, &m_index);
+  if (m_index == std::numeric_limits<unsigned int>::max())
+    return;
+
+  Logger::debug("[VertexArray] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Renderer::deleteVertexArray(m_index);
+  Logger::debug("[VertexArray] Destroyed");
 }
 
 VertexBuffer::VertexBuffer() {
+  Logger::debug("[VertexBuffer] Creating...");
   Renderer::generateBuffer(m_index);
+  Logger::debug("[VertexBuffer] Created (ID: " + std::to_string(m_index) + ')');
 }
 
 VertexBuffer::VertexBuffer(VertexBuffer&& vertexBuffer) noexcept
@@ -52,11 +61,15 @@ VertexBuffer::~VertexBuffer() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
+  Logger::debug("[VertexBuffer] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteBuffer(m_index);
+  Logger::debug("[VertexBuffer] Destroyed");
 }
 
 IndexBuffer::IndexBuffer() {
+  Logger::debug("[IndexBuffer] Creating...");
   Renderer::generateBuffer(m_index);
+  Logger::debug("[IndexBuffer] Created (ID: " + std::to_string(m_index) + ')');
 }
 
 IndexBuffer::IndexBuffer(IndexBuffer&& indexBuffer) noexcept
@@ -79,7 +92,9 @@ IndexBuffer::~IndexBuffer() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
+  Logger::debug("[IndexBuffer] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteBuffer(m_index);
+  Logger::debug("[IndexBuffer] Destroyed");
 }
 
 } // namespace Raz

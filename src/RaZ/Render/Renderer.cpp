@@ -347,6 +347,30 @@ void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureForm
   printConditionalErrors();
 }
 
+void Renderer::generateVertexArrays(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenVertexArrays(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
+void Renderer::bindVertexArray(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindVertexArray(index);
+
+  printConditionalErrors();
+}
+
+void Renderer::deleteVertexArrays(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteVertexArrays(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
 void Renderer::generateBuffers(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

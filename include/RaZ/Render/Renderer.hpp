@@ -781,6 +781,12 @@ public:
 #endif
   static void setPixelStorage(PixelStorage storage, unsigned int value);
   static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
+  static void generateVertexArrays(unsigned int count, unsigned int* indices);
+  static void generateVertexArray(unsigned int& index) { generateVertexArrays(1, &index); }
+  static void bindVertexArray(unsigned int index);
+  static void unbindVertexArray() { bindVertexArray(0); }
+  static void deleteVertexArrays(unsigned int count, unsigned int* indices);
+  static void deleteVertexArray(unsigned int& index) { deleteVertexArrays(1, &index); }
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }
   static void generateBuffer(unsigned int& index) { generateBuffers(1, &index); }
