@@ -48,7 +48,6 @@ void ShaderProgram::updateShaders() const {
   loadShaders();
   compileShaders();
   link();
-  use();
 
   Logger::debug("[ShaderProgram] Updated shaders");
 }
@@ -223,7 +222,7 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader, FragmentShader&&
   setVertexShader(std::move(vertShader));
   setFragmentShader(std::move(fragShader));
 
-  updateShaders();
+  link();
 }
 
 void RenderShaderProgram::setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader) {
@@ -231,7 +230,7 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader, GeometryShader&&
   setGeometryShader(std::move(geomShader));
   setFragmentShader(std::move(fragShader));
 
-  updateShaders();
+  link();
 }
 
 void RenderShaderProgram::setShaders(VertexShader&& vertShader, TessellationEvaluationShader&& tessEvalShader, FragmentShader&& fragShader) {
@@ -239,7 +238,7 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader, TessellationEval
   setTessellationEvaluationShader(std::move(tessEvalShader));
   setFragmentShader(std::move(fragShader));
 
-  updateShaders();
+  link();
 }
 void RenderShaderProgram::setShaders(VertexShader&& vertShader,
                                      TessellationControlShader&& tessCtrlShader,
@@ -250,7 +249,7 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader,
   setTessellationEvaluationShader(std::move(tessEvalShader));
   setFragmentShader(std::move(fragShader));
 
-  updateShaders();
+  link();
 }
 
 void RenderShaderProgram::loadShaders() const {

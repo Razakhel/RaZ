@@ -1,6 +1,7 @@
 #include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 namespace Raz {
 
@@ -41,7 +42,9 @@ TextureInternalFormat recoverInternalFormat(const Image& image) {
 } // namespace
 
 Texture::Texture() {
+  Logger::debug("[Texture] Creating...");
   Renderer::generateTexture(m_index);
+  Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
 }
 
 Texture::Texture(ColorPreset preset, int bindingIndex) : Texture(bindingIndex) {
@@ -119,7 +122,9 @@ Texture::~Texture() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
+  Logger::debug("[Texture] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteTexture(m_index);
+  Logger::debug("[Texture] Destroyed");
 }
 
 void Texture::load(bool createMipmaps) {

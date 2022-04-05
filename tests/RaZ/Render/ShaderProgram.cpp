@@ -203,8 +203,13 @@ TEST_CASE("RenderShaderProgram creation") {
     // Setting all of them at once effectively links the program
     program.setShaders(Raz::VertexShader::loadFromSource(vertSource), Raz::FragmentShader::loadFromSource(fragSource));
     CHECK_FALSE(Raz::Renderer::hasErrors());
-
     CHECK(program.isLinked());
+
+    // But does not declare it as used
+    CHECK_FALSE(program.isUsed());
+
+    program.use();
+    CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK(program.isUsed());
   }
 
@@ -214,6 +219,10 @@ TEST_CASE("RenderShaderProgram creation") {
     CHECK_FALSE(Raz::Renderer::hasErrors());
 
     CHECK(program.isLinked());
+    CHECK_FALSE(program.isUsed());
+
+    program.use();
+    CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK(program.isUsed());
 
     // When destroying only the vertex shader...
@@ -300,7 +309,7 @@ TEST_CASE("ComputeShaderProgram creation") {
     CHECK_FALSE(program.isLinked());
     CHECK_FALSE(program.isUsed());
 
-    // Setting the shaders on its own automatically links the program
+    // Setting the shader on its own automatically links the program
     program.setShader(Raz::ComputeShader::loadFromSource(compSource));
     CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK(program.isLinked());
