@@ -363,6 +363,22 @@ void Renderer::bindVertexArray(unsigned int index) {
   printConditionalErrors();
 }
 
+void Renderer::enableVertexAttribArray(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glEnableVertexAttribArray(index);
+
+  printConditionalErrors();
+}
+
+void Renderer::setVertexAttrib(unsigned int index, AttribDataType dataType, uint8_t size, unsigned int stride, unsigned int offset, bool normalize) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glVertexAttribPointer(index, size, static_cast<unsigned int>(dataType), normalize, static_cast<int>(stride), reinterpret_cast<const void*>(offset));
+
+  printConditionalErrors();
+}
+
 void Renderer::deleteVertexArrays(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

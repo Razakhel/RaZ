@@ -1,4 +1,3 @@
-#include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/SubmeshRenderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -82,39 +81,31 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
   constexpr uint8_t stride = sizeof(vertices.front());
 
   // Position
-  glVertexAttribPointer(0,
-                        3, GL_FLOAT, // vec3
-                        GL_FALSE,
-                        stride,
-                        nullptr); // Position offset is 0
-  glEnableVertexAttribArray(0);
+  Renderer::setVertexAttrib(0,
+                            AttribDataType::FLOAT, 3, // vec3
+                            stride, 0);
+  Renderer::enableVertexAttribArray(0);
 
   // Texcoords
   constexpr std::size_t texcoordsOffset = sizeof(vertices.front().position);
-  glVertexAttribPointer(1,
-                        2, GL_FLOAT, // vec2
-                        GL_FALSE,
-                        stride,
-                        reinterpret_cast<const void*>(texcoordsOffset));
-  glEnableVertexAttribArray(1);
+  Renderer::setVertexAttrib(1,
+                            AttribDataType::FLOAT, 2, // vec2
+                            stride, texcoordsOffset);
+  Renderer::enableVertexAttribArray(1);
 
   // Normal
   constexpr std::size_t normalOffset = texcoordsOffset + sizeof(vertices.front().texcoords);
-  glVertexAttribPointer(2,
-                        3, GL_FLOAT, // vec3
-                        GL_FALSE,
-                        stride,
-                        reinterpret_cast<const void*>(normalOffset));
-  glEnableVertexAttribArray(2);
+  Renderer::setVertexAttrib(2,
+                            AttribDataType::FLOAT, 3, // vec3
+                            stride, normalOffset);
+  Renderer::enableVertexAttribArray(2);
 
   // Tangent
   constexpr std::size_t tangentOffset = normalOffset + sizeof(vertices.front().normal);
-  glVertexAttribPointer(3,
-                        3, GL_FLOAT, // vec3
-                        GL_FALSE,
-                        stride,
-                        reinterpret_cast<const void*>(tangentOffset));
-  glEnableVertexAttribArray(3);
+  Renderer::setVertexAttrib(3,
+                            AttribDataType::FLOAT, 3, // vec3
+                            stride, tangentOffset);
+  Renderer::enableVertexAttribArray(3);
 
   m_vbo.unbind();
   m_vao.unbind();

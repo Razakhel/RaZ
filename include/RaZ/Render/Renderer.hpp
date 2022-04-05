@@ -156,6 +156,24 @@ enum class PixelStorage : unsigned int {
   PACK_ALIGNMENT      = 3333  /* GL_PACK_ALIGNMENT    */  ///<
 };
 
+enum class AttribDataType : unsigned int {
+  BYTE             = 5120  /* GL_BYTE                         */, ///< Byte.
+  UBYTE            = 5121  /* GL_UNSIGNED_BYTE                */, ///< Unsigned byte.
+  SHORT            = 5122  /* GL_SHORT                        */, ///< Short.
+  USHORT           = 5123  /* GL_UNSIGNED_SHORT               */, ///< Unsigned short.
+  INT              = 5124  /* GL_INT                          */, ///< Integer.
+  INT_2_10_10_10   = 36255 /* GL_INT_2_10_10_10_REV           */, ///< Packed integer stored in an ABGR format (2 alpha bits & 10 BGR bits each).
+  UINT             = 5125  /* GL_UNSIGNED_INT                 */, ///< Unsigned integer.
+  UINT_2_10_10_10  = 33640 /* GL_UNSIGNED_INT_2_10_10_10_REV  */, ///< Packed unsigned integer stored in an ABGR format (2 alpha bits & 10 BGR bits each).
+  HALF_FLOAT       = 5131  /* GL_HALF_FLOAT                   */, ///< Half-precision floating-point.
+  FLOAT            = 5126  /* GL_FLOAT                        */, ///< Simple-precision floating-point.
+  FIXED            = 5132  /* GL_FIXED                        */, ///< Fixed-precision.
+  UINT_10F_11F_11F = 35899 /* GL_UNSIGNED_INT_10F_11F_11F_REV */, ///< Packed floating-point stored in a BGR format (10 blue bits & 11 green & red bits each). Requires OpenGL 4.4+.
+#if !defined(USE_OPENGL_ES)
+  DOUBLE           = 5130  /* GL_DOUBLE                       */  ///< Double-precision floating-point.
+#endif
+};
+
 enum class BufferType : unsigned int {
   ARRAY_BUFFER   = 34962 /* GL_ARRAY_BUFFER         */, ///<
   ELEMENT_BUFFER = 34963 /* GL_ELEMENT_ARRAY_BUFFER */, ///<
@@ -810,6 +828,8 @@ public:
   static void generateVertexArray(unsigned int& index) { generateVertexArrays(1, &index); }
   static void bindVertexArray(unsigned int index);
   static void unbindVertexArray() { bindVertexArray(0); }
+  static void enableVertexAttribArray(unsigned int index);
+  static void setVertexAttrib(unsigned int index, AttribDataType dataType, uint8_t size, unsigned int stride, unsigned int offset, bool normalize = false);
   static void deleteVertexArrays(unsigned int count, unsigned int* indices);
   static void deleteVertexArray(unsigned int& index) { deleteVertexArrays(1, &index); }
   static void generateBuffers(unsigned int count, unsigned int* indices);
