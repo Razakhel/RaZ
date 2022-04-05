@@ -56,7 +56,7 @@ bool RenderSystem::update([[maybe_unused]] float deltaTime) {
   return true;
 }
 
-void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
+void RenderSystem::sendCameraMatrices() const {
   assert("Error: A camera must be given to a RenderSystem to send its matrices." && (m_cameraEntity != nullptr));
 
   const auto& camera = m_cameraEntity->getComponent<Camera>();
@@ -66,18 +66,11 @@ void RenderSystem::sendCameraMatrices(const Mat4f& viewProjMat) const {
   sendInverseViewMatrix(camera.getInverseViewMatrix());
   sendProjectionMatrix(camera.getProjectionMatrix());
   sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
-  sendViewProjectionMatrix(viewProjMat);
+  sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
   sendCameraPosition(m_cameraEntity->getComponent<Transform>().getPosition());
 
   // TODO: binding the block is required whenever programs are updated, not every time data is sent, but is done here for now for simplicity
   m_cameraUbo.bindUniformBlock(getGeometryProgram(), "uboCameraInfo", 0);
-}
-
-void RenderSystem::sendCameraMatrices() const {
-  assert("Error: A camera must be given to a RenderSystem to send its matrices." && (m_cameraEntity != nullptr));
-
-  const auto& camera = m_cameraEntity->getComponent<Camera>();
-  sendCameraMatrices(camera.getProjectionMatrix() * camera.getViewMatrix());
 }
 
 void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) const {

@@ -3,8 +3,16 @@ layout(location = 1) in vec2 vertTexcoords;
 layout(location = 2) in vec3 vertNormal;
 layout(location = 3) in vec3 vertTangent;
 
-uniform mat4 uniModelMatrix;
-uniform mat4 uniMvpMatrix;
+layout(std140) uniform uboCameraInfo {
+  mat4 uniViewMat;
+  mat4 uniInvViewMat;
+  mat4 uniProjectionMat;
+  mat4 uniInvProjectionMat;
+  mat4 uniViewProjectionMat;
+  vec3 uniCameraPos;
+};
+
+uniform mat4 uniModelMat;
 
 out struct MeshInfo {
   vec3 vertPosition;
@@ -13,15 +21,15 @@ out struct MeshInfo {
 } vertMeshInfo;
 
 void main() {
-  vertMeshInfo.vertPosition  = (uniModelMatrix * vec4(vertPosition, 1.0)).xyz;
+  vertMeshInfo.vertPosition  = (uniModelMat * vec4(vertPosition, 1.0)).xyz;
   vertMeshInfo.vertTexcoords = vertTexcoords;
 
-  mat3 modelMat = mat3(uniModelMatrix);
+  mat3 modelMat = mat3(uniModelMat);
 
   vec3 tangent   = normalize(modelMat * vertTangent);
   vec3 normal    = normalize(modelMat * vertNormal);
   vec3 bitangent = cross(normal, tangent);
   vertMeshInfo.vertTBNMatrix = mat3(tangent, bitangent, normal);
 
-  gl_Position = uniMvpMatrix * vec4(vertPosition, 1.0);
+  gl_Position = uniViewProjectionMat * uniModelMat * vec4(vertPosition, 1.0);
 }

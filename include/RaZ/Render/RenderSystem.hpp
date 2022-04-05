@@ -71,7 +71,6 @@ public:
   void sendInverseProjectionMatrix(const Mat4f& invProjMat) const { m_cameraUbo.sendData(invProjMat, sizeof(Mat4f) * 3); }
   void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_cameraUbo.sendData(viewProjMat, sizeof(Mat4f) * 4); }
   void sendCameraPosition(const Vec3f& cameraPos) const { m_cameraUbo.sendData(cameraPos, sizeof(Mat4f) * 5); }
-  void sendCameraMatrices(const Mat4f& viewProjMat) const;
   void sendCameraMatrices() const;
   /// Updates a single light, sending its data to the GPU.
   /// \warning The lights UBO needs to be bound before calling this function.

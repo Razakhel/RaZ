@@ -49,24 +49,26 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
   auto& camera       = renderSystem.m_cameraEntity->getComponent<Camera>();
   auto& camTransform = renderSystem.m_cameraEntity->getComponent<Transform>();
 
-  Mat4f viewProjMat;
+  renderSystem.m_cameraUbo.bind();
 
   if (camTransform.hasUpdated()) {
-    if (camera.getCameraType() == CameraType::LOOK_AT) {
+    if (camera.getCameraType() == CameraType::LOOK_AT)
       camera.computeLookAt(camTransform.getPosition());
-    } else {
+    else
       camera.computeViewMatrix(camTransform);
-    }
 
     camera.computeInverseViewMatrix();
-    viewProjMat = camera.getProjectionMatrix() * camera.getViewMatrix();
 
-    renderSystem.sendCameraMatrices(viewProjMat);
+    renderSystem.sendViewMatrix(camera.getViewMatrix());
+    renderSystem.sendInverseViewMatrix(camera.getInverseViewMatrix());
+    renderSystem.sendCameraPosition(camTransform.getPosition());
 
     camTransform.setUpdated(false);
-  } else {
-    viewProjMat = camera.getProjectionMatrix() * camera.getViewMatrix();
   }
+
+  renderSystem.sendProjectionMatrix(camera.getProjectionMatrix());
+  renderSystem.sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
+  renderSystem.sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
 
   // Binding textures marks the pass' program as used
   m_geometryPass.bindTextures();
@@ -82,11 +84,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
     if (!meshRenderer.isEnabled())
       continue;
 
-    const Mat4f modelMat = entity->getComponent<Transform>().computeTransformMatrix();
-
-    geometryProgram.sendUniform("uniModelMatrix", modelMat);
-    geometryProgram.sendUniform("uniMvpMatrix", viewProjMat * modelMat);
-
+    geometryProgram.sendUniform("uniModelMat", entity->getComponent<Transform>().computeTransformMatrix());
     meshRenderer.draw(geometryProgram);
   }
 
