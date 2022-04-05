@@ -8,6 +8,11 @@
 
 namespace Raz {
 
+void RenderSystem::setCubemap(Cubemap&& cubemap) {
+  m_cubemap = std::move(cubemap);
+  m_cameraUbo.bindUniformBlock(m_cubemap->getProgram(), "uboCameraInfo", 0);
+}
+
 void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   m_sceneWidth  = width;
   m_sceneHeight = height;

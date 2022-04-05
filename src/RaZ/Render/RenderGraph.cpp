@@ -91,7 +91,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
   }
 
   if (renderSystem.hasCubemap())
-    renderSystem.getCubemap().draw(camera);
+    renderSystem.getCubemap().draw();
 
   geometryFramebuffer.unbind();
 

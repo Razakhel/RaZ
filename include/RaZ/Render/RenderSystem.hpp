@@ -56,7 +56,7 @@ public:
   bool hasCubemap() const { return m_cubemap.has_value(); }
   const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && hasCubemap()); return *m_cubemap; }
 
-  void setCubemap(Cubemap&& cubemap) { m_cubemap = std::move(cubemap); }
+  void setCubemap(Cubemap&& cubemap);
 
 #if !defined(RAZ_NO_WINDOW)
   void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
