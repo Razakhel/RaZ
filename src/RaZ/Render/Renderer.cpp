@@ -951,6 +951,41 @@ std::string Renderer::recoverUniformName(unsigned int programIndex, unsigned int
   return name;
 }
 
+void Renderer::recoverUniformData(unsigned int programIndex, int uniformIndex, int* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetUniformiv(programIndex, uniformIndex, data);
+
+  printConditionalErrors();
+}
+
+void Renderer::recoverUniformData(unsigned int programIndex, int uniformIndex, unsigned int* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetUniformuiv(programIndex, uniformIndex, data);
+
+  printConditionalErrors();
+}
+
+void Renderer::recoverUniformData(unsigned int programIndex, int uniformIndex, float* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetUniformfv(programIndex, uniformIndex, data);
+
+  printConditionalErrors();
+}
+
+#if !defined(USE_OPENGL_ES)
+void Renderer::recoverUniformData(unsigned int programIndex, int uniformIndex, double* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Recovering uniform data of type double requires OpenGL 4.0+." && checkVersion(4, 0));
+
+  glGetUniformdv(programIndex, uniformIndex, data);
+
+  printConditionalErrors();
+}
+#endif
+
 void Renderer::bindUniformBlock(unsigned int programIndex, unsigned int uniformBlockIndex, unsigned int bindingIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

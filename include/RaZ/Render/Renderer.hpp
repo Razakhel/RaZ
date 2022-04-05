@@ -988,6 +988,12 @@ public:
   static void recoverUniformInfo(unsigned int programIndex, unsigned int uniformIndex, UniformType& type, std::string& name, int* size = nullptr);
   static UniformType recoverUniformType(unsigned int programIndex, unsigned int uniformIndex);
   static std::string recoverUniformName(unsigned int programIndex, unsigned int uniformIndex);
+  static void recoverUniformData(unsigned int programIndex, int uniformIndex, int* data);
+  static void recoverUniformData(unsigned int programIndex, int uniformIndex, unsigned int* data);
+  static void recoverUniformData(unsigned int programIndex, int uniformIndex, float* data);
+#if !defined(USE_OPENGL_ES)
+  static void recoverUniformData(unsigned int programIndex, int uniformIndex, double* data);
+#endif
   static void bindUniformBlock(unsigned int programIndex, unsigned int uniformBlockIndex, unsigned int bindingIndex);
   static unsigned int recoverUniformBlockIndex(unsigned int programIndex, const char* uniformName);
   /// Sends an integer as uniform.

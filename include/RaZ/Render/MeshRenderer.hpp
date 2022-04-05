@@ -47,16 +47,12 @@ public:
   /// Sets one unique material for the whole mesh.
   /// \warning This clears all previously existing materials.
   /// \param material Material to be set.
-  void setMaterial(MaterialPtr material);
-  /// Replaces attributes of all existing materials according to a given preset.
-  /// \param materialPreset Preset material to apply.
-  /// \param roughnessFactor Material's roughness factor.
-  void setMaterial(MaterialPreset materialPreset, float roughnessFactor);
+  void setMaterial(MaterialPtr&& material);
   /// Adds a given material into the mesh renderer.
   /// \note This doesn't apply the material to any submesh; to do so, manually set the corresponding material index to any submesh renderer.
   /// \param material Material to be added.
   /// \return Reference to the newly added material.
-  Material& addMaterial(MaterialPtr material) { return *m_materials.emplace_back(std::move(material)); }
+  Material& addMaterial(MaterialPtr&& material) { return *m_materials.emplace_back(std::move(material)); }
   /// Removes an existing material.
   /// \param materialIndex Index of the material to remove.
   void removeMaterial(std::size_t materialIndex);

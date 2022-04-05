@@ -26,13 +26,6 @@ enum class MaterialType {
   COOK_TORRANCE
 };
 
-enum class MaterialPreset : uint16_t {
-  CHARCOAL = 0, GRASS, SAND, ICE, SNOW,                                                // Dielectric presets
-  IRON, SILVER, ALUMINIUM, GOLD, COPPER, CHROMIUM, NICKEL, TITANIUM, COBALT, PLATINUM, // Metallic presets
-
-  PRESET_COUNT
-};
-
 class Material {
 public:
   Material(Material&&) noexcept = default;
@@ -51,7 +44,6 @@ public:
   void addTexture(TexturePtr texture, std::string uniformName);
   void loadTexture(const FilePath& filePath, int bindingIndex, std::string uniformName, bool flipVertically = true);
 
-  static MaterialCookTorrancePtr recoverMaterial(MaterialPreset preset, float roughnessFactor);
   virtual MaterialPtr clone() const = 0;
   void initTextures(const RenderShaderProgram& program) const;
   void bindTextures(const RenderShaderProgram& program) const;

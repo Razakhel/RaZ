@@ -33,34 +33,12 @@ void MeshRenderer::setRenderMode(RenderMode renderMode, const Mesh& mesh) {
     m_submeshRenderers[i].setRenderMode(renderMode, mesh.getSubmeshes()[i]);
 }
 
-void MeshRenderer::setMaterial(MaterialPtr material) {
+void MeshRenderer::setMaterial(MaterialPtr&& material) {
   m_materials.clear();
   m_materials.emplace_back(std::move(material));
 
   for (SubmeshRenderer& submeshRenderer : m_submeshRenderers)
     submeshRenderer.setMaterialIndex(0);
-}
-
-void MeshRenderer::setMaterial(MaterialPreset materialPreset, float roughnessFactor) {
-  const MaterialCookTorrancePtr& newMaterial = Material::recoverMaterial(materialPreset, roughnessFactor);
-
-  for (MaterialPtr& material : m_materials) {
-    material->setBaseColor(newMaterial->getBaseColor());
-
-    if (material->getType() == MaterialType::COOK_TORRANCE) {
-      auto* materialCT = static_cast<MaterialCookTorrance*>(material.get());
-
-      materialCT->setMetallicFactor(newMaterial->getMetallicFactor());
-      materialCT->setRoughnessFactor(roughnessFactor);
-      materialCT->setAlbedoMap(Texture::create(ColorPreset::WHITE, 0));
-    } else {
-      auto* materialBP = static_cast<MaterialBlinnPhong*>(material.get());
-
-      const float specular = newMaterial->getMetallicFactor() * (1.f - roughnessFactor);
-      materialBP->setSpecular(Vec3f(specular));
-      materialBP->setDiffuseMap(Texture::create(ColorPreset::WHITE, 0));
-    }
-  }
 }
 
 void MeshRenderer::removeMaterial(std::size_t materialIndex) {

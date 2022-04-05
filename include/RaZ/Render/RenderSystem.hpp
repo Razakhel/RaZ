@@ -15,6 +15,8 @@
 
 namespace Raz {
 
+class MeshRenderer;
+
 /// RenderSystem class, handling the rendering part.
 class RenderSystem final : public System {
   friend RenderGraph;
