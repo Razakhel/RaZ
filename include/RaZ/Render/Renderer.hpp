@@ -428,35 +428,6 @@ enum class ShaderInfo : unsigned int {
   SOURCE_LENGTH   = 35720 /* GL_SHADER_SOURCE_LENGTH */  ///<
 };
 
-enum class BarrierType : unsigned int {
-  VERTEX_ATTRIB_ARRAY = 1          /* GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT */, ///<
-  ELEMENT_ARRAY       = 2          /* GL_ELEMENT_ARRAY_BARRIER_BIT       */, ///<
-  UNIFORM             = 4          /* GL_UNIFORM_BARRIER_BIT             */, ///<
-  TEXTURE_FETCH       = 8          /* GL_TEXTURE_FETCH_BARRIER_BIT       */, ///<
-  SHADER_IMAGE_ACCESS = 32         /* GL_SHADER_IMAGE_ACCESS_BARRIER_BIT */, ///<
-  COMMAND             = 64         /* GL_COMMAND_BARRIER_BIT             */, ///<
-  PIXEL_BUFFER        = 128        /* GL_PIXEL_BUFFER_BARRIER_BIT        */, ///<
-  TEXTURE_UPDATE      = 256        /* GL_TEXTURE_UPDATE_BARRIER_BIT      */, ///<
-  BUFFER_UPDATE       = 512        /* GL_BUFFER_UPDATE_BARRIER_BIT       */, ///<
-  FRAMEBUFFER         = 1024       /* GL_FRAMEBUFFER_BARRIER_BIT         */, ///<
-  TRANSFORM_FEEDBACK  = 2048       /* GL_TRANSFORM_FEEDBACK_BARRIER_BIT  */, ///<
-  ATOMIC_COUNTER      = 4096       /* GL_ATOMIC_COUNTER_BARRIER_BIT      */, ///<
-  SHADER_STORAGE      = 8192       /* GL_SHADER_STORAGE_BARRIER_BIT      */, ///<
-  ALL                 = 4294967295 /* GL_ALL_BARRIER_BITS                */  ///<
-};
-MAKE_ENUM_FLAG(BarrierType)
-
-enum class RegionBarrierType : unsigned int {
-  ATOMIC_COUNTER      = static_cast<unsigned int>(BarrierType::ATOMIC_COUNTER),      ///<
-  FRAMEBUFFER         = static_cast<unsigned int>(BarrierType::FRAMEBUFFER),         ///<
-  SHADER_IMAGE_ACCESS = static_cast<unsigned int>(BarrierType::SHADER_IMAGE_ACCESS), ///<
-  SHADER_STORAGE      = static_cast<unsigned int>(BarrierType::SHADER_STORAGE),      ///<
-  TEXTURE_FETCH       = static_cast<unsigned int>(BarrierType::TEXTURE_FETCH),       ///<
-  UNIFORM             = static_cast<unsigned int>(BarrierType::UNIFORM),             ///<
-  ALL                 = static_cast<unsigned int>(BarrierType::ALL)                  ///<
-};
-MAKE_ENUM_FLAG(RegionBarrierType)
-
 enum class UniformType : unsigned int {
   // Primitive types
   FLOAT  = 5126  /* GL_FLOAT        */, ///< Single precision floating-point value.
@@ -666,6 +637,60 @@ enum class BlitFilter : unsigned int {
   LINEAR  = static_cast<unsigned int>(TextureParamValue::LINEAR)   ///<
 };
 
+enum class PrimitiveType : unsigned int {
+  POINTS                   = 0  /* GL_POINTS                   */, ///<
+  LINES                    = 1  /* GL_LINES                    */, ///<
+  LINE_LOOP                = 2  /* GL_LINE_LOOP                */, ///<
+  LINE_STRIP               = 3  /* GL_LINE_STRIP               */, ///<
+#if !defined(USE_OPENGL_ES)
+  LINES_ADJACENCY          = 10 /* GL_LINES_ADJACENCY          */, ///<
+  LINE_STRIP_ADJACENCY     = 11 /* GL_LINE_STRIP_ADJACENCY     */, ///<
+#endif
+  TRIANGLES                = 4  /* GL_TRIANGLES                */, ///<
+  TRIANGLE_STRIP           = 5  /* GL_TRIANGLE_STRIP           */, ///<
+  TRIANGLE_FAN             = 6  /* GL_TRIANGLE_FAN             */, ///<
+#if !defined(USE_OPENGL_ES)
+  TRIANGLES_ADJACENCY      = 12 /* GL_TRIANGLES_ADJACENCY      */, ///<
+  TRIANGLE_STRIP_ADJACENCY = 13 /* GL_TRIANGLE_STRIP_ADJACENCY */, ///<
+  PATCHES                  = 14 /* GL_PATCHES                  */  ///<
+#endif
+};
+
+enum class ElementDataType : unsigned int {
+  UBYTE  = 5121 /* GL_UNSIGNED_BYTE  */, ///<
+  USHORT = 5123 /* GL_UNSIGNED_SHORT */, ///<
+  UINT   = 5125 /* GL_UNSIGNED_INT   */  ///<
+};
+
+enum class BarrierType : unsigned int {
+  VERTEX_ATTRIB_ARRAY = 1          /* GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT */, ///<
+  ELEMENT_ARRAY       = 2          /* GL_ELEMENT_ARRAY_BARRIER_BIT       */, ///<
+  UNIFORM             = 4          /* GL_UNIFORM_BARRIER_BIT             */, ///<
+  TEXTURE_FETCH       = 8          /* GL_TEXTURE_FETCH_BARRIER_BIT       */, ///<
+  SHADER_IMAGE_ACCESS = 32         /* GL_SHADER_IMAGE_ACCESS_BARRIER_BIT */, ///<
+  COMMAND             = 64         /* GL_COMMAND_BARRIER_BIT             */, ///<
+  PIXEL_BUFFER        = 128        /* GL_PIXEL_BUFFER_BARRIER_BIT        */, ///<
+  TEXTURE_UPDATE      = 256        /* GL_TEXTURE_UPDATE_BARRIER_BIT      */, ///<
+  BUFFER_UPDATE       = 512        /* GL_BUFFER_UPDATE_BARRIER_BIT       */, ///<
+  FRAMEBUFFER         = 1024       /* GL_FRAMEBUFFER_BARRIER_BIT         */, ///<
+  TRANSFORM_FEEDBACK  = 2048       /* GL_TRANSFORM_FEEDBACK_BARRIER_BIT  */, ///<
+  ATOMIC_COUNTER      = 4096       /* GL_ATOMIC_COUNTER_BARRIER_BIT      */, ///<
+  SHADER_STORAGE      = 8192       /* GL_SHADER_STORAGE_BARRIER_BIT      */, ///<
+  ALL                 = 4294967295 /* GL_ALL_BARRIER_BITS                */  ///<
+};
+MAKE_ENUM_FLAG(BarrierType)
+
+enum class RegionBarrierType : unsigned int {
+  ATOMIC_COUNTER      = static_cast<unsigned int>(BarrierType::ATOMIC_COUNTER),      ///<
+  FRAMEBUFFER         = static_cast<unsigned int>(BarrierType::FRAMEBUFFER),         ///<
+  SHADER_IMAGE_ACCESS = static_cast<unsigned int>(BarrierType::SHADER_IMAGE_ACCESS), ///<
+  SHADER_STORAGE      = static_cast<unsigned int>(BarrierType::SHADER_STORAGE),      ///<
+  TEXTURE_FETCH       = static_cast<unsigned int>(BarrierType::TEXTURE_FETCH),       ///<
+  UNIFORM             = static_cast<unsigned int>(BarrierType::UNIFORM),             ///<
+  ALL                 = static_cast<unsigned int>(BarrierType::ALL)                  ///<
+};
+MAKE_ENUM_FLAG(RegionBarrierType)
+
 enum class RenderObjectType : unsigned int {
   BUFFER             = 33504                                                   /* GL_BUFFER             */, ///<
   TEXTURE            = 5890                                                    /* GL_TEXTURE            */, ///<
@@ -796,7 +821,8 @@ public:
   static void bindBufferRange(BufferType type, unsigned int bindingIndex, unsigned int bufferIndex, std::ptrdiff_t offset, std::ptrdiff_t size);
   static void sendBufferData(BufferType type, std::ptrdiff_t size, const void* data, BufferDataUsage usage);
   static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::ptrdiff_t dataSize, const void* data);
-  template <typename T> static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset, sizeof(T), &data); }
+  template <typename T> static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset,
+                                                                                                                                 sizeof(T), &data); }
   static void deleteBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteBuffers(unsigned int (&indices)[N]) { deleteBuffers(N, indices); }
   static void deleteBuffer(unsigned int& index) { deleteBuffers(1, &index); }
@@ -926,15 +952,6 @@ public:
   static void detachShader(unsigned int programIndex, unsigned int shaderIndex);
   static bool isShaderAttached(unsigned int programIndex, unsigned int shaderIndex);
   static void deleteShader(unsigned int index);
-  static void dispatchCompute(unsigned int groupCountX, unsigned int groupCountY = 1, unsigned int groupCountZ = 1);
-  /// Sets a memory synchronization barrier.
-  /// \note Requires OpenGL 4.2+ or ES 3.1+.
-  /// \param type Type of the barrier to be set.
-  static void setMemoryBarrier(BarrierType type);
-  /// Sets a localized memory synchronization barrier.
-  /// \note Requires OpenGL 4.5+ or ES 3.1+.
-  /// \param type Type of the barrier to be set.
-  static void setMemoryBarrierByRegion(RegionBarrierType type);
   /// Gets the uniform's location (ID) corresponding to the given name.
   /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).
   /// \param programIndex Index of the shader program to which is bound the uniform.
@@ -1061,6 +1078,39 @@ public:
   static void deleteFramebuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
   static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
+  static void drawArrays(PrimitiveType type, unsigned int first, unsigned int count);
+  static void drawArrays(PrimitiveType type, unsigned int count) { drawArrays(type, 0, count); }
+  static void drawArraysInstanced(PrimitiveType type, unsigned int first, unsigned int primitiveCount, unsigned int instanceCount);
+  static void drawArraysInstanced(PrimitiveType type, unsigned int primitiveCount,
+                                  unsigned int instanceCount) { drawArraysInstanced(type, 0, primitiveCount, instanceCount); }
+  static void drawElements(PrimitiveType type, unsigned int count, ElementDataType dataType, const void* indices);
+  static void drawElements(PrimitiveType type, unsigned int count, const uint8_t* indices) { drawElements(type, count, ElementDataType::UBYTE, indices); }
+  static void drawElements(PrimitiveType type, unsigned int count, const unsigned short* indices) { drawElements(type, count,
+                                                                                                                 ElementDataType::USHORT, indices); }
+  static void drawElements(PrimitiveType type, unsigned int count, const unsigned int* indices) { drawElements(type, count, ElementDataType::UINT, indices); }
+  static void drawElements(PrimitiveType type, unsigned int count) { drawElements(type, count, ElementDataType::UINT, nullptr); }
+  static void drawElementsInstanced(PrimitiveType type, unsigned int primitiveCount, ElementDataType dataType, const void* indices, unsigned int instanceCount);
+  static void drawElementsInstanced(PrimitiveType type, unsigned int primitiveCount, const uint8_t* indices, unsigned int instanceCount) {
+    drawElementsInstanced(type, primitiveCount, ElementDataType::UBYTE, indices, instanceCount);
+  }
+  static void drawElementsInstanced(PrimitiveType type, unsigned int primitiveCount, const unsigned short* indices, unsigned int instanceCount) {
+    drawElementsInstanced(type, primitiveCount, ElementDataType::USHORT, indices, instanceCount);
+  }
+  static void drawElementsInstanced(PrimitiveType type, unsigned int primitiveCount, const unsigned int* indices, unsigned int instanceCount) {
+    drawElementsInstanced(type, primitiveCount, ElementDataType::UINT, indices, instanceCount);
+  }
+  static void drawElementsInstanced(PrimitiveType type, unsigned int primitiveCount, unsigned int instanceCount) {
+    drawElementsInstanced(type, primitiveCount, ElementDataType::UINT, nullptr, instanceCount);
+  }
+  static void dispatchCompute(unsigned int groupCountX, unsigned int groupCountY = 1, unsigned int groupCountZ = 1);
+  /// Sets a memory synchronization barrier.
+  /// \note Requires OpenGL 4.2+ or ES 3.1+.
+  /// \param type Type of the barrier to be set.
+  static void setMemoryBarrier(BarrierType type);
+  /// Sets a localized memory synchronization barrier.
+  /// \note Requires OpenGL 4.5+ or ES 3.1+.
+  /// \param type Type of the barrier to be set.
+  static void setMemoryBarrierByRegion(RegionBarrierType type);
 #if !defined (USE_OPENGL_ES)
   /// Assigns a label to a graphic object.
   /// \note Requires OpenGL 4.3+.

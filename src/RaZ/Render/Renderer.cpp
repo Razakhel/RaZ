@@ -860,45 +860,6 @@ void Renderer::deleteShader(unsigned int index) {
   printConditionalErrors();
 }
 
-void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-#if !defined(USE_OPENGL_ES)
-  assert("Error: Launching a compute operation requires OpenGL 4.3+." && checkVersion(4, 3));
-#else
-  assert("Error: Launching a compute operation requires OpenGL ES 3.1+." && checkVersion(3, 1));
-#endif
-
-  glDispatchCompute(groupCountX, groupCountY, groupCountZ);
-
-  printConditionalErrors();
-}
-
-void Renderer::setMemoryBarrier(BarrierType type) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-#if !defined(USE_OPENGL_ES)
-  assert("Error: Setting a memory barrier requires OpenGL 4.2+." && checkVersion(4, 2));
-#else
-  assert("Error: Setting a memory barrier requires OpenGL ES 3.1+." && checkVersion(3, 1));
-#endif
-
-  glMemoryBarrier(static_cast<unsigned int>(type));
-
-  printConditionalErrors();
-}
-
-void Renderer::setMemoryBarrierByRegion(RegionBarrierType type) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-#if !defined(USE_OPENGL_ES)
-  assert("Error: Setting a memory barrier by region requires OpenGL 4.5+." && checkVersion(4, 5));
-#else
-  assert("Error: Setting a memory barrier by region requires OpenGL ES 3.1+." && checkVersion(3, 1));
-#endif
-
-  glMemoryBarrierByRegion(static_cast<unsigned int>(type));
-
-  printConditionalErrors();
-}
-
 int Renderer::recoverUniformLocation(unsigned int programIndex, const char* uniformName) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -1205,6 +1166,81 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDeleteFramebuffers(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
+void Renderer::drawArrays(PrimitiveType type, unsigned int first, unsigned int count) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDrawArrays(static_cast<unsigned int>(type), static_cast<int>(first), static_cast<int>(count));
+
+  printConditionalErrors();
+}
+
+void Renderer::drawArraysInstanced(PrimitiveType type, unsigned int first, unsigned int primitiveCount, unsigned int instanceCount) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDrawArraysInstanced(static_cast<unsigned int>(type), static_cast<int>(first), static_cast<int>(primitiveCount), static_cast<int>(instanceCount));
+
+  printConditionalErrors();
+}
+
+void Renderer::drawElements(PrimitiveType type, unsigned int count, ElementDataType dataType, const void* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDrawElements(static_cast<unsigned int>(type), static_cast<int>(count), static_cast<unsigned int>(dataType), indices);
+
+  printConditionalErrors();
+}
+
+void Renderer::drawElementsInstanced(PrimitiveType type, unsigned int primitiveCount,
+                                     ElementDataType dataType, const void* indices,
+                                     unsigned int instanceCount) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDrawElementsInstanced(static_cast<unsigned int>(type), static_cast<int>(primitiveCount),
+                          static_cast<unsigned int>(dataType), indices,
+                          static_cast<int>(instanceCount));
+
+  printConditionalErrors();
+}
+
+void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
+  assert("Error: Launching a compute operation requires OpenGL 4.3+." && checkVersion(4, 3));
+#else
+  assert("Error: Launching a compute operation requires OpenGL ES 3.1+." && checkVersion(3, 1));
+#endif
+
+  glDispatchCompute(groupCountX, groupCountY, groupCountZ);
+
+  printConditionalErrors();
+}
+
+void Renderer::setMemoryBarrier(BarrierType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
+  assert("Error: Setting a memory barrier requires OpenGL 4.2+." && checkVersion(4, 2));
+#else
+  assert("Error: Setting a memory barrier requires OpenGL ES 3.1+." && checkVersion(3, 1));
+#endif
+
+  glMemoryBarrier(static_cast<unsigned int>(type));
+
+  printConditionalErrors();
+}
+
+void Renderer::setMemoryBarrierByRegion(RegionBarrierType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+#if !defined(USE_OPENGL_ES)
+  assert("Error: Setting a memory barrier by region requires OpenGL 4.5+." && checkVersion(4, 5));
+#else
+  assert("Error: Setting a memory barrier by region requires OpenGL ES 3.1+." && checkVersion(3, 1));
+#endif
+
+  glMemoryBarrierByRegion(static_cast<unsigned int>(type));
 
   printConditionalErrors();
 }

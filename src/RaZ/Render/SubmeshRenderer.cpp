@@ -11,13 +11,13 @@ void SubmeshRenderer::setRenderMode(RenderMode renderMode, const Submesh& submes
   switch (m_renderMode) {
     case RenderMode::POINT:
       m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&) {
-        glDrawArrays(GL_POINTS, 0, static_cast<int>(vertexBuffer.vertexCount));
+        Renderer::drawArrays(PrimitiveType::POINTS, vertexBuffer.vertexCount);
       };
       break;
 
 //    case RenderMode::LINE: {
 //      m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer) {
-//        glDrawElements(GL_LINES, static_cast<int>(indexBuffer.lineIndexCount), GL_UNSIGNED_INT, nullptr);
+//        Renderer::drawElements(PrimitiveType::LINES, indexBuffer.lineIndexCount);
 //      };
 //      break;
 //    }
@@ -25,14 +25,14 @@ void SubmeshRenderer::setRenderMode(RenderMode renderMode, const Submesh& submes
     case RenderMode::TRIANGLE:
     default:
       m_renderFunc = [] (const VertexBuffer&, const IndexBuffer& indexBuffer) {
-        glDrawElements(GL_TRIANGLES, static_cast<int>(indexBuffer.triangleIndexCount), GL_UNSIGNED_INT, nullptr);
+        Renderer::drawElements(PrimitiveType::TRIANGLES, indexBuffer.triangleIndexCount);
       };
       break;
 
 #if !defined(USE_OPENGL_ES)
     case RenderMode::PATCH:
       m_renderFunc = [] (const VertexBuffer& vertexBuffer, const IndexBuffer&) {
-        glDrawArrays(GL_PATCHES, 0, static_cast<int>(vertexBuffer.vertexCount));
+        Renderer::drawArrays(PrimitiveType::PATCHES, vertexBuffer.vertexCount);
       };
       Renderer::setPatchVertexCount(3); // Should be the default, but just in case
       break;
@@ -95,7 +95,7 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
                         2, GL_FLOAT, // vec2
                         GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(texcoordsOffset));
+                        reinterpret_cast<const void*>(texcoordsOffset));
   glEnableVertexAttribArray(1);
 
   // Normal
@@ -104,7 +104,7 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
                         3, GL_FLOAT, // vec3
                         GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(normalOffset));
+                        reinterpret_cast<const void*>(normalOffset));
   glEnableVertexAttribArray(2);
 
   // Tangent
@@ -113,7 +113,7 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
                         3, GL_FLOAT, // vec3
                         GL_FALSE,
                         stride,
-                        reinterpret_cast<void*>(tangentOffset));
+                        reinterpret_cast<const void*>(tangentOffset));
   glEnableVertexAttribArray(3);
 
   m_vbo.unbind();
