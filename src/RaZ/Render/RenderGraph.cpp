@@ -70,6 +70,8 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
   renderSystem.sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   renderSystem.sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
 
+  renderSystem.m_modelUbo.bind();
+
   // Binding textures marks the pass' program as used
   m_geometryPass.bindTextures();
 
@@ -84,7 +86,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
     if (!meshRenderer.isEnabled())
       continue;
 
-    geometryProgram.sendUniform("uniModelMat", entity->getComponent<Transform>().computeTransformMatrix());
+    renderSystem.m_modelUbo.sendData(entity->getComponent<Transform>().computeTransformMatrix(), 0);
     meshRenderer.draw(geometryProgram);
   }
 

@@ -41,6 +41,10 @@ RenderPass& RenderSystem::addRenderPass(FragmentShader fragShader) {
 bool RenderSystem::update([[maybe_unused]] float deltaTime) {
   m_cameraUbo.bindBase(0);
   m_lightsUbo.bindBase(1);
+  m_modelUbo.bindBase(2);
+
+  // TODO: binding the block is required whenever programs are updated, not every frame, but is done here for now for simplicity
+  m_modelUbo.bindUniformBlock(getGeometryProgram(), "uboModelInfo", 2);
 
   m_renderGraph.execute(*this);
 

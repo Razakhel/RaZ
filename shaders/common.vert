@@ -12,7 +12,9 @@ layout(std140) uniform uboCameraInfo {
   vec3 uniCameraPos;
 };
 
-uniform mat4 uniModelMat;
+layout(std140) uniform uboModelInfo {
+  mat4 uniModelMat;
+};
 
 out struct MeshInfo {
   vec3 vertPosition;
