@@ -1,5 +1,6 @@
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
+#include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
@@ -43,27 +44,38 @@ constexpr std::string_view fragSource = R"(
   }
 )";
 
+inline const MeshRenderer& getDisplayCube() {
+  static const MeshRenderer cube = [] () {
+    MeshRenderer meshRenderer(Mesh(AABB(Vec3f(-1.f, -1.f, -1.f),
+                                        Vec3f(1.f, 1.f, 1.f))), RenderMode::TRIANGLE);
+
+    meshRenderer.setMaterial(Material());
+
+    RenderShaderProgram& program = meshRenderer.getMaterials().front().getProgram();
+    meshRenderer.getMaterials().front().getProgram().setShaders(VertexShader::loadFromSource(vertSource), FragmentShader::loadFromSource(fragSource));
+    program.use();
+    program.sendUniform("uniSkybox", 0);
+
+    return meshRenderer;
+  }();
+
+  return cube;
+}
+
 } // namespace
 
 Cubemap::Cubemap() {
   Logger::debug("[Cubemap] Creating...");
-
   Renderer::generateTexture(m_index);
-
-  m_program.setVertexShader(VertexShader::loadFromSource(vertSource));
-  m_program.setFragmentShader(FragmentShader::loadFromSource(fragSource));
-  m_program.compileShaders();
-  m_program.link();
-
-  m_program.use();
-  m_program.sendUniform("uniSkybox", 0);
-
   Logger::debug("[Cubemap] Created (ID: " + std::to_string(m_index) + ')');
 }
 
+const RenderShaderProgram& Cubemap::getProgram() const {
+  return getDisplayCube().getMaterials().front().getProgram();
+}
+
 Cubemap::Cubemap(Cubemap&& cubemap) noexcept
-  : m_index{ std::exchange(cubemap.m_index, std::numeric_limits<unsigned int>::max()) },
-    m_program{ std::move(cubemap.m_program) } {}
+  : m_index{ std::exchange(cubemap.m_index, std::numeric_limits<unsigned int>::max()) } {}
 
 void Cubemap::load(const FilePath& rightTexturePath, const FilePath& leftTexturePath,
                    const FilePath& topTexturePath, const FilePath& bottomTexturePath,
@@ -107,12 +119,14 @@ void Cubemap::draw() const {
   Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);
   Renderer::setFaceCulling(FaceOrientation::FRONT);
 
-  m_program.use();
+  const MeshRenderer& displayCube = getDisplayCube();
+
+  displayCube.getMaterials().front().getProgram().use();
 
   Renderer::activateTexture(0);
   bind();
 
-  MeshRenderer::drawUnitCube();
+  displayCube.draw();
 
   Renderer::setFaceCulling(FaceOrientation::BACK);
   Renderer::setDepthFunction(DepthStencilFunction::LESS);
@@ -120,7 +134,6 @@ void Cubemap::draw() const {
 
 Cubemap& Cubemap::operator=(Cubemap&& cubemap) noexcept {
   std::swap(m_index, cubemap.m_index);
-  m_program = std::move(cubemap.m_program);
 
   return *this;
 }

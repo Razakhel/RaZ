@@ -9,36 +9,30 @@ TEST_CASE("Cubemap move") {
   Raz::Cubemap cubemap;
 
   const unsigned int cubemapIndex = cubemap.getIndex();
-  const unsigned int cubemapProgIndex = cubemap.getProgram().getIndex();
 
   // Move ctor
 
   Raz::Cubemap movedCubemapCtor(std::move(cubemap));
 
-  // The new cubemap has the same values as the original one
+  // The new cubemap has the same index as the original one
   CHECK(movedCubemapCtor.getIndex() == cubemapIndex);
-  CHECK(movedCubemapCtor.getProgram().getIndex() == cubemapProgIndex);
 
   // The moved cubemap is now invalid
   CHECK(cubemap.getIndex() == std::numeric_limits<unsigned int>::max());
-  CHECK(cubemap.getProgram().getIndex() == std::numeric_limits<unsigned int>::max());
 
   // Move assignment operator
 
   Raz::Cubemap movedCubemapOp;
 
   const unsigned int movedCubemapOpIndex = movedCubemapOp.getIndex();
-  const unsigned int movedCubemapOpProgramIndex = movedCubemapOp.getProgram().getIndex();
 
   movedCubemapOp = std::move(movedCubemapCtor);
 
-  // The new cubemap has the same values as the previous one
+  // The new cubemap has the same index as the previous one
   CHECK(movedCubemapOp.getIndex() == cubemapIndex);
-  CHECK(movedCubemapOp.getProgram().getIndex() == cubemapProgIndex);
 
-  // After being moved, the values are swapped: the moved-from cubemap now has the previous moved-to's values
+  // After being moved, the indices are swapped: the moved-from cubemap now has the previous moved-to's index
   CHECK(movedCubemapCtor.getIndex() == movedCubemapOpIndex);
-  CHECK(movedCubemapCtor.getProgram().getIndex() == movedCubemapOpProgramIndex);
 }
 
 TEST_CASE("Cubemap textures") {
@@ -58,7 +52,7 @@ TEST_CASE("Cubemap textures") {
                        RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png", RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-#if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES
+#if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() functions are unavailable with OpenGL ES
   std::vector<uint8_t> textureData {};
 
   cubemap.bind();
