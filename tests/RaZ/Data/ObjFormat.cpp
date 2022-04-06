@@ -115,7 +115,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   const auto& material = static_cast<const Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials().front());
 
-  CHECK(material.getBaseColor() == Raz::Vec3f(0.99f));
+  CHECK(material.getDiffuse() == Raz::Vec3f(0.99f));
   CHECK(material.getEmissive() == Raz::Vec3f(0.75f));
   CHECK(material.getAmbient() == Raz::Vec3f(0.5f));
   CHECK(material.getSpecular() == Raz::Vec3f(0.25f));
@@ -654,7 +654,7 @@ TEST_CASE("ObjFormat save") {
       CHECK(meshRendererData.getMaterials()[1]->getType() == Raz::MaterialType::BLINN_PHONG);
 
       auto& material = static_cast<Raz::MaterialBlinnPhong&>(*meshRendererData.getMaterials()[1]);
-      CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(material.getDiffuse().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
       CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
       CHECK(material.getAmbient().strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
       CHECK(material.getSpecular().strictlyEquals(Raz::Vec3f(1.f, 0.f, 1.f)));

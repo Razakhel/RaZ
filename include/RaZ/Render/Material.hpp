@@ -4,11 +4,11 @@
 #define RAZ_MATERIAL_HPP
 
 #include "RaZ/Math/Vector.hpp"
-#include "RaZ/Render/Shader.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Texture.hpp"
 
 #include <unordered_map>
+#include <variant>
 
 namespace Raz {
 
@@ -31,23 +31,27 @@ public:
   Material(Material&&) noexcept = default;
 
   virtual MaterialType getType() const = 0;
-  const Vec3f& getBaseColor() const { return m_baseColor; }
-  const Vec3f& getEmissive() const { return m_emissive; }
+  template <typename T>
+  const T& getAttribute(const std::string& uniformName) const {
+    const auto attribIt = m_attributes.find(uniformName);
+
+    if (attribIt == m_attributes.cend())
+      throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+
+    return std::get<T>(attribIt->second);
+  }
   std::size_t getTextureCount() const noexcept { return m_textures.size(); }
   const Texture& getTexture(std::size_t index) const noexcept { return *m_textures[index].first; }
 
-  void setBaseColor(float red, float green, float blue) { setBaseColor(Vec3f(red, green, blue)); }
-  void setBaseColor(const Vec3f& color) { m_baseColor = color; }
-  void setEmissive(float red, float green, float blue) { setEmissive(Vec3f(red, green, blue)); }
-  void setEmissive(const Vec3f& val) { m_emissive = val; }
+  template <typename T> void setAttribute(T&& attribVal, std::string uniformName) { m_attributes[std::move(uniformName)] = std::forward<T>(attribVal); }
 
   void addTexture(TexturePtr texture, std::string uniformName);
   void loadTexture(const FilePath& filePath, int bindingIndex, std::string uniformName, bool flipVertically = true);
 
   virtual MaterialPtr clone() const = 0;
+  void sendAttributes(const RenderShaderProgram& program) const;
   void initTextures(const RenderShaderProgram& program) const;
   void bindTextures(const RenderShaderProgram& program) const;
-  virtual void bindAttributes(const RenderShaderProgram& program) const = 0;
 
   Material& operator=(Material&&) noexcept = default;
 
@@ -57,8 +61,8 @@ protected:
   Material() = default;
   Material(const Material&) = default;
 
-  Vec3f m_baseColor = Vec3f(1.f);
-  Vec3f m_emissive  = Vec3f(0.f);
+  using Attribute = std::variant<int, unsigned int, float, Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f, Mat2f, Mat3f, Mat4f>;
+  std::unordered_map<std::string, Attribute> m_attributes {};
 
   std::vector<std::pair<TexturePtr, std::string>> m_textures {};
 };
@@ -67,16 +71,18 @@ class MaterialBlinnPhong final : public Material {
 public:
   MaterialBlinnPhong();
   explicit MaterialBlinnPhong(TexturePtr diffuseMap) : MaterialBlinnPhong() { setDiffuseMap(std::move(diffuseMap)); }
-  explicit MaterialBlinnPhong(const Vec3f& baseColor,
+  explicit MaterialBlinnPhong(const Vec3f& diffuse,
                               const Vec3f& ambient  = Vec3f(1.f),
                               const Vec3f& specular = Vec3f(1.f),
                               const Vec3f& emissive = Vec3f(0.f),
                               float transparency    = 1.f);
 
   MaterialType getType() const override { return MaterialType::BLINN_PHONG; }
-  const Vec3f& getAmbient() const { return m_ambient; }
-  const Vec3f& getSpecular() const { return m_specular; }
-  float getTransparency() const { return m_transparency; }
+  const Vec3f& getDiffuse() const { return getAttribute<Vec3f>("uniMaterial.diffuse"); }
+  const Vec3f& getEmissive() const { return getAttribute<Vec3f>("uniMaterial.emissive"); }
+  const Vec3f& getAmbient() const { return getAttribute<Vec3f>("uniMaterial.ambient"); }
+  const Vec3f& getSpecular() const { return getAttribute<Vec3f>("uniMaterial.specular"); }
+  float getTransparency() const { return getAttribute<float>("uniMaterial.transparency"); }
 
   const TexturePtr& getDiffuseMap() const { return m_textures[0].first; }
   const TexturePtr& getEmissiveMap() const { return m_textures[1].first; }
@@ -85,13 +91,11 @@ public:
   const TexturePtr& getTransparencyMap() const { return m_textures[4].first; }
   const TexturePtr& getBumpMap() const { return m_textures[5].first; }
 
-  void setDiffuse(float red, float green, float blue) { setBaseColor(red, green, blue); }
-  void setDiffuse(const Vec3f& color) { setBaseColor(color); }
-  void setAmbient(float red, float green, float blue) { setAmbient(Vec3f(red, green, blue)); }
-  void setAmbient(const Vec3f& val) { m_ambient = val; }
-  void setSpecular(float red, float green, float blue) { setSpecular(Vec3f(red, green, blue)); }
-  void setSpecular(const Vec3f& val) { m_specular = val; }
-  void setTransparency(float transparency) { m_transparency = transparency; }
+  void setDiffuse(const Vec3f& color) { setAttribute(color, "uniMaterial.diffuse"); }
+  void setEmissive(const Vec3f& emissive) { setAttribute(emissive, "uniMaterial.emissive"); }
+  void setAmbient(const Vec3f& ambient) { setAttribute(ambient, "uniMaterial.ambient"); }
+  void setSpecular(const Vec3f& specular) { setAttribute(specular, "uniMaterial.specular"); }
+  void setTransparency(float transparency) { setAttribute(transparency, "uniMaterial.transparency"); }
 
   void setDiffuseMap(TexturePtr diffuseMap) { m_textures[0].first = std::move(diffuseMap); }
   void setEmissiveMap(TexturePtr emissiveMap) { m_textures[1].first = std::move(emissiveMap); }
@@ -111,12 +115,6 @@ public:
   void loadBumpMap(const FilePath& filePath, bool flipVertically = true);
 
   MaterialPtr clone() const override { return MaterialBlinnPhong::create(*this); }
-  void bindAttributes(const RenderShaderProgram& program) const override;
-
-private:
-  Vec3f m_ambient      = Vec3f(1.f);
-  Vec3f m_specular     = Vec3f(1.f);
-  float m_transparency = 1.f;
 };
 
 class MaterialCookTorrance final : public Material {
@@ -126,8 +124,10 @@ public:
   MaterialCookTorrance(const Vec3f& baseColor, float metallicFactor, float roughnessFactor);
 
   MaterialType getType() const override { return MaterialType::COOK_TORRANCE; }
-  float getMetallicFactor() const { return m_metallicFactor; }
-  float getRoughnessFactor() const { return m_roughnessFactor; }
+  const Vec3f& getBaseColor() const { return getAttribute<Vec3f>("uniMaterial.baseColor"); }
+  const Vec3f& getEmissive() const { return getAttribute<Vec3f>("uniMaterial.emissive"); }
+  float getMetallicFactor() const { return getAttribute<float>("uniMaterial.metallicFactor"); }
+  float getRoughnessFactor() const { return getAttribute<float>("uniMaterial.roughnessFactor"); }
 
   const TexturePtr& getAlbedoMap() const { return m_textures[0].first; }
   const TexturePtr& getEmissiveMap() const { return m_textures[1].first; }
@@ -136,8 +136,10 @@ public:
   const TexturePtr& getRoughnessMap() const { return m_textures[4].first; }
   const TexturePtr& getAmbientOcclusionMap() const { return m_textures[5].first; }
 
-  void setMetallicFactor(float metallicFactor) { m_metallicFactor = metallicFactor; }
-  void setRoughnessFactor(float roughnessFactor) { m_roughnessFactor = roughnessFactor; }
+  void setBaseColor(const Vec3f& baseColor) { setAttribute(baseColor, "uniMaterial.baseColor"); }
+  void setEmissive(const Vec3f& emissive) { setAttribute(emissive, "uniMaterial.emissive"); }
+  void setMetallicFactor(float metallicFactor) { setAttribute(metallicFactor, "uniMaterial.metallicFactor"); }
+  void setRoughnessFactor(float roughnessFactor) { setAttribute(roughnessFactor, "uniMaterial.roughnessFactor"); }
 
   void setAlbedoMap(TexturePtr albedoMap) { m_textures[0].first = std::move(albedoMap); }
   void setEmissiveMap(TexturePtr emissiveMap) { m_textures[1].first = std::move(emissiveMap); }
@@ -157,11 +159,6 @@ public:
   void loadAmbientOcclusionMap(const FilePath& filePath, bool flipVertically = true);
 
   MaterialPtr clone() const override { return MaterialCookTorrance::create(*this); }
-  void bindAttributes(const RenderShaderProgram& program) const override;
-
-private:
-  float m_metallicFactor  = 1.f;
-  float m_roughnessFactor = 1.f;
 };
 
 } // namespace Raz

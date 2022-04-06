@@ -19,30 +19,30 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& diffuse = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuse);
     if (diffuse.IsValid()) {
-      material->setDiffuse(static_cast<float>(diffuse.Get()[0]),
-                           static_cast<float>(diffuse.Get()[1]),
-                           static_cast<float>(diffuse.Get()[2]));
+      material->setDiffuse(Vec3f(static_cast<float>(diffuse.Get()[0]),
+                                 static_cast<float>(diffuse.Get()[1]),
+                                 static_cast<float>(diffuse.Get()[2])));
     }
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& ambient = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sAmbient);
     if (ambient.IsValid()) {
-      material->setAmbient(static_cast<float>(ambient.Get()[0]),
-                           static_cast<float>(ambient.Get()[1]),
-                           static_cast<float>(ambient.Get()[2]));
+      material->setAmbient(Vec3f(static_cast<float>(ambient.Get()[0]),
+                                 static_cast<float>(ambient.Get()[1]),
+                                 static_cast<float>(ambient.Get()[2])));
     }
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& specular = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sSpecular);
     if (specular.IsValid()) {
-      material->setSpecular(static_cast<float>(specular.Get()[0]),
-                            static_cast<float>(specular.Get()[1]),
-                            static_cast<float>(specular.Get()[2]));
+      material->setSpecular(Vec3f(static_cast<float>(specular.Get()[0]),
+                                  static_cast<float>(specular.Get()[1]),
+                                  static_cast<float>(specular.Get()[2])));
     }
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& emissive = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sEmissive);
     if (emissive.IsValid()) {
-      material->setEmissive(static_cast<float>(emissive.Get()[0]),
-                            static_cast<float>(emissive.Get()[1]),
-                            static_cast<float>(emissive.Get()[2]));
+      material->setEmissive(Vec3f(static_cast<float>(emissive.Get()[0]),
+                                  static_cast<float>(emissive.Get()[1]),
+                                  static_cast<float>(emissive.Get()[2])));
     }
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble>& transparency = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sTransparencyFactor);

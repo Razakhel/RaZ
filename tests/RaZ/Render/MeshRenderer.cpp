@@ -14,7 +14,7 @@ TEST_CASE("MeshRenderer materials") {
 
   CHECK(meshRenderer.getMaterials().size() == 1);
   CHECK(meshRenderer.getMaterials()[0]->getType() == Raz::MaterialType::BLINN_PHONG);
-  CHECK(meshRenderer.getMaterials()[0]->getBaseColor() == Raz::Vec3f(1.f));
+  CHECK(static_cast<Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials()[0]).getDiffuse() == Raz::Vec3f(1.f));
   CHECK(meshRenderer.getSubmeshRenderers().empty()); // Adding a material doesn't add a submesh renderer
 
   meshRenderer.addMaterial(Raz::MaterialCookTorrance::create());
@@ -22,7 +22,7 @@ TEST_CASE("MeshRenderer materials") {
   CHECK(meshRenderer.getMaterials().size() == 2);
   CHECK(meshRenderer.getMaterials()[0]->getType() == Raz::MaterialType::BLINN_PHONG);
   CHECK(meshRenderer.getMaterials()[1]->getType() == Raz::MaterialType::COOK_TORRANCE);
-  CHECK(meshRenderer.getMaterials()[1]->getBaseColor() == Raz::Vec3f(1.f));
+  CHECK(static_cast<Raz::MaterialCookTorrance&>(*meshRenderer.getMaterials()[1]).getBaseColor() == Raz::Vec3f(1.f));
 
   // Adding submesh renderers to test material removal
   meshRenderer.addSubmeshRenderer().setMaterialIndex(1);
@@ -42,7 +42,7 @@ TEST_CASE("MeshRenderer materials") {
   // Setting a material replaces all existing ones
   CHECK(meshRenderer.getMaterials().size() == 1);
   CHECK(meshRenderer.getMaterials()[0]->getType() == Raz::MaterialType::BLINN_PHONG);
-  CHECK(meshRenderer.getMaterials()[0]->getBaseColor() == Raz::Vec3f(0.f));
+  CHECK(static_cast<Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials()[0]).getDiffuse() == Raz::Vec3f(0.f));
 
   // It also sets a material index of 0 to all existing submesh renderers
   CHECK(meshRenderer.getSubmeshRenderers()[0].getMaterialIndex() == 0);
@@ -77,9 +77,9 @@ TEST_CASE("MeshRenderer clone") {
 
   CHECK(clonedMeshRenderer.getMaterials().size() == 2);
   CHECK(clonedMeshRenderer.getMaterials()[0]->getType() == Raz::MaterialType::BLINN_PHONG);
-  CHECK(clonedMeshRenderer.getMaterials()[0]->getBaseColor() == Raz::Vec3f(0.f));
+  CHECK(static_cast<Raz::MaterialBlinnPhong&>(*clonedMeshRenderer.getMaterials()[0]).getDiffuse() == Raz::Vec3f(0.f));
   CHECK(clonedMeshRenderer.getMaterials()[1]->getType() == Raz::MaterialType::COOK_TORRANCE);
-  CHECK(clonedMeshRenderer.getMaterials()[1]->getBaseColor() == Raz::Vec3f(0.f));
+  CHECK(static_cast<Raz::MaterialCookTorrance&>(*clonedMeshRenderer.getMaterials()[1]).getBaseColor() == Raz::Vec3f(0.f));
 
 }
 
@@ -90,7 +90,7 @@ TEST_CASE("MeshRenderer loading") {
   CHECK(meshRenderer.getMaterials().size() == 1); // A default material is created after loading if none exists
 
   meshRenderer.getSubmeshRenderers()[0].setMaterialIndex(42);
-  meshRenderer.getMaterials()[0]->setBaseColor(Raz::Vec3f(0.f));
+  static_cast<Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials()[0]).setDiffuse(Raz::Vec3f(0.f));
 
   meshRenderer.load(Raz::Mesh(Raz::Plane(1.f), 1.f, 1.f));
 
@@ -98,5 +98,5 @@ TEST_CASE("MeshRenderer loading") {
   CHECK(meshRenderer.getSubmeshRenderers()[0].getMaterialIndex() == 42); // The submesh renderers are left untouched
 
   CHECK(meshRenderer.getMaterials().size() == 1); // One material already exists; none has been added
-  CHECK(meshRenderer.getMaterials()[0]->getBaseColor() == Raz::Vec3f(0.f)); // The materials are left untouched
+  CHECK(static_cast<Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials()[0]).getDiffuse() == Raz::Vec3f(0.f)); // The materials are left untouched
 }

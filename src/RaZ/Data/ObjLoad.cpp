@@ -85,20 +85,18 @@ inline void loadMtl(const FilePath& mtlFilePath,
       std::string thirdValue;
       file >> secondValue >> thirdValue;
 
-      const float red   = std::stof(nextValue);
-      const float green = std::stof(secondValue);
-      const float blue  = std::stof(thirdValue);
+      const Vec3f values(std::stof(nextValue), std::stof(secondValue), std::stof(thirdValue));
 
-      if (tag[1] == 'a') {               // Ambient/ambient occlusion factor [Ka]
-        blinnPhongMaterial->setAmbient(red, green, blue);
+      if (tag[1] == 'a') {               // Ambient factor [Ka]
+        blinnPhongMaterial->setAmbient(values);
       } else if (tag[1] == 'd') {        // Diffuse/albedo factor [Kd]
-        blinnPhongMaterial->setDiffuse(red, green, blue);
-        cookTorranceMaterial->setBaseColor(red, green, blue);
+        blinnPhongMaterial->setDiffuse(values);
+        cookTorranceMaterial->setBaseColor(values);
       } else if (tag[1] == 's') {        // Specular factor [Ks]
-        blinnPhongMaterial->setSpecular(red, green, blue);
+        blinnPhongMaterial->setSpecular(values);
       } else if (tag[1] == 'e') {        // Emissive factor [Ke]
-        blinnPhongMaterial->setEmissive(red, green, blue);
-        cookTorranceMaterial->setEmissive(red, green, blue);
+        blinnPhongMaterial->setEmissive(values);
+        cookTorranceMaterial->setEmissive(values);
       }
 
       isBlinnPhongMaterial = true;

@@ -25,12 +25,12 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
     const std::string materialName = mtlFileName + '_' + std::to_string(matIndex);
 
     mtlFile << "\nnewmtl " << materialName << '\n';
-    mtlFile << "\tKd " << material->getBaseColor()[0] << ' ' << material->getBaseColor()[1] << ' ' << material->getBaseColor()[2] << '\n';
-    mtlFile << "\tKe " << material->getEmissive()[0] << ' ' << material->getEmissive()[1] << ' ' << material->getEmissive()[2] << '\n';
 
     if (material->getType() == MaterialType::COOK_TORRANCE) {
       const auto* matCT = static_cast<MaterialCookTorrance*>(material.get());
 
+      mtlFile << "\tKd " << matCT->getBaseColor()[0] << ' ' << matCT->getBaseColor()[1] << ' ' << matCT->getBaseColor()[2] << '\n';
+      mtlFile << "\tKe " << matCT->getEmissive()[0] << ' ' << matCT->getEmissive()[1] << ' ' << matCT->getEmissive()[2] << '\n';
       mtlFile << "\tPm " << matCT->getMetallicFactor() << '\n';
       mtlFile << "\tPr " << matCT->getRoughnessFactor() << '\n';
 
@@ -78,6 +78,8 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
     } else {
       const auto* matBP = static_cast<MaterialBlinnPhong*>(material.get());
 
+      mtlFile << "\tKd " << matBP->getDiffuse()[0] << ' ' << matBP->getDiffuse()[1] << ' ' << matBP->getDiffuse()[2] << '\n';
+      mtlFile << "\tKe " << matBP->getEmissive()[0] << ' ' << matBP->getEmissive()[1] << ' ' << matBP->getEmissive()[2] << '\n';
       mtlFile << "\tKa " << matBP->getAmbient()[0] << ' ' << matBP->getAmbient()[1] << ' ' << matBP->getAmbient()[2] << '\n';
       mtlFile << "\tKs " << matBP->getSpecular()[0] << ' ' << matBP->getSpecular()[1] << ' ' << matBP->getSpecular()[2] << '\n';
       mtlFile << "\td  " << matBP->getTransparency() << '\n';

@@ -115,8 +115,10 @@ void MeshRenderer::draw(const RenderShaderProgram& program) const {
 
       const MaterialPtr& material = m_materials[submeshRenderer.getMaterialIndex()];
 
-      if (material)
-        material->bindAttributes(program);
+      if (material) {
+        material->sendAttributes(program);
+        material->bindTextures(program);
+      }
     }
 
     submeshRenderer.draw();
