@@ -8,12 +8,38 @@ bool Material::hasAttribute(const std::string& uniformName) const noexcept {
   return (m_attributes.find(uniformName) != m_attributes.cend());
 }
 
-void Material::addTexture(TexturePtr texture, std::string uniformName) {
-  m_textures.emplace_back(std::move(texture), std::move(uniformName));
+bool Material::hasTexture(const Texture& texture) const noexcept {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&texture] (const std::pair<TexturePtr, std::string>& element) {
+    return (element.first->getIndex() == texture.getIndex());
+  });
 }
 
-void Material::loadTexture(const FilePath& filePath, int bindingIndex, std::string uniformName, bool flipVertically) {
-  addTexture(Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex), std::move(uniformName));
+bool Material::hasTexture(const std::string& uniformName) const noexcept {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&uniformName] (const std::pair<TexturePtr, std::string>& element) {
+    return (element.second == uniformName);
+  });
+}
+
+const Texture& Material::getTexture(const std::string& uniformName) const {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<TexturePtr, std::string>& element) {
+    return (element.second == uniformName);
+  });
+
+  if (textureIt == m_textures.cend())
+    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+
+  return *textureIt->first;
+}
+
+void Material::setTexture(TexturePtr texture, std::string uniformName) {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<TexturePtr, std::string>& element) {
+    return (element.second == uniformName);
+  });
+
+  if (textureIt != m_textures.end())
+    textureIt->first = std::move(texture);
+  else
+    m_textures.emplace_back(std::move(texture), std::move(uniformName));
 }
 
 void Material::removeAttribute(const std::string& uniformName) {
@@ -25,18 +51,34 @@ void Material::removeAttribute(const std::string& uniformName) {
   m_attributes.erase(attribIt);
 }
 
+void Material::removeTexture(const Texture& texture) {
+  m_textures.erase(std::remove_if(m_textures.begin(), m_textures.end(), [&texture] (const std::pair<TexturePtr, std::string>& element) {
+    return (element.first->getIndex() == texture.getIndex());
+  }), m_textures.end());
+}
+
+void Material::removeTexture(const std::string& uniformName) {
+  for (auto textureIt = m_textures.begin(); textureIt != m_textures.end(); ++textureIt) {
+    if (textureIt->second != uniformName)
+      continue;
+
+    m_textures.erase(textureIt);
+    return;
+  }
+}
+
 void Material::sendAttributes(const RenderShaderProgram& program) const {
   program.use();
 
-  for (const auto& [location, attrib] : m_attributes)
-    std::visit([&program, &uniformName = location] (const auto& value) { program.sendUniform(uniformName, value); }, attrib);
+  for (const auto& [name, attrib] : m_attributes)
+    std::visit([&program, &uniformName = name] (const auto& value) { program.sendUniform(uniformName, value); }, attrib);
 }
 
 void Material::initTextures(const RenderShaderProgram& program) const {
   program.use();
 
-  for (const auto& [texture, location] : m_textures)
-    program.sendUniform(location, texture->getBindingIndex());
+  for (const auto& [texture, name] : m_textures)
+    program.sendUniform(name, texture->getBindingIndex());
 }
 
 void Material::bindTextures(const RenderShaderProgram& program) const {

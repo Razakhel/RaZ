@@ -38,17 +38,27 @@ public:
     assert("Error: The fetched attribute is not of the asked type." && std::holds_alternative<T>(m_attributes.find(uniformName)->second));
     return std::get<T>(m_attributes.find(uniformName)->second);
   }
+  /// Checks if there is a texture entry with the given texture.
+  /// \param texture Texture to find.
+  /// \return True if an entry has been found, false otherwise.
+  bool hasTexture(const Texture& texture) const noexcept;
+  /// Checks if there is a texture entry with the given uniform name.
+  /// \param uniformName Uniform name to find.
+  /// \return True if an entry has been found, false otherwise.
+  bool hasTexture(const std::string& uniformName) const noexcept;
   std::size_t getTextureCount() const noexcept { return m_textures.size(); }
   const Texture& getTexture(std::size_t index) const noexcept { return *m_textures[index].first; }
+  const Texture& getTexture(const std::string& uniformName) const;
 
   /// Sets an attribute to be sent to the shaders. If the uniform name already exists, replaces the attribute's value.
   /// \tparam T Type of the attribute to set. Must be a type handled by ShaderProgram::sendUniform().
   /// \param attribVal Attribute to set.
   /// \param uniformName Uniform name of the attribute to set.
   template <typename T> void setAttribute(T&& attribVal, std::string uniformName) { m_attributes[std::move(uniformName)] = std::forward<T>(attribVal); }
-
-  void addTexture(TexturePtr texture, std::string uniformName);
-  void loadTexture(const FilePath& filePath, int bindingIndex, std::string uniformName, bool flipVertically = true);
+  /// Sets a texture to be bound to the shaders. If the uniform name already exists, replace the texture.
+  /// \param texture Texture to set.
+  /// \param uniformName Uniform name to bind the texture to.
+  void setTexture(TexturePtr texture, std::string uniformName);
 
   virtual MaterialPtr clone() const = 0;
   void sendAttributes(const RenderShaderProgram& program) const;
@@ -59,6 +69,13 @@ public:
   void clearAttributes() { m_attributes.clear(); }
   void initTextures(const RenderShaderProgram& program) const;
   void bindTextures(const RenderShaderProgram& program) const;
+  /// Removes all entries associated with the given texture.
+  /// \param texture Texture to remove the entries for.
+  void removeTexture(const Texture& texture);
+  /// Removes the entry associated with the given uniform name.
+  /// \param uniformName Uniform name to remove the entry for.
+  void removeTexture(const std::string& uniformName);
+  void clearTextures() { m_textures.clear(); }
 
   Material& operator=(Material&&) noexcept = default;
 
