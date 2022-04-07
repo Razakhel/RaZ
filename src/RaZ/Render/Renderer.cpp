@@ -379,6 +379,14 @@ void Renderer::setVertexAttrib(unsigned int index, AttribDataType dataType, uint
   printConditionalErrors();
 }
 
+void Renderer::setVertexAttribDivisor(unsigned int index, unsigned int divisor) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glVertexAttribDivisor(index, divisor);
+
+  printConditionalErrors();
+}
+
 void Renderer::deleteVertexArrays(unsigned int count, unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
