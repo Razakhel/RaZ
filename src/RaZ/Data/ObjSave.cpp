@@ -13,6 +13,27 @@ namespace Raz::ObjFormat {
 
 namespace {
 
+template <typename T, std::size_t Size = 1>
+inline void writeAttribute(std::ofstream& file, std::string_view tag, const Material& material, std::initializer_list<std::string_view> uniformNames) {
+  for (std::string_view uniformName : uniformNames) {
+    if (!material.hasAttribute(uniformName.data()))
+      continue;
+
+    file << '\t' << tag;
+
+    if constexpr (Size == 1) {
+      file << ' ' << material.getAttribute<T>(uniformName.data());
+    } else {
+      for (const T& value : material.getAttribute<Vector<T, Size>>(uniformName.data()).getData())
+        file << ' ' << value;
+    }
+
+    file << '\n';
+
+    return;
+  }
+}
+
 void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materials) {
   std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
 
@@ -25,14 +46,16 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
     const std::string materialName = mtlFileName + '_' + std::to_string(matIndex);
 
     mtlFile << "\nnewmtl " << materialName << '\n';
+    writeAttribute<float, 3>(mtlFile, "Kd", *material, { "uniMaterial.baseColor", "uniMaterial.diffuse" });
+    writeAttribute<float, 3>(mtlFile, "Ke", *material, { "uniMaterial.emissive" });
+    writeAttribute<float, 3>(mtlFile, "Ka", *material, { "uniMaterial.ambient" });
+    writeAttribute<float, 3>(mtlFile, "Ks", *material, { "uniMaterial.specular" });
+    writeAttribute<float>(mtlFile, "d", *material, { "uniMaterial.transparency" });
+    writeAttribute<float>(mtlFile, "Pm", *material, { "uniMaterial.metallicFactor" });
+    writeAttribute<float>(mtlFile, "Pr", *material, { "uniMaterial.roughnessFactor" });
 
     if (material->getType() == MaterialType::COOK_TORRANCE) {
       const auto* matCT = static_cast<MaterialCookTorrance*>(material.get());
-
-      mtlFile << "\tKd " << matCT->getBaseColor()[0] << ' ' << matCT->getBaseColor()[1] << ' ' << matCT->getBaseColor()[2] << '\n';
-      mtlFile << "\tKe " << matCT->getEmissive()[0] << ' ' << matCT->getEmissive()[1] << ' ' << matCT->getEmissive()[2] << '\n';
-      mtlFile << "\tPm " << matCT->getMetallicFactor() << '\n';
-      mtlFile << "\tPr " << matCT->getRoughnessFactor() << '\n';
 
       if (matCT->getAlbedoMap() && !matCT->getAlbedoMap()->getImage().isEmpty()) {
         const auto albedoMapPath = materialName + "_albedo.png";
@@ -77,12 +100,6 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
       }
     } else {
       const auto* matBP = static_cast<MaterialBlinnPhong*>(material.get());
-
-      mtlFile << "\tKd " << matBP->getDiffuse()[0] << ' ' << matBP->getDiffuse()[1] << ' ' << matBP->getDiffuse()[2] << '\n';
-      mtlFile << "\tKe " << matBP->getEmissive()[0] << ' ' << matBP->getEmissive()[1] << ' ' << matBP->getEmissive()[2] << '\n';
-      mtlFile << "\tKa " << matBP->getAmbient()[0] << ' ' << matBP->getAmbient()[1] << ' ' << matBP->getAmbient()[2] << '\n';
-      mtlFile << "\tKs " << matBP->getSpecular()[0] << ' ' << matBP->getSpecular()[1] << ' ' << matBP->getSpecular()[2] << '\n';
-      mtlFile << "\td  " << matBP->getTransparency() << '\n';
 
       if (matBP->getDiffuseMap() && !matBP->getDiffuseMap()->getImage().isEmpty()) {
         const auto diffuseMapPath = materialName + "_diffuse.png";
