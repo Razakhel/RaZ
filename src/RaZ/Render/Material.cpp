@@ -4,12 +4,25 @@
 
 namespace Raz {
 
+bool Material::hasAttribute(const std::string& uniformName) const noexcept {
+  return (m_attributes.find(uniformName) != m_attributes.cend());
+}
+
 void Material::addTexture(TexturePtr texture, std::string uniformName) {
   m_textures.emplace_back(std::move(texture), std::move(uniformName));
 }
 
 void Material::loadTexture(const FilePath& filePath, int bindingIndex, std::string uniformName, bool flipVertically) {
   addTexture(Texture::create(ImageFormat::load(filePath, flipVertically), bindingIndex), std::move(uniformName));
+}
+
+void Material::removeAttribute(const std::string& uniformName) {
+  const auto attribIt = m_attributes.find(uniformName);
+
+  if (attribIt == m_attributes.end())
+    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+
+  m_attributes.erase(attribIt);
 }
 
 void Material::sendAttributes(const RenderShaderProgram& program) const {

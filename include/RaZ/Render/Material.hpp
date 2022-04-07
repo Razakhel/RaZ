@@ -31,18 +31,20 @@ public:
   Material(Material&&) noexcept = default;
 
   virtual MaterialType getType() const = 0;
-  template <typename T>
-  const T& getAttribute(const std::string& uniformName) const {
-    const auto attribIt = m_attributes.find(uniformName);
-
-    if (attribIt == m_attributes.cend())
-      throw std::invalid_argument("Error: The given attribute uniform name does not exist");
-
-    return std::get<T>(attribIt->second);
+  bool hasAttribute(const std::string& uniformName) const noexcept;
+  std::size_t getAttributeCount() const noexcept { return m_attributes.size(); }
+  template <typename T> const T& getAttribute(const std::string& uniformName) const noexcept {
+    assert("Error: The given attribute uniform name does not exist." && hasAttribute(uniformName));
+    assert("Error: The fetched attribute is not of the asked type." && std::holds_alternative<T>(m_attributes.find(uniformName)->second));
+    return std::get<T>(m_attributes.find(uniformName)->second);
   }
   std::size_t getTextureCount() const noexcept { return m_textures.size(); }
   const Texture& getTexture(std::size_t index) const noexcept { return *m_textures[index].first; }
 
+  /// Sets an attribute to be sent to the shaders. If the uniform name already exists, replaces the attribute's value.
+  /// \tparam T Type of the attribute to set. Must be a type handled by ShaderProgram::sendUniform().
+  /// \param attribVal Attribute to set.
+  /// \param uniformName Uniform name of the attribute to set.
   template <typename T> void setAttribute(T&& attribVal, std::string uniformName) { m_attributes[std::move(uniformName)] = std::forward<T>(attribVal); }
 
   void addTexture(TexturePtr texture, std::string uniformName);
@@ -50,6 +52,11 @@ public:
 
   virtual MaterialPtr clone() const = 0;
   void sendAttributes(const RenderShaderProgram& program) const;
+  /// Removes an attribute given its uniform name.
+  /// \param uniformName Uniform name of the attribute to remove.
+  void removeAttribute(const std::string& uniformName);
+  /// Removes all attributes in the material.
+  void clearAttributes() { m_attributes.clear(); }
   void initTextures(const RenderShaderProgram& program) const;
   void bindTextures(const RenderShaderProgram& program) const;
 
