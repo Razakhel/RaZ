@@ -7,8 +7,8 @@ TEST_CASE("RenderPass validity") {
   Raz::RenderPass initialPass;
   CHECK(initialPass.isValid()); // The pass has no buffer, thus is valid
 
-  const Raz::Texture depthTexture(1, 1, 0, Raz::ImageColorspace::DEPTH);
-  const Raz::Texture colorTexture(1, 1, 1, Raz::ImageColorspace::RGB);
+  const auto depthTexture = Raz::Texture::create(1, 1, 0, Raz::ImageColorspace::DEPTH);
+  const auto colorTexture = Raz::Texture::create(1, 1, 1, Raz::ImageColorspace::RGB);
 
   initialPass.addWriteTexture(depthTexture);
   CHECK(initialPass.isValid()); // Direct buffer dependency is not checked; even though no child exists, it is not required to have matching buffers

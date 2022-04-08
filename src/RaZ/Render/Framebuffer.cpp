@@ -60,17 +60,19 @@ VertexShader Framebuffer::recoverVertexShader() {
   return VertexShader::loadFromSource(vertSource);
 }
 
-void Framebuffer::addTextureBuffer(const Texture& texture) {
-  if (texture.getImage().getColorspace() == ImageColorspace::DEPTH) {
+void Framebuffer::addTextureBuffer(TexturePtr texture) {
+  if (texture->getImage().getColorspace() == ImageColorspace::DEPTH) {
     assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
 
-    m_depthBuffer = &texture;
+    m_depthBuffer = std::move(texture);
   } else {
     // Adding the color buffer only if it doesn't exist yet
-    auto bufferIter = std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), &texture);
+    const auto bufferIter = std::find_if(m_colorBuffers.cbegin(), m_colorBuffers.cend(), [&texture] (const TexturePtr& colorBuffer) {
+      return (colorBuffer.get() == texture.get());
+    });
 
     if (bufferIter == m_colorBuffers.cend())
-      m_colorBuffers.emplace_back(&texture);
+      m_colorBuffers.emplace_back(std::move(texture));
   }
 
   mapBuffers();
@@ -128,7 +130,7 @@ void Framebuffer::display(const RenderShaderProgram& program) const {
     m_depthBuffer->bind();
   }
 
-  for (const Texture* colorBuffer : m_colorBuffers) {
+  for (const TexturePtr& colorBuffer : m_colorBuffers) {
     colorBuffer->activate();
     colorBuffer->bind();
   }
@@ -140,7 +142,7 @@ void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
   if (m_depthBuffer)
     m_depthBuffer->resize(width, height);
 
-  for (const Texture* colorBuffer : m_colorBuffers)
+  for (const TexturePtr& colorBuffer : m_colorBuffers)
     colorBuffer->resize(width, height);
 
   mapBuffers();

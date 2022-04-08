@@ -5,7 +5,6 @@
 
 #include "RaZ/Data/Graph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
-#include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
@@ -22,8 +21,6 @@ public:
   const RenderPass& getGeometryPass() const { return m_geometryPass; }
   RenderPass& getGeometryPass() { return m_geometryPass; }
 
-  const Texture& addTextureBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace);
-  const Texture& addTextureBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
   void resizeViewport(unsigned int width, unsigned int height);
   void updateShaders() const;
   /// Executes the render graph, launching all passes followed by their respective children, starting with the geometry pass.
@@ -35,7 +32,6 @@ public:
 
 private:
   RenderPass m_geometryPass {};
-  std::vector<std::unique_ptr<Texture>> m_buffers {};
 };
 
 } // namespace Raz

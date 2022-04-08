@@ -18,14 +18,6 @@ bool RenderGraph::isValid() const {
   return true;
 }
 
-const Texture& RenderGraph::addTextureBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace) {
-  return addTextureBuffer(width, height, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE));
-}
-
-const Texture& RenderGraph::addTextureBuffer(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) {
-  return *m_buffers.emplace_back(std::make_unique<Texture>(width, height, static_cast<int>(m_buffers.size()), colorspace, dataType));
-}
-
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
   for (std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->resizeWriteBuffers(width, height);

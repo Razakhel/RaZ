@@ -6,6 +6,7 @@
 #include "RaZ/Data/Graph.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
@@ -30,8 +31,8 @@ public:
 
   void setProgram(RenderShaderProgram&& program) { m_program = std::move(program); }
 
-  void addReadTexture(const Texture& texture, const std::string& uniformName);
-  void addWriteTexture(const Texture& texture) { m_writeFramebuffer.addTextureBuffer(texture); }
+  void addReadTexture(TexturePtr texture, const std::string& uniformName);
+  void addWriteTexture(TexturePtr texture) { m_writeFramebuffer.addTextureBuffer(std::move(texture)); }
   /// Resizes the render pass' write buffer textures.
   /// \param width New buffers width.
   /// \param height New buffers height.
@@ -56,7 +57,7 @@ protected:
   bool m_enabled = true;
   RenderShaderProgram m_program {};
 
-  std::vector<const Texture*> m_readTextures {};
+  std::vector<TexturePtr> m_readTextures {};
   Framebuffer m_writeFramebuffer {};
 };
 

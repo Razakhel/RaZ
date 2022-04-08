@@ -3,6 +3,8 @@
 #ifndef RAZ_FRAMEBUFFER_HPP
 #define RAZ_FRAMEBUFFER_HPP
 
+#include "RaZ/Render/Texture.hpp"
+
 #include <cassert>
 #include <vector>
 
@@ -33,9 +35,9 @@ public:
   /// \return Basic display vertex shader.
   static VertexShader recoverVertexShader();
 
-  /// Adds an existing buffer texture.
-  /// \param texture Buffer texture to be added. This must commonly be a texture owned by the render graph.
-  void addTextureBuffer(const Texture& texture);
+  /// Adds a write buffer texture.
+  /// \param texture Buffer texture to be added.
+  void addTextureBuffer(TexturePtr texture);
   /// Maps the buffers textures onto the graphics card.
   void mapBuffers() const;
   /// Binds the framebuffer and clears the color & depth buffers.
@@ -57,8 +59,8 @@ public:
 
 private:
   unsigned int m_index {};
-  const Texture* m_depthBuffer {};
-  std::vector<const Texture*> m_colorBuffers {};
+  TexturePtr m_depthBuffer {};
+  std::vector<TexturePtr> m_colorBuffers {};
 };
 
 } // namespace Raz

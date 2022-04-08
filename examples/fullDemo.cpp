@@ -48,11 +48,10 @@ int main() {
     // Blur pass //
     ///////////////
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
     Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
 
-    const Raz::Texture& depthBuffer = renderGraph.addTextureBuffer(window.getWidth(), window.getHeight(), Raz::ImageColorspace::DEPTH);
-    const Raz::Texture& colorBuffer = renderGraph.addTextureBuffer(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGBA);
+    const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), 0, Raz::ImageColorspace::DEPTH);
+    const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), 1, Raz::ImageColorspace::RGBA);
     geometryPass.addWriteTexture(depthBuffer); // A depth buffer is always needed
     geometryPass.addWriteTexture(colorBuffer);
 
@@ -61,7 +60,6 @@ int main() {
     blurPass.getProgram().sendUniform("uniKernelSize", 1); // Neutralizing the blur at first
 
     geometryPass.addChildren(blurPass);
-#endif
 
     ///////////////////
     // Camera entity //
