@@ -25,6 +25,7 @@ public:
   std::size_t getDisabledBitCount() const noexcept { return m_bits.size() - getEnabledBitCount(); }
   void setBit(std::size_t position, bool value = true);
   void resize(std::size_t newSize) { m_bits.resize(newSize); }
+  void reset() { std::fill(m_bits.begin(), m_bits.end(), false); }
   void clear() noexcept { m_bits.clear(); }
 
   Bitset operator~() const noexcept;

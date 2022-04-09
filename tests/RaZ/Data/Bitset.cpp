@@ -31,11 +31,14 @@ TEST_CASE("Bitset basic") {
   CHECK(alternated1.getEnabledBitCount() == 3);
   CHECK(alternated2.getEnabledBitCount() == 3);
 
-  Raz::Bitset compBitset = fullZeros;
-  CHECK(compBitset == fullZeros);
+  Raz::Bitset copy = fullOnes;
+  CHECK(copy == fullOnes);
 
-  compBitset.resize(7);
-  CHECK_FALSE(compBitset.getSize() == fullZeros.getSize());
+  copy.resize(7);
+  CHECK_FALSE(copy.getSize() == fullOnes.getSize());
+
+  copy.reset();
+  CHECK(copy.isEmpty());
 }
 
 TEST_CASE("Bitset manipulations") {
