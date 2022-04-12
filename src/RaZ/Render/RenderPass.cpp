@@ -47,7 +47,7 @@ void RenderPass::execute(const Framebuffer& prevFramebuffer) const {
 
     if (!m_writeFramebuffer.isEmpty())
       m_writeFramebuffer.bind();
-    prevFramebuffer.display(m_program);
+    prevFramebuffer.display();
     m_writeFramebuffer.unbind();
   }
 

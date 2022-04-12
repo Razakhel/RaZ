@@ -192,15 +192,6 @@ int main() {
     // Window callbacks //
     //////////////////////
 
-#if !defined(USE_OPENGL_ES)
-    // Toggling the wireframe rendering's state
-    bool isWireframe = false;
-    window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
-      isWireframe = !isWireframe;
-      Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
-    }, Raz::Input::ONCE);
-#endif
-
     // Toggling the render pass' enabled state
     window.addKeyCallback(Raz::Keyboard::R, [&splitPass] (float /* deltaTime */) noexcept { splitPass.enable(!splitPass.isEnabled()); }, Raz::Input::ONCE);
 

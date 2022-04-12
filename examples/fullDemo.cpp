@@ -30,15 +30,6 @@ int main() {
     Raz::Window& window = renderSystem.getWindow();
     window.setIcon(Raz::ImageFormat::load(RAZ_ROOT "assets/icons/RaZ_logo_128.png"));
 
-#if !defined(USE_OPENGL_ES)
-    // Allow wireframe toggling
-    bool isWireframe = false;
-    window.addKeyCallback(Raz::Keyboard::Z, [&isWireframe] (float /* deltaTime */) {
-      isWireframe = !isWireframe;
-      Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, (isWireframe ? Raz::PolygonMode::LINE : Raz::PolygonMode::FILL));
-    }, Raz::Input::ONCE);
-#endif
-
     // Allowing to quit the application with the Escape key
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
     // Allowing to quit the application when the close button is clicked

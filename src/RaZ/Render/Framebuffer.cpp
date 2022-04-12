@@ -52,8 +52,7 @@ VertexShader Framebuffer::recoverVertexShader() {
 
     void main() {
       fragTexcoords = vertTexcoords;
-
-      gl_Position = vec4(vertPosition, 0.0, 1.0);
+      gl_Position   = vec4(vertPosition, 0.0, 1.0);
     }
   )";
 
@@ -67,13 +66,21 @@ void Framebuffer::addTextureBuffer(TexturePtr texture) {
     m_depthBuffer = std::move(texture);
   } else {
     // Adding the color buffer only if it doesn't exist yet
-    const auto bufferIter = std::find_if(m_colorBuffers.cbegin(), m_colorBuffers.cend(), [&texture] (const TexturePtr& colorBuffer) {
-      return (colorBuffer.get() == texture.get());
-    });
+    const auto bufferIter = std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture);
 
     if (bufferIter == m_colorBuffers.cend())
       m_colorBuffers.emplace_back(std::move(texture));
   }
+
+  mapBuffers();
+}
+
+void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
+  if (m_depthBuffer)
+    m_depthBuffer->resize(width, height);
+
+  for (const TexturePtr& colorBuffer : m_colorBuffers)
+    colorBuffer->resize(width, height);
 
   mapBuffers();
 }
@@ -120,32 +127,9 @@ void Framebuffer::unbind() const {
   Renderer::unbindFramebuffer();
 }
 
-void Framebuffer::display(const RenderShaderProgram& program) const {
+void Framebuffer::display() const {
   Renderer::clear(MaskType::COLOR);
-
-  program.use();
-
-  if (m_depthBuffer) {
-    m_depthBuffer->activate();
-    m_depthBuffer->bind();
-  }
-
-  for (const TexturePtr& colorBuffer : m_colorBuffers) {
-    colorBuffer->activate();
-    colorBuffer->bind();
-  }
-
   getDisplaySurface().draw();
-}
-
-void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
-  if (m_depthBuffer)
-    m_depthBuffer->resize(width, height);
-
-  for (const TexturePtr& colorBuffer : m_colorBuffers)
-    colorBuffer->resize(width, height);
-
-  mapBuffers();
 }
 
 Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {

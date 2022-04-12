@@ -38,19 +38,18 @@ public:
   /// Adds a write buffer texture.
   /// \param texture Buffer texture to be added.
   void addTextureBuffer(TexturePtr texture);
+  /// Resizes the buffer textures.
+  /// \param width Width to be resized to.
+  /// \param height Height to be resized to.
+  void resizeBuffers(unsigned int width, unsigned int height);
   /// Maps the buffers textures onto the graphics card.
   void mapBuffers() const;
   /// Binds the framebuffer and clears the color & depth buffers.
   void bind() const;
   /// Unbinds the framebuffer.
   void unbind() const;
-  /// Binds the buffers textures & displays the framebuffer.
-  /// \param program Shader program to display with.
-  void display(const RenderShaderProgram& program) const;
-  /// Resizes the buffer textures.
-  /// \param width Width to be resized to.
-  /// \param height Height to be resized to.
-  void resizeBuffers(unsigned int width, unsigned int height);
+  /// Displays the framebuffer.
+  void display() const;
 
   Framebuffer& operator=(const Framebuffer&) = delete;
   Framebuffer& operator=(Framebuffer&& fbo) noexcept;
