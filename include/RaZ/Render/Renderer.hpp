@@ -1162,6 +1162,11 @@ public:
   /// \param objectIndex Index of the object to retrieve the label from.
   /// \return Label of the object.
   static std::string recoverLabel(RenderObjectType type, unsigned int objectIndex);
+  /// Adds an entry into the debug group stack. This can be used to define regions which are shown in graphics debuggers.
+  /// \param name Name of the group.
+  static void pushDebugGroup(const std::string& name);
+  /// Removes the latest pushed group.
+  static void popDebugGroup();
 #endif
   static ErrorCodes recoverErrors() noexcept;
   static bool hasErrors() noexcept { return !recoverErrors().isEmpty(); }

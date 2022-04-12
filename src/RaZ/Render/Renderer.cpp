@@ -1331,6 +1331,24 @@ std::string Renderer::recoverLabel(RenderObjectType type, unsigned int objectInd
 
   return label;
 }
+
+void Renderer::pushDebugGroup(const std::string& name) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Pushing a debug group requires OpenGL 4.3+." && checkVersion(4, 3));
+
+  glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, static_cast<int>(name.size()), name.c_str());
+
+  printConditionalErrors();
+}
+
+void Renderer::popDebugGroup() {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Popping a debug group requires OpenGL 4.3+." && checkVersion(4, 3));
+
+  glPopDebugGroup();
+
+  printConditionalErrors();
+}
 #endif
 
 ErrorCodes Renderer::recoverErrors() noexcept {
