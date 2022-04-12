@@ -6,6 +6,8 @@
 #include "RaZ/Data/Graph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
 
+#include <unordered_set>
+
 namespace Raz {
 
 class Entity;
@@ -25,13 +27,16 @@ public:
   void updateShaders() const;
   /// Executes the render graph, launching all passes followed by their respective children, starting with the geometry pass.
   /// \param renderSystem Render system executing the render graph.
-  void execute(RenderSystem& renderSystem) const;
+  void execute(RenderSystem& renderSystem);
 
   RenderGraph& operator=(const RenderGraph&) = delete;
   RenderGraph& operator=(RenderGraph&&) noexcept = delete;
 
 private:
+  void execute(const RenderPass& renderPass);
+
   RenderPass m_geometryPass {};
+  std::unordered_set<const RenderPass*> m_executedPasses {};
 };
 
 } // namespace Raz

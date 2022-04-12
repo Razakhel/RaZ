@@ -30,7 +30,7 @@ void RenderGraph::updateShaders() const {
     renderPass->getProgram().updateShaders();
 }
 
-void RenderGraph::execute(RenderSystem& renderSystem) const {
+void RenderGraph::execute(RenderSystem& renderSystem) {
   assert("Error: The render system needs a camera for the render graph to be executed." && (renderSystem.m_cameraEntity != nullptr));
 
   const Framebuffer& geometryFramebuffer = m_geometryPass.getFramebuffer();
@@ -87,8 +87,24 @@ void RenderGraph::execute(RenderSystem& renderSystem) const {
 
   geometryFramebuffer.unbind();
 
-  for (const RenderPass* renderPass : m_geometryPass.getChildren())
-    renderPass->execute(geometryFramebuffer);
+  m_executedPasses.reserve(m_nodes.size() + 1);
+  m_executedPasses.emplace(&m_geometryPass);
+
+  for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
+    execute(*renderPass);
+
+  m_executedPasses.clear();
+}
+
+void RenderGraph::execute(const RenderPass& renderPass) {
+  if (m_executedPasses.find(&renderPass) != m_executedPasses.cend())
+    return;
+
+  for (const RenderPass* parentPass : renderPass.getParents())
+    execute(*parentPass);
+
+  renderPass.execute();
+  m_executedPasses.emplace(&renderPass);
 }
 
 } // namespace Raz

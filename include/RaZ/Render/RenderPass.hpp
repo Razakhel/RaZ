@@ -45,8 +45,7 @@ public:
   /// Binds the pass' read textures to its program.
   void bindTextures() const noexcept;
   /// Executes the render pass.
-  /// \param prevFramebuffer Framebuffer written by the previous render pass.
-  void execute(const Framebuffer& prevFramebuffer) const;
+  void execute() const;
 
   RenderPass& operator=(const RenderPass&) = delete;
   RenderPass& operator=(RenderPass&&) noexcept = default;

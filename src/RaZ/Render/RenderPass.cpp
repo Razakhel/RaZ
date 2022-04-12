@@ -41,18 +41,16 @@ void RenderPass::bindTextures() const noexcept {
   }
 }
 
-void RenderPass::execute(const Framebuffer& prevFramebuffer) const {
-  if (m_enabled) {
-    bindTextures();
+void RenderPass::execute() const {
+  if (!m_enabled)
+    return;
 
-    if (!m_writeFramebuffer.isEmpty())
-      m_writeFramebuffer.bind();
-    prevFramebuffer.display();
-    m_writeFramebuffer.unbind();
-  }
+  bindTextures();
 
-  for (const RenderPass* renderPass : m_children)
-    renderPass->execute(m_writeFramebuffer);
+  if (!m_writeFramebuffer.isEmpty())
+    m_writeFramebuffer.bind();
+  m_writeFramebuffer.display();
+  m_writeFramebuffer.unbind();
 }
 
 } // namespace Raz
