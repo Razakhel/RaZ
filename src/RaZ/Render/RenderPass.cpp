@@ -29,14 +29,16 @@ void RenderPass::addReadTexture(TexturePtr texture, const std::string& uniformNa
 
   // TODO: this binding will be lost if the program is updated; store the uniform name
   m_program.use();
-  m_program.sendUniform(uniformName, m_readTextures.back()->getBindingIndex());
+  m_program.sendUniform(uniformName, static_cast<int>(m_readTextures.size() - 1));
 }
 
 void RenderPass::bindTextures() const noexcept {
   m_program.use();
 
+  unsigned int textureIndex = 0;
+
   for (const TexturePtr& texture : m_readTextures) {
-    texture->activate();
+    Renderer::activateTexture(textureIndex++);
     texture->bind();
   }
 }

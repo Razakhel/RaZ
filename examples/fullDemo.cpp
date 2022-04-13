@@ -41,8 +41,8 @@ int main() {
 
     Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
 
-    const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), 0, Raz::ImageColorspace::DEPTH);
-    const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), 1, Raz::ImageColorspace::RGBA);
+    const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::DEPTH);
+    const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGBA);
     geometryPass.addWriteTexture(depthBuffer); // A depth buffer is always needed
     geometryPass.addWriteTexture(colorBuffer);
 

@@ -33,13 +33,15 @@ TEST_CASE("Material textures") {
   CHECK(material.getTextureCount() == 6);
 
   CHECK(material.hasTexture("uniMaterial.albedoMap"));
-  CHECK(material.getTexture(0).getBindingIndex() == 0);
-  CHECK(material.getTexture("uniMaterial.albedoMap").getBindingIndex() == 0); // Can be recovered with either index or uniform name
 
-  material.setTexture(Raz::Texture::create(42), "uniMaterial.albedoMap");
+  // Textures can be recovered with either their index in the list or their uniform name
+  const unsigned int origTextureIndex = material.getTexture("uniMaterial.albedoMap").getIndex();
+  CHECK(material.getTexture(0).getIndex() == origTextureIndex);
+
+  material.setTexture(Raz::Texture::create(), "uniMaterial.albedoMap");
   CHECK(material.getTextureCount() == 6); // The texture already exists, none has been added
   CHECK(material.hasTexture("uniMaterial.albedoMap"));
-  CHECK(material.getTexture("uniMaterial.albedoMap").getBindingIndex() == 42); // But its value has been changed
+  CHECK_FALSE(material.getTexture("uniMaterial.albedoMap").getIndex() == origTextureIndex); // But its value has been changed
 
   material.removeTexture("uniMaterial.albedoMap");
   CHECK(material.getTextureCount() == 5);

@@ -31,7 +31,7 @@ constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, co
 
 inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-  return Texture::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), 0);
+  return Texture::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), true);
 }
 
 inline void loadMtl(const FilePath& mtlFilePath,
@@ -45,25 +45,10 @@ inline void loadMtl(const FilePath& mtlFilePath,
   auto cookTorranceMaterial = MaterialCookTorrance::create();
 
   auto addLocalMaterial = [&blinnPhongMaterial, &cookTorranceMaterial, &materials] (bool isCookTorrance) {
-    if (isCookTorrance) {
-      cookTorranceMaterial->getAlbedoMap()->setBindingIndex(0);
-      cookTorranceMaterial->getEmissiveMap()->setBindingIndex(1);
-      cookTorranceMaterial->getNormalMap()->setBindingIndex(2);
-      cookTorranceMaterial->getMetallicMap()->setBindingIndex(3);
-      cookTorranceMaterial->getRoughnessMap()->setBindingIndex(4);
-      cookTorranceMaterial->getAmbientOcclusionMap()->setBindingIndex(5);
-
+    if (isCookTorrance)
       materials.emplace_back(std::move(cookTorranceMaterial));
-    } else {
-      blinnPhongMaterial->getDiffuseMap()->setBindingIndex(0);
-      blinnPhongMaterial->getEmissiveMap()->setBindingIndex(1);
-      blinnPhongMaterial->getAmbientMap()->setBindingIndex(2);
-      blinnPhongMaterial->getSpecularMap()->setBindingIndex(3);
-      blinnPhongMaterial->getTransparencyMap()->setBindingIndex(4);
-      blinnPhongMaterial->getBumpMap()->setBindingIndex(5);
-
+    else
       materials.emplace_back(std::move(blinnPhongMaterial));
-    }
   };
 
   if (!file) {

@@ -47,7 +47,7 @@ Texture::Texture() {
   Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
 }
 
-Texture::Texture(ColorPreset preset, int bindingIndex) : Texture(bindingIndex) {
+Texture::Texture(ColorPreset preset) : Texture() {
   const auto red   = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::RED) >> 16u);
   const auto green = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::GREEN) >> 8u);
   const auto blue  = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::BLUE));
@@ -55,10 +55,10 @@ Texture::Texture(ColorPreset preset, int bindingIndex) : Texture(bindingIndex) {
   makePlainColored(Vec3b(red, green, blue));
 }
 
-Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace)
-  : Texture(width, height, bindingIndex, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
+Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace)
+  : Texture(width, height, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
 
-Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, ImageDataType dataType) : Texture(bindingIndex) {
+Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) : Texture() {
   m_image = Image(colorspace, dataType);
 
   bind();
@@ -75,18 +75,11 @@ Texture::Texture(unsigned int width, unsigned int height, int bindingIndex, Imag
 
 Texture::Texture(Texture&& texture) noexcept
   : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) },
-    m_bindingIndex{ std::exchange(texture.m_bindingIndex, std::numeric_limits<int>::max()) },
     m_image{ std::move(texture.m_image) } {}
 
 void Texture::load(Image image, bool createMipmaps) {
   m_image = std::move(image);
   load(createMipmaps);
-}
-
-void Texture::activate() const {
-  assert("Error: The texture trying to be activated has an invalid binding index." && m_bindingIndex != std::numeric_limits<int>::max());
-
-  Renderer::activateTexture(static_cast<unsigned int>(m_bindingIndex));
 }
 
 void Texture::bind() const {
@@ -112,7 +105,6 @@ void Texture::resize(unsigned int width, unsigned int height) const {
 
 Texture& Texture::operator=(Texture&& texture) noexcept {
   std::swap(m_index, texture.m_index);
-  std::swap(m_bindingIndex, texture.m_bindingIndex);
   m_image = std::move(texture.m_image);
 
   return *this;
@@ -139,7 +131,9 @@ void Texture::load(bool createMipmaps) {
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::REPEAT);
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::REPEAT);
 
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR_MIPMAP_LINEAR);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D,
+                                TextureParam::MINIFY_FILTER,
+                                (createMipmaps ? TextureParamValue::LINEAR_MIPMAP_LINEAR : TextureParamValue::LINEAR));
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
 
   if (m_image.getColorspace() == ImageColorspace::GRAY || m_image.getColorspace() == ImageColorspace::GRAY_ALPHA) {

@@ -77,27 +77,32 @@ void Material::sendAttributes(const RenderShaderProgram& program) const {
 void Material::initTextures(const RenderShaderProgram& program) const {
   program.use();
 
+  // TODO: binding indices should be user-definable to allow the same texture to be bound to multiple uniforms
+  int bindingIndex = 0;
+
   for (const auto& [texture, name] : m_textures)
-    program.sendUniform(name, texture->getBindingIndex());
+    program.sendUniform(name, bindingIndex++);
 }
 
 void Material::bindTextures(const RenderShaderProgram& program) const {
   program.use();
 
+  unsigned int textureIndex = 0;
+
   for (const auto& [texture, _] : m_textures) {
-    texture->activate();
+    Renderer::activateTexture(textureIndex++);
     texture->bind();
   }
 }
 
 MaterialBlinnPhong::MaterialBlinnPhong() {
   m_textures.reserve(6);
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 0), "uniMaterial.diffuseMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 1), "uniMaterial.emissiveMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 2), "uniMaterial.ambientMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 3), "uniMaterial.specularMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 4), "uniMaterial.transparencyMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 5), "uniMaterial.bumpMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.diffuseMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.emissiveMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.ambientMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.specularMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.transparencyMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.bumpMap");
 
   m_attributes.reserve(5);
   setDiffuse(Vec3f(1.f));
@@ -120,37 +125,37 @@ MaterialBlinnPhong::MaterialBlinnPhong(const Vec3f& diffuse,
 }
 
 void MaterialBlinnPhong::loadDiffuseMap(const FilePath& filePath, bool flipVertically) {
-  setDiffuseMap(Texture::create(ImageFormat::load(filePath, flipVertically), getDiffuseMap()->getBindingIndex()));
+  setDiffuseMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialBlinnPhong::loadEmissiveMap(const FilePath& filePath, bool flipVertically) {
-  setEmissiveMap(Texture::create(ImageFormat::load(filePath, flipVertically), getEmissiveMap()->getBindingIndex()));
+  setEmissiveMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialBlinnPhong::loadAmbientMap(const FilePath& filePath, bool flipVertically) {
-  setAmbientMap(Texture::create(ImageFormat::load(filePath, flipVertically), getAmbientMap()->getBindingIndex()));
+  setAmbientMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialBlinnPhong::loadSpecularMap(const FilePath& filePath, bool flipVertically) {
-  setSpecularMap(Texture::create(ImageFormat::load(filePath, flipVertically), getSpecularMap()->getBindingIndex()));
+  setSpecularMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialBlinnPhong::loadTransparencyMap(const FilePath& filePath, bool flipVertically) {
-  setTransparencyMap(Texture::create(ImageFormat::load(filePath, flipVertically), getTransparencyMap()->getBindingIndex()));
+  setTransparencyMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialBlinnPhong::loadBumpMap(const FilePath& filePath, bool flipVertically) {
-  setBumpMap(Texture::create(ImageFormat::load(filePath, flipVertically), getBumpMap()->getBindingIndex()));
+  setBumpMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 MaterialCookTorrance::MaterialCookTorrance() {
   m_textures.reserve(6);
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 0), "uniMaterial.albedoMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::WHITE, 1), "uniMaterial.emissiveMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::MEDIUM_BLUE, 2), "uniMaterial.normalMap"); // Representing a [ 0; 0; 1 ] vector
-  m_textures.emplace_back(Texture::create(ColorPreset::RED, 3), "uniMaterial.metallicMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::RED, 4), "uniMaterial.roughnessMap");
-  m_textures.emplace_back(Texture::create(ColorPreset::RED, 5), "uniMaterial.ambientOcclusionMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.albedoMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::WHITE), "uniMaterial.emissiveMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::MEDIUM_BLUE), "uniMaterial.normalMap"); // Representing a [ 0; 0; 1 ] vector
+  m_textures.emplace_back(Texture::create(ColorPreset::RED), "uniMaterial.metallicMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::RED), "uniMaterial.roughnessMap");
+  m_textures.emplace_back(Texture::create(ColorPreset::RED), "uniMaterial.ambientOcclusionMap");
 
   m_attributes.reserve(4);
   setBaseColor(Vec3f(1.f));
@@ -166,27 +171,27 @@ MaterialCookTorrance::MaterialCookTorrance(const Vec3f& baseColor, float metalli
 }
 
 void MaterialCookTorrance::loadAlbedoMap(const FilePath& filePath, bool flipVertically) {
-  setAlbedoMap(Texture::create(ImageFormat::load(filePath, flipVertically), getAlbedoMap()->getBindingIndex()));
+  setAlbedoMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialCookTorrance::loadEmissiveMap(const FilePath& filePath, bool flipVertically) {
-  setEmissiveMap(Texture::create(ImageFormat::load(filePath, flipVertically), getEmissiveMap()->getBindingIndex()));
+  setEmissiveMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialCookTorrance::loadNormalMap(const FilePath& filePath, bool flipVertically) {
-  setNormalMap(Texture::create(ImageFormat::load(filePath, flipVertically), getNormalMap()->getBindingIndex()));
+  setNormalMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialCookTorrance::loadMetallicMap(const FilePath& filePath, bool flipVertically) {
-  setMetallicMap(Texture::create(ImageFormat::load(filePath, flipVertically), getMetallicMap()->getBindingIndex()));
+  setMetallicMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialCookTorrance::loadRoughnessMap(const FilePath& filePath, bool flipVertically) {
-  setRoughnessMap(Texture::create(ImageFormat::load(filePath, flipVertically), getRoughnessMap()->getBindingIndex()));
+  setRoughnessMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 void MaterialCookTorrance::loadAmbientOcclusionMap(const FilePath& filePath, bool flipVertically) {
-  setAmbientOcclusionMap(Texture::create(ImageFormat::load(filePath, flipVertically), getAmbientOcclusionMap()->getBindingIndex()));
+  setAmbientOcclusionMap(Texture::create(ImageFormat::load(filePath, flipVertically)));
 }
 
 } // namespace Raz

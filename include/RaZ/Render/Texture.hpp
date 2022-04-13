@@ -33,26 +33,20 @@ using TexturePtr = std::shared_ptr<Texture>;
 class Texture {
 public:
   Texture();
-  explicit Texture(int bindingIndex) : Texture() { setBindingIndex(bindingIndex); }
   /// Constructs an 1x1 plain colored texture.
   /// \param value Color value to create the texture with.
-  /// \param bindingIndex Index of the texture's binding point.
-  explicit Texture(const Vec3b& value, int bindingIndex = std::numeric_limits<int>::max()) : Texture(bindingIndex) { makePlainColored(value); }
+  explicit Texture(const Vec3b& value) : Texture() { makePlainColored(value); }
   /// Constructs an 1x1 plain colored texture.
   /// \param preset Color preset to create the texture with.
-  /// \param bindingIndex Index of the texture's binding point.
-  explicit Texture(ColorPreset preset, int bindingIndex = std::numeric_limits<int>::max());
-  Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace);
-  Texture(unsigned int width, unsigned int height, int bindingIndex, ImageColorspace colorspace, ImageDataType dataType);
-  Texture(Image image, int bindingIndex, bool createMipmaps = true) : Texture(bindingIndex) { load(std::move(image), createMipmaps); }
+  explicit Texture(ColorPreset preset);
+  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace);
+  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
+  explicit Texture(Image image, bool createMipmaps = true) : Texture() { load(std::move(image), createMipmaps); }
   Texture(const Texture&) = delete;
   Texture(Texture&& texture) noexcept;
 
   unsigned int getIndex() const { return m_index; }
-  int getBindingIndex() const { return m_bindingIndex; }
   const Image& getImage() const { return m_image; }
-
-  void setBindingIndex(int bindingIndex) { m_bindingIndex = bindingIndex; }
 
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
@@ -61,8 +55,6 @@ public:
   /// \param image Image to be set as a texture.
   /// \param createMipmaps True to generate texture mipmaps, false otherwise.
   void load(Image image, bool createMipmaps = true);
-  /// Sets active the current texture.
-  void activate() const;
   /// Binds the current texture.
   void bind() const;
   /// Unbinds the current texture.
@@ -88,7 +80,6 @@ private:
   void makePlainColored(const Vec3b& color) const;
 
   unsigned int m_index = std::numeric_limits<unsigned int>::max();
-  int m_bindingIndex = std::numeric_limits<int>::max();
   Image m_image {};
 };
 

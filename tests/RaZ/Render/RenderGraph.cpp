@@ -6,7 +6,7 @@ TEST_CASE("RenderGraph validity") {
   Raz::RenderGraph graph;
   CHECK(graph.isValid());
 
-  const auto depthTexture = Raz::Texture::create(1, 1, 0, Raz::ImageColorspace::DEPTH);
+  const auto depthTexture = Raz::Texture::create(1, 1, Raz::ImageColorspace::DEPTH);
   CHECK(graph.isValid()); // Adding a buffer does not change the graph's validity
 
   graph.getGeometryPass().addWriteTexture(depthTexture);

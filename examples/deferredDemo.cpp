@@ -118,9 +118,9 @@ int main() {
     Raz::RenderGraph& renderGraph = render.getRenderGraph();
 
     // Creating the render graph's texture buffers
-    const auto depthBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, 0, Raz::ImageColorspace::DEPTH);
-    const auto colorBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, 1, Raz::ImageColorspace::RGBA);
-    const auto normalBuffer = Raz::Texture::create(sceneWidth, sceneHeight, 2, Raz::ImageColorspace::RGBA);
+    const auto depthBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
+    const auto colorBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+    const auto normalBuffer = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
 
     // Setting geometry pass' shaders & defining its write buffers
     Raz::RenderPass& geomPass = renderGraph.getGeometryPass();

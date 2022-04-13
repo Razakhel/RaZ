@@ -43,7 +43,7 @@ int main() {
     // Compute program //
     /////////////////////
 
-    Raz::Texture texture(textureSize, textureSize, 0, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
+    Raz::Texture texture(textureSize, textureSize, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
     Raz::Renderer::bindImageTexture(0, texture.getIndex(), 0, false, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
     Raz::ComputeShaderProgram compProgram(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise.comp"));

@@ -5,9 +5,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 
 TEST_CASE("Texture dimensions creation") {
-  const Raz::Texture textureEmpty(0, 0, 42, Raz::ImageColorspace::RGBA);
+  const Raz::Texture textureEmpty(0, 0, Raz::ImageColorspace::RGBA);
   CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
-  CHECK(textureEmpty.getBindingIndex() == 42);
   CHECK(textureEmpty.getImage().getWidth() == 0);
   CHECK(textureEmpty.getImage().getHeight() == 0);
   CHECK(textureEmpty.getImage().getColorspace() == Raz::ImageColorspace::RGBA);
@@ -15,9 +14,8 @@ TEST_CASE("Texture dimensions creation") {
   CHECK(textureEmpty.getImage().getChannelCount() == 4);
   CHECK(textureEmpty.getImage().isEmpty());
 
-  const Raz::Texture textureSmall(1, 1, 42, Raz::ImageColorspace::DEPTH);
+  const Raz::Texture textureSmall(1, 1, Raz::ImageColorspace::DEPTH);
   CHECK(textureSmall.getIndex() != std::numeric_limits<unsigned int>::max());
-  CHECK(textureSmall.getBindingIndex() == 42);
   CHECK(textureSmall.getImage().getWidth() == 0); // A texture does not initialize the underlying image
   CHECK(textureSmall.getImage().getHeight() == 0);
   CHECK(textureSmall.getImage().getColorspace() == Raz::ImageColorspace::DEPTH);
@@ -42,20 +40,17 @@ TEST_CASE("Texture move") {
 
   // The new texture has the same values as the original one
   CHECK(movedTextureCtor.getIndex() == textureIndex);
-  CHECK(movedTextureCtor.getBindingIndex() == 42);
   CHECK_FALSE(movedTextureCtor.getImage().isEmpty());
   CHECK(movedTextureCtor.getImage() == refImg);
 
   // The moved texture is now invalid
   CHECK(texture.getIndex() == std::numeric_limits<unsigned int>::max());
-  CHECK(texture.getBindingIndex() == std::numeric_limits<int>::max());
   CHECK(texture.getImage().isEmpty());
 
   // Move assignment operator
 
   Raz::Texture movedTextureOp;
   CHECK_FALSE(Raz::Renderer::hasErrors());
-  movedTextureOp.setBindingIndex(255);
 
   const unsigned int movedTextureOpIndex = movedTextureOp.getIndex();
 
@@ -63,24 +58,21 @@ TEST_CASE("Texture move") {
 
   // The new texture has the same values as the previous one
   CHECK(movedTextureOp.getIndex() == textureIndex);
-  CHECK(movedTextureOp.getBindingIndex() == 42);
   CHECK_FALSE(movedTextureOp.getImage().isEmpty());
   CHECK(movedTextureOp.getImage() == refImg);
 
   // After being moved, the values are swapped: the moved-from texture now has the previous moved-to's values
   // The moved-from image is however always directly moved, thus invalidated
   CHECK(movedTextureCtor.getIndex() == movedTextureOpIndex);
-  CHECK(movedTextureCtor.getBindingIndex() == 255);
   CHECK(movedTextureCtor.getImage().isEmpty());
 }
 
 TEST_CASE("Texture presets") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::WHITE, 42);
+  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::WHITE);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  CHECK(whiteTexture->getBindingIndex() == 42);
   CHECK(whiteTexture->getImage().isEmpty()); // The image's data is untouched, no allocation is made
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES
@@ -109,5 +101,4 @@ TEST_CASE("Texture presets") {
 
   CHECK_FALSE(whiteTexture2.get() == whiteTexture.get());
   CHECK_FALSE(whiteTexture2->getIndex() == whiteTexture->getIndex());
-  CHECK(whiteTexture2->getBindingIndex() == std::numeric_limits<int>::max());
 }
