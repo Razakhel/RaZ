@@ -23,8 +23,8 @@ public:
   bool isEnabled() const noexcept { return m_enabled; }
   const std::vector<SubmeshRenderer>& getSubmeshRenderers() const { return m_submeshRenderers; }
   std::vector<SubmeshRenderer>& getSubmeshRenderers() { return m_submeshRenderers; }
-  const std::vector<MaterialPtr>& getMaterials() const { return m_materials; }
-  std::vector<MaterialPtr>& getMaterials() { return m_materials; }
+  const std::vector<Material>& getMaterials() const { return m_materials; }
+  std::vector<Material>& getMaterials() { return m_materials; }
 
   static void drawUnitPlane();
   static void drawUnitSphere();
@@ -47,12 +47,12 @@ public:
   /// Sets one unique material for the whole mesh.
   /// \warning This clears all previously existing materials.
   /// \param material Material to be set.
-  void setMaterial(MaterialPtr&& material);
+  void setMaterial(Material&& material);
   /// Adds a given material into the mesh renderer.
   /// \note This doesn't apply the material to any submesh; to do so, manually set the corresponding material index to any submesh renderer.
   /// \param material Material to be added.
   /// \return Reference to the newly added material.
-  Material& addMaterial(MaterialPtr&& material) { return *m_materials.emplace_back(std::move(material)); }
+  Material& addMaterial(Material&& material = Material()) { return m_materials.emplace_back(std::move(material)); }
   /// Removes an existing material.
   /// \param materialIndex Index of the material to remove.
   void removeMaterial(std::size_t materialIndex);
@@ -91,7 +91,7 @@ private:
   bool m_enabled = true;
 
   std::vector<SubmeshRenderer> m_submeshRenderers {};
-  std::vector<MaterialPtr> m_materials {};
+  std::vector<Material> m_materials {};
 };
 
 } // namespace Raz

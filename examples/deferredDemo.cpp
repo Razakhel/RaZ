@@ -12,12 +12,12 @@ constexpr std::string_view geomFragSource = R"(
     float metallicFactor;
     float roughnessFactor;
 
-    sampler2D albedoMap;
+    sampler2D baseColorMap;
     sampler2D emissiveMap;
     sampler2D normalMap;
     sampler2D metallicMap;
     sampler2D roughnessMap;
-    sampler2D ambientOcclusionMap;
+    sampler2D ambientMap;
   };
 
   in struct MeshInfo {
@@ -41,7 +41,7 @@ constexpr std::string_view geomFragSource = R"(
   layout(location = 1) out vec4 fragNormal;
 
   void main() {
-    vec3 albedo     = pow(texture(uniMaterial.albedoMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+    vec3 albedo     = pow(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
     vec3 emissive   = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
     float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
     float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;

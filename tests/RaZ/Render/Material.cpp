@@ -3,7 +3,7 @@
 #include "RaZ/Render/Material.hpp"
 
 TEST_CASE("Material attributes") {
-  Raz::MaterialCookTorrance material;
+  Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
   CHECK(material.getAttributeCount() == 4);
 
   CHECK(material.hasAttribute("uniMaterial.baseColor"));
@@ -29,23 +29,23 @@ TEST_CASE("Material attributes") {
 }
 
 TEST_CASE("Material textures") {
-  Raz::MaterialCookTorrance material;
+  Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
   CHECK(material.getTextureCount() == 6);
 
-  CHECK(material.hasTexture("uniMaterial.albedoMap"));
+  CHECK(material.hasTexture("uniMaterial.baseColorMap"));
 
   // Textures can be recovered with either their index in the list or their uniform name
-  const unsigned int origTextureIndex = material.getTexture("uniMaterial.albedoMap").getIndex();
+  const unsigned int origTextureIndex = material.getTexture("uniMaterial.baseColorMap").getIndex();
   CHECK(material.getTexture(0).getIndex() == origTextureIndex);
 
-  material.setTexture(Raz::Texture::create(), "uniMaterial.albedoMap");
+  material.setTexture(Raz::Texture::create(), "uniMaterial.baseColorMap");
   CHECK(material.getTextureCount() == 6); // The texture already exists, none has been added
-  CHECK(material.hasTexture("uniMaterial.albedoMap"));
-  CHECK_FALSE(material.getTexture("uniMaterial.albedoMap").getIndex() == origTextureIndex); // But its value has been changed
+  CHECK(material.hasTexture("uniMaterial.baseColorMap"));
+  CHECK_FALSE(material.getTexture("uniMaterial.baseColorMap").getIndex() == origTextureIndex); // But its value has been changed
 
-  material.removeTexture("uniMaterial.albedoMap");
+  material.removeTexture("uniMaterial.baseColorMap");
   CHECK(material.getTextureCount() == 5);
-  CHECK_FALSE(material.hasTexture("uniMaterial.albedoMap"));
+  CHECK_FALSE(material.hasTexture("uniMaterial.baseColorMap"));
 
   material.clearTextures();
   CHECK(material.getTextureCount() == 0);

@@ -33,7 +33,7 @@ void MeshRenderer::setRenderMode(RenderMode renderMode, const Mesh& mesh) {
     m_submeshRenderers[i].setRenderMode(renderMode, mesh.getSubmeshes()[i]);
 }
 
-void MeshRenderer::setMaterial(MaterialPtr&& material) {
+void MeshRenderer::setMaterial(Material&& material) {
   m_materials.clear();
   m_materials.emplace_back(std::move(material));
 
@@ -53,7 +53,7 @@ void MeshRenderer::removeMaterial(std::size_t materialIndex) {
       continue;
 
     if (submeshMaterialIndex == materialIndex)
-      submeshRenderer.setMaterialIndex(0);
+      submeshRenderer.setMaterialIndex(std::numeric_limits<std::size_t>::max());
     else if (submeshMaterialIndex > materialIndex)
       submeshRenderer.setMaterialIndex(submeshMaterialIndex - 1);
   }
@@ -67,8 +67,8 @@ MeshRenderer MeshRenderer::clone() const {
     meshRenderer.m_submeshRenderers.emplace_back(submeshRenderer.clone());
 
   meshRenderer.m_materials.reserve(m_materials.size());
-  for (const MaterialPtr& material : m_materials)
-    meshRenderer.m_materials.emplace_back(material->clone());
+  for (const Material& material : m_materials)
+    meshRenderer.m_materials.emplace_back(material.clone());
 
   return meshRenderer;
 }
@@ -88,14 +88,14 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
 
   // If no material exists, create a default one
   if (m_materials.empty())
-    setMaterial(MaterialCookTorrance::create());
+    setMaterial(Material(MaterialType::COOK_TORRANCE));
 
   Logger::debug("[MeshRenderer] Loaded mesh data");
 }
 
 void MeshRenderer::load(const RenderShaderProgram& program) const {
-  for (const MaterialPtr& material : m_materials)
-    material->initTextures(program);
+  for (const Material& material : m_materials)
+    material.initTextures(program);
 }
 
 void MeshRenderer::load(const Mesh& mesh, const RenderShaderProgram& program, RenderMode renderMode) {
@@ -111,14 +111,11 @@ void MeshRenderer::draw() const {
 void MeshRenderer::draw(const RenderShaderProgram& program) const {
   for (const SubmeshRenderer& submeshRenderer : m_submeshRenderers) {
     if (submeshRenderer.getMaterialIndex() != std::numeric_limits<std::size_t>::max()) {
-      assert("Error: Material index does not reference any existing material." && submeshRenderer.getMaterialIndex() < m_materials.size());
+      assert("Error: The material index does not reference any existing material." && (submeshRenderer.getMaterialIndex() < m_materials.size()));
 
-      const MaterialPtr& material = m_materials[submeshRenderer.getMaterialIndex()];
-
-      if (material) {
-        material->sendAttributes(program);
-        material->bindTextures(program);
-      }
+      const Material& material = m_materials[submeshRenderer.getMaterialIndex()];
+      material.sendAttributes(program);
+      material.bindTextures(program);
     }
 
     submeshRenderer.draw();

@@ -6,7 +6,7 @@
 #include "RaZ/Utils/FilePath.hpp"
 
 TEST_CASE("FbxFormat load basic") {
-  const auto [mesh, meshRenderer] = Raz::FbxFormat::load(RAZ_TESTS_ROOT + "../assets/meshes/shaderBall.fbx"s);
+  const auto [mesh, meshRenderer] = Raz::FbxFormat::load(RAZ_TESTS_ROOT "../assets/meshes/shaderBall.fbx");
 
   CHECK(mesh.getSubmeshes().size() == 7);
   CHECK(mesh.recoverVertexCount() == 40004);
@@ -22,6 +22,6 @@ TEST_CASE("FbxFormat load basic") {
   CHECK(meshRenderer.getSubmeshRenderers()[6].getMaterialIndex() == 3);
 
   CHECK(meshRenderer.getMaterials().size() == 4);
-  for (const Raz::MaterialPtr& material : meshRenderer.getMaterials())
-    CHECK(material->getType() == Raz::MaterialType::BLINN_PHONG);
+  for (const Raz::Material& material : meshRenderer.getMaterials())
+    CHECK_FALSE(material.isEmpty());
 }

@@ -47,22 +47,20 @@ Raz::MeshRenderer createMeshRenderer() {
   meshRenderer.addSubmeshRenderer().setMaterialIndex(1);
 
   {
-    auto material = Raz::MaterialCookTorrance::create();
-    material->setBaseColor(Raz::Vec3f(1.f, 0.f, 0.f));
-    material->setEmissive(Raz::Vec3f(0.f, 1.f, 0.f));
-    material->setMetallicFactor(0.25f);
-    material->setRoughnessFactor(0.75f);
-    meshRenderer.addMaterial(std::move(material));
+    Raz::Material& material = meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::COOK_TORRANCE));
+    material.setAttribute(Raz::Vec3f(1.f, 0.f, 0.f), "uniMaterial.baseColor");
+    material.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), "uniMaterial.emissive");
+    material.setAttribute(0.25f, "uniMaterial.metallicFactor");
+    material.setAttribute(0.75f, "uniMaterial.roughnessFactor");
   }
 
   {
-    auto material = Raz::MaterialBlinnPhong::create();
-    material->setDiffuse(Raz::Vec3f(1.f, 0.f, 0.f));
-    material->setEmissive(Raz::Vec3f(0.f, 1.f, 0.f));
-    material->setAmbient(Raz::Vec3f(0.f, 0.f, 1.f));
-    material->setSpecular(Raz::Vec3f(1.f, 0.f, 1.f));
-    material->setTransparency(0.5f);
-    meshRenderer.addMaterial(std::move(material));
+    Raz::Material& material = meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::BLINN_PHONG));
+    material.setAttribute(Raz::Vec3f(1.f, 0.f, 0.f), "uniMaterial.baseColor");
+    material.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), "uniMaterial.emissive");
+    material.setAttribute(Raz::Vec3f(0.f, 0.f, 1.f), "uniMaterial.ambient");
+    material.setAttribute(Raz::Vec3f(1.f, 0.f, 1.f), "uniMaterial.specular");
+    material.setAttribute(0.5f, "uniMaterial.transparency");
   }
 
   return meshRenderer;
@@ -111,14 +109,13 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
   REQUIRE(meshRenderer.getMaterials().size() == 1);
-  REQUIRE(meshRenderer.getMaterials().front()->getType() == Raz::MaterialType::BLINN_PHONG);
 
-  const auto& material = static_cast<const Raz::MaterialBlinnPhong&>(*meshRenderer.getMaterials().front());
+  const Raz::Material& material = meshRenderer.getMaterials().front();
 
-  CHECK(material.getDiffuse() == Raz::Vec3f(0.99f));
-  CHECK(material.getEmissive() == Raz::Vec3f(0.75f));
-  CHECK(material.getAmbient() == Raz::Vec3f(0.5f));
-  CHECK(material.getSpecular() == Raz::Vec3f(0.25f));
+  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.99f));
+  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.emissive") == Raz::Vec3f(0.75f));
+  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.ambient") == Raz::Vec3f(0.5f));
+  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.specular") == Raz::Vec3f(0.25f));
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -129,15 +126,17 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Diffuse map
   {
-    REQUIRE_FALSE(material.getDiffuseMap()->getImage().isEmpty());
+    const Raz::Texture& diffuseMap = material.getTexture("uniMaterial.baseColorMap");
 
-    CHECK(material.getDiffuseMap()->getImage().getColorspace() == Raz::ImageColorspace::RGBA);
-    CHECK(material.getDiffuseMap()->getImage().getWidth() == 2);
-    CHECK(material.getDiffuseMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(diffuseMap.getImage().isEmpty());
 
-    REQUIRE(material.getDiffuseMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(diffuseMap.getImage().getColorspace() == Raz::ImageColorspace::RGBA);
+    CHECK(diffuseMap.getImage().getWidth() == 2);
+    CHECK(diffuseMap.getImage().getHeight() == 2);
 
-    const auto* diffuseData = static_cast<const uint8_t*>(material.getDiffuseMap()->getImage().getDataPtr());
+    REQUIRE(diffuseMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* diffuseData = static_cast<const uint8_t*>(diffuseMap.getImage().getDataPtr());
 
     // RGBR image with alpha, flipped vertically: verifying that values are BRRG with 50% opacity
 
@@ -170,15 +169,17 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Emissive map
   {
-    REQUIRE_FALSE(material.getEmissiveMap()->getImage().isEmpty());
+    const Raz::Texture& emissiveMap = material.getTexture("uniMaterial.emissiveMap");
 
-    CHECK(material.getEmissiveMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
-    CHECK(material.getEmissiveMap()->getImage().getWidth() == 2);
-    CHECK(material.getEmissiveMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(emissiveMap.getImage().isEmpty());
 
-    REQUIRE(material.getEmissiveMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(emissiveMap.getImage().getColorspace() == Raz::ImageColorspace::RGB);
+    CHECK(emissiveMap.getImage().getWidth() == 2);
+    CHECK(emissiveMap.getImage().getHeight() == 2);
 
-    const auto* emissiveData = static_cast<const uint8_t*>(material.getEmissiveMap()->getImage().getDataPtr());
+    REQUIRE(emissiveMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* emissiveData = static_cast<const uint8_t*>(emissiveMap.getImage().getDataPtr());
 
     // ---------
     // | R | R |
@@ -205,15 +206,17 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Ambient map
   {
-    REQUIRE_FALSE(material.getAmbientMap()->getImage().isEmpty());
+    const Raz::Texture& ambientMap = material.getTexture("uniMaterial.ambientMap");
 
-    CHECK(material.getAmbientMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
-    CHECK(material.getAmbientMap()->getImage().getWidth() == 2);
-    CHECK(material.getAmbientMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(ambientMap.getImage().isEmpty());
 
-    REQUIRE(material.getAmbientMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(ambientMap.getImage().getColorspace() == Raz::ImageColorspace::RGB);
+    CHECK(ambientMap.getImage().getWidth() == 2);
+    CHECK(ambientMap.getImage().getHeight() == 2);
 
-    const auto* ambientData = static_cast<const uint8_t*>(material.getAmbientMap()->getImage().getDataPtr());
+    REQUIRE(ambientMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* ambientData = static_cast<const uint8_t*>(ambientMap.getImage().getDataPtr());
 
     // ---------
     // | B | B |
@@ -240,15 +243,17 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Specular map
   {
-    REQUIRE_FALSE(material.getSpecularMap()->getImage().isEmpty());
+    const Raz::Texture& specularMap = material.getTexture("uniMaterial.specularMap");
 
-    CHECK(material.getSpecularMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
-    CHECK(material.getSpecularMap()->getImage().getWidth() == 2);
-    CHECK(material.getSpecularMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(specularMap.getImage().isEmpty());
 
-    REQUIRE(material.getSpecularMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(specularMap.getImage().getColorspace() == Raz::ImageColorspace::GRAY);
+    CHECK(specularMap.getImage().getWidth() == 2);
+    CHECK(specularMap.getImage().getHeight() == 2);
 
-    const auto* specularData = static_cast<const uint8_t*>(material.getSpecularMap()->getImage().getDataPtr());
+    REQUIRE(specularMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* specularData = static_cast<const uint8_t*>(specularMap.getImage().getDataPtr());
 
     // ---------
     // | X |   |
@@ -264,15 +269,17 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Transparency map
   {
-    REQUIRE_FALSE(material.getTransparencyMap()->getImage().isEmpty());
+    const Raz::Texture& transparencyMap = material.getTexture("uniMaterial.transparencyMap");
 
-    CHECK(material.getTransparencyMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
-    CHECK(material.getTransparencyMap()->getImage().getWidth() == 2);
-    CHECK(material.getTransparencyMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(transparencyMap.getImage().isEmpty());
 
-    REQUIRE(material.getTransparencyMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(transparencyMap.getImage().getColorspace() == Raz::ImageColorspace::GRAY);
+    CHECK(transparencyMap.getImage().getWidth() == 2);
+    CHECK(transparencyMap.getImage().getHeight() == 2);
 
-    const auto* transparencyData = static_cast<const uint8_t*>(material.getTransparencyMap()->getImage().getDataPtr());
+    REQUIRE(transparencyMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* transparencyData = static_cast<const uint8_t*>(transparencyMap.getImage().getDataPtr());
 
     // ---------
     // | X | X |
@@ -288,15 +295,17 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Bump map
   {
-    REQUIRE_FALSE(material.getBumpMap()->getImage().isEmpty());
+    const Raz::Texture& bumpMap = material.getTexture("uniMaterial.bumpMap");
 
-    CHECK(material.getBumpMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
-    CHECK(material.getBumpMap()->getImage().getWidth() == 2);
-    CHECK(material.getBumpMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(bumpMap.getImage().isEmpty());
 
-    REQUIRE(material.getBumpMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(bumpMap.getImage().getColorspace() == Raz::ImageColorspace::GRAY);
+    CHECK(bumpMap.getImage().getWidth() == 2);
+    CHECK(bumpMap.getImage().getHeight() == 2);
 
-    const auto* bumpData = static_cast<const uint8_t*>(material.getBumpMap()->getImage().getDataPtr());
+    REQUIRE(bumpMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* bumpData = static_cast<const uint8_t*>(bumpMap.getImage().getDataPtr());
 
     // ---------
     // |   |   |
@@ -340,14 +349,13 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
   REQUIRE(meshRenderer.getMaterials().size() == 1);
-  REQUIRE(meshRenderer.getMaterials().front()->getType() == Raz::MaterialType::COOK_TORRANCE);
 
-  const auto& material = static_cast<const Raz::MaterialCookTorrance&>(*meshRenderer.getMaterials().front());
+  const Raz::Material& material = meshRenderer.getMaterials().front();
 
-  CHECK(material.getBaseColor() == Raz::Vec3f(0.99f));
-  CHECK(material.getEmissive() == Raz::Vec3f(0.75f));
-  CHECK(material.getMetallicFactor() == 0.5f);
-  CHECK(material.getRoughnessFactor() == 0.25f);
+  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.99f));
+  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.emissive") == Raz::Vec3f(0.75f));
+  CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 0.5f);
+  CHECK(material.getAttribute<float>("uniMaterial.roughnessFactor") == 0.25f);
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -358,15 +366,17 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Albedo map
   {
-    REQUIRE_FALSE(material.getAlbedoMap()->getImage().isEmpty());
+    const Raz::Texture& albedoMap = material.getTexture("uniMaterial.baseColorMap");
 
-    CHECK(material.getAlbedoMap()->getImage().getColorspace() == Raz::ImageColorspace::RGBA);
-    CHECK(material.getAlbedoMap()->getImage().getWidth() == 2);
-    CHECK(material.getAlbedoMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(albedoMap.getImage().isEmpty());
 
-    REQUIRE(material.getAlbedoMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(albedoMap.getImage().getColorspace() == Raz::ImageColorspace::RGBA);
+    CHECK(albedoMap.getImage().getWidth() == 2);
+    CHECK(albedoMap.getImage().getHeight() == 2);
 
-    const auto* albedoData = static_cast<const uint8_t*>(material.getAlbedoMap()->getImage().getDataPtr());
+    REQUIRE(albedoMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* albedoData = static_cast<const uint8_t*>(albedoMap.getImage().getDataPtr());
 
     // RGBR image with alpha, flipped vertically: verifying that values are BRRG with 50% opacity
 
@@ -399,15 +409,17 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Emissive map
   {
-    REQUIRE_FALSE(material.getEmissiveMap()->getImage().isEmpty());
+    const Raz::Texture& emissiveMap = material.getTexture("uniMaterial.emissiveMap");
 
-    CHECK(material.getEmissiveMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
-    CHECK(material.getEmissiveMap()->getImage().getWidth() == 2);
-    CHECK(material.getEmissiveMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(emissiveMap.getImage().isEmpty());
 
-    REQUIRE(material.getEmissiveMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(emissiveMap.getImage().getColorspace() == Raz::ImageColorspace::RGB);
+    CHECK(emissiveMap.getImage().getWidth() == 2);
+    CHECK(emissiveMap.getImage().getHeight() == 2);
 
-    const auto* emissiveData = static_cast<const uint8_t*>(material.getEmissiveMap()->getImage().getDataPtr());
+    REQUIRE(emissiveMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* emissiveData = static_cast<const uint8_t*>(emissiveMap.getImage().getDataPtr());
 
     // ---------
     // | R | R |
@@ -434,15 +446,17 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Normal map
   {
-    REQUIRE_FALSE(material.getNormalMap()->getImage().isEmpty());
+    const Raz::Texture& normalMap = material.getTexture("uniMaterial.normalMap");
 
-    CHECK(material.getNormalMap()->getImage().getColorspace() == Raz::ImageColorspace::RGB);
-    CHECK(material.getNormalMap()->getImage().getWidth() == 2);
-    CHECK(material.getNormalMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(normalMap.getImage().isEmpty());
 
-    REQUIRE(material.getNormalMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(normalMap.getImage().getColorspace() == Raz::ImageColorspace::RGB);
+    CHECK(normalMap.getImage().getWidth() == 2);
+    CHECK(normalMap.getImage().getHeight() == 2);
 
-    const auto* normalData = static_cast<const uint8_t*>(material.getNormalMap()->getImage().getDataPtr());
+    REQUIRE(normalMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* normalData = static_cast<const uint8_t*>(normalMap.getImage().getDataPtr());
 
     // ---------
     // | B | B |
@@ -469,15 +483,17 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Metallic map
   {
-    REQUIRE_FALSE(material.getMetallicMap()->getImage().isEmpty());
+    const Raz::Texture& metallicMap = material.getTexture("uniMaterial.metallicMap");
 
-    CHECK(material.getMetallicMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
-    CHECK(material.getMetallicMap()->getImage().getWidth() == 2);
-    CHECK(material.getMetallicMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(metallicMap.getImage().isEmpty());
 
-    REQUIRE(material.getMetallicMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(metallicMap.getImage().getColorspace() == Raz::ImageColorspace::GRAY);
+    CHECK(metallicMap.getImage().getWidth() == 2);
+    CHECK(metallicMap.getImage().getHeight() == 2);
 
-    const auto* metallicData = static_cast<const uint8_t*>(material.getMetallicMap()->getImage().getDataPtr());
+    REQUIRE(metallicMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* metallicData = static_cast<const uint8_t*>(metallicMap.getImage().getDataPtr());
 
     // ---------
     // | X | X |
@@ -493,15 +509,17 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Roughness map
   {
-    REQUIRE_FALSE(material.getRoughnessMap()->getImage().isEmpty());
+    const Raz::Texture& roughnessMap = material.getTexture("uniMaterial.roughnessMap");
 
-    CHECK(material.getRoughnessMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
-    CHECK(material.getRoughnessMap()->getImage().getWidth() == 2);
-    CHECK(material.getRoughnessMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(roughnessMap.getImage().isEmpty());
 
-    REQUIRE(material.getRoughnessMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(roughnessMap.getImage().getColorspace() == Raz::ImageColorspace::GRAY);
+    CHECK(roughnessMap.getImage().getWidth() == 2);
+    CHECK(roughnessMap.getImage().getHeight() == 2);
 
-    const auto* roughnessData = static_cast<const uint8_t*>(material.getRoughnessMap()->getImage().getDataPtr());
+    REQUIRE(roughnessMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* roughnessData = static_cast<const uint8_t*>(roughnessMap.getImage().getDataPtr());
 
     // ---------
     // |   |   |
@@ -517,15 +535,17 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Ambient occlusion map
   {
-    REQUIRE_FALSE(material.getAmbientOcclusionMap()->getImage().isEmpty());
+    const Raz::Texture& ambientOcclusionMap = material.getTexture("uniMaterial.ambientMap");
 
-    CHECK(material.getAmbientOcclusionMap()->getImage().getColorspace() == Raz::ImageColorspace::GRAY);
-    CHECK(material.getAmbientOcclusionMap()->getImage().getWidth() == 2);
-    CHECK(material.getAmbientOcclusionMap()->getImage().getHeight() == 2);
+    REQUIRE_FALSE(ambientOcclusionMap.getImage().isEmpty());
 
-    REQUIRE(material.getAmbientOcclusionMap()->getImage().getDataType() == Raz::ImageDataType::BYTE);
+    CHECK(ambientOcclusionMap.getImage().getColorspace() == Raz::ImageColorspace::GRAY);
+    CHECK(ambientOcclusionMap.getImage().getWidth() == 2);
+    CHECK(ambientOcclusionMap.getImage().getHeight() == 2);
 
-    const auto* ambientOccData = static_cast<const uint8_t*>(material.getAmbientOcclusionMap()->getImage().getDataPtr());
+    REQUIRE(ambientOcclusionMap.getImage().getDataType() == Raz::ImageDataType::BYTE);
+
+    const auto* ambientOccData = static_cast<const uint8_t*>(ambientOcclusionMap.getImage().getDataPtr());
 
     // ---------
     // | X |   |
@@ -592,13 +612,12 @@ TEST_CASE("ObjFormat save") {
 
     // A default Cook-Torrance material is added if none has been imported
     CHECK(meshRendererData.getMaterials().size() == 1);
-    CHECK(meshRendererData.getMaterials().front()->getType() == Raz::MaterialType::COOK_TORRANCE);
 
-    auto& material = static_cast<Raz::MaterialCookTorrance&>(*meshRendererData.getMaterials().front());
-    CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
-    CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(0.f, 0.f, 0.f)));
-    CHECK(material.getMetallicFactor() == 1.f);
-    CHECK(material.getRoughnessFactor() == 1.f);
+    const Raz::Material& material = meshRendererData.getMaterials().front();
+    CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor").strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
+    CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.emissive").strictlyEquals(Raz::Vec3f(0.f, 0.f, 0.f)));
+    CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 1.f);
+    CHECK(material.getAttribute<float>("uniMaterial.roughnessFactor") == 1.f);
   }
 
   const Raz::MeshRenderer meshRenderer = createMeshRenderer();
@@ -617,24 +636,20 @@ TEST_CASE("ObjFormat save") {
     CHECK(meshRendererData.getMaterials().size() == 2);
 
     {
-      CHECK(meshRendererData.getMaterials()[0]->getType() == Raz::MaterialType::COOK_TORRANCE);
-
-      auto& material = static_cast<Raz::MaterialCookTorrance&>(*meshRendererData.getMaterials()[0]);
-      CHECK(material.getBaseColor().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
-      CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
-      CHECK(material.getMetallicFactor() == 0.25f);
-      CHECK(material.getRoughnessFactor() == 0.75f);
+      const Raz::Material& material = meshRendererData.getMaterials()[0];
+      CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor").strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.emissive").strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
+      CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 0.25f);
+      CHECK(material.getAttribute<float>("uniMaterial.roughnessFactor") == 0.75f);
     }
 
     {
-      CHECK(meshRendererData.getMaterials()[1]->getType() == Raz::MaterialType::BLINN_PHONG);
-
-      auto& material = static_cast<Raz::MaterialBlinnPhong&>(*meshRendererData.getMaterials()[1]);
-      CHECK(material.getDiffuse().strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
-      CHECK(material.getEmissive().strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
-      CHECK(material.getAmbient().strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
-      CHECK(material.getSpecular().strictlyEquals(Raz::Vec3f(1.f, 0.f, 1.f)));
-      CHECK(material.getTransparency() == 0.5f);
+      const Raz::Material& material = meshRendererData.getMaterials()[1];
+      CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor").strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.emissive").strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
+      CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.ambient").strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
+      CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.specular").strictlyEquals(Raz::Vec3f(1.f, 0.f, 1.f)));
+      CHECK(material.getAttribute<float>("uniMaterial.transparency") == 0.5f);
     }
   }
 }

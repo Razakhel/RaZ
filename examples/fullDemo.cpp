@@ -269,9 +269,9 @@ int main() {
                       1.f, 16.f, 1.f);
 #endif
 
-  overlay.addSeparator();
+    overlay.addSeparator();
 
-  overlay.addTexture(meshRenderComp.getMaterials().front()->getTexture(0), 256, 256);
+    overlay.addTexture(meshRenderComp.getMaterials().front().getTexture(0), 256, 256);
 
     overlay.addSeparator();
 

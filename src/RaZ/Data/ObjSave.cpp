@@ -14,27 +14,39 @@ namespace Raz::ObjFormat {
 namespace {
 
 template <typename T, std::size_t Size = 1>
-inline void writeAttribute(std::ofstream& file, std::string_view tag, const Material& material, std::initializer_list<std::string_view> uniformNames) {
-  for (std::string_view uniformName : uniformNames) {
-    if (!material.hasAttribute(uniformName.data()))
-      continue;
-
-    file << '\t' << tag;
-
-    if constexpr (Size == 1) {
-      file << ' ' << material.getAttribute<T>(uniformName.data());
-    } else {
-      for (const T& value : material.getAttribute<Vector<T, Size>>(uniformName.data()).getData())
-        file << ' ' << value;
-    }
-
-    file << '\n';
-
+inline void writeAttribute(std::ofstream& file, std::string_view tag, const Material& material, std::string_view uniformName) {
+  if (!material.hasAttribute(uniformName.data()))
     return;
+
+  file << '\t' << tag;
+
+  if constexpr (Size == 1) {
+    file << ' ' << material.getAttribute<T>(uniformName.data());
+  } else {
+    for (const T& value : material.getAttribute<Vector<T, Size>>(uniformName.data()).getData())
+      file << ' ' << value;
   }
+
+  file << '\n';
 }
 
-void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materials) {
+inline void writeTexture(std::ofstream& file, std::string_view tag, const std::string& materialName, std::string_view suffix,
+                         const Material& material, std::string_view uniformName) {
+  if (!material.hasTexture(uniformName.data()))
+    return;
+
+  const Texture& texture = material.getTexture(uniformName.data());
+
+  if (texture.getImage().isEmpty())
+    return;
+
+  const std::string texturePath = materialName + '_' + suffix + ".png";
+
+  file << '\t' << tag << ' ' << texturePath << '\n';
+  ImageFormat::save(texturePath, texture.getImage(), true);
+}
+
+void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials) {
   std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
 
   mtlFile << "# MTL file created with RaZ - https://github.com/Razakhel/RaZ\n";
@@ -42,107 +54,28 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<MaterialPtr>& materi
   const std::string mtlFileName = mtlFilePath.recoverFileName(false).toUtf8();
 
   for (std::size_t matIndex = 0; matIndex < materials.size(); ++matIndex) {
-    const MaterialPtr& material    = materials[matIndex];
+    const Material& material       = materials[matIndex];
     const std::string materialName = mtlFileName + '_' + std::to_string(matIndex);
 
     mtlFile << "\nnewmtl " << materialName << '\n';
-    writeAttribute<float, 3>(mtlFile, "Kd", *material, { "uniMaterial.baseColor", "uniMaterial.diffuse" });
-    writeAttribute<float, 3>(mtlFile, "Ke", *material, { "uniMaterial.emissive" });
-    writeAttribute<float, 3>(mtlFile, "Ka", *material, { "uniMaterial.ambient" });
-    writeAttribute<float, 3>(mtlFile, "Ks", *material, { "uniMaterial.specular" });
-    writeAttribute<float>(mtlFile, "d", *material, { "uniMaterial.transparency" });
-    writeAttribute<float>(mtlFile, "Pm", *material, { "uniMaterial.metallicFactor" });
-    writeAttribute<float>(mtlFile, "Pr", *material, { "uniMaterial.roughnessFactor" });
 
-    if (material->getType() == MaterialType::COOK_TORRANCE) {
-      const auto* matCT = static_cast<MaterialCookTorrance*>(material.get());
+    writeAttribute<float, 3>(mtlFile, "Kd", material, "uniMaterial.baseColor");
+    writeAttribute<float, 3>(mtlFile, "Ke", material, "uniMaterial.emissive");
+    writeAttribute<float, 3>(mtlFile, "Ka", material, "uniMaterial.ambient");
+    writeAttribute<float, 3>(mtlFile, "Ks", material, "uniMaterial.specular");
+    writeAttribute<float, 1>(mtlFile, "d",  material, "uniMaterial.transparency");
+    writeAttribute<float, 1>(mtlFile, "Pm", material, "uniMaterial.metallicFactor");
+    writeAttribute<float, 1>(mtlFile, "Pr", material, "uniMaterial.roughnessFactor");
 
-      if (matCT->getAlbedoMap() && !matCT->getAlbedoMap()->getImage().isEmpty()) {
-        const auto albedoMapPath = materialName + "_albedo.png";
-
-        mtlFile << "\tmap_Kd " << albedoMapPath << '\n';
-        ImageFormat::save(albedoMapPath, matCT->getAlbedoMap()->getImage(), true);
-      }
-
-      if (matCT->getEmissiveMap() && !matCT->getEmissiveMap()->getImage().isEmpty()) {
-        const auto emissiveMapPath = materialName + "_emissive.png";
-
-        mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
-        ImageFormat::save(emissiveMapPath, matCT->getEmissiveMap()->getImage(), true);
-      }
-
-      if (matCT->getNormalMap() && !matCT->getNormalMap()->getImage().isEmpty()) {
-        const auto normalMapPath = materialName + "_normal.png";
-
-        mtlFile << "\tnorm " << normalMapPath << '\n';
-        ImageFormat::save(normalMapPath, matCT->getNormalMap()->getImage(), true);
-      }
-
-      if (matCT->getMetallicMap() && !matCT->getMetallicMap()->getImage().isEmpty()) {
-        const auto metallicMapPath = materialName + "_metallic.png";
-
-        mtlFile << "\tmap_Pm " << metallicMapPath << '\n';
-        ImageFormat::save(metallicMapPath, matCT->getMetallicMap()->getImage(), true);
-      }
-
-      if (matCT->getRoughnessMap() && !matCT->getRoughnessMap()->getImage().isEmpty()) {
-        const auto roughnessMapPath = materialName + "_roughness.png";
-
-        mtlFile << "\tmap_Pr " << roughnessMapPath << '\n';
-        ImageFormat::save(roughnessMapPath, matCT->getRoughnessMap()->getImage(), true);
-      }
-
-      if (matCT->getAmbientOcclusionMap() && !matCT->getAmbientOcclusionMap()->getImage().isEmpty()) {
-        const auto ambOccMapPath = materialName + "_ambient_occlusion.png";
-
-        mtlFile << "\tmap_Ka " << ambOccMapPath << '\n';
-        ImageFormat::save(ambOccMapPath, matCT->getAmbientOcclusionMap()->getImage(), true);
-      }
-    } else {
-      const auto* matBP = static_cast<MaterialBlinnPhong*>(material.get());
-
-      if (matBP->getDiffuseMap() && !matBP->getDiffuseMap()->getImage().isEmpty()) {
-        const auto diffuseMapPath = materialName + "_diffuse.png";
-
-        mtlFile << "\tmap_Kd " << diffuseMapPath << '\n';
-        ImageFormat::save(diffuseMapPath, matBP->getDiffuseMap()->getImage(), true);
-      }
-
-      if (matBP->getEmissiveMap() && !matBP->getEmissiveMap()->getImage().isEmpty()) {
-        const auto emissiveMapPath = materialName + "_emissive.png";
-
-        mtlFile << "\tmap_Ke " << emissiveMapPath << '\n';
-        ImageFormat::save(emissiveMapPath, matBP->getEmissiveMap()->getImage(), true);
-      }
-
-      if (matBP->getAmbientMap() && !matBP->getAmbientMap()->getImage().isEmpty()) {
-        const auto ambientMapPath = materialName + "_ambient.png";
-
-        mtlFile << "\tmap_Ka " << ambientMapPath << '\n';
-        ImageFormat::save(ambientMapPath, matBP->getAmbientMap()->getImage(), true);
-      }
-
-      if (matBP->getSpecularMap() && !matBP->getSpecularMap()->getImage().isEmpty()) {
-        const auto specularMapPath = materialName + "_specular.png";
-
-        mtlFile << "\tmap_Ks " << specularMapPath << '\n';
-        ImageFormat::save(specularMapPath, matBP->getSpecularMap()->getImage(), true);
-      }
-
-      if (matBP->getTransparencyMap() && !matBP->getTransparencyMap()->getImage().isEmpty()) {
-        const auto transparencyMapPath = materialName + "_transparency.png";
-
-        mtlFile << "\tmap_d " << transparencyMapPath << '\n';
-        ImageFormat::save(transparencyMapPath, matBP->getTransparencyMap()->getImage(), true);
-      }
-
-      if (matBP->getBumpMap() && !matBP->getBumpMap()->getImage().isEmpty()) {
-        const auto bumpMapPath = materialName + "_bump.png";
-
-        mtlFile << "\tmap_bump " << bumpMapPath << '\n';
-        ImageFormat::save(bumpMapPath, matBP->getBumpMap()->getImage(), true);
-      }
-    }
+    writeTexture(mtlFile, "map_Kd",   materialName, "baseColor",    material, "uniMaterial.baseColorMap");
+    writeTexture(mtlFile, "map_Ke",   materialName, "emissive",     material, "uniMaterial.emissiveMap");
+    writeTexture(mtlFile, "map_Ka",   materialName, "ambient",      material, "uniMaterial.ambientMap");
+    writeTexture(mtlFile, "map_Ks",   materialName, "specular",     material, "uniMaterial.specularMap");
+    writeTexture(mtlFile, "map_d",    materialName, "transparency", material, "uniMaterial.transparencyMap");
+    writeTexture(mtlFile, "map_bump", materialName, "bump",         material, "uniMaterial.bumpMap");
+    writeTexture(mtlFile, "norm",     materialName, "normal",       material, "uniMaterial.normalMap");
+    writeTexture(mtlFile, "map_Pm",   materialName, "metallic",     material, "uniMaterial.metallicMap");
+    writeTexture(mtlFile, "map_Pr",   materialName, "roughness",    material, "uniMaterial.roughnessMap");
   }
 }
 

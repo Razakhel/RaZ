@@ -9,13 +9,13 @@ struct Light {
 };
 
 struct Material {
-  vec3 diffuse;
+  vec3 baseColor;
   vec3 emissive;
   vec3 ambient;
   vec3 specular;
   float transparency;
 
-  sampler2D diffuseMap;
+  sampler2D baseColorMap;
   sampler2D emissiveMap;
   sampler2D ambientMap;
   sampler2D specularMap;
@@ -50,7 +50,7 @@ layout(location = 1) out vec3 bufferNormal;
 
 void main() {
   vec3 normal     = vertMeshInfo.vertTBNMatrix[2];
-  vec3 color      = texture(uniMaterial.diffuseMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.diffuse;
+  vec3 color      = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.baseColor;
   vec3 specFactor = texture(uniMaterial.specularMap, vertMeshInfo.vertTexcoords).r * uniMaterial.specular;
 
   vec3 ambient  = color * 0.05;

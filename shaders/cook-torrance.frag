@@ -15,12 +15,12 @@ struct Material {
   float metallicFactor;
   float roughnessFactor;
 
-  sampler2D albedoMap;
+  sampler2D baseColorMap;
   sampler2D emissiveMap;
   sampler2D normalMap;
   sampler2D metallicMap;
   sampler2D roughnessMap;
-  sampler2D ambientOcclusionMap;
+  sampler2D ambientMap; // Ambient occlusion
 };
 
 in struct MeshInfo {
@@ -91,10 +91,10 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 
 void main() {
   // Gamma correction for albedo (sRGB presumed)
-  vec3 albedo     = pow(texture(uniMaterial.albedoMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+  vec3 albedo     = pow(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
   float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
   float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
-  float ambOcc    = texture(uniMaterial.ambientOcclusionMap, vertMeshInfo.vertTexcoords).r;
+  float ambOcc    = texture(uniMaterial.ambientMap, vertMeshInfo.vertTexcoords).r;
 
   vec3 normal = texture(uniMaterial.normalMap, vertMeshInfo.vertTexcoords).rgb;
   normal      = normalize(normal * 2.0 - 1.0);

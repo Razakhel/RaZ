@@ -1,3 +1,4 @@
+#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
@@ -10,44 +11,44 @@ namespace Raz::FbxFormat {
 
 namespace {
 
-void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials, const FilePath& filePath) {
+void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, const FilePath& filePath) {
   for (int matIndex = 0; matIndex < scene->GetMaterialCount(); ++matIndex) {
     const fbxsdk::FbxSurfaceMaterial* fbxMaterial = scene->GetMaterial(matIndex);
-    auto material = MaterialBlinnPhong::create();
+    Material material;
 
     // Recovering properties
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& diffuse = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sDiffuse);
     if (diffuse.IsValid()) {
-      material->setDiffuse(Vec3f(static_cast<float>(diffuse.Get()[0]),
-                                 static_cast<float>(diffuse.Get()[1]),
-                                 static_cast<float>(diffuse.Get()[2])));
-    }
-
-    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& ambient = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sAmbient);
-    if (ambient.IsValid()) {
-      material->setAmbient(Vec3f(static_cast<float>(ambient.Get()[0]),
-                                 static_cast<float>(ambient.Get()[1]),
-                                 static_cast<float>(ambient.Get()[2])));
-    }
-
-    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& specular = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sSpecular);
-    if (specular.IsValid()) {
-      material->setSpecular(Vec3f(static_cast<float>(specular.Get()[0]),
-                                  static_cast<float>(specular.Get()[1]),
-                                  static_cast<float>(specular.Get()[2])));
+      material.setAttribute(Vec3f(static_cast<float>(diffuse.Get()[0]),
+                                  static_cast<float>(diffuse.Get()[1]),
+                                  static_cast<float>(diffuse.Get()[2])), "uniMaterial.baseColor");
     }
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& emissive = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sEmissive);
     if (emissive.IsValid()) {
-      material->setEmissive(Vec3f(static_cast<float>(emissive.Get()[0]),
+      material.setAttribute(Vec3f(static_cast<float>(emissive.Get()[0]),
                                   static_cast<float>(emissive.Get()[1]),
-                                  static_cast<float>(emissive.Get()[2])));
+                                  static_cast<float>(emissive.Get()[2])), "uniMaterial.emissive");
+    }
+
+    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& ambient = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sAmbient);
+    if (ambient.IsValid()) {
+      material.setAttribute(Vec3f(static_cast<float>(ambient.Get()[0]),
+                                  static_cast<float>(ambient.Get()[1]),
+                                  static_cast<float>(ambient.Get()[2])), "uniMaterial.ambient");
+    }
+
+    const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble3>& specular = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sSpecular);
+    if (specular.IsValid()) {
+      material.setAttribute(Vec3f(static_cast<float>(specular.Get()[0]),
+                                  static_cast<float>(specular.Get()[1]),
+                                  static_cast<float>(specular.Get()[2])), "uniMaterial.specular");
     }
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble>& transparency = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sTransparencyFactor);
     if (transparency.IsValid())
-      material->setTransparency(static_cast<float>(transparency.Get()));
+      material.setAttribute(static_cast<float>(transparency.Get()), "uniMaterial.transparency");
 
     // Recovering textures
 
@@ -58,7 +59,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string diffuseTexturePath = texturePath + diffuseTexture->GetRelativeFileName();
 
       try {
-        material->loadDiffuseMap(diffuseTexturePath);
+        material.setTexture(Texture::create(ImageFormat::load(diffuseTexturePath, true)), "uniMaterial.baseColorMap");
       } catch (...) {
         Logger::error("[FBX] Failed to load diffuse map '" + diffuseTexturePath + "'.");
       }
@@ -69,7 +70,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string emissiveTexturePath = texturePath + emissiveTexture->GetRelativeFileName();
 
       try {
-        material->loadEmissiveMap(emissiveTexturePath);
+        material.setTexture(Texture::create(ImageFormat::load(emissiveTexturePath, true)), "uniMaterial.emissiveMap");
       } catch (...) {
         Logger::error("[FBX] Failed to load emissive map '" + emissiveTexturePath + "'.");
       }
@@ -80,7 +81,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string ambientTexturePath = texturePath + ambientTexture->GetRelativeFileName();
 
       try {
-        material->loadAmbientMap(ambientTexturePath);
+        material.setTexture(Texture::create(ImageFormat::load(ambientTexturePath, true)), "uniMaterial.ambientMap");
       } catch (...) {
         Logger::error("[FBX] Failed to load ambient map '" + ambientTexturePath + "'.");
       }
@@ -91,7 +92,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
       const std::string specularTexturePath = texturePath + specularTexture->GetRelativeFileName();
 
       try {
-        material->loadSpecularMap(specularTexturePath);
+        material.setTexture(Texture::create(ImageFormat::load(specularTexturePath, true)), "uniMaterial.specularMap");
       } catch (...) {
         Logger::error("[FBX] Failed to load specular map '" + specularTexturePath + "'.");
       }
@@ -106,7 +107,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
         const std::string normalMapPath = texturePath + normalMap->GetRelativeFileName();
 
         try {
-          material->loadNormalMap(normalMapPath);
+          material.setTexture(Texture::create(ImageFormat::load(normalMapPath, true)), "uniMaterial.normalMap");
         } catch (...) {
           Logger::error("[FBX] Failed to load normal map '" + normalMapPath + "'.");
         }
@@ -114,6 +115,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<MaterialPtr>& materials,
     }
     */
 
+    material.loadType(MaterialType::BLINN_PHONG);
     materials.emplace_back(std::move(material));
   }
 }
