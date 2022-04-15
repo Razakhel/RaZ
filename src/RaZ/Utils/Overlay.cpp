@@ -11,6 +11,9 @@
 namespace Raz {
 
 void Overlay::initialize(GLFWwindow* windowHandle) const {
+  if (ImGui::GetCurrentContext() != nullptr)
+    return; // The overlay has already been initialized
+
   Logger::debug("[Overlay] Initializing...");
 
   IMGUI_CHECKVERSION();
@@ -54,6 +57,9 @@ void Overlay::render() const {
 }
 
 void Overlay::destroy() const {
+  if (ImGui::GetCurrentContext() == nullptr)
+    return; // The overlay has already been destroyed
+
   Logger::debug("[Overlay] Destroying...");
 
   ImGui_ImplOpenGL3_Shutdown();
