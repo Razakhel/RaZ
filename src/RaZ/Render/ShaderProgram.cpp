@@ -252,6 +252,20 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader,
   link();
 }
 
+RenderShaderProgram RenderShaderProgram::clone() const {
+  RenderShaderProgram program;
+
+  program.setVertexShader(m_vertShader.clone());
+  if (m_tessCtrlShader) program.setTessellationControlShader(m_tessCtrlShader->clone());
+  if (m_tessEvalShader) program.setTessellationEvaluationShader(m_tessEvalShader->clone());
+  if (m_geomShader) program.setGeometryShader(m_geomShader->clone());
+  program.setFragmentShader(m_fragShader.clone());
+
+  program.link();
+
+  return program;
+}
+
 void RenderShaderProgram::loadShaders() const {
   Logger::debug("[RenderShaderProgram] Loading shaders...");
 
@@ -325,6 +339,12 @@ void ComputeShaderProgram::setShader(ComputeShader&& compShader) {
   Renderer::attachShader(m_index, m_compShader.getIndex());
 
   link();
+}
+
+ComputeShaderProgram ComputeShaderProgram::clone() const {
+  ComputeShaderProgram program;
+  program.setShader(m_compShader.clone());
+  return program;
 }
 
 void ComputeShaderProgram::loadShaders() const {

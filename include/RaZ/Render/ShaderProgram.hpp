@@ -209,6 +209,7 @@ public:
                   TessellationEvaluationShader&& tessEvalShader,
                   FragmentShader&& fragShader);
 
+  RenderShaderProgram clone() const;
   /// Loads all the shaders contained by the program.
   void loadShaders() const override;
   /// Compiles all the shaders contained by the program.
@@ -241,6 +242,7 @@ public:
 
   void setShader(ComputeShader&& compShader);
 
+  ComputeShaderProgram clone() const;
   /// Loads the compute shader contained by the program.
   void loadShaders() const override;
   /// Compiles the compute shader contained by the program.
