@@ -9,7 +9,7 @@ namespace Raz {
 
 namespace {
 
-inline const MeshRenderer& getDisplaySurface() {
+inline void drawDisplaySurface() {
   // Creating a triangle large enough to cover the whole render frame:
   //
   //   3 | \                                3 | \
@@ -23,9 +23,31 @@ inline const MeshRenderer& getDisplaySurface() {
   //  -1 -------------------------         -1 -------------
   //    -1     0     1     2     3           -1  0  1  2  3
 
-  static const MeshRenderer surface(Mesh(Triangle(Vec3f(-1.f, -1.f, 0.f), Vec3f(3.f, -1.f, 0.f), Vec3f(-1.f, 3.f, 0.f)),
-                                         Vec2f(0.f, 0.f), Vec2f(2.f, 0.f), Vec2f(0.f, 2.f)));
-  return surface;
+  static const std::pair<VertexArray, VertexBuffer> vertexObjects = [] () {
+    VertexArray vao;
+    VertexBuffer vbo;
+
+    vao.bind();
+    vbo.bind();
+
+    static constexpr std::array<Vec2f, 6> vertices =  { Vec2f(-1.f, -1.f), Vec2f(0.f, 0.f),
+                                                        Vec2f( 3.f, -1.f), Vec2f(2.f, 0.f),
+                                                        Vec2f(-1.f,  3.f), Vec2f(0.f, 2.f) };
+    Renderer::sendBufferData(BufferType::ARRAY_BUFFER, static_cast<std::ptrdiff_t>(sizeof(Vec2f) * 12), vertices.data(), BufferDataUsage::STATIC_DRAW);
+
+    Renderer::setVertexAttrib(0, AttribDataType::FLOAT, 2, sizeof(Vec2f) * 2, 0); // Position
+    Renderer::setVertexAttrib(1, AttribDataType::FLOAT, 2, sizeof(Vec2f) * 2, sizeof(Vec2f)); // Texcoords
+    Renderer::enableVertexAttribArray(0);
+    Renderer::enableVertexAttribArray(1);
+
+    vbo.unbind();
+    vao.unbind();
+
+    return std::make_pair(std::move(vao), std::move(vbo));
+  }();
+
+  vertexObjects.first.bind();
+  Renderer::drawArrays(PrimitiveType::TRIANGLES, 3);
 }
 
 } // namespace
@@ -129,7 +151,7 @@ void Framebuffer::unbind() const {
 
 void Framebuffer::display() const {
   Renderer::clear(MaskType::COLOR);
-  getDisplaySurface().draw();
+  drawDisplaySurface();
 }
 
 Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
