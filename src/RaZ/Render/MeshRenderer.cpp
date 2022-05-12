@@ -33,12 +33,14 @@ void MeshRenderer::setRenderMode(RenderMode renderMode, const Mesh& mesh) {
     m_submeshRenderers[i].setRenderMode(renderMode, mesh.getSubmeshes()[i]);
 }
 
-void MeshRenderer::setMaterial(Material&& material) {
+Material& MeshRenderer::setMaterial(Material&& material) {
   m_materials.clear();
   m_materials.emplace_back(std::move(material));
 
   for (SubmeshRenderer& submeshRenderer : m_submeshRenderers)
     submeshRenderer.setMaterialIndex(0);
+
+  return m_materials.front();
 }
 
 void MeshRenderer::removeMaterial(std::size_t materialIndex) {

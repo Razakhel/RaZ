@@ -47,7 +47,8 @@ public:
   /// Sets one unique material for the whole mesh.
   /// \warning This clears all previously existing materials.
   /// \param material Material to be set.
-  void setMaterial(Material&& material);
+  /// \return Reference to the set material.
+  Material& setMaterial(Material&& material);
   /// Adds a given material into the mesh renderer.
   /// \note This doesn't apply the material to any submesh; to do so, manually set the corresponding material index to any submesh renderer.
   /// \param material Material to be added.
