@@ -22,9 +22,6 @@
 *.out
 *.app
 
-# Embeddable shaders
-shaders/embed/
-
 # Build folders
 *build*/
 
