@@ -15,7 +15,7 @@ TEST_CASE("Sound initialization") {
 
 TEST_CASE("Sound move") {
   Raz::AudioSystem audio;
-  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
+  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
 
   const unsigned int bufferIndex = sound.getBufferIndex();
   constexpr float pitch = 0.123f;
@@ -58,7 +58,7 @@ TEST_CASE("Sound move") {
 }
 
 TEST_CASE("Sound WAV import") {
-  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
+  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
 
   CHECK(sound.getFormat() == Raz::SoundFormat::MONO_I16);
   CHECK(sound.getFrequency() == 48000);
@@ -66,7 +66,7 @@ TEST_CASE("Sound WAV import") {
 
 TEST_CASE("Sound operations") {
   Raz::AudioSystem audio;
-  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT + "assets/sounds/notif_ting.wav"s);
+  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
   sound.setGain(0.f); // Nobody wants his ears assaulted by a wild sound when launching tests
 
   sound.play();

@@ -7,14 +7,14 @@
 namespace {
 
 const std::string fileName = "ͳεs†_fílè_测试.τxt";
-const Raz::FilePath filePath(RAZ_TESTS_ROOT + "assets/misc/"s + fileName);
+const Raz::FilePath filePath(RAZ_TESTS_ROOT "assets/misc/" + fileName);
 
 } // namespace
 
 TEST_CASE("FilePath constructors") {
   const Raz::FilePath pathChar("spêçïàl/fílè/paτh");
-  const Raz::FilePath pathString("spêçïàl/fílè/paτh"s);
-  const Raz::FilePath pathStringView("spêçïàl/fílè/paτh"sv);
+  const Raz::FilePath pathString(std::string("spêçïàl/fílè/paτh"));
+  const Raz::FilePath pathStringView(std::string_view("spêçïàl/fílè/paτh"));
 
   CHECK(pathChar == pathString);
   CHECK(pathString == pathStringView);
@@ -99,7 +99,7 @@ TEST_CASE("FilePath concatenation") {
 }
 
 TEST_CASE("FilePath utilities") {
-  CHECK(filePath.recoverPathToFile() == (RAZ_TESTS_ROOT + "assets/misc/"s));
+  CHECK(filePath.recoverPathToFile() == (RAZ_TESTS_ROOT "assets/misc/"));
   CHECK(filePath.recoverFileName(/* true */) == "ͳεs†_fílè_测试.τxt");
   CHECK(filePath.recoverFileName(false) == "ͳεs†_fílè_测试");
   CHECK(filePath.recoverExtension() == "τxt");

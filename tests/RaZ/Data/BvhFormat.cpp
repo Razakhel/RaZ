@@ -5,8 +5,8 @@
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
-TEST_CASE("BVH import") {
-  const Raz::Skeleton skeleton = Raz::BvhFormat::load(RAZ_TESTS_ROOT + "assets/animation/ànîm.bvh"s);
+TEST_CASE("BvhFormat load") {
+  const Raz::Skeleton skeleton = Raz::BvhFormat::load(RAZ_TESTS_ROOT "assets/animation/ànîm.bvh");
 
   CHECK(skeleton.getNodeCount() == 5);
   CHECK(skeleton.getNode(0).getTranslation() == Raz::Vec3f(1.f, 2.f, 3.f));
