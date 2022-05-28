@@ -131,6 +131,11 @@ private:
 template <typename T>
 Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat);
 
+// Deduction guides
+
+template <typename T>
+Quaternion(Degrees<T>, ...) -> Quaternion<T>;
+
 // Aliases
 
 using Quaternionf = Quaternion<float>;

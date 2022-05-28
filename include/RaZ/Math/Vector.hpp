@@ -242,9 +242,10 @@ constexpr Vector<T, Size> operator+(T val, const Vector<T, Size>& vec) noexcept 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> operator*(T val, const Vector<T, Size>& vec) noexcept { return vec * val; }
 
-// Deduction guide, to automatically deduce the vector's type & size from the given arguments
+// Deduction guides
+
 template <typename T, typename... Args>
-Vector(T&&, Args&&... args) -> Vector<std::decay_t<T>, sizeof...(args) + 1>;
+Vector(T, Args... args) -> Vector<T, sizeof...(args) + 1>;
 
 // Aliases
 

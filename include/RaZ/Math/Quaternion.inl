@@ -126,7 +126,7 @@ constexpr Vec3<T> Quaternion<T>::operator*(const Vec3<T>& vec) const noexcept {
   // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
   // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
 
-  Quaternion vecQuat(0.f, vec.x(), vec.y(), vec.z());
+  Quaternion<T> vecQuat(0.f, vec.x(), vec.y(), vec.z());
   vecQuat = *this * vecQuat * conjugate();
   return vecQuat.m_complexes;
 }
@@ -178,10 +178,10 @@ std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat) {
 
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T currCoeff, T otherCoeff) const noexcept {
-  return Quaternion(m_real          * currCoeff + quat.m_real          * otherCoeff,
-                    m_complexes.x() * currCoeff + quat.m_complexes.x() * otherCoeff,
-                    m_complexes.y() * currCoeff + quat.m_complexes.y() * otherCoeff,
-                    m_complexes.z() * currCoeff + quat.m_complexes.z() * otherCoeff);
+  return Quaternion<T>(m_real          * currCoeff + quat.m_real          * otherCoeff,
+                       m_complexes.x() * currCoeff + quat.m_complexes.x() * otherCoeff,
+                       m_complexes.y() * currCoeff + quat.m_complexes.y() * otherCoeff,
+                       m_complexes.z() * currCoeff + quat.m_complexes.z() * otherCoeff);
 }
 
 template <typename T>
@@ -190,7 +190,7 @@ Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat) {
   // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
   // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
 
-  Quaternion vecQuat(0.f, vec.x(), vec.y(), vec.z());
+  Quaternion<T> vecQuat(0.f, vec.x(), vec.y(), vec.z());
   vecQuat = quat.conjugate() * vecQuat * quat;
   return Vec3<T>(vecQuat.x(), vecQuat.y(), vecQuat.z());
 }

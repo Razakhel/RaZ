@@ -12,6 +12,16 @@ const Raz::Quaternionf quat3(180_deg, 1.f, -2.f, 5.f);
 
 } // namespace
 
+TEST_CASE("Quaternion deduction guides") {
+  const Raz::Quaternion quatfVal(1.f, 1.f, 1.f, 1.f);
+  const Raz::Quaternion quatfDeg(Raz::Degrees(0.f), Raz::Axis::X);
+  const Raz::Quaternion quatdRad(Raz::Radians(0.0), 1.0, 0.0, 0.0);
+
+  CHECK(std::is_same_v<std::decay_t<decltype(quatfVal)>, Raz::Quaternionf>);
+  CHECK(std::is_same_v<std::decay_t<decltype(quatfDeg)>, Raz::Quaternionf>);
+  CHECK(std::is_same_v<std::decay_t<decltype(quatdRad)>, Raz::Quaterniond>);
+}
+
 TEST_CASE("Quaternion dot product") {
   const Raz::Quaternionf normedQuat1 = quat1.normalize();
   const Raz::Quaternionf normedQuat2 = quat2.normalize();

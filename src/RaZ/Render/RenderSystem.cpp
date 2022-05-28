@@ -73,19 +73,19 @@ void RenderSystem::sendCameraMatrices() const {
 
 void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) const {
   const auto& light = entity.getComponent<Light>();
-  const unsigned int dataStride = sizeof(Vec4f) * 4 * lightIndex;
+  const std::size_t dataStride = sizeof(Vec4f) * 4 * lightIndex;
 
   if (light.getType() == LightType::DIRECTIONAL) {
-    m_lightsUbo.sendData(Vec4f(0.f), dataStride);
+    m_lightsUbo.sendData(Vec4f(0.f), static_cast<unsigned int>(dataStride));
   } else {
     assert("Error: A non-directional light needs to have a Transform component." && entity.hasComponent<Transform>());
-    m_lightsUbo.sendData(Vec4f(entity.getComponent<Transform>().getPosition(), 1.f), dataStride);
+    m_lightsUbo.sendData(Vec4f(entity.getComponent<Transform>().getPosition(), 1.f), static_cast<unsigned int>(dataStride));
   }
 
-  m_lightsUbo.sendData(light.getDirection(), dataStride + sizeof(Vec4f));
-  m_lightsUbo.sendData(light.getColor(), dataStride + sizeof(Vec4f) * 2);
-  m_lightsUbo.sendData(light.getEnergy(), dataStride + sizeof(Vec4f) * 3);
-  m_lightsUbo.sendData(light.getAngle().value, dataStride + sizeof(Vec4f) * 3 + sizeof(float));
+  m_lightsUbo.sendData(light.getDirection(), static_cast<unsigned int>(dataStride + sizeof(Vec4f)));
+  m_lightsUbo.sendData(light.getColor(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 2));
+  m_lightsUbo.sendData(light.getEnergy(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3));
+  m_lightsUbo.sendData(light.getAngle().value, static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3 + sizeof(float)));
 }
 
 void RenderSystem::updateLights() const {

@@ -93,6 +93,8 @@ struct Degrees {
   T value;
 };
 
+// Aliases
+
 using Degreesf  = Degrees<float>;
 using Degreesd  = Degrees<double>;
 using Degreesld = Degrees<long double>;
@@ -178,6 +180,8 @@ struct Radians {
 
   T value;
 };
+
+// Aliases
 
 using Radiansf  = Radians<float>;
 using Radiansd  = Radians<double>;
