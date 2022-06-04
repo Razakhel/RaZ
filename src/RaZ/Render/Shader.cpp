@@ -5,6 +5,7 @@
 #include "RaZ/Utils/StrUtils.hpp"
 
 #include <limits>
+#include <utility>
 
 namespace Raz {
 

@@ -1,6 +1,8 @@
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include <utility>
+
 namespace Raz {
 
 UniformBuffer::UniformBuffer() {

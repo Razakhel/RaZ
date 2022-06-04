@@ -69,7 +69,7 @@ Window::Window(unsigned int width, unsigned int height,
     { 4, 2 },
     { 4, 1 },
     { 4, 0 },
-    { 3, 3 },
+    { 3, 3 }
   }};
 
   for (auto [major, minor] : glVersions) {
@@ -82,8 +82,7 @@ Window::Window(unsigned int width, unsigned int height,
       break;
 
     if (glfwGetError(nullptr) == GLFW_VERSION_UNAVAILABLE) {
-      // GLFW's debug callback has already output an error message saying that the driver does not support the required version
-      Logger::error("[Window] Attempting to fallback to a lower version.");
+      Logger::error("[Window] OpenGL " + std::to_string(major) + '.' + std::to_string(minor) + " unsupported; attempting to fallback to a lower version.");
       continue;
     }
 

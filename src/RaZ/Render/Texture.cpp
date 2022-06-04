@@ -3,6 +3,8 @@
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include <utility>
+
 namespace Raz {
 
 namespace {

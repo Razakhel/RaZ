@@ -1,9 +1,10 @@
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
-#include "RaZ/Utils/StrUtils.hpp"
 
 #include <AL/al.h>
+
+#include <utility>
 
 namespace Raz {
 

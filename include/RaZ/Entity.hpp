@@ -65,9 +65,9 @@ public:
   /// Changes the entity's enabled state.
   /// Enables or disables the entity according to the given parameter.
   /// \param enabled True if the entity should be enabled, false if it should be disabled.
-  void enable(bool enabled = true) { m_enabled = enabled; }
+  void enable(bool enabled = true) noexcept { m_enabled = enabled; }
   /// Disables the entity.
-  void disable() { enable(false); }
+  void disable() noexcept { enable(false); }
 
   Entity& operator=(const Entity&) = delete;
   Entity& operator=(Entity&&) noexcept = delete;

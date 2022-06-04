@@ -2,7 +2,7 @@
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <array>
+#include <utility>
 
 namespace Raz {
 

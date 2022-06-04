@@ -2,6 +2,8 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include <utility>
+
 namespace Raz {
 
 VertexArray::VertexArray() {
