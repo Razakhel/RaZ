@@ -101,9 +101,7 @@ void parallelize(const ContainerT& collection, FuncT&& action, unsigned int thre
 /// \param collection Collection to iterate over on multiple threads.
 /// \param action Action to be performed by each thread, giving an iterator range as boundaries.
 /// \param threadCount Amount of threads to start an instance on.
-template <typename ContainerT,
-          typename FuncT,
-          typename = std::enable_if_t<std::is_invocable_v<FuncT, IterRange<ContainerT>>>>
+template <typename ContainerT, typename FuncT, typename = std::enable_if_t<std::is_invocable_v<FuncT, IterRange<ContainerT>>>>
 void parallelize(ContainerT& collection, FuncT&& action, unsigned int threadCount = getSystemThreadCount());
 
 } // namespace Threading

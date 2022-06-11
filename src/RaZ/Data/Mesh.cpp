@@ -8,6 +8,7 @@ namespace Raz {
 Mesh::Mesh(const Plane& plane, float width, float depth) {
   const float height = plane.computeCentroid().y();
 
+  // TODO: creating a Mesh from a Plane doesn't take the normal into account for the vertices' position
   const Vec3f firstPos(-width, height, depth);
   const Vec3f secondPos(width, height, depth);
   const Vec3f thirdPos(width, height, -depth);
