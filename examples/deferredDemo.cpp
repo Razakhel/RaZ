@@ -45,13 +45,14 @@ constexpr std::string_view geomFragSource = R"(
     vec3 emissive   = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
     float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
     float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
+    float ambOcc    = texture(uniMaterial.ambientMap, vertMeshInfo.vertTexcoords).r;
 
     vec3 normal = texture(uniMaterial.normalMap, vertMeshInfo.vertTexcoords).rgb;
     normal      = normalize(normal * 2.0 - 1.0);
     normal      = normalize(vertMeshInfo.vertTBNMatrix * normal);
 
     // Using the emissive (which will always be 0 here) to avoid many warnings about unrecognized uniform names
-    fragColor  = vec4(albedo + emissive, metallic);
+    fragColor  = vec4(albedo + (ambOcc - 1.0) + emissive, metallic);
     fragNormal = vec4(normal, roughness);
   }
 )";
@@ -71,7 +72,9 @@ constexpr std::string_view displayFragSource = R"(
 
   void main() {
     float depth      = texture(uniSceneBuffers.depth, fragTexcoords).r;
-    vec4 color       = texture(uniSceneBuffers.color, fragTexcoords).rgba;
+    vec4 colorMetal  = texture(uniSceneBuffers.color, fragTexcoords).rgba;
+    vec3 color       = colorMetal.rgb;
+    float metalness  = colorMetal.a;
     vec4 normalRough = texture(uniSceneBuffers.normal, fragTexcoords).rgba;
     vec3 normal      = normalRough.rgb;
     float roughness  = normalRough.a;
@@ -83,9 +86,9 @@ constexpr std::string_view displayFragSource = R"(
         fragColor = vec4(normal, 1.0);
     } else {
       if (int(gl_FragCoord.x) < 640)
-        fragColor = vec4(vec3(roughness), 1.0);
+        fragColor = vec4(1.0, metalness, roughness, 1.0);
       else
-        fragColor = color;
+        fragColor = vec4(color, 1.0);
     }
   }
 )";
@@ -139,11 +142,12 @@ int main() {
     //////////
 
     // Importing the mesh & transforming it so that it can be fully visible
-    Raz::Entity& mesh = world.addEntity();
+    Raz::Entity& mesh  = world.addEntity();
+    auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj").second);
 
-    auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj");
-    mesh.addComponent<Raz::Mesh>(std::move(meshData));
-    mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
+    Raz::RenderShaderProgram& shaderProgram = meshRenderer.getMaterials().front().getProgram();
+    shaderProgram.setFragmentShader(Raz::FragmentShader::loadFromSource(geomFragSource));
+    shaderProgram.link();
 
     auto& meshTrans = mesh.addComponent<Raz::Transform>();
     meshTrans.scale(0.2f);
