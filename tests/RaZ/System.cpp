@@ -26,7 +26,7 @@ TEST_CASE("System basic") {
   if (!(mesh->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
     testSystem.linkEntity(mesh);
 
-  CHECK_FALSE(testSystem.containsEntity(mesh));
+  CHECK_FALSE(testSystem.containsEntity(*mesh));
 
   Raz::EntityPtr transform = Raz::Entity::create(1);
   transform->addComponent<Raz::Transform>();
@@ -34,7 +34,7 @@ TEST_CASE("System basic") {
   if (!(transform->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
     testSystem.linkEntity(transform);
 
-  CHECK(testSystem.containsEntity(transform));
+  CHECK(testSystem.containsEntity(*transform));
 
   // Removing our Transform component, the entity shouldn't be processed by the system anymore
   transform->removeComponent<Raz::Transform>();
@@ -43,7 +43,7 @@ TEST_CASE("System basic") {
   if ((transform->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
     testSystem.unlinkEntity(transform);
 
-  CHECK_FALSE(testSystem.containsEntity(transform));
+  CHECK_FALSE(testSystem.containsEntity(*transform));
 
   // Creating an entity without components
   const Raz::EntityPtr emptyEntity = Raz::Entity::create(2);
@@ -52,5 +52,5 @@ TEST_CASE("System basic") {
   if (!(emptyEntity->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
     testSystem.linkEntity(emptyEntity);
 
-  CHECK_FALSE(testSystem.containsEntity(emptyEntity));
+  CHECK_FALSE(testSystem.containsEntity(*emptyEntity));
 }

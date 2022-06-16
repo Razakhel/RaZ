@@ -62,7 +62,7 @@ void World::refresh() {
 
       // If the system doesn't contain the entity, check if it should (possesses the accepted components); if yes, link it
       // Else, if the system contains the entity but shouldn't, unlink it
-      if (!system->containsEntity(entity)) {
+      if (!system->containsEntity(*entity)) {
         if (!matchingComponents.isEmpty())
           system->linkEntity(entity);
       } else {
