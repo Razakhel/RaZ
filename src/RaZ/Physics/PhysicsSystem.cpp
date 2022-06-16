@@ -50,10 +50,12 @@ void PhysicsSystem::solveConstraints() {
       continue;
 
     auto& rigidBody = entity->getComponent<RigidBody>();
-    auto& transform = entity->getComponent<Transform>();
+
+    if (rigidBody.getMass() <= 0.f)
+      continue;
 
     const Vec3f velocity    = rigidBody.getVelocity();
-    const Vec3f velocityDir = velocity.normalize();
+    const Vec3f velocityDir = (velocity.computeSquaredLength() != 0.f ? velocity.normalize() : Vec3f(0.f));
 
     for (Entity* collidableEntity : m_entities) {
       if (collidableEntity == entity || !collidableEntity->isEnabled() || !collidableEntity->hasComponent<Collider>())
@@ -67,6 +69,8 @@ void PhysicsSystem::solveConstraints() {
       // The test shapes/rays must thus be translated into that space
       const Vec3f colliderPos   = collidableEntity->getComponent<Transform>().getPosition();
       const Vec3f localStartPos = rigidBody.m_oldPosition - colliderPos;
+
+      auto& transform = entity->getComponent<Transform>();
 
       // We first try to determine if the last movement gave an intersection
       // This is necessary in case our object has travelled too fast right through the collider,
