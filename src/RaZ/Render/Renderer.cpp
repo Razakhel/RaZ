@@ -1201,6 +1201,14 @@ void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
   printConditionalErrors();
 }
 
+void Renderer::setReadBuffer(ReadBuffer buffer) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glReadBuffer(static_cast<unsigned int>(buffer));
+
+  printConditionalErrors();
+}
+
 void Renderer::setDrawBuffers(unsigned int count, const DrawBuffer* buffers) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

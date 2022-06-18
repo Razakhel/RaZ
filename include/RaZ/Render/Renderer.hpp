@@ -628,26 +628,50 @@ enum class FramebufferAttachment : unsigned int {
   COLOR7 = 36071 /* GL_COLOR_ATTACHMENT7 */  ///< Color attachment 7.
 };
 
-enum class DrawBuffer : unsigned int {
-  NONE = 0 /* GL_NONE */, ///<
+enum class ReadBuffer : unsigned int {
+  NONE = 0    /* GL_NONE */, ///<
+  BACK = 1029 /* GL_BACK */, ///<
 
 #if !defined(USE_OPENGL_ES)
+  FRONT       = 1028 /* GL_FRONT       */, ///<
+  LEFT        = 1030 /* GL_LEFT        */, ///<
+  RIGHT       = 1031 /* GL_RIGHT       */, ///<
   FRONT_LEFT  = 1024 /* GL_FRONT_LEFT  */, ///<
   FRONT_RIGHT = 1025 /* GL_FRONT_RIGHT */, ///<
   BACK_LEFT   = 1026 /* GL_BACK_LEFT   */, ///<
   BACK_RIGHT  = 1027 /* GL_BACK_RIGHT  */, ///<
-#else
-  BACK        = 1029 /* GL_BACK        */, ///<
 #endif
 
-  COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0), ///<
-  COLOR_ATTACHMENT1 = static_cast<unsigned int>(FramebufferAttachment::COLOR1), ///<
-  COLOR_ATTACHMENT2 = static_cast<unsigned int>(FramebufferAttachment::COLOR2), ///<
-  COLOR_ATTACHMENT3 = static_cast<unsigned int>(FramebufferAttachment::COLOR3), ///<
-  COLOR_ATTACHMENT4 = static_cast<unsigned int>(FramebufferAttachment::COLOR4), ///<
-  COLOR_ATTACHMENT5 = static_cast<unsigned int>(FramebufferAttachment::COLOR5), ///<
-  COLOR_ATTACHMENT6 = static_cast<unsigned int>(FramebufferAttachment::COLOR6), ///<
-  COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)  ///<
+  COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0), ///< Color attachment 0.
+  COLOR_ATTACHMENT1 = static_cast<unsigned int>(FramebufferAttachment::COLOR1), ///< Color attachment 1.
+  COLOR_ATTACHMENT2 = static_cast<unsigned int>(FramebufferAttachment::COLOR2), ///< Color attachment 2.
+  COLOR_ATTACHMENT3 = static_cast<unsigned int>(FramebufferAttachment::COLOR3), ///< Color attachment 3.
+  COLOR_ATTACHMENT4 = static_cast<unsigned int>(FramebufferAttachment::COLOR4), ///< Color attachment 4.
+  COLOR_ATTACHMENT5 = static_cast<unsigned int>(FramebufferAttachment::COLOR5), ///< Color attachment 5.
+  COLOR_ATTACHMENT6 = static_cast<unsigned int>(FramebufferAttachment::COLOR6), ///< Color attachment 6.
+  COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)  ///< Color attachment 7.
+};
+
+enum class DrawBuffer : unsigned int {
+  NONE = static_cast<unsigned int>(ReadBuffer::NONE), ///<
+
+#if !defined(USE_OPENGL_ES)
+  FRONT_LEFT  = static_cast<unsigned int>(ReadBuffer::FRONT_LEFT),  ///<
+  FRONT_RIGHT = static_cast<unsigned int>(ReadBuffer::FRONT_RIGHT), ///<
+  BACK_LEFT   = static_cast<unsigned int>(ReadBuffer::BACK_LEFT),   ///<
+  BACK_RIGHT  = static_cast<unsigned int>(ReadBuffer::BACK_RIGHT),  ///<
+#else
+  BACK = static_cast<unsigned int>(ReadBuffer::BACK), ///<
+#endif
+
+  COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0), ///< Color attachment 0.
+  COLOR_ATTACHMENT1 = static_cast<unsigned int>(FramebufferAttachment::COLOR1), ///< Color attachment 1.
+  COLOR_ATTACHMENT2 = static_cast<unsigned int>(FramebufferAttachment::COLOR2), ///< Color attachment 2.
+  COLOR_ATTACHMENT3 = static_cast<unsigned int>(FramebufferAttachment::COLOR3), ///< Color attachment 3.
+  COLOR_ATTACHMENT4 = static_cast<unsigned int>(FramebufferAttachment::COLOR4), ///< Color attachment 4.
+  COLOR_ATTACHMENT5 = static_cast<unsigned int>(FramebufferAttachment::COLOR5), ///< Color attachment 5.
+  COLOR_ATTACHMENT6 = static_cast<unsigned int>(FramebufferAttachment::COLOR6), ///< Color attachment 6.
+  COLOR_ATTACHMENT7 = static_cast<unsigned int>(FramebufferAttachment::COLOR7)  ///< Color attachment 7.
 };
 
 enum class BlitFilter : unsigned int {
@@ -1097,6 +1121,7 @@ public:
   static void setFramebufferTexture2D(FramebufferAttachment attachment,
                                       TextureType textureType, unsigned int textureIndex, int mipmapLevel,
                                       FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static void setReadBuffer(ReadBuffer buffer);
   static void setDrawBuffers(unsigned int count, const DrawBuffer* buffers);
   template <std::size_t N> static void setDrawBuffers(DrawBuffer (&buffers)[N]) { setDrawBuffers(N, buffers); }
   static void blitFramebuffer(int readMinX, int readMinY, int readMaxX, int readMaxY,
