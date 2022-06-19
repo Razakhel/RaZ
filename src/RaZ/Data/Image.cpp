@@ -1,23 +1,29 @@
 #include "RaZ/Data/Image.hpp"
-#include "RaZ/Utils/FilePath.hpp"
-#include "RaZ/Utils/Logger.hpp"
-#include "RaZ/Utils/StrUtils.hpp"
 
 #include <cassert>
-#include <fstream>
 
 namespace Raz {
 
 bool ImageDataB::operator==(const ImageData& imgData) const {
   assert("Error: Image data equality check requires having data of the same type." && imgData.getDataType() == ImageDataType::BYTE);
 
-  return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataB*>(&imgData)->data.cbegin());
+  const auto& imgDataB = static_cast<const ImageDataB&>(imgData);
+
+  if (data.size() != imgDataB.data.size())
+    return false;
+
+  return std::equal(data.cbegin(), data.cend(), imgDataB.data.cbegin());
 }
 
 bool ImageDataF::operator==(const ImageData& imgData) const {
   assert("Error: Image data equality check requires having data of the same type." && imgData.getDataType() == ImageDataType::FLOAT);
 
-  return std::equal(data.cbegin(), data.cend(), static_cast<const ImageDataF*>(&imgData)->data.cbegin());
+  const auto& imgDataF = static_cast<const ImageDataF&>(imgData);
+
+  if (data.size() != imgDataF.data.size())
+    return false;
+
+  return std::equal(data.cbegin(), data.cend(), imgDataF.data.cbegin());
 }
 
 Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{ colorspace }, m_dataType{ dataType } {
