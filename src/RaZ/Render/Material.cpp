@@ -147,6 +147,9 @@ void Material::loadType(MaterialType type) {
 }
 
 void Material::sendAttributes() const {
+  if (m_attributes.empty())
+    return;
+
   m_program.use();
 
   for (const auto& [name, attrib] : m_attributes)
@@ -154,6 +157,9 @@ void Material::sendAttributes() const {
 }
 
 void Material::initTextures() const {
+  if (m_textures.empty())
+    return;
+
   m_program.use();
 
   // TODO: binding indices should be user-definable to allow the same texture to be bound to multiple uniforms

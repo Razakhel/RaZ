@@ -29,7 +29,7 @@ constexpr std::string_view vertSource = R"(
   void main() {
     fragTexcoords = vertPosition;
 
-    vec4 pos = uniProjectionMat * mat4(mat3(uniViewMat)) * vec4(vertPosition, 1.0);
+    vec4 pos    = uniProjectionMat * mat4(mat3(uniViewMat)) * vec4(vertPosition, 1.0);
     gl_Position = pos.xyww;
   }
 )";
@@ -54,7 +54,7 @@ inline const MeshRenderer& getDisplayCube() {
     meshRenderer.setMaterial(Material());
 
     RenderShaderProgram& program = meshRenderer.getMaterials().front().getProgram();
-    meshRenderer.getMaterials().front().getProgram().setShaders(VertexShader::loadFromSource(vertSource), FragmentShader::loadFromSource(fragSource));
+    program.setShaders(VertexShader::loadFromSource(vertSource), FragmentShader::loadFromSource(fragSource));
     program.use();
     program.sendUniform("uniSkybox", 0);
 
