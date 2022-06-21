@@ -64,6 +64,68 @@ inline const MeshRenderer& getDisplayCube() {
   return cube;
 }
 
+TextureFormat recoverFormat(const Image& image) {
+  TextureFormat colorFormat {};
+
+  switch (image.getColorspace()) {
+    case ImageColorspace::GRAY:
+      colorFormat = TextureFormat::RED;
+      break;
+
+    case ImageColorspace::GRAY_ALPHA:
+      colorFormat = TextureFormat::RG;
+      break;
+
+    case ImageColorspace::RGB:
+    default:
+      colorFormat = TextureFormat::RGB;
+      break;
+
+    case ImageColorspace::RGBA:
+      colorFormat = TextureFormat::RGBA;
+      break;
+
+    case ImageColorspace::DEPTH:
+      colorFormat = TextureFormat::DEPTH;
+      break;
+  }
+
+  return colorFormat;
+}
+
+TextureInternalFormat recoverInternalFormat(const Image& image) {
+  // If the image is of a byte data type, its internal format is the same as its format
+  if (image.getDataType() == ImageDataType::BYTE)
+    return static_cast<TextureInternalFormat>(recoverFormat(image));
+
+  TextureInternalFormat colorFormat {};
+
+  switch (image.getColorspace()) {
+    case ImageColorspace::GRAY:
+      colorFormat = TextureInternalFormat::R16F;
+      break;
+
+    case ImageColorspace::GRAY_ALPHA:
+      colorFormat = TextureInternalFormat::RG16F;
+      break;
+
+    case ImageColorspace::RGB:
+    default:
+      colorFormat = TextureInternalFormat::RGB16F;
+      break;
+
+    case ImageColorspace::RGBA:
+      colorFormat = TextureInternalFormat::RGBA16F;
+      break;
+
+    case ImageColorspace::DEPTH:
+      colorFormat = TextureInternalFormat::DEPTH32F;
+      break;
+  }
+
+  return colorFormat;
+}
+
 } // namespace
 
 Cubemap::Cubemap() {
@@ -87,9 +149,11 @@ void Cubemap::load(const FilePath& rightTexturePath, const FilePath& leftTexture
   constexpr auto mapImage = [] (const Image& img, TextureType type) {
     Renderer::sendImageData2D(type,
                               0,
-                              static_cast<TextureInternalFormat>(img.getColorspace()),
-                              img.getWidth(), img.getHeight(),
-                              static_cast<TextureFormat>(img.getColorspace()), TextureDataType::UBYTE,
+                              recoverInternalFormat(img),
+                              img.getWidth(),
+                              img.getHeight(),
+                              recoverFormat(img),
+                              (img.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
                               img.getDataPtr());
   };
 

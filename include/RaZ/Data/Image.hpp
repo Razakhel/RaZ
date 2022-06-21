@@ -3,10 +3,7 @@
 #ifndef RAZ_IMAGE_HPP
 #define RAZ_IMAGE_HPP
 
-#include "RaZ/Render/Renderer.hpp"
-
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace Raz {
@@ -25,16 +22,16 @@ using ImageDataFPtr = std::unique_ptr<ImageDataF>;
 class Image;
 using ImagePtr = std::unique_ptr<Image>;
 
-enum class ImageColorspace : unsigned int {
-  GRAY       = static_cast<unsigned int>(TextureFormat::RED),
-  GRAY_ALPHA = static_cast<unsigned int>(TextureFormat::RG),
-  RGB        = static_cast<unsigned int>(TextureFormat::RGB),
-  RGBA       = static_cast<unsigned int>(TextureFormat::RGBA),
-  DEPTH      = static_cast<unsigned int>(TextureFormat::DEPTH)
+enum class ImageColorspace {
+  GRAY,
+  GRAY_ALPHA,
+  RGB,
+  RGBA,
+  DEPTH
 };
 
-enum class ImageDataType : uint8_t {
-  BYTE = 0,
+enum class ImageDataType {
+  BYTE,
   FLOAT
 };
 

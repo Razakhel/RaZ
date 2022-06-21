@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_RUNNER // Telling Catch we will define a main on our own
 #include "Catch.hpp"
 
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/Window.hpp"
 

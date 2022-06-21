@@ -3,6 +3,7 @@
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Cubemap.hpp"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
 TEST_CASE("Cubemap move") {

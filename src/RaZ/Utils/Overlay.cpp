@@ -3,8 +3,8 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/misc/cpp/imgui_stdlib.h"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
-#include "RaZ/Utils/CompilerUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/Overlay.hpp"
 

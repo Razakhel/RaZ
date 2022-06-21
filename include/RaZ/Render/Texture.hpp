@@ -5,6 +5,7 @@
 
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Utils/EnumUtils.hpp"
 
 #include <memory>
 

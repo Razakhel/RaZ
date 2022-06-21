@@ -9,33 +9,63 @@ namespace Raz {
 
 namespace {
 
+TextureFormat recoverFormat(const Image& image) {
+  TextureFormat colorFormat {};
+
+  switch (image.getColorspace()) {
+    case ImageColorspace::GRAY:
+      colorFormat = TextureFormat::RED;
+      break;
+
+    case ImageColorspace::GRAY_ALPHA:
+      colorFormat = TextureFormat::RG;
+      break;
+
+    case ImageColorspace::RGB:
+    default:
+      colorFormat = TextureFormat::RGB;
+      break;
+
+    case ImageColorspace::RGBA:
+      colorFormat = TextureFormat::RGBA;
+      break;
+
+    case ImageColorspace::DEPTH:
+      colorFormat = TextureFormat::DEPTH;
+      break;
+  }
+
+  return colorFormat;
+}
+
 TextureInternalFormat recoverInternalFormat(const Image& image) {
-  // Default internal format is the image's own colorspace; modified if the image is a floating point one
-  auto colorFormat = static_cast<TextureInternalFormat>(image.getColorspace());
+  // If the image is of a byte data type, its internal format is the same as its format
+  if (image.getDataType() == ImageDataType::BYTE)
+    return static_cast<TextureInternalFormat>(recoverFormat(image));
 
-  if (image.getDataType() == ImageDataType::FLOAT) {
-    switch (image.getColorspace()) {
-      case ImageColorspace::GRAY:
-        colorFormat = TextureInternalFormat::R16F;
-        break;
+  TextureInternalFormat colorFormat {};
 
-      case ImageColorspace::GRAY_ALPHA:
-        colorFormat = TextureInternalFormat::RG16F;
-        break;
+  switch (image.getColorspace()) {
+    case ImageColorspace::GRAY:
+      colorFormat = TextureInternalFormat::R16F;
+      break;
 
-      case ImageColorspace::RGB:
-      default:
-        colorFormat = TextureInternalFormat::RGB16F;
-        break;
+    case ImageColorspace::GRAY_ALPHA:
+      colorFormat = TextureInternalFormat::RG16F;
+      break;
 
-      case ImageColorspace::RGBA:
-        colorFormat = TextureInternalFormat::RGBA16F;
-        break;
+    case ImageColorspace::RGB:
+    default:
+      colorFormat = TextureInternalFormat::RGB16F;
+      break;
 
-      case ImageColorspace::DEPTH:
-        colorFormat = TextureInternalFormat::DEPTH32F;
-        break;
-    }
+    case ImageColorspace::RGBA:
+      colorFormat = TextureInternalFormat::RGBA16F;
+      break;
+
+    case ImageColorspace::DEPTH:
+      colorFormat = TextureInternalFormat::DEPTH32F;
+      break;
   }
 
   return colorFormat;
@@ -99,7 +129,7 @@ void Texture::resize(unsigned int width, unsigned int height) const {
                             recoverInternalFormat(m_image),
                             width,
                             height,
-                            static_cast<TextureFormat>(m_image.m_colorspace),
+                            recoverFormat(m_image),
                             (m_image.m_dataType == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
                             (m_image.isEmpty() ? nullptr : m_image.getDataPtr()));
   unbind();
@@ -151,7 +181,7 @@ void Texture::load(bool createMipmaps) {
                             recoverInternalFormat(m_image),
                             m_image.getWidth(),
                             m_image.getHeight(),
-                            static_cast<TextureFormat>(m_image.m_colorspace),
+                            recoverFormat(m_image),
                             (m_image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
                             m_image.getDataPtr());
 

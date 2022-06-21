@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Data/ImageFormat.hpp"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
