@@ -18,9 +18,12 @@ int main() {
     ///////////////
 
     auto& renderSystem = world.addSystem<Raz::RenderSystem>(1280u, 720u, "RaZ", Raz::WindowSetting::DEFAULT, 2);
-    renderSystem.setCubemap(Raz::Cubemap(RAZ_ROOT "assets/skyboxes/clouds_right.png", RAZ_ROOT "assets/skyboxes/clouds_left.png",
-                                         RAZ_ROOT "assets/skyboxes/clouds_top.png",   RAZ_ROOT "assets/skyboxes/clouds_bottom.png",
-                                         RAZ_ROOT "assets/skyboxes/clouds_front.png", RAZ_ROOT "assets/skyboxes/clouds_back.png"));
+    renderSystem.setCubemap(Raz::Cubemap(Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_right.png"),
+                                         Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_left.png"),
+                                         Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_top.png"),
+                                         Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_bottom.png"),
+                                         Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_front.png"),
+                                         Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_back.png")));
 
     Raz::Window& window = renderSystem.getWindow();
     window.setIcon(Raz::ImageFormat::load(RAZ_ROOT "assets/icons/RaZ_logo_128.png"));

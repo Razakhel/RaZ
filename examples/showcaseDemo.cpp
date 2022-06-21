@@ -60,21 +60,25 @@ inline void loadShaderBallScene(Raz::Entity& mesh, const Raz::RenderSystem& rend
 #endif
 
 inline void loadCloudsSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap(RAZ_ROOT "assets/skyboxes/clouds_right.png",
-                                 RAZ_ROOT "assets/skyboxes/clouds_left.png",
-                                 RAZ_ROOT "assets/skyboxes/clouds_top.png",
-                                 RAZ_ROOT "assets/skyboxes/clouds_bottom.png",
-                                 RAZ_ROOT "assets/skyboxes/clouds_front.png",
-                                 RAZ_ROOT "assets/skyboxes/clouds_back.png"));
+  static const Raz::Image right  = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_right.png");
+  static const Raz::Image left   = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_left.png");
+  static const Raz::Image top    = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_top.png");
+  static const Raz::Image bottom = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_bottom.png");
+  static const Raz::Image front  = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_front.png");
+  static const Raz::Image back   = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/clouds_back.png");
+
+  render.setCubemap(Raz::Cubemap(right, left, top, bottom, front, back));
 }
 
 inline void loadLakeSkybox(Raz::RenderSystem& render) {
-  render.setCubemap(Raz::Cubemap(RAZ_ROOT "assets/skyboxes/lake_right.png",
-                                 RAZ_ROOT "assets/skyboxes/lake_left.png",
-                                 RAZ_ROOT "assets/skyboxes/lake_top.png",
-                                 RAZ_ROOT "assets/skyboxes/lake_bottom.png",
-                                 RAZ_ROOT "assets/skyboxes/lake_front.png",
-                                 RAZ_ROOT "assets/skyboxes/lake_back.png"));
+  static const Raz::Image right  = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/lake_right.png");
+  static const Raz::Image left   = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/lake_left.png");
+  static const Raz::Image top    = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/lake_top.png");
+  static const Raz::Image bottom = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/lake_bottom.png");
+  static const Raz::Image front  = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/lake_front.png");
+  static const Raz::Image back   = Raz::ImageFormat::load(RAZ_ROOT "assets/skyboxes/lake_back.png");
+
+  render.setCubemap(Raz::Cubemap(right, left, top, bottom, front, back));
 }
 
 int main() {

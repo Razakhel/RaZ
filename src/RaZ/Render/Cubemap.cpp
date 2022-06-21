@@ -1,5 +1,4 @@
 #include "RaZ/Data/Image.hpp"
-#include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
@@ -141,9 +140,7 @@ const RenderShaderProgram& Cubemap::getProgram() const {
 Cubemap::Cubemap(Cubemap&& cubemap) noexcept
   : m_index{ std::exchange(cubemap.m_index, std::numeric_limits<unsigned int>::max()) } {}
 
-void Cubemap::load(const FilePath& rightTexturePath, const FilePath& leftTexturePath,
-                   const FilePath& topTexturePath, const FilePath& bottomTexturePath,
-                   const FilePath& frontTexturePath, const FilePath& backTexturePath) const {
+void Cubemap::load(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back) const {
   bind();
 
   constexpr auto mapImage = [] (const Image& img, TextureType type) {
@@ -157,12 +154,28 @@ void Cubemap::load(const FilePath& rightTexturePath, const FilePath& leftTexture
                               img.getDataPtr());
   };
 
-  mapImage(ImageFormat::load(rightTexturePath), TextureType::CUBEMAP_POS_X);
-  mapImage(ImageFormat::load(leftTexturePath), TextureType::CUBEMAP_NEG_X);
-  mapImage(ImageFormat::load(topTexturePath), TextureType::CUBEMAP_POS_Y);
-  mapImage(ImageFormat::load(bottomTexturePath), TextureType::CUBEMAP_NEG_Y);
-  mapImage(ImageFormat::load(frontTexturePath), TextureType::CUBEMAP_POS_Z);
-  mapImage(ImageFormat::load(backTexturePath), TextureType::CUBEMAP_NEG_Z);
+  //            ______________________
+  //           /|                   /|
+  //          / |                  / |
+  //         /  |       +Y        /  |
+  //        /   |                /   |
+  //       |--------------------|    |
+  //       |    |        -Z     |    |
+  //       | -X |               | +X |
+  //       |    |               |    |
+  //       |    |    +Z         |    |
+  //       |   /----------------|---/
+  //       |  /                 |  /
+  //       | /        -Y        | /
+  //       |/                   |/
+  //       ----------------------
+
+  mapImage(right, TextureType::CUBEMAP_POS_X);
+  mapImage(left, TextureType::CUBEMAP_NEG_X);
+  mapImage(top, TextureType::CUBEMAP_POS_Y);
+  mapImage(bottom, TextureType::CUBEMAP_NEG_Y);
+  mapImage(front, TextureType::CUBEMAP_POS_Z);
+  mapImage(back, TextureType::CUBEMAP_NEG_Z);
 
   Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR);
   Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);

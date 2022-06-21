@@ -48,9 +48,7 @@ TEST_CASE("Cubemap textures") {
   const Raz::Image refImgPosZ = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png");
   const Raz::Image refImgNegZ = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
 
-  Raz::Cubemap cubemap(RAZ_TESTS_ROOT "assets/textures/₀₀₀₀.png", RAZ_TESTS_ROOT "assets/textures/₁₀₀₁.png",
-                       RAZ_TESTS_ROOT "assets/textures/₁₁₁₁.png", RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png",
-                       RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png", RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
+  Raz::Cubemap cubemap(refImgPosX, refImgNegX, refImgPosY, refImgNegY, refImgPosZ, refImgNegZ);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() functions are unavailable with OpenGL ES

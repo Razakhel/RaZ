@@ -3,38 +3,31 @@
 #ifndef RAZ_CUBEMAP_HPP
 #define RAZ_CUBEMAP_HPP
 
-#include "RaZ/Render/ShaderProgram.hpp"
-
-#include <memory>
-
 namespace Raz {
 
-class FilePath;
+class Image;
+class RenderShaderProgram;
 
 /// Cubemap class representing an environment map surrounding the scene (also known as a skybox).
 class Cubemap {
 public:
   Cubemap();
-  explicit Cubemap(const FilePath& rightTexturePath, const FilePath& leftTexturePath,
-                   const FilePath& topTexturePath, const FilePath& bottomTexturePath,
-                   const FilePath& frontTexturePath, const FilePath& backTexturePath)
-    : Cubemap() { load(rightTexturePath, leftTexturePath, topTexturePath, bottomTexturePath, frontTexturePath, backTexturePath); }
+  explicit Cubemap(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back)
+    : Cubemap() { load(right, left, top, bottom, front, back); }
   Cubemap(const Cubemap&) = delete;
   Cubemap(Cubemap&& cubemap) noexcept;
 
   unsigned int getIndex() const { return m_index; }
   const RenderShaderProgram& getProgram() const;
 
-  /// Imports 6 textures and loads them onto the graphics card.
-  /// \param rightTexturePath Path to the texture located on the right of the cube.
-  /// \param leftTexturePath Path to the texture located on the left of the cube.
-  /// \param topTexturePath Path to the texture located on the top of the cube.
-  /// \param bottomTexturePath Path to the texture located on the bottom of the cube.
-  /// \param frontTexturePath Path to the texture located on the front of the cube.
-  /// \param backTexturePath Path to the texture located on the back of the cube.
-  void load(const FilePath& rightTexturePath, const FilePath& leftTexturePath,
-            const FilePath& topTexturePath, const FilePath& bottomTexturePath,
-            const FilePath& frontTexturePath, const FilePath& backTexturePath) const;
+  /// Applies the given images to the cubemap.
+  /// \param right Image which will be on the right of the cube.
+  /// \param left Image which will be on the left of the cube.
+  /// \param top Image which will be on the top of the cube.
+  /// \param bottom Image which will be on the bottom of the cube.
+  /// \param front Image which will be on the front of the cube.
+  /// \param back Image which will be on the back of the cube.
+  void load(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back) const;
   /// Binds the cubemap texture.
   void bind() const;
   /// Unbinds the cubemap texture.
