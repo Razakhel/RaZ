@@ -5,15 +5,29 @@
 
 namespace Raz {
 
+namespace {
+
+inline BufferDataUsage recoverDataUsage(UniformBufferUsage usage) {
+  switch (usage) {
+    case UniformBufferUsage::STATIC:  return BufferDataUsage::STATIC_DRAW;
+    case UniformBufferUsage::DYNAMIC: return BufferDataUsage::DYNAMIC_DRAW;
+    case UniformBufferUsage::STREAM:  return BufferDataUsage::STREAM_DRAW;
+  }
+
+  throw std::invalid_argument("Error: Invalid uniform buffer usage");
+}
+
+} // namespace
+
 UniformBuffer::UniformBuffer() {
   Renderer::generateBuffer(m_index);
 }
 
-UniformBuffer::UniformBuffer(unsigned int size) : UniformBuffer() {
+UniformBuffer::UniformBuffer(unsigned int size, UniformBufferUsage usage) : UniformBuffer() {
   Logger::debug("[UniformBuffer] Creating (with size: " + std::to_string(size) + ")...");
 
   bind();
-  Renderer::sendBufferData(BufferType::UNIFORM_BUFFER, size, nullptr, BufferDataUsage::STATIC_DRAW); // Allocating memory
+  Renderer::sendBufferData(BufferType::UNIFORM_BUFFER, size, nullptr, recoverDataUsage(usage)); // Allocating memory
   unbind();
 
   Logger::debug("[UniformBuffer] Created (ID: " + std::to_string(m_index) + ')');

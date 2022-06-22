@@ -101,9 +101,9 @@ private:
 
   Entity* m_cameraEntity {};
   RenderGraph m_renderGraph {};
-  UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f));
-  UniformBuffer m_lightsUbo = UniformBuffer(sizeof(Vec4f) * 4 * 100 + sizeof(Vec4u));
-  UniformBuffer m_modelUbo  = UniformBuffer(sizeof(Mat4f));
+  UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), UniformBufferUsage::DYNAMIC);
+  UniformBuffer m_lightsUbo = UniformBuffer(sizeof(Vec4f) * 4 * 100 + sizeof(Vec4u), UniformBufferUsage::DYNAMIC);
+  UniformBuffer m_modelUbo  = UniformBuffer(sizeof(Mat4f), UniformBufferUsage::STREAM);
 
   std::optional<Cubemap> m_cubemap {};
 };

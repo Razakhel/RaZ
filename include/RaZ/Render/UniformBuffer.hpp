@@ -10,10 +10,16 @@
 
 namespace Raz {
 
+enum class UniformBufferUsage {
+  STATIC,  ///< Data is assumed to never change.
+  DYNAMIC, ///< Data is assumed to be changed often.
+  STREAM   ///< Data is assumed to be given each frame.
+};
+
 class UniformBuffer {
 public:
   UniformBuffer();
-  explicit UniformBuffer(unsigned int size);
+  explicit UniformBuffer(unsigned int size, UniformBufferUsage usage = UniformBufferUsage::DYNAMIC);
   UniformBuffer(const UniformBuffer&) = delete;
   UniformBuffer(UniformBuffer&& ubo) noexcept;
 
