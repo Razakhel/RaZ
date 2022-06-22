@@ -65,7 +65,6 @@ public:
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
-  const Vec4f& getClearColor() const { return m_clearColor; }
   const InputCallbacks& getCallbacks() const { return m_callbacks; }
   InputCallbacks& getCallbacks() { return m_callbacks; }
   const CloseCallback& getCloseCallback() const { return m_closeCallback; }
@@ -74,8 +73,8 @@ public:
   Overlay& getOverlay() noexcept { return m_overlay; }
 #endif
 
-  void setClearColor(const Vec4f& clearColor) { m_clearColor = clearColor; }
-  void setClearColor(float red, float green, float blue, float alpha = 1.f) { setClearColor(Vec4f(red, green, blue, alpha)); }
+  void setClearColor(const Vec4f& clearColor) const;
+  void setClearColor(float red, float green, float blue, float alpha = 1.f) const { setClearColor(Vec4f(red, green, blue, alpha)); }
   void setTitle(const std::string& title) const;
   void setIcon(const Image& img) const;
 
@@ -169,7 +168,6 @@ public:
 private:
   unsigned int m_width {};
   unsigned int m_height {};
-  Vec4f m_clearColor = Vec4f(0.15f, 0.15f, 0.15f, 1.f);
 
   GLFWwindow* m_windowHandle {};
   InputCallbacks m_callbacks {};

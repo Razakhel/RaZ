@@ -28,6 +28,8 @@ void RenderGraph::updateShaders() const {
 void RenderGraph::execute(RenderSystem& renderSystem) {
   assert("Error: The render system needs a camera for the render graph to be executed." && (renderSystem.m_cameraEntity != nullptr));
 
+  Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
+
   const Framebuffer& geometryFramebuffer = m_geometryPass.getFramebuffer();
 
   if (!geometryFramebuffer.isEmpty())

@@ -105,6 +105,7 @@ Window::Window(unsigned int width, unsigned int height,
     Renderer::resizeViewport(0, 0, static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
   });
 
+  setClearColor(0.15f, 0.15f, 0.15f);
   enableFaceCulling();
 
 #if !defined(RAZ_NO_OVERLAY)
@@ -112,6 +113,10 @@ Window::Window(unsigned int width, unsigned int height,
 #endif
 
   Logger::debug("[Window] Initialized");
+}
+
+void Window::setClearColor(const Vec4f& clearColor) const {
+  Renderer::clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
 }
 
 void Window::setTitle(const std::string& title) const {
@@ -383,9 +388,6 @@ bool Window::run(float deltaTime) {
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_webgl_commit_frame();
 #endif
-
-  Renderer::clearColor(m_clearColor[0], m_clearColor[1], m_clearColor[2], m_clearColor[3]);
-  Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
 
   return true;
 }
