@@ -3,12 +3,15 @@
 #ifndef RAZ_CATCH_HPP
 #define RAZ_CATCH_HPP
 
+#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/FloatUtils.hpp"
 
 #include <catch/catch.hpp>
 
 #include <iomanip>
 #include <sstream>
+
+namespace Raz { class Image; }
 
 /// Custom Catch matcher, which checks for near-equality between floating point values.
 /// \tparam T Type of the value to be compared to.
@@ -206,5 +209,32 @@ private:
 
 template <typename T, typename TolT>
 IsNearlyEqualToQuaternion(Raz::Quaternion<T>, TolT) -> IsNearlyEqualToQuaternion<T, TolT>;
+
+/// Custom Catch matcher, which checks for near-equality between images.
+class IsNearlyEqualToImage final : public Catch::MatcherBase<Raz::Image> {
+public:
+  /// Creates an instance of a near-equality image check custom matcher.
+  /// \param comparison Image to be compared with.
+  /// \param diffImgPath Path to the image containing the differences to be output. If empty, no image will be saved.
+  explicit IsNearlyEqualToImage(const Raz::Image& comparison, Raz::FilePath diffImgPath = {})
+    : m_comparison{ comparison }, m_diffImgPath{ std::move(diffImgPath) } {}
+
+  /// Checks if the given image has nearly equal values compared to the comparison one.
+  /// \param base Base image to compare to.
+  /// \return True if images are nearly equal to each other, false otherwise.
+  bool match(const Raz::Image& base) const override;
+
+  /// Gets the description of the error if the match failed.
+  /// \return Error string to be printed.
+  std::string describe() const override;
+
+private:
+  void matchByte(const Raz::Image& base, Raz::Image& diffImg) const;
+  void matchFloat(const Raz::Image& base, Raz::Image& diffImg) const;
+
+  const Raz::Image& m_comparison;
+  mutable std::size_t m_diffValueCount = 0;
+  Raz::FilePath m_diffImgPath {};
+};
 
 #endif // RAZ_CATCH_HPP

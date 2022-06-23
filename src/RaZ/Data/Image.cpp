@@ -109,10 +109,9 @@ Image& Image::operator=(const Image& image) {
 }
 
 bool Image::operator==(const Image& img) const {
-  if (m_data == nullptr || img.m_data == nullptr)
+  if (m_width != img.m_width || m_height != img.m_height || m_channelCount != img.m_channelCount || m_colorspace != img.m_colorspace
+      || m_dataType != img.m_dataType || m_data == nullptr || img.m_data == nullptr)
     return false;
-
-  assert("Error: Image equality check requires having images of the same type." && m_dataType == img.m_dataType);
 
   return (*m_data == *img.m_data);
 }

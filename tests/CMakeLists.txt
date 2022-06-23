@@ -67,6 +67,7 @@ set(
     RaZ/Render/*.cpp
     RaZ/Utils/*.cpp
 
+    Catch/Catch.cpp
     Catch/Catch.hpp
 )
 
