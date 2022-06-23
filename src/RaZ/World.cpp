@@ -58,6 +58,9 @@ void World::refresh() {
     const EntityPtr& entity = m_entities[entityIndex];
 
     for (const SystemPtr& system : m_systems) {
+      if (system == nullptr)
+        continue;
+
       const Bitset matchingComponents = system->getAcceptedComponents() & entity->getEnabledComponents();
 
       // If the system doesn't contain the entity, check if it should (possesses the accepted components); if yes, link it
@@ -81,8 +84,10 @@ void World::destroy() {
 
   // This means that no entity must be used in any system destructor, since they will all be invalid
   // Their list is thus cleared to avoid any invalid usage
-  for (SystemPtr& system : m_systems)
-    system->m_entities.clear();
+  for (const SystemPtr& system : m_systems) {
+    if (system)
+      system->m_entities.clear();
+  }
 
   m_systems.clear();
   m_activeSystems.clear();
