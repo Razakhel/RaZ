@@ -30,6 +30,9 @@ jobs:
     #   - Doxygen & Dot to generate the documentation
     #   - OpenAL-soft to handle the audio part
     #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
+    #   - Gdb to run the unit tests with the debugger
+    #   - Mesa-utils to get glxinfo
+    # Running glxinfo through xvfb to recover graphics capabilities
     - name: Packages installation
       run: |
         sudo apt update && sudo apt install -y --no-install-recommends \
@@ -37,7 +40,10 @@ jobs:
           lcov \
           doxygen python3-pydot python3-pydot-ng \
           libopenal-dev \
-          xvfb
+          xvfb \
+          gdb \
+          mesa-utils &&
+        xvfb-run -a glxinfo -B
 
     # Installing the FBX SDK (in /usr)
     # The installation asks for software user agreement (send 'yes'), then afterwards if the README file should be opened (send 'n')
@@ -60,7 +66,7 @@ jobs:
                                   -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON -DRAZ_USE_FBX=OFF \
                                   -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=ON -DSKIP_RENDERER_ERRORS=ON \
                                   -DENABLE_DEBUG_INFO=ON \
-                                  $GITHUB_WORKSPACE &&
+                                  ${{ github.workspace }} &&
         cmake --build . --target RaZ_PrintDebugInfo --config ${{ matrix.build_type }}
 
     - name: Build
@@ -70,10 +76,13 @@ jobs:
         cmake --build . --config ${{ matrix.build_type }} &&
         pwd && find .
 
+    # Running the tests using gdb to catch potential segfaults
     - name: Test
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' ./tests/RaZ_Tests
+      run: |
+        ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' \
+        gdb --batch --return-child-result -x '${{ github.workspace }}/tests/assets/debug/gdb_commands.txt' ./tests/RaZ_Tests
 
     # Preparing code coverage; only done with GCC in Debug
     - name: Coverage setup

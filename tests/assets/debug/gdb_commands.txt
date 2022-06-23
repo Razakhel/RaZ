@@ -1,0 +1,7 @@
+set print thread-events off
+catch signal SIGSEGV
+commands
+  silent
+  bt
+  end
+run
