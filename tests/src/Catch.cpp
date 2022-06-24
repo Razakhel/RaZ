@@ -36,7 +36,7 @@ bool IsNearlyEqualToImage::match(const Raz::Image& base) const {
 std::string IsNearlyEqualToImage::describe() const {
   std::ostringstream stream;
 
-  stream << "Images have " << std::to_string(m_diffValueCount) << " non-matching pixel values";
+  stream << "Images have " << std::to_string(m_diffValueCount) << " non-matching pixel value(s)";
 
   if (!m_diffImgPath.isEmpty())
     stream << "\nAn image containing the pixels difference has been saved to '" + m_diffImgPath.toUtf8() + '\'';

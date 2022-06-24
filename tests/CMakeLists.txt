@@ -58,17 +58,17 @@ set(
 
     Main.cpp
 
-    RaZ/*.cpp
-    RaZ/Animation/*.cpp
-    RaZ/Audio/*.cpp
-    RaZ/Data/*.cpp
-    RaZ/Math/*.cpp
-    RaZ/Physics/*.cpp
-    RaZ/Render/*.cpp
-    RaZ/Utils/*.cpp
+    src/*.cpp
+    src/RaZ/*.cpp
+    src/RaZ/Animation/*.cpp
+    src/RaZ/Audio/*.cpp
+    src/RaZ/Data/*.cpp
+    src/RaZ/Math/*.cpp
+    src/RaZ/Physics/*.cpp
+    src/RaZ/Render/*.cpp
+    src/RaZ/Utils/*.cpp
 
-    Catch/Catch.cpp
-    Catch/Catch.hpp
+    include/*.hpp
 )
 
 file(
@@ -91,7 +91,7 @@ else ()
         REMOVE_ITEM
         RAZ_TESTS_FILES
 
-        "${PROJECT_SOURCE_DIR}/RaZ/Data/FbxFormat.cpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Data/FbxFormat.cpp"
     )
 endif ()
 
@@ -106,7 +106,7 @@ target_include_directories(
 
     PRIVATE
 
-    "${CMAKE_CURRENT_SOURCE_DIR}/Catch"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
     "${CMAKE_HOME_DIRECTORY}/extern"
 )
 

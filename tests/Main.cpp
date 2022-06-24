@@ -1,5 +1,6 @@
 #define CATCH_CONFIG_RUNNER // Telling Catch we will define a main on our own
 #include "Catch.hpp"
+#include "TestUtils.hpp"
 
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -15,8 +16,8 @@ int main(int argc, char* argv[]) {
   // Disabling all logging output to avoid cluttering the console with expected error messages
   Raz::Logger::setLoggingLevel(Raz::LoggingLevel::NONE);
 
-  // Some tests require an OpenGL context to be instantiated, which is done by the Window
-  const Raz::Window window(1, 1, "", Raz::WindowSetting::INVISIBLE);
+  // Rendering tests require an OpenGL context to be created, which is done by the Window; the following instruction instantiates it
+  TestUtils::getWindow();
 
   // Setting texture [un]pack alignment to 1, so that the elements are aligned on bytes. This allows direct comparison with raw data
   Raz::Renderer::setPixelStorage(Raz::PixelStorage::PACK_ALIGNMENT, 1);
