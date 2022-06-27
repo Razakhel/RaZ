@@ -167,8 +167,11 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /MP # Enabling multi-processes compilation
 
             /wd4061 # Enum value in a switch not explicitly handled by a case label
+            /wd4242 # Conversion from T1 to T2, possible loss of data (any type)
+            /wd4244 # Conversion from T1 to T2, possible loss of data (specific types)
             /wd4571 # SEH exceptions aren't caught since Visual C++ 7.1
             /wd5045 # Spectre mitigation
+            /wd5246 # Initialization of subobject should be wrapped in braces
 
             # Warnings triggered by the FBX SDK
             /wd4266 # No override available (function is hidden)
@@ -190,6 +193,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd5026 # Move constructor implicitly deleted
             /wd5027 # Move assignment operator implicitly deleted
             /wd5039 # Pointer/ref to a potentially throwing function passed to an 'extern "C"' function (with -EHc)
+            /wd5105 # Undefined macro expansion
             /wd5204 # Class with virtual functions but no virtual destructor
             /wd5220 # Non-static volatile member doesn't imply non-trivial move/copy ctor/operator=
         )

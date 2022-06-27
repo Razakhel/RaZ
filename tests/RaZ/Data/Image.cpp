@@ -53,7 +53,7 @@ TEST_CASE("Image copy/move") {
   Raz::Image imgBase(3, 3, Raz::ImageColorspace::RGB);
 
   auto* imgData = static_cast<uint8_t*>(imgBase.getDataPtr());
-  std::iota(imgData, imgData + 9, 0);
+  std::iota(imgData, imgData + 9, static_cast<uint8_t>(0));
 
   auto areEqual = [] (const Raz::Image& img1, const Raz::Image& img2) {
     return (img1.getWidth() == img2.getWidth()

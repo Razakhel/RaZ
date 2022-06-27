@@ -30,7 +30,7 @@ TEST_CASE("Texture move") {
 
   const Raz::Image refImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
 
-  Raz::Texture texture(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png"), 42);
+  Raz::Texture texture(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png"), false);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   const unsigned int textureIndex = texture.getIndex();
