@@ -26,13 +26,12 @@ if (RAZ_COMPILER_CLANG)
 
         -Wno-double-promotion # [long] double/float operations are voluntarily made
         -Wno-float-conversion # Can occur voluntarily for readability
-        -Wno-header-hygiene # The namespace std::literals is imported in the Catch.hpp custom header
         -Wno-implicit-int-float-conversion # Can occur voluntarily for readability
         -Wno-unneeded-member-function # Test structures may contain unnecessary member functions
     )
 
     # Disabling some other warnings available since Clang 13.X
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13 AND NOT APPLE)
         target_compile_options(RaZ_Tests PRIVATE -Wno-reserved-identifier) # Each Catch test case macro triggers this
     endif ()
 elseif (RAZ_COMPILER_MSVC)

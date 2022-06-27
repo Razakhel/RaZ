@@ -114,6 +114,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             -Wno-c++98-compat
             -Wno-c++98-compat-pedantic
             -Wno-covered-switch-default
+            -Wno-ctad-maybe-unsupported
             -Wno-documentation
             -Wno-documentation-unknown-command
             -Wno-exit-time-destructors
@@ -122,6 +123,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             -Wno-global-constructors
             -Wno-mismatched-tags
             -Wno-missing-braces
+            -Wno-newline-eof
             -Wno-padded
             -Wno-reserved-id-macro
             -Wno-sign-conversion
