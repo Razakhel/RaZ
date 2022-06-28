@@ -234,6 +234,9 @@ private:
 
   const Raz::Image& m_comparison;
   mutable std::size_t m_diffValueCount = 0;
+  mutable float m_minDiff = std::numeric_limits<float>::max();
+  mutable float m_maxDiff {};
+  mutable float m_avgDiff {};
   Raz::FilePath m_diffImgPath {};
 };
 

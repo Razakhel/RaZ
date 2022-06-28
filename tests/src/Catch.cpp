@@ -27,19 +27,25 @@ bool IsNearlyEqualToImage::match(const Raz::Image& base) const {
   else
     matchByte(base, diffImg);
 
-  if (!m_diffImgPath.isEmpty() && m_diffValueCount != 0)
-    Raz::ImageFormat::save(m_diffImgPath, diffImg);
+  if (m_diffValueCount > 0)
+    m_avgDiff /= static_cast<float>(m_diffValueCount);
 
-  return (m_diffValueCount == 0);
+  if (!m_diffImgPath.isEmpty() && m_diffValueCount != 0)
+    Raz::ImageFormat::save(m_diffImgPath, diffImg, true);
+
+  return (m_avgDiff < (base.getDataType() == Raz::ImageDataType::FLOAT ? 0.04f : 10.f));
 }
 
 std::string IsNearlyEqualToImage::describe() const {
   std::ostringstream stream;
 
-  stream << "Images have " << std::to_string(m_diffValueCount) << " non-matching pixel value(s)";
+  stream << "Images have " << std::to_string(m_diffValueCount) << " non-matching pixel value(s)\n"
+         << "  Minimum difference: " << std::to_string(m_minDiff) << '\n'
+         << "  Maximum difference: " << std::to_string(m_maxDiff) << '\n'
+         << "  Average difference: " << std::to_string(m_avgDiff);
 
   if (!m_diffImgPath.isEmpty())
-    stream << "\nAn image containing the pixels difference has been saved to '" + m_diffImgPath.toUtf8() + '\'';
+    stream << "\nAn image containing the pixels difference has been saved to '" + m_diffImgPath + '\'';
 
   return stream.str();
 }
@@ -50,8 +56,11 @@ void IsNearlyEqualToImage::matchByte(const Raz::Image& base, Raz::Image& diffImg
     const int compPixel = static_cast<const uint8_t*>(m_comparison.getDataPtr())[i];
     const int absDiff   = std::abs(basePixel - compPixel);
 
-    if (absDiff > 10) {
+    if (absDiff > 0) {
       ++m_diffValueCount;
+      m_minDiff  = std::min(m_minDiff, static_cast<float>(absDiff));
+      m_maxDiff  = std::max(m_maxDiff, static_cast<float>(absDiff));
+      m_avgDiff += static_cast<float>(absDiff);
 
       if (!m_diffImgPath.isEmpty())
         static_cast<uint8_t*>(diffImg.getDataPtr())[i] = 255;
@@ -65,8 +74,11 @@ void IsNearlyEqualToImage::matchFloat(const Raz::Image& base, Raz::Image& diffIm
     const float compPixel = static_cast<const float*>(m_comparison.getDataPtr())[i];
     const float absDiff   = std::abs(basePixel - compPixel);
 
-    if (absDiff > 0.01f) {
+    if (absDiff > 0.f) {
       ++m_diffValueCount;
+      m_minDiff  = std::min(m_minDiff, absDiff);
+      m_maxDiff  = std::max(m_maxDiff, absDiff);
+      m_avgDiff += absDiff;
 
       if (!m_diffImgPath.isEmpty())
         static_cast<float*>(diffImg.getDataPtr())[i] = 1.f;
