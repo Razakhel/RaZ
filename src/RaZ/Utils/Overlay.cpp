@@ -263,7 +263,12 @@ void OverlayWindow::render() const {
       {
         auto& listBox = static_cast<OverlayListBox&>(*element);
 
-        if (ImGui::BeginListBox(listBox.m_label.c_str())) {
+        // The list box will get a default width, while being automatically resized vertically up to 5 elements
+        // The stride added is to avoid showing a scrollbar when having few entries. Its value is directly defined here,
+        //  but may be required to be ImGui::GetStyle().ItemSpacing.y / 2
+        const ImVec2 dimensions(0, ImGui::GetTextLineHeightWithSpacing() * std::min(static_cast<float>(listBox.m_entries.size()), 5.f) + 2.f);
+
+        if (ImGui::BeginListBox(listBox.m_label.c_str(), dimensions)) {
           for (std::size_t i = 0; i < listBox.m_entries.size(); ++i) {
             const bool isSelected = (listBox.m_currentId == i);
 
