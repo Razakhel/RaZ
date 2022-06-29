@@ -184,7 +184,16 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
 }
 
 void RenderSystem::initialize() {
+  // TODO: this Renderer initialization is technically useless; the RenderSystem needs to have it initialized before construction
+  //  (either manually or through the Window's initialization), since it constructs the RenderGraph's rendering objects
+  //  As such, if reaching here, the Renderer is necessarily already functional. Ideally, this call below should be the only one in the whole program
   Renderer::initialize();
+  Renderer::enable(Capability::CULL);
+  Renderer::enable(Capability::DEPTH_TEST);
+  Renderer::enable(Capability::STENCIL_TEST);
+#if !defined(USE_OPENGL_ES)
+  Renderer::enable(Capability::CUBEMAP_SEAMLESS);
+#endif
 
   m_acceptedComponents.setBit(Component::getId<Camera>());
   m_acceptedComponents.setBit(Component::getId<Light>());

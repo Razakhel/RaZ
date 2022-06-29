@@ -16,26 +16,35 @@ enum class Capability : unsigned int {
   CULL           = 2884 /* GL_CULL_FACE      */, ///<
   DITHER         = 3024 /* GL_DITHER         */, ///<
   BLEND          = 3042 /* GL_BLEND          */, ///<
+#if !defined(USE_OPENGL_ES)
   COLOR_LOGIC_OP = 3058 /* GL_COLOR_LOGIC_OP */, ///<
+#endif
 
+#if !defined(USE_OPENGL_ES)
   DEPTH_CLAMP  = 34383 /* GL_DEPTH_CLAMP  */, ///<
+#endif
   DEPTH_TEST   = 2929  /* GL_DEPTH_TEST   */, ///<
   STENCIL_TEST = 2960  /* GL_STENCIL_TEST */, ///<
   SCISSOR_TEST = 3089  /* GL_SCISSOR_TEST */, ///<
 
+#if !defined(USE_OPENGL_ES)
   LINE_SMOOTH          = 2848  /* GL_LINE_SMOOTH          */, ///<
   POLYGON_SMOOTH       = 2881  /* GL_POLYGON_SMOOTH       */, ///<
   POLYGON_OFFSET_POINT = 10753 /* GL_POLYGON_OFFSET_POINT */, ///<
   POLYGON_OFFSET_LINE  = 10754 /* GL_POLYGON_OFFSET_LINE  */, ///<
+#endif
   POLYGON_OFFSET_FILL  = 32823 /* GL_POLYGON_OFFSET_FILL  */, ///<
 
+#if !defined(USE_OPENGL_ES)
   MULTISAMPLE              = 32925 /* GL_MULTISAMPLE              */, ///<
-  SAMPLE_ALPHA_TO_COVERAGE = 32926 /* GL_SAMPLE_ALPHA_TO_COVERAGE */, ///<
-  SAMPLE_ALPHA_TO_ONE      = 32927 /* GL_SAMPLE_ALPHA_TO_ONE      */, ///<
-  SAMPLE_COVERAGE          = 32928 /* GL_SAMPLE_COVERAGE          */, ///<
   SAMPLE_SHADING           = 35894 /* GL_SAMPLE_SHADING           */, ///<
+  SAMPLE_ALPHA_TO_ONE      = 32927 /* GL_SAMPLE_ALPHA_TO_ONE      */, ///<
+#endif
+  SAMPLE_ALPHA_TO_COVERAGE = 32926 /* GL_SAMPLE_ALPHA_TO_COVERAGE */, ///<
+  SAMPLE_COVERAGE          = 32928 /* GL_SAMPLE_COVERAGE          */, ///<
   SAMPLE_MASK              = 36433 /* GL_SAMPLE_MASK              */, ///<
 
+#if !defined(USE_OPENGL_ES)
   POINT_SIZE        = 34370 /* GL_PROGRAM_POINT_SIZE        */, ///<
   CUBEMAP_SEAMLESS  = 34895 /* GL_TEXTURE_CUBE_MAP_SEAMLESS */, ///<
   FRAMEBUFFER_SRGB  = 36281 /* GL_FRAMEBUFFER_SRGB          */, ///<
@@ -43,6 +52,7 @@ enum class Capability : unsigned int {
 
   DEBUG_OUTPUT             = 37600 /* GL_DEBUG_OUTPUT             */, ///<
   DEBUG_OUTPUT_SYNCHRONOUS = 33346 /* GL_DEBUG_OUTPUT_SYNCHRONOUS */  ///<
+#endif
 };
 
 enum class ContextInfo : unsigned int {
@@ -67,7 +77,9 @@ enum class StateParameter : unsigned int {
   DEPTH_WRITEMASK   = 2930                                              /* GL_DEPTH_WRITEMASK   */, ///< Depth write mask.
 
   COLOR_CLEAR_VALUE = 3106                                                  /* GL_COLOR_CLEAR_VALUE */, ///< Clear color.
+#if !defined(USE_OPENGL_ES)
   COLOR_LOGIC_OP    = static_cast<unsigned int>(Capability::COLOR_LOGIC_OP) /* GL_COLOR_LOGIC_OP    */, ///<
+#endif
   COLOR_WRITEMASK   = 3107                                                  /* GL_COLOR_WRITEMASK   */, ///< Color write mask.
 
   BLEND                = static_cast<unsigned int>(Capability::BLEND) /* GL_BLEND                */, ///< Blending.
@@ -80,12 +92,16 @@ enum class StateParameter : unsigned int {
   BLEND_EQUATION_ALPHA = 34877                                        /* GL_BLEND_EQUATION_ALPHA */, ///<
 
   ALIASED_LINE_WIDTH_RANGE      = 33902 /* GL_ALIASED_LINE_WIDTH_RANGE      */, ///<
+#if !defined(USE_OPENGL_ES)
   SMOOTH_LINE_WIDTH_RANGE       = 2850  /* GL_SMOOTH_LINE_WIDTH_RANGE       */, ///<
   SMOOTH_LINE_WIDTH_GRANULARITY = 2851  /* GL_SMOOTH_LINE_WIDTH_GRANULARITY */, ///<
+#endif
 
   DITHER                     = static_cast<unsigned int>(Capability::DITHER)     /* GL_DITHER                     */, ///< Dithering.
   CULL_FACE                  = static_cast<unsigned int>(Capability::CULL)       /* GL_CULL_FACE                  */, ///< Polygon culling.
+#if !defined(USE_OPENGL_ES)
   POINT_SIZE                 = static_cast<unsigned int>(Capability::POINT_SIZE) /* GL_POINT_SIZE                 */, ///< Point size.
+#endif
   COMPRESSED_TEXTURE_FORMATS = 34467                                             /* GL_COMPRESSED_TEXTURE_FORMATS */, ///<
   ARRAY_BUFFER_BINDING       = 34964                                             /* GL_ARRAY_BUFFER_BINDING       */  ///<
 };

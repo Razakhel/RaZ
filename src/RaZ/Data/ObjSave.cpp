@@ -85,7 +85,7 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Unable to create a mesh file as '" + filePath + "'; path to file must exist");
+    throw std::invalid_argument("Error: Unable to create an OBJ file as '" + filePath + "'; path to file must exist");
 
   file << "# OBJ file created with RaZ - https://github.com/Razakhel/RaZ\n\n";
 

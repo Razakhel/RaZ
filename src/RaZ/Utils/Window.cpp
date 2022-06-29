@@ -93,20 +93,15 @@ Window::Window(unsigned int width, unsigned int height,
   m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
 #endif
 
+  glfwSetWindowUserPointer(m_windowHandle, this);
   glfwMakeContextCurrent(m_windowHandle);
 
   Renderer::initialize();
-  Renderer::enable(Capability::DEPTH_TEST);
-  Renderer::enable(Capability::STENCIL_TEST);
-
-  glfwSetWindowUserPointer(m_windowHandle, this);
+  setClearColor(0.15f, 0.15f, 0.15f);
 
   glfwSetFramebufferSizeCallback(m_windowHandle, [] (GLFWwindow*, int newWidth, int newHeight) {
     Renderer::resizeViewport(0, 0, static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
   });
-
-  setClearColor(0.15f, 0.15f, 0.15f);
-  enableFaceCulling();
 
 #if !defined(RAZ_NO_OVERLAY)
   m_overlay.initialize(m_windowHandle);

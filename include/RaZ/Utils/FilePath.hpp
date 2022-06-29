@@ -10,7 +10,7 @@
 namespace Raz {
 
 class FilePath {
-#if defined(RAZ_PLATFORM_WINDOWS) && !defined(RAZ_PLATFORM_CYGWIN) // Cygwin handles conversion on its own; sticking to UTF-8 strings
+#if defined(_WIN32) && !defined(__CYGWIN__) // Cygwin handles conversions on its own; sticking to UTF-8 strings
   using StringType = std::wstring;
   using CharType   = wchar_t;
 #else
@@ -67,7 +67,7 @@ public:
   FilePath recoverPathToFile() const { return recoverPathToFile(m_path); }
   FilePath recoverFileName(bool keepExtension = true) const { return recoverFileName(m_path, keepExtension); }
   FilePath recoverExtension() const { return recoverExtension(m_path); }
-#if defined(RAZ_PLATFORM_WINDOWS) && !defined(RAZ_PLATFORM_CYGWIN)
+#if defined(_WIN32) && !defined(__CYGWIN__)
   std::string toUtf8() const;
   const StringType& toWide() const { return m_path; }
 #else
