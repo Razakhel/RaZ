@@ -70,3 +70,43 @@ TEST_CASE("RenderSystem Cook-Torrance ball") {
 
   CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true)));
 }
+
+TEST_CASE("RenderSystem overlay render") {
+  Raz::World world(1);
+
+  Raz::Window& window = TestUtils::getWindow();
+
+  world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  // The RenderSystem needs a Camera in order to be run
+  world.addEntityWithComponents<Raz::Transform, Raz::Camera>();
+
+  {
+    Raz::OverlayWindow& overlay1 = window.getOverlay().addWindow("RaZ - Overlay test 1", Raz::Vec2f(window.getWidth(), window.getHeight()));
+    overlay1.addLabel("Label");
+    overlay1.addColoredLabel("Label red", Raz::Vec4f(1.f, 0.f, 0.f, 1.f));
+    overlay1.addColoredLabel("Label cyan", Raz::Vec4f(0.f, 1.f, 1.f, 1.f));
+    overlay1.addButton("Button", [] () noexcept {});
+    overlay1.addCheckbox("Checkbox on", [] () noexcept {}, [] () noexcept {}, true);
+    overlay1.addCheckbox("Checkbox off", [] () noexcept {}, [] () noexcept {}, false);
+    overlay1.addTextbox("Textbox", [] (const std::string&) noexcept {});
+
+    CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay1_base.png", true)));
+
+    overlay1.disable(); // Hiding the overlay window
+  }
+
+  {
+    Raz::OverlayWindow& overlay2 = window.getOverlay().addWindow("RaZ - Overlay test 2", Raz::Vec2f(window.getWidth(), window.getHeight()));
+    overlay2.addSlider("Slider", [] (float) noexcept {}, 0.f, 10.f, 3.123f);
+    overlay2.addListBox("List box", { "Value 0", "Value 1" }, [] (const std::string&, std::size_t) noexcept {}, 1);
+    overlay2.addDropdown("Dropdown", { "Value 0", "Value 1" }, [] (const std::string&, std::size_t) noexcept {}, 1);
+    overlay2.addProgressBar(0, 100, true).setCurrentValue(35);
+    const Raz::Texture texture(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/₁₀₀₁.png", true), false);
+    overlay2.addTexture(texture, 30, 30);
+
+    CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay2_base.png", true)));
+
+    overlay2.disable();
+  }
+}
