@@ -44,9 +44,6 @@ std::string IsNearlyEqualToImage::describe() const {
          << "  Maximum difference: " << std::to_string(m_maxDiff) << '\n'
          << "  Average difference: " << std::to_string(m_avgDiff);
 
-  if (!m_diffImgPath.isEmpty())
-    stream << "\nAn image containing the pixels difference has been saved to '" + m_diffImgPath + '\'';
-
   return stream.str();
 }
 

@@ -53,9 +53,12 @@ TEST_CASE("RenderSystem Cook-Torrance ball") {
 
   Raz::Window& window = TestUtils::getWindow();
 
-  world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+  auto& renderSystem = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
 
-  world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f)).addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+  Raz::Entity& camera = world.addEntity();
+  auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f));
+  auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_TESTS_ROOT "../assets/meshes/ball.obj").second);
 
   world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 1.5f)).addComponent<Raz::Light>(Raz::LightType::POINT, 1.5f, Raz::Vec3f(1.f));
@@ -69,6 +72,21 @@ TEST_CASE("RenderSystem Cook-Torrance ball") {
                                                                           1.f, Raz::Vec3f(1.f, 0.f, 0.f));
 
   CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true)));
+
+  // Setting a cubemap & moving the camera to look the ball from below, in order to see the left, top & back faces of the cubemap
+
+  renderSystem.setCubemap(Raz::Cubemap(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png"),
+                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png"),
+                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ĜƓGǦ.png"),
+                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ĜƓGǦ.png"),
+                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png"),
+                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png")));
+
+  cameraTrans.translate(Raz::Vec3f(3.f, -3.f, 0.f));
+  cameraComp.setCameraType(Raz::CameraType::LOOK_AT);
+  cameraComp.setTarget(Raz::Vec3f(0.f));
+
+  CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_cubemap_base.png", true)));
 }
 
 TEST_CASE("RenderSystem overlay render") {
