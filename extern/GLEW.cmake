@@ -8,28 +8,11 @@ add_library(GLEW OBJECT)
 
 target_compile_features(GLEW PRIVATE c_std_11)
 
-# Defining preprocessor macros
 if (RAZ_PLATFORM_WINDOWS OR RAZ_PLATFORM_CYGWIN)
-    set(
-        GLEW_DEFINITIONS
-
-        -DGLEW_BUILD
-        -DGLEW_NO_GLU
-    )
-
-    set(
-        GLEW_LINKER_FLAGS
-
-        opengl32
-    )
+    set(GLEW_LINKER_FLAGS opengl32)
 elseif (RAZ_PLATFORM_MAC)
     find_package(OpenGL REQUIRED)
-
-    set(
-        GLEW_LINKER_FLAGS
-
-        OpenGL::GL
-    )
+    set(GLEW_LINKER_FLAGS OpenGL::GL)
 endif ()
 
 set(
@@ -70,7 +53,14 @@ endif ()
 
 target_include_directories(GLEW SYSTEM PUBLIC glew/include)
 
-target_compile_definitions(GLEW PUBLIC ${GLEW_DEFINITIONS})
+target_compile_definitions(
+    GLEW
+
+    PUBLIC
+
+    -DGLEW_STATIC
+    -DGLEW_NO_GLU
+)
 
 # Disabling all compilers warnings
 if (RAZ_COMPILER_MSVC)

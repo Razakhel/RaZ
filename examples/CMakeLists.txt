@@ -75,10 +75,5 @@ endif ()
 
 # If FBX SDK used with MSVC, copy the DLL into the examples/ folder to link it properly
 if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)
-    set(DLL_COPY_COMMAND ${CMAKE_COMMAND} -E copy "${FBX_DLL}" "${CMAKE_BINARY_DIR}/examples/${FBX_LIB_NAME}.dll")
-
-    add_custom_command(TARGET RaZ_DeferredDemo PRE_LINK COMMAND ${DLL_COPY_COMMAND})
-    add_custom_command(TARGET RaZ_FullDemo     PRE_LINK COMMAND ${DLL_COPY_COMMAND})
-    add_custom_command(TARGET RaZ_MinDemo      PRE_LINK COMMAND ${DLL_COPY_COMMAND})
-    add_custom_command(TARGET RaZ_ShowcaseDemo PRE_LINK COMMAND ${DLL_COPY_COMMAND})
+    file(COPY "${FBX_DLL}" DESTINATION "${CMAKE_BINARY_DIR}/examples/")
 endif ()

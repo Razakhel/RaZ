@@ -3,8 +3,6 @@
 #ifndef RAZ_RAZ_HPP
 #define RAZ_RAZ_HPP
 
-#define GLEW_STATIC
-
 #include "Application.hpp"
 #include "Component.hpp"
 #include "Entity.hpp"

@@ -285,12 +285,12 @@ if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_GCC AND NOT MINGW) # FBX SDK unavailable f
         find_package(FBX)
 
         if (FBX_FOUND)
-            set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} "${FBX_LIB}")
+            set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} "${FBX_LIBS}")
 
             target_compile_definitions(RaZ PUBLIC ${FBX_DEFINITIONS})
-            target_include_directories(RaZ PUBLIC "${FBX_INCLUDE}")
+            target_include_directories(RaZ SYSTEM PUBLIC "${FBX_INCLUDE_DIRS}")
 
-            message(STATUS "[RaZ] FBX SDK linked (${FBX_LIB})")
+            message(STATUS "[RaZ] FBX SDK linked (${FBX_LIBS})")
         endif ()
     endif ()
 endif ()

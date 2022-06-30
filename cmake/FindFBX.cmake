@@ -2,86 +2,109 @@
 # Finding FBX SDK #
 ###################
 
-if (MSVC)
-    # TODO: searching by default into 'vs2015'; should be MSVC-version dependent
-    set(FBX_LIB_DIR "${FBX_ROOT_DIR}/lib/vs2015/x64")
+set(FBX_ROOT_DIR "" CACHE PATH "Path to your FBX SDK root directory")
 
-    set(FBX_LIB_NAME "libfbxsdk")
-    set(FBX_DEBUG_LIB "${FBX_LIB_DIR}/debug/${FBX_LIB_NAME}")
-    set(FBX_RELEASE_LIB "${FBX_LIB_DIR}/release/${FBX_LIB_NAME}")
-
-    # Checking that .lib & .dll exist, either in debug or release
-    if ((EXISTS "${FBX_DEBUG_LIB}.lib" AND EXISTS "${FBX_DEBUG_LIB}.dll") OR (EXISTS "${FBX_RELEASE_LIB}.lib" AND EXISTS "${FBX_RELEASE_LIB}.dll"))
-        set(FBX_LIB "${FBX_LIB_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>/${FBX_LIB_NAME}.lib")
-        set(FBX_DLL "${FBX_LIB_DIR}/$<IF:$<CONFIG:Debug>,Debug,Release>/${FBX_LIB_NAME}.dll")
-
-        set(FBX_FOUND TRUE)
-    endif ()
-elseif (CMAKE_COMPILER_IS_GNUCC)
-    if ("${CMAKE_BUILD_TYPE}" MATCHES "(D|d)eb")
-        set(BUILD_TYPE "debug")
-    else ()
-        set(BUILD_TYPE "release")
-    endif ()
-
-    set(FBX_LIB "${FBX_ROOT_DIR}/lib/gcc4/x64/${BUILD_TYPE}/libfbxsdk.a")
-
-    # Checking if correctly user-assigned or previously found
-    if (EXISTS "${FBX_ROOT_DIR}/include/fbxsdk.h" AND EXISTS "${FBX_LIB}")
-        set(FBX_FOUND TRUE)
-    endif ()
-endif ()
-
-# SDK not found yet at the requested place, searching for it elsewhere
-if (NOT FBX_FOUND)
-    if (MSVC)
-        # Wildcards used to fetch from 'Program Files (x86)' as well, plus for every version: 2019.0, 2018.1.1, 2018.0, ...
-        # TODO: minor, but should be sorted in reverse order: the more recent the better (always possible to manually select it)
+# If the FBX_ROOT_DIR variable has not been given, attempting to find the SDK's location
+if (FBX_ROOT_DIR)
+    set(FBX_SEARCH_PATHS "${FBX_ROOT_DIR}")
+else ()
+    if (WIN32)
+        # Wildcards used to search in 'Program Files (x86)' as well, and to find every version (20XX.X.X)
         set(FBX_PATH "Program Files*/Autodesk/FBX/FBX SDK/*")
         file(
             GLOB
-            SEARCH_PATHS
+            FBX_SEARCH_PATHS
 
             "C:/${FBX_PATH}"
             "D:/${FBX_PATH}"
             "E:/${FBX_PATH}"
         )
-    elseif (CMAKE_COMPILER_IS_GNUCC)
+
+        list(SORT FBX_SEARCH_PATHS ORDER DESCENDING) # Sorting by descending order, to supposedly have the latest version first
+    elseif (UNIX AND NOT APPLE)
         file(
             GLOB
-            SEARCH_PATHS
+            FBX_SEARCH_PATHS
 
-            "/usr"
+            "/home/*/*FBX*"
+            "/home/*/*fbx*"
             "/usr/local"
-            "~/*FBX*"
-            "~/*fbx*"
+            "/usr"
         )
     endif ()
-
-    foreach (PATH ${SEARCH_PATHS})
-        set(FBX_LIB_LOCATION "${PATH}/${FBX_LIB_DIR}")
-
-        # If header & lib exist, include & link each other respectively
-        if (EXISTS "${PATH}/include/fbxsdk.h" AND EXISTS ${FBX_LIB_LOCATION})
-            set(FBX_ROOT_DIR ${PATH} CACHE PATH "Path to your FBX SDK root directory" FORCE)
-            set(FBX_FOUND TRUE)
-            set(FBX_LIB ${FBX_LIB} ${FBX_LIB_LOCATION})
-
-            break()
-        endif ()
-    endforeach ()
 endif ()
 
-if (FBX_FOUND)
-    set(
-        FBX_DEFINITIONS
+find_path(
+    FBX_INCLUDE_DIRS
 
-        -DFBX_ENABLED
-        -DFBXSDK_SHARED
+    NAMES
+        fbxsdk.h
+    HINTS
+        ENV FBX_ROOT
+    PATHS
+        ${FBX_SEARCH_PATHS}
+    PATH_SUFFIXES
+        include
+    REQUIRED
+)
+
+message("[FBX] Found include directory: ${FBX_INCLUDE_DIRS}")
+
+if (CMAKE_BUILD_TYPE AND CMAKE_BUILD_TYPE MATCHES "(D|d)eb")
+    set(FBX_CONFIG "debug")
+else ()
+    set(FBX_CONFIG "release")
+endif ()
+
+find_library(
+    FBX_LIBS
+
+    NAMES
+        libfbxsdk
+        libfbxsdk.a # CMake does not seem to find libraries with an extension under Linux (and presumably macOS); it must be specified
+    HINTS
+        ENV FBX_ROOT
+    PATHS
+        ${FBX_SEARCH_PATHS}
+    PATH_SUFFIXES
+        lib/vs2022/x64/${FBX_CONFIG}
+        lib/vs2019/x64/${FBX_CONFIG}
+        lib/vs2017/x64/${FBX_CONFIG}
+        lib/vs2015/x64/${FBX_CONFIG}
+
+        lib/gcc/x64/${FBX_CONFIG}
+        lib/gcc4/x64/${FBX_CONFIG}
+    REQUIRED
+)
+
+message("[FBX] Found library: ${FBX_LIBS}")
+
+if (WIN32)
+    # Under Windows, finding the DLL may be useful in some cases
+    find_file(
+        FBX_DLL
+
+        NAMES
+            libfbxsdk.dll
+        HINTS
+            ENV FBX_ROOT
+        PATHS
+            ${FBX_SEARCH_PATHS}
+        PATH_SUFFIXES
+            lib/vs2022/x64/${FBX_CONFIG}
+            lib/vs2019/x64/${FBX_CONFIG}
+            lib/vs2017/x64/${FBX_CONFIG}
+            lib/vs2015/x64/${FBX_CONFIG}
+        REQUIRED
     )
 
-    set(FBX_INCLUDE "${FBX_ROOT_DIR}/include")
-else ()
-    set(FBX_ROOT_DIR "" CACHE PATH "Path to your FBX SDK root directory")
-    message(SEND_ERROR "Error: Couldn't find FBX SDK in expected places, please set its root directory manually.")
+    message("[FBX] Found DLL: ${FBX_DLL}")
 endif ()
+
+set(FBX_FOUND ON)
+set(
+    FBX_DEFINITIONS
+
+    -DFBX_ENABLED
+    -DFBXSDK_SHARED
+)

@@ -42,12 +42,11 @@ if (WIN32 OR CYGWIN)
         HINTS
             ENV OPENALDIR
             ENV OPENAL_SDK_PATH
-        PATH_SUFFIXES
-            lib64 lib libs64 libs libs/Win64
         PATHS
             ${OPENAL_SEARCH_PATHS}
+        PATH_SUFFIXES
+            lib64 lib libs64 libs libs/Win64
         REQUIRED
-        NO_DEFAULT_PATH
     )
 
     if (WIN32)
@@ -60,10 +59,10 @@ if (WIN32 OR CYGWIN)
             HINTS
                 ENV OPENALDIR
                 ENV OPENAL_SDK_PATH
-            PATH_SUFFIXES
-                bin bin/Win64
             PATHS
                 ${OPENAL_SEARCH_PATHS}
+            PATH_SUFFIXES
+                bin bin/Win64
         )
     endif ()
 elseif (APPLE)
@@ -86,9 +85,10 @@ else () # Linux
         GLOB
         OPENAL_SEARCH_PATHS
 
-        "/usr/include"
+        "/home/*/OpenAL*"
+        "/home/*/openal*"
         "/usr/local/include"
-        "~/OpenAL*"
+        "/usr/include"
     )
 endif ()
 
@@ -101,20 +101,16 @@ find_path(
     HINTS
         ENV OPENALDIR
         ENV OPENAL_SDK_PATH
-    PATH_SUFFIXES
-        include/AL include/OpenAL include AL OpenAL
     PATHS
         ${OPENAL_SEARCH_PATHS}
+    PATH_SUFFIXES
+        include/AL include/OpenAL include AL OpenAL
     REQUIRED
 )
 
-if (OPENAL_INCLUDE_DIRS AND OPENAL_LIBS)
-    set(OpenAL_FOUND ON)
-    message("[OpenAL] Found:")
-else ()
-    message("[OpenAL] NOT found:")
-endif ()
+set(OpenAL_FOUND ON)
 
+message("[OpenAL] Found:")
 message("  - Include directory: ${OPENAL_INCLUDE_DIRS}")
 message("  - Library: ${OPENAL_LIBS}")
 if (WIN32)
