@@ -79,6 +79,10 @@ find_library(
 
 message("[FBX] Found library: ${FBX_LIBS}")
 
+if (UNIX)
+    list(APPEND FBX_LIBS xml2) # The SDK requires libxml2
+endif ()
+
 if (WIN32)
     # Under Windows, finding the DLL may be useful in some cases
     find_file(

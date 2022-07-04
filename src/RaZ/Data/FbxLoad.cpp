@@ -1,3 +1,4 @@
+#include "RaZ/Data/FbxFormat.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
@@ -5,7 +6,6 @@
 #include "RaZ/Utils/Logger.hpp"
 
 #include <fbxsdk.h>
-#include <fstream>
 
 namespace Raz::FbxFormat {
 

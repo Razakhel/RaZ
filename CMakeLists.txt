@@ -290,7 +290,7 @@ if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_GCC AND NOT MINGW) # FBX SDK unavailable f
             target_compile_definitions(RaZ PUBLIC ${FBX_DEFINITIONS})
             target_include_directories(RaZ SYSTEM PUBLIC "${FBX_INCLUDE_DIRS}")
 
-            message(STATUS "[RaZ] FBX SDK linked (${FBX_LIBS})")
+            message(STATUS "[RaZ] FBX SDK linked")
         endif ()
     endif ()
 endif ()
@@ -412,7 +412,11 @@ install(TARGETS RaZ DESTINATION "lib/$<CONFIG>")
 # Installing the headers
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ" DESTINATION include)
 
-# If FBX SDK used, install the DLL file into the bin/ folder
-if (RAZ_COMPILER_MSVC AND RAZ_USE_FBX AND FBX_FOUND)
-    install(FILES "${FBX_DLL}" DESTINATION "bin/$<CONFIG>")
+# Installing DLL files into the bin/ folder
+if (RAZ_COMPILER_MSVC)
+    install(FILES "${OPENAL_DLL}" RENAME "OpenAL32.dll" DESTINATION "bin/$<CONFIG>")
+
+    if (RAZ_USE_FBX AND FBX_FOUND)
+        install(FILES "${FBX_DLL}" DESTINATION "bin/$<CONFIG>")
+    endif ()
 endif ()
