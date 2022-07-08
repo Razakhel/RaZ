@@ -71,7 +71,7 @@ TEST_CASE("Texture move") {
 TEST_CASE("Texture presets") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::WHITE);
+  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::White);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(whiteTexture->getImage().isEmpty()); // The image's data is untouched, no allocation is made
@@ -97,7 +97,7 @@ TEST_CASE("Texture presets") {
 #endif
 
   // Creating another texture from the same preset gives a different one; both aren't linked
-  const Raz::TexturePtr whiteTexture2 = Raz::Texture::create(Raz::ColorPreset::WHITE);
+  const Raz::TexturePtr whiteTexture2 = Raz::Texture::create(Raz::ColorPreset::White);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK_FALSE(whiteTexture2.get() == whiteTexture.get());

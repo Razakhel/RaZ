@@ -79,14 +79,6 @@ Texture::Texture() {
   Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
 }
 
-Texture::Texture(ColorPreset preset) : Texture() {
-  const auto red   = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::RED) >> 16u);
-  const auto green = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::GREEN) >> 8u);
-  const auto blue  = static_cast<uint8_t>(static_cast<uint32_t>(preset & ColorPreset::BLUE));
-
-  makePlainColored(Vec3b(red, green, blue));
-}
-
 Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace)
   : Texture(width, height, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
 
@@ -154,7 +146,7 @@ Texture::~Texture() {
 void Texture::load(bool createMipmaps) {
   if (m_image.isEmpty()) {
     // Image not found, defaulting texture to pure white
-    makePlainColored(Vec3b(255));
+    makePlainColored(ColorPreset::White);
     return;
   }
 
@@ -191,9 +183,9 @@ void Texture::load(bool createMipmaps) {
   unbind();
 }
 
-void Texture::makePlainColored(const Vec3b& color) const {
+void Texture::makePlainColored(const Color& color) const {
   bind();
-  Renderer::sendImageData2D(TextureType::TEXTURE_2D, 0, TextureInternalFormat::RGB, 1, 1, TextureFormat::RGB, TextureDataType::UBYTE, color.getDataPtr());
+  Renderer::sendImageData2D(TextureType::TEXTURE_2D, 0, TextureInternalFormat::RGB, 1, 1, TextureFormat::RGB, TextureDataType::UBYTE, Vec3b(color).getDataPtr());
   unbind();
 }
 

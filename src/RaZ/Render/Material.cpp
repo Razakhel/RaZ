@@ -98,17 +98,17 @@ void Material::loadType(MaterialType type) {
         setAttribute(1.f, "uniMaterial.roughnessFactor");
 
       if (!hasTexture("uniMaterial.baseColorMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.baseColorMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.baseColorMap");
       if (!hasTexture("uniMaterial.emissiveMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.emissiveMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.emissiveMap");
       if (!hasTexture("uniMaterial.normalMap"))
-        setTexture(Texture::create(ColorPreset::MEDIUM_BLUE), "uniMaterial.normalMap"); // Representing a [ 0; 0; 1 ] vector
+        setTexture(Texture::create(ColorPreset::MediumBlue), "uniMaterial.normalMap"); // Representing a [ 0; 0; 1 ] vector
       if (!hasTexture("uniMaterial.metallicMap"))
-        setTexture(Texture::create(ColorPreset::RED), "uniMaterial.metallicMap");
+        setTexture(Texture::create(ColorPreset::Red), "uniMaterial.metallicMap");
       if (!hasTexture("uniMaterial.roughnessMap"))
-        setTexture(Texture::create(ColorPreset::RED), "uniMaterial.roughnessMap");
+        setTexture(Texture::create(ColorPreset::Red), "uniMaterial.roughnessMap");
       if (!hasTexture("uniMaterial.ambientMap"))
-        setTexture(Texture::create(ColorPreset::RED), "uniMaterial.ambientMap");
+        setTexture(Texture::create(ColorPreset::Red), "uniMaterial.ambientMap");
 
       break;
 
@@ -127,17 +127,17 @@ void Material::loadType(MaterialType type) {
         setAttribute(1.f, "uniMaterial.transparency");
 
       if (!hasTexture("uniMaterial.baseColorMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.baseColorMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.baseColorMap");
       if (!hasTexture("uniMaterial.emissiveMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.emissiveMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.emissiveMap");
       if (!hasTexture("uniMaterial.ambientMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.ambientMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.ambientMap");
       if (!hasTexture("uniMaterial.specularMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.specularMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.specularMap");
       if (!hasTexture("uniMaterial.transparencyMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.transparencyMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.transparencyMap");
       if (!hasTexture("uniMaterial.bumpMap"))
-        setTexture(Texture::create(ColorPreset::WHITE), "uniMaterial.bumpMap");
+        setTexture(Texture::create(ColorPreset::White), "uniMaterial.bumpMap");
 
       break;
 

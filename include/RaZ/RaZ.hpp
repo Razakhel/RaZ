@@ -14,6 +14,7 @@
 #include "Audio/Sound.hpp"
 #include "Data/Bitset.hpp"
 #include "Data/BvhFormat.hpp"
+#include "Data/Color.hpp"
 #include "Data/FbxFormat.hpp"
 #include "Data/Graph.hpp"
 #include "Data/Image.hpp"

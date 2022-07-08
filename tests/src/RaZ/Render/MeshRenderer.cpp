@@ -72,7 +72,6 @@ TEST_CASE("MeshRenderer clone") {
   CHECK(clonedMeshRenderer.getMaterials().size() == 2);
   CHECK(clonedMeshRenderer.getMaterials()[0].getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.5f));
   CHECK(clonedMeshRenderer.getMaterials()[1].getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.5f));
-
 }
 
 TEST_CASE("MeshRenderer loading") {

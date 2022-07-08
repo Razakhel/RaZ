@@ -2,7 +2,7 @@
 #include "RaZ/Math/PerlinNoise.hpp"
 #include "RaZ/Math/Vector.hpp"
 
-namespace Raz::PerlinNoise{
+namespace Raz::PerlinNoise {
 
 namespace {
 
