@@ -82,3 +82,52 @@ TEST_CASE("Camera perspective projection") {
                                                                             0.f,     0.f, -1.002002f, -0.2002002f,
                                                                             0.f,     0.f, -1.f,        0.f)));
 }
+
+TEST_CASE("Camera point unprojection") {
+  Raz::Camera camera(320, 180);
+
+  Raz::Transform camTrans(Raz::Vec3f(5.f));
+  camera.computeViewMatrix(camTrans);
+  camera.computeInverseViewMatrix();
+
+  // The projection is always slightly in front of the camera, in this case in the -Z direction
+  //    _________
+  //    \       /
+  //     \     /
+  //      \_x_/
+  //      |___|
+  //
+  constexpr float zDepth = 4.8002f;
+
+  CHECK(camera.unproject(Raz::Vec2f(0.f)) == Raz::Vec3f(5.f, 5.f, zDepth));
+  CHECK(camera.unproject(Raz::Vec2f(0.5f, 0.5f)) == Raz::Vec3f(5.073564f, 5.04138f, zDepth));
+  CHECK(camera.unproject(Raz::Vec2f(1.f, 1.f)) == Raz::Vec3f(5.147128f, 5.08276f, zDepth));
+  CHECK(camera.unproject(Raz::Vec2f(-0.5f, -0.5f)) == Raz::Vec3f(4.926435f, 4.95862f, zDepth));
+  CHECK(camera.unproject(Raz::Vec2f(-1.f, -1.f)) == Raz::Vec3f(4.852871f, 4.91724f, zDepth));
+
+  camTrans.rotate(Raz::Quaternionf(90_deg, Raz::Axis::Y));
+  camera.computeViewMatrix(camTrans);
+  camera.computeInverseViewMatrix();
+
+  // After the above rotation, the camera is now facing -X
+  constexpr float xDepth = zDepth;
+
+  CHECK(camera.unproject(Raz::Vec2f(0.f)) == Raz::Vec3f(xDepth, 5.f, 5.f));
+  CHECK(camera.unproject(Raz::Vec2f(0.5f, 0.5f)) == Raz::Vec3f(xDepth, 5.0413799f, 4.926435f));
+  CHECK(camera.unproject(Raz::Vec2f(1.f, 1.f)) == Raz::Vec3f(xDepth, 5.08276f, 4.852871f));
+  CHECK(camera.unproject(Raz::Vec2f(-0.5f, -0.5f)) == Raz::Vec3f(xDepth, 4.95862f, 5.073564f));
+  CHECK(camera.unproject(Raz::Vec2f(-1.f, -1.f)) == Raz::Vec3f(xDepth, 4.91724f, 5.147128f));
+
+  camTrans.rotate(Raz::Quaternionf(90_deg, Raz::Axis::X));
+  camera.computeViewMatrix(camTrans);
+  camera.computeInverseViewMatrix();
+
+  // After another rotation, the camera is now facing +Y
+  constexpr float yDepth = 5.1998f;
+
+  CHECK_THAT(camera.unproject(Raz::Vec2f(0.f)), IsNearlyEqualToVector(Raz::Vec3f(5.f, yDepth, 5.f)));
+  CHECK_THAT(camera.unproject(Raz::Vec2f(0.5f, 0.5f)), IsNearlyEqualToVector(Raz::Vec3f(5.04138f, yDepth, 4.926435f)));
+  CHECK_THAT(camera.unproject(Raz::Vec2f(1.f, 1.f)), IsNearlyEqualToVector(Raz::Vec3f(5.08276f, yDepth, 4.852871f)));
+  CHECK_THAT(camera.unproject(Raz::Vec2f(-0.5f, -0.5f)), IsNearlyEqualToVector(Raz::Vec3f(4.95862f, yDepth, 5.073564f)));
+  CHECK_THAT(camera.unproject(Raz::Vec2f(-1.f, -1.f)), IsNearlyEqualToVector(Raz::Vec3f(4.91724f, yDepth, 5.147128f)));
+}

@@ -89,11 +89,20 @@ public:
   /// Unprojects to world space the given 3D point in homogeneous coordinates.
   /// \param point Point to unproject.
   /// \return Given point in world space.
-  Vec4f unproject(const Vec4f& point) const { return m_invProjMat * m_invViewMat * point; }
+  constexpr Vec3f unproject(const Vec4f& point) const noexcept(std::numeric_limits<float>::is_iec559) {
+    Vec4f viewSpacePoint = m_invProjMat * point;
+    viewSpacePoint      /= viewSpacePoint.w();
+
+    return Vec3f(m_invViewMat * viewSpacePoint);
+  }
   /// Unprojects to world space the given 3D point.
   /// \param point Point to unproject.
   /// \return Given point in world space.
-  Vec3f unproject(const Vec3f& point) const { return Vec3f(unproject(Vec4f(point, 0.f))); }
+  constexpr Vec3f unproject(const Vec3f& point) const noexcept(std::numeric_limits<float>::is_iec559) { return unproject(Vec4f(point, 1.f)); }
+  /// Unprojects to world space the given 2D coordinates.
+  /// \param point Point to unproject. Its values are supposed to be between -1 & 1.
+  /// \return Given point in world space.
+  constexpr Vec3f unproject(const Vec2f& point) const noexcept(std::numeric_limits<float>::is_iec559) { return unproject(Vec3f(point, 0.f)); }
 
 private:
   float m_frameRatio     = 1.f;
