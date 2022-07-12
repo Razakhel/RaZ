@@ -57,6 +57,14 @@ inline const MeshRenderer& getDisplayCube() {
     program.use();
     program.sendUniform("uniSkybox", 0);
 
+#if !defined(USE_OPENGL_ES)
+    if (Renderer::checkVersion(4, 3)) {
+      Renderer::setLabel(RenderObjectType::PROGRAM, program.getIndex(), "Cubemap shader program");
+      Renderer::setLabel(RenderObjectType::SHADER, program.getVertexShader().getIndex(), "Cubemap vertex shader");
+      Renderer::setLabel(RenderObjectType::SHADER, program.getFragmentShader().getIndex(), "Cubemap fragment shader");
+    }
+#endif
+
     return meshRenderer;
   }();
 
@@ -184,6 +192,12 @@ void Cubemap::load(const Image& right, const Image& left, const Image& top, cons
   Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::WRAP_R, TextureParamValue::CLAMP_TO_EDGE);
 
   unbind();
+
+#if !defined(USE_OPENGL_ES)
+  // Setting the label right after creating the texture works, but generates an OpenGL error. This is thus done here instead
+  if (Renderer::checkVersion(4, 3))
+    Renderer::setLabel(RenderObjectType::TEXTURE, m_index, "Cubemap texture");
+#endif
 }
 
 void Cubemap::bind() const {

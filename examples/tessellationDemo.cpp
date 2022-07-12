@@ -202,6 +202,14 @@ int main() {
     materialProgram.setTessellationEvaluationShader(Raz::TessellationEvaluationShader::loadFromSource(tessEvalSource));
     materialProgram.link();
 
+    if (Raz::Renderer::checkVersion(4, 3)) {
+      Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, materialProgram.getIndex(), "Tessellation shader program");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, materialProgram.getVertexShader().getIndex(), "Vertex shader");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, materialProgram.getTessellationControlShader().getIndex(), "Tess. control shader");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, materialProgram.getTessellationEvaluationShader().getIndex(), "Tess. eval. shader");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, materialProgram.getFragmentShader().getIndex(), "Fragment shader");
+    }
+
     /////////////
     // Overlay //
     /////////////

@@ -44,6 +44,10 @@ int main() {
     Raz::ComputeShaderProgram compProgram(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise.comp"));
     compProgram.execute(textureSize, textureSize);
 
+    Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, texture.getIndex(), "Noise texture");
+    Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, compProgram.getIndex(), "Noise shader program");
+    Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, compProgram.getShader().getIndex(), "Noise compute shader");
+
     /////////////
     // Overlay //
     /////////////

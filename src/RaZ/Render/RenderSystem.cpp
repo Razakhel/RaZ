@@ -198,6 +198,14 @@ void RenderSystem::initialize() {
   m_acceptedComponents.setBit(Component::getId<Camera>());
   m_acceptedComponents.setBit(Component::getId<Light>());
   m_acceptedComponents.setBit(Component::getId<MeshRenderer>());
+
+#if !defined(USE_OPENGL_ES)
+  if (Renderer::checkVersion(4, 3)) {
+    Renderer::setLabel(RenderObjectType::BUFFER, m_cameraUbo.getIndex(), "Camera UBO");
+    Renderer::setLabel(RenderObjectType::BUFFER, m_lightsUbo.getIndex(), "Lights UBO");
+    Renderer::setLabel(RenderObjectType::BUFFER, m_modelUbo.getIndex(), "Model UBO");
+  }
+#endif
 }
 
 void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight) {

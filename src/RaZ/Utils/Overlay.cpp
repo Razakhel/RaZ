@@ -45,6 +45,11 @@ bool Overlay::hasMouseFocus() const {
 }
 
 void Overlay::render() const {
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::pushDebugGroup("Overlay pass");
+#endif
+
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
@@ -54,6 +59,11 @@ void Overlay::render() const {
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::popDebugGroup();
+#endif
 }
 
 void Overlay::destroy() const {

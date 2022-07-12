@@ -123,6 +123,14 @@ int main() {
     const auto colorBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
     const auto normalBuffer = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
 
+#if !defined(USE_OPENGL_ES)
+    if (Raz::Renderer::checkVersion(4, 3)) {
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, depthBuffer->getIndex(), "Depth buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, colorBuffer->getIndex(), "Color buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, normalBuffer->getIndex(), "Normal buffer");
+    }
+#endif
+
     // Setting the geometry pass' write buffers
     Raz::RenderPass& geomPass = renderGraph.getGeometryPass();
     geomPass.addWriteTexture(depthBuffer);

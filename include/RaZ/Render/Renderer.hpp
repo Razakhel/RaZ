@@ -1204,9 +1204,11 @@ public:
   /// \return Label of the object.
   static std::string recoverLabel(RenderObjectType type, unsigned int objectIndex);
   /// Adds an entry into the debug group stack. This can be used to define regions which are shown in graphics debuggers.
+  /// \note Requires OpenGL 4.3+.
   /// \param name Name of the group.
   static void pushDebugGroup(const std::string& name);
   /// Removes the latest pushed group.
+  /// \note Requires OpenGL 4.3+.
   static void popDebugGroup();
 #endif
   static ErrorCodes recoverErrors() noexcept;

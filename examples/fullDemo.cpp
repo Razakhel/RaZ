@@ -42,6 +42,14 @@ int main() {
 
     const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::DEPTH);
     const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGBA);
+
+#if !defined(USE_OPENGL_ES)
+    if (Raz::Renderer::checkVersion(4, 3)) {
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, depthBuffer->getIndex(), "Depth buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, colorBuffer->getIndex(), "Color buffer");
+    }
+#endif
+
     geometryPass.addWriteTexture(depthBuffer); // A depth buffer is always needed
     geometryPass.addWriteTexture(colorBuffer);
 

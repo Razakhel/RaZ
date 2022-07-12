@@ -32,6 +32,11 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
 
   const Framebuffer& geometryFramebuffer = m_geometryPass.getFramebuffer();
 
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::pushDebugGroup("Geometry pass");
+#endif
+
   if (!geometryFramebuffer.isEmpty())
     geometryFramebuffer.bind();
 
@@ -79,6 +84,11 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
 
   geometryFramebuffer.unbind();
 
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::popDebugGroup();
+#endif
+
   m_executedPasses.reserve(m_nodes.size() + 1);
   m_executedPasses.emplace(&m_geometryPass);
 
@@ -95,7 +105,18 @@ void RenderGraph::execute(const RenderPass& renderPass) {
   for (const RenderPass* parentPass : renderPass.getParents())
     execute(*parentPass);
 
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::pushDebugGroup("Render pass #" + std::to_string(m_executedPasses.size()));
+#endif
+
   renderPass.execute();
+
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::popDebugGroup();
+#endif
+
   m_executedPasses.emplace(&renderPass);
 }
 
