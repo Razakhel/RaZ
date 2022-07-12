@@ -13,8 +13,8 @@
 
 #include "GLFW/glfw3.h"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Render/Window.hpp"
 #include "RaZ/Utils/Logger.hpp"
-#include "RaZ/Utils/Window.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten/html5.h>

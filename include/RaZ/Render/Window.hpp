@@ -5,9 +5,9 @@
 
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Render/Overlay.hpp"
 #include "RaZ/Utils/EnumUtils.hpp"
 #include "RaZ/Utils/Input.hpp"
-#include "RaZ/Utils/Overlay.hpp"
 
 #include <functional>
 #include <unordered_map>

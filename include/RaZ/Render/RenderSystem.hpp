@@ -4,14 +4,14 @@
 #define RAZ_RENDERSYSTEM_HPP
 
 #include "RaZ/Entity.hpp"
+#include "RaZ/System.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
-#include "RaZ/System.hpp"
-#include "RaZ/Utils/Window.hpp"
+#include "RaZ/Render/Window.hpp"
 
 namespace Raz {
 

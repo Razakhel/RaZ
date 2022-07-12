@@ -44,6 +44,7 @@
 #include "Render/Light.hpp"
 #include "Render/Material.hpp"
 #include "Render/MeshRenderer.hpp"
+#include "Render/Overlay.hpp"
 #include "Render/Renderer.hpp"
 #include "Render/RenderGraph.hpp"
 #include "Render/RenderPass.hpp"
@@ -53,6 +54,7 @@
 #include "Render/SubmeshRenderer.hpp"
 #include "Render/Texture.hpp"
 #include "Render/UniformBuffer.hpp"
+#include "Render/Window.hpp"
 #include "Utils/CompilerUtils.hpp"
 #include "Utils/EnumUtils.hpp"
 #include "Utils/FilePath.hpp"
@@ -60,7 +62,6 @@
 #include "Utils/FloatUtils.hpp"
 #include "Utils/Input.hpp"
 #include "Utils/Logger.hpp"
-#include "Utils/Overlay.hpp"
 #include "Utils/Plugin.hpp"
 #include "Utils/Ray.hpp"
 #include "Utils/Shape.hpp"
@@ -68,7 +69,6 @@
 #include "Utils/Threading.hpp"
 #include "Utils/ThreadPool.hpp"
 #include "Utils/TypeUtils.hpp"
-#include "Utils/Window.hpp"
 
 using namespace Raz::Literals;
 

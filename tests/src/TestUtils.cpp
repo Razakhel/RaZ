@@ -1,6 +1,6 @@
 #include "TestUtils.hpp"
 
-#include "RaZ/Utils/Window.hpp"
+#include "RaZ/Render/Window.hpp"
 
 namespace TestUtils {
 

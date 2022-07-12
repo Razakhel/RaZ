@@ -4,7 +4,6 @@
 
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
-#include "RaZ/Utils/Window.hpp"
 
 int main(int argc, char* argv[]) {
   // Increasing precision output for floating-point values
