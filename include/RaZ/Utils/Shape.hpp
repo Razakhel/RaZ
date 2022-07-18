@@ -100,7 +100,7 @@ protected:
 /// Line segment defined by its two extremities' positions.
 class Line final : public Shape {
 public:
-  Line(const Vec3f& beginPos, const Vec3f& endPos) : m_beginPos{ beginPos }, m_endPos{ endPos } {}
+  Line(const Vec3f& beginPos, const Vec3f& endPos) noexcept : m_beginPos{ beginPos }, m_endPos{ endPos } {}
 
   ShapeType getType() const noexcept override { return ShapeType::LINE; }
   const Vec3f& getBeginPos() const { return m_beginPos; }
@@ -183,9 +183,9 @@ private:
 /// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
 class Plane final : public Shape {
 public:
-  explicit Plane(float distance, const Vec3f& normal = Axis::Y) : m_distance{ distance }, m_normal{ normal } {}
-  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) : m_distance{ position.computeLength() }, m_normal{ normal } {}
-  Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint)
+  explicit Plane(float distance, const Vec3f& normal = Axis::Y) noexcept : m_distance{ distance }, m_normal{ normal } {}
+  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) noexcept : m_distance{ position.computeLength() }, m_normal{ normal } {}
+  Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint) noexcept
     : m_distance{ ((firstPoint + secondPoint + thirdPoint) / 3.f).computeLength() },
       m_normal{ (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize() } {}
 
@@ -263,7 +263,7 @@ private:
 /// Sphere defined by its center position and a radius.
 class Sphere final : public Shape {
 public:
-  Sphere(const Vec3f& centerPos, float radius) : m_centerPos{ centerPos }, m_radius{ radius } {}
+  Sphere(const Vec3f& centerPos, float radius) noexcept : m_centerPos{ centerPos }, m_radius{ radius } {}
 
   ShapeType getType() const noexcept override { return ShapeType::SPHERE; }
   const Vec3f& getCenter() const { return m_centerPos; }
@@ -339,7 +339,7 @@ private:
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
 class Triangle final : public Shape {
 public:
-  Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos)
+  Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos) noexcept
     : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
   ShapeType getType() const noexcept override { return ShapeType::TRIANGLE; }
@@ -429,7 +429,7 @@ private:
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.
 class Quad final : public Shape {
 public:
-  Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos)
+  Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos) noexcept
     : m_leftTopPos{ leftTopPos }, m_rightTopPos{ rightTopPos }, m_rightBottomPos{ rightBottomPos }, m_leftBottomPos{ leftBottomPos } {}
 
   ShapeType getType() const noexcept override { return ShapeType::QUAD; }
@@ -650,8 +650,8 @@ private:
 ///
 class OBB final : public Shape {
 public:
-  OBB(const Vec3f& minPos, const Vec3f& maxPos, const Mat3f& rotation = Mat3f::identity()) : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
-  explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) : m_aabb{ aabb }, m_rotation{ rotation } {}
+  OBB(const Vec3f& minPos, const Vec3f& maxPos, const Mat3f& rotation = Mat3f::identity()) noexcept : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
+  explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) noexcept : m_aabb{ aabb }, m_rotation{ rotation } {}
 
   ShapeType getType() const noexcept override { return ShapeType::OBB; }
   const Vec3f& getMinPosition() const { return m_aabb.getMinPosition(); }
