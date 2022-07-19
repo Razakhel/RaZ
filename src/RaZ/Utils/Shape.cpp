@@ -73,11 +73,11 @@ void Line::translate(const Vec3f& translation) noexcept {
 
 Vec3f Line::computeProjection(const Vec3f& point) const {
   const Vec3f lineVec   = m_endPos - m_beginPos;
-  const float pointDist = lineVec.dot(point - m_beginPos) / lineVec.dot(lineVec);
+  const float pointDist = lineVec.dot(point - m_beginPos) / lineVec.computeSquaredLength();
 
   // Clamping pointDist between 0 & 1, since it can be outside these bounds if not directly projectable
   //
-  //         <0        |        ==0        |        >0
+  //         <0        |        ==0        |        >1
   // __________________________________________________________
   //                   |                   |
   // P                 |         P         |                  P

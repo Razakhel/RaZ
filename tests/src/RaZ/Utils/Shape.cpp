@@ -202,6 +202,18 @@ TEST_CASE("Line point projection") {
   CHECK(line4.computeProjection(furtherBegin) == Raz::Vec3f(-9.5f, -9.5f, 0.f));
 }
 
+TEST_CASE("Line equality") {
+  CHECK(line1 == line1);
+  CHECK(line2 == line2);
+
+  CHECK(line1 != line2);
+  CHECK(line1 != line3);
+
+  Raz::Line line1Copy = line1;
+  line1Copy.translate(Raz::Vec3f(std::numeric_limits<float>::epsilon()));
+  CHECK(line1Copy == line1);
+}
+
 TEST_CASE("Plane basic") {
   const Raz::Plane testPlane1(1.f, Raz::Axis::Y);
   CHECK(testPlane1.getDistance() == 1.f);
@@ -291,6 +303,18 @@ TEST_CASE("Plane translation") {
   }
 }
 
+TEST_CASE("Plane equality") {
+  CHECK(plane1 == plane1);
+  CHECK(plane2 == plane2);
+
+  CHECK(plane1 != plane2);
+  CHECK(plane1 != plane3);
+
+  Raz::Plane plane1Copy = plane1;
+  plane1Copy.translate(Raz::Vec3f(std::numeric_limits<float>::epsilon()));
+  CHECK(plane1Copy == plane1);
+}
+
 TEST_CASE("Sphere point containment") {
   CHECK(sphere1.contains(sphere1.getCenter()));
   CHECK(sphere1.contains(Raz::Vec3f(0.f, 1.f, 0.f))); // Right on the sphere's border
@@ -337,6 +361,18 @@ TEST_CASE("Sphere translation") {
   CHECK(sphere1Copy.getRadius() == sphere1.getRadius());
 }
 
+TEST_CASE("Sphere equality") {
+  CHECK(sphere1 == sphere1);
+  CHECK(sphere2 == sphere2);
+
+  CHECK(sphere1 != sphere2);
+  CHECK(sphere1 != sphere3);
+
+  Raz::Sphere sphere1Copy = sphere1;
+  sphere1Copy.translate(Raz::Vec3f(std::numeric_limits<float>::epsilon()));
+  CHECK(sphere1Copy == sphere1);
+}
+
 TEST_CASE("Triangle basic") {
   // See: https://www.geogebra.org/m/gszsn33d
 
@@ -381,6 +417,18 @@ TEST_CASE("Triangle clockwiseness") {
   CHECK(testTriangle2.isCounterClockwise(Raz::Axis::Z));
   testTriangle2.makeCounterClockwise(Raz::Axis::Z);
   CHECK(testTriangle2.isCounterClockwise(Raz::Axis::Z));
+}
+
+TEST_CASE("Triangle equality") {
+  CHECK(triangle1 == triangle1);
+  CHECK(triangle2 == triangle2);
+
+  CHECK(triangle1 != triangle2);
+  CHECK(triangle1 != triangle3);
+
+  Raz::Triangle triangle1Copy = triangle1;
+  triangle1Copy.translate(Raz::Vec3f(std::numeric_limits<float>::epsilon()));
+  CHECK(triangle1Copy == triangle1);
 }
 
 TEST_CASE("AABB basic") {
@@ -437,4 +485,16 @@ TEST_CASE("AABB translation") {
   aabb1Copy.translate(Raz::Vec3f(-1.f));
   CHECK(aabb1Copy.getMinPosition() == aabb1.getMinPosition());
   CHECK(aabb1Copy.getMaxPosition() == aabb1.getMaxPosition());
+}
+
+TEST_CASE("AABB equality") {
+  CHECK(aabb1 == aabb1);
+  CHECK(aabb2 == aabb2);
+
+  CHECK(aabb1 != aabb2);
+  CHECK(aabb1 != aabb3);
+
+  Raz::AABB aabb1Copy = aabb1;
+  aabb1Copy.translate(Raz::Vec3f(std::numeric_limits<float>::epsilon()));
+  CHECK(aabb1Copy == aabb1);
 }
