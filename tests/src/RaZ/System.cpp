@@ -7,7 +7,7 @@
 
 class TestSystem : public Raz::System {
 public:
-  TestSystem() { m_acceptedComponents.setBit(Raz::Component::getId<Raz::Transform>()); } // [ 0 1 ]
+  TestSystem() { registerComponents<Raz::Transform>(); } // [ 0 1 ]
 
   void linkEntity(const Raz::EntityPtr& entity) override { System::linkEntity(entity); }
   void unlinkEntity(const Raz::EntityPtr& entity) override { System::unlinkEntity(entity); }

@@ -35,9 +35,7 @@ inline void checkError(void* device, const std::string& errorMsg) {
 } // namespace
 
 AudioSystem::AudioSystem(const char* deviceName) {
-  m_acceptedComponents.setBit(Component::getId<Sound>());
-  m_acceptedComponents.setBit(Component::getId<Listener>());
-
+  registerComponents<Sound, Listener>();
   openDevice(deviceName);
 }
 

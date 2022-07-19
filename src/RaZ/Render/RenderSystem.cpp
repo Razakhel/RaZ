@@ -195,9 +195,7 @@ void RenderSystem::initialize() {
   Renderer::enable(Capability::CUBEMAP_SEAMLESS);
 #endif
 
-  m_acceptedComponents.setBit(Component::getId<Camera>());
-  m_acceptedComponents.setBit(Component::getId<Light>());
-  m_acceptedComponents.setBit(Component::getId<MeshRenderer>());
+  registerComponents<Camera, Light, MeshRenderer>();
 
 #if !defined(USE_OPENGL_ES)
   if (Renderer::checkVersion(4, 3)) {

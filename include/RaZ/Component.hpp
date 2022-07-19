@@ -13,13 +13,13 @@ using ComponentPtr = std::unique_ptr<Component>;
 /// Component class representing a base Component to be inherited.
 class Component {
 public:
-  /// Gets the ID of the given component.
-  /// It uses CRTP to assign a different ID to each component it is called with.
-  /// This function will be compiled every time it is called with a different component type, incrementing the assigned index.
+  /// Gets the ID of the given component type.
+  /// It uses CRTP to assign a different ID to each component type it is called with.
+  /// This function will be instantiated every time it is called with a different type, incrementing the assigned index.
   /// Note that it must be called directly from Component, and a derived class must be given (Component::getId<DerivedComponent>()).
-  /// \tparam T Type of the component to get the ID for.
+  /// \tparam CompT Type of the component to get the ID of.
   /// \return Given component's ID.
-  template <typename T> static std::size_t getId();
+  template <typename CompT> static std::size_t getId();
 
   virtual ~Component() = default;
 

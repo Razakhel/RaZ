@@ -23,13 +23,13 @@ public:
 
   const Bitset& getAcceptedComponents() const { return m_acceptedComponents; }
 
-  /// Gets the ID of the given system.
-  /// It uses CRTP to assign a different ID to each system it is called with.
-  /// This function will be compiled every time it is called with a different system type, incrementing the assigned index.
+  /// Gets the ID of the given system type.
+  /// It uses CRTP to assign a different ID to each system type it is called with.
+  /// This function will be instantiated every time it is called with a different type, incrementing the assigned index.
   /// Note that it must be called directly from System, and a derived class must be given (System::getId<DerivedSystem>()).
-  /// \tparam T Type of the system to get the ID for.
+  /// \tparam SysT Type of the system to get the ID of.
   /// \return Given system's ID.
-  template <typename T> static std::size_t getId();
+  template <typename SysT> static std::size_t getId();
   /// Checks if the system contains the given entity.
   /// \param entity Entity to be checked.
   /// \return True if the system contains the entity, false otherwise.
@@ -53,6 +53,12 @@ public:
 protected:
   System() = default;
 
+  /// Adds the given component types as accepted by the current system.
+  /// \tparam CompTs Types of the components to accept.
+  template <typename... CompTs> void registerComponents() { (m_acceptedComponents.setBit(Component::getId<CompTs>()), ...); }
+  /// Removes the given component types as accepted by the current system.
+  /// \tparam CompTs Types of the components to deny.
+  template <typename... CompTs> void unregisterComponents() { (m_acceptedComponents.setBit(Component::getId<CompTs>(), false), ...); }
   /// Links the entity to the system.
   /// \param entity Entity to be linked.
   virtual void linkEntity(const EntityPtr& entity);

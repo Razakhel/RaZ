@@ -6,8 +6,7 @@
 namespace Raz {
 
 PhysicsSystem::PhysicsSystem() {
-  m_acceptedComponents.setBit(Component::getId<Collider>());
-  m_acceptedComponents.setBit(Component::getId<RigidBody>());
+  registerComponents<Collider, RigidBody>();
 }
 
 bool PhysicsSystem::step(float deltaTime) {
