@@ -80,6 +80,11 @@ template <typename FuncT, typename... Args, typename ResultT = std::invoke_resul
 /// \param threadCount Amount of threads to start an instance on.
 void parallelize(const std::function<void()>& action, unsigned int threadCount = getSystemThreadCount());
 
+/// Calls the given functions in parallel, each on its own thread.
+/// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
+/// \param actions Actions to be performed in parallel.
+void parallelize(std::initializer_list<std::function<void()>> actions);
+
 /// Calls a function in parallel on a given number of separate threads of execution.
 /// The collection is automatically split by indices, giving a separate start/past-the-end range to each thread.
 /// \note The container must either be a constant-size C array or have a size() function.

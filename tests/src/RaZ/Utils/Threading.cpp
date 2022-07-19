@@ -54,6 +54,19 @@ TEST_CASE("Threading simple parallelization") {
   CHECK(i == 10);
 }
 
+TEST_CASE("Threading multi parallelization") {
+  std::atomic<int> i = 0;
+  Raz::Threading::parallelize({
+    [&i] () noexcept { ++i; },
+    [&i] () noexcept { ++i; },
+    [&i] () noexcept { ++i; },
+    [&i] () noexcept { ++i; },
+    [&i] () noexcept { ++i; }
+  });
+
+  CHECK(i == 5);
+}
+
 TEST_CASE("Threading index parallelization - divisible size") {
   std::vector<int> values(2048); // Choosing a size that can be easily divided
   fillRandom(values);

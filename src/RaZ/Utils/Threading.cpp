@@ -34,6 +34,30 @@ void parallelize(const std::function<void()>& action, unsigned int threadCount) 
 #endif
 }
 
+void parallelize(std::initializer_list<std::function<void()>> actions) {
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  ThreadPool& threadPool = getDefaultThreadPool();
+
+  std::vector<std::promise<void>> promises;
+  promises.resize(actions.size());
+
+  for (unsigned int i = 0; i < actions.size(); ++i) {
+    threadPool.addAction([&actions, &promises, i] () {
+      const std::function<void()>& action = *(actions.begin() + i);
+      action();
+      promises[i].set_value();
+    });
+  }
+
+  // Blocking here to wait for all threads to finish their action
+  for (std::promise<void>& promise : promises)
+    promise.get_future().wait();
+#else
+  for (const std::function<void()>& action : actions)
+    action();
+#endif
+}
+
 } // namespace Raz::Threading
 
 #endif // RAZ_THREADS_AVAILABLE
