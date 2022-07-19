@@ -161,6 +161,18 @@ TEST_CASE("Line-AABB intersection") {
   CHECK(line4.intersects(aabb3));
 }
 
+TEST_CASE("Line translation") {
+  Raz::Line line1Copy = line1;
+
+  line1Copy.translate(Raz::Vec3f(1.f));
+  CHECK(line1Copy.getBeginPos() == line1.getBeginPos() + Raz::Vec3f(1.f));
+  CHECK(line1Copy.getEndPos() == line1.getEndPos() + Raz::Vec3f(1.f));
+
+  line1Copy.translate(Raz::Vec3f(-1.f));
+  CHECK(line1Copy.getBeginPos() == line1.getBeginPos());
+  CHECK(line1Copy.getEndPos() == line1.getEndPos());
+}
+
 TEST_CASE("Line point projection") {
   CHECK(line1.computeProjection(line1.getBeginPos()) == line1.getBeginPos());
   CHECK(line1.computeProjection(line1.getEndPos()) == line1.getEndPos());
@@ -241,6 +253,44 @@ TEST_CASE("Plane-sphere intersection") {
   CHECK(plane3.intersects(sphere3));
 }
 
+TEST_CASE("Plane translation") {
+  {
+    Raz::Plane plane1Copy = plane1;
+
+    plane1Copy.translate(Raz::Vec3f(1.f));
+    CHECK(plane1Copy.getDistance() == plane1.getDistance() + 1.f);
+    CHECK(plane1Copy.getNormal().strictlyEquals(plane1.getNormal())); // The normal doesn't change
+
+    plane1Copy.translate(Raz::Vec3f(-1.f));
+    CHECK(plane1Copy.getDistance() == plane1.getDistance());
+    CHECK(plane1Copy.getNormal().strictlyEquals(plane1.getNormal()));
+  }
+
+  {
+    Raz::Plane plane2Copy = plane2;
+
+    plane2Copy.translate(Raz::Vec3f(1.f));
+    CHECK(plane2Copy.getDistance() == plane2.getDistance() + std::sqrt(2.f) /* 1.4142135f */);
+    CHECK(plane2Copy.getNormal().strictlyEquals(plane2.getNormal()));
+
+    plane2Copy.translate(Raz::Vec3f(-1.f));
+    CHECK(Raz::FloatUtils::areNearlyEqual(plane2Copy.getDistance(), plane2.getDistance(), 15e-8f)); // A small error has been introduced due to the operations
+    CHECK(plane2Copy.getNormal().strictlyEquals(plane2.getNormal()));
+  }
+
+  {
+    Raz::Plane plane3Copy = plane3;
+
+    plane3Copy.translate(Raz::Vec3f(1.f));
+    CHECK(plane3Copy.getDistance() == plane3.getDistance()); // The point lies on the plane; nothing is done
+    CHECK(plane3Copy.getNormal().strictlyEquals(plane3.getNormal()));
+
+    plane3Copy.translate(Raz::Vec3f(-1.f));
+    CHECK(plane3Copy.getDistance() == plane3.getDistance());
+    CHECK(plane3Copy.getNormal().strictlyEquals(plane3.getNormal()));
+  }
+}
+
 TEST_CASE("Sphere point containment") {
   CHECK(sphere1.contains(sphere1.getCenter()));
   CHECK(sphere1.contains(Raz::Vec3f(0.f, 1.f, 0.f))); // Right on the sphere's border
@@ -275,6 +325,18 @@ TEST_CASE("Sphere-sphere intersection") {
   CHECK(testSphere.intersects(sphere3));
 }
 
+TEST_CASE("Sphere translation") {
+  Raz::Sphere sphere1Copy = sphere1;
+
+  sphere1Copy.translate(Raz::Vec3f(1.f));
+  CHECK(sphere1Copy.getCenter() == sphere1.getCenter() + Raz::Vec3f(1.f));
+  CHECK(sphere1Copy.getRadius() == sphere1.getRadius()); // The radius doesn't change
+
+  sphere1Copy.translate(Raz::Vec3f(-1.f));
+  CHECK(sphere1Copy.getCenter() == sphere1.getCenter());
+  CHECK(sphere1Copy.getRadius() == sphere1.getRadius());
+}
+
 TEST_CASE("Triangle basic") {
   // See: https://www.geogebra.org/m/gszsn33d
 
@@ -286,6 +348,20 @@ TEST_CASE("Triangle basic") {
 
   CHECK(triangle3.computeCentroid() == Raz::Vec3f(-0.5f, -1.416666666f, 0.f));
   CHECK_THAT(triangle3.computeNormal(), IsNearlyEqualToVector(Raz::Vec3f(0.077791f, -0.93349177f, 0.35005942f)));
+}
+
+TEST_CASE("Triangle translation") {
+  Raz::Triangle triangle1Copy = triangle1;
+
+  triangle1Copy.translate(Raz::Vec3f(1.f));
+  CHECK(triangle1Copy.getFirstPos() == triangle1.getFirstPos() + Raz::Vec3f(1.f));
+  CHECK(triangle1Copy.getSecondPos() == triangle1.getSecondPos() + Raz::Vec3f(1.f));
+  CHECK(triangle1Copy.getThirdPos() == triangle1.getThirdPos() + Raz::Vec3f(1.f));
+
+  triangle1Copy.translate(Raz::Vec3f(-1.f));
+  CHECK(triangle1Copy.getFirstPos() == triangle1.getFirstPos());
+  CHECK(triangle1Copy.getSecondPos() == triangle1.getSecondPos());
+  CHECK(triangle1Copy.getThirdPos() == triangle1.getThirdPos());
 }
 
 TEST_CASE("Triangle clockwiseness") {
@@ -349,4 +425,16 @@ TEST_CASE("AABB point containment") {
   CHECK_FALSE(aabb1.contains(point5));
   CHECK_FALSE(aabb2.contains(point5));
   CHECK_FALSE(aabb3.contains(point5));
+}
+
+TEST_CASE("AABB translation") {
+  Raz::AABB aabb1Copy = aabb1;
+
+  aabb1Copy.translate(Raz::Vec3f(1.f));
+  CHECK(aabb1Copy.getMinPosition() == aabb1.getMinPosition() + Raz::Vec3f(1.f));
+  CHECK(aabb1Copy.getMaxPosition() == aabb1.getMaxPosition() + Raz::Vec3f(1.f));
+
+  aabb1Copy.translate(Raz::Vec3f(-1.f));
+  CHECK(aabb1Copy.getMinPosition() == aabb1.getMinPosition());
+  CHECK(aabb1Copy.getMaxPosition() == aabb1.getMaxPosition());
 }

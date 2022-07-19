@@ -74,6 +74,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the shape, false otherwise.
   virtual bool intersects(const Ray& ray, RayHit* hit) const = 0;
+  /// Translates the shape by the given vector.
+  /// \param displacement Displacement to be translated by.
+  virtual void translate(const Vec3f& displacement) noexcept = 0;
   /// Computes the projection of a point (closest point) onto the shape.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the shape.
@@ -137,6 +140,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the line, false otherwise.
   bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
+  /// Translates the line by the given vector.
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the projection of a point (closest point) onto the line.
   /// The projected point is necessarily located on the line.
   /// \param point Point to compute the projection from.
@@ -209,6 +215,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the plane, false otherwise.
   bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
+  /// Translates the plane by the given vector.
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) noexcept override { m_distance = m_normal.dot(computeCentroid() + displacement); }
   /// Computes the projection of a point (closest point) onto the plane.
   /// The projected point is necessarily located on the plane.
   /// \param point Point to compute the projection from.
@@ -269,6 +278,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the sphere, false otherwise.
   bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
+  /// Translates the sphere by the given vector.
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) noexcept override { m_centerPos += displacement; }
   /// Computes the projection of a point (closest point) onto the sphere.
   /// The projected point may be inside the sphere itself or on its surface.
   /// \param point Point to compute the projection from.
@@ -331,6 +343,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the triangle, false otherwise.
   bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
+  /// Translates the triangle by the given vector.
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the projection of a point (closest point) onto the triangle.
   /// The projected point is necessarily located on the triangle's surface.
   /// \param point Point to compute the projection from.
@@ -405,6 +420,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the quad, false otherwise.
   bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
+  /// Translates the quad by the given vector.
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the projection of a point (closest point) onto the quad.
   /// The projected point is necessarily located on the quad's surface.
   /// \param point Point to compute the projection from.
@@ -481,6 +499,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the AABB, false otherwise.
   bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
+  /// Translates the AABB by the given vector.
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) noexcept override;
   /// Computes the projection of a point (closest point) onto the AABB.
   /// The projected point may be inside the AABB itself or on its surface.
   /// \param point Point to compute the projection from.
@@ -594,6 +615,9 @@ public:
   /// \param hit Optional ray intersection's information to recover (nullptr if unneeded).
   /// \return True if the ray intersects the OBB, false otherwise.
   bool intersects(const Ray&, RayHit*) const override { throw std::runtime_error("Error: Not implemented yet."); }
+  /// Translates the OBB by the given vector.
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) noexcept override { m_aabb.translate(displacement); }
   /// Computes the projection of a point (closest point) onto the OBB.
   /// The projected point may be inside the AABB itself or on its surface.
   /// \param point Point to compute the projection from.

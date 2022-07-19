@@ -66,6 +66,11 @@ bool Line::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+void Line::translate(const Vec3f& translation) noexcept {
+  m_beginPos += translation;
+  m_endPos   += translation;
+}
+
 Vec3f Line::computeProjection(const Vec3f& point) const {
   const Vec3f lineVec   = m_endPos - m_beginPos;
   const float pointDist = lineVec.dot(point - m_beginPos) / lineVec.dot(lineVec);
@@ -169,6 +174,12 @@ bool Triangle::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+void Triangle::translate(const Vec3f& translation) noexcept {
+  m_firstPos  += translation;
+  m_secondPos += translation;
+  m_thirdPos  += translation;
+}
+
 Vec3f Triangle::computeProjection(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
@@ -201,6 +212,13 @@ bool Quad::intersects(const AABB&) const {
 
 bool Quad::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
+}
+
+void Quad::translate(const Vec3f& translation) noexcept {
+  m_leftTopPos     += translation;
+  m_rightTopPos    += translation;
+  m_rightBottomPos += translation;
+  m_leftBottomPos  += translation;
 }
 
 Vec3f Quad::computeProjection(const Vec3f&) const {
@@ -251,6 +269,11 @@ bool AABB::intersects(const AABB& aabb) const {
 
 bool AABB::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
+}
+
+void AABB::translate(const Vec3f& translation) noexcept {
+  m_minPos += translation;
+  m_maxPos += translation;
 }
 
 Vec3f AABB::computeProjection(const Vec3f& point) const {
