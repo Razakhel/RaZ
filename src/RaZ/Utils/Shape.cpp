@@ -88,6 +88,14 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
   return m_beginPos + lineVec * std::clamp(pointDist, 0.f, 1.f);
 }
 
+AABB Line::computeBoundingBox() const {
+  const auto [xMin, xMax] = std::minmax(m_beginPos.x(), m_endPos.x());
+  const auto [yMin, yMax] = std::minmax(m_beginPos.y(), m_endPos.y());
+  const auto [zMin, zMax] = std::minmax(m_beginPos.z(), m_endPos.z());
+
+  return AABB(Vec3f(xMin, yMin, zMin), Vec3f(xMax, yMax, zMax));
+}
+
 // Plane functions
 
 bool Plane::intersects(const Plane& plane) const {
@@ -120,6 +128,10 @@ bool Plane::intersects(const AABB& aabb) const {
 }
 
 bool Plane::intersects(const OBB&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+AABB Plane::computeBoundingBox() const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
@@ -156,6 +168,10 @@ bool Sphere::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+AABB Sphere::computeBoundingBox() const {
+  return AABB(m_centerPos - m_radius, m_centerPos + m_radius);
+}
+
 // Triangle functions
 
 bool Triangle::intersects(const Triangle&) const {
@@ -182,6 +198,14 @@ void Triangle::translate(const Vec3f& translation) noexcept {
 
 Vec3f Triangle::computeProjection(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
+}
+
+AABB Triangle::computeBoundingBox() const {
+  const auto [xMin, xMax] = std::minmax({ m_firstPos.x(), m_secondPos.x(), m_thirdPos.x() });
+  const auto [yMin, yMax] = std::minmax({ m_firstPos.y(), m_secondPos.y(), m_thirdPos.y() });
+  const auto [zMin, zMax] = std::minmax({ m_firstPos.z(), m_secondPos.z(), m_thirdPos.z() });
+
+  return AABB(Vec3f(xMin, yMin, zMin), Vec3f(xMax, yMax, zMax));
 }
 
 Vec3f Triangle::computeNormal() const {
@@ -225,6 +249,14 @@ Vec3f Quad::computeProjection(const Vec3f&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+AABB Quad::computeBoundingBox() const {
+  const auto [xMin, xMax] = std::minmax({ m_leftTopPos.x(), m_rightTopPos.x(), m_rightBottomPos.x(), m_leftBottomPos.x() });
+  const auto [yMin, yMax] = std::minmax({ m_leftTopPos.y(), m_rightTopPos.y(), m_rightBottomPos.y(), m_leftBottomPos.y() });
+  const auto [zMin, zMax] = std::minmax({ m_leftTopPos.z(), m_rightTopPos.z(), m_rightBottomPos.z(), m_leftBottomPos.z() });
+
+  return AABB(Vec3f(xMin, yMin, zMin), Vec3f(xMax, yMax, zMax));
+}
+
 // AABB functions
 
 bool AABB::contains(const Vec3f& point) const {
@@ -245,20 +277,17 @@ bool AABB::intersects(const AABB& aabb) const {
   // We determine for each axis if there are extremities that are overlapping
   // If the max point of one AABB is further on an axis than the min point of the other, they intersect each other on this axis
   //
-  //                         max1
-  //                          v
-  //    -----------------------
-  //    |                     |
-  //    |                -------------------
-  //    |                |    |            |
-  //    |                |    |            |
-  //    |                |    |            |
-  //    |                |    |            |
-  //    -----------------|-----            |
-  //                     |                 |
-  //                     -------------------
-  //                     ^
-  //                   min2
+  //            max1
+  //             v
+  //    ----------
+  //    |        |
+  //    |     ----------
+  //    |     |  |     |
+  //    ------|---     |
+  //          |        |
+  //          ----------
+  //          ^
+  //        min2
 
   const bool intersectsX = (minPoint1.x() <= maxPoint2.x()) && (maxPoint1.x() >= minPoint2.x());
   const bool intersectsY = (minPoint1.y() <= maxPoint2.y()) && (maxPoint1.y() >= minPoint2.y());
@@ -300,6 +329,10 @@ bool OBB::intersects(const OBB&) const {
 }
 
 Vec3f OBB::computeProjection(const Vec3f&) const {
+  throw std::runtime_error("Error: Not implemented yet.");
+}
+
+AABB OBB::computeBoundingBox() const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 

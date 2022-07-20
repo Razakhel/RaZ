@@ -84,6 +84,9 @@ public:
   /// Computes the shape's centroid.
   /// \return Computed centroid.
   virtual Vec3f computeCentroid() const = 0;
+  /// Computes the shape's bounding box.
+  /// \return Computed bounding box.
+  virtual AABB computeBoundingBox() const = 0;
 
   Shape& operator=(const Shape&) = default;
   Shape& operator=(Shape&&) noexcept = default;
@@ -151,6 +154,7 @@ public:
   /// Computes the line's centroid, which is the point lying directly between the two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) * 0.5f; }
+  AABB computeBoundingBox() const override;
   /// Line length computation.
   /// To be used if the actual length is needed; otherwise, prefer computeSquaredLength().
   /// \return Line's length.
@@ -237,6 +241,7 @@ public:
   /// Computes the plane's centroid, which is the point lying onto the plane at its distance from the center in its normal direction.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_normal * m_distance; }
+  AABB computeBoundingBox() const override;
 
   /// Checks if the current plane is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
@@ -312,6 +317,7 @@ public:
   /// Computes the sphere's centroid, which is its center. Strictly equivalent to getCenterPos().
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_centerPos; }
+  AABB computeBoundingBox() const override;
 
   /// Checks if the current sphere is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
@@ -389,6 +395,7 @@ public:
   /// Computes the triangle's centroid, which is the point lying directly between its three points.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_firstPos + m_secondPos + m_thirdPos) / 3.f; }
+  AABB computeBoundingBox() const override;
   /// Computes the triangle's normal from its points.
   /// \return Computed normal.
   Vec3f computeNormal() const;
@@ -479,6 +486,7 @@ public:
   /// Computes the quad's centroid, which is the point lying directly between its four points.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_leftTopPos + m_rightTopPos + m_rightBottomPos + m_leftBottomPos) * 0.25f; }
+  AABB computeBoundingBox() const override;
 
   /// Checks if the current quad is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
@@ -572,6 +580,7 @@ public:
   /// Computes the AABB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_maxPos + m_minPos) * 0.5f; }
+  AABB computeBoundingBox() const override { return *this; }
   /// Computes the half extents of the box, starting from its centroid.
   ///
   ///          _______________________
@@ -699,6 +708,7 @@ public:
   /// Computes the OBB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
+  AABB computeBoundingBox() const override;
   /// Computes the half extents of the box, starting from its centroid.
   /// These half extents are oriented according to the box's rotation.
   ///

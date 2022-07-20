@@ -202,6 +202,13 @@ TEST_CASE("Line point projection") {
   CHECK(line4.computeProjection(furtherBegin) == Raz::Vec3f(-9.5f, -9.5f, 0.f));
 }
 
+TEST_CASE("Line bounding box") {
+  CHECK(line1.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(1.f, 0.f, 0.f)));
+  CHECK(line2.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f, 1.f, 0.f)));
+  CHECK(line3.computeBoundingBox() == Raz::AABB(Raz::Vec3f(1.5f, 2.5f, 0.f), Raz::Vec3f(5.5f, 5.f, 0.f)));
+  CHECK(line4.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-10.f, -10.f, 0.f), Raz::Vec3f(6.f, 6.f, 0.f)));
+}
+
 TEST_CASE("Line equality") {
   CHECK(line1 == line1);
   CHECK(line2 == line2);
@@ -332,7 +339,7 @@ TEST_CASE("Sphere point containment") {
 TEST_CASE("Sphere-sphere intersection") {
   // See: https://www.geogebra.org/m/tsfueyp5
 
-  const Raz::Sphere testSphere(Raz::Vec3f(0.f), 13.15f); // This sphere intersects all of the test ones
+  const Raz::Sphere testSphere(Raz::Vec3f(0.f), 13.15f); // This sphere intersects all the test ones
 
   CHECK(sphere1.intersects(sphere1));
   CHECK_FALSE(sphere1.intersects(sphere2));
@@ -359,6 +366,12 @@ TEST_CASE("Sphere translation") {
   sphere1Copy.translate(Raz::Vec3f(-1.f));
   CHECK(sphere1Copy.getCenter() == sphere1.getCenter());
   CHECK(sphere1Copy.getRadius() == sphere1.getRadius());
+}
+
+TEST_CASE("Sphere bounding box") {
+  CHECK(sphere1.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-1.f), Raz::Vec3f(1.f)));
+  CHECK(sphere2.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.f, 5.f, -5.f), Raz::Vec3f(10.f, 15.f, 5.f)));
+  CHECK(sphere3.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-11.f, -11.f, -1.f), Raz::Vec3f(-9.f, -9.f, 1.f)));
 }
 
 TEST_CASE("Sphere equality") {
@@ -398,6 +411,12 @@ TEST_CASE("Triangle translation") {
   CHECK(triangle1Copy.getFirstPos() == triangle1.getFirstPos());
   CHECK(triangle1Copy.getSecondPos() == triangle1.getSecondPos());
   CHECK(triangle1Copy.getThirdPos() == triangle1.getThirdPos());
+}
+
+TEST_CASE("Triangle bounding box") {
+  CHECK(triangle1.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-3.f, 0.5f, -6.f), Raz::Vec3f(3.f, 0.5f, 3.f)));
+  CHECK(triangle2.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.5f, -0.5f, -3.f), Raz::Vec3f(0.5f, 3.f, 3.f)));
+  CHECK(triangle3.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-1.5f, -1.75f, -1.f), Raz::Vec3f(0.f, -1.f, 1.f)));
 }
 
 TEST_CASE("Triangle clockwiseness") {
@@ -485,6 +504,12 @@ TEST_CASE("AABB translation") {
   aabb1Copy.translate(Raz::Vec3f(-1.f));
   CHECK(aabb1Copy.getMinPosition() == aabb1.getMinPosition());
   CHECK(aabb1Copy.getMaxPosition() == aabb1.getMaxPosition());
+}
+
+TEST_CASE("AABB bounding box") {
+  CHECK(aabb1.computeBoundingBox() == aabb1);
+  CHECK(aabb2.computeBoundingBox() == aabb2);
+  CHECK(aabb3.computeBoundingBox() == aabb3);
 }
 
 TEST_CASE("AABB equality") {

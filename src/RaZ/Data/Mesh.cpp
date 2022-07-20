@@ -300,8 +300,8 @@ std::size_t Mesh::recoverTriangleCount() const {
 }
 
 const AABB& Mesh::computeBoundingBox() {
-  Vec3f maxPos(std::numeric_limits<float>::lowest());
   Vec3f minPos(std::numeric_limits<float>::max());
+  Vec3f maxPos(std::numeric_limits<float>::lowest());
 
   for (Submesh& submesh : m_submeshes) {
     const AABB& boundingBox = submesh.computeBoundingBox();
