@@ -288,7 +288,7 @@ TEST_CASE("Mesh AABB") {
   const Raz::Submesh& submesh = mesh.getSubmeshes().front();
 
   auto checkWindingOrder = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal) {
-    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex]].position,
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex    ]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
 

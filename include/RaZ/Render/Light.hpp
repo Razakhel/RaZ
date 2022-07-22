@@ -3,6 +3,7 @@
 #ifndef RAZ_LIGHT_HPP
 #define RAZ_LIGHT_HPP
 
+#include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 namespace Raz {

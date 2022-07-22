@@ -1,5 +1,6 @@
 #include "RaZ/Data/BvhSystem.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Math/Transform.hpp"
 
 namespace Raz {
 
@@ -49,10 +50,6 @@ void BvhNode::build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginI
   // TODO: wait for a parallel/reduce to be implemented in order to optimize the following loop
   for (std::size_t i = beginIndex + 1; i < endIndex; ++i) {
     const AABB triangleBox = trianglesInfo[i].triangle.computeBoundingBox();
-
-    // TODO: transform the box
-    //if (trianglesInfo[i].entity->hasComponent<Transform>())
-    //  triangleBox.transform(trianglesInfo[i].entity->getComponent<Transform>());
 
     const float xMin = std::min(triangleBox.getMinPosition().x(), m_boundingBox.getMinPosition().x());
     const float yMin = std::min(triangleBox.getMinPosition().y(), m_boundingBox.getMinPosition().y());
@@ -108,8 +105,12 @@ void BvhSystem::build() {
 
   std::size_t totalTriangleCount = 0;
 
-  for (const Entity* entity : m_entities)
+  for (const Entity* entity : m_entities) {
+    if (!entity->isEnabled())
+      continue;
+
     totalTriangleCount += entity->getComponent<Mesh>().recoverTriangleCount();
+  }
 
   if (totalTriangleCount == 0)
     return; // No triangle to build the BVH from
@@ -118,11 +119,25 @@ void BvhSystem::build() {
   triangles.reserve(totalTriangleCount);
 
   for (Entity* entity : m_entities) {
+    if (!entity->isEnabled())
+      continue;
+
+    const bool hasTransform    = entity->hasComponent<Transform>();
+    const Mat4f transformation = (hasTransform ? entity->getComponent<Transform>().computeTransformMatrix() : Mat4f());
+
     for (const Submesh& submesh : entity->getComponent<Mesh>().getSubmeshes()) {
       for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
-        triangles.emplace_back(BvhNode::TriangleInfo{ Triangle(submesh.getVertices()[submesh.getTriangleIndices()[i    ]].position,
-                                                               submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].position,
-                                                               submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].position), entity });
+        Triangle triangle(submesh.getVertices()[submesh.getTriangleIndices()[i    ]].position,
+                          submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].position,
+                          submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].position);
+
+        if (hasTransform) {
+          triangle = Triangle(Vec3f(transformation * Vec4f(triangle.getFirstPos(), 1.f)),
+                              Vec3f(transformation * Vec4f(triangle.getSecondPos(), 1.f)),
+                              Vec3f(transformation * Vec4f(triangle.getThirdPos(), 1.f)));
+        }
+
+        triangles.emplace_back(BvhNode::TriangleInfo{ triangle, entity });
       }
     }
   }

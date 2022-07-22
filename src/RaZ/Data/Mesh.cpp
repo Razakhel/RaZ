@@ -168,8 +168,6 @@ Mesh::Mesh(const AABB& box) {
   const float minZ = minPos.z();
   const float maxZ = maxPos.z();
 
-  // TODO: texcoords should not exist for simple display cubes like a skybox
-
   Vertex rightTopBack {};
   rightTopBack.position  = Vec3f(maxX, maxY, minZ);
   rightTopBack.texcoords = Vec2f(0.f, 1.f);
@@ -203,7 +201,6 @@ Mesh::Mesh(const AABB& box) {
   leftBottomFront.texcoords = Vec2f(0.f, 0.f);
 
   // Computing normals
-  // TODO: normals should not be computed (or even exist) for simple display cubes like a skybox
   // TODO: compute normals
 
   Submesh& submesh = m_submeshes.emplace_back();
