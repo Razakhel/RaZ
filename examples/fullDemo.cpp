@@ -1,5 +1,7 @@
 #include "RaZ/RaZ.hpp"
 
+#include <iostream>
+
 using namespace std::literals;
 
 int main() {

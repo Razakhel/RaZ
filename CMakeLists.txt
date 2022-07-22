@@ -355,8 +355,8 @@ elseif (NOT RAZ_USE_EMSCRIPTEN) # Emscripten handles GLFW on its own, but still 
         REMOVE_ITEM
         RAZ_FILES
 
-        "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/Window.cpp"
-        "${PROJECT_SOURCE_DIR}/include/RaZ/Utils/Window.hpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Render/Window.cpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Render/Window.hpp"
     )
 
     target_compile_definitions(RaZ PUBLIC RAZ_NO_WINDOW)
@@ -369,8 +369,8 @@ else ()
         REMOVE_ITEM
         RAZ_FILES
 
-        "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/Overlay.cpp"
-        "${PROJECT_SOURCE_DIR}/include/RaZ/Utils/Overlay.hpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Render/Overlay.cpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Render/Overlay.hpp"
     )
 
     target_compile_definitions(RaZ PUBLIC RAZ_NO_OVERLAY)

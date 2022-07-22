@@ -1,5 +1,7 @@
 #include "RaZ/RaZ.hpp"
 
+#include <iostream>
+
 using namespace std::literals;
 
 inline void loadSponzaScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {

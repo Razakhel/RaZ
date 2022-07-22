@@ -4,8 +4,8 @@
 #define RAZ_MATRIX_HPP
 
 #include <array>
-#include <iostream>
 #include <limits>
+#include <ostream>
 
 namespace Raz {
 

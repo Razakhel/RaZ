@@ -1,6 +1,6 @@
 #include "RaZ/Data/Bitset.hpp"
 
-#include <iostream>
+#include <ostream>
 
 namespace Raz {
 

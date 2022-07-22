@@ -1,7 +1,7 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
-#include <iostream>
+#include <ostream>
 
 namespace Raz {
 

@@ -14,9 +14,9 @@ namespace {
 //          |        |         /         |        /
 //      [ 0; 0 ]     |    [ -1; -1 ]     |       v
 
-const Raz::Ray ray1(Raz::Vec3f(0.f, 0.f, 0.f), Raz::Axis::Y);
-const Raz::Ray ray2(Raz::Vec3f(-1.f, -1.f, 0.f), Raz::Vec3f(1.f, 1.f, 0.f).normalize());
-const Raz::Ray ray3(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-1.f, -1.f, 0.f).normalize());
+constexpr Raz::Ray ray1(Raz::Vec3f(0.f, 0.f, 0.f), Raz::Axis::Y);
+constexpr Raz::Ray ray2(Raz::Vec3f(-1.f, -1.f, 0.f), Raz::Vec3f(0.707106769f, 0.707106769f, 0.f));
+constexpr Raz::Ray ray3(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-0.707106769f, -0.707106769f, 0.f));
 
 } // namespace
 

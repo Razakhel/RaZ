@@ -26,7 +26,9 @@ struct RayHit {
 class Ray {
 public:
   constexpr Ray(const Vec3f& origin, const Vec3f& direction)
-    : m_origin{ origin }, m_direction{ direction }, m_invDirection(1.f / direction.x(), 1.f / direction.y(), 1.f / direction.z()) {}
+    : m_origin{ origin }, m_direction{ direction }, m_invDirection((direction.x() != 0.f ? 1.f / direction.x() : std::numeric_limits<float>::infinity()),
+                                                                   (direction.y() != 0.f ? 1.f / direction.y() : std::numeric_limits<float>::infinity()),
+                                                                   (direction.z() != 0.f ? 1.f / direction.z() : std::numeric_limits<float>::infinity())) {}
   constexpr Ray(const Ray&) noexcept = default;
   constexpr Ray(Ray&&) noexcept = default;
 
