@@ -40,7 +40,7 @@ Entity* BvhNode::query(const Ray& ray, RayHit* hit) const {
   return (leftEntity != nullptr ? leftEntity : rightEntity);
 }
 
-void BvhNode::build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginIndex, std::size_t endIndex) {
+void BvhNode::build(std::vector<BvhNode>& nodes, std::size_t nodeIndex, std::vector<TriangleInfo>& trianglesInfo, std::size_t beginIndex, std::size_t endIndex) {
   m_boundingBox = trianglesInfo[beginIndex].triangle.computeBoundingBox();
 
   if (endIndex - beginIndex <= 1) {
@@ -88,11 +88,12 @@ void BvhNode::build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginI
   if (midIndex == beginIndex || midIndex == endIndex)
     midIndex = (beginIndex + endIndex) / 2;
 
-  m_leftChild = std::make_unique<BvhNode>();
-  m_leftChild->build(trianglesInfo, beginIndex, midIndex);
+  m_leftChild = &nodes[nodeIndex];
+  m_leftChild->build(nodes, nodeIndex + 1, trianglesInfo, beginIndex, midIndex);
 
-  m_rightChild = std::make_unique<BvhNode>();
-  m_rightChild->build(trianglesInfo, midIndex, endIndex);
+  nodeIndex += (endIndex - beginIndex) / 2;
+  m_rightChild = &nodes[nodeIndex];
+  m_rightChild->build(nodes, nodeIndex + 1, trianglesInfo, midIndex, endIndex);
 }
 
 BvhSystem::BvhSystem() {
@@ -101,6 +102,7 @@ BvhSystem::BvhSystem() {
 
 void BvhSystem::build() {
   m_rootNode = BvhNode();
+  m_nodes.clear();
 
   // Storing all triangles in a list to build the BVH from
 
@@ -115,6 +117,8 @@ void BvhSystem::build() {
 
   if (totalTriangleCount == 0)
     return; // No triangle to build the BVH from
+
+  m_nodes.resize(totalTriangleCount * 2 - 1);
 
   std::vector<BvhNode::TriangleInfo> triangles;
   triangles.reserve(totalTriangleCount);
@@ -143,7 +147,7 @@ void BvhSystem::build() {
     }
   }
 
-  m_rootNode.build(triangles, 0, totalTriangleCount);
+  m_rootNode.build(m_nodes, 0, triangles, 0, totalTriangleCount);
 }
 
 void BvhSystem::linkEntity(const EntityPtr& entity) {

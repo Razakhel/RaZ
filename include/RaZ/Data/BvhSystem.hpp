@@ -47,14 +47,16 @@ public:
 
 private:
   /// Builds the node and its children from a list of triangles.
+  /// \param nodes Nodes to be linked with each other.
+  /// \param nodeIndex Current index of the node in the list.
   /// \param trianglesInfo List of triangles information to build the node from.
   /// \param beginIndex First index in the triangles' list.
   /// \param endIndex Past-the-end index in the triangles' list.
-  void build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginIndex, std::size_t endIndex);
+  void build(std::vector<BvhNode>& nodes, std::size_t nodeIndex, std::vector<TriangleInfo>& trianglesInfo, std::size_t beginIndex, std::size_t endIndex);
 
   AABB m_boundingBox = AABB(Vec3f(0.f), Vec3f(0.f));
-  std::unique_ptr<BvhNode> m_leftChild {};
-  std::unique_ptr<BvhNode> m_rightChild {};
+  BvhNode* m_leftChild {};
+  BvhNode* m_rightChild {};
   TriangleInfo m_triangleInfo; ///< Triangle/entity pair. Only valid if the node is a leaf.
 };
 
@@ -84,6 +86,7 @@ private:
   void unlinkEntity(const EntityPtr& entity) override;
 
   BvhNode m_rootNode {};
+  std::vector<BvhNode> m_nodes {};
 };
 
 } // namespace Raz
