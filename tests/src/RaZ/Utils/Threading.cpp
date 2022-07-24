@@ -22,14 +22,14 @@ std::size_t computeSum(const std::vector<int>& values) {
 }
 
 void indexParallelIncrementation(std::vector<int>& values) {
-  Raz::Threading::parallelize(values, [&values] (const Raz::Threading::IndexRange& range) noexcept {
+  Raz::Threading::parallelize(0, values.size(), [&values] (const Raz::Threading::IndexRange& range) noexcept {
     for (std::size_t i = range.beginIndex; i < range.endIndex; ++i)
       ++values[i];
   }, 4);
 }
 
 void iteratorParallelIncrementation(std::vector<int>& values) {
-  Raz::Threading::parallelize(values, [] (const Raz::Threading::IterRange<std::vector<int>>& range) noexcept {
+  Raz::Threading::parallelize(values, [] (const Raz::Threading::IterRange<std::vector<int>::iterator>& range) noexcept {
     for (int& value : range)
       ++value;
   }, 4);
@@ -79,7 +79,7 @@ TEST_CASE("Threading index parallelization - divisible size") {
 }
 
 TEST_CASE("Threading index parallelization - indivisible size") {
-  std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be easily divided
+  std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be divided
   fillRandom(values);
 
   const std::size_t sumBeforeIncrement = computeSum(values);
@@ -101,7 +101,7 @@ TEST_CASE("Threading iterator parallelization - divisible size") {
 }
 
 TEST_CASE("Threading iterator parallelization - indivisible size") {
-  std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be easily divided
+  std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be divided
   fillRandom(values);
 
   const std::size_t sumBeforeIncrement = computeSum(values);
