@@ -137,18 +137,13 @@ int main() {
       render.updateLights();
     }, 0.f, 15.f, redLight.getEnergy());
 
-    overlay.addSlider("Threshold value", [&bloom] (float value) {
-      bloom.setThresholdValue(value);
-    }, 0.15f, 5.f, 1.f);
+    overlay.addSlider("Bloom strength", [&bloom] (float value) {
+      bloom.setStrength(value);
+    }, 0.f, 1.f, 0.2f);
 
     overlay.addSlider("Tone mapping strength", [&toneMapping] (float value) {
       toneMapping.setMaxWhiteValue(value);
     }, 0.f, 10.f, 1.f);
-
-    overlay.addSeparator();
-
-    overlay.addLabel("Thresholded color");
-    overlay.addTexture(bloom.getThresholdPass().getFramebuffer().getColorBuffer(0), window.getWidth() / 7, window.getHeight() / 7);
 
     overlay.addSeparator();
 

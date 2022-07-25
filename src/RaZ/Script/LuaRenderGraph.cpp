@@ -104,7 +104,6 @@ void LuaWrapper::registerRenderGraphTypes() {
       auto bloomRenderProcess = state.new_usertype<BloomRenderProcess>("BloomRenderProcess",
                                                                        sol::constructors<BloomRenderProcess(RenderGraph&)>(),
                                                                        sol::base_classes, sol::bases<RenderProcess>());
-      bloomRenderProcess["getThresholdPass"]        = &BloomRenderProcess::getThresholdPass;
       bloomRenderProcess["getDownscalePassCount"]   = &BloomRenderProcess::getDownscalePassCount;
       bloomRenderProcess["getDownscalePass"]        = PickNonConstOverload<std::size_t>(&BloomRenderProcess::getDownscalePass);
       bloomRenderProcess["getDownscaleBufferCount"] = &BloomRenderProcess::getDownscaleBufferCount;
@@ -115,7 +114,7 @@ void LuaWrapper::registerRenderGraphTypes() {
       bloomRenderProcess["getUpscaleBuffer"]        = [] (BloomRenderProcess& b, std::size_t i) { return &b.getUpscaleBuffer(i); };
       bloomRenderProcess["setInputColorBuffer"]     = &BloomRenderProcess::setInputColorBuffer;
       bloomRenderProcess["setOutputBuffer"]         = &BloomRenderProcess::setOutputBuffer;
-      bloomRenderProcess["setThresholdValue"]       = &BloomRenderProcess::setThresholdValue;
+      bloomRenderProcess["setStrength"]             = &BloomRenderProcess::setStrength;
     }
 
     {

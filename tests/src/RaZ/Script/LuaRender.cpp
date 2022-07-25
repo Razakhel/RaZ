@@ -441,7 +441,6 @@ TEST_CASE("LuaRender RenderProcess") {
     bloomRenderProcess:addChild(BloomRenderProcess.new(renderGraph))
     bloomRenderProcess:resizeBuffers(1, 1)
     assert(bloomRenderProcess:recoverElapsedTime() >= 0)
-    assert(bloomRenderProcess:getThresholdPass() ~= nil)
     assert(bloomRenderProcess:getDownscalePassCount() == bloomRenderProcess:getDownscaleBufferCount())
     assert(bloomRenderProcess:getDownscalePass(0) ~= nil)
     assert(bloomRenderProcess:getDownscaleBuffer(0) ~= nil)
@@ -450,7 +449,7 @@ TEST_CASE("LuaRender RenderProcess") {
     assert(bloomRenderProcess:getUpscaleBuffer(0) ~= nil)
     bloomRenderProcess:setInputColorBuffer(Texture2D.create(TextureColorspace.RGB))
     bloomRenderProcess:setOutputBuffer(Texture2D.create(TextureColorspace.RGB))
-    bloomRenderProcess:setThresholdValue(0)
+    bloomRenderProcess:setStrength(0)
 
     local boxBlurRenderProcess = BoxBlurRenderProcess.new(renderGraph)
     boxBlurRenderProcess:setState(true)

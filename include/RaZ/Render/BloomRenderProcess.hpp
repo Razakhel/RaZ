@@ -14,7 +14,6 @@ public:
   explicit BloomRenderProcess(RenderGraph& renderGraph);
 
   bool isEnabled() const noexcept override;
-  RenderPass& getThresholdPass() noexcept { return *m_thresholdPass; }
   std::size_t getDownscalePassCount() const noexcept { return m_downscalePasses.size(); }
   const RenderPass& getDownscalePass(std::size_t passIndex) const noexcept { return *m_downscalePasses[passIndex]; }
   RenderPass& getDownscalePass(std::size_t passIndex) noexcept { return *m_downscalePasses[passIndex]; }
@@ -34,12 +33,10 @@ public:
   void resizeBuffers(unsigned int width, unsigned int height) override;
   float recoverElapsedTime() const override;
   void setInputColorBuffer(Texture2DPtr colorBuffer);
-  void setOutputBuffer(Texture2DPtr outputBuffer);
-  void setThresholdValue(float threshold) const;
+  void setOutputBuffer(Texture2DPtr colorBuffer);
+  void setStrength(float strength) const;
 
 private:
-  RenderPass* m_thresholdPass {};
-
   std::vector<RenderPass*> m_downscalePasses {};
   std::vector<std::weak_ptr<Texture2D>> m_downscaleBuffers {};
 

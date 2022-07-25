@@ -11,23 +11,6 @@ namespace {
 
 constexpr int passCount = 5;
 
-constexpr std::string_view thresholdSource = R"(
-  in vec2 fragTexcoords;
-
-  uniform sampler2D uniColorBuffer;
-  uniform float uniThreshold;
-
-  layout(location = 0) out vec4 fragColor;
-
-  void main() {
-    vec3 color = texture(uniColorBuffer, fragTexcoords).rgb;
-
-    // Thresholding pixels according to their luminance: https://en.wikipedia.org/wiki/Luma_(video)#Use_of_relative_luminance
-    float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
-    fragColor        = vec4(color * float(brightness > uniThreshold), 1.0);
-  }
-)";
-
 constexpr std::string_view downscaleSource = R"(
   in vec2 fragTexcoords;
 
@@ -106,6 +89,7 @@ constexpr std::string_view finalSource = R"(
 
   uniform sampler2D uniOriginalColorBuffer;
   uniform sampler2D uniFinalUpscaledBuffer;
+  uniform float uniBloomStrength;
 
   layout(location = 0) out vec4 fragColor;
 
@@ -117,8 +101,7 @@ constexpr std::string_view finalSource = R"(
     //blurredColor = blurredColor / (blurredColor + vec3(1.0)); // Tone mapping
     //blurredColor = pow(blurredColor, vec3(1.0 / 2.2)); // Gamma correction
 
-    // TODO: divide the result by the amount of passes (https://www.froyok.fr/blog/2021-12-ue4-custom-bloom/#upsample_shader)
-    fragColor = vec4(originalColor + blurredColor, 1.0);
+    fragColor = vec4(mix(originalColor, blurredColor / 8.0, uniBloomStrength), 1.0);
   }
 )";
 
@@ -127,26 +110,6 @@ constexpr std::string_view finalSource = R"(
 BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph) : RenderProcess(renderGraph) {
   // Based on Fabrice "froyok" Piquet's bloom, itself based on the one used in Unreal Engine 4/Call of Duty: Advanced Warfare
   // See: https://www.froyok.fr/blog/2021-12-ue4-custom-bloom/
-
-  //////////////////
-  // Thresholding //
-  //////////////////
-
-  m_thresholdPass = &renderGraph.addNode(FragmentShader::loadFromSource(thresholdSource), "Bloom thresholding");
-  setThresholdValue(1.f);
-
-  const auto thresholdBuffer = Texture2D::create(TextureColorspace::RGB, TextureDataType::FLOAT16);
-  m_thresholdPass->addWriteColorTexture(thresholdBuffer, 0);
-
-#if !defined(USE_OPENGL_ES)
-  if (Renderer::checkVersion(4, 3)) {
-    Renderer::setLabel(RenderObjectType::PROGRAM, m_thresholdPass->getProgram().getIndex(), "Bloom threshold program");
-    Renderer::setLabel(RenderObjectType::SHADER, m_thresholdPass->getProgram().getVertexShader().getIndex(), "Bloom threshold vertex shader");
-    Renderer::setLabel(RenderObjectType::SHADER, m_thresholdPass->getProgram().getFragmentShader().getIndex(), "Bloom threshold fragment shader");
-    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_thresholdPass->getFramebuffer().getIndex(), "Bloom threshold framebuffer");
-    Renderer::setLabel(RenderObjectType::TEXTURE, thresholdBuffer->getIndex(), "Bloom threshold buffer");
-  }
-#endif
 
   /////////////////
   // Downscaling //
@@ -174,15 +137,18 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph) : RenderProcess
     //      v prevDownscaledBuffer
     //     ...
 
-    downscalePass.addReadTexture((downscalePassIndex == 0 ? thresholdBuffer : m_downscaleBuffers[downscalePassIndex - 1].lock()), "uniPrevDownscaledBuffer");
+    if (downscalePassIndex > 0) {
+      downscalePass.addReadTexture(m_downscaleBuffers[downscalePassIndex - 1].lock(), "uniPrevDownscaledBuffer");
+      downscalePass.addParents(*m_downscalePasses[downscalePassIndex - 1]);
+    } else {
+      downscalePass.getProgram().use();
+    }
 
     const auto downscaledBuffer = Texture2D::create(TextureColorspace::RGB, TextureDataType::FLOAT16);
     downscalePass.addWriteColorTexture(downscaledBuffer, 0);
 
     m_downscalePasses[downscalePassIndex]  = &downscalePass;
     m_downscaleBuffers[downscalePassIndex] = downscaledBuffer;
-
-    downscalePass.addParents((downscalePassIndex == 0 ? *m_thresholdPass : *m_downscalePasses[downscalePassIndex - 1]));
 
 #if !defined(USE_OPENGL_ES)
     if (Renderer::checkVersion(4, 3)) {
@@ -255,6 +221,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph) : RenderProcess
   ////////////////////////
 
   m_finalPass = &renderGraph.addNode(FragmentShader::loadFromSource(finalSource), "Bloom final pass");
+  setStrength(0.2f);
 
   m_finalPass->addParents(*m_upscalePasses.back());
   m_finalPass->addReadTexture(m_upscaleBuffers.back().lock(), "uniFinalUpscaledBuffer");
@@ -273,12 +240,10 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph) : RenderProcess
 }
 
 bool BloomRenderProcess::isEnabled() const noexcept {
-  return m_thresholdPass->isEnabled();
+  return m_finalPass->isEnabled();
 }
 
 void BloomRenderProcess::setState(bool enabled) {
-  m_thresholdPass->enable(enabled);
-
   for (RenderPass* downscalePass : m_downscalePasses)
     downscalePass->enable(enabled);
 
@@ -289,11 +254,11 @@ void BloomRenderProcess::setState(bool enabled) {
 }
 
 void BloomRenderProcess::addParent(RenderPass& parentPass) {
-  m_thresholdPass->addParents(parentPass);
+  m_downscalePasses.front()->addParents(parentPass);
 }
 
 void BloomRenderProcess::addParent(RenderProcess& parentProcess) {
-  parentProcess.addChild(*m_thresholdPass);
+  parentProcess.addChild(*m_downscalePasses.front());
 }
 
 void BloomRenderProcess::addChild(RenderPass& childPass) {
@@ -305,7 +270,6 @@ void BloomRenderProcess::addChild(RenderProcess& childProcess) {
 }
 
 void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) {
-  m_thresholdPass->resizeWriteBuffers(width, height);
   m_finalPass->resizeWriteBuffers(width, height);
 
   for (std::size_t i = 0; i < m_downscaleBuffers.size(); ++i) {
@@ -332,7 +296,7 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
 }
 
 float BloomRenderProcess::recoverElapsedTime() const {
-  float time = m_thresholdPass->recoverElapsedTime() + m_finalPass->recoverElapsedTime();
+  float time = m_finalPass->recoverElapsedTime();
 
   for (const RenderPass* pass : m_downscalePasses)
     time += pass->recoverElapsedTime();
@@ -346,13 +310,13 @@ float BloomRenderProcess::recoverElapsedTime() const {
 void BloomRenderProcess::setInputColorBuffer(Texture2DPtr colorBuffer) {
   resizeBuffers(colorBuffer->getWidth(), colorBuffer->getHeight());
 
-  m_thresholdPass->addReadTexture(colorBuffer, "uniColorBuffer");
+  m_downscalePasses.front()->addReadTexture(colorBuffer, "uniPrevDownscaledBuffer");
   m_finalPass->addReadTexture(std::move(colorBuffer), "uniOriginalColorBuffer");
 }
 
-void BloomRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer) {
+void BloomRenderProcess::setOutputBuffer(Texture2DPtr colorBuffer) {
   // TODO: if the input buffer has a floating-point data type, the output should too
-  m_finalPass->addWriteColorTexture(std::move(outputBuffer), 0);
+  m_finalPass->addWriteColorTexture(std::move(colorBuffer), 0);
 
 #if !defined(USE_OPENGL_ES)
   if (Renderer::checkVersion(4, 3))
@@ -360,9 +324,9 @@ void BloomRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer) {
 #endif
 }
 
-void BloomRenderProcess::setThresholdValue(float threshold) const {
-  m_thresholdPass->getProgram().setAttribute(threshold, "uniThreshold");
-  m_thresholdPass->getProgram().sendAttributes();
+void BloomRenderProcess::setStrength(float strength) const {
+  m_finalPass->getProgram().setAttribute(strength, "uniBloomStrength");
+  m_finalPass->getProgram().sendAttributes();
 }
 
 } // namespace Raz
