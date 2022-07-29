@@ -47,15 +47,40 @@ constexpr std::string_view fragSource = R"(
 
 inline const MeshRenderer& getDisplayCube() {
   static const MeshRenderer cube = [] () {
-    MeshRenderer meshRenderer(Mesh(AABB(Vec3f(-1.f, -1.f, -1.f),
-                                        Vec3f(1.f, 1.f, 1.f))), RenderMode::TRIANGLE);
+    Mesh mesh;
 
-    meshRenderer.setMaterial(Material());
+    Submesh& submesh = mesh.addSubmesh();
 
-    RenderShaderProgram& program = meshRenderer.getMaterials().front().getProgram();
+    submesh.getVertices() = {
+      Vertex{ Raz::Vec3f( 1.f,  1.f, -1.f) }, // Right top back
+      Vertex{ Raz::Vec3f( 1.f,  1.f,  1.f) }, // Right top front
+      Vertex{ Raz::Vec3f( 1.f, -1.f, -1.f) }, // Right bottom back
+      Vertex{ Raz::Vec3f( 1.f, -1.f,  1.f) }, // Right bottom front
+      Vertex{ Raz::Vec3f(-1.f,  1.f, -1.f) }, // Left top back
+      Vertex{ Raz::Vec3f(-1.f,  1.f,  1.f) }, // Left top front
+      Vertex{ Raz::Vec3f(-1.f, -1.f, -1.f) }, // Left bottom back
+      Vertex{ Raz::Vec3f(-1.f, -1.f,  1.f) }  // Left bottom front
+    };
+
+    // Organizing the triangles to be in a clockwise order, since we will always be inside the cube
+    submesh.getTriangleIndices() = {
+      0, 2, 1, 1, 2, 3, // Right
+      4, 5, 7, 4, 7, 6, // Left
+      4, 0, 1, 4, 1, 5, // Top
+      7, 3, 2, 7, 2, 6, // Bottom
+      5, 1, 3, 5, 3, 7, // Front
+      0, 4, 6, 0, 6, 2  // Back
+    };
+
+    MeshRenderer meshRenderer;
+
+    RenderShaderProgram& program = meshRenderer.addMaterial().getProgram();
     program.setShaders(VertexShader::loadFromSource(vertSource), FragmentShader::loadFromSource(fragSource));
     program.use();
     program.sendUniform("uniSkybox", 0);
+
+    meshRenderer.load(mesh, RenderMode::TRIANGLE);
+    meshRenderer.getSubmeshRenderers().front().setMaterialIndex(0);
 
 #if !defined(USE_OPENGL_ES)
     if (Renderer::checkVersion(4, 3)) {
@@ -220,7 +245,6 @@ void Cubemap::unbind() const {
 
 void Cubemap::draw() const {
   Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);
-  Renderer::setFaceCulling(FaceOrientation::FRONT);
 
   const MeshRenderer& displayCube = getDisplayCube();
 
@@ -231,7 +255,6 @@ void Cubemap::draw() const {
 
   displayCube.draw();
 
-  Renderer::setFaceCulling(FaceOrientation::BACK);
   Renderer::setDepthFunction(DepthStencilFunction::LESS);
 }
 
