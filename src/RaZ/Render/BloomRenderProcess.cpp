@@ -131,7 +131,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
   // Thresholding //
   //////////////////
 
-  m_thresholdPass = &renderGraph.addNode(FragmentShader::loadFromSource(thresholdSource));
+  m_thresholdPass = &renderGraph.addNode(FragmentShader::loadFromSource(thresholdSource), "Bloom thresholding");
   setThresholdValue(0.75f); // Tone mapping is applied before the bloom, thus no value above 1 exist here. This value will be changed later
 
   const auto thresholdBuffer = Texture::create(frameWidth, frameHeight, ImageColorspace::RGB, ImageDataType::FLOAT);
@@ -155,7 +155,9 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
   m_downscaleBuffers.resize(passCount);
 
   for (std::size_t downscalePassIndex = 0; downscalePassIndex < passCount; ++downscalePassIndex) {
-    RenderPass& downscalePass = renderGraph.addNode(FragmentShader::loadFromSource(downscaleSource));
+    const std::string idStr = std::to_string(downscalePassIndex);
+
+    RenderPass& downscalePass = renderGraph.addNode(FragmentShader::loadFromSource(downscaleSource), "Bloom downscale #" + idStr);
 
     //  ----------
     //  |        |
@@ -189,7 +191,6 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
 
 #if !defined(USE_OPENGL_ES)
     if (Renderer::checkVersion(4, 3)) {
-      const std::string idStr = std::to_string(downscalePassIndex);
       Renderer::setLabel(RenderObjectType::PROGRAM, downscalePass.getProgram().getIndex(), "Bloom downscale program #" + idStr);
       Renderer::setLabel(RenderObjectType::SHADER, downscalePass.getProgram().getVertexShader().getIndex(), "Bloom downscale vertex shader #" + idStr);
       Renderer::setLabel(RenderObjectType::SHADER, downscalePass.getProgram().getFragmentShader().getIndex(), "Bloom downscale fragment shader #" + idStr);
@@ -207,7 +208,9 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
   m_upscaleBuffers.resize(passCount - 1);
 
   for (std::size_t upscalePassIndex = 0; upscalePassIndex < passCount - 1; ++upscalePassIndex) {
-    RenderPass& upscalePass = renderGraph.addNode(FragmentShader::loadFromSource(upscaleSource));
+    const std::string idStr = std::to_string(upscalePassIndex);
+
+    RenderPass& upscalePass = renderGraph.addNode(FragmentShader::loadFromSource(upscaleSource), "Bloom upscale #" + idStr);
 
     //  ----------                ----------
     //  |        |                |        |
@@ -249,7 +252,6 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
 
 #if !defined(USE_OPENGL_ES)
     if (Renderer::checkVersion(4, 3)) {
-      const std::string idStr = std::to_string(upscalePassIndex);
       Renderer::setLabel(RenderObjectType::PROGRAM, upscalePass.getProgram().getIndex(), "Bloom upscale program #" + idStr);
       Renderer::setLabel(RenderObjectType::SHADER, upscalePass.getProgram().getVertexShader().getIndex(), "Bloom upscale vertex shader #" + idStr);
       Renderer::setLabel(RenderObjectType::SHADER, upscalePass.getProgram().getFragmentShader().getIndex(), "Bloom upscale fragment shader #" + idStr);
@@ -263,7 +265,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
   // Final display pass //
   ////////////////////////
 
-  m_finalPass = &renderGraph.addNode(FragmentShader::loadFromSource(finalSource));
+  m_finalPass = &renderGraph.addNode(FragmentShader::loadFromSource(finalSource), "Bloom final pass");
 
   m_finalPass->addParents(*m_upscalePasses.back());
   m_finalPass->addReadTexture(m_upscaleBuffers.back().lock(), "uniFinalUpscaledBuffer");

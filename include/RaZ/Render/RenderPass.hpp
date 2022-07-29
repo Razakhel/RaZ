@@ -13,24 +13,28 @@ namespace Raz {
 class RenderPass : public GraphNode<RenderPass> {
 public:
   RenderPass() = default;
-  RenderPass(VertexShader&& vertShader, FragmentShader&& fragShader) : m_program(std::move(vertShader), std::move(fragShader)) {}
-  explicit RenderPass(FragmentShader&& fragShader) : RenderPass(Framebuffer::recoverVertexShader(), std::move(fragShader)) {}
+  RenderPass(VertexShader&& vertShader, FragmentShader&& fragShader, std::string passName = {}) noexcept
+    : m_name{ std::move(passName) }, m_program(std::move(vertShader), std::move(fragShader)) {}
+  explicit RenderPass(FragmentShader&& fragShader, std::string passName = {}) noexcept
+    : RenderPass(Framebuffer::recoverVertexShader(), std::move(fragShader), std::move(passName)) {}
   RenderPass(const RenderPass&) = delete;
   RenderPass(RenderPass&&) noexcept = default;
 
   bool isEnabled() const { return m_enabled; }
-  /// Checks that the current render pass is valid, that is, if none of its buffer has been defined as both read & write.
-  /// \return True if the render pass is valid, false otherwise.
-  /// \see RenderGraph::isValid()
-  bool isValid() const;
+  const std::string& getName() const { return m_name; }
   const RenderShaderProgram& getProgram() const { return m_program; }
   RenderShaderProgram& getProgram() { return m_program; }
   std::size_t getReadTextureCount() const noexcept { return m_readTextures.size(); }
   const Texture& getReadTexture(std::size_t textureIndex) const noexcept { return *m_readTextures[textureIndex]; }
   const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
 
+  void setName(std::string name) noexcept { m_name = std::move(name); }
   void setProgram(RenderShaderProgram&& program) { m_program = std::move(program); }
 
+  /// Checks that the current render pass is valid, that is, if none of its buffer has been defined as both read & write.
+  /// \return True if the render pass is valid, false otherwise.
+  /// \see RenderGraph::isValid()
+  bool isValid() const;
   void addReadTexture(TexturePtr texture, const std::string& uniformName);
   void addWriteTexture(TexturePtr texture) { m_writeFramebuffer.addTextureBuffer(std::move(texture)); }
   /// Resizes the render pass' write buffer textures.
@@ -54,6 +58,7 @@ public:
 
 protected:
   bool m_enabled = true;
+  std::string m_name {};
   RenderShaderProgram m_program {};
 
   std::vector<TexturePtr> m_readTextures {};

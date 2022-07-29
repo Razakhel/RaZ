@@ -108,17 +108,7 @@ void RenderGraph::execute(const RenderPass& renderPass) {
   for (const RenderPass* parentPass : renderPass.getParents())
     execute(*parentPass);
 
-#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
-  if (Renderer::checkVersion(4, 3))
-    Renderer::pushDebugGroup("Render pass #" + std::to_string(m_executedPasses.size()));
-#endif
-
   renderPass.execute();
-
-#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
-  if (Renderer::checkVersion(4, 3))
-    Renderer::popDebugGroup();
-#endif
 
   m_executedPasses.emplace(&renderPass);
 }

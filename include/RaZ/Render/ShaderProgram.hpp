@@ -181,10 +181,10 @@ private:
 
 class RenderShaderProgram final : public ShaderProgram {
 public:
-  RenderShaderProgram() : ShaderProgram() {}
-  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader)
+  RenderShaderProgram() noexcept : ShaderProgram() {}
+  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader) noexcept
     : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
-  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader)
+  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader) noexcept
     : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(geomShader), std::move(fragShader)); }
 
   const VertexShader& getVertexShader() const noexcept { return m_vertShader; }

@@ -48,12 +48,22 @@ void RenderPass::execute() const {
   if (!m_enabled)
     return;
 
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3) && !m_name.empty())
+    Renderer::pushDebugGroup(m_name);
+#endif
+
   bindTextures();
 
   if (!m_writeFramebuffer.isEmpty())
     m_writeFramebuffer.bind();
   m_writeFramebuffer.display();
   m_writeFramebuffer.unbind();
+
+#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+  if (Renderer::checkVersion(4, 3) && !m_name.empty())
+    Renderer::popDebugGroup();
+#endif
 }
 
 } // namespace Raz
