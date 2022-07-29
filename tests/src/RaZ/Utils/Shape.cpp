@@ -494,6 +494,43 @@ TEST_CASE("AABB point containment") {
   CHECK_FALSE(aabb3.contains(point5));
 }
 
+TEST_CASE("AABB-AABB intersection") {
+  CHECK(aabb1.intersects(aabb1)); // A box always intersects itself
+  CHECK(aabb2.intersects(aabb2));
+  CHECK(aabb3.intersects(aabb3));
+
+  {
+    const Raz::AABB largerBox1(aabb1.getMinPosition() - Raz::Vec3f(0.0000001f), aabb1.getMaxPosition() + Raz::Vec3f(0.0000001f));
+    REQUIRE_FALSE(aabb1.getMinPosition().strictlyEquals(largerBox1.getMinPosition()));
+    REQUIRE_FALSE(aabb1.getMaxPosition().strictlyEquals(largerBox1.getMaxPosition()));
+
+    CHECK(aabb1.intersects(largerBox1));
+    CHECK(largerBox1.intersects(aabb1)); // The intersection is commutative
+  }
+
+  {
+    const Raz::AABB smallerBox2(aabb2.getMinPosition() + Raz::Vec3f(0.000001f), aabb2.getMaxPosition() - Raz::Vec3f(0.000001f));
+    REQUIRE_FALSE(aabb2.getMinPosition().strictlyEquals(smallerBox2.getMinPosition()));
+    REQUIRE_FALSE(aabb2.getMaxPosition().strictlyEquals(smallerBox2.getMaxPosition()));
+
+    CHECK(aabb2.intersects(smallerBox2));
+    CHECK(smallerBox2.intersects(aabb2));
+  }
+
+  {
+    const Raz::AABB hugeBox(Raz::Vec3f(-10.f, -10.f, -5.f), Raz::Vec3f(5.f));
+
+    CHECK(aabb1.intersects(hugeBox));
+    CHECK(hugeBox.intersects(aabb1));
+
+    CHECK(aabb2.intersects(hugeBox));
+    CHECK(hugeBox.intersects(aabb2));
+
+    CHECK(aabb3.intersects(hugeBox));
+    CHECK(hugeBox.intersects(aabb3));
+  }
+}
+
 TEST_CASE("AABB translation") {
   Raz::AABB aabb1Copy = aabb1;
 
