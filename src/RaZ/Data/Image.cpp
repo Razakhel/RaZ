@@ -1,6 +1,7 @@
 #include "RaZ/Data/Image.hpp"
 
 #include <cassert>
+#include <stdexcept>
 
 namespace Raz {
 
@@ -27,6 +28,8 @@ bool ImageDataF::operator==(const ImageData& imgData) const {
 }
 
 Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{ colorspace }, m_dataType{ dataType } {
+  assert("Error: An sRGB[A] image must have a byte data type."
+      && (m_colorspace != ImageColorspace::SRGB || m_colorspace != ImageColorspace::SRGBA || m_dataType == ImageDataType::BYTE));
   assert("Error: A depth image must have a floating-point data type." && (m_colorspace != ImageColorspace::DEPTH || m_dataType == ImageDataType::FLOAT));
 
   switch (colorspace) {
@@ -40,13 +43,17 @@ Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{
       break;
 
     case ImageColorspace::RGB:
-    default:
+    case ImageColorspace::SRGB:
       m_channelCount = 3;
       break;
 
     case ImageColorspace::RGBA:
+    case ImageColorspace::SRGBA:
       m_channelCount = 4;
       break;
+
+    default:
+      throw std::invalid_argument("Error: Invalid colorspace to create an image with");
   }
 }
 

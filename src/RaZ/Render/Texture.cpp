@@ -22,11 +22,13 @@ TextureFormat recoverFormat(const Image& image) {
       break;
 
     case ImageColorspace::RGB:
+    case ImageColorspace::SRGB:
     default:
       colorFormat = TextureFormat::RGB;
       break;
 
     case ImageColorspace::RGBA:
+    case ImageColorspace::SRGBA:
       colorFormat = TextureFormat::RGBA;
       break;
 
@@ -39,8 +41,8 @@ TextureFormat recoverFormat(const Image& image) {
 }
 
 TextureInternalFormat recoverInternalFormat(const Image& image) {
-  // If the image is of a byte data type, its internal format is the same as its format
-  if (image.getDataType() == ImageDataType::BYTE)
+  // If the image is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
+  if (image.getDataType() == ImageDataType::BYTE && image.getColorspace() != ImageColorspace::SRGB && image.getColorspace() != ImageColorspace::SRGBA)
     return static_cast<TextureInternalFormat>(recoverFormat(image));
 
   TextureInternalFormat colorFormat {};
@@ -61,6 +63,14 @@ TextureInternalFormat recoverInternalFormat(const Image& image) {
 
     case ImageColorspace::RGBA:
       colorFormat = TextureInternalFormat::RGBA16F;
+      break;
+
+    case ImageColorspace::SRGB:
+      colorFormat = TextureInternalFormat::SRGB8;
+      break;
+
+    case ImageColorspace::SRGBA:
+      colorFormat = TextureInternalFormat::SRGBA8;
       break;
 
     case ImageColorspace::DEPTH:

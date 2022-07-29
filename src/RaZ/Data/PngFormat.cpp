@@ -53,11 +53,11 @@ Image load(const FilePath& filePath, bool flipVertically) {
 
   const unsigned int width  = png_get_image_width(readStruct, infoStruct);
   const unsigned int height = png_get_image_height(readStruct, infoStruct);
-  uint8_t channelCount      = png_get_channels(readStruct, infoStruct);
+  const uint8_t colorType   = png_get_color_type(readStruct, infoStruct);
   uint8_t bitDepth          = png_get_bit_depth(readStruct, infoStruct);
-  ImageColorspace colorspace {};
+  uint8_t channelCount      = png_get_channels(readStruct, infoStruct);
 
-  const uint8_t colorType = png_get_color_type(readStruct, infoStruct);
+  ImageColorspace colorspace {};
 
   switch (colorType) {
     case PNG_COLOR_TYPE_GRAY:
@@ -76,8 +76,7 @@ Image load(const FilePath& filePath, bool flipVertically) {
     case PNG_COLOR_TYPE_PALETTE:
       png_set_palette_to_rgb(readStruct);
       channelCount = 3;
-      colorspace   = ImageColorspace::RGB;
-      break;
+      [[fallthrough]];
 
     case PNG_COLOR_TYPE_RGB:
     default:
@@ -139,6 +138,7 @@ void save(const FilePath& filePath, const Image& image, bool flipVertically) {
     throw std::runtime_error("Error: Could not initialize PNG info struct");
 
   int colorType {};
+
   switch (image.getColorspace()) {
     case ImageColorspace::GRAY:
     case ImageColorspace::DEPTH:
@@ -150,11 +150,13 @@ void save(const FilePath& filePath, const Image& image, bool flipVertically) {
       break;
 
     case ImageColorspace::RGB:
+    case ImageColorspace::SRGB:
     default:
       colorType = PNG_COLOR_TYPE_RGB;
       break;
 
     case ImageColorspace::RGBA:
+    case ImageColorspace::SRGBA:
       colorType = PNG_COLOR_TYPE_RGBA;
       break;
   }

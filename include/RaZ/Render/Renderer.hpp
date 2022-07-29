@@ -283,23 +283,24 @@ enum class TextureInternalFormat : unsigned int {
   DEPTH_STENCIL = static_cast<unsigned int>(TextureFormat::DEPTH_STENCIL),
 
   // Sized formats
-  R8          = 33321 /* GL_R8          */, ///<
-  RG8         = 33323 /* GL_RG8         */, ///<
-  RGB8        = 32849 /* GL_RGB8        */, ///<
-  SRGB8       = 35905 /* GL_SRGB8       */, ///<
-  RGBA8       = 32856 /* GL_RGBA8       */, ///<
-  R8I         = 33329 /* GL_R8I         */, ///<
-  RG8I        = 33335 /* GL_RG8I        */, ///<
-  RGB8I       = 36239 /* GL_RGB8I       */, ///<
-  RGBA8I      = 36238 /* GL_RGBA8I      */, ///<
-  R8UI        = 33330 /* GL_R8UI        */, ///<
-  RG8UI       = 33336 /* GL_RG8UI       */, ///<
-  RGB8UI      = 36221 /* GL_RGB8UI      */, ///<
-  RGBA8UI     = 36220 /* GL_RGBA8UI     */, ///<
-  R8_SNORM    = 36756 /* GL_R8_SNORM    */, ///<
-  RG8_SNORM   = 36757 /* GL_RG8_SNORM   */, ///<
-  RGB8_SNORM  = 36758 /* GL_RGB8_SNORM  */, ///<
-  RGBA8_SNORM = 36759 /* GL_RGBA8_SNORM */, ///<
+  R8          = 33321 /* GL_R8           */, ///<
+  RG8         = 33323 /* GL_RG8          */, ///<
+  RGB8        = 32849 /* GL_RGB8         */, ///<
+  RGBA8       = 32856 /* GL_RGBA8        */, ///<
+  SRGB8       = 35905 /* GL_SRGB8        */, ///<
+  SRGBA8      = 35907 /* GL_SRGB8_ALPHA8 */, ///<
+  R8I         = 33329 /* GL_R8I          */, ///<
+  RG8I        = 33335 /* GL_RG8I         */, ///<
+  RGB8I       = 36239 /* GL_RGB8I        */, ///<
+  RGBA8I      = 36238 /* GL_RGBA8I       */, ///<
+  R8UI        = 33330 /* GL_R8UI         */, ///<
+  RG8UI       = 33336 /* GL_RG8UI        */, ///<
+  RGB8UI      = 36221 /* GL_RGB8UI       */, ///<
+  RGBA8UI     = 36220 /* GL_RGBA8UI      */, ///<
+  R8_SNORM    = 36756 /* GL_R8_SNORM     */, ///<
+  RG8_SNORM   = 36757 /* GL_RG8_SNORM    */, ///<
+  RGB8_SNORM  = 36758 /* GL_RGB8_SNORM   */, ///<
+  RGBA8_SNORM = 36759 /* GL_RGBA8_SNORM  */, ///<
 
   R16          = 33322 /* GL_R16          */, ///<
   RG16         = 33324 /* GL_RG16         */, ///<

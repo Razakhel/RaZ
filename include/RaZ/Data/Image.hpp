@@ -27,6 +27,8 @@ enum class ImageColorspace {
   GRAY_ALPHA,
   RGB,
   RGBA,
+  SRGB,
+  SRGBA,
   DEPTH
 };
 
