@@ -4,30 +4,6 @@
 
 namespace Raz {
 
-void MeshRenderer::drawUnitPlane() {
-  static const MeshRenderer plane(Mesh(Plane(Vec3f(0.f), Axis::Y), 1.f, 1.f), RenderMode::TRIANGLE);
-  plane.draw();
-}
-
-void MeshRenderer::drawUnitSphere() {
-  static const MeshRenderer sphere(Mesh(Sphere(Vec3f(0.f), 1.f), 10, SphereMeshType::UV), RenderMode::TRIANGLE);
-  sphere.draw();
-}
-
-void MeshRenderer::drawUnitQuad() {
-  static const MeshRenderer quad(Mesh(Quad(Vec3f(-1.f,  1.f, 0.f),
-                                           Vec3f( 1.f,  1.f, 0.f),
-                                           Vec3f( 1.f, -1.f, 0.f),
-                                           Vec3f(-1.f, -1.f, 0.f))), RenderMode::TRIANGLE);
-  quad.draw();
-}
-
-void MeshRenderer::drawUnitCube() {
-  static const MeshRenderer cube(Mesh(AABB(Vec3f(-1.f, -1.f, -1.f),
-                                           Vec3f( 1.f,  1.f,  1.f))), RenderMode::TRIANGLE);
-  cube.draw();
-}
-
 void MeshRenderer::setRenderMode(RenderMode renderMode, const Mesh& mesh) {
   for (std::size_t i = 0; i < m_submeshRenderers.size(); ++i)
     m_submeshRenderers[i].setRenderMode(renderMode, mesh.getSubmeshes()[i]);

@@ -26,11 +26,6 @@ public:
   const std::vector<Material>& getMaterials() const { return m_materials; }
   std::vector<Material>& getMaterials() { return m_materials; }
 
-  static void drawUnitPlane();
-  static void drawUnitSphere();
-  static void drawUnitQuad();
-  static void drawUnitCube();
-
   /// Changes the mesh renderer's state.
   /// \note Only the rendering will be affected, not the entity itself.
   /// \param enabled True if the mesh should be rendered, false otherwise.
