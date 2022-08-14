@@ -46,6 +46,7 @@
 #include "Render/Light.hpp"
 #include "Render/Material.hpp"
 #include "Render/MeshRenderer.hpp"
+#include "Render/MonoPassRenderProcess.hpp"
 #include "Render/Overlay.hpp"
 #include "Render/Renderer.hpp"
 #include "Render/RenderGraph.hpp"
