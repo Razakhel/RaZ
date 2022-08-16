@@ -60,6 +60,7 @@
 #include "Render/RenderSystem.hpp"
 #include "Render/Shader.hpp"
 #include "Render/ShaderProgram.hpp"
+#include "Render/SsrRenderProcess.hpp"
 #include "Render/SubmeshRenderer.hpp"
 #include "Render/Texture.hpp"
 #include "Render/UniformBuffer.hpp"

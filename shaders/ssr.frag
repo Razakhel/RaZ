@@ -2,6 +2,7 @@ struct Buffers {
   sampler2D depth;
   sampler2D color;
   sampler2D normal;
+  sampler2D specular;
 };
 
 in vec2 fragTexcoords;
@@ -19,51 +20,56 @@ uniform Buffers uniSceneBuffers;
 
 layout(location = 0) out vec4 fragColor;
 
-const uint maxRaySteps    = 500u;
-const uint maxBinarySteps = 5u;
+const uint maxRaySteps    = 50u;
+const uint maxRefineSteps = 10u;
 
-vec3 binaryRefinement(vec3 rayDir, vec3 viewPos) {
-  vec4 projCoords;
+vec3 refineRayHit(vec3 viewDir, vec3 viewPos) {
+  for (uint refineStep = 0u; refineStep < maxRefineSteps; ++refineStep) {
+    vec4 projPos = uniProjectionMat * vec4(viewPos, 1.0);
+    projPos.xyz /= projPos.w;
+    projPos.xyz  = projPos.xyz * 0.5 + 0.5;
 
-  for (uint binStep = 0u; binStep < maxBinarySteps; ++binStep) {
-    projCoords     = uniProjectionMat * vec4(viewPos, 1.0);
-    projCoords.xy /= projCoords.w;
-    projCoords.xy  = projCoords.xy * 0.5 + 0.5;
+    vec2 projCoords = projPos.xy;
 
-    float depth     = texture(uniSceneBuffers.depth, projCoords.xy).r;
-    float depthDiff = viewPos.z - depth;
+    float projDepth = projPos.z;
+    float fragDepth = texture(uniSceneBuffers.depth, projCoords).r;
 
-    rayDir *= 0.5;
+    viewDir *= 0.5;
 
-    if (depthDiff > 0.0)
-      viewPos += rayDir;
+    if (projDepth > fragDepth)
+      viewPos -= viewDir;
     else
-      viewPos -= rayDir;
+      viewPos += viewDir;
   }
 
-  projCoords     = uniProjectionMat * vec4(viewPos, 1.0);
-  projCoords.xy /= projCoords.w;
-  projCoords.xy  = projCoords.xy * 0.5 + 0.5;
+  vec4 projPos = uniProjectionMat * vec4(viewPos, 1.0);
+  projPos.xy  /= projPos.w;
 
-  return texture(uniSceneBuffers.color, projCoords.xy).rgb;
+  vec2 projCoords = projPos.xy * 0.5 + 0.5;
+
+  return texture(uniSceneBuffers.color, projCoords).rgb;
 }
 
-vec3 recoverReflectColor(vec3 rayDir, vec3 viewPos) {
-  rayDir *= 0.5;
+vec3 recoverReflectColor(vec3 viewDir, vec3 viewPos) {
+  viewDir *= 0.5;
 
   for (uint rayStep = 0u; rayStep < maxRaySteps; ++rayStep) {
-    viewPos += rayDir;
+    viewPos += viewDir;
 
-    vec4 projCoords = uniProjectionMat * vec4(viewPos, 1.0);
-    projCoords.xy  /= projCoords.w;
-    projCoords.xy   = projCoords.xy * 0.5 + 0.5;
+    vec4 projPos = uniProjectionMat * vec4(viewPos, 1.0);
+    projPos.xyz /= projPos.w;
+    projPos.xyz  = projPos.xyz * 0.5 + 0.5;
 
-    float depth     = texture(uniSceneBuffers.depth, projCoords.xy).r;
-    float depthDiff = viewPos.z - depth;
+    vec2 projCoords = projPos.xy;
 
-    if (depthDiff < 0.0)
-      return texture(uniSceneBuffers.color, projCoords.xy).rgb;
-      //return binaryRefinement(rayDir, viewPos);
+    if (projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
+      break; // The ray has gotten out of the frame, nothing will be found
+
+    float projDepth = projPos.z;
+    float fragDepth = texture(uniSceneBuffers.depth, projCoords).r;
+
+    if (projDepth >= fragDepth)
+      return refineRayHit(viewDir, viewPos);
   }
 
   return vec3(0.0);
@@ -76,21 +82,36 @@ vec3 computeViewPosFromDepth(vec2 texcoords, float depth) {
   return viewPos.xyz / viewPos.w;
 }
 
+vec3 computeFresnel(float cosTheta, vec3 baseReflectivity) {
+  // Optimized exponent version, from: http://blog.selfshadow.com/publications/s2013-shading-course/karis/s2013_pbs_epic_notes_v2.pdf
+  return baseReflectivity + (1.0 - baseReflectivity) * pow(2.0, (-5.55473 * cosTheta - 6.98316) * cosTheta);
+}
+
 void main() {
-  vec4 pixelColor     = texture(uniSceneBuffers.color, fragTexcoords).rgba;
-  vec3 reflectColor   = pixelColor.rgb;
-  float reflectFactor = pixelColor.a;
+  vec3 pixelColor = texture(uniSceneBuffers.color, fragTexcoords).rgb;
+  float fragDepth = texture(uniSceneBuffers.depth, fragTexcoords).r;
 
-  if (reflectFactor > 0.1) {
-    float depth = texture(uniSceneBuffers.depth, fragTexcoords).r;
-
-    vec3 viewPos     = computeViewPosFromDepth(fragTexcoords, depth);
-    vec3 worldNormal = normalize(texture(uniSceneBuffers.normal, fragTexcoords).xyz * 2.0 - 1.0);
-    vec3 reflectDir  = normalize(reflect(normalize(viewPos), worldNormal));
-
-    reflectColor *= 1.0 - reflectFactor;
-    reflectColor += recoverReflectColor(vec3(reflectDir.xy, -reflectDir.z) * max(0.1, -viewPos.z), viewPos.xyz) * reflectFactor;
+  if (fragDepth == 1.0) {
+    fragColor = vec4(pixelColor, 1.0);
+    return;
   }
 
-  fragColor = vec4(reflectColor, 1.0);
+  vec3 viewFragPos = computeViewPosFromDepth(fragTexcoords, fragDepth);
+  vec3 viewFragDir = normalize(viewFragPos); // The camera's position in view space is [0.0; 0.0; 0.0]
+
+  vec3 worldNormal = normalize(texture(uniSceneBuffers.normal, fragTexcoords).rgb * 2.0 - 1.0);
+  vec3 viewNormal  = normalize(mat3(uniViewMat) * worldNormal);
+
+  vec3 viewReflectDir = normalize(reflect(viewFragDir, viewNormal));
+
+  vec3 reflectColor = recoverReflectColor(viewReflectDir, viewFragPos);
+
+  vec4 specRough  = texture(uniSceneBuffers.specular, fragTexcoords);
+  vec3 specular   = specRough.rgb;
+  float roughness = specRough.a;
+
+  float viewAngle = abs(dot(-viewFragDir, viewNormal));
+  vec3 fresnel    = computeFresnel(viewAngle, specular);
+
+  fragColor = vec4(mix(pixelColor, reflectColor, fresnel), 1.0);
 }

@@ -301,3 +301,27 @@ if (RAZ_USE_AUDIO)
         "SHELL:-s ALLOW_MEMORY_GROWTH=1"
     )
 endif ()
+
+####################
+# Assets - SSRDemo #
+####################
+
+set(
+    RaZ_SSRDemo_ASSETS
+
+    assets/textures/checkerboard.png
+    assets/textures/rustediron_normal.png
+)
+
+foreach (ASSET_PATH ${RaZ_SSRDemo_ASSETS})
+    target_link_options(RaZ_SSRDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+endforeach ()
+
+target_link_options(
+    RaZ_SSRDemo
+
+    PRIVATE
+
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+)
