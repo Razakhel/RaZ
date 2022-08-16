@@ -333,6 +333,92 @@ target_link_options(
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
 
+#####################
+# Assets - SSAODemo #
+#####################
+
+set(
+    RaZ_SSAODemo_ASSETS
+
+    assets/meshes/crytek_sponza.obj
+    assets/materials/crytek_sponza.mtl
+
+    assets/textures/sponza_thorn_diff.png
+    assets/textures/sponza_thorn_mask.png
+    assets/textures/sponza_thorn_bump.png
+
+    assets/textures/vase_round.png
+    assets/textures/vase_round_bump.png
+
+    assets/textures/vase_plant.png
+    assets/textures/vase_plant_mask.png
+
+    assets/textures/background.png
+    assets/textures/background_bump.png
+
+    assets/textures/spnza_bricks_a_spec.png
+    assets/textures/spnza_bricks_a_diff.png
+    assets/textures/spnza_bricks_a_bump.png
+
+    assets/textures/sponza_arch_diff.png
+
+    assets/textures/sponza_ceiling_a_diff.png
+
+    assets/textures/sponza_column_a_diff.png
+    assets/textures/sponza_column_a_bump.png
+
+    assets/textures/sponza_floor_a_diff.png
+
+    assets/textures/sponza_column_c_diff.png
+    assets/textures/sponza_column_c_bump.png
+
+    assets/textures/sponza_details_diff.png
+
+    assets/textures/sponza_column_b_diff.png
+    assets/textures/sponza_column_b_bump.png
+
+    assets/textures/sponza_flagpole_diff.png
+
+    assets/textures/sponza_fabric_green_diff.png
+
+    assets/textures/sponza_fabric_blue_diff.png
+
+    assets/textures/sponza_fabric_diff.png
+
+    assets/textures/sponza_curtain_blue_diff.png
+
+    assets/textures/sponza_curtain_diff.png
+
+    assets/textures/sponza_curtain_green_diff.png
+
+    assets/textures/chain_texture.png
+    assets/textures/chain_texture_mask.png
+    assets/textures/chain_texture_bump.png
+
+    assets/textures/vase_hanging.png
+
+    assets/textures/vase_dif.png
+    assets/textures/vase_bump.png
+
+    assets/textures/lion.png
+    assets/textures/lion_bump.png
+
+    assets/textures/sponza_roof_diff.png
+)
+
+foreach (ASSET_PATH ${RaZ_SSAODemo_ASSETS})
+    target_link_options(RaZ_SSAODemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+endforeach ()
+
+target_link_options(
+    RaZ_SSAODemo
+
+    PRIVATE
+
+    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
+    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+)
+
 ####################
 # Assets - SSRDemo #
 ####################

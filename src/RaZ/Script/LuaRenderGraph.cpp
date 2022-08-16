@@ -8,6 +8,7 @@
 #include "RaZ/Render/PixelizationRenderProcess.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
+#include "RaZ/Render/SsaoRenderProcess.hpp"
 #include "RaZ/Render/SsrRenderProcess.hpp"
 #include "RaZ/Render/VignetteRenderProcess.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
@@ -175,6 +176,15 @@ void LuaWrapper::registerRenderGraphTypes() {
                                                           PickOverload<RenderProcess&>(&RenderProcess::addChild));
       renderProcess["resizeBuffers"]      = &RenderProcess::resizeBuffers;
       renderProcess["recoverElapsedTime"] = &RenderProcess::recoverElapsedTime;
+    }
+
+    {
+      auto ssaoRenderProcess = state.new_usertype<SsaoRenderProcess>("SsaoRenderProcess",
+                                                                     sol::constructors<SsaoRenderProcess(RenderGraph&)>(),
+                                                                     sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+      ssaoRenderProcess["setInputDepthBuffer"]  = &SsaoRenderProcess::setInputDepthBuffer;
+      ssaoRenderProcess["setInputNormalBuffer"] = &SsaoRenderProcess::setInputNormalBuffer;
+      ssaoRenderProcess["setOutputBuffer"]      = &SsaoRenderProcess::setOutputBuffer;
     }
 
     {

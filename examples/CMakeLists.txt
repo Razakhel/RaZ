@@ -71,6 +71,9 @@ target_link_libraries(RaZ_ShowcaseDemo RaZ_Examples)
 add_executable(RaZ_SSRDemo ssrDemo.cpp)
 target_link_libraries(RaZ_SSRDemo RaZ_Examples)
 
+add_executable(RaZ_SSAODemo ssaoDemo.cpp)
+target_link_libraries(RaZ_SSAODemo RaZ_Examples)
+
 if (NOT RAZ_USE_EMSCRIPTEN)
     add_executable(RaZ_TessellationDemo tessellationDemo.cpp)
     target_link_libraries(RaZ_TessellationDemo RaZ_Examples)
@@ -83,6 +86,7 @@ if (RAZ_USE_EMSCRIPTEN)
     set_target_properties(RaZ_MinDemo      PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_PhysicsDemo  PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_ShowcaseDemo PROPERTIES SUFFIX ".html")
+    set_target_properties(RaZ_SSAODemo     PROPERTIES SUFFIX ".html")
     set_target_properties(RaZ_SSRDemo      PROPERTIES SUFFIX ".html")
 
     if (RAZ_USE_AUDIO)
