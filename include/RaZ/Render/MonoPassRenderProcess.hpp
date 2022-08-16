@@ -13,7 +13,7 @@ class FragmentShader;
 
 class MonoPassRenderProcess : public RenderProcess {
 public:
-  MonoPassRenderProcess(RenderGraph& renderGraph, FragmentShader&& fragShader);
+  MonoPassRenderProcess(RenderGraph& renderGraph, FragmentShader&& fragShader, std::string passName = {});
 
   bool isEnabled() const noexcept override;
 

@@ -1,12 +1,22 @@
 #include "RaZ/Render/MonoPassRenderProcess.hpp"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/Shader.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
 namespace Raz {
 
-MonoPassRenderProcess::MonoPassRenderProcess(RenderGraph& renderGraph, FragmentShader&& fragShader)
-  : m_pass{ renderGraph.addNode(std::move(fragShader)) } {}
+MonoPassRenderProcess::MonoPassRenderProcess(RenderGraph& renderGraph, FragmentShader&& fragShader, std::string passName)
+  : m_pass{ renderGraph.addNode(std::move(fragShader), std::move(passName)) } {
+#if !defined(USE_OPENGL_ES)
+  if (Renderer::checkVersion(4, 3)) {
+    Renderer::setLabel(RenderObjectType::PROGRAM, m_pass.getProgram().getIndex(), m_pass.getName() + " program");
+    Renderer::setLabel(RenderObjectType::SHADER, m_pass.getProgram().getVertexShader().getIndex(), m_pass.getName() + " vertex shader");
+    Renderer::setLabel(RenderObjectType::SHADER, m_pass.getProgram().getFragmentShader().getIndex(), m_pass.getName() + " fragment shader");
+    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_pass.getFramebuffer().getIndex(), m_pass.getName() + " framebuffer");
+  }
+#endif
+}
 
 bool MonoPassRenderProcess::isEnabled() const noexcept {
   return m_pass.isEnabled();
