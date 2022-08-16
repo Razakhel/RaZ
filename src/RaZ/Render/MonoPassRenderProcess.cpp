@@ -12,7 +12,7 @@ bool MonoPassRenderProcess::isEnabled() const noexcept {
   return m_pass.isEnabled();
 }
 
-void MonoPassRenderProcess::enable(bool enabled) {
+void MonoPassRenderProcess::setState(bool enabled) {
   m_pass.enable(enabled);
 }
 

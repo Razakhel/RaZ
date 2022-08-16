@@ -290,7 +290,7 @@ bool BloomRenderProcess::isEnabled() const noexcept {
   return m_thresholdPass->isEnabled();
 }
 
-void BloomRenderProcess::enable(bool enabled) {
+void BloomRenderProcess::setState(bool enabled) {
   m_thresholdPass->enable(enabled);
 
   for (RenderPass* downscalePass : m_downscalePasses)

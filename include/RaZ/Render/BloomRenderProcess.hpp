@@ -26,7 +26,7 @@ public:
   std::size_t getUpscaleBufferCount() const noexcept { return m_upscaleBuffers.size(); }
   const Texture& getUpscaleBuffer(std::size_t bufferIndex) const noexcept { return *m_upscaleBuffers[bufferIndex].lock(); }
 
-  void enable(bool enabled) override;
+  void setState(bool enabled) override;
   void addParent(RenderPass& parentPass) override;
   void addParent(RenderProcess& parentProcess) override;
   void addChild(RenderPass& childPass) override;

@@ -17,9 +17,9 @@ class RenderProcess {
 public:
   virtual bool isEnabled() const noexcept = 0;
 
-  virtual void enable(bool enabled) = 0;
-  void enable() noexcept { enable(true); }
-  void disable() noexcept { enable(false); }
+  virtual void setState(bool enabled) = 0;
+  void enable() noexcept { setState(true); }
+  void disable() noexcept { setState(false); }
   virtual void addParent(RenderPass& parentPass) = 0;
   virtual void addParent(RenderProcess& parentProcess) = 0;
   virtual void addChild(RenderPass& childPass) = 0;

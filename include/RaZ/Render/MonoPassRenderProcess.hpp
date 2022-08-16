@@ -17,7 +17,7 @@ public:
 
   bool isEnabled() const noexcept override;
 
-  void enable(bool enabled) override;
+  void setState(bool enabled) override;
   void addParent(RenderPass& parentPass) override;
   void addParent(RenderProcess& parentProcess) override;
   void addChild(RenderPass& childPass) override;
