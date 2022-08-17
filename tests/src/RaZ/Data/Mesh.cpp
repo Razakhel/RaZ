@@ -18,18 +18,22 @@ TEST_CASE("Mesh plane") {
   CHECK(submesh.getVertices()[0].position == Raz::Vec3f(-width, plane.getDistance(), depth));
   CHECK(submesh.getVertices()[0].normal == plane.getNormal());
   CHECK(submesh.getVertices()[0].texcoords == Raz::Vec2f(0.f));
+  CHECK(submesh.getVertices()[0].tangent == Raz::Axis::X);
 
   CHECK(submesh.getVertices()[1].position == Raz::Vec3f(width, plane.getDistance(), depth));
   CHECK(submesh.getVertices()[1].normal == plane.getNormal());
   CHECK(submesh.getVertices()[1].texcoords == Raz::Vec2f(1.f, 0.f));
+  CHECK(submesh.getVertices()[1].tangent == Raz::Axis::X);
 
   CHECK(submesh.getVertices()[2].position == Raz::Vec3f(width, plane.getDistance(), -depth));
   CHECK(submesh.getVertices()[2].normal == plane.getNormal());
   CHECK(submesh.getVertices()[2].texcoords == Raz::Vec2f(1.f, 1.f));
+  CHECK(submesh.getVertices()[2].tangent == Raz::Axis::X);
 
   CHECK(submesh.getVertices()[3].position == Raz::Vec3f(-width, plane.getDistance(), -depth));
   CHECK(submesh.getVertices()[3].normal == plane.getNormal());
   CHECK(submesh.getVertices()[3].texcoords == Raz::Vec2f(0.f, 1.f));
+  CHECK(submesh.getVertices()[3].tangent == Raz::Axis::X);
 
   // Checking that the mesh's triangles are constructed in a counter-clockwise order according to the plane's normal
   CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[0]].position,
@@ -56,7 +60,7 @@ TEST_CASE("Mesh triangle") {
   CHECK(triangle.computeNormal() == Raz::Axis::Z);
   CHECK(triangle.isCounterClockwise(Raz::Axis::Z));
 
-  Raz::Mesh mesh(triangle, Raz::Vec2f(0.f, 0.f), Raz::Vec2f(0.5f, 0.5f), Raz::Vec2f(1.f, 1.f));
+  Raz::Mesh mesh(triangle, Raz::Vec2f(0.f, 0.f), Raz::Vec2f(1.f, 0.f), Raz::Vec2f(0.5f, 1.f));
 
   CHECK(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 3);
@@ -69,13 +73,13 @@ TEST_CASE("Mesh triangle") {
   CHECK(submesh.getVertices()[2].position == triangle.getThirdPos());
 
   CHECK(submesh.getVertices()[0].texcoords == Raz::Vec2f(0.f, 0.f));
-  CHECK(submesh.getVertices()[1].texcoords == Raz::Vec2f(0.5f, 0.5f));
-  CHECK(submesh.getVertices()[2].texcoords == Raz::Vec2f(1.f, 1.f));
+  CHECK(submesh.getVertices()[1].texcoords == Raz::Vec2f(1.f, 0.f));
+  CHECK(submesh.getVertices()[2].texcoords == Raz::Vec2f(0.5f, 1.f));
 
-  const Raz::Vec3f normal = triangle.computeNormal();
-  CHECK(submesh.getVertices()[0].normal == normal);
-  CHECK(submesh.getVertices()[1].normal == normal);
-  CHECK(submesh.getVertices()[2].normal == normal);
+  for (const Raz::Vertex& vertex : submesh.getVertices()) {
+    CHECK(vertex.normal == Raz::Axis::Z);
+    CHECK(vertex.tangent == Raz::Axis::X);
+  }
 
   // Checking that the mesh is constructed with the same winding order
   CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[0]].position,
@@ -104,8 +108,10 @@ TEST_CASE("Mesh quad") {
 
   const Raz::Submesh& submesh = mesh.getSubmeshes().front();
 
-  for (const Raz::Vertex& vertex : submesh.getVertices())
+  for (const Raz::Vertex& vertex : submesh.getVertices()) {
     CHECK(vertex.normal == Raz::Axis::Z);
+    CHECK(vertex.tangent == Raz::Axis::X);
+  }
 
   // Checking that the mesh's triangles are constructed in a counter-clockwise order
   CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[0]].position,
@@ -139,14 +145,19 @@ TEST_CASE("Mesh UV sphere") {
       // A simple epsilon is not enough for all compilers except MinGW: the X component of a single vector has a difference
       //  beyond tolerance, although very small; the origin of this discrepancy between compilers is unknown
       CHECK_THAT(vertex.normal, IsNearlyEqualToVector((vertex.position - sphere.getCenter()).normalize(), 0.000001f));
+
+      // TODO: 4 tangents are null for unknown reasons
+      // Checking that the tangent is perpendicular to the normal
+      //CHECK_THAT(vertex.tangent.computeLength(), IsNearlyEqualTo(1.f));
+      //CHECK_THAT(vertex.tangent.dot(vertex.normal), IsNearlyEqualTo(0.f));
     }
 
     // Checking that the mesh's triangles are constructed in a counter-clockwise order
     for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
-        const Raz::Vec3f normal = (submesh.getVertices()[submesh.getTriangleIndices()[i]].normal
+        const Raz::Vec3f normal = (submesh.getVertices()[submesh.getTriangleIndices()[i    ]].normal
                                  + submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].normal
                                  + submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].normal).normalize();
-        CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[i]].position,
+        CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[i    ]].position,
                             submesh.getVertices()[submesh.getTriangleIndices()[i + 1]].position,
                             submesh.getVertices()[submesh.getTriangleIndices()[i + 2]].position).isCounterClockwise(normal));
     }
@@ -295,6 +306,10 @@ TEST_CASE("Mesh AABB") {
     CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 3]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
+
+    // TODO: normals must be added to the mesh before checking their value
+    //for (std::size_t i = startIndex; i < startIndex + 6; ++i)
+    //  CHECK(submesh.getVertices()[submesh.getTriangleIndices()[i]].normal.strictlyEquals(normal));
   };
 
   checkWindingOrder(0, Raz::Axis::X);
@@ -303,6 +318,12 @@ TEST_CASE("Mesh AABB") {
   checkWindingOrder(18, -Raz::Axis::Y);
   checkWindingOrder(24, Raz::Axis::Z);
   checkWindingOrder(30, -Raz::Axis::Z);
+
+  // TODO: normals must be added to the mesh before checking the tangents' value
+  //for (const Raz::Vertex& vert : submesh.getVertices()) {
+  //  CHECK_THAT(vert.tangent.computeLength(), IsNearlyEqualTo(1.f));
+  //  CHECK_THAT(vert.tangent.dot(vert.normal), IsNearlyEqualTo(0.f));
+  //}
 
   const Raz::AABB& boundingBox = mesh.computeBoundingBox();
 

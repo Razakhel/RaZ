@@ -13,22 +13,6 @@ namespace Raz::ObjFormat {
 
 namespace {
 
-constexpr Vec3f computeTangent(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos,
-                               const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) noexcept {
-  const Vec3f firstEdge = secondPos - firstPos;
-  const Vec3f secondEdge = thirdPos - firstPos;
-
-  const Vec2f firstUVDiff = secondTexcoords - firstTexcoords;
-  const Vec2f secondUVDiff = thirdTexcoords - firstTexcoords;
-
-  const float denominator = (firstUVDiff[0] * secondUVDiff[1] - secondUVDiff[0] * firstUVDiff[1]);
-
-  if (denominator == 0.f)
-    return Vec3f(0.f);
-
-  return (firstEdge * secondUVDiff[1] - secondEdge * firstUVDiff[1]) / denominator;
-}
-
 inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
   return Texture::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), true);
@@ -296,7 +280,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
       // vertIndices[i][j] -> vertex i, feature j (j = 0 -> position, j = 1 -> texcoords, j = 2 -> normal)
       std::array<std::array<std::size_t, 3>, 3> vertIndices {};
 
-      // First vertex informations
+      // First vertex information
       int64_t tempIndex = posIndices[submeshIndex][partIndex];
       vertIndices[0][0] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + posCount) : static_cast<std::size_t>(tempIndex - 1));
 
@@ -308,7 +292,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
       ++partIndex;
 
-      // Second vertex informations
+      // Second vertex information
       tempIndex = posIndices[submeshIndex][partIndex];
       vertIndices[1][0] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + posCount) : static_cast<std::size_t>(tempIndex - 1));
 
@@ -320,7 +304,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
       ++partIndex;
 
-      // Third vertex informations
+      // Third vertex information
       tempIndex = posIndices[submeshIndex][partIndex];
       vertIndices[2][0] = (tempIndex < 0 ? static_cast<std::size_t>(tempIndex + posCount) : static_cast<std::size_t>(tempIndex - 1));
 
@@ -334,15 +318,11 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
                                                    positions[vertIndices[1][0]],
                                                    positions[vertIndices[2][0]] };
 
-      Vec3f faceTangent;
       std::array<Vec2f, 3> faceTexcoords {};
       if (!texcoords.empty()) {
         faceTexcoords[0] = texcoords[vertIndices[0][1]];
         faceTexcoords[1] = texcoords[vertIndices[1][1]];
         faceTexcoords[2] = texcoords[vertIndices[2][1]];
-
-        faceTangent = computeTangent(facePositions[0], facePositions[1], facePositions[2],
-                                     faceTexcoords[0], faceTexcoords[1], faceTexcoords[2]);
       }
 
       std::array<Vec3f, 3> faceNormals {};
@@ -356,32 +336,24 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
         const auto indexIter = indicesMap.find(vertIndices[vertPartIndex]);
 
         if (indexIter != indicesMap.cend()) {
-          submesh.getVertices()[indexIter->second].tangent += faceTangent; // Adding current tangent to be averaged later
           submesh.getTriangleIndices().emplace_back(indexIter->second);
-        } else {
-          Vertex vert {};
-
-          vert.position  = facePositions[vertPartIndex];
-          vert.texcoords = faceTexcoords[vertPartIndex];
-          vert.normal    = faceNormals[vertPartIndex];
-          vert.tangent   = faceTangent;
-
-          submesh.getTriangleIndices().emplace_back(static_cast<unsigned int>(indicesMap.size()));
-          indicesMap.emplace(vertIndices[vertPartIndex], static_cast<unsigned int>(indicesMap.size()));
-          submesh.getVertices().emplace_back(vert);
+          continue;
         }
+
+        const Vertex vert {
+          facePositions[vertPartIndex],
+          faceTexcoords[vertPartIndex],
+          faceNormals[vertPartIndex]
+        };
+
+        submesh.getTriangleIndices().emplace_back(static_cast<unsigned int>(indicesMap.size()));
+        indicesMap.emplace(vertIndices[vertPartIndex], static_cast<unsigned int>(indicesMap.size()));
+        submesh.getVertices().emplace_back(vert);
       }
     }
-
-    // Normalizing tangents to become unit vectors & to be averaged after being accumulated
-    for (Vertex& vertex : submesh.getVertices()) {
-      // If the tangent is null, don't normalize it to avoid NaNs
-      if (vertex.tangent.strictlyEquals(Vec3f(0.f)))
-        continue;
-
-      vertex.tangent = (vertex.tangent - vertex.normal * vertex.tangent.dot(vertex.normal)).normalize();
-    }
   }
+
+  mesh.computeTangents();
 
   // Creating the mesh renderer from the mesh's data
   meshRenderer.load(mesh);

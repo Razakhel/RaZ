@@ -1,9 +1,29 @@
-#include "RaZ/Math/Constants.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Math/Constants.hpp"
+#include "RaZ/Utils/Threading.hpp"
 
 #include <unordered_map>
 
 namespace Raz {
+
+namespace {
+
+constexpr Vec3f computeTangent(const Vertex& firstVert, const Vertex& secondVert, const Vertex& thirdVert) noexcept {
+  const Vec3f firstEdge  = secondVert.position - firstVert.position;
+  const Vec3f secondEdge = thirdVert.position - firstVert.position;
+
+  const Vec2f firstUvDiff  = secondVert.texcoords - firstVert.texcoords;
+  const Vec2f secondUvDiff = thirdVert.texcoords - firstVert.texcoords;
+
+  const float denominator = (firstUvDiff.x() * secondUvDiff.y() - secondUvDiff.x() * firstUvDiff.y());
+
+  if (denominator == 0.f)
+    return Vec3f(0.f);
+
+  return (firstEdge * secondUvDiff.y() - secondEdge * firstUvDiff.y()) / denominator;
+}
+
+} // namespace
 
 Mesh::Mesh(const Plane& plane, float width, float depth) {
   const float height = plane.computeCentroid().y();
@@ -54,6 +74,8 @@ Mesh::Mesh(const Plane& plane, float width, float depth) {
   indices[3] = 0;
   indices[4] = 2;
   indices[5] = 3;
+
+  computeTangents();
 }
 
 Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
@@ -66,6 +88,8 @@ Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
       createIcosphere(sphere, subdivCount);
       break;
   }
+
+  computeTangents();
 }
 
 Mesh::Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
@@ -104,6 +128,8 @@ Mesh::Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& s
   indices[0] = 0;
   indices[1] = 1;
   indices[2] = 2;
+
+  computeTangents();
 }
 
 Mesh::Mesh(const Quad& quad) {
@@ -129,7 +155,6 @@ Mesh::Mesh(const Quad& quad) {
   leftBottom.texcoords = Vec2f(0.f, 0.f);
 
   // Computing normals
-  // TODO: normals should not be computed (or even exist) for simple display quads like a framebuffer
   leftTop.normal     = (leftTopPos - rightTopPos).cross(leftBottomPos - leftTopPos).normalize();
   rightTop.normal    = (rightTopPos - rightBottomPos).cross(leftTopPos - rightTopPos).normalize();
   rightBottom.normal = (rightBottomPos - leftBottomPos).cross(rightTopPos - rightBottomPos).normalize();
@@ -155,6 +180,8 @@ Mesh::Mesh(const Quad& quad) {
   indices[3] = 0;
   indices[4] = 2;
   indices[5] = 3;
+
+  computeTangents();
 }
 
 Mesh::Mesh(const AABB& box) {
@@ -276,6 +303,8 @@ Mesh::Mesh(const AABB& box) {
   indices[33] = 6;
   indices[34] = 0;
   indices[35] = 2;
+
+  computeTangents();
 }
 
 std::size_t Mesh::recoverVertexCount() const {
@@ -316,6 +345,34 @@ const AABB& Mesh::computeBoundingBox() {
   return m_boundingBox;
 }
 
+void Mesh::computeTangents() {
+  Threading::parallelize(m_submeshes, [] (const auto& range) noexcept {
+    for (Submesh& submesh : range) {
+      for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
+        Vertex& firstVert  = submesh.getVertices()[submesh.getTriangleIndices()[i    ]];
+        Vertex& secondVert = submesh.getVertices()[submesh.getTriangleIndices()[i + 1]];
+        Vertex& thirdVert  = submesh.getVertices()[submesh.getTriangleIndices()[i + 2]];
+
+        const Vec3f tangent = computeTangent(firstVert, secondVert, thirdVert);
+
+        // Adding the computed tangent to each vertex; they will be normalized later
+        firstVert.tangent  += tangent;
+        secondVert.tangent += tangent;
+        thirdVert.tangent  += tangent;
+      }
+
+      // Normalizing the accumulated tangents
+      for (Vertex& vert : submesh.getVertices()) {
+        // Avoiding NaNs by preventing normalization of a 0 vector
+        if (vert.tangent.strictlyEquals(Vec3f(0.f)))
+          continue;
+
+        vert.tangent = (vert.tangent - vert.normal * vert.tangent.dot(vert.normal)).normalize();
+      }
+    }
+  });
+}
+
 void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount) {
   // Algorithm based on the standard/UV sphere presented here: http://www.songho.ca/opengl/gl_sphere.html#sphere
 
@@ -345,7 +402,6 @@ void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t he
       vert.texcoords = Vec2f(static_cast<float>(widthIndex) / static_cast<float>(widthCount),
                              static_cast<float>(heightIndex) / static_cast<float>(heightCount));
       vert.normal    = Vec3f(x, y, z).normalize(); // Dividing by the inverse radius does not give a perfectly unit vector; normalizing directly
-      vert.tangent   = Vec3f(vert.normal.y(), vert.normal.x(), vert.normal.z()); // TODO: how does this give seemingly accurate results in basic cases?
 
       vertices.emplace_back(vert);
     }
@@ -404,68 +460,54 @@ void Mesh::createIcosphere(const Sphere& sphere, uint32_t /* subdivCount */) {
   std::vector<Vertex>& vertices = submesh.getVertices();
   vertices.resize(12);
 
-  // TODO: how does this tangent calculation give seemingly accurate results in basic cases?
-
   constexpr float invFactor = 1.f / (Pi<float> * 2);
 
   vertices[0].normal    = Vec3f(-radius, goldenRadius, 0.f).normalize();
   vertices[0].position  = vertices[0].normal * radius;
-  vertices[0].tangent   = Vec3f(vertices[0].normal[1], vertices[0].normal[0], vertices[0].normal[2]);
   vertices[0].texcoords = Vec2f(std::atan2(vertices[0].normal[0], vertices[0].normal[2]) * invFactor + 0.5f, vertices[0].normal[1] * 0.5f + 0.5f);
 
   vertices[1].normal    = Vec3f(radius, goldenRadius, 0.f).normalize();
   vertices[1].position  = vertices[1].normal * radius;
-  vertices[1].tangent   = Vec3f(vertices[1].normal[1], vertices[1].normal[0], vertices[1].normal[2]);
   vertices[1].texcoords = Vec2f(std::atan2(vertices[1].normal[0], vertices[1].normal[2]) * invFactor + 0.5f, vertices[1].normal[1] * 0.5f + 0.5f);
 
   vertices[2].normal    = Vec3f(-radius, -goldenRadius, 0.f).normalize();
   vertices[2].position  = vertices[2].normal * radius;
-  vertices[2].tangent   = Vec3f(vertices[2].normal[1], vertices[2].normal[0], vertices[2].normal[2]);
   vertices[2].texcoords = Vec2f(std::atan2(vertices[2].normal[0], vertices[2].normal[2]) * invFactor + 0.5f, vertices[2].normal[1] * 0.5f + 0.5f);
 
   vertices[3].normal    = Vec3f(radius, -goldenRadius, 0.f).normalize();
   vertices[3].position  = vertices[3].normal * radius;
-  vertices[3].tangent   = Vec3f(vertices[3].normal[1], vertices[3].normal[0], vertices[3].normal[2]);
   vertices[3].texcoords = Vec2f(std::atan2(vertices[3].normal[0], vertices[3].normal[2]) * invFactor + 0.5f, vertices[3].normal[1] * 0.5f + 0.5f);
 
   vertices[4].normal    = Vec3f(0.f, -radius, goldenRadius).normalize();
   vertices[4].position  = vertices[4].normal * radius;
-  vertices[4].tangent   = Vec3f(vertices[4].normal[1], vertices[4].normal[0], vertices[4].normal[2]);
   vertices[4].texcoords = Vec2f(std::atan2(vertices[4].normal[0], vertices[4].normal[2]) * invFactor + 0.5f, vertices[4].normal[1] * 0.5f + 0.5f);
 
   vertices[5].normal    = Vec3f(0.f, radius, goldenRadius).normalize();
   vertices[5].position  = vertices[5].normal * radius;
-  vertices[5].tangent   = Vec3f(vertices[5].normal[1], vertices[5].normal[0], vertices[5].normal[2]);
   vertices[5].texcoords = Vec2f(std::atan2(vertices[5].normal[0], vertices[5].normal[2]) * invFactor + 0.5f, vertices[5].normal[1] * 0.5f + 0.5f);
 
   vertices[6].normal    = Vec3f(0.f, -radius, -goldenRadius).normalize();
   vertices[6].position  = vertices[6].normal * radius;
-  vertices[6].tangent   = Vec3f(vertices[6].normal[1], vertices[6].normal[0], vertices[6].normal[2]);
   vertices[6].texcoords = Vec2f(std::atan2(vertices[6].normal[0], vertices[6].normal[2]) * invFactor + 0.5f, vertices[6].normal[1] * 0.5f + 0.5f);
 
   vertices[7].normal    = Vec3f(0.f, radius, -goldenRadius).normalize();
   vertices[7].position  = vertices[7].normal * radius;
-  vertices[7].tangent   = Vec3f(vertices[7].normal[1], vertices[7].normal[0], vertices[7].normal[2]);
   vertices[7].texcoords = Vec2f(std::atan2(vertices[7].normal[0], vertices[7].normal[2]) * invFactor + 0.5f, vertices[7].normal[1] * 0.5f + 0.5f);
 
   vertices[8].normal    = Vec3f(goldenRadius, 0.f, -radius).normalize();
   vertices[8].position  = vertices[8].normal * radius;
-  vertices[8].tangent   = Vec3f(vertices[8].normal[1], vertices[8].normal[0], vertices[8].normal[2]);
   vertices[8].texcoords = Vec2f(std::atan2(vertices[8].normal[0], vertices[8].normal[2]) * invFactor + 0.5f, vertices[8].normal[1] * 0.5f + 0.5f);
 
   vertices[9].normal    = Vec3f(goldenRadius, 0.f, radius).normalize();
   vertices[9].position  = vertices[9].normal * radius;
-  vertices[9].tangent   = Vec3f(vertices[9].normal[1], vertices[9].normal[0], vertices[9].normal[2]);
   vertices[9].texcoords = Vec2f(std::atan2(vertices[9].normal[0], vertices[9].normal[2]) * invFactor + 0.5f, vertices[9].normal[1] * 0.5f + 0.5f);
 
   vertices[10].normal    = Vec3f(-goldenRadius, 0.f, -radius).normalize();
   vertices[10].position  = vertices[10].normal * radius;
-  vertices[10].tangent   = Vec3f(vertices[10].normal[1], vertices[10].normal[0], vertices[10].normal[2]);
   vertices[10].texcoords = Vec2f(std::atan2(vertices[10].normal[0], vertices[10].normal[2]) * invFactor + 0.5f, vertices[10].normal[1] * 0.5f + 0.5f);
 
   vertices[11].normal    = Vec3f(-goldenRadius, 0.f, radius).normalize();
   vertices[11].position  = vertices[11].normal * radius;
-  vertices[11].tangent   = Vec3f(vertices[11].normal[1], vertices[11].normal[0], vertices[11].normal[2]);
   vertices[11].texcoords = Vec2f(std::atan2(vertices[11].normal[0], vertices[11].normal[2]) * invFactor + 0.5f, vertices[11].normal[1] * 0.5f + 0.5f);
 
   // Applying a translation on each vertex by the sphere's center
@@ -611,21 +653,18 @@ void Mesh::createIcosphere(const Sphere& sphere, uint32_t /* subdivCount */) {
 //
 //      Vertex& firstEdgeVert   = newVertices.emplace_back();
 //      firstEdgeVert.position  = (firstVert.position + secondVert.position) * 0.5f;
-//      firstEdgeVert.normal    = (firstVert.normal + secondVert.normal).normalize();
-//      firstEdgeVert.tangent   = Vec3f(firstEdgeVert.normal[1], firstEdgeVert.normal[0], firstEdgeVert.normal[2]);
 //      firstEdgeVert.texcoords = (firstVert.texcoords + secondVert.texcoords) * 0.5f;
+//      firstEdgeVert.normal    = (firstVert.normal + secondVert.normal).normalize();
 //
 //      Vertex& secondEdgeVert   = newVertices.emplace_back();
 //      secondEdgeVert.position  = (secondVert.position + thirdVert.position) * 0.5f;
-//      secondEdgeVert.normal    = (secondVert.normal + thirdVert.normal).normalize();
-//      secondEdgeVert.tangent   = Vec3f(secondEdgeVert.normal[1], secondEdgeVert.normal[0], secondEdgeVert.normal[2]);
 //      secondEdgeVert.texcoords = (secondVert.texcoords + thirdVert.texcoords) * 0.5f;
+//      secondEdgeVert.normal    = (secondVert.normal + thirdVert.normal).normalize();
 //
 //      Vertex& thirdEdgeVert   = newVertices.emplace_back();
 //      thirdEdgeVert.position  = (thirdVert.position + firstVert.position) * 0.5f;
-//      thirdEdgeVert.normal    = (thirdVert.normal + firstVert.normal).normalize();
-//      thirdEdgeVert.tangent   = Vec3f(thirdEdgeVert.normal[1], thirdEdgeVert.normal[0], thirdEdgeVert.normal[2]);
 //      thirdEdgeVert.texcoords = (thirdVert.texcoords + firstVert.texcoords) * 0.5f;
+//      thirdEdgeVert.normal    = (thirdVert.normal + firstVert.normal).normalize();
 //
 //      // Adding indices to create the 4 resulting triangles
 //      //       x

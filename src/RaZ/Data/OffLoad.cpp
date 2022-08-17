@@ -31,10 +31,11 @@ Mesh load(const FilePath& filePath) {
   std::vector<unsigned int>& indices = submesh.getTriangleIndices();
   indices.reserve(faceCount * 3);
 
-  for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex)
+  for (std::size_t vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
     file >> vertices[vertexIndex].position.x()
          >> vertices[vertexIndex].position.y()
          >> vertices[vertexIndex].position.z();
+  }
 
   for (std::size_t faceIndex = 0; faceIndex < faceCount; ++faceIndex) {
     uint16_t partCount {};
@@ -57,6 +58,8 @@ Mesh load(const FilePath& filePath) {
   }
 
   indices.shrink_to_fit();
+
+  mesh.computeTangents();
 
   Logger::debug("[OffLoad] Loaded OFF file (" + std::to_string(mesh.recoverVertexCount()) + " vertices, "
                                               + std::to_string(mesh.recoverTriangleCount()) + " triangles)");

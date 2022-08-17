@@ -89,22 +89,31 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   const Raz::Submesh& submesh = mesh.getSubmeshes().front();
 
-  auto checkWindingOrder = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal) {
-    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex]].position,
+  auto checkData = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal, const Raz::Vec3f& tangent) {
+    REQUIRE(tangent.dot(normal) == 0.f);
+
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex    ]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
 
     CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 3]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
+
+    for (std::size_t i = startIndex; i < startIndex + 6; ++i) {
+      const Raz::Vertex& vert = submesh.getVertices()[submesh.getTriangleIndices()[i]];
+
+      CHECK(vert.normal.strictlyEquals(normal));
+      CHECK(vert.tangent.strictlyEquals(tangent));
+    }
   };
 
-  checkWindingOrder(0, Raz::Axis::Y);
-  checkWindingOrder(6, -Raz::Axis::X);
-  checkWindingOrder(12, Raz::Axis::X);
-  checkWindingOrder(18, -Raz::Axis::Z);
-  checkWindingOrder(24, Raz::Axis::Z);
-  checkWindingOrder(30, -Raz::Axis::Y);
+  checkData(0, Raz::Axis::Y, Raz::Axis::X);
+  checkData(6, -Raz::Axis::X, Raz::Axis::Z);
+  checkData(12, Raz::Axis::X, -Raz::Axis::Z);
+  checkData(18, -Raz::Axis::Z, -Raz::Axis::X);
+  checkData(24, Raz::Axis::Z, Raz::Axis::X);
+  checkData(30, -Raz::Axis::Y, Raz::Axis::X);
 
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
@@ -329,7 +338,9 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   const Raz::Submesh& submesh = mesh.getSubmeshes().front();
 
-  auto checkWindingOrder = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal) {
+  auto checkData = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal, const Raz::Vec3f& tangent) {
+    REQUIRE(tangent.dot(normal) == 0.f);
+
     CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
@@ -337,14 +348,21 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 3]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
+
+    for (std::size_t i = startIndex; i < startIndex + 6; ++i) {
+      const Raz::Vertex& vert = submesh.getVertices()[submesh.getTriangleIndices()[i]];
+
+      CHECK(vert.normal.strictlyEquals(normal));
+      CHECK(vert.tangent.strictlyEquals(tangent));
+    }
   };
 
-  checkWindingOrder(0, Raz::Axis::Y);
-  checkWindingOrder(6, -Raz::Axis::X);
-  checkWindingOrder(12, Raz::Axis::X);
-  checkWindingOrder(18, -Raz::Axis::Z);
-  checkWindingOrder(24, Raz::Axis::Z);
-  checkWindingOrder(30, -Raz::Axis::Y);
+  checkData(0, Raz::Axis::Y, Raz::Axis::X);
+  checkData(6, -Raz::Axis::X, Raz::Axis::Z);
+  checkData(12, Raz::Axis::X, -Raz::Axis::Z);
+  checkData(18, -Raz::Axis::Z, -Raz::Axis::X);
+  checkData(24, Raz::Axis::Z, Raz::Axis::X);
+  checkData(30, -Raz::Axis::Y, Raz::Axis::X);
 
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
