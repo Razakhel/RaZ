@@ -56,24 +56,11 @@ Mesh::Mesh(const Plane& plane, float width, float depth) {
 
   Submesh& submesh = m_submeshes.emplace_back();
 
-  std::vector<Vertex>& vertices = submesh.getVertices();
-  vertices.resize(4);
-
-  vertices[0] = firstCorner;
-  vertices[1] = secondCorner;
-  vertices[2] = thirdCorner;
-  vertices[3] = fourthCorner;
-
-  std::vector<unsigned int>& indices = submesh.getTriangleIndices();
-  indices.resize(6);
-
-  indices[0] = 0;
-  indices[1] = 1;
-  indices[2] = 2;
-
-  indices[3] = 0;
-  indices[4] = 2;
-  indices[5] = 3;
+  submesh.getVertices() = { firstCorner, secondCorner, thirdCorner, fourthCorner };
+  submesh.getTriangleIndices() = {
+    0, 1, 2,
+    0, 2, 3
+  };
 
   computeTangents();
 }
@@ -115,19 +102,8 @@ Mesh::Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& s
 
   Submesh& submesh = m_submeshes.emplace_back();
 
-  std::vector<Vertex>& vertices = submesh.getVertices();
-  vertices.resize(3);
-
-  vertices[0] = firstVert;
-  vertices[1] = secondVert;
-  vertices[2] = thirdVert;
-
-  std::vector<unsigned int>& indices = submesh.getTriangleIndices();
-  indices.resize(3);
-
-  indices[0] = 0;
-  indices[1] = 1;
-  indices[2] = 2;
+  submesh.getVertices() = { firstVert, secondVert, thirdVert };
+  submesh.getTriangleIndices() = { 0, 1, 2 };
 
   computeTangents();
 }
@@ -162,149 +138,77 @@ Mesh::Mesh(const Quad& quad) {
 
   Submesh& submesh = m_submeshes.emplace_back();
 
-  std::vector<Vertex>& vertices = submesh.getVertices();
-  vertices.resize(4);
-
-  vertices[0] = leftTop;
-  vertices[1] = leftBottom;
-  vertices[2] = rightBottom;
-  vertices[3] = rightTop;
-
-  std::vector<unsigned int>& indices = submesh.getTriangleIndices();
-  indices.resize(6);
-
-  indices[0] = 0;
-  indices[1] = 1;
-  indices[2] = 2;
-
-  indices[3] = 0;
-  indices[4] = 2;
-  indices[5] = 3;
+  submesh.getVertices() = { leftTop, leftBottom, rightBottom, rightTop };
+  submesh.getTriangleIndices() = {
+    0, 1, 2,
+    0, 2, 3
+  };
 
   computeTangents();
 }
 
 Mesh::Mesh(const AABB& box) {
-  const Vec3f& minPos = box.getMinPosition();
-  const Vec3f& maxPos = box.getMaxPosition();
+  const auto [minX, minY, minZ] = box.getMinPosition().getData();
+  const auto [maxX, maxY, maxZ] = box.getMaxPosition().getData();
 
-  const float minX = minPos.x();
-  const float maxX = maxPos.x();
-  const float minY = minPos.y();
-  const float maxY = maxPos.y();
-  const float minZ = minPos.z();
-  const float maxZ = maxPos.z();
-
-  Vertex rightTopBack {};
-  rightTopBack.position  = Vec3f(maxX, maxY, minZ);
-  rightTopBack.texcoords = Vec2f(0.f, 1.f);
-
-  Vertex rightTopFront {};
-  rightTopFront.position  = maxPos;
-  rightTopFront.texcoords = Vec2f(1.f, 1.f);
-
-  Vertex rightBottomBack {};
-  rightBottomBack.position  = Vec3f(maxX, minY, minZ);
-  rightBottomBack.texcoords = Vec2f(0.f, 0.f);
-
-  Vertex rightBottomFront {};
-  rightBottomFront.position  = Vec3f(maxX, minY, maxZ);
-  rightBottomFront.texcoords = Vec2f(1.f, 0.f);
-
-  Vertex leftTopBack {};
-  leftTopBack.position  = Vec3f(minX, maxY, minZ);
-  leftTopBack.texcoords = Vec2f(1.f, 1.f);
-
-  Vertex leftTopFront {};
-  leftTopFront.position  = Vec3f(minX, maxY, maxZ);
-  leftTopFront.texcoords = Vec2f(0.f, 1.f);
-
-  Vertex leftBottomBack {};
-  leftBottomBack.position  = minPos;
-  leftBottomBack.texcoords = Vec2f(1.f, 0.f);
-
-  Vertex leftBottomFront {};
-  leftBottomFront.position  = Vec3f(minX, minY, maxZ);
-  leftBottomFront.texcoords = Vec2f(0.f, 0.f);
-
-  // Computing normals
-  // TODO: compute normals
+  const Vec3f rightTopBack(maxX, maxY, minZ);
+  const Vec3f rightTopFront(maxX, maxY, maxZ);
+  const Vec3f rightBottomBack(maxX, minY, minZ);
+  const Vec3f rightBottomFront(maxX, minY, maxZ);
+  const Vec3f leftTopBack(minX, maxY, minZ);
+  const Vec3f leftTopFront(minX, maxY, maxZ);
+  const Vec3f leftBottomBack(minX, minY, minZ);
+  const Vec3f leftBottomFront(minX, minY, maxZ);
 
   Submesh& submesh = m_submeshes.emplace_back();
 
   std::vector<Vertex>& vertices = submesh.getVertices();
-  vertices.resize(8);
-
-  vertices[0] = rightTopBack;
-  vertices[1] = rightTopFront;
-
-  vertices[2] = rightBottomBack;
-  vertices[3] = rightBottomFront;
-
-  vertices[4] = leftTopBack;
-  vertices[5] = leftTopFront;
-
-  vertices[6] = leftBottomBack;
-  vertices[7] = leftBottomFront;
-
-  std::vector<unsigned int>& indices = submesh.getTriangleIndices();
-  indices.resize(36);
+  vertices.reserve(24);
 
   // Right face
-  indices[0] = 0;
-  indices[1] = 1;
-  indices[2] = 2;
-
-  indices[3] = 2;
-  indices[4] = 1;
-  indices[5] = 3;
+  vertices.emplace_back(Vertex{ rightBottomFront, Raz::Vec2f(0.f, 0.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ rightBottomBack, Raz::Vec2f(1.f, 0.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ rightTopFront, Raz::Vec2f(0.f, 1.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ rightTopBack, Raz::Vec2f(1.f, 1.f), Axis::X, -Axis::Z });
 
   // Left face
-  indices[6] = 5;
-  indices[7] = 4;
-  indices[8] = 7;
-
-  indices[9]  = 7;
-  indices[10] = 4;
-  indices[11] = 6;
+  vertices.emplace_back(Vertex{ leftBottomBack, Raz::Vec2f(0.f, 0.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ leftBottomFront, Raz::Vec2f(1.f, 0.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ leftTopBack, Raz::Vec2f(0.f, 1.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ leftTopFront, Raz::Vec2f(1.f, 1.f), -Axis::X, Axis::Z });
 
   // Top face
-  indices[12] = 0;
-  indices[13] = 4;
-  indices[14] = 1;
-
-  indices[15] = 1;
-  indices[16] = 4;
-  indices[17] = 5;
+  vertices.emplace_back(Vertex{ leftTopFront, Raz::Vec2f(0.f, 0.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightTopFront, Raz::Vec2f(1.f, 0.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ leftTopBack, Raz::Vec2f(0.f, 1.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightTopBack, Raz::Vec2f(1.f, 1.f), Axis::Y, Axis::X });
 
   // Bottom face
-  indices[18] = 3;
-  indices[19] = 7;
-  indices[20] = 2;
-
-  indices[21] = 2;
-  indices[22] = 7;
-  indices[23] = 6;
+  vertices.emplace_back(Vertex{ leftBottomBack, Raz::Vec2f(0.f, 0.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightBottomBack, Raz::Vec2f(1.f, 0.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ leftBottomFront, Raz::Vec2f(0.f, 1.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightBottomFront, Raz::Vec2f(1.f, 1.f), -Axis::Y, Axis::X });
 
   // Front face
-  indices[24] = 1;
-  indices[25] = 5;
-  indices[26] = 3;
-
-  indices[27] = 3;
-  indices[28] = 5;
-  indices[29] = 7;
+  vertices.emplace_back(Vertex{ leftBottomFront, Raz::Vec2f(0.f, 0.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ rightBottomFront, Raz::Vec2f(1.f, 0.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ leftTopFront, Raz::Vec2f(0.f, 1.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ rightTopFront, Raz::Vec2f(1.f, 1.f), Axis::Z, Axis::X });
 
   // Back face
-  indices[30] = 4;
-  indices[31] = 0;
-  indices[32] = 6;
+  vertices.emplace_back(Vertex{ rightBottomBack, Raz::Vec2f(0.f, 0.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ leftBottomBack, Raz::Vec2f(1.f, 0.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ rightTopBack, Raz::Vec2f(0.f, 1.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ leftTopBack, Raz::Vec2f(1.f, 1.f), -Axis::Z, -Axis::X });
 
-  indices[33] = 6;
-  indices[34] = 0;
-  indices[35] = 2;
-
-  computeTangents();
+  submesh.getTriangleIndices() = {
+     0,  1,  2,  1,  3,  2, // Right face
+     4,  5,  6,  5,  7,  6, // Left face
+     8,  9, 10,  9, 11, 10, // Top face
+    12, 13, 14, 13, 15, 14, // Bottom face
+    16, 17, 18, 17, 19, 18, // Front face
+    20, 21, 22, 21, 23, 22  // Back face
+  };
 }
 
 std::size_t Mesh::recoverVertexCount() const {
@@ -514,88 +418,28 @@ void Mesh::createIcosphere(const Sphere& sphere, uint32_t /* subdivCount */) {
   for (Vertex& vertex : vertices)
     vertex.position += sphere.getCenter();
 
-  std::vector<unsigned int>& indices = submesh.getTriangleIndices();
-  indices.resize(60);
-
-  indices[0] = 5;
-  indices[1] = 0;
-  indices[2] = 11;
-
-  indices[3] = 1;
-  indices[4] = 0;
-  indices[5] = 5;
-
-  indices[6] = 7;
-  indices[7] = 0;
-  indices[8] = 1;
-
-  indices[9]  = 10;
-  indices[10] = 0;
-  indices[11] = 7;
-
-  indices[12] = 11;
-  indices[13] = 0;
-  indices[14] = 10;
-
-  indices[15] = 9;
-  indices[16] = 1;
-  indices[17] = 5;
-
-  indices[18] = 4;
-  indices[19] = 5;
-  indices[20] = 11;
-
-  indices[21] = 2;
-  indices[22] = 11;
-  indices[23] = 10;
-
-  indices[24] = 6;
-  indices[25] = 10;
-  indices[26] = 7;
-
-  indices[27] = 8;
-  indices[28] = 7;
-  indices[29] = 1;
-
-  indices[30] = 4;
-  indices[31] = 3;
-  indices[32] = 9;
-
-  indices[33] = 2;
-  indices[34] = 3;
-  indices[35] = 4;
-
-  indices[36] = 6;
-  indices[37] = 3;
-  indices[38] = 2;
-
-  indices[39] = 8;
-  indices[40] = 3;
-  indices[41] = 6;
-
-  indices[42] = 9;
-  indices[43] = 3;
-  indices[44] = 8;
-
-  indices[45] = 5;
-  indices[46] = 4;
-  indices[47] = 9;
-
-  indices[48] = 11;
-  indices[49] = 2;
-  indices[50] = 4;
-
-  indices[51] = 10;
-  indices[52] = 6;
-  indices[53] = 2;
-
-  indices[54] = 7;
-  indices[55] = 8;
-  indices[56] = 6;
-
-  indices[57] = 1;
-  indices[58] = 9;
-  indices[59] = 8;
+  submesh.getTriangleIndices() = {
+     5,  0, 11,
+     1,  0,  5,
+     7,  0,  1,
+    10,  0,  7,
+    11,  0, 10,
+     9,  1,  5,
+     4,  5, 11,
+     2, 11, 10,
+     6, 10,  7,
+     8,  7,  1,
+     4,  3,  9,
+     2,  3,  4,
+     6,  3,  2,
+     8,  3,  6,
+     9,  3,  8,
+     5,  4,  9,
+    11,  2,  4,
+    10,  6,  2,
+     7,  8,  6,
+     1,  9,  8
+  };
 
   // Applying subdivisions
 

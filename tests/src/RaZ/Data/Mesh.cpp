@@ -293,12 +293,14 @@ TEST_CASE("Mesh AABB") {
   Raz::Mesh mesh(box);
 
   CHECK(mesh.getSubmeshes().size() == 1);
-  CHECK(mesh.recoverVertexCount() == 8);
+  CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.recoverTriangleCount() == 12);
 
   const Raz::Submesh& submesh = mesh.getSubmeshes().front();
 
-  auto checkWindingOrder = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal) {
+  auto checkData = [&submesh] (std::size_t startIndex, const Raz::Vec3f& normal, const Raz::Vec3f& tangent) {
+    REQUIRE(tangent.dot(normal) == 0.f);
+
     CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex    ]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
@@ -307,27 +309,24 @@ TEST_CASE("Mesh AABB") {
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
                         submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
 
-    // TODO: normals must be added to the mesh before checking their value
-    //for (std::size_t i = startIndex; i < startIndex + 6; ++i)
-    //  CHECK(submesh.getVertices()[submesh.getTriangleIndices()[i]].normal.strictlyEquals(normal));
+    for (std::size_t i = startIndex; i < startIndex + 6; ++i) {
+      const Raz::Vertex& vert = submesh.getVertices()[submesh.getTriangleIndices()[i]];
+
+      CHECK(vert.normal.strictlyEquals(normal));
+      CHECK(vert.tangent.strictlyEquals(tangent));
+    }
   };
 
-  checkWindingOrder(0, Raz::Axis::X);
-  checkWindingOrder(6, -Raz::Axis::X);
-  checkWindingOrder(12, Raz::Axis::Y);
-  checkWindingOrder(18, -Raz::Axis::Y);
-  checkWindingOrder(24, Raz::Axis::Z);
-  checkWindingOrder(30, -Raz::Axis::Z);
-
-  // TODO: normals must be added to the mesh before checking the tangents' value
-  //for (const Raz::Vertex& vert : submesh.getVertices()) {
-  //  CHECK_THAT(vert.tangent.computeLength(), IsNearlyEqualTo(1.f));
-  //  CHECK_THAT(vert.tangent.dot(vert.normal), IsNearlyEqualTo(0.f));
-  //}
+  checkData(0, Raz::Axis::X, -Raz::Axis::Z);   // Right face
+  checkData(6, -Raz::Axis::X, Raz::Axis::Z);   // Left face
+  checkData(12, Raz::Axis::Y, Raz::Axis::X);   // Top face
+  checkData(18, -Raz::Axis::Y, Raz::Axis::X);  // Bottom face
+  checkData(24, Raz::Axis::Z, Raz::Axis::X);   // Front face
+  checkData(30, -Raz::Axis::Z, -Raz::Axis::X); // Back face
 
   const Raz::AABB& boundingBox = mesh.computeBoundingBox();
 
-  CHECK(boundingBox.computeCentroid() == box.computeCentroid());
-  CHECK(boundingBox.getMinPosition() == box.getMinPosition());
-  CHECK(boundingBox.getMaxPosition() == box.getMaxPosition());
+  CHECK(boundingBox.computeCentroid().strictlyEquals(box.computeCentroid()));
+  CHECK(boundingBox.getMinPosition().strictlyEquals(box.getMinPosition()));
+  CHECK(boundingBox.getMaxPosition().strictlyEquals(box.getMaxPosition()));
 }
