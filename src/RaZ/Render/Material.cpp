@@ -93,7 +93,7 @@ void Material::loadType(MaterialType type) {
       if (!hasAttribute("uniMaterial.emissive"))
         setAttribute(Vec3f(0.f), "uniMaterial.emissive");
       if (!hasAttribute("uniMaterial.metallicFactor"))
-        setAttribute(1.f, "uniMaterial.metallicFactor");
+        setAttribute(0.f, "uniMaterial.metallicFactor");
       if (!hasAttribute("uniMaterial.roughnessFactor"))
         setAttribute(1.f, "uniMaterial.roughnessFactor");
 

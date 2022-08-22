@@ -634,7 +634,7 @@ TEST_CASE("ObjFormat save") {
     const Raz::Material& material = meshRendererData.getMaterials().front();
     CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor").strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
     CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.emissive").strictlyEquals(Raz::Vec3f(0.f, 0.f, 0.f)));
-    CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 1.f);
+    CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 0.f);
     CHECK(material.getAttribute<float>("uniMaterial.roughnessFactor") == 1.f);
   }
 

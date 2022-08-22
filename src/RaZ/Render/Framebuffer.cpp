@@ -31,9 +31,9 @@ inline void drawDisplaySurface() {
     vao.bind();
     vbo.bind();
 
-    static constexpr std::array<Vec2f, 6> vertices =  { Vec2f(-1.f, -1.f), Vec2f(0.f, 0.f),
-                                                        Vec2f( 3.f, -1.f), Vec2f(2.f, 0.f),
-                                                        Vec2f(-1.f,  3.f), Vec2f(0.f, 2.f) };
+    static constexpr std::array<Vec2f, 6> vertices = { Vec2f(-1.f, -1.f), Vec2f(0.f, 0.f),
+                                                       Vec2f( 3.f, -1.f), Vec2f(2.f, 0.f),
+                                                       Vec2f(-1.f,  3.f), Vec2f(0.f, 2.f) };
     Renderer::sendBufferData(BufferType::ARRAY_BUFFER, static_cast<std::ptrdiff_t>(sizeof(Vec2f) * 12), vertices.data(), BufferDataUsage::STATIC_DRAW);
 
     Renderer::setVertexAttrib(0, AttribDataType::FLOAT, 2, sizeof(Vec2f) * 2, 0); // Position

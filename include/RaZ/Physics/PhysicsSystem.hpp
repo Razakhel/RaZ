@@ -26,7 +26,7 @@ public:
 private:
   void solveConstraints();
 
-  Vec3f m_gravity  = Vec3f(0.f, -9.80665f, 0.f); ///< Gravity force.
+  Vec3f m_gravity  = Vec3f(0.f, -9.80665f, 0.f); ///< Gravity acceleration.
   float m_friction = 0.95f; ///< Friction coefficient.
 };
 

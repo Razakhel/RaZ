@@ -1,8 +1,7 @@
 newmtl shield
-  illum 4
   Kd 1.00 1.00 1.00
-  Tf 1.00 1.00 1.00
-  Ni 1.00
+  Pm 1.00
+  Pr 1.00
   map_Kd ../textures/shield_albedo.png
   norm ../textures/shield_normal.png
   map_Pm ../textures/shield_metallic.png

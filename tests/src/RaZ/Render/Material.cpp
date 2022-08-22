@@ -9,7 +9,7 @@ TEST_CASE("Material attributes") {
   CHECK(material.hasAttribute("uniMaterial.baseColor"));
   CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(1.f));
   CHECK(material.hasAttribute("uniMaterial.metallicFactor"));
-  CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 1.f);
+  CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 0.f);
 
   material.setAttribute(Raz::Vec3f(0.f), "uniMaterial.baseColor");
   CHECK(material.getAttributeCount() == 4); // The attribute already exists, none has been added

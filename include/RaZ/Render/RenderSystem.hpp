@@ -3,18 +3,17 @@
 #ifndef RAZ_RENDERSYSTEM_HPP
 #define RAZ_RENDERSYSTEM_HPP
 
-#include "RaZ/Entity.hpp"
 #include "RaZ/System.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Cubemap.hpp"
-#include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Render/Window.hpp"
 
 namespace Raz {
 
+class Entity;
 class MeshRenderer;
 
 /// RenderSystem class, handling the rendering part.
@@ -44,7 +43,7 @@ public:
 
 #if !defined(RAZ_NO_WINDOW)
   bool hasWindow() const { return (m_window != nullptr); }
-  const Window& getWindow() const { assert("Error: Window must be set before being accessed." && hasWindow()); return *m_window; }
+  const Window& getWindow() const { assert("Error: The window must be set before being accessed." && hasWindow()); return *m_window; }
   Window& getWindow() { return const_cast<Window&>(static_cast<const RenderSystem*>(this)->getWindow()); }
 #endif
   const RenderPass& getGeometryPass() const { return m_renderGraph.getGeometryPass(); }
@@ -52,7 +51,7 @@ public:
   const RenderGraph& getRenderGraph() const { return m_renderGraph; }
   RenderGraph& getRenderGraph() { return m_renderGraph; }
   bool hasCubemap() const { return m_cubemap.has_value(); }
-  const Cubemap& getCubemap() const { assert("Error: Cubemap must be set before being accessed." && hasCubemap()); return *m_cubemap; }
+  const Cubemap& getCubemap() const { assert("Error: The cubemap must be set before being accessed." && hasCubemap()); return *m_cubemap; }
 
   void setCubemap(Cubemap&& cubemap);
 

@@ -111,9 +111,49 @@ Texture::Texture(Texture&& texture) noexcept
   : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) },
     m_image{ std::move(texture.m_image) } {}
 
-void Texture::load(Image image, bool createMipmaps) {
+void Texture::load(Image&& image, bool createMipmaps) {
   m_image = std::move(image);
-  load(createMipmaps);
+  load(m_image, createMipmaps);
+}
+
+void Texture::load(const Image& image, bool createMipmaps) {
+  if (image.isEmpty()) {
+    // Image not found, defaulting texture to pure white
+    makePlainColored(ColorPreset::White);
+    return;
+  }
+
+  bind();
+
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::REPEAT);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::REPEAT);
+
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D,
+                                TextureParam::MINIFY_FILTER,
+                                (createMipmaps ? TextureParamValue::LINEAR_MIPMAP_LINEAR : TextureParamValue::LINEAR));
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
+
+  if (image.getColorspace() == ImageColorspace::GRAY || image.getColorspace() == ImageColorspace::GRAY_ALPHA) {
+    const std::array<int, 4> swizzle = { GL_RED,
+                                         GL_RED,
+                                         GL_RED,
+                                         (image.getColorspace() == ImageColorspace::GRAY_ALPHA ? GL_GREEN : GL_ONE) };
+    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_RGBA, swizzle.data());
+  }
+
+  Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                            0,
+                            recoverInternalFormat(image),
+                            image.getWidth(),
+                            image.getHeight(),
+                            recoverFormat(image),
+                            (image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
+                            image.getDataPtr());
+
+  if (createMipmaps)
+    Renderer::generateMipmap(TextureType::TEXTURE_2D);
+
+  unbind();
 }
 
 void Texture::bind() const {
@@ -151,46 +191,6 @@ Texture::~Texture() {
   Logger::debug("[Texture] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteTexture(m_index);
   Logger::debug("[Texture] Destroyed");
-}
-
-void Texture::load(bool createMipmaps) {
-  if (m_image.isEmpty()) {
-    // Image not found, defaulting texture to pure white
-    makePlainColored(ColorPreset::White);
-    return;
-  }
-
-  bind();
-
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::REPEAT);
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::REPEAT);
-
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D,
-                                TextureParam::MINIFY_FILTER,
-                                (createMipmaps ? TextureParamValue::LINEAR_MIPMAP_LINEAR : TextureParamValue::LINEAR));
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
-
-  if (m_image.getColorspace() == ImageColorspace::GRAY || m_image.getColorspace() == ImageColorspace::GRAY_ALPHA) {
-    const std::array<int, 4> swizzle = { GL_RED,
-                                         GL_RED,
-                                         GL_RED,
-                                         (m_image.getColorspace() == ImageColorspace::GRAY_ALPHA ? GL_GREEN : GL_ONE) };
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_RGBA, swizzle.data());
-  }
-
-  Renderer::sendImageData2D(TextureType::TEXTURE_2D,
-                            0,
-                            recoverInternalFormat(m_image),
-                            m_image.getWidth(),
-                            m_image.getHeight(),
-                            recoverFormat(m_image),
-                            (m_image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
-                            m_image.getDataPtr());
-
-  if (createMipmaps)
-    Renderer::generateMipmap(TextureType::TEXTURE_2D);
-
-  unbind();
 }
 
 void Texture::makePlainColored(const Color& color) const {

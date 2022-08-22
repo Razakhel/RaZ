@@ -1,18 +1,17 @@
 newmtl default
-illum 4
-Kd 0.50 0.50 0.50
-Tf 1.00 1.00 1.00
-Ni 1.00
-#map_Kd ../textures/brickwall.png
-#norm ../textures/brickwall_normal.png
+  Kd 0.50 0.50 0.50
+  Pm 1.0
+  Pr 1.0
+  #map_Kd ../textures/brickwall.png
+  #norm ../textures/brickwall_normal.png
 
-map_Kd ../textures/rustediron_albedo.png
-norm ../textures/rustediron_normal.png
-map_Pm ../textures/rustediron_metallic.png
-map_Pr ../textures/rustediron_roughness.png
+  map_Kd ../textures/rustediron_albedo.png
+  norm ../textures/rustediron_normal.png
+  map_Pm ../textures/rustediron_metallic.png
+  map_Pr ../textures/rustediron_roughness.png
 
-#map_Kd ../textures/copper-rock-alb.png
-#norm ../textures/copper-rock-normal.png
-#map_Pm ../textures/copper-rock-metal.png
-#map_Pr ../textures/copper-rock-rough.png
-#map_Ka ../textures/copper-rock-ao.png
+  #map_Kd ../textures/copper-rock-alb.png
+  #norm ../textures/copper-rock-normal.png
+  #map_Pm ../textures/copper-rock-metal.png
+  #map_Pr ../textures/copper-rock-rough.png
+  #map_Ka ../textures/copper-rock-ao.png
