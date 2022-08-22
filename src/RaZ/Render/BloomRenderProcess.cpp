@@ -36,7 +36,7 @@ constexpr std::string_view downscaleSource = R"(
 
   layout(location = 0) out vec4 fragColor;
 
-  const vec2 kernelCoords[13] = vec2[](
+  const vec2 kernelOffsets[13] = vec2[](
     vec2(-1.0,  1.0), vec2(1.0,  1.0),
     vec2(-1.0, -1.0), vec2(1.0, -1.0),
 
@@ -60,7 +60,7 @@ constexpr std::string_view downscaleSource = R"(
     vec3 color = vec3(0.0);
 
     for (int i = 0; i < 13; ++i) {
-      vec2 normalizedTexcoords = (gl_FragCoord.xy + kernelCoords[i]) * uniInvBufferSize;
+      vec2 normalizedTexcoords = (gl_FragCoord.xy + kernelOffsets[i]) * uniInvBufferSize;
       color += texture(uniPrevDownscaledBuffer, normalizedTexcoords).rgb * kernelWeights[i];
     }
 
@@ -77,7 +77,7 @@ constexpr std::string_view upscaleSource = R"(
 
   layout(location = 0) out vec4 fragColor;
 
-  const vec2 kernelCoords[9] = vec2[](
+  const vec2 kernelOffsets[9] = vec2[](
       vec2(-1.0,  1.0), vec2(0.0,  1.0), vec2(1.0,  1.0),
       vec2(-1.0,  0.0), vec2(0.0,  0.0), vec2(1.0,  0.0),
       vec2(-1.0, -1.0), vec2(0.0, -1.0), vec2(1.0, -1.0)
@@ -93,7 +93,7 @@ constexpr std::string_view upscaleSource = R"(
     vec3 color = texture(uniDownscaledBuffer, gl_FragCoord.xy * uniInvBufferSize).rgb;
 
     for (int i = 0; i < 9; ++i) {
-      vec2 normalizedTexcoords = (gl_FragCoord.xy + kernelCoords[i]) * uniInvBufferSize;
+      vec2 normalizedTexcoords = (gl_FragCoord.xy + kernelOffsets[i]) * uniInvBufferSize;
       color += texture(uniPrevUpscaledBuffer, normalizedTexcoords).rgb * kernelWeights[i];
     }
 

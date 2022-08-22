@@ -55,7 +55,7 @@ int main() {
     geometryPass.addWriteTexture(depthBuffer); // A depth buffer is always needed
     geometryPass.addWriteTexture(colorBuffer);
 
-    Raz::RenderPass& blurPass = renderGraph.addNode(Raz::FragmentShader(RAZ_ROOT "shaders/blur.frag"));
+    Raz::RenderPass& blurPass = renderGraph.addNode(Raz::FragmentShader(RAZ_ROOT "shaders/box_blur.frag"));
     blurPass.addReadTexture(colorBuffer, "uniBuffer");
     blurPass.getProgram().sendUniform("uniKernelSize", 1); // Neutralizing the blur at first
 

@@ -42,6 +42,7 @@
 #include "Render/Camera.hpp"
 #include "Render/Cubemap.hpp"
 #include "Render/Framebuffer.hpp"
+#include "Render/GaussianBlurRenderProcess.hpp"
 #include "Render/GraphicObjects.hpp"
 #include "Render/Light.hpp"
 #include "Render/Material.hpp"
