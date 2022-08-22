@@ -46,18 +46,17 @@ layout(std140) uniform uboLightsInfo {
 uniform Material uniMaterial;
 
 layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec3 bufferNormal;
+layout(location = 1) out vec3 fragNormal;
+layout(location = 2) out vec4 fragSpecular;
 
 void main() {
-  vec3 normal     = vertMeshInfo.vertTBNMatrix[2];
   vec3 color      = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.baseColor;
-  vec3 specFactor = texture(uniMaterial.specularMap, vertMeshInfo.vertTexcoords).r * uniMaterial.specular;
+  vec3 specFactor = texture(uniMaterial.specularMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.specular;
+  vec3 normal     = vertMeshInfo.vertTBNMatrix[2];
+  vec3 viewDir    = normalize(uniCameraPos - vertMeshInfo.vertPosition);
 
-  vec3 ambient  = color * 0.05;
   vec3 diffuse  = vec3(0.0);
   vec3 specular = vec3(0.0);
-
-  vec3 viewDir = normalize(uniCameraPos - vertMeshInfo.vertPosition);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
     // Diffuse
@@ -68,7 +67,7 @@ void main() {
       fullLightDir = uniLights[lightIndex].position.xyz - vertMeshInfo.vertPosition;
 
       float sqDist = dot(fullLightDir, fullLightDir);
-      attenuation  /= sqDist;
+      attenuation /= sqDist;
     } else {
       fullLightDir = -uniLights[lightIndex].direction.xyz;
     }
@@ -82,10 +81,10 @@ void main() {
     specular    += uniLights[lightIndex].color.rgb * pow(max(dot(halfDir, normal), 0.0), 32.0) * specFactor * attenuation;
   }
 
+  vec3 ambient  = color * 0.05;
   vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
 
-  fragColor = vec4(ambient + diffuse + specular + emissive, specFactor);
-
-  // Sending fragment normal to next framebuffer(s), if any
-  bufferNormal = normal;
+  fragColor    = vec4(ambient + diffuse + specular + emissive, 1.0);
+  fragNormal   = normal * 0.5 + 0.5;
+  fragSpecular = vec4(specFactor, 1.0 - max(specFactor.x, max(specFactor.y, specFactor.z)));
 }

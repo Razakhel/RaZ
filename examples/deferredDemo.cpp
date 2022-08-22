@@ -79,13 +79,13 @@ constexpr std::string_view displayFragSource = R"(
     vec3 normal      = normalRough.rgb;
     float roughness  = normalRough.a;
 
-    if (int(gl_FragCoord.y) > 360) {
-      if (int(gl_FragCoord.x) < 640)
+    if (fragTexcoords.y > 0.5) {
+      if (fragTexcoords.x < 0.5)
         fragColor = vec4(vec3(depth), 1.0);
       else
         fragColor = vec4(normal, 1.0);
     } else {
-      if (int(gl_FragCoord.x) < 640)
+      if (fragTexcoords.x < 0.5)
         fragColor = vec4(1.0, metalness, roughness, 1.0);
       else
         fragColor = vec4(color, 1.0);

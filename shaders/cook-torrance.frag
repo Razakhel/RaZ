@@ -46,7 +46,8 @@ layout(std140) uniform uboLightsInfo {
 uniform Material uniMaterial;
 
 layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec3 bufferNormal;
+layout(location = 1) out vec3 fragNormal;
+layout(location = 2) out vec4 fragSpecular;
 
 // Normal Distribution Function: Trowbridge-Reitz GGX
 float computeNormalDistrib(vec3 normal, vec3 halfVec, float roughness) {
@@ -102,7 +103,7 @@ void main() {
 
   vec3 viewDir = normalize(uniCameraPos - vertMeshInfo.vertPosition);
 
-  // Base Fresnel (F)
+  // Base Fresnel (F0)
   vec3 baseReflectivity = mix(vec3(0.04), albedo, metallic);
 
   vec3 albedoFactor = albedo / PI;
@@ -126,7 +127,7 @@ void main() {
     vec3 halfDir  = normalize(viewDir + lightDir);
     vec3 radiance = uniLights[lightIndex].color.rgb * attenuation;
 
-    // Normal distrib (D)
+    // Normal distribution (D)
     float normalDistrib = computeNormalDistrib(normal, halfDir, roughness);
 
     // Fresnel (F)
@@ -155,8 +156,7 @@ void main() {
   // Gamma correction
   color = pow(color, vec3(1.0 / 2.2));
 
-  fragColor = vec4(color, metallic);
-
-  // Sending fragment normal to next framebuffer(s), if any
-  bufferNormal = normal;
+  fragColor    = vec4(color, 1.0);
+  fragNormal   = normal * 0.5 + 0.5;
+  fragSpecular = vec4(baseReflectivity, roughness);
 }
