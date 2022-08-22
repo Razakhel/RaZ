@@ -25,7 +25,7 @@ int main() {
 
     float elapsedTime = 0.f;
 
-    app.run([&] () {
+    app.run([&] (float /* deltaTime */) {
       elapsedTime = std::max(elapsedTime, soundComp.recoverElapsedTime());
 
       if (!soundComp.isPlaying()) {

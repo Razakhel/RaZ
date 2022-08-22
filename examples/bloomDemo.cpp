@@ -226,8 +226,8 @@ int main() {
       });
     }
 
-    app.run([&] {
-      meshTrans.rotate(-45.0_deg * app.getDeltaTime(), Raz::Axis::Y);
+    app.run([&] (float deltaTime) {
+      meshTrans.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
     });
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occured: "s + exception.what());
