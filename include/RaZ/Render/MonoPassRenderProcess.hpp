@@ -23,7 +23,6 @@ public:
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
   void setOutputBuffer(TexturePtr outputBuffer) override;
-  void resizeBuffers(unsigned int width, unsigned int height) override;
 
 protected:
   void setInput(TexturePtr inputBuffer, const std::string& uniformName);
