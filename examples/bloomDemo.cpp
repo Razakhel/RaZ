@@ -112,7 +112,7 @@ int main() {
     Raz::RenderPass& geometryPass = renderGraph.getGeometryPass();
 
     const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::DEPTH);
-    const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGBA, Raz::ImageDataType::FLOAT);
+    const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::FLOAT);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
@@ -128,7 +128,7 @@ int main() {
 
     auto& bloom = renderGraph.addRenderProcess<Raz::BloomRenderProcess>(window.getWidth(), window.getHeight());
     bloom.addParent(geometryPass);
-    bloom.setInputBuffer(colorBuffer);
+    bloom.setInputColorBuffer(colorBuffer);
 
     /////////////
     // Overlay //

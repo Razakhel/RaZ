@@ -218,6 +218,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /EHsc # Enabling exceptions
             /utf-8 # Forcing MSVC to actually handle files as UTF-8
             /Zc:__cplusplus # Forcing the __cplusplus definition to be of the proper value
+            /Zc:externConstexpr # Allowing external linkage for "extern constexpr" variables
             #/Zc:lambda # Forcing lambdas' parsing to be standard compliant; to be removed in C++20 (implied by /std:c++20)
         )
 

@@ -25,7 +25,7 @@ public:
   void setOutputBuffer(TexturePtr outputBuffer) override;
 
 protected:
-  void setInput(TexturePtr inputBuffer, const std::string& uniformName);
+  void setInputBuffer(TexturePtr inputBuffer, const std::string& uniformName);
 
   RenderPass& m_pass;
 };

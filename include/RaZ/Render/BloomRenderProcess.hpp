@@ -31,9 +31,9 @@ public:
   void addParent(RenderProcess& parentProcess) override;
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
-  void setInputBuffer(TexturePtr inputBuffer) override;
   void setOutputBuffer(TexturePtr outputBuffer) override;
   void resizeBuffers(unsigned int width, unsigned int height) override;
+  void setInputColorBuffer(TexturePtr colorBuffer);
   void setThresholdValue(float threshold);
 
 private:

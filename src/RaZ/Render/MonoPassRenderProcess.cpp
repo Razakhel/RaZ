@@ -46,7 +46,7 @@ void MonoPassRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
   m_pass.addWriteTexture(std::move(outputBuffer));
 }
 
-void MonoPassRenderProcess::setInput(TexturePtr inputBuffer, const std::string& uniformName) {
+void MonoPassRenderProcess::setInputBuffer(TexturePtr inputBuffer, const std::string& uniformName) {
   m_pass.addReadTexture(std::move(inputBuffer), uniformName);
 }
 

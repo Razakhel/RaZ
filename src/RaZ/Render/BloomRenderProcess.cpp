@@ -318,13 +318,6 @@ void BloomRenderProcess::addChild(RenderProcess& childProcess) {
   childProcess.addParent(*m_finalPass);
 }
 
-void BloomRenderProcess::setInputBuffer(TexturePtr inputBuffer) {
-  assert("Error: Bloom's input buffer must have at least 3 channels." && inputBuffer->getImage().getChannelCount() >= 3);
-
-  m_thresholdPass->addReadTexture(inputBuffer, "uniColorBuffer");
-  m_finalPass->addReadTexture(std::move(inputBuffer), "uniOriginalColorBuffer");
-}
-
 void BloomRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
   m_finalPass->addWriteTexture(std::move(outputBuffer));
 }
@@ -340,6 +333,13 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
     const auto sizeFactor = static_cast<unsigned int>(2 * (correspDownscaleIndex + 1));
     m_upscaleBuffers[i].lock()->resize(width / sizeFactor, height / sizeFactor);
   }
+}
+
+void BloomRenderProcess::setInputColorBuffer(TexturePtr colorBuffer) {
+  assert("Error: Bloom's input color buffer must have at least 3 channels." && colorBuffer->getImage().getChannelCount() >= 3);
+
+  m_thresholdPass->addReadTexture(colorBuffer, "uniColorBuffer");
+  m_finalPass->addReadTexture(std::move(colorBuffer), "uniOriginalColorBuffer");
 }
 
 void BloomRenderProcess::setThresholdValue(float threshold) {
