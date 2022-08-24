@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 
 namespace Raz {
 
@@ -116,6 +117,22 @@ template <typename... Args>
 NodeT& Graph<NodeT>::addNode(Args&& ... args) {
   m_nodes.emplace_back(std::make_unique<NodeT>(std::forward<Args>(args)...));
   return *m_nodes.back();
+}
+
+template <typename NodeT>
+void Graph<NodeT>::removeNode(NodeT& node) {
+  const auto nodeIt = std::find_if(m_nodes.cbegin(), m_nodes.cend(), [&node] (const NodePtr& nodePtr) { return (nodePtr.get() == &node); });
+
+  if (nodeIt == m_nodes.cend())
+    throw std::invalid_argument("Error: The graph node to be removed does not exist");
+
+  for (NodeT* parent : node.m_parents)
+    parent->unlinkChild(node);
+
+  for (NodeT* child : node.m_children)
+    child->unlinkParent(node);
+
+  m_nodes.erase(nodeIt);
 }
 
 } // namespace Raz

@@ -111,6 +111,9 @@ public:
   /// \return Reference to the newly added node.
   template <typename... Args>
   NodeT& addNode(Args&&... args);
+  /// Removes a node from the graph, after unlinking it from all its parents & children.
+  /// \param node Node to be removed.
+  void removeNode(NodeT& node);
 
   Graph& operator=(const Graph&) = delete;
   Graph& operator=(Graph&&) noexcept = default;

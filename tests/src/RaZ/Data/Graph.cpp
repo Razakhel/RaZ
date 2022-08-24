@@ -119,6 +119,25 @@ TEST_CASE("Graph linking test") {
   CHECK(node2.getParentCount() == 1);
   CHECK(&node2.getParent(0) == &root);
   CHECK(node2.getChildCount() == 0);
+
+  // root -> node2
+  //
+  // node11
+  graph.removeNode(node1);
+
+  CHECK(root.getParentCount() == 0);
+  CHECK(root.getChildCount() == 1);
+  CHECK(&root.getChild(0) == &node2);
+
+  CHECK(node11.isIsolated());
+
+  CHECK(node2.getParentCount() == 1);
+  CHECK(&node2.getParent(0) == &root);
+  CHECK(node2.getChildCount() == 0);
+
+  // Trying to remove a node which is not in the graph throws an exception
+  TestNode testNode;
+  CHECK_THROWS(graph.removeNode(testNode));
 }
 
 TEST_CASE("Graph extremities test") {
@@ -174,4 +193,32 @@ TEST_CASE("Graph extremities test") {
   CHECK_FALSE(node2.isLeaf());
   CHECK_FALSE(node3.isLeaf());
   CHECK(leaf.isLeaf());
+
+  // node1
+  //       \
+  // node2 -> leaf
+  //       /
+  // node3
+  graph.removeNode(root); // Removing a node automatically unlinks it from both its parents & children
+
+  CHECK(node1.isRoot());
+  CHECK(node2.isRoot());
+  CHECK(node3.isRoot());
+  CHECK_FALSE(leaf.isRoot());
+
+  CHECK_FALSE(node1.isLeaf());
+  CHECK_FALSE(node2.isLeaf());
+  CHECK_FALSE(node3.isLeaf());
+  CHECK(leaf.isLeaf());
+
+  // node1
+  //
+  // node2
+  //
+  // node3
+  graph.removeNode(leaf);
+
+  CHECK(node1.isIsolated());
+  CHECK(node2.isIsolated());
+  CHECK(node3.isIsolated());
 }
