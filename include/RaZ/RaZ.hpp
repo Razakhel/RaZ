@@ -43,6 +43,7 @@
 #include "Render/Camera.hpp"
 #include "Render/ConvolutionRenderProcess.hpp"
 #include "Render/Cubemap.hpp"
+#include "Render/EnhancedKawaseBlurRenderProcess.hpp"
 #include "Render/Framebuffer.hpp"
 #include "Render/GaussianBlurRenderProcess.hpp"
 #include "Render/GraphicObjects.hpp"

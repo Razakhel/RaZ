@@ -37,9 +37,9 @@ int main() {
     // Quitting the application when the close button is clicked
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
-    ///////////////
-    // Blur pass //
-    ///////////////
+    //////////////////
+    // Blur process //
+    //////////////////
 
     Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
     Raz::RenderPass& geometryPass = renderSystem.getGeometryPass();
@@ -59,9 +59,9 @@ int main() {
 
     // Blur
 
-    auto& boxBlur = renderGraph.addRenderProcess<Raz::BoxBlurRenderProcess>();
-    boxBlur.setInputBuffer(colorBuffer);
-    boxBlur.addParent(geometryPass);
+    auto& blur = renderGraph.addRenderProcess<Raz::BoxBlurRenderProcess>();
+    blur.setInputBuffer(colorBuffer);
+    blur.addParent(geometryPass);
 
     ////////////
     // Camera //
@@ -146,7 +146,7 @@ int main() {
     overlay.addSlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
 
     overlay.addSlider("Blur strength",
-                      [&boxBlur] (float value) { boxBlur.setStrength(static_cast<unsigned int>(value)); },
+                      [&blur] (float value) { blur.setStrength(static_cast<unsigned int>(value)); },
                       1.f, 16.f, 1.f);
 
     overlay.addSeparator();
