@@ -92,6 +92,33 @@ TEST_CASE("Graph linking test") {
   CHECK(node2.getParentCount() == 1);
   CHECK(&node2.getParent(0) == &root);
   CHECK(node2.getChildCount() == 0);
+
+  //     / node1 -> node11
+  // root
+  //     \ node2
+  //
+  // node12
+  node12.removeParents(node1);
+
+  CHECK(root.getParentCount() == 0);
+  CHECK(root.getChildCount() == 2);
+  CHECK(&root.getChild(0) == &node1);
+  CHECK(&root.getChild(1) == &node2);
+
+  CHECK(node1.getParentCount() == 1);
+  CHECK(&node1.getParent(0) == &root);
+  CHECK(node1.getChildCount() == 1);
+  CHECK(&node1.getChild(0) == &node11);
+
+  CHECK(node11.getParentCount() == 1);
+  CHECK(&node11.getParent(0) == &node1);
+  CHECK(node11.getChildCount() == 0);
+
+  CHECK(node12.isIsolated());
+
+  CHECK(node2.getParentCount() == 1);
+  CHECK(&node2.getParent(0) == &root);
+  CHECK(node2.getChildCount() == 0);
 }
 
 TEST_CASE("Graph extremities test") {

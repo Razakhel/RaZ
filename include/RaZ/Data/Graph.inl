@@ -28,16 +28,12 @@ T& GraphNode<T>::getChild(std::size_t index) noexcept {
 }
 
 template <typename T>
-template <typename NodeT, typename... OtherNodesTs>
-void GraphNode<T>::addParents(NodeT&& node, OtherNodesTs&&... otherNodes) {
-  static_assert(std::is_same_v<T, std::decay_t<NodeT>>, "Error: The given objects' type must be the same as the node's one.");
-  static_assert(std::is_base_of_v<GraphNode, std::decay_t<NodeT>>,
-                "Error: A graph node can only have other objects of types derived from GraphNode as parents.");
-
+template <typename... OtherNodesTs>
+void GraphNode<T>::addParents(GraphNode& node, OtherNodesTs&&... otherNodes) {
   assert("Error: A graph node cannot have itself as a parent." && &node != this);
 
   if (std::find(m_parents.cbegin(), m_parents.cend(), &node) == m_parents.cend())
-    m_parents.emplace_back(&node);
+    m_parents.emplace_back(static_cast<T*>(&node));
 
   if (std::find(node.m_children.cbegin(), node.m_children.cend(), this) == node.m_children.cend())
     node.m_children.emplace_back(static_cast<T*>(this));
@@ -48,16 +44,23 @@ void GraphNode<T>::addParents(NodeT&& node, OtherNodesTs&&... otherNodes) {
 }
 
 template <typename T>
-template <typename NodeT, typename... OtherNodesTs>
-void GraphNode<T>::addChildren(NodeT&& node, OtherNodesTs&&... otherNodes) {
-  static_assert(std::is_same_v<T, std::decay_t<NodeT>>, "Error: The given objects' type must be the same as the node's one.");
-  static_assert(std::is_base_of_v<GraphNode, std::decay_t<NodeT>>,
-                "Error: A graph node can only have other objects of types derived from GraphNode as children.");
+template <typename... OtherNodesTs>
+void GraphNode<T>::removeParents(GraphNode& node, OtherNodesTs&&... otherNodes) {
+  unlinkParent(node);
+  node.unlinkChild(*this);
 
+  // Stop the recursive unpacking if no more nodes are to be removed as parents
+  if constexpr (sizeof...(otherNodes) > 0)
+    removeParents(std::forward<OtherNodesTs>(otherNodes)...);
+}
+
+template <typename T>
+template <typename... OtherNodesTs>
+void GraphNode<T>::addChildren(GraphNode& node, OtherNodesTs&&... otherNodes) {
   assert("Error: A graph node cannot be a child of itself." && &node != this);
 
   if (std::find(m_children.cbegin(), m_children.cend(), &node) == m_children.cend())
-    m_children.emplace_back(&node);
+    m_children.emplace_back(static_cast<T*>(&node));
 
   if (std::find(node.m_parents.cbegin(), node.m_parents.cend(), this) == node.m_parents.cend())
     node.m_parents.emplace_back(static_cast<T*>(this));
@@ -65,6 +68,35 @@ void GraphNode<T>::addChildren(NodeT&& node, OtherNodesTs&&... otherNodes) {
   // Stop the recursive unpacking if no more nodes are to be added as children
   if constexpr (sizeof...(otherNodes) > 0)
     addChildren(std::forward<OtherNodesTs>(otherNodes)...);
+}
+
+template <typename T>
+template <typename... OtherNodesTs>
+void GraphNode<T>::removeChildren(GraphNode& node, OtherNodesTs&&... otherNodes) {
+  unlinkChild(node);
+  node.unlinkParent(*this);
+
+  // Stop the recursive unpacking if no more nodes are to be removed as children
+  if constexpr (sizeof...(otherNodes) > 0)
+    removeChildren(std::forward<OtherNodesTs>(otherNodes)...);
+}
+
+template <typename T>
+void GraphNode<T>::unlinkParent(const GraphNode& node) {
+  assert("Error: A graph node cannot be unlinked from itself." && &node != this);
+
+  const auto parentIt = std::find(m_parents.cbegin(), m_parents.cend(), &node);
+  if (parentIt != m_parents.cend())
+    m_parents.erase(parentIt);
+}
+
+template <typename T>
+void GraphNode<T>::unlinkChild(const GraphNode& node) {
+  assert("Error: A graph node cannot be unlinked from itself." && &node != this);
+
+  const auto childIt = std::find(m_children.cbegin(), m_children.cend(), &node);
+  if (childIt != m_children.cend())
+    m_children.erase(childIt);
 }
 
 template <typename NodeT>

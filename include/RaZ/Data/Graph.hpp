@@ -8,10 +8,15 @@
 
 namespace Raz {
 
+template <typename NodeT>
+class Graph;
+
 /// GraphNode class, representing a base node in a Graph. Must be inherited to be used by a Graph.
 /// \tparam T Graph node's specific type. Must be the derived class itself.
 template <typename T>
 class GraphNode {
+  friend Graph<T>;
+
 public:
   GraphNode(const GraphNode&) = delete;
   GraphNode(GraphNode&&) noexcept = default;
@@ -35,19 +40,29 @@ public:
   bool isIsolated() const noexcept { return isRoot() && isLeaf(); }
 
   /// Links the given nodes as parents of the current one.
-  /// \tparam NodeT Type of the first node to link.
   /// \tparam OtherNodesTs Types of the other nodes to link.
-  /// \param node First node to link.
-  /// \param otherNodes Other nodes to link.
-  template<typename NodeT, typename... OtherNodesTs>
-  void addParents(NodeT&& node, OtherNodesTs&&... otherNodes);
+  /// \param node First node to be linked.
+  /// \param otherNodes Other nodes to be linked.
+  template<typename... OtherNodesTs>
+  void addParents(GraphNode& node, OtherNodesTs&&... otherNodes);
+  /// Unlinks the given nodes as parents of the current one; this also removes the current one from the nodes' children.
+  /// \tparam OtherNodesTs Types of the other nodes to unlink.
+  /// \param node First node to be unlinked.
+  /// \param otherNodes Other nodes to be unlinked.
+  template<typename... OtherNodesTs>
+  void removeParents(GraphNode& node, OtherNodesTs&&... otherNodes);
   /// Links the given nodes as children of the current one.
-  /// \tparam NodeT Type of the first node to link.
   /// \tparam OtherNodesTs Types of the other nodes to link.
-  /// \param node First node to link.
-  /// \param otherNodes Other nodes to link.
-  template<typename NodeT, typename... OtherNodesTs>
-  void addChildren(NodeT&& node, OtherNodesTs&&... otherNodes);
+  /// \param node First node to be linked.
+  /// \param otherNodes Other nodes to be linked.
+  template<typename... OtherNodesTs>
+  void addChildren(GraphNode& node, OtherNodesTs&&... otherNodes);
+  /// Unlinks the given nodes as children of the current one; this also removes the current one from the nodes' parents.
+  /// \tparam OtherNodesTs Types of the other nodes to unlink.
+  /// \param node First node to be unlinked.
+  /// \param otherNodes Other nodes to be unlinked.
+  template<typename... OtherNodesTs>
+  void removeChildren(GraphNode& node, OtherNodesTs&&... otherNodes);
 
   GraphNode& operator=(const GraphNode&) = delete;
   GraphNode& operator=(GraphNode&&) noexcept = default;
@@ -56,6 +71,13 @@ public:
 
 protected:
   GraphNode() = default;
+
+  /// Unlinks the given node only as a parent of the current one; the given node's children are left untouched.
+  /// \param node Node to be unlinked.
+  void unlinkParent(const GraphNode& node);
+  /// Unlinks the given node only as a child of the current one; the given node's parents are left untouched.
+  /// \param node Node to be unlinked.
+  void unlinkChild(const GraphNode& node);
 
   std::vector<T*> m_parents {};
   std::vector<T*> m_children {};
