@@ -55,11 +55,11 @@ int main() {
     geometryPass.addWriteTexture(depthBuffer); // A depth buffer is always needed
     geometryPass.addWriteTexture(colorBuffer);
 
-    Raz::RenderPass& blurPass = renderGraph.addNode(Raz::FragmentShader(RAZ_ROOT "shaders/box_blur.frag"));
-    blurPass.addReadTexture(colorBuffer, "uniBuffer");
-    blurPass.getProgram().sendUniform("uniKernelSize", 1); // Neutralizing the blur at first
+    // Blur
 
-    geometryPass.addChildren(blurPass);
+    auto& boxBlur = renderGraph.addRenderProcess<Raz::BoxBlurRenderProcess>();
+    boxBlur.setInputBuffer(colorBuffer);
+    boxBlur.addParent(geometryPass);
 
     ///////////////////
     // Camera entity //
@@ -272,11 +272,9 @@ int main() {
 
     overlay.addSlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
     overlay.addSlider("Blur strength",
-                      [&blurPass] (float value) { blurPass.getProgram().sendUniform("uniKernelSize", static_cast<int>(value)); },
+                      [&boxBlur] (float value) { boxBlur.setStrength(static_cast<unsigned int>(value)); },
                       1.f, 16.f, 1.f);
-#endif
 
     overlay.addSeparator();
 
