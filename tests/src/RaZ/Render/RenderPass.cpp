@@ -7,31 +7,35 @@ TEST_CASE("RenderPass validity") {
   Raz::RenderPass initialPass;
   CHECK(initialPass.isValid()); // The pass has no buffer, thus is valid
 
-  const auto depthTexture = Raz::Texture::create(1, 1, Raz::ImageColorspace::DEPTH);
-  const auto colorTexture = Raz::Texture::create(1, 1, Raz::ImageColorspace::RGB);
+  const auto depthBuffer = Raz::Texture::create(Raz::ImageColorspace::DEPTH);
+  const auto colorBuffer = Raz::Texture::create(Raz::ImageColorspace::RGB);
 
-  initialPass.addWriteTexture(depthTexture);
+  initialPass.addWriteTexture(depthBuffer);
   CHECK(initialPass.isValid()); // Direct buffer dependency is not checked; even though no child exists, it is not required to have matching buffers
 
   Raz::RenderPass nextPass;
 
-  // Adding the second pass as a child of the first one
   initialPass.addChildren(nextPass);
   CHECK(initialPass.isValid()); // A subsequent pass exists, but doesn't change the previous result
   CHECK(nextPass.isValid());
 
-  // Adding a read color buffer to the second pass
-  nextPass.addReadTexture(colorTexture, ""); // An uniform name is unnecessary here
+  nextPass.addReadTexture(colorBuffer, ""); // A uniform name is unnecessary here
   CHECK(initialPass.isValid()); // Matching buffers being unrequired, the first pass is still valid
   CHECK(nextPass.isValid());
 
-  // Adding the depth buffer as a read one in the first pass
-  initialPass.addReadTexture(depthTexture, "");
+  initialPass.addReadTexture(depthBuffer, "");
   CHECK_FALSE(initialPass.isValid()); // The depth buffer is defined as both read & write in the first pass
   CHECK(nextPass.isValid());
 
-  // Adding the color buffer as a write one in the second pass
-  nextPass.addWriteTexture(colorTexture);
+  nextPass.addWriteTexture(colorBuffer);
   CHECK_FALSE(initialPass.isValid());
   CHECK_FALSE(nextPass.isValid()); // The color buffer is defined as both read & write in the second pass
+
+  initialPass.removeReadTexture(depthBuffer);
+  CHECK(initialPass.isValid()); // The depth buffer is only set as write, the pass is valid again
+  CHECK_FALSE(nextPass.isValid());
+
+  nextPass.removeWriteTexture(colorBuffer);
+  CHECK(initialPass.isValid());
+  CHECK(nextPass.isValid()); // The color buffer is only set as read, the pass is valid again
 }

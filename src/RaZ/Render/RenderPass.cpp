@@ -6,7 +6,7 @@ namespace Raz {
 
 bool RenderPass::isValid() const {
   // Since a pass can get read & write buffers from other sources than the previous pass, one may have more or less
-  //  buffers than those its parent write to. Direct buffer compatibility is thus not checked
+  //  buffers than its parent write to. Direct buffer compatibility is thus not checked
 
   const std::vector<TexturePtr>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
 
@@ -31,6 +31,12 @@ void RenderPass::addReadTexture(TexturePtr texture, const std::string& uniformNa
   // TODO: this binding will be lost if the program is updated; store the uniform name
   m_program.use();
   m_program.sendUniform(uniformName, static_cast<int>(m_readTextures.size() - 1));
+}
+
+void RenderPass::removeReadTexture(const TexturePtr& texture) {
+  const auto textureIt = std::find(m_readTextures.cbegin(), m_readTextures.cend(), texture);
+  if (textureIt != m_readTextures.cend())
+    m_readTextures.erase(textureIt);
 }
 
 void RenderPass::bindTextures() const noexcept {

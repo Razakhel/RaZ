@@ -9,13 +9,13 @@ struct Light {
 };
 
 struct Material {
-  vec3 diffuse;
+  vec3 baseColor;
   vec3 emissive;
   vec3 ambient;
   vec3 specular;
   float transparency;
 
-  sampler2D diffuseMap;
+  sampler2D baseColorMap;
   sampler2D emissiveMap;
   sampler2D ambientMap;
   sampler2D specularMap;
@@ -46,7 +46,7 @@ layout(std140) uniform uboLightsInfo {
 uniform Material uniMaterial;
 
 layout(location = 0) out vec4 fragColor;
-layout(location = 1) out vec3 bufferNormal;
+layout(location = 1) out vec3 fragNormal;
 
 void main() {
   vec3 normal = vertMeshInfo.vertTBNMatrix[2];
@@ -65,11 +65,9 @@ void main() {
     lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, normal), 0.0, 1.0));
   }
 
+  vec3 diffuse  = lightHitAngle * texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.baseColor;
   vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
 
-  vec3 color = lightHitAngle * texture(uniMaterial.diffuseMap, vertMeshInfo.vertTexcoords).rgb + emissive;
-  fragColor  = vec4(color, 1.0);
-
-  // Sending fragment normal to next framebuffer(s), if any
-  bufferNormal = normal;
+  fragColor  = vec4(diffuse + emissive, 1.0);
+  fragNormal = normal;
 }
