@@ -63,7 +63,7 @@ Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
   : m_index{ std::exchange(fbo.m_index, std::numeric_limits<unsigned int>::max()) },
     m_depthBuffer{ std::exchange(fbo.m_depthBuffer, nullptr) },
     m_colorBuffers{ std::move(fbo.m_colorBuffers) } {
-  mapBuffers();
+  mapBuffers(); // TODO: may be unnecessary
 }
 
 VertexShader Framebuffer::recoverVertexShader() {
@@ -89,10 +89,20 @@ void Framebuffer::addTextureBuffer(TexturePtr texture) {
     m_depthBuffer = std::move(texture);
   } else {
     // Adding the color buffer only if it doesn't exist yet
-    const auto bufferIter = std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture);
-
-    if (bufferIter == m_colorBuffers.cend())
+    if (std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture) == m_colorBuffers.cend())
       m_colorBuffers.emplace_back(std::move(texture));
+  }
+
+  mapBuffers();
+}
+
+void Framebuffer::removeTextureBuffer(const TexturePtr& texture) {
+  if (texture == m_depthBuffer) {
+    m_depthBuffer.reset();
+  } else {
+    const auto bufferIter = std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture);
+    if (bufferIter != m_colorBuffers.cend())
+      m_colorBuffers.erase(bufferIter);
   }
 
   mapBuffers();
@@ -105,7 +115,7 @@ void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
   for (const TexturePtr& colorBuffer : m_colorBuffers)
     colorBuffer->resize(width, height);
 
-  mapBuffers();
+  mapBuffers(); // TODO: may be unnecessary
 }
 
 void Framebuffer::mapBuffers() const {
@@ -133,9 +143,6 @@ void Framebuffer::mapBuffers() const {
     Renderer::setDrawBuffers(static_cast<unsigned int>(drawBuffers.size()), drawBuffers.data());
   }
 
-  if (!Renderer::isFramebufferComplete())
-    Logger::error("Framebuffer is not complete.");
-
   unbind();
 
   Logger::debug("[Framebuffer] Mapped buffers");
@@ -157,10 +164,10 @@ void Framebuffer::display() const {
 
 Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
   std::swap(m_index, fbo.m_index);
-  std::swap(m_depthBuffer, fbo.m_depthBuffer);
+  m_depthBuffer  = std::move(fbo.m_depthBuffer);
   m_colorBuffers = std::move(fbo.m_colorBuffers);
 
-  mapBuffers();
+  mapBuffers(); // TODO: may be unnecessary
 
   return *this;
 }

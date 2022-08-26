@@ -20,7 +20,6 @@ class Framebuffer {
 
 public:
   Framebuffer();
-  Framebuffer(unsigned int width, unsigned int height) : Framebuffer() { resizeBuffers(width, height); }
   Framebuffer(const Framebuffer&) = delete;
   Framebuffer(Framebuffer&& fbo) noexcept;
 
@@ -38,6 +37,9 @@ public:
   /// Adds a write buffer texture.
   /// \param texture Buffer texture to be added.
   void addTextureBuffer(TexturePtr texture);
+  /// Removes a write buffer texture.
+  /// \param texture Buffer texture to be removed.
+  void removeTextureBuffer(const TexturePtr& texture);
   /// Resizes the buffer textures.
   /// \param width Width to be resized to.
   /// \param height Height to be resized to.
