@@ -1,4 +1,4 @@
-#include "RaZ/Data/ImageFormat.hpp"
+#include "RaZ/Data/Color.hpp"
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/Renderer.hpp"
 
@@ -10,12 +10,12 @@ constexpr std::string_view vertShaderSource = {
 #include "common.vert.embed"
 };
 
-constexpr std::string_view blinnPhongShaderSource = {
-#include "blinn-phong.frag.embed"
-};
-
 constexpr std::string_view cookTorranceShaderSource = {
 #include "cook-torrance.frag.embed"
+};
+
+constexpr std::string_view blinnPhongShaderSource = {
+#include "blinn-phong.frag.embed"
 };
 
 } // namespace

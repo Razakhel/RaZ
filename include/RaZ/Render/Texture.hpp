@@ -3,14 +3,14 @@
 #ifndef RAZ_TEXTURE_HPP
 #define RAZ_TEXTURE_HPP
 
-#include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/Image.hpp"
-#include "RaZ/Math/Vector.hpp"
 
+#include <limits>
 #include <memory>
 
 namespace Raz {
 
+class Color;
 class Texture;
 using TexturePtr = std::shared_ptr<Texture>;
 
@@ -18,12 +18,15 @@ using TexturePtr = std::shared_ptr<Texture>;
 class Texture {
 public:
   Texture();
+  explicit Texture(ImageColorspace colorspace);
+  Texture(ImageColorspace colorspace, ImageDataType dataType);
+  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace) : Texture(colorspace) { resize(width, height); }
+  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
+  explicit Texture(Image&& image, bool createMipmaps = true) : Texture() { load(std::move(image), createMipmaps); }
+  explicit Texture(const Image& image, bool createMipmaps = true) : Texture() { load(image, createMipmaps); }
   /// Constructs an 1x1 plain colored texture.
   /// \param value Color to create the texture with.
-  explicit Texture(const Color& color) : Texture() { makePlainColored(color); }
-  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace);
-  Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
-  explicit Texture(Image image, bool createMipmaps = true) : Texture() { load(std::move(image), createMipmaps); }
+  explicit Texture(const Color& color);
   Texture(const Texture&) = delete;
   Texture(Texture&& texture) noexcept;
 
@@ -46,10 +49,10 @@ public:
   /// Unbinds the current texture.
   void unbind() const;
   /// Resizes the texture.
-  /// \warning This does NOT resize the contained image.
+  /// \warning This does NOT resize the contained image's data.
   /// \param width New texture width.
   /// \param height New texture height.
-  void resize(unsigned int width, unsigned int height) const;
+  void resize(unsigned int width, unsigned int height);
 
   Texture& operator=(const Texture&) = delete;
   Texture& operator=(Texture&& texture) noexcept;
@@ -58,9 +61,9 @@ public:
 
 private:
   /// Fills the texture with a single pixel (creates a single-colored 1x1 texture).
-  /// \note This only allocates & fills memory on the graphics card; the image member's data is left untouched.
+  /// \warning This does NOT override the contained image's data.
   /// \param color Color to fill the texture with.
-  void makePlainColored(const Color& color) const;
+  void makePlainColored(const Color& color);
 
   unsigned int m_index = std::numeric_limits<unsigned int>::max();
   Image m_image {};

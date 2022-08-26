@@ -1,4 +1,5 @@
 #include "GL/glew.h"
+#include "RaZ/Data/Color.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -89,10 +90,10 @@ Texture::Texture() {
   Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
 }
 
-Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace)
-  : Texture(width, height, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
+Texture::Texture(ImageColorspace colorspace)
+  : Texture(colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
 
-Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) : Texture() {
+Texture::Texture(ImageColorspace colorspace, ImageDataType dataType) : Texture() {
   m_image = Image(colorspace, dataType);
 
   bind();
@@ -104,8 +105,14 @@ Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colors
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::CLAMP_TO_EDGE);
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
 
-  resize(width, height);
+  unbind();
 }
+
+Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType)
+  : Texture(colorspace, dataType) { resize(width, height); }
+
+Texture::Texture(const Color& color)
+  : Texture() { makePlainColored(color); }
 
 Texture::Texture(Texture&& texture) noexcept
   : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) },
@@ -164,7 +171,10 @@ void Texture::unbind() const {
   Renderer::unbindTexture(TextureType::TEXTURE_2D);
 }
 
-void Texture::resize(unsigned int width, unsigned int height) const {
+void Texture::resize(unsigned int width, unsigned int height) {
+  m_image.m_width  = width;
+  m_image.m_height = height;
+
   bind();
   Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                             0,
@@ -193,7 +203,10 @@ Texture::~Texture() {
   Logger::debug("[Texture] Destroyed");
 }
 
-void Texture::makePlainColored(const Color& color) const {
+void Texture::makePlainColored(const Color& color) {
+  m_image.m_width  = 1;
+  m_image.m_height = 1;
+
   bind();
   Renderer::sendImageData2D(TextureType::TEXTURE_2D, 0, TextureInternalFormat::RGB, 1, 1, TextureFormat::RGB, TextureDataType::UBYTE, Vec3b(color).getDataPtr());
   unbind();

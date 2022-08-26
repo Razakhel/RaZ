@@ -1,12 +1,13 @@
 #include "Catch.hpp"
 
+#include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
-TEST_CASE("Texture dimensions creation") {
-  const Raz::Texture textureEmpty(0, 0, Raz::ImageColorspace::RGBA);
+TEST_CASE("Texture creation") {
+  Raz::Texture textureEmpty(Raz::ImageColorspace::RGBA); // A texture can be created without dimensions
   CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
   CHECK(textureEmpty.getImage().getWidth() == 0);
   CHECK(textureEmpty.getImage().getHeight() == 0);
@@ -15,10 +16,19 @@ TEST_CASE("Texture dimensions creation") {
   CHECK(textureEmpty.getImage().getChannelCount() == 4);
   CHECK(textureEmpty.getImage().isEmpty());
 
+  textureEmpty.resize(1, 1);
+  CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(textureEmpty.getImage().getWidth() == 1); // Resizing a texture sets the dimensions to the image
+  CHECK(textureEmpty.getImage().getHeight() == 1);
+  CHECK(textureEmpty.getImage().getColorspace() == Raz::ImageColorspace::RGBA);
+  CHECK(textureEmpty.getImage().getDataType() == Raz::ImageDataType::BYTE);
+  CHECK(textureEmpty.getImage().getChannelCount() == 4);
+  CHECK(textureEmpty.getImage().isEmpty()); // Resizing a texture does not modify the contained image
+
   const Raz::Texture textureSmall(1, 1, Raz::ImageColorspace::DEPTH);
   CHECK(textureSmall.getIndex() != std::numeric_limits<unsigned int>::max());
-  CHECK(textureSmall.getImage().getWidth() == 0); // A texture does not initialize the underlying image
-  CHECK(textureSmall.getImage().getHeight() == 0);
+  CHECK(textureSmall.getImage().getWidth() == 1);
+  CHECK(textureSmall.getImage().getHeight() == 1);
   CHECK(textureSmall.getImage().getColorspace() == Raz::ImageColorspace::DEPTH);
   CHECK(textureSmall.getImage().getDataType() == Raz::ImageDataType::FLOAT); // A depth texture is always floating-point
   CHECK(textureSmall.getImage().getChannelCount() == 1);
@@ -74,7 +84,9 @@ TEST_CASE("Texture presets") {
   const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::White);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  CHECK(whiteTexture->getImage().isEmpty()); // The image's data is untouched, no allocation is made
+  CHECK(whiteTexture->getImage().getWidth() == 1); // The width & height are set to 1
+  CHECK(whiteTexture->getImage().getHeight() == 1);
+  CHECK(whiteTexture->getImage().isEmpty()); // However, the image's data is untouched; no allocation is made
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES
   std::array<uint8_t, 3> textureData {}; // Recovering the texture's data (1 RGB pixel -> 3 values)
