@@ -7,7 +7,7 @@
 namespace Raz {
 
 MonoPassRenderProcess::MonoPassRenderProcess(RenderGraph& renderGraph, FragmentShader&& fragShader, std::string passName)
-  : m_pass{ renderGraph.addNode(std::move(fragShader), std::move(passName)) } {
+  : RenderProcess(renderGraph), m_pass{ renderGraph.addNode(std::move(fragShader), std::move(passName)) } {
 #if !defined(USE_OPENGL_ES)
   if (Renderer::checkVersion(4, 3)) {
     Renderer::setLabel(RenderObjectType::PROGRAM, m_pass.getProgram().getIndex(), m_pass.getName() + " program");

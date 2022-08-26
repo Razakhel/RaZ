@@ -15,6 +15,8 @@ using TexturePtr = std::shared_ptr<Texture>;
 /// RenderProcess class, representing a set of render passes with fixed actions; can be derived to implement post effects.
 class RenderProcess {
 public:
+  explicit RenderProcess(RenderGraph& renderGraph) : m_renderGraph{ renderGraph } {}
+
   virtual bool isEnabled() const noexcept = 0;
 
   virtual void setState(bool enabled) = 0;
@@ -28,6 +30,9 @@ public:
   virtual void resizeBuffers([[maybe_unused]] unsigned int width, [[maybe_unused]] unsigned int height) {}
 
   virtual ~RenderProcess() = default;
+
+protected:
+  RenderGraph& m_renderGraph;
 };
 
 } // namespace Raz

@@ -15,7 +15,7 @@ constexpr std::string_view gaussianBlurSource = {
 
 } // namespace
 
-GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph, unsigned int frameWidth, unsigned int frameHeight) {
+GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph, unsigned int frameWidth, unsigned int frameHeight) : RenderProcess(renderGraph) {
   // Two-pass gaussian blur based on:
   //  - https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
   //  - https://www.intel.com/content/www/us/en/developer/articles/technical/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms.html

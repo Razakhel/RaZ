@@ -123,7 +123,7 @@ constexpr std::string_view finalSource = R"(
 
 } // namespace
 
-BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int frameWidth, unsigned int frameHeight) {
+BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int frameWidth, unsigned int frameHeight) : RenderProcess(renderGraph) {
   // Based on Fabrice "froyok" Piquet's bloom, itself based on the one used in Unreal Engine 4/Call of Duty: Advanced Warfare
   // See: https://www.froyok.fr/blog/2021-12-ue4-custom-bloom/
 
