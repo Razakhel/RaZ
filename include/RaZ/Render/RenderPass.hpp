@@ -37,8 +37,10 @@ public:
   bool isValid() const;
   void addReadTexture(TexturePtr texture, const std::string& uniformName);
   void removeReadTexture(const TexturePtr& texture);
+  void clearReadTextures() { m_readTextures.clear(); }
   void addWriteTexture(TexturePtr texture) { m_writeFramebuffer.addTextureBuffer(std::move(texture)); }
   void removeWriteTexture(const TexturePtr& texture) { m_writeFramebuffer.removeTextureBuffer(texture); }
+  void clearWriteTextures() { m_writeFramebuffer.clearTextureBuffers(); }
   /// Resizes the render pass' write buffer textures.
   /// \param width New buffers width.
   /// \param height New buffers height.

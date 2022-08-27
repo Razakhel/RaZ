@@ -39,3 +39,47 @@ TEST_CASE("RenderPass validity") {
   CHECK(initialPass.isValid());
   CHECK(nextPass.isValid()); // The color buffer is only set as read, the pass is valid again
 }
+
+TEST_CASE("RenderPass textures") {
+  Raz::RenderPass initialPass;
+  CHECK(initialPass.getReadTextureCount() == 0);
+  CHECK_FALSE(initialPass.getFramebuffer().hasDepthBuffer());
+  CHECK(initialPass.getFramebuffer().getColorBufferCount() == 0);
+
+  const auto depthBuffer = Raz::Texture::create(Raz::ImageColorspace::DEPTH);
+  const auto colorBuffer = Raz::Texture::create(Raz::ImageColorspace::RGB);
+
+  initialPass.addWriteTexture(depthBuffer);
+  CHECK(initialPass.getReadTextureCount() == 0);
+  REQUIRE(initialPass.getFramebuffer().hasDepthBuffer());
+  CHECK(initialPass.getFramebuffer().getDepthBuffer().getIndex() == depthBuffer->getIndex());
+  CHECK(initialPass.getFramebuffer().getColorBufferCount() == 0);
+
+  Raz::RenderPass nextPass;
+
+  nextPass.addReadTexture(colorBuffer, "");
+  REQUIRE(nextPass.getReadTextureCount() == 1);
+  CHECK(nextPass.getReadTexture(0).getIndex() == colorBuffer->getIndex());
+  CHECK_FALSE(nextPass.getFramebuffer().hasDepthBuffer());
+  CHECK(nextPass.getFramebuffer().getColorBufferCount() == 0);
+
+  initialPass.addChildren(nextPass);
+  CHECK(initialPass.getFramebuffer().getColorBufferCount() == 0); // Setting a pass dependency does not add any buffer automatically
+  CHECK(nextPass.getReadTextureCount() == 1);
+
+  initialPass.addWriteTexture(colorBuffer);
+  REQUIRE(initialPass.getFramebuffer().getColorBufferCount() == 1);
+  REQUIRE(nextPass.getReadTextureCount() == 1);
+  CHECK(initialPass.getFramebuffer().getColorBuffer(0).getIndex() == nextPass.getReadTexture(0).getIndex()); // The color buffer is the same in both passes
+
+  nextPass.removeParents(initialPass);
+  CHECK(initialPass.getFramebuffer().getColorBufferCount() == 1); // Removing a pass dependency does not remove any buffer automatically
+  CHECK(nextPass.getReadTextureCount() == 1);
+
+  initialPass.clearWriteTextures();
+  CHECK_FALSE(initialPass.getFramebuffer().hasDepthBuffer());
+  CHECK(initialPass.getFramebuffer().getColorBufferCount() == 0);
+
+  nextPass.clearReadTextures();
+  CHECK(nextPass.getReadTextureCount() == 0);
+}
