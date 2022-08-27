@@ -108,6 +108,11 @@ void Framebuffer::removeTextureBuffer(const TexturePtr& texture) {
   mapBuffers();
 }
 
+void Framebuffer::clearTextureBuffers() {
+  clearDepthBuffer();
+  clearColorBuffers();
+}
+
 void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
   if (m_depthBuffer)
     m_depthBuffer->resize(width, height);

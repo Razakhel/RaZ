@@ -40,8 +40,16 @@ TEST_CASE("Framebuffer buffers") {
   CHECK(framebuffer.getColorBuffer(0).getIndex() == colorBuffer->getIndex());
 
   framebuffer.removeTextureBuffer(colorBuffer);
-  CHECK_FALSE(framebuffer.hasDepthBuffer());
-  CHECK(framebuffer.getColorBufferCount() == 0);
+  CHECK(framebuffer.isEmpty());
+
+  // Re-adding both buffers to check clear operations
+  framebuffer.addTextureBuffer(depthBuffer);
+  framebuffer.addTextureBuffer(colorBuffer);
+  CHECK(framebuffer.hasDepthBuffer());
+  CHECK(framebuffer.getColorBufferCount() == 1);
+
+  framebuffer.clearTextureBuffers();
+  CHECK(framebuffer.isEmpty()); // Both depth & color buffers have been removed
 }
 
 TEST_CASE("Framebuffer move") {

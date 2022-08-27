@@ -40,6 +40,12 @@ public:
   /// Removes a write buffer texture.
   /// \param texture Buffer texture to be removed.
   void removeTextureBuffer(const TexturePtr& texture);
+  /// Removes the depth buffer.
+  void clearDepthBuffer() { m_depthBuffer.reset(); }
+  /// Removes all color buffers.
+  void clearColorBuffers() { m_colorBuffers.clear(); }
+  /// Removes both depth & color buffers.
+  void clearTextureBuffers();
   /// Resizes the buffer textures.
   /// \param width Width to be resized to.
   /// \param height Height to be resized to.
