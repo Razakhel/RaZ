@@ -13,7 +13,6 @@ MonoPassRenderProcess::MonoPassRenderProcess(RenderGraph& renderGraph, FragmentS
     Renderer::setLabel(RenderObjectType::PROGRAM, m_pass.getProgram().getIndex(), m_pass.getName() + " program");
     Renderer::setLabel(RenderObjectType::SHADER, m_pass.getProgram().getVertexShader().getIndex(), m_pass.getName() + " vertex shader");
     Renderer::setLabel(RenderObjectType::SHADER, m_pass.getProgram().getFragmentShader().getIndex(), m_pass.getName() + " fragment shader");
-    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_pass.getFramebuffer().getIndex(), m_pass.getName() + " framebuffer");
   }
 #endif
 }
@@ -44,6 +43,13 @@ void MonoPassRenderProcess::addChild(RenderProcess& childProcess) {
 
 void MonoPassRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
   m_pass.addWriteTexture(std::move(outputBuffer));
+
+#if !defined(USE_OPENGL_ES)
+  // This label could be added in the constructor. However, although it does work, adding a label to an empty framebuffer
+  //    (with no write texture) produces an OpenGL error, which is avoided here
+  if (Renderer::checkVersion(4, 3))
+    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_pass.getFramebuffer().getIndex(), m_pass.getName() + " framebuffer");
+#endif
 }
 
 void MonoPassRenderProcess::setInputBuffer(TexturePtr inputBuffer, const std::string& uniformName) {

@@ -275,9 +275,6 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
     Renderer::setLabel(RenderObjectType::PROGRAM, m_finalPass->getProgram().getIndex(), "Bloom final pass program");
     Renderer::setLabel(RenderObjectType::SHADER, m_finalPass->getProgram().getVertexShader().getIndex(), "Bloom final pass vertex shader");
     Renderer::setLabel(RenderObjectType::SHADER, m_finalPass->getProgram().getFragmentShader().getIndex(), "Bloom final pass fragment shader");
-    // Adding a label to an empty framebuffer produces an OpenGL error, but the label is properly set nonetheless
-    // This could be done in setOutputBuffer() to make sure it isn't empty, but it would be done for each assigned buffer in that case
-    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_finalPass->getFramebuffer().getIndex(), "Bloom final pass framebuffer");
   }
 #endif
 
@@ -320,6 +317,11 @@ void BloomRenderProcess::addChild(RenderProcess& childProcess) {
 
 void BloomRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
   m_finalPass->addWriteTexture(std::move(outputBuffer));
+
+#if !defined(USE_OPENGL_ES)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_finalPass->getFramebuffer().getIndex(), "Bloom final pass framebuffer");
+#endif
 }
 
 void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) {

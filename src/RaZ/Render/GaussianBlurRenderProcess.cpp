@@ -61,7 +61,6 @@ GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph, u
     Renderer::setLabel(RenderObjectType::PROGRAM, m_verticalPass->getProgram().getIndex(), "Gaussian blur (vertical) program");
     Renderer::setLabel(RenderObjectType::SHADER, m_verticalPass->getProgram().getVertexShader().getIndex(), "Gaussian blur (vertical) vertex shader");
     Renderer::setLabel(RenderObjectType::SHADER, m_verticalPass->getProgram().getFragmentShader().getIndex(), "Gaussian blur (vertical) fragment shader");
-    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_verticalPass->getFramebuffer().getIndex(), "Gaussian blur (vertical) framebuffer");
   }
 #endif
 
@@ -97,6 +96,11 @@ void GaussianBlurRenderProcess::addChild(RenderProcess& childProcess) {
 
 void GaussianBlurRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
   m_verticalPass->addWriteTexture(std::move(outputBuffer));
+
+#if !defined(USE_OPENGL_ES)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_verticalPass->getFramebuffer().getIndex(), "Gaussian blur (vertical) framebuffer");
+#endif
 }
 
 void GaussianBlurRenderProcess::setInputBuffer(TexturePtr inputBuffer) {
