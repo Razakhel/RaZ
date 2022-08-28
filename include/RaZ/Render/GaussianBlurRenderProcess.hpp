@@ -9,7 +9,7 @@ namespace Raz {
 
 class GaussianBlurRenderProcess final : public RenderProcess {
 public:
-  GaussianBlurRenderProcess(RenderGraph& renderGraph, unsigned int frameWidth, unsigned int frameHeight);
+  explicit GaussianBlurRenderProcess(RenderGraph& renderGraph);
 
   bool isEnabled() const noexcept override;
   const RenderPass& getHorizontalPass() const noexcept { return *m_horizontalPass; }
@@ -21,11 +21,14 @@ public:
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
   void setOutputBuffer(TexturePtr outputBuffer) override;
+  void resizeBuffers(unsigned int width, unsigned int height) override;
   void setInputBuffer(TexturePtr inputBuffer);
 
 private:
   RenderPass* m_horizontalPass {};
   RenderPass* m_verticalPass {};
+
+  TexturePtr m_horizontalBuffer {};
 };
 
 } // namespace Raz
