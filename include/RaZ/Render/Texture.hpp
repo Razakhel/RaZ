@@ -18,15 +18,15 @@ using TexturePtr = std::shared_ptr<Texture>;
 class Texture {
 public:
   Texture();
-  explicit Texture(ImageColorspace colorspace);
-  Texture(ImageColorspace colorspace, ImageDataType dataType);
+  explicit Texture(ImageColorspace colorspace) : Texture() { setColorspace(colorspace); }
+  Texture(ImageColorspace colorspace, ImageDataType dataType) : Texture() { setColorspace(colorspace, dataType); }
   Texture(unsigned int width, unsigned int height, ImageColorspace colorspace) : Texture(colorspace) { resize(width, height); }
   Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
   explicit Texture(Image&& image, bool createMipmaps = true) : Texture() { load(std::move(image), createMipmaps); }
   explicit Texture(const Image& image, bool createMipmaps = true) : Texture() { load(image, createMipmaps); }
   /// Constructs an 1x1 plain colored texture.
   /// \param value Color to create the texture with.
-  explicit Texture(const Color& color);
+  explicit Texture(const Color& color) : Texture() { makePlainColored(color); }
   Texture(const Texture&) = delete;
   Texture(Texture&& texture) noexcept;
 
@@ -48,8 +48,32 @@ public:
   void bind() const;
   /// Unbinds the current texture.
   void unbind() const;
+  /// Sets the texture's parameters.
+  /// \warning This does NOT modify the contained image's data.
+  /// \param width New texture width.
+  /// \param height New texture height.
+  /// \param colorspace New colorspace.
+  /// \see resize(), setColorspace()
+  void setParameters(unsigned int width, unsigned int height, ImageColorspace colorspace);
+  /// Sets the texture's parameters.
+  /// \warning This does NOT modify the contained image's data.
+  /// \param width New texture width.
+  /// \param height New texture height.
+  /// \param colorspace New colorspace.
+  /// \param dataType New data type.
+  /// \see resize(), setColorspace()
+  void setParameters(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
+  /// Sets the texture's colorspace & data type; the latter will be deduced from the former.
+  /// \warning This does NOT modify the contained image's data.
+  /// \param colorspace New colorspace.
+  void setColorspace(ImageColorspace colorspace);
+  /// Sets the texture's colorspace & data type.
+  /// \warning This does NOT modify the contained image's data.
+  /// \param colorspace New colorspace.
+  /// \param dataType New data type.
+  void setColorspace(ImageColorspace colorspace, ImageDataType dataType);
   /// Resizes the texture.
-  /// \warning This does NOT resize the contained image's data.
+  /// \warning This does NOT modify the contained image's data.
   /// \param width New texture width.
   /// \param height New texture height.
   void resize(unsigned int width, unsigned int height);

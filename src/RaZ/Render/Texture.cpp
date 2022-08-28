@@ -90,29 +90,8 @@ Texture::Texture() {
   Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
 }
 
-Texture::Texture(ImageColorspace colorspace)
-  : Texture(colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
-
-Texture::Texture(ImageColorspace colorspace, ImageDataType dataType) : Texture() {
-  m_image = Image(colorspace, dataType);
-
-  bind();
-
-  const TextureParamValue textureParam = (colorspace == ImageColorspace::DEPTH ? TextureParamValue::NEAREST : TextureParamValue::LINEAR);
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, textureParam);
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, textureParam);
-
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::CLAMP_TO_EDGE);
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
-
-  unbind();
-}
-
 Texture::Texture(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType)
   : Texture(colorspace, dataType) { resize(width, height); }
-
-Texture::Texture(const Color& color)
-  : Texture() { makePlainColored(color); }
 
 Texture::Texture(Texture&& texture) noexcept
   : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) },
@@ -169,6 +148,35 @@ void Texture::bind() const {
 
 void Texture::unbind() const {
   Renderer::unbindTexture(TextureType::TEXTURE_2D);
+}
+
+void Texture::setParameters(unsigned int width, unsigned int height, ImageColorspace colorspace) {
+  setColorspace(colorspace);
+  resize(width, height);
+}
+
+void Texture::setParameters(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) {
+  setColorspace(colorspace, dataType);
+  resize(width, height);
+}
+
+void Texture::setColorspace(ImageColorspace colorspace) {
+  setColorspace(colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE));
+}
+
+void Texture::setColorspace(ImageColorspace colorspace, ImageDataType dataType) {
+  m_image = Image(colorspace, dataType);
+
+  bind();
+
+  const TextureParamValue textureParam = (colorspace == ImageColorspace::DEPTH ? TextureParamValue::NEAREST : TextureParamValue::LINEAR);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, textureParam);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, textureParam);
+
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, TextureParamValue::CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
+
+  unbind();
 }
 
 void Texture::resize(unsigned int width, unsigned int height) {

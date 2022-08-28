@@ -7,16 +7,16 @@
 #include "RaZ/Utils/FilePath.hpp"
 
 TEST_CASE("Texture creation") {
-  Raz::Texture textureEmpty(Raz::ImageColorspace::RGBA); // A texture can be created without dimensions
+  Raz::Texture textureEmpty; // A texture can be created without dimensions and colorspace/data type
   CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
   CHECK(textureEmpty.getImage().getWidth() == 0);
   CHECK(textureEmpty.getImage().getHeight() == 0);
-  CHECK(textureEmpty.getImage().getColorspace() == Raz::ImageColorspace::RGBA);
+  CHECK(textureEmpty.getImage().getColorspace() == Raz::ImageColorspace::GRAY); // TODO: there should be an invalid colorspace, not a default one
   CHECK(textureEmpty.getImage().getDataType() == Raz::ImageDataType::BYTE);
-  CHECK(textureEmpty.getImage().getChannelCount() == 4);
+  CHECK(textureEmpty.getImage().getChannelCount() == 0);
   CHECK(textureEmpty.getImage().isEmpty());
 
-  textureEmpty.resize(1, 1);
+  textureEmpty.setParameters(1, 1, Raz::ImageColorspace::RGBA);
   CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
   CHECK(textureEmpty.getImage().getWidth() == 1); // Resizing a texture sets the dimensions to the image
   CHECK(textureEmpty.getImage().getHeight() == 1);
