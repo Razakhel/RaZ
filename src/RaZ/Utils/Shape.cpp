@@ -77,7 +77,7 @@ Vec3f Line::computeProjection(const Vec3f& point) const {
 
   // Clamping pointDist between 0 & 1, since it can be outside these bounds if not directly projectable
   //
-  //         <0        |        ==0        |        >1
+  //        < 0        |    >= 0 & <= 1    |        > 1
   // __________________________________________________________
   //                   |                   |
   // P                 |         P         |                  P

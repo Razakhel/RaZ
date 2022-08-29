@@ -19,7 +19,7 @@ int main() {
     // Rendering //
     ///////////////
 
-    auto& render = world.addSystem<Raz::RenderSystem>(textureSize, textureSize + 85, "RaZ");
+    auto& render = world.addSystem<Raz::RenderSystem>(textureSize, textureSize + 105, "RaZ");
 
     if (!Raz::Renderer::checkVersion(4, 3)) {
       throw std::runtime_error("Error: Compute is only available with an OpenGL 4.3 context or above; "
@@ -41,12 +41,16 @@ int main() {
     Raz::Texture texture(textureSize, textureSize, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
     Raz::Renderer::bindImageTexture(0, texture.getIndex(), 0, false, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
-    Raz::ComputeShaderProgram compProgram(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise.comp"));
-    compProgram.execute(textureSize, textureSize);
+    Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise.comp"));
+    perlinNoise.execute(textureSize, textureSize);
+
+    Raz::ComputeShaderProgram worleyNoise(Raz::ComputeShader(RAZ_ROOT "shaders/worley_noise.comp"));
 
     Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, texture.getIndex(), "Noise texture");
-    Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, compProgram.getIndex(), "Noise shader program");
-    Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, compProgram.getShader().getIndex(), "Noise compute shader");
+    Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, perlinNoise.getIndex(), "Perlin noise shader program");
+    Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, worleyNoise.getIndex(), "Worley noise shader program");
+    Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, perlinNoise.getShader().getIndex(), "Perlin noise compute shader");
+    Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, worleyNoise.getShader().getIndex(), "Worley noise compute shader");
 
     /////////////
     // Overlay //
@@ -56,17 +60,47 @@ int main() {
 
     overlay.addTexture(texture, textureSize, textureSize);
 
-    overlay.addSlider("Noise map factor", [&compProgram] (float value) {
-      compProgram.use();
-      compProgram.sendUniform("uniNoiseFactor", value);
-      compProgram.execute(textureSize, textureSize);
+    Raz::OverlaySlider& perlinFactor = overlay.addSlider("Perlin noise factor", [&perlinNoise] (float value) {
+      perlinNoise.use();
+      perlinNoise.sendUniform("uniNoiseFactor", value);
+      perlinNoise.execute(textureSize, textureSize);
     }, 0.001f, 0.1f, 0.01f);
 
-    overlay.addSlider("Octave count", [&compProgram] (float value) {
-      compProgram.use();
-      compProgram.sendUniform("uniOctaveCount", static_cast<int>(value));
-      compProgram.execute(textureSize, textureSize);
+    Raz::OverlaySlider& perlinOctave = overlay.addSlider("Perlin noise octaves", [&perlinNoise] (float value) {
+      perlinNoise.use();
+      perlinNoise.sendUniform("uniOctaveCount", static_cast<int>(value));
+      perlinNoise.execute(textureSize, textureSize);
     }, 1, 8, 8);
+
+    Raz::OverlaySlider& worleyFactor = overlay.addSlider("Worley noise factor", [&worleyNoise] (float value) {
+      worleyNoise.use();
+      worleyNoise.sendUniform("uniNoiseFactor", value);
+      worleyNoise.execute(textureSize, textureSize);
+    }, 0.001f, 0.1f, 0.01f);
+    worleyFactor.disable();
+
+    overlay.addDropdown("Noise method", { "Perlin", "Worley" }, [&] (const std::string&, std::size_t index) {
+      perlinFactor.disable();
+      perlinOctave.disable();
+
+      worleyFactor.disable();
+
+      switch (index) {
+        case 0:
+          perlinFactor.enable();
+          perlinOctave.enable();
+          perlinNoise.execute(textureSize, textureSize);
+          break;
+
+        case 1:
+          worleyFactor.enable();
+          worleyNoise.execute(textureSize, textureSize);
+          break;
+
+        default:
+          break;
+      }
+    });
 
     app.run();
   } catch (const std::exception& exception) {

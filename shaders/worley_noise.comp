@@ -1,0 +1,38 @@
+layout(local_size_x = 1, local_size_y = 1, local_size_x = 1) in;
+
+layout(r16f, binding = 0) uniform image2D uniNoiseMap;
+uniform float uniNoiseFactor = 0.01;
+
+const vec2 offsets[9] = vec2[](
+  vec2(-1.0,  1.0), vec2(0.0,  1.0), vec2(1.0,  1.0),
+  vec2(-1.0,  0.0), vec2(0.0,  0.0), vec2(1.0,  0.0),
+  vec2(-1.0, -1.0), vec2(0.0, -1.0), vec2(1.0, -1.0)
+);
+
+vec2 rand(vec2 vec) {
+  return fract(sin(vec2(dot(vec, vec2(127.1, 311.7)), dot(vec, vec2(269.5, 183.3)))) * 43758.5453);
+}
+
+float computeWorley(vec2 coords) {
+  vec2 intCoords   = floor(coords);
+  vec2 fractCoords = coords - intCoords; // fract(coords)
+
+  float minSqDist = 1.0;
+
+  for (int i = 0; i < 9; ++i) {
+    vec2 cellCoords   = rand(intCoords + offsets[i]);
+    vec2 cellPoint    = cellCoords + offsets[i] - fractCoords;
+    float pointSqDist = dot(cellPoint, cellPoint);
+
+    minSqDist = min(minSqDist, pointSqDist);
+  }
+
+  return sqrt(minSqDist);
+}
+
+void main() {
+  float noise = computeWorley(vec2(gl_GlobalInvocationID.xy) * uniNoiseFactor);
+
+  ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+  imageStore(uniNoiseMap, pixelCoords, vec4(vec3(noise), 1.0));
+}
