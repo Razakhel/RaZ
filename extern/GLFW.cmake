@@ -104,12 +104,12 @@ elseif (RAZ_PLATFORM_LINUX)
         GLFW_LINKER_FLAGS
 
         dl
-        pthread
         GL
+        pthread
         X11
-        Xrandr
         Xcursor
         Xinerama
+        Xrandr
         Xxf86vm
     )
 endif ()

@@ -58,13 +58,13 @@ Bitset Bitset::operator>>(std::size_t shift) const {
 
 Bitset& Bitset::operator&=(const Bitset& bitset) noexcept {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
-    m_bits[bitIndex] = m_bits[bitIndex] & bitset[bitIndex];
+    m_bits[bitIndex] = m_bits[bitIndex] && bitset[bitIndex];
   return *this;
 }
 
 Bitset& Bitset::operator|=(const Bitset& bitset) noexcept {
   for (std::size_t bitIndex = 0; bitIndex < std::min(m_bits.size(), bitset.getSize()); ++bitIndex)
-    m_bits[bitIndex] = m_bits[bitIndex] | bitset[bitIndex];
+    m_bits[bitIndex] = m_bits[bitIndex] || bitset[bitIndex];
   return *this;
 }
 

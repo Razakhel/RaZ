@@ -185,6 +185,10 @@ if (RAZ_COMPILER_GCC)
     endif ()
 endif ()
 
+if (RAZ_PLATFORM_LINUX)
+    set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} pthread)
+endif ()
+
 if (RAZ_USE_EMSCRIPTEN)
     target_compile_options(RaZ PRIVATE "SHELL:-s USE_LIBPNG=1")
 
