@@ -9,8 +9,8 @@ TEST_CASE("Framebuffer buffers") {
   CHECK(framebuffer.isEmpty()); // Combining the above checks
 
   // The buffers need to have a size for the framebuffer to be complete
-  const auto depthBuffer = Raz::Texture::create(Raz::ImageColorspace::DEPTH);
-  const auto colorBuffer = Raz::Texture::create(Raz::ImageColorspace::RGB);
+  const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
+  const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
 
   framebuffer.addTextureBuffer(depthBuffer);
   REQUIRE(framebuffer.hasDepthBuffer());
@@ -23,16 +23,16 @@ TEST_CASE("Framebuffer buffers") {
   REQUIRE(framebuffer.getColorBufferCount() == 1);
   CHECK(framebuffer.getColorBuffer(0).getIndex() == colorBuffer->getIndex());
 
-  CHECK(depthBuffer->getImage().getWidth() == 0);
-  CHECK(depthBuffer->getImage().getHeight() == 0);
-  CHECK(colorBuffer->getImage().getWidth() == 0);
-  CHECK(colorBuffer->getImage().getHeight() == 0);
+  CHECK(depthBuffer->getWidth() == 0);
+  CHECK(depthBuffer->getHeight() == 0);
+  CHECK(colorBuffer->getWidth() == 0);
+  CHECK(colorBuffer->getHeight() == 0);
 
   framebuffer.resizeBuffers(1, 1);
-  CHECK(depthBuffer->getImage().getWidth() == 1); // Resizing the framebuffer resizes all contained buffers
-  CHECK(depthBuffer->getImage().getHeight() == 1);
-  CHECK(colorBuffer->getImage().getWidth() == 1);
-  CHECK(colorBuffer->getImage().getHeight() == 1);
+  CHECK(depthBuffer->getWidth() == 1); // Resizing the framebuffer resizes all contained buffers
+  CHECK(depthBuffer->getHeight() == 1);
+  CHECK(colorBuffer->getWidth() == 1);
+  CHECK(colorBuffer->getHeight() == 1);
 
   framebuffer.removeTextureBuffer(depthBuffer);
   CHECK_FALSE(framebuffer.hasDepthBuffer());
@@ -57,8 +57,8 @@ TEST_CASE("Framebuffer move") {
 
   const unsigned int framebufferIndex = framebuffer.getIndex();
 
-  const auto depthBuffer = Raz::Texture::create(Raz::ImageColorspace::DEPTH);
-  const auto colorBuffer = Raz::Texture::create(Raz::ImageColorspace::RGB);
+  const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
+  const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
 
   framebuffer.addTextureBuffer(depthBuffer);
   framebuffer.addTextureBuffer(colorBuffer);

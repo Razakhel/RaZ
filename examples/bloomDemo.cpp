@@ -111,8 +111,8 @@ int main() {
     Raz::RenderGraph& renderGraph = render.getRenderGraph();
     Raz::RenderPass& geometryPass = renderGraph.getGeometryPass();
 
-    const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::DEPTH);
-    const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::FLOAT);
+    const auto depthBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer = Raz::Texture::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {

@@ -96,76 +96,52 @@ inline const MeshRenderer& getDisplayCube() {
   return cube;
 }
 
-TextureFormat recoverFormat(const Image& image) {
-  TextureFormat colorFormat {};
-
-  switch (image.getColorspace()) {
+TextureFormat recoverFormat(ImageColorspace colorspace) {
+  switch (colorspace) {
     case ImageColorspace::GRAY:
-      colorFormat = TextureFormat::RED;
-      break;
+      return TextureFormat::RED;
 
     case ImageColorspace::GRAY_ALPHA:
-      colorFormat = TextureFormat::RG;
-      break;
+      return TextureFormat::RG;
 
     case ImageColorspace::RGB:
     case ImageColorspace::SRGB:
-    default:
-      colorFormat = TextureFormat::RGB;
-      break;
+      return TextureFormat::RGB;
 
     case ImageColorspace::RGBA:
     case ImageColorspace::SRGBA:
-      colorFormat = TextureFormat::RGBA;
-      break;
-
-    case ImageColorspace::DEPTH:
-      colorFormat = TextureFormat::DEPTH;
-      break;
+      return TextureFormat::RGBA;
   }
 
-  return colorFormat;
+  throw std::invalid_argument("Error: Invalid image colorspace");
 }
 
-TextureInternalFormat recoverInternalFormat(const Image& image) {
+TextureInternalFormat recoverInternalFormat(ImageColorspace colorspace, ImageDataType dataType) {
   // If the image is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
-  if (image.getDataType() == ImageDataType::BYTE && image.getColorspace() != ImageColorspace::SRGB && image.getColorspace() != ImageColorspace::SRGBA)
-    return static_cast<TextureInternalFormat>(recoverFormat(image));
+  if (dataType == ImageDataType::BYTE && colorspace != ImageColorspace::SRGB && colorspace != ImageColorspace::SRGBA)
+    return static_cast<TextureInternalFormat>(recoverFormat(colorspace));
 
-  TextureInternalFormat colorFormat {};
-
-  switch (image.getColorspace()) {
+  switch (colorspace) {
     case ImageColorspace::GRAY:
-      colorFormat = TextureInternalFormat::R16F;
-      break;
+      return TextureInternalFormat::R16F;
 
     case ImageColorspace::GRAY_ALPHA:
-      colorFormat = TextureInternalFormat::RG16F;
-      break;
+      return TextureInternalFormat::RG16F;
 
     case ImageColorspace::RGB:
-    default:
-      colorFormat = TextureInternalFormat::RGB16F;
-      break;
+      return TextureInternalFormat::RGB16F;
 
     case ImageColorspace::RGBA:
-      colorFormat = TextureInternalFormat::RGBA16F;
-      break;
+      return TextureInternalFormat::RGBA16F;
 
     case ImageColorspace::SRGB:
-      colorFormat = TextureInternalFormat::SRGB8;
-      break;
+      return TextureInternalFormat::SRGB8;
 
     case ImageColorspace::SRGBA:
-      colorFormat = TextureInternalFormat::SRGBA8;
-      break;
-
-    case ImageColorspace::DEPTH:
-      colorFormat = TextureInternalFormat::DEPTH32F;
-      break;
+      return TextureInternalFormat::SRGBA8;
   }
 
-  return colorFormat;
+  throw std::invalid_argument("Error: Invalid image colorspace");
 }
 
 } // namespace
@@ -189,11 +165,11 @@ void Cubemap::load(const Image& right, const Image& left, const Image& top, cons
   constexpr auto mapImage = [] (const Image& img, TextureType type) {
     Renderer::sendImageData2D(type,
                               0,
-                              recoverInternalFormat(img),
+                              recoverInternalFormat(img.getColorspace(), img.getDataType()),
                               img.getWidth(),
                               img.getHeight(),
-                              recoverFormat(img),
-                              (img.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::UBYTE),
+                              recoverFormat(img.getColorspace()),
+                              (img.getDataType() == ImageDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
                               img.getDataPtr());
   };
 

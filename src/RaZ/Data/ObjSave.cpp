@@ -1,9 +1,9 @@
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/ObjFormat.hpp"
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
-#include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
 #include <fstream>
@@ -30,6 +30,7 @@ inline void writeAttribute(std::ofstream& file, std::string_view tag, const Mate
   file << '\n';
 }
 
+#if !defined(USE_OPENGL_ES) // Texture::recoverImage() is unavailable with OpenGL ES
 inline void writeTexture(std::ofstream& file, std::string_view tag, const std::string& materialName, std::string_view suffix,
                          const Material& material, std::string_view uniformName) {
   if (!material.hasTexture(uniformName.data()))
@@ -37,14 +38,15 @@ inline void writeTexture(std::ofstream& file, std::string_view tag, const std::s
 
   const Texture& texture = material.getTexture(uniformName.data());
 
-  if (texture.getImage().isEmpty())
+  if (texture.getWidth() == 0 || texture.getHeight() == 0 || texture.getColorspace() == TextureColorspace::INVALID)
     return;
 
   const std::string texturePath = materialName + '_' + suffix + ".png";
 
   file << '\t' << tag << ' ' << texturePath << '\n';
-  ImageFormat::save(texturePath, texture.getImage(), true);
+  ImageFormat::save(texturePath, texture.recoverImage(), true);
 }
+#endif
 
 void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials) {
   std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
@@ -67,6 +69,7 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
     writeAttribute<float, 1>(mtlFile, "Pm", material, "uniMaterial.metallicFactor");
     writeAttribute<float, 1>(mtlFile, "Pr", material, "uniMaterial.roughnessFactor");
 
+#if !defined(USE_OPENGL_ES)
     writeTexture(mtlFile, "map_Kd",   materialName, "baseColor",    material, "uniMaterial.baseColorMap");
     writeTexture(mtlFile, "map_Ke",   materialName, "emissive",     material, "uniMaterial.emissiveMap");
     writeTexture(mtlFile, "map_Ka",   materialName, "ambient",      material, "uniMaterial.ambientMap");
@@ -76,6 +79,7 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
     writeTexture(mtlFile, "norm",     materialName, "normal",       material, "uniMaterial.normalMap");
     writeTexture(mtlFile, "map_Pm",   materialName, "metallic",     material, "uniMaterial.metallicMap");
     writeTexture(mtlFile, "map_Pr",   materialName, "roughness",    material, "uniMaterial.roughnessMap");
+#endif
   }
 }
 

@@ -30,10 +30,8 @@ bool ImageDataF::operator==(const ImageData& imgData) const {
 Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{ colorspace }, m_dataType{ dataType } {
   assert("Error: An sRGB[A] image must have a byte data type."
       && (m_colorspace != ImageColorspace::SRGB || m_colorspace != ImageColorspace::SRGBA || m_dataType == ImageDataType::BYTE));
-  assert("Error: A depth image must have a floating-point data type." && (m_colorspace != ImageColorspace::DEPTH || m_dataType == ImageDataType::FLOAT));
 
   switch (colorspace) {
-    case ImageColorspace::DEPTH:
     case ImageColorspace::GRAY:
       m_channelCount = 1;
       break;
@@ -57,16 +55,13 @@ Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{
   }
 }
 
-Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace)
-  : Image(width, height, colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
-
 Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType) : Image(colorspace, dataType) {
   m_width  = width;
   m_height = height;
 
   const std::size_t imageDataSize = m_width * m_height * m_channelCount;
 
-  if (m_dataType == ImageDataType::FLOAT || m_colorspace == ImageColorspace::DEPTH)
+  if (m_dataType == ImageDataType::FLOAT)
     m_data = ImageDataF::create(imageDataSize);
   else
     m_data = ImageDataB::create(imageDataSize);

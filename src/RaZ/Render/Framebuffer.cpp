@@ -83,7 +83,7 @@ VertexShader Framebuffer::recoverVertexShader() {
 }
 
 void Framebuffer::addTextureBuffer(TexturePtr texture) {
-  if (texture->getImage().getColorspace() == ImageColorspace::DEPTH) {
+  if (texture->getColorspace() == TextureColorspace::DEPTH) {
     assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
 
     m_depthBuffer = std::move(texture);

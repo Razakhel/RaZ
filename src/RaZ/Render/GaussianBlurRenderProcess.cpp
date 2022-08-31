@@ -108,9 +108,8 @@ void GaussianBlurRenderProcess::resizeBuffers(unsigned int width, unsigned int h
 }
 
 void GaussianBlurRenderProcess::setInputBuffer(TexturePtr inputBuffer) {
-  const Image& bufferImg = inputBuffer->getImage();
-  m_horizontalBuffer->setColorspace(bufferImg.getColorspace(), bufferImg.getDataType());
-  resizeBuffers(bufferImg.getWidth(), bufferImg.getHeight());
+  m_horizontalBuffer->setColorspace(inputBuffer->getColorspace(), inputBuffer->getDataType());
+  resizeBuffers(inputBuffer->getWidth(), inputBuffer->getHeight());
 
   m_horizontalPass->clearReadTextures();
   m_horizontalPass->addReadTexture(std::move(inputBuffer), "uniBuffer");

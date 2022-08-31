@@ -22,7 +22,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath =
 
   // Recovering the rendered frame into an image
   Raz::Image renderedImg(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
-  Raz::Renderer::recoverFrame(window.getWidth(), window.getHeight(), Raz::TextureFormat::RGB, Raz::TextureDataType::UBYTE, renderedImg.getDataPtr());
+  Raz::Renderer::recoverFrame(window.getWidth(), window.getHeight(), Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, renderedImg.getDataPtr());
 
   if (!renderedImgPath.isEmpty())
     Raz::ImageFormat::save(renderedImgPath, renderedImg, true);

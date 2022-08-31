@@ -131,13 +131,13 @@ void RenderSystem::updateMaterials() const {
   }
 }
 
-void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format, TextureDataType dataType) const {
+void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format, PixelDataType dataType) const {
   ImageColorspace colorspace = ImageColorspace::RGB;
 
   switch (format) {
     case TextureFormat::DEPTH:
-      colorspace = ImageColorspace::DEPTH;
-      dataType   = TextureDataType::FLOAT;
+      colorspace = ImageColorspace::GRAY;
+      dataType   = PixelDataType::FLOAT;
       break;
 
     case TextureFormat::RGBA:
@@ -149,7 +149,7 @@ void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format, T
       break;
   }
 
-  Image img(m_sceneWidth, m_sceneHeight, colorspace, (dataType == TextureDataType::FLOAT ? ImageDataType::FLOAT : ImageDataType::BYTE));
+  Image img(m_sceneWidth, m_sceneHeight, colorspace, (dataType == PixelDataType::FLOAT ? ImageDataType::FLOAT : ImageDataType::BYTE));
   Renderer::recoverFrame(m_sceneWidth, m_sceneHeight, format, dataType, img.getDataPtr());
 
   ImageFormat::save(filePath, img, true);

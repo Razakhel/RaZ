@@ -9,6 +9,7 @@
 
 #include <unordered_map>
 #include <variant>
+#include <vector>
 
 namespace Raz {
 

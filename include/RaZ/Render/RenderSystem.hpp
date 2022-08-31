@@ -78,7 +78,11 @@ public:
   void updateShaders() const;
   void updateMaterials(const MeshRenderer& meshRenderer) const;
   void updateMaterials() const;
-  void saveToImage(const FilePath& filePath, TextureFormat format = TextureFormat::RGB, TextureDataType dataType = TextureDataType::UBYTE) const;
+  /// Retrieves & saves the back buffer's data from the GPU.
+  /// \warning The pixel storage pack & unpack alignments should be set to 1 in order to recover actual pixels.
+  /// \see Renderer::setPixelStorage()
+  /// \warning Retrieving an image from the GPU is slow; use this function with caution.
+  void saveToImage(const FilePath& filePath, TextureFormat format = TextureFormat::RGB, PixelDataType dataType = PixelDataType::UBYTE) const;
   void removeCubemap() { m_cubemap.reset(); }
   void destroy() override;
 

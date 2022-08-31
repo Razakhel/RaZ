@@ -346,7 +346,7 @@ enum class TextureInternalFormat : unsigned int {
   R11F_G11F_B10F = 35898 /* GL_R11F_G11F_B10F */  ///<
 };
 
-enum class TextureDataType : unsigned int {
+enum class PixelDataType : unsigned int {
   UBYTE = 5121 /* GL_UNSIGNED_BYTE */, ///< Unsigned byte data type.
   FLOAT = 5126 /* GL_FLOAT         */  ///< Single precision floating-point data type.
 };
@@ -864,7 +864,7 @@ public:
   static void setPatchParameter(PatchParameter param, const float* values);
 #endif
   static void setPixelStorage(PixelStorage storage, unsigned int value);
-  static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data);
+  static void recoverFrame(unsigned int width, unsigned int height, TextureFormat format, PixelDataType dataType, void* data);
   static void generateVertexArrays(unsigned int count, unsigned int* indices);
   static void generateVertexArray(unsigned int& index) { generateVertexArrays(1, &index); }
   static void bindVertexArray(unsigned int index);
@@ -970,7 +970,7 @@ public:
                               TextureInternalFormat internalFormat,
                               unsigned int width, unsigned int height,
                               TextureFormat format,
-                              TextureDataType dataType, const void* data);
+                              PixelDataType dataType, const void* data);
 #if !defined(USE_OPENGL_ES)
   static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values);
   static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, float* values);
@@ -978,7 +978,7 @@ public:
   static int recoverTextureHeight(TextureType type, unsigned int mipmapLevel = 0);
   static int recoverTextureDepth(TextureType type, unsigned int mipmapLevel = 0);
   static TextureInternalFormat recoverTextureInternalFormat(TextureType type, unsigned int mipmapLevel = 0);
-  static void recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data);
+  static void recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, PixelDataType dataType, void* data);
 #endif
   /// Generate mipmaps (levels of detail) for the currently bound texture.
   /// \param type Type of the texture to generate mipmaps for.

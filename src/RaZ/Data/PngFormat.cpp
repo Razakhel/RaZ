@@ -141,7 +141,6 @@ void save(const FilePath& filePath, const Image& image, bool flipVertically) {
 
   switch (image.getColorspace()) {
     case ImageColorspace::GRAY:
-    case ImageColorspace::DEPTH:
       colorType = PNG_COLOR_TYPE_GRAY;
       break;
 

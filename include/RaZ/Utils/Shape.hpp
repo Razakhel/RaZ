@@ -10,6 +10,14 @@
 
 namespace Raz {
 
+class Line;
+class Plane;
+class Sphere;
+class Triangle;
+class Quad;
+class AABB;
+class OBB;
+
 enum class ShapeType {
   LINE,
   PLANE,
@@ -19,14 +27,6 @@ enum class ShapeType {
   AABB,
   OBB
 };
-
-class Line;
-class Plane;
-class Sphere;
-class Triangle;
-class Quad;
-class AABB;
-class OBB;
 
 class Shape {
 public:

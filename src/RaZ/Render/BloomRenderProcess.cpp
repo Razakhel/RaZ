@@ -134,7 +134,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
   m_thresholdPass = &renderGraph.addNode(FragmentShader::loadFromSource(thresholdSource), "Bloom thresholding");
   setThresholdValue(0.75f); // Tone mapping is applied before the bloom, thus no value above 1 exist here. This value will be changed later
 
-  const auto thresholdBuffer = Texture::create(frameWidth, frameHeight, ImageColorspace::RGB, ImageDataType::FLOAT);
+  const auto thresholdBuffer = Texture::create(frameWidth, frameHeight, TextureColorspace::RGB, TextureDataType::FLOAT);
   m_thresholdPass->addWriteTexture(thresholdBuffer);
 
 #if !defined(USE_OPENGL_ES)
@@ -178,7 +178,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
     const auto bufferWidth  = frameWidth / static_cast<unsigned int>(2 * (downscalePassIndex + 1));
     const auto bufferHeight = frameHeight / static_cast<unsigned int>(2 * (downscalePassIndex + 1));
 
-    const auto downscaledBuffer = Texture::create(bufferWidth, bufferHeight, ImageColorspace::RGB, ImageDataType::FLOAT);
+    const auto downscaledBuffer = Texture::create(bufferWidth, bufferHeight, TextureColorspace::RGB, TextureDataType::FLOAT);
     downscalePass.addWriteTexture(downscaledBuffer);
 
     const Vec2f invBufferSize(1.f / static_cast<float>(bufferWidth), 1.f / static_cast<float>(bufferHeight));
@@ -234,7 +234,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
     const auto bufferWidth  = frameWidth / static_cast<unsigned int>(2 * (correspDownscalePassIndex + 1));
     const auto bufferHeight = frameHeight / static_cast<unsigned int>(2 * (correspDownscalePassIndex + 1));
 
-    const auto upscaledBuffer = Texture::create(bufferWidth, bufferHeight, ImageColorspace::RGB, ImageDataType::FLOAT);
+    const auto upscaledBuffer = Texture::create(bufferWidth, bufferHeight, TextureColorspace::RGB, TextureDataType::FLOAT);
     upscalePass.addWriteTexture(upscaledBuffer);
 
     const Vec2f invBufferSize(1.f / static_cast<float>(bufferWidth), 1.f / static_cast<float>(bufferHeight));
@@ -338,8 +338,6 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
 }
 
 void BloomRenderProcess::setInputColorBuffer(TexturePtr colorBuffer) {
-  assert("Error: Bloom's input color buffer must have at least 3 channels." && colorBuffer->getImage().getChannelCount() >= 3);
-
   m_thresholdPass->addReadTexture(colorBuffer, "uniColorBuffer");
   m_finalPass->addReadTexture(std::move(colorBuffer), "uniOriginalColorBuffer");
 }

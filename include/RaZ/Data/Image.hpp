@@ -23,13 +23,12 @@ class Image;
 using ImagePtr = std::unique_ptr<Image>;
 
 enum class ImageColorspace {
-  GRAY,
+  GRAY = 0,
   GRAY_ALPHA,
   RGB,
   RGBA,
   SRGB,
-  SRGBA,
-  DEPTH
+  SRGBA
 };
 
 enum class ImageDataType {
@@ -126,14 +125,10 @@ struct ImageDataF final : public ImageData {
 
 /// Image class, handling images of different formats.
 class Image {
-  friend class Texture;
-
 public:
   Image() = default;
-  explicit Image(ImageColorspace colorspace) : Image(colorspace, (colorspace == ImageColorspace::DEPTH ? ImageDataType::FLOAT : ImageDataType::BYTE)) {}
-  Image(ImageColorspace colorspace, ImageDataType dataType);
-  Image(unsigned int width, unsigned int height, ImageColorspace colorspace);
-  Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType);
+  explicit Image(ImageColorspace colorspace, ImageDataType dataType = ImageDataType::BYTE);
+  Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType = ImageDataType::BYTE);
   Image(const Image& image);
   Image(Image&&) noexcept = default;
 

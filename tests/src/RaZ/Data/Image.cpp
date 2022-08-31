@@ -21,14 +21,6 @@ TEST_CASE("Image colorspace/data type creation") {
   CHECK(imgFloat.getDataType() == Raz::ImageDataType::FLOAT);
   CHECK(imgFloat.getChannelCount() == 2);
   CHECK(imgFloat.isEmpty());
-
-  const Raz::Image imgDepth(Raz::ImageColorspace::DEPTH);
-  CHECK(imgDepth.getWidth() == 0);
-  CHECK(imgDepth.getHeight() == 0);
-  CHECK(imgDepth.getColorspace() == Raz::ImageColorspace::DEPTH);
-  CHECK(imgDepth.getDataType() == Raz::ImageDataType::FLOAT); // A depth image is always floating-point
-  CHECK(imgDepth.getChannelCount() == 1);
-  CHECK(imgDepth.isEmpty());
 }
 
 TEST_CASE("Image dimensions creation") {
@@ -40,11 +32,11 @@ TEST_CASE("Image dimensions creation") {
   CHECK(imgEmpty.getChannelCount() == 4);
   CHECK(imgEmpty.isEmpty());
 
-  const Raz::Image imgSmall(1, 1, Raz::ImageColorspace::DEPTH);
+  const Raz::Image imgSmall(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
   CHECK(imgSmall.getWidth() == 1);
   CHECK(imgSmall.getHeight() == 1);
-  CHECK(imgSmall.getColorspace() == Raz::ImageColorspace::DEPTH);
-  CHECK(imgSmall.getDataType() == Raz::ImageDataType::FLOAT); // A depth image is always floating-point
+  CHECK(imgSmall.getColorspace() == Raz::ImageColorspace::GRAY);
+  CHECK(imgSmall.getDataType() == Raz::ImageDataType::FLOAT);
   CHECK(imgSmall.getChannelCount() == 1);
   CHECK_FALSE(imgSmall.isEmpty());
 }

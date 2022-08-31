@@ -17,7 +17,7 @@ BoxBlurRenderProcess::BoxBlurRenderProcess(RenderGraph& renderGraph)
   : MonoPassRenderProcess(renderGraph, FragmentShader::loadFromSource(boxBlurSource), "Box blur") { setStrength(1); }
 
 void BoxBlurRenderProcess::setInputBuffer(TexturePtr colorBuffer) {
-  const Vec2f invBufferSize(1.f / static_cast<float>(colorBuffer->getImage().getWidth()), 1.f / static_cast<float>(colorBuffer->getImage().getHeight()));
+  const Vec2f invBufferSize(1.f / static_cast<float>(colorBuffer->getWidth()), 1.f / static_cast<float>(colorBuffer->getHeight()));
 
   m_pass.getProgram().use();
   m_pass.getProgram().sendUniform("uniInvBufferSize", invBufferSize);

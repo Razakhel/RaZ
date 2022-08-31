@@ -64,7 +64,7 @@ TEST_CASE("Cubemap textures") {
 
   textureData.resize(4); // 4 black & white pixels
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_POS_X, 0, Raz::TextureFormat::RED, Raz::TextureDataType::UBYTE, textureData.data());
+  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_POS_X, 0, Raz::TextureFormat::RED, Raz::PixelDataType::UBYTE, textureData.data());
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(std::equal(textureData.cbegin(), textureData.cend(), static_cast<const uint8_t*>(refImgPosX.getDataPtr())));
@@ -75,7 +75,7 @@ TEST_CASE("Cubemap textures") {
   CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::CUBEMAP_NEG_X) == Raz::TextureInternalFormat::RED);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_NEG_X, 0, Raz::TextureFormat::RED, Raz::TextureDataType::UBYTE, textureData.data());
+  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_NEG_X, 0, Raz::TextureFormat::RED, Raz::PixelDataType::UBYTE, textureData.data());
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(std::equal(textureData.cbegin(), textureData.cend(), static_cast<const uint8_t*>(refImgNegX.getDataPtr())));
@@ -86,7 +86,7 @@ TEST_CASE("Cubemap textures") {
   CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::CUBEMAP_POS_Y) == Raz::TextureInternalFormat::RED);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_POS_Y, 0, Raz::TextureFormat::RED, Raz::TextureDataType::UBYTE, textureData.data());
+  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_POS_Y, 0, Raz::TextureFormat::RED, Raz::PixelDataType::UBYTE, textureData.data());
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(std::equal(textureData.cbegin(), textureData.cend(), static_cast<const uint8_t*>(refImgPosY.getDataPtr())));
@@ -99,7 +99,7 @@ TEST_CASE("Cubemap textures") {
 
   textureData.resize(12); // 4 RGB pixels
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_NEG_Y, 0, Raz::TextureFormat::RGB, Raz::TextureDataType::UBYTE, textureData.data());
+  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_NEG_Y, 0, Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, textureData.data());
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(std::equal(textureData.cbegin(), textureData.cend(), static_cast<const uint8_t*>(refImgNegY.getDataPtr())));
@@ -110,7 +110,7 @@ TEST_CASE("Cubemap textures") {
   CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::CUBEMAP_POS_Z) == Raz::TextureInternalFormat::RGB);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_POS_Z, 0, Raz::TextureFormat::RGB, Raz::TextureDataType::UBYTE, textureData.data());
+  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_POS_Z, 0, Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, textureData.data());
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(std::equal(textureData.cbegin(), textureData.cend(), static_cast<const uint8_t*>(refImgPosZ.getDataPtr())));
@@ -123,7 +123,7 @@ TEST_CASE("Cubemap textures") {
 
   textureData.resize(16); // 4 RGBA pixels
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_NEG_Z, 0, Raz::TextureFormat::RGBA, Raz::TextureDataType::UBYTE, textureData.data());
+  Raz::Renderer::recoverTextureData(Raz::TextureType::CUBEMAP_NEG_Z, 0, Raz::TextureFormat::RGBA, Raz::PixelDataType::UBYTE, textureData.data());
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(std::equal(textureData.cbegin(), textureData.cend(), static_cast<const uint8_t*>(refImgNegZ.getDataPtr())));

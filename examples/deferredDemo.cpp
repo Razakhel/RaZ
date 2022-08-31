@@ -119,9 +119,9 @@ int main() {
     Raz::RenderGraph& renderGraph = render.getRenderGraph();
 
     // Creating the render graph's texture buffers
-    const auto depthBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::DEPTH);
-    const auto colorBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
-    const auto normalBuffer = Raz::Texture::create(sceneWidth, sceneHeight, Raz::ImageColorspace::RGBA);
+    const auto depthBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer  = Raz::Texture::create(sceneWidth, sceneHeight, Raz::TextureColorspace::RGBA);
+    const auto normalBuffer = Raz::Texture::create(sceneWidth, sceneHeight, Raz::TextureColorspace::RGBA);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {

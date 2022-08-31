@@ -1,4 +1,5 @@
 #include "RaZ/Data/FbxFormat.hpp"
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"

@@ -1,7 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Data/Color.hpp"
-#include "RaZ/Data/ImageFormat.hpp"
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/FilePath.hpp"
@@ -9,41 +9,37 @@
 TEST_CASE("Texture creation") {
   Raz::Texture textureEmpty; // A texture can be created without dimensions and colorspace/data type
   CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
-  CHECK(textureEmpty.getImage().getWidth() == 0);
-  CHECK(textureEmpty.getImage().getHeight() == 0);
-  CHECK(textureEmpty.getImage().getColorspace() == Raz::ImageColorspace::GRAY); // TODO: there should be an invalid colorspace, not a default one
-  CHECK(textureEmpty.getImage().getDataType() == Raz::ImageDataType::BYTE);
-  CHECK(textureEmpty.getImage().getChannelCount() == 0);
-  CHECK(textureEmpty.getImage().isEmpty());
+  CHECK(textureEmpty.getWidth() == 0);
+  CHECK(textureEmpty.getHeight() == 0);
+  CHECK(textureEmpty.getColorspace() == Raz::TextureColorspace::INVALID);
+  CHECK(textureEmpty.getDataType() == Raz::TextureDataType::BYTE);
 
-  textureEmpty.setParameters(1, 1, Raz::ImageColorspace::RGBA);
+  textureEmpty.setParameters(1, 1, Raz::TextureColorspace::RGBA);
   CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
-  CHECK(textureEmpty.getImage().getWidth() == 1); // Resizing a texture sets the dimensions to the image
-  CHECK(textureEmpty.getImage().getHeight() == 1);
-  CHECK(textureEmpty.getImage().getColorspace() == Raz::ImageColorspace::RGBA);
-  CHECK(textureEmpty.getImage().getDataType() == Raz::ImageDataType::BYTE);
-  CHECK(textureEmpty.getImage().getChannelCount() == 4);
-  CHECK(textureEmpty.getImage().isEmpty()); // Resizing a texture does not modify the contained image
+  CHECK(textureEmpty.getWidth() == 1);
+  CHECK(textureEmpty.getHeight() == 1);
+  CHECK(textureEmpty.getColorspace() == Raz::TextureColorspace::RGBA);
+  CHECK(textureEmpty.getDataType() == Raz::TextureDataType::BYTE);
 
-  const Raz::Texture textureSmall(1, 1, Raz::ImageColorspace::DEPTH);
+  const Raz::Texture textureSmall(1, 1, Raz::TextureColorspace::DEPTH);
   CHECK(textureSmall.getIndex() != std::numeric_limits<unsigned int>::max());
-  CHECK(textureSmall.getImage().getWidth() == 1);
-  CHECK(textureSmall.getImage().getHeight() == 1);
-  CHECK(textureSmall.getImage().getColorspace() == Raz::ImageColorspace::DEPTH);
-  CHECK(textureSmall.getImage().getDataType() == Raz::ImageDataType::FLOAT); // A depth texture is always floating-point
-  CHECK(textureSmall.getImage().getChannelCount() == 1);
-  CHECK(textureSmall.getImage().isEmpty());
+  CHECK(textureSmall.getWidth() == 1);
+  CHECK(textureSmall.getHeight() == 1);
+  CHECK(textureSmall.getColorspace() == Raz::TextureColorspace::DEPTH);
+  CHECK(textureSmall.getDataType() == Raz::TextureDataType::FLOAT); // A depth texture is always floating-point
 }
 
 TEST_CASE("Texture move") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::Image refImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png");
-
-  Raz::Texture texture(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔĜBŖĀ.png"), false);
+  Raz::Texture texture(3, 3, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  const unsigned int textureIndex = texture.getIndex();
+  const unsigned int textureIndex         = texture.getIndex();
+  const unsigned int textureWidth         = texture.getWidth();
+  const unsigned int textureHeight        = texture.getHeight();
+  const Raz::TextureColorspace colorspace = texture.getColorspace();
+  const Raz::TextureDataType dataType     = texture.getDataType();
 
   // Move ctor
 
@@ -51,12 +47,13 @@ TEST_CASE("Texture move") {
 
   // The new texture has the same values as the original one
   CHECK(movedTextureCtor.getIndex() == textureIndex);
-  CHECK_FALSE(movedTextureCtor.getImage().isEmpty());
-  CHECK(movedTextureCtor.getImage() == refImg);
+  CHECK(movedTextureCtor.getWidth() == textureWidth);
+  CHECK(movedTextureCtor.getHeight() == textureHeight);
+  CHECK(movedTextureCtor.getColorspace() == colorspace);
+  CHECK(movedTextureCtor.getDataType() == dataType);
 
   // The moved texture is now invalid
   CHECK(texture.getIndex() == std::numeric_limits<unsigned int>::max());
-  CHECK(texture.getImage().isEmpty());
 
   // Move assignment operator
 
@@ -69,13 +66,14 @@ TEST_CASE("Texture move") {
 
   // The new texture has the same values as the previous one
   CHECK(movedTextureOp.getIndex() == textureIndex);
-  CHECK_FALSE(movedTextureOp.getImage().isEmpty());
-  CHECK(movedTextureOp.getImage() == refImg);
+  CHECK(movedTextureOp.getWidth() == textureWidth);
+  CHECK(movedTextureOp.getHeight() == textureHeight);
+  CHECK(movedTextureOp.getColorspace() == colorspace);
+  CHECK(movedTextureOp.getDataType() == dataType);
 
   // After being moved, the values are swapped: the moved-from texture now has the previous moved-to's values
   // The moved-from image is however always directly moved, thus invalidated
   CHECK(movedTextureCtor.getIndex() == movedTextureOpIndex);
-  CHECK(movedTextureCtor.getImage().isEmpty());
 }
 
 TEST_CASE("Texture presets") {
@@ -84,9 +82,10 @@ TEST_CASE("Texture presets") {
   const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::White);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  CHECK(whiteTexture->getImage().getWidth() == 1); // The width & height are set to 1
-  CHECK(whiteTexture->getImage().getHeight() == 1);
-  CHECK(whiteTexture->getImage().isEmpty()); // However, the image's data is untouched; no allocation is made
+  CHECK(whiteTexture->getWidth() == 1);
+  CHECK(whiteTexture->getHeight() == 1);
+  CHECK(whiteTexture->getColorspace() == Raz::TextureColorspace::RGB);
+  CHECK(whiteTexture->getDataType() == Raz::TextureDataType::BYTE);
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES
   std::array<uint8_t, 3> textureData {}; // Recovering the texture's data (1 RGB pixel -> 3 values)
@@ -98,7 +97,7 @@ TEST_CASE("Texture presets") {
   CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_2D) == Raz::TextureInternalFormat::RGB);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_2D, 0, Raz::TextureFormat::RGB, Raz::TextureDataType::UBYTE, textureData.data());
+  Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_2D, 0, Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, textureData.data());
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   whiteTexture->unbind();

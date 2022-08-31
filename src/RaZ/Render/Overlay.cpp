@@ -103,7 +103,7 @@ void OverlayTextbox::clear() {
 }
 
 OverlayTexture::OverlayTexture(const Texture& texture)
-  : OverlayTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight()) {}
+  : OverlayTexture(texture, texture.getWidth(), texture.getHeight()) {}
 
 void OverlayTexture::setTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept {
   m_index  = texture.getIndex();
@@ -112,7 +112,7 @@ void OverlayTexture::setTexture(const Texture& texture, unsigned int maxWidth, u
 }
 
 void OverlayTexture::setTexture(const Texture& texture) noexcept {
-  setTexture(texture, texture.getImage().getWidth(), texture.getImage().getHeight());
+  setTexture(texture, texture.getWidth(), texture.getHeight());
 }
 
 OverlayWindow::OverlayWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) noexcept

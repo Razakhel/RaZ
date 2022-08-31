@@ -339,7 +339,7 @@ void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
 #endif
 }
 
-void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureFormat format, TextureDataType dataType, void* data) {
+void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureFormat format, PixelDataType dataType, void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glReadPixels(0, 0, static_cast<int>(width), static_cast<int>(height), static_cast<unsigned int>(format), static_cast<unsigned int>(dataType), data);
@@ -575,7 +575,7 @@ void Renderer::sendImageData2D(TextureType type,
                                TextureInternalFormat internalFormat,
                                unsigned int width, unsigned int height,
                                TextureFormat format,
-                               TextureDataType dataType, const void* data) {
+                               PixelDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glTexImage2D(static_cast<unsigned int>(type),
@@ -636,7 +636,7 @@ TextureInternalFormat Renderer::recoverTextureInternalFormat(TextureType type, u
   return static_cast<TextureInternalFormat>(format);
 }
 
-void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, TextureDataType dataType, void* data) {
+void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, PixelDataType dataType, void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glGetTexImage(static_cast<unsigned int>(type),
