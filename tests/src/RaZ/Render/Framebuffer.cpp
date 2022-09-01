@@ -12,12 +12,16 @@ TEST_CASE("Framebuffer buffers") {
   const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
   const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
 
-  framebuffer.addTextureBuffer(depthBuffer);
+  // Setting a color buffer as depth or adding a depth buffer as color throws an exception
+  CHECK_THROWS(framebuffer.setDepthBuffer(colorBuffer));
+  CHECK_THROWS(framebuffer.addColorBuffer(depthBuffer, 0));
+
+  framebuffer.setDepthBuffer(depthBuffer);
   REQUIRE(framebuffer.hasDepthBuffer());
   CHECK(framebuffer.getDepthBuffer().getIndex() == depthBuffer->getIndex());
   CHECK(framebuffer.getColorBufferCount() == 0);
 
-  framebuffer.addTextureBuffer(colorBuffer);
+  framebuffer.addColorBuffer(colorBuffer, 0);
   REQUIRE(framebuffer.hasDepthBuffer());
   CHECK(framebuffer.getDepthBuffer().getIndex() == depthBuffer->getIndex());
   REQUIRE(framebuffer.getColorBufferCount() == 1);
@@ -43,8 +47,8 @@ TEST_CASE("Framebuffer buffers") {
   CHECK(framebuffer.isEmpty());
 
   // Re-adding both buffers to check clear operations
-  framebuffer.addTextureBuffer(depthBuffer);
-  framebuffer.addTextureBuffer(colorBuffer);
+  framebuffer.setDepthBuffer(depthBuffer);
+  framebuffer.addColorBuffer(colorBuffer, 0);
   CHECK(framebuffer.hasDepthBuffer());
   CHECK(framebuffer.getColorBufferCount() == 1);
 
@@ -60,8 +64,8 @@ TEST_CASE("Framebuffer move") {
   const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
   const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
 
-  framebuffer.addTextureBuffer(depthBuffer);
-  framebuffer.addTextureBuffer(colorBuffer);
+  framebuffer.setDepthBuffer(depthBuffer);
+  framebuffer.addColorBuffer(colorBuffer, 0);
 
   // Move ctor
 

@@ -121,8 +121,8 @@ int main() {
     }
 #endif
 
-    geometryPass.addWriteTexture(depthBuffer);
-    geometryPass.addWriteTexture(colorBuffer);
+    geometryPass.setWriteDepthTexture(depthBuffer);
+    geometryPass.addWriteColorTexture(colorBuffer, 0);
 
     // Bloom
 

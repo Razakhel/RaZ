@@ -28,15 +28,19 @@ public:
   bool hasDepthBuffer() const noexcept { return (m_depthBuffer != nullptr); }
   const Texture& getDepthBuffer() const noexcept { assert("Error: Framebuffer doesn't contain a depth buffer." && hasDepthBuffer()); return *m_depthBuffer; }
   std::size_t getColorBufferCount() const noexcept { return m_colorBuffers.size(); }
-  const Texture& getColorBuffer(std::size_t bufferIndex) const noexcept { return *m_colorBuffers[bufferIndex]; }
+  const Texture& getColorBuffer(std::size_t bufferIndex) const noexcept { return *m_colorBuffers[bufferIndex].first; }
 
   /// Gives a basic vertex shader, to display the framebuffer.
   /// \return Basic display vertex shader.
   static VertexShader recoverVertexShader();
 
-  /// Adds a write buffer texture.
-  /// \param texture Buffer texture to be added.
-  void addTextureBuffer(TexturePtr texture);
+  /// Sets the write depth buffer texture.
+  /// \param texture Depth buffer texture to be set; must have a depth colorspace.
+  void setDepthBuffer(TexturePtr texture);
+  /// Adds a write color buffer texture.
+  /// \param texture Color buffer texture to be added; must have a non-depth colorspace.
+  /// \param index Buffer's index (location of the shader's output value).
+  void addColorBuffer(TexturePtr texture, unsigned int index);
   /// Removes a write buffer texture.
   /// \param texture Buffer texture to be removed.
   void removeTextureBuffer(const TexturePtr& texture);
@@ -67,7 +71,7 @@ public:
 private:
   unsigned int m_index {};
   TexturePtr m_depthBuffer {};
-  std::vector<TexturePtr> m_colorBuffers {};
+  std::vector<std::pair<TexturePtr, unsigned int>> m_colorBuffers {};
 };
 
 } // namespace Raz

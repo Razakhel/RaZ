@@ -38,7 +38,13 @@ public:
   void addReadTexture(TexturePtr texture, const std::string& uniformName);
   void removeReadTexture(const TexturePtr& texture);
   void clearReadTextures() { m_readTextures.clear(); }
-  void addWriteTexture(TexturePtr texture) { m_writeFramebuffer.addTextureBuffer(std::move(texture)); }
+  /// Sets the write depth buffer texture.
+  /// \param texture Depth buffer texture to be set; must have a depth colorspace.
+  void setWriteDepthTexture(TexturePtr texture) { m_writeFramebuffer.setDepthBuffer(std::move(texture)); }
+  /// Adds a write color buffer texture.
+  /// \param texture Color buffer texture to be added.
+  /// \param index Buffer's index (location of the shader's output value).
+  void addWriteColorTexture(TexturePtr texture, unsigned int index) { m_writeFramebuffer.addColorBuffer(std::move(texture), index); }
   void removeWriteTexture(const TexturePtr& texture) { m_writeFramebuffer.removeTextureBuffer(texture); }
   void clearWriteTextures() { m_writeFramebuffer.clearTextureBuffers(); }
   /// Resizes the render pass' write buffer textures.

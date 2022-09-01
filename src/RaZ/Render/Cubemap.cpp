@@ -52,14 +52,14 @@ inline const MeshRenderer& getDisplayCube() {
     Submesh& submesh = mesh.addSubmesh();
 
     submesh.getVertices() = {
-      Vertex{ Raz::Vec3f( 1.f,  1.f, -1.f) }, // Right top back
-      Vertex{ Raz::Vec3f( 1.f,  1.f,  1.f) }, // Right top front
-      Vertex{ Raz::Vec3f( 1.f, -1.f, -1.f) }, // Right bottom back
-      Vertex{ Raz::Vec3f( 1.f, -1.f,  1.f) }, // Right bottom front
-      Vertex{ Raz::Vec3f(-1.f,  1.f, -1.f) }, // Left top back
-      Vertex{ Raz::Vec3f(-1.f,  1.f,  1.f) }, // Left top front
-      Vertex{ Raz::Vec3f(-1.f, -1.f, -1.f) }, // Left bottom back
-      Vertex{ Raz::Vec3f(-1.f, -1.f,  1.f) }  // Left bottom front
+      Vertex{ Vec3f( 1.f,  1.f, -1.f) }, // Right top back
+      Vertex{ Vec3f( 1.f,  1.f,  1.f) }, // Right top front
+      Vertex{ Vec3f( 1.f, -1.f, -1.f) }, // Right bottom back
+      Vertex{ Vec3f( 1.f, -1.f,  1.f) }, // Right bottom front
+      Vertex{ Vec3f(-1.f,  1.f, -1.f) }, // Left top back
+      Vertex{ Vec3f(-1.f,  1.f,  1.f) }, // Left top front
+      Vertex{ Vec3f(-1.f, -1.f, -1.f) }, // Left bottom back
+      Vertex{ Vec3f(-1.f, -1.f,  1.f) }  // Left bottom front
     };
 
     // Organizing the triangles to be in a clockwise order, since we will always be inside the cube

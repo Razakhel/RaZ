@@ -22,10 +22,10 @@ public:
   void addParent(RenderProcess& parentProcess) override;
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
-  void setOutputBuffer(TexturePtr outputBuffer) override;
 
 protected:
   void setInputBuffer(TexturePtr inputBuffer, const std::string& uniformName);
+  void setOutputBuffer(TexturePtr outputBuffer, unsigned int index);
 
   RenderPass& m_pass;
 };

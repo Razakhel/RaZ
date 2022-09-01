@@ -86,15 +86,6 @@ void GaussianBlurRenderProcess::addChild(RenderProcess& childProcess) {
   childProcess.addParent(*m_verticalPass);
 }
 
-void GaussianBlurRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
-  m_verticalPass->addWriteTexture(std::move(outputBuffer));
-
-#if !defined(USE_OPENGL_ES)
-  if (Renderer::checkVersion(4, 3))
-    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_verticalPass->getFramebuffer().getIndex(), "Gaussian blur (vertical) framebuffer");
-#endif
-}
-
 void GaussianBlurRenderProcess::resizeBuffers(unsigned int width, unsigned int height) {
   m_horizontalBuffer->resize(width, height);
 
@@ -115,7 +106,7 @@ void GaussianBlurRenderProcess::setInputBuffer(TexturePtr inputBuffer) {
   m_horizontalPass->addReadTexture(std::move(inputBuffer), "uniBuffer");
 
   m_horizontalPass->clearWriteTextures();
-  m_horizontalPass->addWriteTexture(m_horizontalBuffer);
+  m_horizontalPass->addWriteColorTexture(m_horizontalBuffer, 0);
 
 #if !defined(USE_OPENGL_ES)
   if (Renderer::checkVersion(4, 3)) {
@@ -127,6 +118,15 @@ void GaussianBlurRenderProcess::setInputBuffer(TexturePtr inputBuffer) {
   // Validating the render graph
   if (!m_renderGraph.isValid())
     throw std::runtime_error("Error: The gaussian blur process is invalid");
+}
+
+void GaussianBlurRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
+  m_verticalPass->addWriteColorTexture(std::move(outputBuffer), 0);
+
+#if !defined(USE_OPENGL_ES)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_verticalPass->getFramebuffer().getIndex(), "Gaussian blur (vertical) framebuffer");
+#endif
 }
 
 } // namespace Raz

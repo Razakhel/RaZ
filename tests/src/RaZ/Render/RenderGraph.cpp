@@ -12,7 +12,7 @@ TEST_CASE("RenderGraph validity") {
   Raz::RenderPass& firstPass = graph.addNode();
   CHECK(graph.isValid()); // An empty pass is always valid
 
-  firstPass.addWriteTexture(depthTexture);
+  firstPass.setWriteDepthTexture(depthTexture);
   CHECK(graph.isValid()); // A pass does not need matching buffers with its children
 
   Raz::RenderPass& secondPass = graph.addNode();

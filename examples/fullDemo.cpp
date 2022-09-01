@@ -52,8 +52,8 @@ int main() {
     }
 #endif
 
-    geometryPass.addWriteTexture(depthBuffer); // A depth buffer is always needed
-    geometryPass.addWriteTexture(colorBuffer);
+    geometryPass.setWriteDepthTexture(depthBuffer); // A depth buffer is always needed
+    geometryPass.addWriteColorTexture(colorBuffer, 0);
 
     // Blur
 

@@ -133,9 +133,9 @@ int main() {
 
     // Setting the geometry pass' write buffers
     Raz::RenderPass& geomPass = renderGraph.getGeometryPass();
-    geomPass.addWriteTexture(depthBuffer);
-    geomPass.addWriteTexture(colorBuffer);
-    geomPass.addWriteTexture(normalBuffer);
+    geomPass.setWriteDepthTexture(depthBuffer);
+    geomPass.addWriteColorTexture(colorBuffer, 0);
+    geomPass.addWriteColorTexture(normalBuffer, 1);
 
     // Adding the second pass & defining its read buffers
     Raz::RenderPass& splitPass = renderGraph.addNode(Raz::FragmentShader::loadFromSource(displayFragSource));

@@ -10,7 +10,7 @@ TEST_CASE("RenderPass validity") {
   const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
   const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
 
-  initialPass.addWriteTexture(depthBuffer);
+  initialPass.setWriteDepthTexture(depthBuffer);
   CHECK(initialPass.isValid()); // Direct buffer dependency is not checked; even though no child exists, it is not required to have matching buffers
 
   Raz::RenderPass nextPass;
@@ -27,7 +27,7 @@ TEST_CASE("RenderPass validity") {
   CHECK_FALSE(initialPass.isValid()); // The depth buffer is defined as both read & write in the first pass
   CHECK(nextPass.isValid());
 
-  nextPass.addWriteTexture(colorBuffer);
+  nextPass.addWriteColorTexture(colorBuffer, 0);
   CHECK_FALSE(initialPass.isValid());
   CHECK_FALSE(nextPass.isValid()); // The color buffer is defined as both read & write in the second pass
 
@@ -49,7 +49,7 @@ TEST_CASE("RenderPass textures") {
   const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
   const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
 
-  initialPass.addWriteTexture(depthBuffer);
+  initialPass.setWriteDepthTexture(depthBuffer);
   CHECK(initialPass.getReadTextureCount() == 0);
   REQUIRE(initialPass.getFramebuffer().hasDepthBuffer());
   CHECK(initialPass.getFramebuffer().getDepthBuffer().getIndex() == depthBuffer->getIndex());
@@ -67,7 +67,7 @@ TEST_CASE("RenderPass textures") {
   CHECK(initialPass.getFramebuffer().getColorBufferCount() == 0); // Setting a pass dependency does not add any buffer automatically
   CHECK(nextPass.getReadTextureCount() == 1);
 
-  initialPass.addWriteTexture(colorBuffer);
+  initialPass.addWriteColorTexture(colorBuffer, 0);
   REQUIRE(initialPass.getFramebuffer().getColorBufferCount() == 1);
   REQUIRE(nextPass.getReadTextureCount() == 1);
   CHECK(initialPass.getFramebuffer().getColorBuffer(0).getIndex() == nextPass.getReadTexture(0).getIndex()); // The color buffer is the same in both passes

@@ -135,7 +135,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
   setThresholdValue(0.75f); // Tone mapping is applied before the bloom, thus no value above 1 exist here. This value will be changed later
 
   const auto thresholdBuffer = Texture::create(frameWidth, frameHeight, TextureColorspace::RGB, TextureDataType::FLOAT);
-  m_thresholdPass->addWriteTexture(thresholdBuffer);
+  m_thresholdPass->addWriteColorTexture(thresholdBuffer, 0);
 
 #if !defined(USE_OPENGL_ES)
   if (Renderer::checkVersion(4, 3)) {
@@ -179,7 +179,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
     const auto bufferHeight = frameHeight / static_cast<unsigned int>(2 * (downscalePassIndex + 1));
 
     const auto downscaledBuffer = Texture::create(bufferWidth, bufferHeight, TextureColorspace::RGB, TextureDataType::FLOAT);
-    downscalePass.addWriteTexture(downscaledBuffer);
+    downscalePass.addWriteColorTexture(downscaledBuffer, 0);
 
     const Vec2f invBufferSize(1.f / static_cast<float>(bufferWidth), 1.f / static_cast<float>(bufferHeight));
     downscalePass.getProgram().sendUniform("uniInvBufferSize", invBufferSize);
@@ -235,7 +235,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
     const auto bufferHeight = frameHeight / static_cast<unsigned int>(2 * (correspDownscalePassIndex + 1));
 
     const auto upscaledBuffer = Texture::create(bufferWidth, bufferHeight, TextureColorspace::RGB, TextureDataType::FLOAT);
-    upscalePass.addWriteTexture(upscaledBuffer);
+    upscalePass.addWriteColorTexture(upscaledBuffer, 0);
 
     const Vec2f invBufferSize(1.f / static_cast<float>(bufferWidth), 1.f / static_cast<float>(bufferHeight));
     upscalePass.getProgram().sendUniform("uniInvBufferSize", invBufferSize);
@@ -315,15 +315,6 @@ void BloomRenderProcess::addChild(RenderProcess& childProcess) {
   childProcess.addParent(*m_finalPass);
 }
 
-void BloomRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
-  m_finalPass->addWriteTexture(std::move(outputBuffer));
-
-#if !defined(USE_OPENGL_ES)
-  if (Renderer::checkVersion(4, 3))
-    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_finalPass->getFramebuffer().getIndex(), "Bloom final pass framebuffer");
-#endif
-}
-
 void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) {
   for (std::size_t i = 0; i < m_downscaleBuffers.size(); ++i) {
     const auto sizeFactor = static_cast<unsigned int>(2 * (i + 1));
@@ -340,6 +331,15 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
 void BloomRenderProcess::setInputColorBuffer(TexturePtr colorBuffer) {
   m_thresholdPass->addReadTexture(colorBuffer, "uniColorBuffer");
   m_finalPass->addReadTexture(std::move(colorBuffer), "uniOriginalColorBuffer");
+}
+
+void BloomRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
+  m_finalPass->addWriteColorTexture(std::move(outputBuffer), 0);
+
+#if !defined(USE_OPENGL_ES)
+  if (Renderer::checkVersion(4, 3))
+    Renderer::setLabel(RenderObjectType::FRAMEBUFFER, m_finalPass->getFramebuffer().getIndex(), "Bloom final pass framebuffer");
+#endif
 }
 
 void BloomRenderProcess::setThresholdValue(float threshold) {

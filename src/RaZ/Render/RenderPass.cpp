@@ -8,7 +8,7 @@ bool RenderPass::isValid() const {
   // Since a pass can get read & write buffers from other sources than the previous pass, one may have more or less
   //  buffers than its parent write to. Direct buffer compatibility is thus not checked
 
-  const std::vector<TexturePtr>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
+  const std::vector<std::pair<TexturePtr, unsigned int>>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
 
   for (const TexturePtr& readTexture : m_readTextures) {
     // If the same depth buffer exists both in read & write, the pass is invalid
@@ -17,8 +17,12 @@ bool RenderPass::isValid() const {
         return false;
     }
 
+    const auto bufferIt = std::find_if(writeColorBuffers.cbegin(), writeColorBuffers.cend(), [&readTexture] (const auto& buffer) {
+      return (readTexture == buffer.first);
+    });
+
     // Likewise for the color buffers: if any has been added as both read & write, the pass is invalid
-    if (std::find(writeColorBuffers.cbegin(), writeColorBuffers.cend(), readTexture) != writeColorBuffers.cend())
+    if (bufferIt != writeColorBuffers.cend())
       return false;
   }
 

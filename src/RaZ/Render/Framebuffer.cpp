@@ -82,16 +82,26 @@ VertexShader Framebuffer::recoverVertexShader() {
   return VertexShader::loadFromSource(vertSource);
 }
 
-void Framebuffer::addTextureBuffer(TexturePtr texture) {
-  if (texture->getColorspace() == TextureColorspace::DEPTH) {
-    assert("Error: There can be only one depth buffer in a Framebuffer." && !hasDepthBuffer());
+void Framebuffer::setDepthBuffer(TexturePtr texture) {
+  if (texture->getColorspace() != TextureColorspace::DEPTH)
+    throw std::invalid_argument("Error: Invalid depth buffer");
 
-    m_depthBuffer = std::move(texture);
-  } else {
-    // Adding the color buffer only if it doesn't exist yet
-    if (std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture) == m_colorBuffers.cend())
-      m_colorBuffers.emplace_back(std::move(texture));
-  }
+  m_depthBuffer = std::move(texture);
+
+  mapBuffers();
+}
+
+void Framebuffer::addColorBuffer(TexturePtr texture, unsigned int index) {
+  if (texture->getColorspace() == TextureColorspace::DEPTH || texture->getColorspace() == TextureColorspace::INVALID)
+    throw std::invalid_argument("Error: Invalid color buffer");
+
+  const auto bufferIt = std::find_if(m_colorBuffers.cbegin(), m_colorBuffers.cend(), [&texture, index] (const auto& colorBuffer) {
+    return (texture == colorBuffer.first && index == colorBuffer.second);
+  });
+
+  // Adding the color buffer only if it doesn't exist yet
+  if (bufferIt == m_colorBuffers.cend())
+    m_colorBuffers.emplace_back(std::move(texture), index);
 
   mapBuffers();
 }
@@ -100,9 +110,10 @@ void Framebuffer::removeTextureBuffer(const TexturePtr& texture) {
   if (texture == m_depthBuffer) {
     m_depthBuffer.reset();
   } else {
-    const auto bufferIter = std::find(m_colorBuffers.cbegin(), m_colorBuffers.cend(), texture);
-    if (bufferIter != m_colorBuffers.cend())
-      m_colorBuffers.erase(bufferIter);
+    const auto bufferIt = std::remove_if(m_colorBuffers.begin(), m_colorBuffers.end(), [&texture] (const auto& buffer) {
+      return (texture == buffer.first);
+    });
+    m_colorBuffers.erase(bufferIt, m_colorBuffers.end());
   }
 
   mapBuffers();
@@ -117,7 +128,7 @@ void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
   if (m_depthBuffer)
     m_depthBuffer->resize(width, height);
 
-  for (const TexturePtr& colorBuffer : m_colorBuffers)
+  for (const auto& [colorBuffer, _] : m_colorBuffers)
     colorBuffer->resize(width, height);
 
   mapBuffers(); // TODO: may be unnecessary
@@ -134,15 +145,18 @@ void Framebuffer::mapBuffers() const {
   }
 
   if (!m_colorBuffers.empty()) {
-    std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size());
+    std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size(), DrawBuffer::NONE);
 
-    for (std::size_t bufferIndex = 0; bufferIndex < m_colorBuffers.size(); ++bufferIndex) {
+    for (const auto& [colorBuffer, bufferIndex] : m_colorBuffers) {
       Logger::debug("[Framebuffer] Mapping color buffer " + std::to_string(bufferIndex) + "...");
 
-      const std::size_t colorBuffer = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0) + bufferIndex;
+      const std::size_t colorAttachment = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0) + bufferIndex;
 
-      Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorBuffer), TextureType::TEXTURE_2D, m_colorBuffers[bufferIndex]->getIndex(), 0);
-      drawBuffers[bufferIndex] = static_cast<DrawBuffer>(colorBuffer);
+      Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorAttachment), TextureType::TEXTURE_2D, colorBuffer->getIndex(), 0);
+
+      if (bufferIndex >= drawBuffers.size())
+        drawBuffers.resize(bufferIndex + 1, DrawBuffer::NONE);
+      drawBuffers[bufferIndex] = static_cast<DrawBuffer>(colorAttachment);
     }
 
     Renderer::setDrawBuffers(static_cast<unsigned int>(drawBuffers.size()), drawBuffers.data());

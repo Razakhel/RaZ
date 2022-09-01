@@ -26,7 +26,6 @@ public:
   virtual void addParent(RenderProcess& parentProcess) = 0;
   virtual void addChild(RenderPass& childPass) = 0;
   virtual void addChild(RenderProcess& childProcess) = 0;
-  virtual void setOutputBuffer(TexturePtr outputBuffer) = 0;
   virtual void resizeBuffers([[maybe_unused]] unsigned int width, [[maybe_unused]] unsigned int height) {}
 
   virtual ~RenderProcess() = default;

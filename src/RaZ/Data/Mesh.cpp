@@ -166,40 +166,40 @@ Mesh::Mesh(const AABB& box) {
   vertices.reserve(24);
 
   // Right face
-  vertices.emplace_back(Vertex{ rightBottomFront, Raz::Vec2f(0.f, 0.f), Axis::X, -Axis::Z });
-  vertices.emplace_back(Vertex{ rightBottomBack, Raz::Vec2f(1.f, 0.f), Axis::X, -Axis::Z });
-  vertices.emplace_back(Vertex{ rightTopFront, Raz::Vec2f(0.f, 1.f), Axis::X, -Axis::Z });
-  vertices.emplace_back(Vertex{ rightTopBack, Raz::Vec2f(1.f, 1.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ rightBottomFront, Vec2f(0.f, 0.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ rightBottomBack, Vec2f(1.f, 0.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ rightTopFront, Vec2f(0.f, 1.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ rightTopBack, Vec2f(1.f, 1.f), Axis::X, -Axis::Z });
 
   // Left face
-  vertices.emplace_back(Vertex{ leftBottomBack, Raz::Vec2f(0.f, 0.f), -Axis::X, Axis::Z });
-  vertices.emplace_back(Vertex{ leftBottomFront, Raz::Vec2f(1.f, 0.f), -Axis::X, Axis::Z });
-  vertices.emplace_back(Vertex{ leftTopBack, Raz::Vec2f(0.f, 1.f), -Axis::X, Axis::Z });
-  vertices.emplace_back(Vertex{ leftTopFront, Raz::Vec2f(1.f, 1.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ leftBottomBack, Vec2f(0.f, 0.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ leftBottomFront, Vec2f(1.f, 0.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ leftTopBack, Vec2f(0.f, 1.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ leftTopFront, Vec2f(1.f, 1.f), -Axis::X, Axis::Z });
 
   // Top face
-  vertices.emplace_back(Vertex{ leftTopFront, Raz::Vec2f(0.f, 0.f), Axis::Y, Axis::X });
-  vertices.emplace_back(Vertex{ rightTopFront, Raz::Vec2f(1.f, 0.f), Axis::Y, Axis::X });
-  vertices.emplace_back(Vertex{ leftTopBack, Raz::Vec2f(0.f, 1.f), Axis::Y, Axis::X });
-  vertices.emplace_back(Vertex{ rightTopBack, Raz::Vec2f(1.f, 1.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ leftTopFront, Vec2f(0.f, 0.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightTopFront, Vec2f(1.f, 0.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ leftTopBack, Vec2f(0.f, 1.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightTopBack, Vec2f(1.f, 1.f), Axis::Y, Axis::X });
 
   // Bottom face
-  vertices.emplace_back(Vertex{ leftBottomBack, Raz::Vec2f(0.f, 0.f), -Axis::Y, Axis::X });
-  vertices.emplace_back(Vertex{ rightBottomBack, Raz::Vec2f(1.f, 0.f), -Axis::Y, Axis::X });
-  vertices.emplace_back(Vertex{ leftBottomFront, Raz::Vec2f(0.f, 1.f), -Axis::Y, Axis::X });
-  vertices.emplace_back(Vertex{ rightBottomFront, Raz::Vec2f(1.f, 1.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ leftBottomBack, Vec2f(0.f, 0.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightBottomBack, Vec2f(1.f, 0.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ leftBottomFront, Vec2f(0.f, 1.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ rightBottomFront, Vec2f(1.f, 1.f), -Axis::Y, Axis::X });
 
   // Front face
-  vertices.emplace_back(Vertex{ leftBottomFront, Raz::Vec2f(0.f, 0.f), Axis::Z, Axis::X });
-  vertices.emplace_back(Vertex{ rightBottomFront, Raz::Vec2f(1.f, 0.f), Axis::Z, Axis::X });
-  vertices.emplace_back(Vertex{ leftTopFront, Raz::Vec2f(0.f, 1.f), Axis::Z, Axis::X });
-  vertices.emplace_back(Vertex{ rightTopFront, Raz::Vec2f(1.f, 1.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ leftBottomFront, Vec2f(0.f, 0.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ rightBottomFront, Vec2f(1.f, 0.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ leftTopFront, Vec2f(0.f, 1.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ rightTopFront, Vec2f(1.f, 1.f), Axis::Z, Axis::X });
 
   // Back face
-  vertices.emplace_back(Vertex{ rightBottomBack, Raz::Vec2f(0.f, 0.f), -Axis::Z, -Axis::X });
-  vertices.emplace_back(Vertex{ leftBottomBack, Raz::Vec2f(1.f, 0.f), -Axis::Z, -Axis::X });
-  vertices.emplace_back(Vertex{ rightTopBack, Raz::Vec2f(0.f, 1.f), -Axis::Z, -Axis::X });
-  vertices.emplace_back(Vertex{ leftTopBack, Raz::Vec2f(1.f, 1.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ rightBottomBack, Vec2f(0.f, 0.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ leftBottomBack, Vec2f(1.f, 0.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ rightTopBack, Vec2f(0.f, 1.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ leftTopBack, Vec2f(1.f, 1.f), -Axis::Z, -Axis::X });
 
   submesh.getTriangleIndices() = {
      0,  1,  2,  1,  3,  2, // Right face
