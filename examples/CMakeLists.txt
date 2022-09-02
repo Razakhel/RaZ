@@ -52,6 +52,9 @@ target_link_libraries(RaZ_FullDemo RaZ_Examples)
 add_executable(RaZ_MinDemo minDemo.cpp)
 target_link_libraries(RaZ_MinDemo RaZ_Examples)
 
+add_executable(RaZ_RaytraceDemo raytraceDemo.cpp)
+target_link_libraries(RaZ_RaytraceDemo RaZ_Examples)
+
 add_executable(RaZ_PhysicsDemo physicsDemo.cpp)
 target_link_libraries(RaZ_PhysicsDemo RaZ_Examples)
 
