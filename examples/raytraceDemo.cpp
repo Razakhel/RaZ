@@ -40,6 +40,7 @@ int main() {
     Raz::Material& boxMat      = boxEntity.addComponent<Raz::MeshRenderer>(boxMesh).getMaterials().front();
 
     sphereMat.setAttribute(Raz::ColorPreset::Blue, Raz::MaterialAttribute::BaseColor);
+    sphereMat.setAttribute(0.75f, Raz::MaterialAttribute::Metallic);
     triangleMat.setAttribute(Raz::ColorPreset::Green, Raz::MaterialAttribute::BaseColor);
     boxMat.setAttribute(Raz::ColorPreset::Red, Raz::MaterialAttribute::BaseColor);
 

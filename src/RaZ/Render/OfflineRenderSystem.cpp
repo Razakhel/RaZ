@@ -1,6 +1,7 @@
 #include "RaZ/Data/BvhSystem.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Math/MathUtils.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
@@ -182,6 +183,14 @@ const Entity* OfflineRenderSystem::recoverHitEntity(const Ray& ray, RayHit& clos
 Vec3f OfflineRenderSystem::computeLighting(const Entity& hitEntity, const RayHit& hitInfo) {
   const auto& material = hitEntity.getComponent<MeshRenderer>().getMaterials().front();
 
+  const auto baseColor         = material.getAttribute<Vec3f>(MaterialAttribute::BaseColor);
+  const auto metallic          = material.getAttribute<float>(MaterialAttribute::Metallic);
+  const Vec3f baseReflectivity = MathUtils::lerp(Vec3f(0.04f), baseColor, metallic);
+
+  const Vec3f viewDir = (m_cameraEntity->getComponent<Transform>().getPosition() - hitInfo.position).normalize();
+
+  Vec3f lightRadiance(0.f);
+
   for (const Entity* entity : m_entities) {
     if (!entity->hasComponent<Light>())
       continue;
@@ -189,27 +198,41 @@ Vec3f OfflineRenderSystem::computeLighting(const Entity& hitEntity, const RayHit
     const auto& light      = entity->getComponent<Light>();
     const auto& lightTrans = entity->getComponent<Transform>();
 
-    const Vec3f lightDir = (light.getType() == LightType::POINT ? (hitInfo.position - lightTrans.getPosition()).normalize() : light.getDirection());
+    Vec3f lightDir = (light.getType() == LightType::POINT ? lightTrans.getPosition() - hitInfo.position : -light.getDirection());
 
-    const Vec3f baseColor = material.getAttribute<Vec3f>("uniMaterial.baseColor");
-    const Vec3f emissive  = material.getAttribute<Vec3f>("uniMaterial.emissive");
-    const Vec3f ambient   = 0.03f * baseColor/* * ambOcc*/;
-    const Vec3f diffuse   = baseColor * light.getColor() * light.getEnergy() * std::max(hitInfo.normal.dot(-lightDir), 0.f);
+    const float lightSqDist = lightDir.computeSquaredLength();
+    const float attenuation = light.getEnergy() / lightSqDist;
 
-    Vec3f lighting = ambient + diffuse + emissive;
+    lightDir /= std::sqrt(lightSqDist); // Normalizing the light direction
 
-    // HDR tone mapping
-    lighting = lighting / (lighting + 1.f);
+    const Vec3f halfDir = (viewDir + lightDir).normalize();
 
-    // Gamma correction
-    lighting.x() = std::pow(lighting.x(), 0.4545454545f); // 1 / 2.2
-    lighting.y() = std::pow(lighting.y(), 0.4545454545f);
-    lighting.z() = std::pow(lighting.z(), 0.4545454545f);
+    // Fresnel
+    const float cosTheta = std::max(halfDir.dot(viewDir), 0.f);
+    const Vec3f fresnel  = baseReflectivity + (Vec3f(1.f) - baseReflectivity) * std::pow(2.f, (-5.55473f * cosTheta - 6.98316f) * cosTheta);
 
-    return lighting;
+    const Vec3f radiance = light.getColor() * attenuation * std::max(lightDir.dot(hitInfo.normal), 0.f);
+    const Vec3f diffuse  = (Vec3f(1.f) - fresnel) * (1.f - metallic);
+
+    lightRadiance += (diffuse * baseColor /*+ specular*/) * radiance;
   }
 
-  return {};
+  const Vec3f ambient = 0.03f * baseColor/* * ambOcc*/;
+
+  Vec3f lighting = ambient + lightRadiance;
+
+  if (material.hasAttribute(MaterialAttribute::Emissive))
+    lighting += material.getAttribute<Vec3f>(MaterialAttribute::Emissive);
+
+  // HDR tone mapping
+  lighting = lighting / (lighting + 1.f);
+
+  // Gamma correction
+  lighting.x() = std::pow(lighting.x(), 0.4545454545f); // 1 / 2.2
+  lighting.y() = std::pow(lighting.y(), 0.4545454545f);
+  lighting.z() = std::pow(lighting.z(), 0.4545454545f);
+
+  return lighting;
 }
 
 } // namespace Raz
