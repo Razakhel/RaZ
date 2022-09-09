@@ -138,7 +138,7 @@ int main() {
 
     overlay.addSlider("Emissive strength", [&meshRenderer] (float value) noexcept {
       Raz::Material& material = meshRenderer.getMaterials().front();
-      material.setAttribute(Raz::Vec3f(value), "uniMaterial.emissive");
+      material.setAttribute(Raz::Vec3f(value), Raz::MaterialAttribute::Emissive);
       material.sendAttributes();
     }, 0.f, 10.f, 0.f);
 

@@ -88,56 +88,56 @@ void Material::loadType(MaterialType type) {
     case MaterialType::COOK_TORRANCE:
       m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(cookTorranceShaderSource));
 
-      if (!hasAttribute("uniMaterial.baseColor"))
-        setAttribute(Vec3f(1.f), "uniMaterial.baseColor");
-      if (!hasAttribute("uniMaterial.emissive"))
-        setAttribute(Vec3f(0.f), "uniMaterial.emissive");
-      if (!hasAttribute("uniMaterial.metallicFactor"))
-        setAttribute(0.f, "uniMaterial.metallicFactor");
-      if (!hasAttribute("uniMaterial.roughnessFactor"))
-        setAttribute(1.f, "uniMaterial.roughnessFactor");
+      if (!hasAttribute(MaterialAttribute::BaseColor))
+        setAttribute(Vec3f(1.f), MaterialAttribute::BaseColor);
+      if (!hasAttribute(MaterialAttribute::Emissive))
+        setAttribute(Vec3f(0.f), MaterialAttribute::Emissive);
+      if (!hasAttribute(MaterialAttribute::Metallic))
+        setAttribute(0.f, MaterialAttribute::Metallic);
+      if (!hasAttribute(MaterialAttribute::Roughness))
+        setAttribute(1.f, MaterialAttribute::Roughness);
 
-      if (!hasTexture("uniMaterial.baseColorMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.baseColorMap");
-      if (!hasTexture("uniMaterial.emissiveMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.emissiveMap");
-      if (!hasTexture("uniMaterial.normalMap"))
-        setTexture(Texture::create(ColorPreset::MediumBlue), "uniMaterial.normalMap"); // Representing a [ 0; 0; 1 ] vector
-      if (!hasTexture("uniMaterial.metallicMap"))
-        setTexture(Texture::create(ColorPreset::Red), "uniMaterial.metallicMap");
-      if (!hasTexture("uniMaterial.roughnessMap"))
-        setTexture(Texture::create(ColorPreset::Red), "uniMaterial.roughnessMap");
-      if (!hasTexture("uniMaterial.ambientMap"))
-        setTexture(Texture::create(ColorPreset::Red), "uniMaterial.ambientMap");
+      if (!hasTexture(MaterialTexture::BaseColor))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::BaseColor);
+      if (!hasTexture(MaterialTexture::Emissive))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Emissive);
+      if (!hasTexture(MaterialTexture::Normal))
+        setTexture(Texture::create(ColorPreset::MediumBlue), MaterialTexture::Normal); // Representing a [ 0; 0; 1 ] vector
+      if (!hasTexture(MaterialTexture::Metallic))
+        setTexture(Texture::create(ColorPreset::Red), MaterialTexture::Metallic);
+      if (!hasTexture(MaterialTexture::Roughness))
+        setTexture(Texture::create(ColorPreset::Red), MaterialTexture::Roughness);
+      if (!hasTexture(MaterialTexture::Ambient))
+        setTexture(Texture::create(ColorPreset::Red), MaterialTexture::Ambient);
 
       break;
 
     case MaterialType::BLINN_PHONG:
       m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(blinnPhongShaderSource));
 
-      if (!hasAttribute("uniMaterial.baseColor"))
-        setAttribute(Vec3f(1.f), "uniMaterial.baseColor");
-      if (!hasAttribute("uniMaterial.emissive"))
-        setAttribute(Vec3f(0.f), "uniMaterial.emissive");
-      if (!hasAttribute("uniMaterial.ambient"))
-        setAttribute(Vec3f(1.f), "uniMaterial.ambient");
-      if (!hasAttribute("uniMaterial.specular"))
-        setAttribute(Vec3f(1.f), "uniMaterial.specular");
-      if (!hasAttribute("uniMaterial.transparency"))
-        setAttribute(1.f, "uniMaterial.transparency");
+      if (!hasAttribute(MaterialAttribute::BaseColor))
+        setAttribute(Vec3f(1.f), MaterialAttribute::BaseColor);
+      if (!hasAttribute(MaterialAttribute::Emissive))
+        setAttribute(Vec3f(0.f), MaterialAttribute::Emissive);
+      if (!hasAttribute(MaterialAttribute::Ambient))
+        setAttribute(Vec3f(1.f), MaterialAttribute::Ambient);
+      if (!hasAttribute(MaterialAttribute::Specular))
+        setAttribute(Vec3f(1.f), MaterialAttribute::Specular);
+      if (!hasAttribute(MaterialAttribute::Transparency))
+        setAttribute(1.f, MaterialAttribute::Transparency);
 
-      if (!hasTexture("uniMaterial.baseColorMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.baseColorMap");
-      if (!hasTexture("uniMaterial.emissiveMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.emissiveMap");
-      if (!hasTexture("uniMaterial.ambientMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.ambientMap");
-      if (!hasTexture("uniMaterial.specularMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.specularMap");
-      if (!hasTexture("uniMaterial.transparencyMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.transparencyMap");
-      if (!hasTexture("uniMaterial.bumpMap"))
-        setTexture(Texture::create(ColorPreset::White), "uniMaterial.bumpMap");
+      if (!hasTexture(MaterialTexture::BaseColor))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::BaseColor);
+      if (!hasTexture(MaterialTexture::Emissive))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Emissive);
+      if (!hasTexture(MaterialTexture::Ambient))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Ambient);
+      if (!hasTexture(MaterialTexture::Specular))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Specular);
+      if (!hasTexture(MaterialTexture::Transparency))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Transparency);
+      if (!hasTexture(MaterialTexture::Bump))
+        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Bump);
 
       break;
 

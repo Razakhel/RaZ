@@ -61,24 +61,24 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
 
     mtlFile << "\nnewmtl " << materialName << '\n';
 
-    writeAttribute<float, 3>(mtlFile, "Kd", material, "uniMaterial.baseColor");
-    writeAttribute<float, 3>(mtlFile, "Ke", material, "uniMaterial.emissive");
-    writeAttribute<float, 3>(mtlFile, "Ka", material, "uniMaterial.ambient");
-    writeAttribute<float, 3>(mtlFile, "Ks", material, "uniMaterial.specular");
-    writeAttribute<float, 1>(mtlFile, "d",  material, "uniMaterial.transparency");
-    writeAttribute<float, 1>(mtlFile, "Pm", material, "uniMaterial.metallicFactor");
-    writeAttribute<float, 1>(mtlFile, "Pr", material, "uniMaterial.roughnessFactor");
+    writeAttribute<float, 3>(mtlFile, "Kd", material, MaterialAttribute::BaseColor);
+    writeAttribute<float, 3>(mtlFile, "Ke", material, MaterialAttribute::Emissive);
+    writeAttribute<float, 3>(mtlFile, "Ka", material, MaterialAttribute::Ambient);
+    writeAttribute<float, 3>(mtlFile, "Ks", material, MaterialAttribute::Specular);
+    writeAttribute<float, 1>(mtlFile, "d",  material, MaterialAttribute::Transparency);
+    writeAttribute<float, 1>(mtlFile, "Pm", material, MaterialAttribute::Metallic);
+    writeAttribute<float, 1>(mtlFile, "Pr", material, MaterialAttribute::Roughness);
 
 #if !defined(USE_OPENGL_ES)
-    writeTexture(mtlFile, "map_Kd",   materialName, "baseColor",    material, "uniMaterial.baseColorMap");
-    writeTexture(mtlFile, "map_Ke",   materialName, "emissive",     material, "uniMaterial.emissiveMap");
-    writeTexture(mtlFile, "map_Ka",   materialName, "ambient",      material, "uniMaterial.ambientMap");
-    writeTexture(mtlFile, "map_Ks",   materialName, "specular",     material, "uniMaterial.specularMap");
-    writeTexture(mtlFile, "map_d",    materialName, "transparency", material, "uniMaterial.transparencyMap");
-    writeTexture(mtlFile, "map_bump", materialName, "bump",         material, "uniMaterial.bumpMap");
-    writeTexture(mtlFile, "norm",     materialName, "normal",       material, "uniMaterial.normalMap");
-    writeTexture(mtlFile, "map_Pm",   materialName, "metallic",     material, "uniMaterial.metallicMap");
-    writeTexture(mtlFile, "map_Pr",   materialName, "roughness",    material, "uniMaterial.roughnessMap");
+    writeTexture(mtlFile, "map_Kd",   materialName, "baseColor",    material, MaterialTexture::BaseColor);
+    writeTexture(mtlFile, "map_Ke",   materialName, "emissive",     material, MaterialTexture::Emissive);
+    writeTexture(mtlFile, "map_Ka",   materialName, "ambient",      material, MaterialTexture::Ambient);
+    writeTexture(mtlFile, "map_Ks",   materialName, "specular",     material, MaterialTexture::Specular);
+    writeTexture(mtlFile, "map_d",    materialName, "transparency", material, MaterialTexture::Transparency);
+    writeTexture(mtlFile, "map_bump", materialName, "bump",         material, MaterialTexture::Bump);
+    writeTexture(mtlFile, "norm",     materialName, "normal",       material, MaterialTexture::Normal);
+    writeTexture(mtlFile, "map_Pm",   materialName, "metallic",     material, MaterialTexture::Metallic);
+    writeTexture(mtlFile, "map_Pr",   materialName, "roughness",    material, MaterialTexture::Roughness);
 #endif
   }
 }

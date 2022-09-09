@@ -6,25 +6,26 @@ TEST_CASE("Material attributes") {
   Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
   CHECK(material.getAttributeCount() == 4);
 
-  CHECK(material.hasAttribute("uniMaterial.baseColor"));
-  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(1.f));
-  CHECK(material.hasAttribute("uniMaterial.metallicFactor"));
-  CHECK(material.getAttribute<float>("uniMaterial.metallicFactor") == 0.f);
+  REQUIRE(material.hasAttribute(Raz::MaterialAttribute::BaseColor));
+  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(1.f));
+  REQUIRE(material.hasAttribute(Raz::MaterialAttribute::Metallic));
+  CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
 
-  material.setAttribute(Raz::Vec3f(0.f), "uniMaterial.baseColor");
+  material.setAttribute(Raz::Vec3f(0.f), Raz::MaterialAttribute::BaseColor);
   CHECK(material.getAttributeCount() == 4); // The attribute already exists, none has been added
-  CHECK(material.hasAttribute("uniMaterial.baseColor"));
-  CHECK(material.getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.f)); // But its value has been changed
+  REQUIRE(material.hasAttribute(Raz::MaterialAttribute::BaseColor));
+  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.f)); // But its value has been changed
 
-  material.removeAttribute("uniMaterial.baseColor");
+  material.removeAttribute(Raz::MaterialAttribute::BaseColor);
   CHECK(material.getAttributeCount() == 3);
-  CHECK_FALSE(material.hasAttribute("uniMaterial.baseColor"));
+  CHECK_FALSE(material.hasAttribute(Raz::MaterialAttribute::BaseColor));
 
   material.clearAttributes();
   CHECK(material.getAttributeCount() == 0);
 
   material.setAttribute(42, "test");
   CHECK(material.getAttributeCount() == 1);
+  REQUIRE(material.hasAttribute("test"));
   CHECK(material.getAttribute<int>("test") == 42);
 }
 
@@ -32,20 +33,20 @@ TEST_CASE("Material textures") {
   Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
   CHECK(material.getTextureCount() == 6);
 
-  CHECK(material.hasTexture("uniMaterial.baseColorMap"));
+  CHECK(material.hasTexture(Raz::MaterialTexture::BaseColor));
 
   // Textures can be recovered with either their index in the list or their uniform name
-  const unsigned int origTextureIndex = material.getTexture("uniMaterial.baseColorMap").getIndex();
+  const unsigned int origTextureIndex = material.getTexture(Raz::MaterialTexture::BaseColor).getIndex();
   CHECK(material.getTexture(0).getIndex() == origTextureIndex);
 
-  material.setTexture(Raz::Texture::create(), "uniMaterial.baseColorMap");
+  material.setTexture(Raz::Texture::create(), Raz::MaterialTexture::BaseColor);
   CHECK(material.getTextureCount() == 6); // The texture already exists, none has been added
-  CHECK(material.hasTexture("uniMaterial.baseColorMap"));
-  CHECK_FALSE(material.getTexture("uniMaterial.baseColorMap").getIndex() == origTextureIndex); // But its value has been changed
+  REQUIRE(material.hasTexture(Raz::MaterialTexture::BaseColor));
+  CHECK_FALSE(material.getTexture(Raz::MaterialTexture::BaseColor).getIndex() == origTextureIndex); // But its value has been changed
 
-  material.removeTexture("uniMaterial.baseColorMap");
+  material.removeTexture(Raz::MaterialTexture::BaseColor);
   CHECK(material.getTextureCount() == 5);
-  CHECK_FALSE(material.hasTexture("uniMaterial.baseColorMap"));
+  CHECK_FALSE(material.hasTexture(Raz::MaterialTexture::BaseColor));
 
   material.clearTextures();
   CHECK(material.getTextureCount() == 0);
@@ -53,13 +54,13 @@ TEST_CASE("Material textures") {
   Raz::TexturePtr texture = Raz::Texture::create();
   material.setTexture(texture, "test");
   CHECK(material.getTextureCount() == 1);
-  CHECK(material.hasTexture("test"));
+  REQUIRE(material.hasTexture("test"));
   CHECK(material.hasTexture(*texture)); // Can be checked with either the uniform name or the texture itself
 
   // The same texture can be paired with different uniform names
   material.setTexture(texture, "test2");
   CHECK(material.getTextureCount() == 2);
-  CHECK(material.hasTexture("test2"));
+  REQUIRE(material.hasTexture("test2"));
   CHECK(material.hasTexture(*texture));
   // Getting a texture with either of the uniform names returns the same
   CHECK(material.getTexture("test").getIndex() == material.getTexture("test2").getIndex());

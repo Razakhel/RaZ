@@ -18,6 +18,44 @@ enum class MaterialType {
   BLINN_PHONG    ///< Blinn-Phong material.
 };
 
+/// Predefined material attributes names.
+namespace MaterialAttribute {
+
+// Common attributes
+static constexpr const char* BaseColor = "uniMaterial.baseColor"; ///< Base color factor.
+static constexpr const char* Emissive  = "uniMaterial.emissive";  ///< Emissive factor.
+
+// PBR attributes
+static constexpr const char* Metallic  = "uniMaterial.metallicFactor";  ///< Metallic factor.
+static constexpr const char* Roughness = "uniMaterial.roughnessFactor"; ///< Roughness factor.
+
+// Legacy attributes
+static constexpr const char* Ambient      = "uniMaterial.ambient";      ///< Ambient factor.
+static constexpr const char* Specular     = "uniMaterial.specular";     ///< Specular factor.
+static constexpr const char* Transparency = "uniMaterial.transparency"; ///< Transparency factor.
+
+}
+
+/// Predefined material textures names.
+namespace MaterialTexture {
+
+// Common textures
+static constexpr const char* BaseColor = "uniMaterial.baseColorMap"; ///< Base color (albedo or diffuse) map.
+static constexpr const char* Emissive  = "uniMaterial.emissiveMap";  ///< Emissive map.
+static constexpr const char* Ambient   = "uniMaterial.ambientMap";   ///< Ambient occlusion map (Cook-Torrance) or ambient map (legacy).
+
+// PBR textures
+static constexpr const char* Normal    = "uniMaterial.normalMap";    ///< Normal map.
+static constexpr const char* Metallic  = "uniMaterial.metallicMap";  ///< Metalness map.
+static constexpr const char* Roughness = "uniMaterial.roughnessMap"; ///< Roughness map.
+
+// Legacy textures
+static constexpr const char* Specular     = "uniMaterial.specularMap";     ///< Specular map
+static constexpr const char* Transparency = "uniMaterial.transparencyMap"; ///< Transparency map.
+static constexpr const char* Bump         = "uniMaterial.bumpMap";         ///< Bump map.
+
+}
+
 class Material {
 public:
   Material() = default;

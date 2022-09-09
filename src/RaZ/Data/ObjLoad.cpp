@@ -48,20 +48,20 @@ inline void loadMtl(const FilePath& mtlFilePath,
       const Vec3f values(std::stof(nextValue), std::stof(secondValue), std::stof(thirdValue));
 
       if (tag[1] == 'd')                 // Diffuse/albedo factor [Kd]
-        material.setAttribute(values, "uniMaterial.baseColor");
+        material.setAttribute(values, MaterialAttribute::BaseColor);
       else if (tag[1] == 'e')            // Emissive factor [Ke]
-        material.setAttribute(values, "uniMaterial.emissive");
+        material.setAttribute(values, MaterialAttribute::Emissive);
       else if (tag[1] == 'a')            // Ambient factor [Ka]
-        material.setAttribute(values, "uniMaterial.ambient");
+        material.setAttribute(values, MaterialAttribute::Ambient);
       else if (tag[1] == 's')            // Specular factor [Ks]
-        material.setAttribute(values, "uniMaterial.specular");
+        material.setAttribute(values, MaterialAttribute::Specular);
     } else if (tag[0] == 'P') {          // PBR properties
       const float factor = std::stof(nextValue);
 
       if (tag[1] == 'm')                 // Metallic factor [Pm]
-        material.setAttribute(factor, "uniMaterial.metallicFactor");
+        material.setAttribute(factor, MaterialAttribute::Metallic);
       else if (tag[1] == 'r')            // Roughness factor [Pr]
-        material.setAttribute(factor, "uniMaterial.roughnessFactor");
+        material.setAttribute(factor, MaterialAttribute::Roughness);
 
       materialType = MaterialType::COOK_TORRANCE;
     } else if (tag[0] == 'm') {          // Import texture
@@ -69,35 +69,35 @@ inline void loadMtl(const FilePath& mtlFilePath,
 
       if (tag[4] == 'K') {               // Standard maps
         if (tag[5] == 'd')               // Diffuse/albedo map [map_Kd]
-          material.setTexture(map, "uniMaterial.baseColorMap");
+          material.setTexture(map, MaterialTexture::BaseColor);
         else if (tag[5] == 'e')          // Emissive map [map_Ke]
-          material.setTexture(map, "uniMaterial.emissiveMap");
+          material.setTexture(map, MaterialTexture::Emissive);
         else if (tag[5] == 'a')          // Ambient/ambient occlusion map [map_Ka]
-          material.setTexture(map, "uniMaterial.ambientMap");
+          material.setTexture(map, MaterialTexture::Ambient);
         else if (tag[5] == 's')          // Specular map [map_Ks]
-          material.setTexture(map, "uniMaterial.specularMap");
+          material.setTexture(map, MaterialTexture::Specular);
       } else if (tag[4] == 'P') {       // PBR maps
         if (tag[5] == 'm')               // Metallic map [map_Pm]
-          material.setTexture(map, "uniMaterial.metallicMap");
+          material.setTexture(map, MaterialTexture::Metallic);
         else if (tag[5] == 'r')          // Roughness map [map_Pr]
-          material.setTexture(map, "uniMaterial.roughnessMap");
+          material.setTexture(map, MaterialTexture::Roughness);
 
         materialType = MaterialType::COOK_TORRANCE;
       } else if (tag[4] == 'd') {        // Transparency map [map_d]
-        material.setTexture(map, "uniMaterial.transparencyMap");
+        material.setTexture(map, MaterialTexture::Transparency);
       } else if (tag[4] == 'b') {        // Bump map [map_bump]
-        material.setTexture(map, "uniMaterial.bumpMap");
+        material.setTexture(map, MaterialTexture::Bump);
       }
     } else if (tag[0] == 'd') {          // Transparency factor
-      material.setAttribute(std::stof(nextValue), "uniMaterial.transparency");
+      material.setAttribute(std::stof(nextValue), MaterialAttribute::Transparency);
     } else if (tag[0] == 'T') {
       if (tag[1] == 'r')                 // Transparency factor (alias, 1 - d) [Tr]
-        material.setAttribute(1.f - std::stof(nextValue), "uniMaterial.transparency");
+        material.setAttribute(1.f - std::stof(nextValue), MaterialAttribute::Transparency);
     } else if (tag[0] == 'b') {         // Bump map (alias) [bump]
-      material.setTexture(loadTexture(mtlFilePath, nextValue), "uniMaterial.bumpMap");
+      material.setTexture(loadTexture(mtlFilePath, nextValue), MaterialTexture::Bump);
     } else if (tag[0] == 'n') {
       if (tag[1] == 'o') {               // Normal map [norm]
-        material.setTexture(loadTexture(mtlFilePath, nextValue), "uniMaterial.normalMap");
+        material.setTexture(loadTexture(mtlFilePath, nextValue), MaterialTexture::Normal);
       } else if (tag[1] == 'e') {        // New material [newmtl]
         materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
 

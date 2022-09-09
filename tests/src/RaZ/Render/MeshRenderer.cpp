@@ -60,8 +60,8 @@ TEST_CASE("MeshRenderer clone") {
   meshRenderer.addSubmeshRenderer().setMaterialIndex(42);
   meshRenderer.addSubmeshRenderer().setMaterialIndex(150);
 
-  meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::BLINN_PHONG)).setAttribute(Raz::Vec3f(0.5f), "uniMaterial.baseColor");
-  meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::COOK_TORRANCE)).setAttribute(Raz::Vec3f(0.5f), "uniMaterial.baseColor");
+  meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::BLINN_PHONG)).setAttribute(Raz::Vec3f(0.5f), Raz::MaterialAttribute::BaseColor);
+  meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::COOK_TORRANCE)).setAttribute(Raz::Vec3f(0.5f), Raz::MaterialAttribute::BaseColor);
 
   Raz::MeshRenderer clonedMeshRenderer = meshRenderer.clone();
 
@@ -70,8 +70,8 @@ TEST_CASE("MeshRenderer clone") {
   CHECK(clonedMeshRenderer.getSubmeshRenderers()[1].getMaterialIndex() == 150);
 
   CHECK(clonedMeshRenderer.getMaterials().size() == 2);
-  CHECK(clonedMeshRenderer.getMaterials()[0].getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.5f));
-  CHECK(clonedMeshRenderer.getMaterials()[1].getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.5f));
+  CHECK(clonedMeshRenderer.getMaterials()[0].getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.5f));
+  CHECK(clonedMeshRenderer.getMaterials()[1].getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.5f));
 }
 
 TEST_CASE("MeshRenderer loading") {
@@ -81,7 +81,7 @@ TEST_CASE("MeshRenderer loading") {
   CHECK(meshRenderer.getMaterials().size() == 1); // A default material is created after loading if none exists
 
   meshRenderer.getSubmeshRenderers()[0].setMaterialIndex(42);
-  meshRenderer.getMaterials()[0].setAttribute(Raz::Vec3f(0.f), "uniMaterial.baseColor");
+  meshRenderer.getMaterials()[0].setAttribute(Raz::Vec3f(0.f), Raz::MaterialAttribute::BaseColor);
 
   meshRenderer.load(Raz::Mesh(Raz::Plane(1.f), 1.f, 1.f));
 
@@ -89,5 +89,5 @@ TEST_CASE("MeshRenderer loading") {
   CHECK(meshRenderer.getSubmeshRenderers()[0].getMaterialIndex() == 42); // The submesh renderers are left untouched
 
   CHECK(meshRenderer.getMaterials().size() == 1); // One material already exists; none has been added
-  CHECK(meshRenderer.getMaterials()[0].getAttribute<Raz::Vec3f>("uniMaterial.baseColor") == Raz::Vec3f(0.f)); // The materials are left untouched
+  CHECK(meshRenderer.getMaterials()[0].getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.f)); // The materials are left untouched
 }
