@@ -211,14 +211,25 @@ enum class BufferDataUsage : unsigned int {
 };
 
 enum class TextureType : unsigned int {
-  TEXTURE_2D    = 3553  /* GL_TEXTURE_2D                  */, ///<
-  CUBEMAP       = 34067 /* GL_TEXTURE_CUBE_MAP            */, ///<
-  CUBEMAP_POS_X = 34069 /* GL_TEXTURE_CUBE_MAP_POSITIVE_X */, ///<
-  CUBEMAP_NEG_X = 34070 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_X */, ///<
-  CUBEMAP_POS_Y = 34071 /* GL_TEXTURE_CUBE_MAP_POSITIVE_Y */, ///<
-  CUBEMAP_NEG_Y = 34072 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Y */, ///<
-  CUBEMAP_POS_Z = 34073 /* GL_TEXTURE_CUBE_MAP_POSITIVE_Z */, ///<
-  CUBEMAP_NEG_Z = 34074 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Z */  ///<
+#if !defined(USE_OPENGL_ES)
+  TEXTURE_1D       = 3552  /* GL_TEXTURE_1D                  */, ///<
+#endif
+  TEXTURE_2D       = 3553  /* GL_TEXTURE_2D                  */, ///<
+  TEXTURE_3D       = 32879 /* GL_TEXTURE_3D                  */, ///<
+#if !defined(USE_OPENGL_ES)
+  TEXTURE_1D_ARRAY = 35864 /* GL_TEXTURE_1D_ARRAY            */, ///<
+#endif
+  TEXTURE_2D_ARRAY = 35866 /* GL_TEXTURE_2D_ARRAY            */, ///<
+  CUBEMAP          = 34067 /* GL_TEXTURE_CUBE_MAP            */, ///<
+  CUBEMAP_POS_X    = 34069 /* GL_TEXTURE_CUBE_MAP_POSITIVE_X */, ///<
+  CUBEMAP_NEG_X    = 34070 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_X */, ///<
+  CUBEMAP_POS_Y    = 34071 /* GL_TEXTURE_CUBE_MAP_POSITIVE_Y */, ///<
+  CUBEMAP_NEG_Y    = 34072 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Y */, ///<
+  CUBEMAP_POS_Z    = 34073 /* GL_TEXTURE_CUBE_MAP_POSITIVE_Z */, ///<
+  CUBEMAP_NEG_Z    = 34074 /* GL_TEXTURE_CUBE_MAP_NEGATIVE_Z */, ///<
+#if !defined(USE_OPENGL_ES)
+  CUBEMAP_ARRAY    = 36873 /* GL_TEXTURE_CUBE_MAP_ARRAY      */  ///<
+#endif
 };
 
 enum class TextureParam : unsigned int {
@@ -956,7 +967,7 @@ public:
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param,
                                                                                                                                 static_cast<int>(value)); }
 #endif
-  /// Sends the image's data corresponding to the currently bound texture.
+  /// Sends the image's data corresponding to the currently bound 2D texture.
   /// \param type Type of the texture.
   /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
   /// \param internalFormat Image internal format.
@@ -969,6 +980,22 @@ public:
                               unsigned int mipmapLevel,
                               TextureInternalFormat internalFormat,
                               unsigned int width, unsigned int height,
+                              TextureFormat format,
+                              PixelDataType dataType, const void* data);
+  /// Sends the image's data corresponding to the currently bound 3D texture.
+  /// \param type Type of the texture.
+  /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
+  /// \param internalFormat Image internal format.
+  /// \param width Image width.
+  /// \param height Image height.
+  /// \param depth Image depth.
+  /// \param format Image format.
+  /// \param dataType Type of the data to be sent.
+  /// \param data Data to be sent.
+  static void sendImageData3D(TextureType type,
+                              unsigned int mipmapLevel,
+                              TextureInternalFormat internalFormat,
+                              unsigned int width, unsigned int height, unsigned depth,
                               TextureFormat format,
                               PixelDataType dataType, const void* data);
 #if !defined(USE_OPENGL_ES)

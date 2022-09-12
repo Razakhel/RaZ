@@ -591,6 +591,28 @@ void Renderer::sendImageData2D(TextureType type,
   printConditionalErrors();
 }
 
+void Renderer::sendImageData3D(TextureType type,
+                               unsigned int mipmapLevel,
+                               TextureInternalFormat internalFormat,
+                               unsigned int width, unsigned int height, unsigned int depth,
+                               TextureFormat format,
+                               PixelDataType dataType, const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexImage3D(static_cast<unsigned int>(type),
+               static_cast<int>(mipmapLevel),
+               static_cast<int>(internalFormat),
+               static_cast<int>(width),
+               static_cast<int>(height),
+               static_cast<int>(depth),
+               0,
+               static_cast<unsigned int>(format),
+               static_cast<unsigned int>(dataType),
+               data);
+
+  printConditionalErrors();
+}
+
 #if !defined(USE_OPENGL_ES)
 void Renderer::recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
