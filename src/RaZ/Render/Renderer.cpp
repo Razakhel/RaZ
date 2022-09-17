@@ -1209,8 +1209,38 @@ FramebufferStatus Renderer::getFramebufferStatus(FramebufferType type) {
   return static_cast<FramebufferStatus>(status);
 }
 
+#if !defined(USE_OPENGL_ES)
+void Renderer::setFramebufferTexture(FramebufferAttachment attachment,
+                                     unsigned int textureIndex, unsigned int mipmapLevel,
+                                     FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glFramebufferTexture(static_cast<unsigned int>(type),
+                       static_cast<unsigned int>(attachment),
+                       textureIndex,
+                       static_cast<int>(mipmapLevel));
+
+  printConditionalErrors();
+}
+
+void Renderer::setFramebufferTexture1D(FramebufferAttachment attachment,
+                                       unsigned int textureIndex, unsigned int mipmapLevel,
+                                       FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glFramebufferTexture1D(static_cast<unsigned int>(type),
+                         static_cast<unsigned int>(attachment),
+                         static_cast<unsigned int>(TextureType::TEXTURE_1D),
+                         textureIndex,
+                         static_cast<int>(mipmapLevel));
+
+  printConditionalErrors();
+}
+#endif
+
 void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
-                                       TextureType textureType, unsigned int textureIndex, int mipmapLevel,
+                                       unsigned int textureIndex, unsigned int mipmapLevel,
+                                       TextureType textureType,
                                        FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -1218,10 +1248,27 @@ void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
                          static_cast<unsigned int>(attachment),
                          static_cast<unsigned int>(textureType),
                          textureIndex,
-                         mipmapLevel);
+                         static_cast<int>(mipmapLevel));
 
   printConditionalErrors();
 }
+
+#if !defined(USE_OPENGL_ES)
+void Renderer::setFramebufferTexture3D(FramebufferAttachment attachment,
+                                       unsigned int textureIndex, unsigned int mipmapLevel, unsigned int layer,
+                                       FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glFramebufferTexture3D(static_cast<unsigned int>(type),
+                         static_cast<unsigned int>(attachment),
+                         static_cast<unsigned int>(TextureType::TEXTURE_3D),
+                         textureIndex,
+                         static_cast<int>(mipmapLevel),
+                         static_cast<int>(layer));
+
+  printConditionalErrors();
+}
+#endif
 
 void Renderer::setReadBuffer(ReadBuffer buffer) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());

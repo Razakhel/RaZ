@@ -1162,9 +1162,23 @@ public:
   static void unbindFramebuffer(FramebufferType type = FramebufferType::FRAMEBUFFER) { bindFramebuffer(0, type); }
   static FramebufferStatus getFramebufferStatus(FramebufferType type = FramebufferType::FRAMEBUFFER);
   static bool isFramebufferComplete(FramebufferType type = FramebufferType::FRAMEBUFFER) { return getFramebufferStatus(type) == FramebufferStatus::COMPLETE; }
-  static void setFramebufferTexture2D(FramebufferAttachment attachment,
-                                      TextureType textureType, unsigned int textureIndex, int mipmapLevel,
+#if !defined(USE_OPENGL_ES)
+  static void setFramebufferTexture(FramebufferAttachment attachment,
+                                    unsigned int textureIndex, unsigned int mipmapLevel,
+                                    FramebufferType type = FramebufferType::FRAMEBUFFER);
+  static void setFramebufferTexture1D(FramebufferAttachment attachment,
+                                      unsigned int textureIndex, unsigned int mipmapLevel,
                                       FramebufferType type = FramebufferType::FRAMEBUFFER);
+#endif
+  static void setFramebufferTexture2D(FramebufferAttachment attachment,
+                                      unsigned int textureIndex, unsigned int mipmapLevel,
+                                      TextureType textureType = TextureType::TEXTURE_2D,
+                                      FramebufferType type = FramebufferType::FRAMEBUFFER);
+#if !defined(USE_OPENGL_ES)
+  static void setFramebufferTexture3D(FramebufferAttachment attachment,
+                                      unsigned int textureIndex, unsigned int mipmapLevel, unsigned int layer,
+                                      FramebufferType type = FramebufferType::FRAMEBUFFER);
+#endif
   static void setReadBuffer(ReadBuffer buffer);
   static void setDrawBuffers(unsigned int count, const DrawBuffer* buffers);
   template <std::size_t N> static void setDrawBuffers(DrawBuffer (&buffers)[N]) { setDrawBuffers(N, buffers); }

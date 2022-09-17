@@ -141,7 +141,7 @@ void Framebuffer::mapBuffers() const {
 
   if (m_depthBuffer) {
     Logger::debug("[Framebuffer] Mapping depth buffer...");
-    Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, TextureType::TEXTURE_2D, m_depthBuffer->getIndex(), 0);
+    Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, m_depthBuffer->getIndex(), 0, TextureType::TEXTURE_2D);
   }
 
   if (!m_colorBuffers.empty()) {
@@ -152,7 +152,7 @@ void Framebuffer::mapBuffers() const {
 
       const std::size_t colorAttachment = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0) + bufferIndex;
 
-      Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorAttachment), TextureType::TEXTURE_2D, colorBuffer->getIndex(), 0);
+      Renderer::setFramebufferTexture2D(static_cast<FramebufferAttachment>(colorAttachment), colorBuffer->getIndex(), 0, TextureType::TEXTURE_2D);
 
       if (bufferIndex >= drawBuffers.size())
         drawBuffers.resize(bufferIndex + 1, DrawBuffer::NONE);
