@@ -29,6 +29,16 @@ enum class TextureDataType {
   FLOAT
 };
 
+enum class TextureFilter {
+  NEAREST,
+  LINEAR
+};
+
+enum class TextureWrapping {
+  REPEAT,
+  CLAMP
+};
+
 /// Texture class, handling images to be displayed into the scene.
 class Texture {
 public:
@@ -53,14 +63,14 @@ public:
   template <typename... Args>
   static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
 
-  /// Loads the image's data onto the graphics card.
-  /// \param image Image to load the data from.
-  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
-  void load(const Image& image, bool createMipmaps = true);
   /// Binds the current texture.
   void bind() const;
   /// Unbinds the current texture.
   void unbind() const;
+  void setFilter(TextureFilter filter) const { setFilter(filter, filter); }
+  void setFilter(TextureFilter minify, TextureFilter magnify) const;
+  void setFilter(TextureFilter minify, TextureFilter mipmapMinify, TextureFilter magnify) const;
+  void setWrapping(TextureWrapping wrapping) const;
   /// Sets the texture's parameters; the data type will be deduced from the colorspace (float if depth, byte otherwise).
   /// \param width New texture width.
   /// \param height New texture height.
@@ -85,6 +95,10 @@ public:
   /// \param width New texture width.
   /// \param height New texture height.
   void resize(unsigned int width, unsigned int height);
+  /// Loads the image's data onto the graphics card.
+  /// \param image Image to load the data from.
+  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
+  void load(const Image& image, bool createMipmaps = true);
 #if !defined(USE_OPENGL_ES)
   /// Retrieves the texture's data from the GPU.
   /// \warning The pixel storage pack & unpack alignments should be set to 1 in order to recover actual pixels.
