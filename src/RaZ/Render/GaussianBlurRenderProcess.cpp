@@ -15,7 +15,7 @@ constexpr std::string_view gaussianBlurSource = {
 
 } // namespace
 
-GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph) : RenderProcess(renderGraph), m_horizontalBuffer{ Texture::create() } {
+GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph) : RenderProcess(renderGraph), m_horizontalBuffer{ Texture2D::create() } {
   // Two-pass gaussian blur based on:
   //  - https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
   //  - https://www.intel.com/content/www/us/en/developer/articles/technical/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms.html
@@ -98,7 +98,7 @@ void GaussianBlurRenderProcess::resizeBuffers(unsigned int width, unsigned int h
   m_verticalPass->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
 }
 
-void GaussianBlurRenderProcess::setInputBuffer(TexturePtr inputBuffer) {
+void GaussianBlurRenderProcess::setInputBuffer(Texture2DPtr inputBuffer) {
   m_horizontalBuffer->setColorspace(inputBuffer->getColorspace(), inputBuffer->getDataType());
   resizeBuffers(inputBuffer->getWidth(), inputBuffer->getHeight());
 
@@ -120,7 +120,7 @@ void GaussianBlurRenderProcess::setInputBuffer(TexturePtr inputBuffer) {
     throw std::runtime_error("Error: The gaussian blur process is invalid");
 }
 
-void GaussianBlurRenderProcess::setOutputBuffer(TexturePtr outputBuffer) {
+void GaussianBlurRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer) {
   m_verticalPass->addWriteColorTexture(std::move(outputBuffer), 0);
 
 #if !defined(USE_OPENGL_ES)

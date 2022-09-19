@@ -9,8 +9,8 @@ namespace Raz {
 
 class RenderGraph;
 class RenderPass;
-class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+class Texture2D;
+using Texture2DPtr = std::shared_ptr<Texture2D>;
 
 /// RenderProcess class, representing a set of render passes with fixed actions; can be derived to implement post effects.
 class RenderProcess {

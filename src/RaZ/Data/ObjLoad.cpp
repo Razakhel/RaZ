@@ -14,9 +14,9 @@ namespace Raz::ObjFormat {
 
 namespace {
 
-inline TexturePtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
+inline Texture2DPtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-  return Texture::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), true);
+  return Texture2D::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), true);
 }
 
 inline void loadMtl(const FilePath& mtlFilePath,
@@ -65,7 +65,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
 
       materialType = MaterialType::COOK_TORRANCE;
     } else if (tag[0] == 'm') {          // Import texture
-      const TexturePtr map = loadTexture(mtlFilePath, nextValue);
+      const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
 
       if (tag[4] == 'K') {               // Standard maps
         if (tag[5] == 'd')               // Diffuse/albedo map [map_Kd]

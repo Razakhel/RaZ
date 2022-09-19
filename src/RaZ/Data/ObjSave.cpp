@@ -36,7 +36,7 @@ inline void writeTexture(std::ofstream& file, std::string_view tag, const std::s
   if (!material.hasTexture(uniformName.data()))
     return;
 
-  const Texture& texture = material.getTexture(uniformName.data());
+  const Texture2D& texture = material.getTexture(uniformName.data());
 
   if (texture.getWidth() == 0 || texture.getHeight() == 0 || texture.getColorspace() == TextureColorspace::INVALID)
     return;

@@ -10,8 +10,8 @@ namespace Raz {
 
 class Color;
 class Image;
-class Texture;
-using TexturePtr = std::shared_ptr<Texture>;
+class Texture2D;
+using Texture2DPtr = std::shared_ptr<Texture2D>;
 
 enum class TextureColorspace {
   INVALID = -1,
@@ -39,20 +39,20 @@ enum class TextureWrapping {
   CLAMP
 };
 
-/// Texture class, handling images to be displayed into the scene.
-class Texture {
+/// 2D texture class, representing images or buffers to be used in the rendering process.
+class Texture2D {
 public:
-  Texture();
-  explicit Texture(TextureColorspace colorspace) : Texture() { setColorspace(colorspace); }
-  Texture(TextureColorspace colorspace, TextureDataType dataType) : Texture() { setColorspace(colorspace, dataType); }
-  Texture(unsigned int width, unsigned int height, TextureColorspace colorspace) : Texture(colorspace) { resize(width, height); }
-  Texture(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType);
-  explicit Texture(const Image& image, bool createMipmaps = true) : Texture() { load(image, createMipmaps); }
+  Texture2D();
+  explicit Texture2D(TextureColorspace colorspace) : Texture2D() { setColorspace(colorspace); }
+  Texture2D(TextureColorspace colorspace, TextureDataType dataType) : Texture2D() { setColorspace(colorspace, dataType); }
+  Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace) : Texture2D(colorspace) { resize(width, height); }
+  Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType);
+  explicit Texture2D(const Image& image, bool createMipmaps = true) : Texture2D() { load(image, createMipmaps); }
   /// Constructs an 1x1 plain colored texture.
   /// \param value Color to create the texture with.
-  explicit Texture(const Color& color) : Texture() { makePlainColored(color); }
-  Texture(const Texture&) = delete;
-  Texture(Texture&& texture) noexcept;
+  explicit Texture2D(const Color& color) : Texture2D() { makePlainColored(color); }
+  Texture2D(const Texture2D&) = delete;
+  Texture2D(Texture2D&& texture) noexcept;
 
   unsigned int getIndex() const { return m_index; }
   unsigned int getWidth() const { return m_width; }
@@ -61,7 +61,7 @@ public:
   TextureDataType getDataType() const { return m_dataType; }
 
   template <typename... Args>
-  static TexturePtr create(Args&&... args) { return std::make_shared<Texture>(std::forward<Args>(args)...); }
+  static Texture2DPtr create(Args&&... args) { return std::make_shared<Texture2D>(std::forward<Args>(args)...); }
 
   /// Binds the current texture.
   void bind() const;
@@ -108,10 +108,10 @@ public:
   Image recoverImage() const;
 #endif
 
-  Texture& operator=(const Texture&) = delete;
-  Texture& operator=(Texture&& texture) noexcept;
+  Texture2D& operator=(const Texture2D&) = delete;
+  Texture2D& operator=(Texture2D&& texture) noexcept;
 
-  ~Texture();
+  ~Texture2D();
 
 private:
   /// Fills the texture with a single pixel (creates a single-colored 1x1 texture).

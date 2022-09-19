@@ -7,7 +7,7 @@
 #include "RaZ/Utils/FilePath.hpp"
 
 TEST_CASE("Texture creation") {
-  Raz::Texture textureEmpty; // A texture can be created without dimensions and colorspace/data type
+  Raz::Texture2D textureEmpty; // A texture can be created without dimensions and colorspace/data type
   CHECK(textureEmpty.getIndex() != std::numeric_limits<unsigned int>::max());
   CHECK(textureEmpty.getWidth() == 0);
   CHECK(textureEmpty.getHeight() == 0);
@@ -21,7 +21,7 @@ TEST_CASE("Texture creation") {
   CHECK(textureEmpty.getColorspace() == Raz::TextureColorspace::RGBA);
   CHECK(textureEmpty.getDataType() == Raz::TextureDataType::BYTE);
 
-  const Raz::Texture textureSmall(1, 1, Raz::TextureColorspace::DEPTH);
+  const Raz::Texture2D textureSmall(1, 1, Raz::TextureColorspace::DEPTH);
   CHECK(textureSmall.getIndex() != std::numeric_limits<unsigned int>::max());
   CHECK(textureSmall.getWidth() == 1);
   CHECK(textureSmall.getHeight() == 1);
@@ -32,7 +32,7 @@ TEST_CASE("Texture creation") {
 TEST_CASE("Texture move") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  Raz::Texture texture(3, 3, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT);
+  Raz::Texture2D texture(3, 3, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   const unsigned int textureIndex         = texture.getIndex();
@@ -43,7 +43,7 @@ TEST_CASE("Texture move") {
 
   // Move ctor
 
-  Raz::Texture movedTextureCtor(std::move(texture));
+  Raz::Texture2D movedTextureCtor(std::move(texture));
 
   // The new texture has the same values as the original one
   CHECK(movedTextureCtor.getIndex() == textureIndex);
@@ -57,7 +57,7 @@ TEST_CASE("Texture move") {
 
   // Move assignment operator
 
-  Raz::Texture movedTextureOp;
+  Raz::Texture2D movedTextureOp;
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   const unsigned int movedTextureOpIndex = movedTextureOp.getIndex();
@@ -79,7 +79,7 @@ TEST_CASE("Texture move") {
 TEST_CASE("Texture presets") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::TexturePtr whiteTexture = Raz::Texture::create(Raz::ColorPreset::White);
+  const Raz::Texture2DPtr whiteTexture = Raz::Texture2D::create(Raz::ColorPreset::White);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK(whiteTexture->getWidth() == 1);
@@ -108,7 +108,7 @@ TEST_CASE("Texture presets") {
 #endif
 
   // Creating another texture from the same preset gives a different one; both aren't linked
-  const Raz::TexturePtr whiteTexture2 = Raz::Texture::create(Raz::ColorPreset::White);
+  const Raz::Texture2DPtr whiteTexture2 = Raz::Texture2D::create(Raz::ColorPreset::White);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
   CHECK_FALSE(whiteTexture2.get() == whiteTexture.get());

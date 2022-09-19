@@ -9,9 +9,9 @@ namespace Raz {
 
 class BoxBlurRenderProcess final : public MonoPassRenderProcess {
 public:
-  BoxBlurRenderProcess(RenderGraph& renderGraph);
+  explicit BoxBlurRenderProcess(RenderGraph& renderGraph);
 
-  void setInputBuffer(TexturePtr colorBuffer);
+  void setInputBuffer(Texture2DPtr colorBuffer);
   void setStrength(unsigned int strength);
 };
 

@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Render/Framebuffer.hpp"
+#include "RaZ/Render/Texture.hpp"
 
 TEST_CASE("Framebuffer buffers") {
   Raz::Framebuffer framebuffer;
@@ -9,8 +10,8 @@ TEST_CASE("Framebuffer buffers") {
   CHECK(framebuffer.isEmpty()); // Combining the above checks
 
   // The buffers need to have a size for the framebuffer to be complete
-  const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
-  const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
+  const auto depthBuffer = Raz::Texture2D::create(Raz::TextureColorspace::DEPTH);
+  const auto colorBuffer = Raz::Texture2D::create(Raz::TextureColorspace::RGB);
 
   // Setting a color buffer as depth or adding a depth buffer as color throws an exception
   CHECK_THROWS(framebuffer.setDepthBuffer(colorBuffer));
@@ -61,8 +62,8 @@ TEST_CASE("Framebuffer move") {
 
   const unsigned int framebufferIndex = framebuffer.getIndex();
 
-  const auto depthBuffer = Raz::Texture::create(Raz::TextureColorspace::DEPTH);
-  const auto colorBuffer = Raz::Texture::create(Raz::TextureColorspace::RGB);
+  const auto depthBuffer = Raz::Texture2D::create(Raz::TextureColorspace::DEPTH);
+  const auto colorBuffer = Raz::Texture2D::create(Raz::TextureColorspace::RGB);
 
   framebuffer.setDepthBuffer(depthBuffer);
   framebuffer.addColorBuffer(colorBuffer, 0);

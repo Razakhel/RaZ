@@ -3,15 +3,14 @@
 #ifndef RAZ_FRAMEBUFFER_HPP
 #define RAZ_FRAMEBUFFER_HPP
 
-#include "RaZ/Render/Texture.hpp"
-
 #include <cassert>
 #include <vector>
 
 namespace Raz {
 
 class RenderShaderProgram;
-class Texture;
+class Texture2D;
+using Texture2DPtr = std::shared_ptr<Texture2D>;
 class VertexShader;
 
 /// Framebuffer class, handling buffers used for deferred rendering.
@@ -26,9 +25,9 @@ public:
   unsigned int getIndex() const noexcept { return m_index; }
   bool isEmpty() const noexcept { return (!hasDepthBuffer() && m_colorBuffers.empty()); }
   bool hasDepthBuffer() const noexcept { return (m_depthBuffer != nullptr); }
-  const Texture& getDepthBuffer() const noexcept { assert("Error: Framebuffer doesn't contain a depth buffer." && hasDepthBuffer()); return *m_depthBuffer; }
+  const Texture2D& getDepthBuffer() const noexcept { assert("Error: Framebuffer doesn't contain a depth buffer." && hasDepthBuffer()); return *m_depthBuffer; }
   std::size_t getColorBufferCount() const noexcept { return m_colorBuffers.size(); }
-  const Texture& getColorBuffer(std::size_t bufferIndex) const noexcept { return *m_colorBuffers[bufferIndex].first; }
+  const Texture2D& getColorBuffer(std::size_t bufferIndex) const noexcept { return *m_colorBuffers[bufferIndex].first; }
 
   /// Gives a basic vertex shader, to display the framebuffer.
   /// \return Basic display vertex shader.
@@ -36,14 +35,14 @@ public:
 
   /// Sets the write depth buffer texture.
   /// \param texture Depth buffer texture to be set; must have a depth colorspace.
-  void setDepthBuffer(TexturePtr texture);
+  void setDepthBuffer(Texture2DPtr texture);
   /// Adds a write color buffer texture.
   /// \param texture Color buffer texture to be added; must have a non-depth colorspace.
   /// \param index Buffer's index (location of the shader's output value).
-  void addColorBuffer(TexturePtr texture, unsigned int index);
+  void addColorBuffer(Texture2DPtr texture, unsigned int index);
   /// Removes a write buffer texture.
   /// \param texture Buffer texture to be removed.
-  void removeTextureBuffer(const TexturePtr& texture);
+  void removeTextureBuffer(const Texture2DPtr& texture);
   /// Removes the depth buffer.
   void clearDepthBuffer() { m_depthBuffer.reset(); }
   /// Removes all color buffers.
@@ -70,8 +69,8 @@ public:
 
 private:
   unsigned int m_index {};
-  TexturePtr m_depthBuffer {};
-  std::vector<std::pair<TexturePtr, unsigned int>> m_colorBuffers {};
+  Texture2DPtr m_depthBuffer {};
+  std::vector<std::pair<Texture2DPtr, unsigned int>> m_colorBuffers {};
 };
 
 } // namespace Raz

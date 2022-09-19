@@ -102,16 +102,16 @@ void OverlayTextbox::clear() {
   m_callback(m_text);
 }
 
-OverlayTexture::OverlayTexture(const Texture& texture)
+OverlayTexture::OverlayTexture(const Texture2D& texture)
   : OverlayTexture(texture, texture.getWidth(), texture.getHeight()) {}
 
-void OverlayTexture::setTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept {
+void OverlayTexture::setTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept {
   m_index  = texture.getIndex();
   m_width  = static_cast<float>(maxWidth);
   m_height = static_cast<float>(maxHeight);
 }
 
-void OverlayTexture::setTexture(const Texture& texture) noexcept {
+void OverlayTexture::setTexture(const Texture2D& texture) noexcept {
   setTexture(texture, texture.getWidth(), texture.getHeight());
 }
 
@@ -170,11 +170,11 @@ OverlayDropdown& OverlayWindow::addDropdown(std::string label, std::vector<std::
                                                                                                   std::move(actionChanged), initId)));
 }
 
-OverlayTexture& OverlayWindow::addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) {
+OverlayTexture& OverlayWindow::addTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) {
   return static_cast<OverlayTexture&>(*m_elements.emplace_back(std::make_unique<OverlayTexture>(texture, maxWidth, maxHeight)));
 }
 
-OverlayTexture& OverlayWindow::addTexture(const Texture& texture) {
+OverlayTexture& OverlayWindow::addTexture(const Texture2D& texture) {
   return static_cast<OverlayTexture&>(*m_elements.emplace_back(std::make_unique<OverlayTexture>(texture)));
 }
 

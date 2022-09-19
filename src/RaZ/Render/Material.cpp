@@ -24,20 +24,20 @@ bool Material::hasAttribute(const std::string& uniformName) const noexcept {
   return (m_attributes.find(uniformName) != m_attributes.cend());
 }
 
-bool Material::hasTexture(const Texture& texture) const noexcept {
-  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&texture] (const std::pair<TexturePtr, std::string>& element) {
+bool Material::hasTexture(const Texture2D& texture) const noexcept {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&texture] (const std::pair<Texture2DPtr, std::string>& element) {
     return (element.first->getIndex() == texture.getIndex());
   });
 }
 
 bool Material::hasTexture(const std::string& uniformName) const noexcept {
-  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&uniformName] (const std::pair<TexturePtr, std::string>& element) {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&uniformName] (const std::pair<Texture2DPtr, std::string>& element) {
     return (element.second == uniformName);
   });
 }
 
-const Texture& Material::getTexture(const std::string& uniformName) const {
-  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<TexturePtr, std::string>& element) {
+const Texture2D& Material::getTexture(const std::string& uniformName) const {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<Texture2DPtr, std::string>& element) {
     return (element.second == uniformName);
   });
 
@@ -47,8 +47,8 @@ const Texture& Material::getTexture(const std::string& uniformName) const {
   return *textureIt->first;
 }
 
-void Material::setTexture(TexturePtr texture, std::string uniformName) {
-  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<TexturePtr, std::string>& element) {
+void Material::setTexture(Texture2DPtr texture, std::string uniformName) {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<Texture2DPtr, std::string>& element) {
     return (element.second == uniformName);
   });
 
@@ -67,22 +67,6 @@ void Material::removeAttribute(const std::string& uniformName) {
   m_attributes.erase(attribIt);
 }
 
-void Material::removeTexture(const Texture& texture) {
-  m_textures.erase(std::remove_if(m_textures.begin(), m_textures.end(), [&texture] (const std::pair<TexturePtr, std::string>& element) {
-    return (element.first->getIndex() == texture.getIndex());
-  }), m_textures.end());
-}
-
-void Material::removeTexture(const std::string& uniformName) {
-  for (auto textureIt = m_textures.begin(); textureIt != m_textures.end(); ++textureIt) {
-    if (textureIt->second != uniformName)
-      continue;
-
-    m_textures.erase(textureIt);
-    return;
-  }
-}
-
 void Material::loadType(MaterialType type) {
   switch (type) {
     case MaterialType::COOK_TORRANCE:
@@ -98,17 +82,17 @@ void Material::loadType(MaterialType type) {
         setAttribute(1.f, MaterialAttribute::Roughness);
 
       if (!hasTexture(MaterialTexture::BaseColor))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::BaseColor);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::BaseColor);
       if (!hasTexture(MaterialTexture::Emissive))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Emissive);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Emissive);
       if (!hasTexture(MaterialTexture::Normal))
-        setTexture(Texture::create(ColorPreset::MediumBlue), MaterialTexture::Normal); // Representing a [ 0; 0; 1 ] vector
+        setTexture(Texture2D::create(ColorPreset::MediumBlue), MaterialTexture::Normal); // Representing a [ 0; 0; 1 ] vector
       if (!hasTexture(MaterialTexture::Metallic))
-        setTexture(Texture::create(ColorPreset::Red), MaterialTexture::Metallic);
+        setTexture(Texture2D::create(ColorPreset::Red), MaterialTexture::Metallic);
       if (!hasTexture(MaterialTexture::Roughness))
-        setTexture(Texture::create(ColorPreset::Red), MaterialTexture::Roughness);
+        setTexture(Texture2D::create(ColorPreset::Red), MaterialTexture::Roughness);
       if (!hasTexture(MaterialTexture::Ambient))
-        setTexture(Texture::create(ColorPreset::Red), MaterialTexture::Ambient);
+        setTexture(Texture2D::create(ColorPreset::Red), MaterialTexture::Ambient);
 
       break;
 
@@ -127,17 +111,17 @@ void Material::loadType(MaterialType type) {
         setAttribute(1.f, MaterialAttribute::Transparency);
 
       if (!hasTexture(MaterialTexture::BaseColor))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::BaseColor);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::BaseColor);
       if (!hasTexture(MaterialTexture::Emissive))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Emissive);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Emissive);
       if (!hasTexture(MaterialTexture::Ambient))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Ambient);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Ambient);
       if (!hasTexture(MaterialTexture::Specular))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Specular);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Specular);
       if (!hasTexture(MaterialTexture::Transparency))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Transparency);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Transparency);
       if (!hasTexture(MaterialTexture::Bump))
-        setTexture(Texture::create(ColorPreset::White), MaterialTexture::Bump);
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Bump);
 
       break;
 
@@ -177,6 +161,22 @@ void Material::bindTextures() const {
   for (const auto& [texture, _] : m_textures) {
     Renderer::activateTexture(textureIndex++);
     texture->bind();
+  }
+}
+
+void Material::removeTexture(const Texture2D& texture) {
+  m_textures.erase(std::remove_if(m_textures.begin(), m_textures.end(), [&texture] (const std::pair<Texture2DPtr, std::string>& element) {
+    return (element.first->getIndex() == texture.getIndex());
+  }), m_textures.end());
+}
+
+void Material::removeTexture(const std::string& uniformName) {
+  for (auto textureIt = m_textures.begin(); textureIt != m_textures.end(); ++textureIt) {
+    if (textureIt->second != uniformName)
+      continue;
+
+    m_textures.erase(textureIt);
+    return;
   }
 }
 

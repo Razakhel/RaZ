@@ -2,6 +2,7 @@
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <utility>
@@ -82,7 +83,7 @@ VertexShader Framebuffer::recoverVertexShader() {
   return VertexShader::loadFromSource(vertSource);
 }
 
-void Framebuffer::setDepthBuffer(TexturePtr texture) {
+void Framebuffer::setDepthBuffer(Texture2DPtr texture) {
   if (texture->getColorspace() != TextureColorspace::DEPTH)
     throw std::invalid_argument("Error: Invalid depth buffer");
 
@@ -91,7 +92,7 @@ void Framebuffer::setDepthBuffer(TexturePtr texture) {
   mapBuffers();
 }
 
-void Framebuffer::addColorBuffer(TexturePtr texture, unsigned int index) {
+void Framebuffer::addColorBuffer(Texture2DPtr texture, unsigned int index) {
   if (texture->getColorspace() == TextureColorspace::DEPTH || texture->getColorspace() == TextureColorspace::INVALID)
     throw std::invalid_argument("Error: Invalid color buffer");
 
@@ -106,7 +107,7 @@ void Framebuffer::addColorBuffer(TexturePtr texture, unsigned int index) {
   mapBuffers();
 }
 
-void Framebuffer::removeTextureBuffer(const TexturePtr& texture) {
+void Framebuffer::removeTextureBuffer(const Texture2DPtr& texture) {
   if (texture == m_depthBuffer) {
     m_depthBuffer.reset();
   } else {

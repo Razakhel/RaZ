@@ -8,9 +8,9 @@ bool RenderPass::isValid() const {
   // Since a pass can get read & write buffers from other sources than the previous pass, one may have more or less
   //  buffers than its parent write to. Direct buffer compatibility is thus not checked
 
-  const std::vector<std::pair<TexturePtr, unsigned int>>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
+  const std::vector<std::pair<Texture2DPtr, unsigned int>>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
 
-  for (const TexturePtr& readTexture : m_readTextures) {
+  for (const Texture2DPtr& readTexture : m_readTextures) {
     // If the same depth buffer exists both in read & write, the pass is invalid
     if (readTexture->getColorspace() == TextureColorspace::DEPTH && m_writeFramebuffer.hasDepthBuffer()) {
       if (readTexture.get() == &m_writeFramebuffer.getDepthBuffer())
@@ -29,7 +29,7 @@ bool RenderPass::isValid() const {
   return true;
 }
 
-void RenderPass::addReadTexture(TexturePtr texture, const std::string& uniformName) {
+void RenderPass::addReadTexture(Texture2DPtr texture, const std::string& uniformName) {
   m_readTextures.emplace_back(std::move(texture));
 
   // TODO: this binding will be lost if the program is updated; store the uniform name
@@ -37,7 +37,7 @@ void RenderPass::addReadTexture(TexturePtr texture, const std::string& uniformNa
   m_program.sendUniform(uniformName, static_cast<int>(m_readTextures.size() - 1));
 }
 
-void RenderPass::removeReadTexture(const TexturePtr& texture) {
+void RenderPass::removeReadTexture(const Texture2DPtr& texture) {
   const auto textureIt = std::find(m_readTextures.cbegin(), m_readTextures.cend(), texture);
   if (textureIt != m_readTextures.cend())
     m_readTextures.erase(textureIt);
@@ -48,7 +48,7 @@ void RenderPass::bindTextures() const noexcept {
 
   unsigned int textureIndex = 0;
 
-  for (const TexturePtr& texture : m_readTextures) {
+  for (const Texture2DPtr& texture : m_readTextures) {
     Renderer::activateTexture(textureIndex++);
     texture->bind();
   }

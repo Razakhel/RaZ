@@ -21,14 +21,14 @@ public:
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
   void resizeBuffers(unsigned int width, unsigned int height) override;
-  void setInputBuffer(TexturePtr inputBuffer);
-  void setOutputBuffer(TexturePtr outputBuffer);
+  void setInputBuffer(Texture2DPtr inputBuffer);
+  void setOutputBuffer(Texture2DPtr outputBuffer);
 
 private:
   RenderPass* m_horizontalPass {};
   RenderPass* m_verticalPass {};
 
-  TexturePtr m_horizontalBuffer {};
+  Texture2DPtr m_horizontalBuffer {};
 };
 
 } // namespace Raz

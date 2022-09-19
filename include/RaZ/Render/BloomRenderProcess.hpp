@@ -19,12 +19,12 @@ public:
   const RenderPass& getDownscalePass(std::size_t passIndex) const noexcept { return *m_downscalePasses[passIndex]; }
   RenderPass& getDownscalePass(std::size_t passIndex) noexcept { return *m_downscalePasses[passIndex]; }
   std::size_t getDownscaleBufferCount() const noexcept { return m_downscaleBuffers.size(); }
-  const Texture& getDownscaleBuffer(std::size_t bufferIndex) const noexcept { return *m_downscaleBuffers[bufferIndex].lock(); }
+  const Texture2D& getDownscaleBuffer(std::size_t bufferIndex) const noexcept { return *m_downscaleBuffers[bufferIndex].lock(); }
   std::size_t getUpscalePassCount() const noexcept { return m_upscalePasses.size(); }
   const RenderPass& getUpscalePass(std::size_t passIndex) const noexcept { return *m_upscalePasses[passIndex]; }
   RenderPass& getUpscalePass(std::size_t passIndex) noexcept { return *m_upscalePasses[passIndex]; }
   std::size_t getUpscaleBufferCount() const noexcept { return m_upscaleBuffers.size(); }
-  const Texture& getUpscaleBuffer(std::size_t bufferIndex) const noexcept { return *m_upscaleBuffers[bufferIndex].lock(); }
+  const Texture2D& getUpscaleBuffer(std::size_t bufferIndex) const noexcept { return *m_upscaleBuffers[bufferIndex].lock(); }
 
   void setState(bool enabled) override;
   void addParent(RenderPass& parentPass) override;
@@ -32,18 +32,18 @@ public:
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
   void resizeBuffers(unsigned int width, unsigned int height) override;
-  void setInputColorBuffer(TexturePtr colorBuffer);
-  void setOutputBuffer(TexturePtr outputBuffer);
+  void setInputColorBuffer(Texture2DPtr colorBuffer);
+  void setOutputBuffer(Texture2DPtr outputBuffer);
   void setThresholdValue(float threshold);
 
 private:
   RenderPass* m_thresholdPass {};
 
   std::vector<RenderPass*> m_downscalePasses {};
-  std::vector<std::weak_ptr<Texture>> m_downscaleBuffers {};
+  std::vector<std::weak_ptr<Texture2D>> m_downscaleBuffers {};
 
   std::vector<RenderPass*> m_upscalePasses {};
-  std::vector<std::weak_ptr<Texture>> m_upscaleBuffers {};
+  std::vector<std::weak_ptr<Texture2D>> m_upscaleBuffers {};
 
   RenderPass* m_finalPass {};
 };

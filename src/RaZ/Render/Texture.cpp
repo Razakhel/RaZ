@@ -108,45 +108,45 @@ inline TextureParamValue recoverParam(TextureWrapping wrapping) {
 
 } // namespace
 
-Texture::Texture() {
+Texture2D::Texture2D() {
   Logger::debug("[Texture] Creating...");
   Renderer::generateTexture(m_index);
   Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
 }
 
-Texture::Texture(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType)
-  : Texture(colorspace, dataType) { resize(width, height); }
+Texture2D::Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType)
+  : Texture2D(colorspace, dataType) { resize(width, height); }
 
-Texture::Texture(Texture&& texture) noexcept
+Texture2D::Texture2D(Texture2D&& texture) noexcept
   : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) },
     m_width{ texture.m_width },
     m_height{ texture.m_height },
     m_colorspace{ texture.m_colorspace },
     m_dataType{ texture.m_dataType } {}
 
-void Texture::bind() const {
+void Texture2D::bind() const {
   Renderer::bindTexture(TextureType::TEXTURE_2D, m_index);
 }
 
-void Texture::unbind() const {
+void Texture2D::unbind() const {
   Renderer::unbindTexture(TextureType::TEXTURE_2D);
 }
 
-void Texture::setFilter(TextureFilter minify, TextureFilter magnify) const {
+void Texture2D::setFilter(TextureFilter minify, TextureFilter magnify) const {
   bind();
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, recoverParam(minify));
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
   unbind();
 }
 
-void Texture::setFilter(TextureFilter minify, TextureFilter mipmapMinify, TextureFilter magnify) const {
+void Texture2D::setFilter(TextureFilter minify, TextureFilter mipmapMinify, TextureFilter magnify) const {
   bind();
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, recoverParam(minify, mipmapMinify));
   Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
   unbind();
 }
 
-void Texture::setWrapping(TextureWrapping wrapping) const {
+void Texture2D::setWrapping(TextureWrapping wrapping) const {
   const TextureParamValue value = recoverParam(wrapping);
 
   bind();
@@ -156,21 +156,21 @@ void Texture::setWrapping(TextureWrapping wrapping) const {
   unbind();
 }
 
-void Texture::setParameters(unsigned int width, unsigned int height, TextureColorspace colorspace) {
+void Texture2D::setParameters(unsigned int width, unsigned int height, TextureColorspace colorspace) {
   setColorspace(colorspace);
   resize(width, height);
 }
 
-void Texture::setParameters(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType) {
+void Texture2D::setParameters(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType) {
   setColorspace(colorspace, dataType);
   resize(width, height);
 }
 
-void Texture::setColorspace(TextureColorspace colorspace) {
+void Texture2D::setColorspace(TextureColorspace colorspace) {
   setColorspace(colorspace, (colorspace == TextureColorspace::DEPTH ? TextureDataType::FLOAT : TextureDataType::BYTE));
 }
 
-void Texture::setColorspace(TextureColorspace colorspace, TextureDataType dataType) {
+void Texture2D::setColorspace(TextureColorspace colorspace, TextureDataType dataType) {
   assert("Error: A depth texture must have a floating-point data type." && (colorspace != TextureColorspace::DEPTH || dataType == TextureDataType::FLOAT));
 
   m_colorspace = colorspace;
@@ -180,7 +180,7 @@ void Texture::setColorspace(TextureColorspace colorspace, TextureDataType dataTy
   setWrapping(TextureWrapping::CLAMP);
 }
 
-void Texture::resize(unsigned int width, unsigned int height) {
+void Texture2D::resize(unsigned int width, unsigned int height) {
   m_width  = width;
   m_height = height;
 
@@ -196,7 +196,7 @@ void Texture::resize(unsigned int width, unsigned int height) {
   unbind();
 }
 
-void Texture::load(const Image& image, bool createMipmaps) {
+void Texture2D::load(const Image& image, bool createMipmaps) {
   if (image.isEmpty()) {
     // Image not found, defaulting texture to pure white
     makePlainColored(ColorPreset::White);
@@ -241,7 +241,7 @@ void Texture::load(const Image& image, bool createMipmaps) {
 }
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTextureData() is unavailable with OpenGL ES
-Image Texture::recoverImage() const {
+Image Texture2D::recoverImage() const {
   Image img(m_width, m_height, static_cast<ImageColorspace>(m_colorspace), (m_dataType == TextureDataType::FLOAT ? ImageDataType::FLOAT : ImageDataType::BYTE));
 
   bind();
@@ -256,7 +256,7 @@ Image Texture::recoverImage() const {
 }
 #endif
 
-Texture& Texture::operator=(Texture&& texture) noexcept {
+Texture2D& Texture2D::operator=(Texture2D&& texture) noexcept {
   std::swap(m_index, texture.m_index);
   m_width      = texture.m_width;
   m_height     = texture.m_height;
@@ -266,7 +266,7 @@ Texture& Texture::operator=(Texture&& texture) noexcept {
   return *this;
 }
 
-Texture::~Texture() {
+Texture2D::~Texture2D() {
   if (m_index == std::numeric_limits<unsigned int>::max())
     return;
 
@@ -275,7 +275,7 @@ Texture::~Texture() {
   Logger::debug("[Texture] Destroyed");
 }
 
-void Texture::makePlainColored(const Color& color) {
+void Texture2D::makePlainColored(const Color& color) {
   m_width      = 1;
   m_height     = 1;
   m_colorspace = TextureColorspace::RGB;

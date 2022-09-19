@@ -16,7 +16,7 @@ constexpr std::string_view boxBlurSource = {
 BoxBlurRenderProcess::BoxBlurRenderProcess(RenderGraph& renderGraph)
   : MonoPassRenderProcess(renderGraph, FragmentShader::loadFromSource(boxBlurSource), "Box blur") { setStrength(1); }
 
-void BoxBlurRenderProcess::setInputBuffer(TexturePtr colorBuffer) {
+void BoxBlurRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
   const Vec2f invBufferSize(1.f / static_cast<float>(colorBuffer->getWidth()), 1.f / static_cast<float>(colorBuffer->getHeight()));
 
   m_pass.getProgram().use();

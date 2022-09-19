@@ -25,7 +25,7 @@ public:
   const RenderShaderProgram& getProgram() const { return m_program; }
   RenderShaderProgram& getProgram() { return m_program; }
   std::size_t getReadTextureCount() const noexcept { return m_readTextures.size(); }
-  const Texture& getReadTexture(std::size_t textureIndex) const noexcept { return *m_readTextures[textureIndex]; }
+  const Texture2D& getReadTexture(std::size_t textureIndex) const noexcept { return *m_readTextures[textureIndex]; }
   const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
 
   void setName(std::string name) noexcept { m_name = std::move(name); }
@@ -35,17 +35,17 @@ public:
   /// \return True if the render pass is valid, false otherwise.
   /// \see RenderGraph::isValid()
   bool isValid() const;
-  void addReadTexture(TexturePtr texture, const std::string& uniformName);
-  void removeReadTexture(const TexturePtr& texture);
+  void addReadTexture(Texture2DPtr texture, const std::string& uniformName);
+  void removeReadTexture(const Texture2DPtr& texture);
   void clearReadTextures() { m_readTextures.clear(); }
   /// Sets the write depth buffer texture.
   /// \param texture Depth buffer texture to be set; must have a depth colorspace.
-  void setWriteDepthTexture(TexturePtr texture) { m_writeFramebuffer.setDepthBuffer(std::move(texture)); }
+  void setWriteDepthTexture(Texture2DPtr texture) { m_writeFramebuffer.setDepthBuffer(std::move(texture)); }
   /// Adds a write color buffer texture.
   /// \param texture Color buffer texture to be added; must have a non-depth colorspace.
   /// \param index Buffer's index (location of the shader's output value).
-  void addWriteColorTexture(TexturePtr texture, unsigned int index) { m_writeFramebuffer.addColorBuffer(std::move(texture), index); }
-  void removeWriteTexture(const TexturePtr& texture) { m_writeFramebuffer.removeTextureBuffer(texture); }
+  void addWriteColorTexture(Texture2DPtr texture, unsigned int index) { m_writeFramebuffer.addColorBuffer(std::move(texture), index); }
+  void removeWriteTexture(const Texture2DPtr& texture) { m_writeFramebuffer.removeTextureBuffer(texture); }
   void clearWriteTextures() { m_writeFramebuffer.clearTextureBuffers(); }
   /// Resizes the render pass' write buffer textures.
   /// \param width New buffers width.
@@ -71,7 +71,7 @@ protected:
   std::string m_name {};
   RenderShaderProgram m_program {};
 
-  std::vector<TexturePtr> m_readTextures {};
+  std::vector<Texture2DPtr> m_readTextures {};
   Framebuffer m_writeFramebuffer {};
 };
 

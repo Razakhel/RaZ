@@ -60,7 +60,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
       const std::string diffuseTexturePath = texturePath + diffuseTexture->GetRelativeFileName();
 
       try {
-        material.setTexture(Texture::create(ImageFormat::load(diffuseTexturePath, true)), MaterialTexture::BaseColor);
+        material.setTexture(Texture2D::create(ImageFormat::load(diffuseTexturePath, true)), MaterialTexture::BaseColor);
       } catch (...) {
         Logger::error("[FBX] Failed to load diffuse map '" + diffuseTexturePath + "'.");
       }
@@ -71,7 +71,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
       const std::string emissiveTexturePath = texturePath + emissiveTexture->GetRelativeFileName();
 
       try {
-        material.setTexture(Texture::create(ImageFormat::load(emissiveTexturePath, true)), MaterialTexture::Emissive);
+        material.setTexture(Texture2D::create(ImageFormat::load(emissiveTexturePath, true)), MaterialTexture::Emissive);
       } catch (...) {
         Logger::error("[FBX] Failed to load emissive map '" + emissiveTexturePath + "'.");
       }
@@ -82,7 +82,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
       const std::string ambientTexturePath = texturePath + ambientTexture->GetRelativeFileName();
 
       try {
-        material.setTexture(Texture::create(ImageFormat::load(ambientTexturePath, true)), MaterialTexture::Ambient);
+        material.setTexture(Texture2D::create(ImageFormat::load(ambientTexturePath, true)), MaterialTexture::Ambient);
       } catch (...) {
         Logger::error("[FBX] Failed to load ambient map '" + ambientTexturePath + "'.");
       }
@@ -93,7 +93,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
       const std::string specularTexturePath = texturePath + specularTexture->GetRelativeFileName();
 
       try {
-        material.setTexture(Texture::create(ImageFormat::load(specularTexturePath, true)), MaterialTexture::Specular);
+        material.setTexture(Texture2D::create(ImageFormat::load(specularTexturePath, true)), MaterialTexture::Specular);
       } catch (...) {
         Logger::error("[FBX] Failed to load specular map '" + specularTexturePath + "'.");
       }
@@ -108,7 +108,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
         const std::string normalMapPath = texturePath + normalMap->GetRelativeFileName();
 
         try {
-          material.setTexture(Texture::create(ImageFormat::load(normalMapPath, true)), MaterialTexture::Normal);
+          material.setTexture(Texture2D::create(ImageFormat::load(normalMapPath, true)), MaterialTexture::Normal);
         } catch (...) {
           Logger::error("[FBX] Failed to load normal map '" + normalMapPath + "'.");
         }

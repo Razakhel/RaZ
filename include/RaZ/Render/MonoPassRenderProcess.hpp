@@ -24,8 +24,8 @@ public:
   void addChild(RenderProcess& childProcess) override;
 
 protected:
-  void setInputBuffer(TexturePtr inputBuffer, const std::string& uniformName);
-  void setOutputBuffer(TexturePtr outputBuffer, unsigned int index);
+  void setInputBuffer(Texture2DPtr inputBuffer, const std::string& uniformName);
+  void setOutputBuffer(Texture2DPtr outputBuffer, unsigned int index);
 
   RenderPass& m_pass;
 };

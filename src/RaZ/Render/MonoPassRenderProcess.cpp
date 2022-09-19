@@ -41,11 +41,11 @@ void MonoPassRenderProcess::addChild(RenderProcess& childProcess) {
   childProcess.addParent(m_pass);
 }
 
-void MonoPassRenderProcess::setInputBuffer(TexturePtr inputBuffer, const std::string& uniformName) {
+void MonoPassRenderProcess::setInputBuffer(Texture2DPtr inputBuffer, const std::string& uniformName) {
   m_pass.addReadTexture(std::move(inputBuffer), uniformName);
 }
 
-void MonoPassRenderProcess::setOutputBuffer(TexturePtr outputBuffer, unsigned int index) {
+void MonoPassRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer, unsigned int index) {
   m_pass.addWriteColorTexture(std::move(outputBuffer), index);
 
 #if !defined(USE_OPENGL_ES)

@@ -39,7 +39,7 @@ TEST_CASE("Material textures") {
   const unsigned int origTextureIndex = material.getTexture(Raz::MaterialTexture::BaseColor).getIndex();
   CHECK(material.getTexture(0).getIndex() == origTextureIndex);
 
-  material.setTexture(Raz::Texture::create(), Raz::MaterialTexture::BaseColor);
+  material.setTexture(Raz::Texture2D::create(), Raz::MaterialTexture::BaseColor);
   CHECK(material.getTextureCount() == 6); // The texture already exists, none has been added
   REQUIRE(material.hasTexture(Raz::MaterialTexture::BaseColor));
   CHECK_FALSE(material.getTexture(Raz::MaterialTexture::BaseColor).getIndex() == origTextureIndex); // But its value has been changed
@@ -51,7 +51,7 @@ TEST_CASE("Material textures") {
   material.clearTextures();
   CHECK(material.getTextureCount() == 0);
 
-  Raz::TexturePtr texture = Raz::Texture::create();
+  Raz::Texture2DPtr texture = Raz::Texture2D::create();
   material.setTexture(texture, "test");
   CHECK(material.getTextureCount() == 1);
   REQUIRE(material.hasTexture("test"));

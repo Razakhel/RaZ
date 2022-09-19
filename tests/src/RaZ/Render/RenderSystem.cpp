@@ -120,7 +120,7 @@ TEST_CASE("RenderSystem overlay render") {
     overlay2.addListBox("List box", { "Value 0", "Value 1" }, [] (const std::string&, std::size_t) noexcept {}, 1);
     overlay2.addDropdown("Dropdown", { "Value 0", "Value 1" }, [] (const std::string&, std::size_t) noexcept {}, 1);
     overlay2.addProgressBar(0, 100, true).setCurrentValue(35);
-    const Raz::Texture texture(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/₁₀₀₁.png", true), false);
+    const Raz::Texture2D texture(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/₁₀₀₁.png", true), false);
     overlay2.addTexture(texture, 30, 30);
 
     CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay2_base.png", true)));

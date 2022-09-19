@@ -15,7 +15,7 @@ struct GLFWwindow;
 namespace Raz {
 
 class OverlayWindow;
-class Texture;
+class Texture2D;
 
 enum class OverlayElementType {
   LABEL,
@@ -229,13 +229,13 @@ class OverlayTexture final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) { setTexture(texture, maxWidth, maxHeight); }
-  explicit OverlayTexture(const Texture& texture);
+  OverlayTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) { setTexture(texture, maxWidth, maxHeight); }
+  explicit OverlayTexture(const Texture2D& texture);
 
   OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
 
-  void setTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept;
-  void setTexture(const Texture& texture) noexcept;
+  void setTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept;
+  void setTexture(const Texture2D& texture) noexcept;
 
 private:
   unsigned int m_index {};
@@ -371,11 +371,11 @@ public:
   /// \param maxWidth Maximum texture's width.
   /// \param maxHeight Maximum texture's height.
   /// \return Reference to the newly added texture.
-  OverlayTexture& addTexture(const Texture& texture, unsigned int maxWidth, unsigned int maxHeight);
+  OverlayTexture& addTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight);
   /// Adds a texture on the overlay window. The maximum width & height will be those of the texture.
   /// \param texture Texture to be displayed.
   /// \return Reference to the newly added texture.
-  OverlayTexture& addTexture(const Texture& texture);
+  OverlayTexture& addTexture(const Texture2D& texture);
   /// Adds a progress bar on the overlay window.
   /// \param minVal Minimum value.
   /// \param maxVal Maximum value.
