@@ -4,8 +4,6 @@
 
 #include <AL/al.h>
 
-#include <utility>
-
 namespace Raz {
 
 namespace {
@@ -31,13 +29,6 @@ inline void checkError(const std::string& errorMsg) {
 
 } // namespace
 
-Sound::Sound(Sound&& sound) noexcept
-  : m_buffer{ std::exchange(sound.m_buffer, std::numeric_limits<unsigned int>::max()) },
-    m_source{ std::exchange(sound.m_source, std::numeric_limits<unsigned int>::max()) },
-    m_format{ sound.m_format },
-    m_frequency{ sound.m_frequency },
-    m_data{ std::move(sound.m_data) } {}
-
 void Sound::init() {
   Logger::debug("[Sound] Initializing...");
 
@@ -46,12 +37,12 @@ void Sound::init() {
   destroy();
 
   Logger::debug("[Sound] Creating buffer...");
-  alGenBuffers(1, &m_buffer);
+  alGenBuffers(1, &m_buffer.get());
   checkError("Failed to create a sound buffer");
   Logger::debug("[Sound] Created buffer (ID: " + std::to_string(m_buffer) + ')');
 
   Logger::debug("[Sound] Creating source...");
-  alGenSources(1, &m_source);
+  alGenSources(1, &m_source.get());
   checkError("Failed to create a sound source");
   Logger::debug("[Sound] Created source (ID: " + std::to_string(m_source) + ')');
 
@@ -182,43 +173,32 @@ float Sound::recoverElapsedTime() const noexcept {
 }
 
 void Sound::destroy() {
-  if (m_source == std::numeric_limits<unsigned int>::max() &&  m_buffer == std::numeric_limits<unsigned int>::max())
+  if (!m_source.isValid() && !m_buffer.isValid())
     return;
 
   Logger::debug("[Sound] Destroying...");
 
-  if (m_source != std::numeric_limits<unsigned int>::max()) {
+  if (m_source.isValid()) {
     Logger::debug("[Sound] Destroying source (ID: " + std::to_string(m_source) + ")...");
 
-    alDeleteSources(1, &m_source);
+    alDeleteSources(1, &m_source.get());
     checkError("Failed to delete source");
-    m_source = std::numeric_limits<unsigned int>::max();
+    m_source.reset();
 
     Logger::debug("[Sound] Destroyed source");
   }
 
-  if (m_buffer != std::numeric_limits<unsigned int>::max()) {
+  if (m_buffer.isValid()) {
     Logger::debug("[Sound] Destroying buffer (ID: " + std::to_string(m_buffer) + ")...");
 
-    alDeleteBuffers(1, &m_buffer);
+    alDeleteBuffers(1, &m_buffer.get());
     checkError("Failed to delete buffer");
-    m_buffer = std::numeric_limits<unsigned int>::max();
+    m_buffer.reset();
 
     Logger::debug("[Sound] Destroyed buffer");
   }
 
   Logger::debug("[Sound] Destroyed");
-}
-
-Sound& Sound::operator=(Sound&& sound) noexcept {
-  std::swap(m_buffer, sound.m_buffer);
-  std::swap(m_source, sound.m_source);
-
-  m_format    = sound.m_format;
-  m_frequency = sound.m_frequency;
-  m_data      = std::move(sound.m_data);
-
-  return *this;
 }
 
 } // namespace Raz

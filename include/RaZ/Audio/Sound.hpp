@@ -4,6 +4,7 @@
 #define RAZ_SOUND_HPP
 
 #include "RaZ/Component.hpp"
+#include "RaZ/Data/OwnerValue.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 #include <cstddef>
@@ -38,7 +39,7 @@ class Sound final : public Component {
 public:
   Sound() { init(); }
   Sound(const Sound&) = delete;
-  Sound(Sound&& sound) noexcept;
+  Sound(Sound&&) noexcept = default;
 
   constexpr unsigned int getBufferIndex() const noexcept { return m_buffer; }
   constexpr SoundFormat getFormat() const noexcept { return m_format; }
@@ -117,13 +118,13 @@ public:
   void destroy();
 
   Sound& operator=(const Sound&) = delete;
-  Sound& operator=(Sound&& sound) noexcept;
+  Sound& operator=(Sound&&) noexcept = default;
 
   ~Sound() override { destroy(); }
 
 private:
-  unsigned int m_buffer = std::numeric_limits<unsigned int>::max();
-  unsigned int m_source = std::numeric_limits<unsigned int>::max();
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_buffer {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_source {};
 
   SoundFormat m_format {};
   int m_frequency {};
