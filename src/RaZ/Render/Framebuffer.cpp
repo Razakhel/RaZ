@@ -5,8 +5,6 @@
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <utility>
-
 namespace Raz {
 
 namespace {
@@ -58,13 +56,6 @@ Framebuffer::Framebuffer() {
   Logger::debug("[Framebuffer] Creating...");
   Renderer::generateFramebuffer(m_index);
   Logger::debug("[Framebuffer] Created (ID: " + std::to_string(m_index) + ')');
-}
-
-Framebuffer::Framebuffer(Framebuffer&& fbo) noexcept
-  : m_index{ std::exchange(fbo.m_index, std::numeric_limits<unsigned int>::max()) },
-    m_depthBuffer{ std::exchange(fbo.m_depthBuffer, nullptr) },
-    m_colorBuffers{ std::move(fbo.m_colorBuffers) } {
-  mapBuffers(); // TODO: may be unnecessary
 }
 
 VertexShader Framebuffer::recoverVertexShader() {
@@ -182,18 +173,8 @@ void Framebuffer::display() const {
   drawDisplaySurface();
 }
 
-Framebuffer& Framebuffer::operator=(Framebuffer&& fbo) noexcept {
-  std::swap(m_index, fbo.m_index);
-  m_depthBuffer  = std::move(fbo.m_depthBuffer);
-  m_colorBuffers = std::move(fbo.m_colorBuffers);
-
-  mapBuffers(); // TODO: may be unnecessary
-
-  return *this;
-}
-
 Framebuffer::~Framebuffer() {
-  if (m_index == std::numeric_limits<unsigned int>::max())
+  if (!m_index.isValid())
     return;
 
   Logger::debug("[Framebuffer] Destroying (ID: " + std::to_string(m_index) + ")...");

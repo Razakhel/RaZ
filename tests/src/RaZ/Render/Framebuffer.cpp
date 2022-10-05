@@ -61,6 +61,7 @@ TEST_CASE("Framebuffer move") {
   Raz::Framebuffer framebuffer;
 
   const unsigned int framebufferIndex = framebuffer.getIndex();
+  REQUIRE(framebufferIndex != std::numeric_limits<unsigned int>::max());
 
   const auto depthBuffer = Raz::Texture2D::create(Raz::TextureColorspace::DEPTH);
   const auto colorBuffer = Raz::Texture2D::create(Raz::TextureColorspace::RGB);
@@ -89,6 +90,7 @@ TEST_CASE("Framebuffer move") {
   Raz::Framebuffer movedFramebufferOp;
 
   const unsigned int movedFramebufferOpIndex = movedFramebufferOp.getIndex();
+  REQUIRE(movedFramebufferOpIndex != std::numeric_limits<unsigned int>::max());
 
   movedFramebufferOp = std::move(movedFramebufferCtor);
 

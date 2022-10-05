@@ -3,7 +3,10 @@
 #ifndef RAZ_FRAMEBUFFER_HPP
 #define RAZ_FRAMEBUFFER_HPP
 
+#include "RaZ/Data/OwnerValue.hpp"
+
 #include <cassert>
+#include <limits>
 #include <vector>
 
 namespace Raz {
@@ -20,7 +23,7 @@ class Framebuffer {
 public:
   Framebuffer();
   Framebuffer(const Framebuffer&) = delete;
-  Framebuffer(Framebuffer&& fbo) noexcept;
+  Framebuffer(Framebuffer&&) noexcept = default;
 
   unsigned int getIndex() const noexcept { return m_index; }
   bool isEmpty() const noexcept { return (!hasDepthBuffer() && m_colorBuffers.empty()); }
@@ -63,12 +66,12 @@ public:
   void display() const;
 
   Framebuffer& operator=(const Framebuffer&) = delete;
-  Framebuffer& operator=(Framebuffer&& fbo) noexcept;
+  Framebuffer& operator=(Framebuffer&&) noexcept = default;
 
   ~Framebuffer();
 
 private:
-  unsigned int m_index {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
   Texture2DPtr m_depthBuffer {};
   std::vector<std::pair<Texture2DPtr, unsigned int>> m_colorBuffers {};
 };
