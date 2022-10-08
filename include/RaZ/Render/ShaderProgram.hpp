@@ -3,10 +3,12 @@
 #ifndef RAZ_SHADERPROGRAM_HPP
 #define RAZ_SHADERPROGRAM_HPP
 
+#include "RaZ/Data/OwnerValue.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
 
+#include <limits>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -18,7 +20,7 @@ class ShaderProgram {
 public:
   ShaderProgram();
   ShaderProgram(const ShaderProgram&) = delete;
-  ShaderProgram(ShaderProgram&& program) noexcept;
+  ShaderProgram(ShaderProgram&&) noexcept = default;
 
   unsigned int getIndex() const { return m_index; }
 
@@ -168,12 +170,12 @@ public:
   void sendUniform(const std::string& uniformName, const Mat4f& mat) const { sendUniform(recoverUniformLocation(uniformName), mat); }
 
   ShaderProgram& operator=(const ShaderProgram&) = delete;
-  ShaderProgram& operator=(ShaderProgram&& program) noexcept;
+  ShaderProgram& operator=(ShaderProgram&&) noexcept = default;
 
   virtual ~ShaderProgram();
 
 protected:
-  unsigned int m_index {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
 
 private:
   std::unordered_map<std::string, int> m_uniforms {};

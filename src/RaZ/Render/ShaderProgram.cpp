@@ -2,8 +2,6 @@
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <utility>
-
 namespace Raz {
 
 namespace {
@@ -19,10 +17,6 @@ inline void checkProgramUsed([[maybe_unused]] const ShaderProgram& program) {
 
 ShaderProgram::ShaderProgram()
   : m_index{ Renderer::createProgram() } {}
-
-ShaderProgram::ShaderProgram(ShaderProgram&& program) noexcept
-  : m_index{ std::exchange(program.m_index, std::numeric_limits<unsigned int>::max()) },
-    m_uniforms{ std::move(program.m_uniforms) } {}
 
 void ShaderProgram::link() const {
   Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
@@ -140,15 +134,8 @@ void ShaderProgram::sendUniform(int uniformIndex, const Mat4f& mat) const {
   Renderer::sendUniformMatrix4x4(uniformIndex, mat.getDataPtr());
 }
 
-ShaderProgram& ShaderProgram::operator=(ShaderProgram&& program) noexcept {
-  std::swap(m_index, program.m_index);
-  m_uniforms = std::move(program.m_uniforms);
-
-  return *this;
-}
-
 ShaderProgram::~ShaderProgram() {
-  if (m_index == std::numeric_limits<unsigned int>::max())
+  if (!m_index.isValid())
     return;
 
   Logger::debug("[ShaderProgram] Destroying (ID: " + std::to_string(m_index) + ")...");
