@@ -3,8 +3,10 @@
 #ifndef RAZ_SHADER_HPP
 #define RAZ_SHADER_HPP
 
+#include "RaZ/Data/OwnerValue.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
+#include <limits>
 #include <string>
 
 namespace Raz {
@@ -12,20 +14,22 @@ namespace Raz {
 class Shader {
 public:
   Shader(const Shader&) = delete;
-  Shader(Shader&& shader) noexcept;
+  Shader(Shader&&) noexcept = default;
 
   unsigned int getIndex() const noexcept { return m_index; }
   const FilePath& getPath() const noexcept { return m_path; }
 
-  bool isValid() const noexcept;
+  bool isValid() const noexcept { return m_index.isValid(); }
   void import(FilePath filePath);
+  /// Reloads the shader file. The shader must have been previously imported from a file for this function to load anything.
+  /// \see import()
   void load() const;
   void compile() const;
   bool isCompiled() const noexcept;
   void destroy();
 
   Shader& operator=(const Shader&) = delete;
-  Shader& operator=(Shader&& shader) noexcept;
+  Shader& operator=(Shader&&) noexcept = default;
 
   ~Shader() { destroy(); }
 
@@ -34,7 +38,7 @@ protected:
 
   void loadSource(const std::string& source) const;
 
-  unsigned int m_index {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
   FilePath m_path {};
 };
 

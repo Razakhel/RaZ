@@ -4,17 +4,7 @@
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
-#include <limits>
-#include <utility>
-
 namespace Raz {
-
-Shader::Shader(Shader&& shader) noexcept
-  : m_index{ std::exchange(shader.m_index, std::numeric_limits<unsigned int>::max()) }, m_path{ std::move(shader.m_path) } {}
-
-bool Shader::isValid() const noexcept {
-  return (m_index != std::numeric_limits<unsigned int>::max());
-}
 
 void Shader::import(FilePath filePath) {
   m_path = std::move(filePath);
@@ -22,13 +12,11 @@ void Shader::import(FilePath filePath) {
 }
 
 void Shader::load() const {
-  if (m_path.getPath().empty()) // Shader imported directly from source, no path available
+  if (m_path.isEmpty()) // Shader imported directly from source, no path available
     return;
 
   Logger::debug("[Shader] Loading (ID: " + std::to_string(m_index) + ", path: '" + m_path + "')...");
-
   loadSource(FileUtils::readFile(m_path));
-
   Logger::debug("[Shader] Loaded");
 }
 
@@ -68,20 +56,13 @@ void Shader::loadSource(const std::string& source) const {
 }
 
 void Shader::destroy() {
-  if (!isValid())
+  if (!m_index.isValid())
     return;
 
   Logger::debug("[Shader] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteShader(m_index);
-  m_index = std::numeric_limits<unsigned int>::max();
+  m_index.reset();
   Logger::debug("[Shader] Destroyed");
-}
-
-Shader& Shader::operator=(Shader&& shader) noexcept {
-  std::swap(m_index, shader.m_index);
-  m_path = std::move(shader.m_path);
-
-  return *this;
 }
 
 VertexShader::VertexShader() {
