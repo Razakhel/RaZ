@@ -5,8 +5,6 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <utility>
-
 namespace Raz {
 
 namespace {
@@ -156,9 +154,6 @@ const RenderShaderProgram& Cubemap::getProgram() const {
   return getDisplayCube().getMaterials().front().getProgram();
 }
 
-Cubemap::Cubemap(Cubemap&& cubemap) noexcept
-  : m_index{ std::exchange(cubemap.m_index, std::numeric_limits<unsigned int>::max()) } {}
-
 void Cubemap::load(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back) const {
   bind();
 
@@ -234,14 +229,8 @@ void Cubemap::draw() const {
   Renderer::setDepthFunction(DepthStencilFunction::LESS);
 }
 
-Cubemap& Cubemap::operator=(Cubemap&& cubemap) noexcept {
-  std::swap(m_index, cubemap.m_index);
-
-  return *this;
-}
-
 Cubemap::~Cubemap() {
-  if (m_index == std::numeric_limits<unsigned int>::max())
+  if (!m_index.isValid())
     return;
 
   Logger::debug("[Cubemap] Destroying (ID: " + std::to_string(m_index) + ")...");

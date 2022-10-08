@@ -3,6 +3,10 @@
 #ifndef RAZ_CUBEMAP_HPP
 #define RAZ_CUBEMAP_HPP
 
+#include "RaZ/Data/OwnerValue.hpp"
+
+#include <limits>
+
 namespace Raz {
 
 class Image;
@@ -15,7 +19,7 @@ public:
   explicit Cubemap(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back)
     : Cubemap() { load(right, left, top, bottom, front, back); }
   Cubemap(const Cubemap&) = delete;
-  Cubemap(Cubemap&& cubemap) noexcept;
+  Cubemap(Cubemap&&) noexcept = default;
 
   unsigned int getIndex() const { return m_index; }
   const RenderShaderProgram& getProgram() const;
@@ -36,12 +40,12 @@ public:
   void draw() const;
 
   Cubemap& operator=(const Cubemap&) = delete;
-  Cubemap& operator=(Cubemap&& cubemap) noexcept;
+  Cubemap& operator=(Cubemap&&) noexcept = default;
 
   ~Cubemap();
 
 private:
-  unsigned int m_index {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
 };
 
 } // namespace Raz
