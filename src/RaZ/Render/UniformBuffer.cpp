@@ -1,8 +1,6 @@
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <utility>
-
 namespace Raz {
 
 namespace {
@@ -33,9 +31,6 @@ UniformBuffer::UniformBuffer(unsigned int size, UniformBufferUsage usage) : Unif
   Logger::debug("[UniformBuffer] Created (ID: " + std::to_string(m_index) + ')');
 }
 
-UniformBuffer::UniformBuffer(UniformBuffer&& ubo) noexcept
-  : m_index{ std::exchange(ubo.m_index, std::numeric_limits<unsigned int>::max()) } {}
-
 void UniformBuffer::bindUniformBlock(const ShaderProgram& program, unsigned int uboIndex, unsigned int shaderBindingIndex) const {
   Renderer::bindUniformBlock(program.getIndex(), uboIndex, shaderBindingIndex);
 }
@@ -60,14 +55,8 @@ void UniformBuffer::unbind() const {
   Renderer::unbindBuffer(BufferType::UNIFORM_BUFFER);
 }
 
-UniformBuffer& UniformBuffer::operator=(UniformBuffer&& ubo) noexcept {
-  std::swap(m_index, ubo.m_index);
-
-  return *this;
-}
-
 UniformBuffer::~UniformBuffer() {
-  if (m_index == std::numeric_limits<unsigned int>::max())
+  if (!m_index.isValid())
     return;
 
   Logger::debug("[UniformBuffer] Destroying (ID: " + std::to_string(m_index) + ")...");

@@ -3,10 +3,13 @@
 #ifndef RAZ_UNIFORMBUFFER_HPP
 #define RAZ_UNIFORMBUFFER_HPP
 
+#include "RaZ/Data/OwnerValue.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Renderer.hpp"
+
+#include <limits>
 
 namespace Raz {
 
@@ -21,7 +24,7 @@ public:
   UniformBuffer();
   explicit UniformBuffer(unsigned int size, UniformBufferUsage usage = UniformBufferUsage::DYNAMIC);
   UniformBuffer(const UniformBuffer&) = delete;
-  UniformBuffer(UniformBuffer&& ubo) noexcept;
+  UniformBuffer(UniformBuffer&&) noexcept = default;
 
   unsigned int getIndex() const { return m_index; }
 
@@ -40,12 +43,12 @@ public:
                                                                                                      offset, sizeof(mat), mat.getDataPtr()); }
 
   UniformBuffer& operator=(const UniformBuffer&) = delete;
-  UniformBuffer& operator=(UniformBuffer&& ubo) noexcept;
+  UniformBuffer& operator=(UniformBuffer&&) noexcept = default;
 
   ~UniformBuffer();
 
 private:
-  unsigned int m_index {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
 };
 
 } // namespace Raz
