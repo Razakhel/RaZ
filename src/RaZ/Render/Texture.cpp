@@ -117,13 +117,6 @@ Texture2D::Texture2D() {
 Texture2D::Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType)
   : Texture2D(colorspace, dataType) { resize(width, height); }
 
-Texture2D::Texture2D(Texture2D&& texture) noexcept
-  : m_index{ std::exchange(texture.m_index, std::numeric_limits<unsigned int>::max()) },
-    m_width{ texture.m_width },
-    m_height{ texture.m_height },
-    m_colorspace{ texture.m_colorspace },
-    m_dataType{ texture.m_dataType } {}
-
 void Texture2D::bind() const {
   Renderer::bindTexture(TextureType::TEXTURE_2D, m_index);
 }
@@ -256,18 +249,8 @@ Image Texture2D::recoverImage() const {
 }
 #endif
 
-Texture2D& Texture2D::operator=(Texture2D&& texture) noexcept {
-  std::swap(m_index, texture.m_index);
-  m_width      = texture.m_width;
-  m_height     = texture.m_height;
-  m_colorspace = texture.m_colorspace;
-  m_dataType   = texture.m_dataType;
-
-  return *this;
-}
-
 Texture2D::~Texture2D() {
-  if (m_index == std::numeric_limits<unsigned int>::max())
+  if (!m_index.isValid())
     return;
 
   Logger::debug("[Texture] Destroying (ID: " + std::to_string(m_index) + ")...");

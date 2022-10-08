@@ -3,6 +3,8 @@
 #ifndef RAZ_TEXTURE_HPP
 #define RAZ_TEXTURE_HPP
 
+#include "RaZ/Data/OwnerValue.hpp"
+
 #include <limits>
 #include <memory>
 
@@ -52,7 +54,7 @@ public:
   /// \param value Color to create the texture with.
   explicit Texture2D(const Color& color) : Texture2D() { makePlainColored(color); }
   Texture2D(const Texture2D&) = delete;
-  Texture2D(Texture2D&& texture) noexcept;
+  Texture2D(Texture2D&&) noexcept = default;
 
   unsigned int getIndex() const { return m_index; }
   unsigned int getWidth() const { return m_width; }
@@ -109,7 +111,7 @@ public:
 #endif
 
   Texture2D& operator=(const Texture2D&) = delete;
-  Texture2D& operator=(Texture2D&& texture) noexcept;
+  Texture2D& operator=(Texture2D&&) noexcept = default;
 
   ~Texture2D();
 
@@ -118,7 +120,7 @@ private:
   /// \param color Color to fill the texture with.
   void makePlainColored(const Color& color);
 
-  unsigned int m_index = std::numeric_limits<unsigned int>::max();
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
 
   unsigned int m_width {};
   unsigned int m_height {};
