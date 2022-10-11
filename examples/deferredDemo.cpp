@@ -1,5 +1,7 @@
 #include "RaZ/RaZ.hpp"
 
+#include "DemoUtils.hpp"
+
 using namespace std::literals;
 
 constexpr unsigned int sceneWidth  = 1280;
@@ -112,6 +114,11 @@ int main() {
 
     Raz::Window& window = render.getWindow();
 
+    // Allowing to quit the application by pressing the Escape key
+    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+    // Quitting the application when the close button is clicked
+    window.setCloseCallback([&app] () noexcept { app.quit(); });
+
     ///////////////////
     // Render passes //
     ///////////////////
@@ -145,11 +152,23 @@ int main() {
 
     geomPass.addChildren(splitPass);
 
+    // Toggling the render pass' enabled state
+    window.addKeyCallback(Raz::Keyboard::R, [&splitPass] (float /* deltaTime */) noexcept { splitPass.enable(!splitPass.isEnabled()); }, Raz::Input::ONCE);
+
+    ////////////
+    // Camera //
+    ////////////
+
+    Raz::Entity& camera = world.addEntity();
+    auto& cameraComp    = camera.addComponent<Raz::Camera>(sceneWidth, sceneHeight);
+    auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
+
+    DemoUtils::setupCameraControls(camera, window);
+
     //////////
     // Mesh //
     //////////
 
-    // Importing the mesh & transforming it so that it can be fully visible
     Raz::Entity& mesh  = world.addEntity();
     auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj").second);
 
@@ -160,56 +179,6 @@ int main() {
     auto& meshTrans = mesh.addComponent<Raz::Transform>();
     meshTrans.scale(0.2f);
 
-    ////////////
-    // Camera //
-    ////////////
-
-    Raz::Entity& camera = world.addEntity();
-    auto& cameraComp    = camera.addComponent<Raz::Camera>(sceneWidth, sceneHeight);
-    auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-
-    float cameraSpeed = 1.f;
-    window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
-                          [&cameraSpeed] (float /* deltaTime */) noexcept { cameraSpeed = 2.f; },
-                          Raz::Input::ONCE,
-                          [&cameraSpeed] () noexcept { cameraSpeed = 1.f; });
-    window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::V, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move(0.f, 0.f, (-10.f * deltaTime) * cameraSpeed);
-    });
-    window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move(0.f,  0.f, (10.f * deltaTime) * cameraSpeed);
-    });
-    window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::D, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
-    });
-
-    window.setMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
-      // Dividing move by window size to scale between -1 and 1
-      cameraTrans.rotate(-90_deg * static_cast<float>(yMove) / window.getHeight(),
-                         -90_deg * static_cast<float>(xMove) / window.getWidth());
-    });
-
-    //////////////////////
-    // Window callbacks //
-    //////////////////////
-
-    // Toggling the render pass' enabled state
-    window.addKeyCallback(Raz::Keyboard::R, [&splitPass] (float /* deltaTime */) noexcept { splitPass.enable(!splitPass.isEnabled()); }, Raz::Input::ONCE);
-
-    // Allowing to quit the application by pressing the Esc key
-    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
-    // Allowing to quit the application when the close button is clicked
-    window.setCloseCallback([&app] () noexcept { app.quit(); });
-
     /////////////
     // Overlay //
     /////////////
@@ -217,14 +186,13 @@ int main() {
 #if !defined(RAZ_NO_OVERLAY)
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Deferred demo", Raz::Vec2f(sceneWidth / 4, sceneHeight));
 
-    overlay.addTexture(*depthBuffer, sceneWidth / 4, sceneHeight / 4);
-    overlay.addTexture(*colorBuffer, sceneWidth / 4, sceneHeight / 4);
-    overlay.addTexture(*normalBuffer, sceneWidth / 4, sceneHeight / 4);
+    DemoUtils::insertOverlayCameraControlsHelp(overlay);
 
     overlay.addSeparator();
 
-    overlay.addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
-    overlay.addFpsCounter("FPS: %.1f");
+    overlay.addTexture(*depthBuffer, sceneWidth / 4, sceneHeight / 4);
+    overlay.addTexture(*colorBuffer, sceneWidth / 4, sceneHeight / 4);
+    overlay.addTexture(*normalBuffer, sceneWidth / 4, sceneHeight / 4);
 #endif
 
     //////////////////////////

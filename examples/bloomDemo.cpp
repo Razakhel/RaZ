@@ -1,5 +1,7 @@
 #include "RaZ/RaZ.hpp"
 
+#include "DemoUtils.hpp"
+
 using namespace std::literals;
 
 int main() {
@@ -25,6 +27,8 @@ int main() {
     auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
     auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
+    DemoUtils::setupCameraControls(camera, window);
+
     Raz::Entity& mesh  = world.addEntity();
     auto& meshTrans    = mesh.addComponent<Raz::Transform>();
     auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
@@ -42,67 +46,6 @@ int main() {
 
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
     window.setCloseCallback([&app] () noexcept { app.quit(); });
-
-    /////////////////////
-    // Camera controls //
-    /////////////////////
-
-    float cameraSpeed = 1.f;
-    window.addKeyCallback(Raz::Keyboard::LEFT_SHIFT,
-                          [&cameraSpeed] (float /* deltaTime */) noexcept { cameraSpeed = 2.f; },
-                          Raz::Input::ONCE,
-                          [&cameraSpeed] () noexcept { cameraSpeed = 1.f; });
-    window.addKeyCallback(Raz::Keyboard::SPACE, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move(0.f, (10.f * deltaTime) * cameraSpeed, 0.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::V, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move(0.f, (-10.f * deltaTime) * cameraSpeed, 0.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::W, [&cameraTrans, &cameraComp, &cameraSpeed] (float deltaTime) {
-      const float moveVal = (-10.f * deltaTime) * cameraSpeed;
-
-      cameraTrans.move(0.f, 0.f, moveVal);
-      cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() + moveVal / 10.f);
-      cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() + moveVal / 10.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::S, [&cameraTrans, &cameraComp, &cameraSpeed] (float deltaTime) {
-      const float moveVal = (10.f * deltaTime) * cameraSpeed;
-
-      cameraTrans.move(0.f, 0.f, moveVal);
-      cameraComp.setOrthoBoundX(cameraComp.getOrthoBoundX() + moveVal / 10.f);
-      cameraComp.setOrthoBoundY(cameraComp.getOrthoBoundY() + moveVal / 10.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::A, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move((-10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
-    });
-    window.addKeyCallback(Raz::Keyboard::D, [&cameraTrans, &cameraSpeed] (float deltaTime) {
-      cameraTrans.move((10.f * deltaTime) * cameraSpeed, 0.f, 0.f);
-    });
-
-    window.setMouseScrollCallback([&cameraComp] (double /* xOffset */, double yOffset) {
-      const float newFovDeg = std::clamp(Raz::Degreesf(cameraComp.getFieldOfView()).value + static_cast<float>(-yOffset) * 2.f, 15.f, 90.f);
-      cameraComp.setFieldOfView(Raz::Degreesf(newFovDeg));
-    });
-
-    // The camera can be rotated while holding the mouse right click
-    bool isRightClicking = false;
-
-    window.addMouseButtonCallback(Raz::Mouse::RIGHT_CLICK, [&isRightClicking, &window] (float /* deltaTime */) {
-      isRightClicking = true;
-      window.disableCursor();
-    }, Raz::Input::ONCE, [&isRightClicking, &window] () {
-      isRightClicking = false;
-      window.showCursor();
-    });
-
-    window.setMouseMoveCallback([&isRightClicking, &cameraTrans, &window] (double xMove, double yMove) {
-      if (!isRightClicking)
-        return;
-
-      // Dividing movement by the window's size to scale between -1 and 1
-      cameraTrans.rotate(-90_deg * static_cast<float>(yMove) / window.getHeight(),
-                         -90_deg * static_cast<float>(xMove) / window.getWidth());
-    });
 
     ///////////
     // Bloom //
@@ -136,7 +79,15 @@ int main() {
 
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Bloom demo", Raz::Vec2f(-1.f));
 
-    overlay.addSlider("Emissive strength", [&meshRenderer] (float value) noexcept {
+    DemoUtils::insertOverlayCameraControlsHelp(overlay);
+
+    overlay.addSeparator();
+
+    DemoUtils::insertOverlayVerticalSyncOption(window, overlay);
+
+    overlay.addSeparator();
+
+    overlay.addSlider("Emissive strength", [&meshRenderer] (float value) {
       Raz::Material& material = meshRenderer.getMaterials().front();
       material.setAttribute(Raz::Vec3f(value), Raz::MaterialAttribute::Emissive);
       material.sendAttributes();
@@ -225,6 +176,14 @@ int main() {
                                   window.getHeight() / static_cast<unsigned int>(5 * (bloom.getUpscaleBufferCount() - newIndex + 1)));
       });
     }
+
+    overlay.addSeparator();
+
+    DemoUtils::insertOverlayFrameSpeed(overlay);
+
+    //////////////////////////
+    // Starting application //
+    //////////////////////////
 
     app.run([&] (float deltaTime) {
       meshTrans.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
