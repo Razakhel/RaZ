@@ -108,85 +108,81 @@ inline TextureParamValue recoverParam(TextureWrapping wrapping) {
 
 } // namespace
 
-Texture2D::Texture2D() {
-  Logger::debug("[Texture] Creating...");
-  Renderer::generateTexture(m_index);
-  Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
+void Texture::bind() const {
+  Renderer::bindTexture(m_type, m_index);
 }
 
-Texture2D::Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType)
-  : Texture2D(colorspace, dataType) { resize(width, height); }
-
-void Texture2D::bind() const {
-  Renderer::bindTexture(TextureType::TEXTURE_2D, m_index);
+void Texture::unbind() const {
+  Renderer::unbindTexture(m_type);
 }
 
-void Texture2D::unbind() const {
-  Renderer::unbindTexture(TextureType::TEXTURE_2D);
-}
-
-void Texture2D::setFilter(TextureFilter minify, TextureFilter magnify) const {
+void Texture::setFilter(TextureFilter minify, TextureFilter magnify) const {
   bind();
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, recoverParam(minify));
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
+  Renderer::setTextureParameter(m_type, TextureParam::MINIFY_FILTER, recoverParam(minify));
+  Renderer::setTextureParameter(m_type, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
   unbind();
 }
 
-void Texture2D::setFilter(TextureFilter minify, TextureFilter mipmapMinify, TextureFilter magnify) const {
+void Texture::setFilter(TextureFilter minify, TextureFilter mipmapMinify, TextureFilter magnify) const {
   bind();
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MINIFY_FILTER, recoverParam(minify, mipmapMinify));
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
+  Renderer::setTextureParameter(m_type, TextureParam::MINIFY_FILTER, recoverParam(minify, mipmapMinify));
+  Renderer::setTextureParameter(m_type, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
   unbind();
 }
 
-void Texture2D::setWrapping(TextureWrapping wrapping) const {
+void Texture::setWrapping(TextureWrapping wrapping) const {
   const TextureParamValue value = recoverParam(wrapping);
 
   bind();
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_S, value);
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_T, value);
-  Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::WRAP_R, value);
+  Renderer::setTextureParameter(m_type, TextureParam::WRAP_S, value);
+  Renderer::setTextureParameter(m_type, TextureParam::WRAP_T, value);
+  Renderer::setTextureParameter(m_type, TextureParam::WRAP_R, value);
   unbind();
 }
 
-void Texture2D::setParameters(unsigned int width, unsigned int height, TextureColorspace colorspace) {
-  setColorspace(colorspace);
-  resize(width, height);
-}
-
-void Texture2D::setParameters(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType) {
-  setColorspace(colorspace, dataType);
-  resize(width, height);
-}
-
-void Texture2D::setColorspace(TextureColorspace colorspace) {
+void Texture::setColorspace(TextureColorspace colorspace) {
   setColorspace(colorspace, (colorspace == TextureColorspace::DEPTH ? TextureDataType::FLOAT : TextureDataType::BYTE));
 }
 
-void Texture2D::setColorspace(TextureColorspace colorspace, TextureDataType dataType) {
+void Texture::setColorspace(TextureColorspace colorspace, TextureDataType dataType) {
   assert("Error: A depth texture must have a floating-point data type." && (colorspace != TextureColorspace::DEPTH || dataType == TextureDataType::FLOAT));
+  assert("Error: A depth texture cannot be three-dimensional." && (colorspace != TextureColorspace::DEPTH || m_type != TextureType::TEXTURE_3D));
 
   m_colorspace = colorspace;
   m_dataType   = dataType;
 
-  setFilter((m_colorspace == TextureColorspace::DEPTH ? TextureFilter::NEAREST : TextureFilter::LINEAR));
+  load();
+  setFilter((m_colorspace == TextureColorspace::DEPTH ? TextureFilter::NEAREST : TextureFilter::LINEAR)); // TODO: this should not be done every time
+}
+
+Texture::~Texture() {
+  if (!m_index.isValid())
+    return;
+
+  Logger::debug("[Texture] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Renderer::deleteTexture(m_index);
+  Logger::debug("[Texture] Destroyed");
+}
+
+Texture::Texture(TextureType type) : m_type{ type } {
+  Logger::debug("[Texture] Creating...");
+  Renderer::generateTexture(m_index);
+  Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
+
   setWrapping(TextureWrapping::CLAMP);
 }
+
+Texture2D::Texture2D()
+  : Texture(TextureType::TEXTURE_2D) {}
+
+Texture2D::Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType)
+  : Texture2D(colorspace, dataType) { resize(width, height); }
 
 void Texture2D::resize(unsigned int width, unsigned int height) {
   m_width  = width;
   m_height = height;
 
-  bind();
-  Renderer::sendImageData2D(TextureType::TEXTURE_2D,
-                            0,
-                            recoverInternalFormat(m_colorspace, m_dataType),
-                            width,
-                            height,
-                            recoverFormat(m_colorspace),
-                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
-                            nullptr);
-  unbind();
+  load();
 }
 
 void Texture2D::load(const Image& image, bool createMipmaps) {
@@ -249,13 +245,20 @@ Image Texture2D::recoverImage() const {
 }
 #endif
 
-Texture2D::~Texture2D() {
-  if (!m_index.isValid())
-    return;
+void Texture2D::load() const {
+  if (m_colorspace == TextureColorspace::INVALID)
+    return; // No colorspace has been set yet, the texture can't be loaded
 
-  Logger::debug("[Texture] Destroying (ID: " + std::to_string(m_index) + ")...");
-  Renderer::deleteTexture(m_index);
-  Logger::debug("[Texture] Destroyed");
+  bind();
+  Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                            0,
+                            recoverInternalFormat(m_colorspace, m_dataType),
+                            m_width,
+                            m_height,
+                            recoverFormat(m_colorspace),
+                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                            nullptr);
+  unbind();
 }
 
 void Texture2D::makePlainColored(const Color& color) {
@@ -266,6 +269,37 @@ void Texture2D::makePlainColored(const Color& color) {
 
   bind();
   Renderer::sendImageData2D(TextureType::TEXTURE_2D, 0, TextureInternalFormat::RGB, 1, 1, TextureFormat::RGB, PixelDataType::UBYTE, Vec3b(color).getDataPtr());
+  unbind();
+}
+
+Texture3D::Texture3D()
+  : Texture(TextureType::TEXTURE_3D) {}
+
+Texture3D::Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace, TextureDataType dataType)
+  : Texture3D(colorspace, dataType) { resize(width, height, depth); }
+
+void Texture3D::resize(unsigned int width, unsigned int height, unsigned int depth) {
+  m_width  = width;
+  m_height = height;
+  m_depth  = depth;
+
+  load();
+}
+
+void Texture3D::load() const {
+  if (m_colorspace == TextureColorspace::INVALID)
+    return; // No colorspace has been set yet, the texture can't be loaded
+
+  bind();
+  Renderer::sendImageData3D(TextureType::TEXTURE_3D,
+                            0,
+                            recoverInternalFormat(m_colorspace, m_dataType),
+                            m_width,
+                            m_height,
+                            m_depth,
+                            recoverFormat(m_colorspace),
+                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                            nullptr);
   unbind();
 }
 
