@@ -41,7 +41,7 @@ int main() {
     Raz::Texture2D texture(textureSize, textureSize, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT);
     Raz::Renderer::bindImageTexture(0, texture.getIndex(), 0, false, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
-    Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise.comp"));
+    Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise_2d.comp"));
     perlinNoise.execute(textureSize, textureSize);
 
     Raz::ComputeShaderProgram worleyNoise(Raz::ComputeShader(RAZ_ROOT "shaders/worley_noise.comp"));
@@ -70,7 +70,7 @@ int main() {
       perlinNoise.use();
       perlinNoise.sendUniform("uniOctaveCount", static_cast<int>(value));
       perlinNoise.execute(textureSize, textureSize);
-    }, 1, 8, 8);
+    }, 1, 8, 1);
 
     Raz::OverlaySlider& worleyFactor = overlay.addSlider("Worley noise factor", [&worleyNoise] (float value) {
       worleyNoise.use();

@@ -40,11 +40,23 @@ constexpr std::array<Vec2f, 8> gradients2D = {
   Vec2f(0.7071067691f, -0.7071067691f), Vec2f(-0.7071067691f, -0.7071067691f)
 };
 
+// Only 12 gradients are necessary; however, 16 are defined to avoid dividing by 12. These form a regular tetrahedron, thus no bias is introduced
+constexpr std::array<Vec3f, 16> gradients3D = {
+  Vec3f(0.7071067691f,  0.7071067691f,            0.f), Vec3f(-0.7071067691f,  0.7071067691f,            0.f),
+  Vec3f(0.7071067691f, -0.7071067691f,            0.f), Vec3f(-0.7071067691f, -0.7071067691f,            0.f),
+  Vec3f(0.7071067691f,            0.f,  0.7071067691f), Vec3f(-0.7071067691f,            0.f,  0.7071067691f),
+  Vec3f(0.7071067691f,            0.f, -0.7071067691f), Vec3f(-0.7071067691f,            0.f, -0.7071067691f),
+  Vec3f(          0.f,  0.7071067691f,  0.7071067691f), Vec3f(           0.f, -0.7071067691f,  0.7071067691f),
+  Vec3f(          0.f,  0.7071067691f, -0.7071067691f), Vec3f(           0.f, -0.7071067691f, -0.7071067691f),
+  Vec3f(0.7071067691f,  0.7071067691f,            0.f), Vec3f(-0.7071067691f,  0.7071067691f,            0.f),
+  Vec3f(          0.f, -0.7071067691f,  0.7071067691f), Vec3f(           0.f, -0.7071067691f, -0.7071067691f)
+};
+
 constexpr float getGradient1D(unsigned int x) {
   return (permutations[x] % 2 == 0 ? 1.f : -1.f);
 }
 
-constexpr float getValue(float x) {
+constexpr float computeValue(float x) {
   // Determining coordinates on the line
   //
   //  x0---------x0+1
@@ -75,7 +87,7 @@ constexpr const Vec2f& getGradient2D(unsigned int x, unsigned int y) {
   return gradients2D[permutations[permutations[x] + y] % gradients2D.size()];
 }
 
-constexpr float getValue(float x, float y) {
+constexpr float computeValue(float x, float y) {
   // Recovering integer coordinates on the quad
   //
   //  y0+1______x0+1/y0+1
@@ -90,10 +102,10 @@ constexpr float getValue(float x, float y) {
   const unsigned int y0 = intY & 255u;
 
   // Recovering pseudo-random gradients at each corner of the quad
-  const Vec2f& botLeftGrad  = getGradient2D(x0, y0);
-  const Vec2f& botRightGrad = getGradient2D(x0 + 1, y0);
-  const Vec2f& topLeftGrad  = getGradient2D(x0, y0 + 1);
-  const Vec2f& topRightGrad = getGradient2D(x0 + 1, y0 + 1);
+  const Vec2f& leftBotGrad  = getGradient2D(x0,     y0    );
+  const Vec2f& rightBotGrad = getGradient2D(x0 + 1, y0    );
+  const Vec2f& leftTopGrad  = getGradient2D(x0,     y0 + 1);
+  const Vec2f& rightTopGrad = getGradient2D(x0 + 1, y0 + 1);
 
   // Computing the distance to the coordinates
   //  _____________
@@ -106,29 +118,93 @@ constexpr float getValue(float x, float y) {
   const float xWeight = x - static_cast<float>(intX);
   const float yWeight = y - static_cast<float>(intY);
 
-  const float botLeftDot  = Vec2f(xWeight    , yWeight    ).dot(botLeftGrad);
-  const float botRightDot = Vec2f(xWeight - 1, yWeight    ).dot(botRightGrad);
-  const float topLeftDot  = Vec2f(xWeight    , yWeight - 1).dot(topLeftGrad);
-  const float topRightDot = Vec2f(xWeight - 1, yWeight - 1).dot(topRightGrad);
+  const float leftBotDot  = Vec2f(xWeight,     yWeight    ).dot(leftBotGrad);
+  const float rightBotDot = Vec2f(xWeight - 1, yWeight    ).dot(rightBotGrad);
+  const float leftTopDot  = Vec2f(xWeight,     yWeight - 1).dot(leftTopGrad);
+  const float rightTopDot = Vec2f(xWeight - 1, yWeight - 1).dot(rightTopGrad);
 
   const float smoothX = MathUtils::smootherstep(xWeight);
   const float smoothY = MathUtils::smootherstep(yWeight);
 
-  const float botCoeff = MathUtils::lerp(botLeftDot, botRightDot, smoothX);
-  const float topCoeff = MathUtils::lerp(topLeftDot, topRightDot, smoothX);
+  const float botCoeff = MathUtils::lerp(leftBotDot, rightBotDot, smoothX);
+  const float topCoeff = MathUtils::lerp(leftTopDot, rightTopDot, smoothX);
 
   return MathUtils::lerp(botCoeff, topCoeff, smoothY);
 }
 
+constexpr const Vec3f& getGradient3D(unsigned int x, unsigned int y, unsigned int z) {
+  return gradients3D[permutations[permutations[permutations[x] + y] + z] % gradients3D.size()];
+}
+
+constexpr float computeValue(float x, float y, float z) {
+  // Recovering integer coordinates on the cube
+
+  const auto intX = static_cast<unsigned int>(x);
+  const auto intY = static_cast<unsigned int>(y);
+  const auto intZ = static_cast<unsigned int>(z);
+
+  const unsigned int x0 = intX & 255u;
+  const unsigned int y0 = intY & 255u;
+  const unsigned int z0 = intZ & 255u;
+
+  // Recovering pseudo-random gradients at each corner of the quad
+  const Vec3f& leftBotBackGrad   = getGradient3D(x0,     y0,     z0    );
+  const Vec3f& leftBotFrontGrad  = getGradient3D(x0,     y0,     z0 + 1);
+  const Vec3f& rightBotBackGrad  = getGradient3D(x0 + 1, y0,     z0    );
+  const Vec3f& rightBotFrontGrad = getGradient3D(x0 + 1, y0,     z0 + 1);
+  const Vec3f& leftTopBackGrad   = getGradient3D(x0,     y0 + 1, z0    );
+  const Vec3f& leftTopFrontGrad  = getGradient3D(x0,     y0 + 1, z0 + 1);
+  const Vec3f& rightTopBackGrad  = getGradient3D(x0 + 1, y0 + 1, z0    );
+  const Vec3f& rightTopFrontGrad = getGradient3D(x0 + 1, y0 + 1, z0 + 1);
+
+  // Computing the distance to the coordinates
+  //     _____________
+  //    /           /|
+  //   /           / |
+  //  /___________/ X|
+  //  |           |/ |
+  //  | xWeight   / zWeight
+  //  |---------X |  /
+  //  |         | yWeight
+  //  |_________|_|/
+
+  const float xWeight = x - static_cast<float>(intX);
+  const float yWeight = y - static_cast<float>(intY);
+  const float zWeight = z - static_cast<float>(intZ);
+
+  const float leftBotBackDot   = Vec3f(xWeight,     yWeight,     zWeight    ).dot(leftBotBackGrad);
+  const float leftBotFrontDot  = Vec3f(xWeight,     yWeight,     zWeight - 1).dot(leftBotFrontGrad);
+  const float rightBotBackDot  = Vec3f(xWeight - 1, yWeight,     zWeight    ).dot(rightBotBackGrad);
+  const float rightBotFrontDot = Vec3f(xWeight - 1, yWeight,     zWeight - 1).dot(rightBotFrontGrad);
+  const float leftTopBackDot   = Vec3f(xWeight,     yWeight - 1, zWeight    ).dot(leftTopBackGrad);
+  const float leftTopFrontDot  = Vec3f(xWeight,     yWeight - 1, zWeight - 1).dot(leftTopFrontGrad);
+  const float rightTopBackDot  = Vec3f(xWeight - 1, yWeight - 1, zWeight    ).dot(rightTopBackGrad);
+  const float rightTopFrontDot = Vec3f(xWeight - 1, yWeight - 1, zWeight - 1).dot(rightTopFrontGrad);
+
+  const float smoothX = MathUtils::smootherstep(xWeight);
+  const float smoothY = MathUtils::smootherstep(yWeight);
+  const float smoothZ = MathUtils::smootherstep(zWeight);
+
+  const float botBackCoeff  = MathUtils::lerp(leftBotBackDot,  rightBotBackDot,  smoothX);
+  const float botFrontCoeff = MathUtils::lerp(leftBotFrontDot, rightBotFrontDot, smoothX);
+  const float topBackCoeff  = MathUtils::lerp(leftTopBackDot,  rightTopBackDot,  smoothX);
+  const float topFrontCoeff = MathUtils::lerp(leftTopFrontDot, rightTopFrontDot, smoothX);
+
+  const float backCoeff  = MathUtils::lerp(botBackCoeff,  topBackCoeff,  smoothY);
+  const float frontCoeff = MathUtils::lerp(botFrontCoeff, topFrontCoeff, smoothY);
+
+  return MathUtils::lerp(backCoeff, frontCoeff, smoothZ);
+}
+
 } // namespace
 
-float get1D(float x, uint8_t octaveCount, bool normalize) {
+float compute1D(float x, uint8_t octaveCount, bool normalize) {
   float frequency = 1.f;
   float amplitude = 1.f;
   float total     = 0.f;
 
   for (uint8_t i = 0; i < octaveCount; ++i) {
-    total += getValue(x * frequency) * amplitude;
+    total += computeValue(x * frequency) * amplitude;
 
     amplitude *= 0.5f;
     frequency *= 2.f;
@@ -140,13 +216,31 @@ float get1D(float x, uint8_t octaveCount, bool normalize) {
   return total;
 }
 
-float get2D(float x, float y, uint8_t octaveCount, bool normalize) {
+float compute2D(float x, float y, uint8_t octaveCount, bool normalize) {
   float frequency = 1.f;
   float amplitude = 1.f;
   float total     = 0.f;
 
   for (uint8_t i = 0; i < octaveCount; ++i) {
-    total += getValue(x * frequency, y * frequency) * amplitude;
+    total += computeValue(x * frequency, y * frequency) * amplitude;
+
+    amplitude *= 0.5f;
+    frequency *= 2.f;
+  }
+
+  if (normalize)
+    return (total + 1) / 2; // Scaling between [0; 1]
+
+  return total;
+}
+
+float compute3D(float x, float y, float z, uint8_t octaveCount, bool normalize) {
+  float frequency = 1.f;
+  float amplitude = 1.f;
+  float total     = 0.f;
+
+  for (uint8_t i = 0; i < octaveCount; ++i) {
+    total += computeValue(x * frequency, y * frequency, z * frequency) * amplitude;
 
     amplitude *= 0.5f;
     frequency *= 2.f;

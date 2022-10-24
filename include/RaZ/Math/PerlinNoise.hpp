@@ -12,14 +12,24 @@ namespace Raz::PerlinNoise {
 /// \param octaveCount Amount of octaves to apply for the [fractional Brownian motion](https://en.wikipedia.org/wiki/Fractional_Brownian_motion) computation.
 /// \param normalize Remap the value between [0; 1]. If false, the original [-1; 1] range is preserved.
 /// \return 1D Perlin noise value. May be slightly below or above the expected range.
-float get1D(float x, uint8_t octaveCount = 1, bool normalize = false);
+float compute1D(float x, uint8_t octaveCount = 1, bool normalize = false);
+
 /// Computes the 2D Perlin noise at the given coordinates.
 /// \param x X coordinate.
 /// \param y Y coordinate.
 /// \param octaveCount Amount of octaves to apply for the [fractional Brownian motion](https://en.wikipedia.org/wiki/Fractional_Brownian_motion) computation.
 /// \param normalize Remap the value between [0; 1]. If false, the original [-1; 1] range is preserved.
 /// \return 2D Perlin noise value. May be slightly below or above the expected range.
-float get2D(float x, float y, uint8_t octaveCount = 1, bool normalize = false);
+float compute2D(float x, float y, uint8_t octaveCount = 1, bool normalize = false);
+
+/// Computes the 3D Perlin noise at the given coordinates.
+/// \param x X coordinate.
+/// \param y Y coordinate.
+/// \param z Z coordinate.
+/// \param octaveCount Amount of octaves to apply for the [fractional Brownian motion](https://en.wikipedia.org/wiki/Fractional_Brownian_motion) computation.
+/// \param normalize Remap the value between [0; 1]. If false, the original [-1; 1] range is preserved.
+/// \return 3D Perlin noise value. May be slightly below or above the expected range.
+float compute3D(float x, float y, float z, uint8_t octaveCount = 1, bool normalize = false);
 
 } // namespace Raz::PerlinNoise
 
