@@ -966,6 +966,21 @@ public:
   /// \param value Value to be set.
   static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param,
                                                                                                                                 static_cast<int>(value)); }
+  /// Sends the image's data corresponding to the currently bound 1D texture.
+  /// \note Unavailable with OpenGL ES; use a Nx1 2D texture instead.
+  /// \param type Type of the texture.
+  /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
+  /// \param internalFormat Image internal format.
+  /// \param width Image width.
+  /// \param format Image format.
+  /// \param dataType Type of the data to be sent.
+  /// \param data Data to be sent.
+  static void sendImageData1D(TextureType type,
+                              unsigned int mipmapLevel,
+                              TextureInternalFormat internalFormat,
+                              unsigned int width,
+                              TextureFormat format,
+                              PixelDataType dataType, const void* data);
 #endif
   /// Sends the image's data corresponding to the currently bound 2D texture.
   /// \param type Type of the texture.

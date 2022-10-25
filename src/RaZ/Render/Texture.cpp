@@ -172,6 +172,35 @@ Texture::Texture(TextureType type) : m_type{ type } {
   setWrapping(TextureWrapping::CLAMP);
 }
 
+#if !defined(USE_OPENGL_ES)
+Texture1D::Texture1D()
+  : Texture(TextureType::TEXTURE_1D) {}
+
+Texture1D::Texture1D(unsigned int width, TextureColorspace colorspace, TextureDataType dataType)
+  : Texture1D(colorspace, dataType) { resize(width); }
+
+void Texture1D::resize(unsigned int width) {
+  m_width  = width;
+
+  load();
+}
+
+void Texture1D::load() const {
+  if (m_colorspace == TextureColorspace::INVALID)
+    return; // No colorspace has been set yet, the texture can't be loaded
+
+  bind();
+  Renderer::sendImageData1D(TextureType::TEXTURE_1D,
+                            0,
+                            recoverInternalFormat(m_colorspace, m_dataType),
+                            m_width,
+                            recoverFormat(m_colorspace),
+                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                            nullptr);
+  unbind();
+}
+#endif
+
 Texture2D::Texture2D()
   : Texture(TextureType::TEXTURE_2D) {}
 

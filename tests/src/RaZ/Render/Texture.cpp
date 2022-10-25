@@ -7,29 +7,38 @@
 TEST_CASE("Texture creation") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  Raz::Texture2D texture2D; // A texture can be created without dimensions and colorspace/data type
+#if !defined(USE_OPENGL_ES) // 1D textures are unavailable with OpenGL ES
+  const Raz::Texture1D texture1D; // A texture can be created without dimensions and colorspace/data type
+  CHECK_FALSE(Raz::Renderer::hasErrors());
+  CHECK(texture1D.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(texture1D.getWidth() == 0);
+  CHECK(texture1D.getColorspace() == Raz::TextureColorspace::INVALID); // If no colorspace is given, an invalid one is assigned
+  CHECK(texture1D.getDataType() == Raz::TextureDataType::BYTE);
+#endif
+
+  Raz::Texture2D texture2D(Raz::TextureColorspace::GRAY); // A texture can be created with colorspace/data type, but without dimensions
   CHECK_FALSE(Raz::Renderer::hasErrors());
   CHECK(texture2D.getIndex() != std::numeric_limits<unsigned int>::max());
   CHECK(texture2D.getWidth() == 0);
   CHECK(texture2D.getHeight() == 0);
-  CHECK(texture2D.getColorspace() == Raz::TextureColorspace::INVALID); // If no colorspace is given, an invalid one is assigned
+  CHECK(texture2D.getColorspace() == Raz::TextureColorspace::GRAY);
   CHECK(texture2D.getDataType() == Raz::TextureDataType::BYTE);
 
-  texture2D.resize(1, 1);
+  texture2D.resize(1, 2);
   texture2D.setColorspace(Raz::TextureColorspace::DEPTH);
   CHECK_FALSE(Raz::Renderer::hasErrors());
   CHECK(texture2D.getIndex() != std::numeric_limits<unsigned int>::max());
   CHECK(texture2D.getWidth() == 1);
-  CHECK(texture2D.getHeight() == 1);
+  CHECK(texture2D.getHeight() == 2);
   CHECK(texture2D.getColorspace() == Raz::TextureColorspace::DEPTH);
   CHECK(texture2D.getDataType() == Raz::TextureDataType::FLOAT); // A depth texture is always floating-point
 
-  const Raz::Texture3D texture3D(2, 2, 2, Raz::TextureColorspace::RGBA);
+  const Raz::Texture3D texture3D(3, 4, 5, Raz::TextureColorspace::RGBA);
   CHECK_FALSE(Raz::Renderer::hasErrors());
   CHECK(texture3D.getIndex() != std::numeric_limits<unsigned int>::max());
-  CHECK(texture3D.getWidth() == 2);
-  CHECK(texture3D.getHeight() == 2);
-  CHECK(texture3D.getDepth() == 2);
+  CHECK(texture3D.getWidth() == 3);
+  CHECK(texture3D.getHeight() == 4);
+  CHECK(texture3D.getDepth() == 5);
   CHECK(texture3D.getColorspace() == Raz::TextureColorspace::RGBA);
   CHECK(texture3D.getDataType() == Raz::TextureDataType::BYTE);
 }
@@ -37,9 +46,19 @@ TEST_CASE("Texture creation") {
 TEST_CASE("Texture move") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  Raz::Texture2D texture2D(1, 2, Raz::TextureColorspace::GRAY, Raz::TextureDataType::BYTE);
-  Raz::Texture3D texture3D(3, 4, 5, Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT);
+#if !defined(USE_OPENGL_ES) // 1D textures are unavailable with OpenGL ES
+  Raz::Texture1D texture1D(1, Raz::TextureColorspace::GRAY, Raz::TextureDataType::BYTE);
+#endif
+  Raz::Texture2D texture2D(2, 3, Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  Raz::Texture3D texture3D(4, 5, 6, Raz::TextureColorspace::RGBA, Raz::TextureDataType::FLOAT);
   CHECK_FALSE(Raz::Renderer::hasErrors());
+
+#if !defined(USE_OPENGL_ES)
+  const unsigned int texture1DIndex         = texture1D.getIndex();
+  const unsigned int texture1DWidth         = texture1D.getWidth();
+  const Raz::TextureColorspace colorspace1D = texture1D.getColorspace();
+  const Raz::TextureDataType dataType1D     = texture1D.getDataType();
+#endif
 
   const unsigned int texture2DIndex         = texture2D.getIndex();
   const unsigned int texture2DWidth         = texture2D.getWidth();
@@ -54,15 +73,28 @@ TEST_CASE("Texture move") {
   const Raz::TextureColorspace colorspace3D = texture3D.getColorspace();
   const Raz::TextureDataType dataType3D     = texture3D.getDataType();
 
+#if !defined(USE_OPENGL_ES)
+  CHECK(texture1DIndex != std::numeric_limits<unsigned int>::max());
+#endif
   CHECK(texture2DIndex != std::numeric_limits<unsigned int>::max());
   CHECK(texture3DIndex != std::numeric_limits<unsigned int>::max());
 
   // Move ctor
 
+#if !defined(USE_OPENGL_ES)
+  Raz::Texture1D movedTexture1DCtor(std::move(texture1D));
+#endif
   Raz::Texture2D movedTexture2DCtor(std::move(texture2D));
   Raz::Texture3D movedTexture3DCtor(std::move(texture3D));
 
   // The new textures have the same values as the original ones
+#if !defined(USE_OPENGL_ES)
+  CHECK(movedTexture1DCtor.getIndex() == texture1DIndex);
+  CHECK(movedTexture1DCtor.getWidth() == texture1DWidth);
+  CHECK(movedTexture1DCtor.getColorspace() == colorspace1D);
+  CHECK(movedTexture1DCtor.getDataType() == dataType1D);
+#endif
+
   CHECK(movedTexture2DCtor.getIndex() == texture2DIndex);
   CHECK(movedTexture2DCtor.getWidth() == texture2DWidth);
   CHECK(movedTexture2DCtor.getHeight() == texture2DHeight);
@@ -77,22 +109,41 @@ TEST_CASE("Texture move") {
   CHECK(movedTexture3DCtor.getDataType() == dataType3D);
 
   // The moved textures are now invalid
+#if !defined(USE_OPENGL_ES)
+  CHECK(texture1D.getIndex() == std::numeric_limits<unsigned int>::max());
+#endif
   CHECK(texture2D.getIndex() == std::numeric_limits<unsigned int>::max());
   CHECK(texture3D.getIndex() == std::numeric_limits<unsigned int>::max());
 
   // Move assignment operator
 
+#if !defined(USE_OPENGL_ES)
+  Raz::Texture1D movedTexture1DOp;
+#endif
   Raz::Texture2D movedTexture2DOp;
   Raz::Texture3D movedTexture3DOp;
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
+#if !defined(USE_OPENGL_ES)
+  const unsigned int movedTexture1DOpIndex = movedTexture1DOp.getIndex();
+#endif
   const unsigned int movedTexture2DOpIndex = movedTexture2DOp.getIndex();
   const unsigned int movedTexture3DOpIndex = movedTexture3DOp.getIndex();
 
+#if !defined(USE_OPENGL_ES)
+  movedTexture1DOp = std::move(movedTexture1DCtor);
+#endif
   movedTexture2DOp = std::move(movedTexture2DCtor);
   movedTexture3DOp = std::move(movedTexture3DCtor);
 
   // The new textures have the same values as the previous ones
+#if !defined(USE_OPENGL_ES)
+  CHECK(movedTexture1DOp.getIndex() == texture1DIndex);
+  CHECK(movedTexture1DOp.getWidth() == texture1DWidth);
+  CHECK(movedTexture1DOp.getColorspace() == colorspace1D);
+  CHECK(movedTexture1DOp.getDataType() == dataType1D);
+#endif
+
   CHECK(movedTexture2DOp.getIndex() == texture2DIndex);
   CHECK(movedTexture2DOp.getWidth() == texture2DWidth);
   CHECK(movedTexture2DOp.getHeight() == texture2DHeight);
@@ -107,6 +158,9 @@ TEST_CASE("Texture move") {
   CHECK(movedTexture3DOp.getDataType() == dataType3D);
 
   // After being moved, the values are swapped: the moved-from textures now have the previous moved-to's values
+#if !defined(USE_OPENGL_ES)
+  CHECK(movedTexture1DCtor.getIndex() == movedTexture1DOpIndex);
+#endif
   CHECK(movedTexture2DCtor.getIndex() == movedTexture2DOpIndex);
   CHECK(movedTexture3DCtor.getIndex() == movedTexture3DOpIndex);
 }

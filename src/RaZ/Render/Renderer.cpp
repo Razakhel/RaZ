@@ -568,6 +568,26 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
 
   printConditionalErrors();
 }
+
+void Renderer::sendImageData1D(TextureType type,
+                               unsigned int mipmapLevel,
+                               TextureInternalFormat internalFormat,
+                               unsigned int width,
+                               TextureFormat format,
+                               PixelDataType dataType, const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexImage1D(static_cast<unsigned int>(type),
+               static_cast<int>(mipmapLevel),
+               static_cast<int>(internalFormat),
+               static_cast<int>(width),
+               0,
+               static_cast<unsigned int>(format),
+               static_cast<unsigned int>(dataType),
+               data);
+
+  printConditionalErrors();
+}
 #endif
 
 void Renderer::sendImageData2D(TextureType type,

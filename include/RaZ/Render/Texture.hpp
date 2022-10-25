@@ -13,6 +13,9 @@ namespace Raz {
 class Color;
 class Image;
 using TexturePtr   = std::shared_ptr<class Texture>;
+#if !defined(USE_OPENGL_ES)
+using Texture1DPtr = std::shared_ptr<class Texture1D>;
+#endif
 using Texture2DPtr = std::shared_ptr<class Texture2D>;
 using Texture3DPtr = std::shared_ptr<class Texture3D>;
 enum class TextureType : unsigned int;
@@ -85,6 +88,31 @@ protected:
   TextureColorspace m_colorspace = TextureColorspace::INVALID;
   TextureDataType m_dataType {};
 };
+
+#if !defined(USE_OPENGL_ES)
+class Texture1D final : public Texture {
+public:
+  Texture1D();
+  explicit Texture1D(TextureColorspace colorspace) : Texture1D() { setColorspace(colorspace); }
+  Texture1D(TextureColorspace colorspace, TextureDataType dataType) : Texture1D() { setColorspace(colorspace, dataType); }
+  Texture1D(unsigned int width, TextureColorspace colorspace) : Texture1D(colorspace) { resize(width); }
+  Texture1D(unsigned int width, TextureColorspace colorspace, TextureDataType dataType);
+
+  unsigned int getWidth() const { return m_width; }
+
+  template <typename... Args>
+  static Texture1DPtr create(Args&&... args) { return std::make_shared<Texture1D>(std::forward<Args>(args)...); }
+
+  /// Resizes the texture.
+  /// \param width New texture width.
+  void resize(unsigned int width);
+
+private:
+  void load() const override;
+
+  unsigned int m_width  = 0;
+};
+#endif
 
 class Texture2D final : public Texture {
 public:
