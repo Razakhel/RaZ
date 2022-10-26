@@ -61,10 +61,10 @@ float computePerlin(vec2 coords) {
   int y0 = intY & 255;
 
   // Recovering pseudo-random gradients at each corner of the quad
-  vec2 botLeftGrad  = recoverGradient2D(x0,     y0    );
-  vec2 botRightGrad = recoverGradient2D(x0 + 1, y0    );
-  vec2 topLeftGrad  = recoverGradient2D(x0,     y0 + 1);
-  vec2 topRightGrad = recoverGradient2D(x0 + 1, y0 + 1);
+  vec2 leftBotGrad  = recoverGradient2D(x0,     y0    );
+  vec2 rightBotGrad = recoverGradient2D(x0 + 1, y0    );
+  vec2 leftTopGrad  = recoverGradient2D(x0,     y0 + 1);
+  vec2 rightTopGrad = recoverGradient2D(x0 + 1, y0 + 1);
 
   // Computing the distance to the coordinates
   //  _____________
@@ -77,16 +77,16 @@ float computePerlin(vec2 coords) {
   float xWeight = coords.x - float(intX);
   float yWeight = coords.y - float(intY);
 
-  float botLeftDot  = dot(vec2(xWeight,       yWeight      ), botLeftGrad);
-  float botRightDot = dot(vec2(xWeight - 1.0, yWeight      ), botRightGrad);
-  float topLeftDot  = dot(vec2(xWeight,       yWeight - 1.0), topLeftGrad);
-  float topRightDot = dot(vec2(xWeight - 1.0, yWeight - 1.0), topRightGrad);
+  float leftBotDot  = dot(vec2(xWeight,       yWeight      ), leftBotGrad);
+  float rightBotDot = dot(vec2(xWeight - 1.0, yWeight      ), rightBotGrad);
+  float leftTopDot  = dot(vec2(xWeight,       yWeight - 1.0), leftTopGrad);
+  float rightTopDot = dot(vec2(xWeight - 1.0, yWeight - 1.0), rightTopGrad);
 
   float smoothX = smootherstep(xWeight);
   float smoothY = smootherstep(yWeight);
 
-  float botCoeff = mix(botLeftDot, botRightDot, smoothX);
-  float topCoeff = mix(topLeftDot, topRightDot, smoothX);
+  float botCoeff = mix(leftBotDot, rightBotDot, smoothX);
+  float topCoeff = mix(leftTopDot, rightTopDot, smoothX);
 
   return mix(botCoeff, topCoeff, smoothY);
 }
