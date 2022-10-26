@@ -79,14 +79,14 @@ public:
   /// Checks if there is a texture entry with the given texture.
   /// \param texture Texture to find.
   /// \return True if an entry has been found, false otherwise.
-  bool hasTexture(const Texture2D& texture) const noexcept;
+  bool hasTexture(const Texture& texture) const noexcept;
   /// Checks if there is a texture entry with the given uniform name.
   /// \param uniformName Uniform name to find.
   /// \return True if an entry has been found, false otherwise.
   bool hasTexture(const std::string& uniformName) const noexcept;
   std::size_t getTextureCount() const noexcept { return m_textures.size(); }
-  const Texture2D& getTexture(std::size_t index) const noexcept { return *m_textures[index].first; }
-  const Texture2D& getTexture(const std::string& uniformName) const;
+  const Texture& getTexture(std::size_t index) const noexcept { return *m_textures[index].first; }
+  const Texture& getTexture(const std::string& uniformName) const;
 
   /// Sets an attribute to be sent to the shaders. If the uniform name already exists, replaces the attribute's value.
   /// \tparam T Type of the attribute to set. Must be a type handled by ShaderProgram::sendUniform().
@@ -96,7 +96,7 @@ public:
   /// Sets a texture to be bound to the shaders. If the uniform name already exists, replace the texture.
   /// \param texture Texture to set.
   /// \param uniformName Uniform name to bind the texture to.
-  void setTexture(Texture2DPtr texture, std::string uniformName);
+  void setTexture(TexturePtr texture, std::string uniformName);
 
   Material clone() const { return *this; }
   /// Loads a predefined material type, setting default shaders & adding all needed attributes & textures if they do not exist yet.
@@ -112,7 +112,7 @@ public:
   void bindTextures() const;
   /// Removes all entries associated with the given texture.
   /// \param texture Texture to remove the entries for.
-  void removeTexture(const Texture2D& texture);
+  void removeTexture(const Texture& texture);
   /// Removes the entry associated with the given uniform name.
   /// \param uniformName Uniform name to remove the entry for.
   void removeTexture(const std::string& uniformName);
@@ -128,7 +128,7 @@ private:
   using Attribute = std::variant<int, unsigned int, float, Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f, Mat2f, Mat3f, Mat4f>;
   std::unordered_map<std::string, Attribute> m_attributes {};
 
-  std::vector<std::pair<Texture2DPtr, std::string>> m_textures {};
+  std::vector<std::pair<TexturePtr, std::string>> m_textures {};
 };
 
 } // namespace Raz

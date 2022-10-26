@@ -136,7 +136,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Diffuse map
   {
-    const Raz::Texture2D& diffuseMap = material.getTexture(Raz::MaterialTexture::BaseColor);
+    const auto& diffuseMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::BaseColor));
 
     CHECK(diffuseMap.getWidth() == 2);
     CHECK(diffuseMap.getHeight() == 2);
@@ -181,7 +181,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Emissive map
   {
-    const Raz::Texture2D& emissiveMap = material.getTexture(Raz::MaterialTexture::Emissive);
+    const auto& emissiveMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Emissive));
 
     CHECK(emissiveMap.getWidth() == 2);
     CHECK(emissiveMap.getHeight() == 2);
@@ -220,7 +220,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Ambient map
   {
-    const Raz::Texture2D& ambientMap = material.getTexture(Raz::MaterialTexture::Ambient);
+    const auto& ambientMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Ambient));
 
     CHECK(ambientMap.getWidth() == 2);
     CHECK(ambientMap.getHeight() == 2);
@@ -259,7 +259,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Specular map
   {
-    const Raz::Texture2D& specularMap = material.getTexture(Raz::MaterialTexture::Specular);
+    const auto& specularMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Specular));
 
     CHECK(specularMap.getWidth() == 2);
     CHECK(specularMap.getHeight() == 2);
@@ -287,7 +287,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Transparency map
   {
-    const Raz::Texture2D& transparencyMap = material.getTexture(Raz::MaterialTexture::Transparency);
+    const auto& transparencyMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Transparency));
 
     CHECK(transparencyMap.getWidth() == 2);
     CHECK(transparencyMap.getHeight() == 2);
@@ -315,7 +315,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Bump map
   {
-    const Raz::Texture2D& bumpMap = material.getTexture(Raz::MaterialTexture::Bump);
+    const auto& bumpMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Bump));
 
     CHECK(bumpMap.getWidth() == 2);
     CHECK(bumpMap.getHeight() == 2);
@@ -397,7 +397,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Albedo map
   {
-    const Raz::Texture2D& albedoMap = material.getTexture(Raz::MaterialTexture::BaseColor);
+    const auto& albedoMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::BaseColor));
 
     CHECK(albedoMap.getWidth() == 2);
     CHECK(albedoMap.getHeight() == 2);
@@ -442,7 +442,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Emissive map
   {
-    const Raz::Texture2D& emissiveMap = material.getTexture(Raz::MaterialTexture::Emissive);
+    const auto& emissiveMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Emissive));
 
     CHECK(emissiveMap.getWidth() == 2);
     CHECK(emissiveMap.getHeight() == 2);
@@ -481,7 +481,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Normal map
   {
-    const Raz::Texture2D& normalMap = material.getTexture(Raz::MaterialTexture::Normal);
+    const auto& normalMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Normal));
 
     CHECK(normalMap.getWidth() == 2);
     CHECK(normalMap.getHeight() == 2);
@@ -520,7 +520,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Metallic map
   {
-    const Raz::Texture2D& metallicMap = material.getTexture(Raz::MaterialTexture::Metallic);
+    const auto& metallicMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Metallic));
 
     CHECK(metallicMap.getWidth() == 2);
     CHECK(metallicMap.getHeight() == 2);
@@ -548,7 +548,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Roughness map
   {
-    const Raz::Texture2D& roughnessMap = material.getTexture(Raz::MaterialTexture::Roughness);
+    const auto& roughnessMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Roughness));
 
     CHECK(roughnessMap.getWidth() == 2);
     CHECK(roughnessMap.getHeight() == 2);
@@ -576,7 +576,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Ambient occlusion map
   {
-    const Raz::Texture2D& ambientOcclusionMap = material.getTexture(Raz::MaterialTexture::Ambient);
+    const auto& ambientOcclusionMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Ambient));
 
     CHECK(ambientOcclusionMap.getWidth() == 2);
     CHECK(ambientOcclusionMap.getHeight() == 2);

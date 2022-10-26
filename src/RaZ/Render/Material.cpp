@@ -24,20 +24,20 @@ bool Material::hasAttribute(const std::string& uniformName) const noexcept {
   return (m_attributes.find(uniformName) != m_attributes.cend());
 }
 
-bool Material::hasTexture(const Texture2D& texture) const noexcept {
-  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&texture] (const std::pair<Texture2DPtr, std::string>& element) {
+bool Material::hasTexture(const Texture& texture) const noexcept {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&texture] (const auto& element) {
     return (element.first->getIndex() == texture.getIndex());
   });
 }
 
 bool Material::hasTexture(const std::string& uniformName) const noexcept {
-  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&uniformName] (const std::pair<Texture2DPtr, std::string>& element) {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&uniformName] (const auto& element) {
     return (element.second == uniformName);
   });
 }
 
-const Texture2D& Material::getTexture(const std::string& uniformName) const {
-  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<Texture2DPtr, std::string>& element) {
+const Texture& Material::getTexture(const std::string& uniformName) const {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
     return (element.second == uniformName);
   });
 
@@ -47,8 +47,8 @@ const Texture2D& Material::getTexture(const std::string& uniformName) const {
   return *textureIt->first;
 }
 
-void Material::setTexture(Texture2DPtr texture, std::string uniformName) {
-  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const std::pair<Texture2DPtr, std::string>& element) {
+void Material::setTexture(TexturePtr texture, std::string uniformName) {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
     return (element.second == uniformName);
   });
 
@@ -164,8 +164,8 @@ void Material::bindTextures() const {
   }
 }
 
-void Material::removeTexture(const Texture2D& texture) {
-  m_textures.erase(std::remove_if(m_textures.begin(), m_textures.end(), [&texture] (const std::pair<Texture2DPtr, std::string>& element) {
+void Material::removeTexture(const Texture& texture) {
+  m_textures.erase(std::remove_if(m_textures.begin(), m_textures.end(), [&texture] (const auto& element) {
     return (element.first->getIndex() == texture.getIndex());
   }), m_textures.end());
 }

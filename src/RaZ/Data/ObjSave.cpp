@@ -36,15 +36,15 @@ inline void writeTexture(std::ofstream& file, std::string_view tag, const std::s
   if (!material.hasTexture(uniformName.data()))
     return;
 
-  const Texture2D& texture = material.getTexture(uniformName.data());
+  const auto* texture = dynamic_cast<const Texture2D*>(&material.getTexture(uniformName.data()));
 
-  if (texture.getWidth() == 0 || texture.getHeight() == 0 || texture.getColorspace() == TextureColorspace::INVALID)
+  if (texture == nullptr || texture->getWidth() == 0 || texture->getHeight() == 0 || texture->getColorspace() == TextureColorspace::INVALID)
     return;
 
   const std::string texturePath = materialName + '_' + suffix + ".png";
 
   file << '\t' << tag << ' ' << texturePath << '\n';
-  ImageFormat::save(texturePath, texture.recoverImage(), true);
+  ImageFormat::save(texturePath, texture->recoverImage(), true);
 }
 #endif
 
