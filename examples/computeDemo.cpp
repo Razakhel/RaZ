@@ -44,7 +44,7 @@ int main() {
     Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise_2d.comp"));
     perlinNoise.execute(textureSize, textureSize);
 
-    Raz::ComputeShaderProgram worleyNoise(Raz::ComputeShader(RAZ_ROOT "shaders/worley_noise.comp"));
+    Raz::ComputeShaderProgram worleyNoise(Raz::ComputeShader(RAZ_ROOT "shaders/worley_noise_2d.comp"));
 
     Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, texture.getIndex(), "Noise texture");
     Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, perlinNoise.getIndex(), "Perlin noise shader program");

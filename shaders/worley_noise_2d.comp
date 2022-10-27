@@ -9,8 +9,11 @@ const vec2 offsets[9] = vec2[](
   vec2(-1.0, -1.0), vec2(0.0, -1.0), vec2(1.0, -1.0)
 );
 
-vec2 rand(vec2 vec) {
-  return fract(sin(vec2(dot(vec, vec2(127.1, 311.7)), dot(vec, vec2(269.5, 183.3)))) * 43758.5453);
+vec2 hash(vec2 vec) {
+  // "Hash without Sine", from https://www.shadertoy.com/view/4djSRW
+  vec3 v3 = fract(vec3(vec.xyx) * vec3(0.1031, 0.1030, 0.0973));
+  v3     += dot(v3, v3.yzx + 33.33);
+  return fract((v3.xx + v3.yz) * v3.zy);
 }
 
 float computeWorley(vec2 coords) {
@@ -20,7 +23,7 @@ float computeWorley(vec2 coords) {
   float minSqDist = 1.0;
 
   for (int i = 0; i < 9; ++i) {
-    vec2 cellCoords   = rand(intCoords + offsets[i]);
+    vec2 cellCoords   = hash(intCoords + offsets[i]);
     vec2 cellPoint    = cellCoords + offsets[i] - fractCoords;
     float pointSqDist = dot(cellPoint, cellPoint);
 

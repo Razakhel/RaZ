@@ -1,0 +1,49 @@
+layout(local_size_x = 1, local_size_y = 1, local_size_x = 1) in;
+
+layout(r16f, binding = 0) uniform image3D uniNoiseMap;
+uniform float uniNoiseFactor = 0.01;
+
+const vec3 offsets[27] = vec3[](
+  vec3(-1.0,  1.0, -1.0), vec3(0.0,  1.0, -1.0), vec3(1.0,  1.0, -1.0),
+  vec3(-1.0,  0.0, -1.0), vec3(0.0,  0.0, -1.0), vec3(1.0,  0.0, -1.0),
+  vec3(-1.0, -1.0, -1.0), vec3(0.0, -1.0, -1.0), vec3(1.0, -1.0, -1.0),
+
+  vec3(-1.0,  1.0, 0.0), vec3(0.0,  1.0, 0.0), vec3(1.0,  1.0, 0.0),
+  vec3(-1.0,  0.0, 0.0), vec3(0.0,  0.0, 0.0), vec3(1.0,  0.0, 0.0),
+  vec3(-1.0, -1.0, 0.0), vec3(0.0, -1.0, 0.0), vec3(1.0, -1.0, 0.0),
+
+  vec3(-1.0,  1.0, 1.0), vec3(0.0,  1.0, 1.0), vec3(1.0,  1.0, 1.0),
+  vec3(-1.0,  0.0, 1.0), vec3(0.0,  0.0, 1.0), vec3(1.0,  0.0, 1.0),
+  vec3(-1.0, -1.0, 1.0), vec3(0.0, -1.0, 1.0), vec3(1.0, -1.0, 1.0)
+);
+
+vec3 hash(vec3 vec) {
+  // "Hash without Sine", from https://www.shadertoy.com/view/4djSRW
+  vec  = fract(vec * vec3(0.1031, 0.1030, 0.0973));
+  vec += dot(vec, vec.yxz + 33.33);
+  return fract((vec.xxy + vec.yxx) * vec.zyx);
+}
+
+float computeWorley(vec3 coords) {
+  vec3 intCoords   = floor(coords);
+  vec3 fractCoords = coords - intCoords; // fract(coords)
+
+  float minSqDist = 1.0;
+
+  for (int i = 0; i < 27; ++i) {
+    vec3 cellCoords   = hash(intCoords + offsets[i]);
+    vec3 cellPoint    = cellCoords + offsets[i] - fractCoords;
+    float pointSqDist = dot(cellPoint, cellPoint);
+
+    minSqDist = min(minSqDist, pointSqDist);
+  }
+
+  return sqrt(minSqDist);
+}
+
+void main() {
+  float noise = computeWorley(vec3(gl_GlobalInvocationID.xyz) * uniNoiseFactor);
+
+  ivec3 pixelCoords = ivec3(gl_GlobalInvocationID.xyz);
+  imageStore(uniNoiseMap, pixelCoords, vec4(vec3(noise), 1.0));
+}
