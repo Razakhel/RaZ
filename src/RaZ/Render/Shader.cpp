@@ -45,6 +45,8 @@ void Shader::loadSource(const std::string& source) const {
 
     if (!StrUtils::startsWith(shaderSource, "precision"))
       header += "\nprecision highp float;\nprecision highp int;";
+
+    header += "\n#define GL_ES";
 #endif
 
     shaderSource = header + '\n' + shaderSource;
