@@ -125,9 +125,9 @@ int main() {
 
     Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
     light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                   Raz::Vec3f(0.f, 0.f, -1.f),  // Direction
+                                   -Raz::Axis::Z,               // Direction
                                    3.f,                         // Energy
-                                   Raz::Vec3f(1.f));            // Color (R/G/B)
+                                   Raz::ColorPreset::White);    // Color
 
     Raz::Window& window = world.getSystem<Raz::RenderSystem>().getWindow();
 

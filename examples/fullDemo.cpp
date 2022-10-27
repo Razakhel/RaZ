@@ -99,13 +99,13 @@ int main() {
     ///////////
 
     Raz::Entity& light = world.addEntity();
-    /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT, // Type
-                                                     1.f,                   // Energy
-                                                     Raz::Vec3f(1.f));      // Color(RGB)*/
+    /*auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::POINT,    // Type
+                                                     1.f,                      // Energy
+                                                     Raz::ColorPreset::White); // Color*/
     auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                                     Raz::Vec3f(0.f, 0.f, -1.f),  // Direction
+                                                     -Raz::Axis::Z,               // Direction
                                                      1.f,                         // Energy
-                                                     Raz::Vec3f(1.f));            // Color (RGB)
+                                                     Raz::ColorPreset::White);    // Color
     auto& lightTrans = light.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 1.f, 0.f));
 
     DemoUtils::setupLightControls(light, renderSystem, window);

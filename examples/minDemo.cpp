@@ -5,9 +5,7 @@ using namespace std::literals;
 int main() {
   try {
     Raz::Application app;
-    Raz::World& world = app.addWorld(2);
-
-    Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
+    Raz::World& world = app.addWorld(3);
 
     auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
 
@@ -15,16 +13,13 @@ int main() {
     camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());
 
     Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
-
-    auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj");
-    mesh.addComponent<Raz::Mesh>(std::move(meshData));
-    mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData));
+    mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
 
     Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
     light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                   Raz::Vec3f(0.f, 0.f, -1.f),  // Direction
+                                   -Raz::Axis::Z,               // Direction
                                    1.f,                         // Energy
-                                   Raz::Vec3f(1.f));            // Color (R/G/B)
+                                   Raz::ColorPreset::White);    // Color
 
     render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
     render.getWindow().setCloseCallback([&app] () noexcept { app.quit(); });

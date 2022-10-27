@@ -33,7 +33,7 @@ int main() {
     auto& meshTrans    = mesh.addComponent<Raz::Transform>();
     auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
 
-    auto& whiteLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, 0.f, -1.f),
+    auto& whiteLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Z,
                                                                                                3.f, Raz::Vec3f(1.f));
     auto& yellowLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(5.f, 0.f, -1.f),
                                                                                                 1.f, Raz::Vec3f(1.f, 1.f, 0.f));
