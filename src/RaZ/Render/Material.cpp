@@ -18,6 +18,14 @@ constexpr std::string_view blinnPhongShaderSource = {
 #include "blinn-phong.frag.embed"
 };
 
+constexpr std::string_view singleTexture2DShaderSource = {
+#include "single_texture_2d.frag.embed"
+};
+
+constexpr std::string_view singleTexture3DShaderSource = {
+#include "single_texture_3d.frag.embed"
+};
+
 } // namespace
 
 bool Material::hasAttribute(const std::string& uniformName) const noexcept {
@@ -122,6 +130,22 @@ void Material::loadType(MaterialType type) {
         setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Transparency);
       if (!hasTexture(MaterialTexture::Bump))
         setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Bump);
+
+      break;
+
+    case MaterialType::SINGLE_TEXTURE_2D:
+      m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(singleTexture2DShaderSource));
+
+      if (!hasTexture(MaterialTexture::BaseColor))
+        setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::BaseColor);
+
+      break;
+
+    case MaterialType::SINGLE_TEXTURE_3D:
+      m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(singleTexture3DShaderSource));
+
+      if (!hasTexture(MaterialTexture::BaseColor))
+        setTexture(Texture3D::create(ColorPreset::White), MaterialTexture::BaseColor);
 
       break;
 
