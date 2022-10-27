@@ -199,6 +199,16 @@ void Texture1D::load() const {
                             nullptr);
   unbind();
 }
+
+void Texture1D::makePlainColored(const Color& color) {
+  m_width      = 1;
+  m_colorspace = TextureColorspace::RGB;
+  m_dataType   = TextureDataType::BYTE;
+
+  bind();
+  Renderer::sendImageData1D(TextureType::TEXTURE_1D, 0, TextureInternalFormat::RGB, 1, TextureFormat::RGB, PixelDataType::UBYTE, Vec3b(color).getDataPtr());
+  unbind();
+}
 #endif
 
 Texture2D::Texture2D()
@@ -329,6 +339,18 @@ void Texture3D::load() const {
                             recoverFormat(m_colorspace),
                             (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
                             nullptr);
+  unbind();
+}
+
+void Texture3D::makePlainColored(const Color& color) {
+  m_width      = 1;
+  m_height     = 1;
+  m_depth      = 1;
+  m_colorspace = TextureColorspace::RGB;
+  m_dataType   = TextureDataType::BYTE;
+
+  bind();
+  Renderer::sendImageData3D(TextureType::TEXTURE_3D, 0, TextureInternalFormat::RGB, 1, 1, 1, TextureFormat::RGB, PixelDataType::UBYTE, Vec3b(color).getDataPtr());
   unbind();
 }
 

@@ -168,39 +168,118 @@ TEST_CASE("Texture move") {
 TEST_CASE("Texture presets") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  const Raz::Texture2DPtr whiteTexture = Raz::Texture2D::create(Raz::ColorPreset::White);
+#if !defined(USE_OPENGL_ES)
+  const Raz::Texture1DPtr texture1D = Raz::Texture1D::create(Raz::ColorPreset::Red);
+#endif
+  const Raz::Texture2DPtr texture2D = Raz::Texture2D::create(Raz::ColorPreset::Green);
+  const Raz::Texture3DPtr texture3D = Raz::Texture3D::create(Raz::ColorPreset::Blue);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  CHECK(whiteTexture->getWidth() == 1);
-  CHECK(whiteTexture->getHeight() == 1);
-  CHECK(whiteTexture->getColorspace() == Raz::TextureColorspace::RGB);
-  CHECK(whiteTexture->getDataType() == Raz::TextureDataType::BYTE);
+#if !defined(USE_OPENGL_ES)
+  CHECK(texture1D->getWidth() == 1);
+  CHECK(texture1D->getColorspace() == Raz::TextureColorspace::RGB);
+  CHECK(texture1D->getDataType() == Raz::TextureDataType::BYTE);
+#endif
+
+  CHECK(texture2D->getWidth() == 1);
+  CHECK(texture2D->getHeight() == 1);
+  CHECK(texture2D->getColorspace() == Raz::TextureColorspace::RGB);
+  CHECK(texture2D->getDataType() == Raz::TextureDataType::BYTE);
+
+  CHECK(texture3D->getWidth() == 1);
+  CHECK(texture3D->getHeight() == 1);
+  CHECK(texture3D->getDepth() == 1);
+  CHECK(texture3D->getColorspace() == Raz::TextureColorspace::RGB);
+  CHECK(texture3D->getDataType() == Raz::TextureDataType::BYTE);
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() are unavailable with OpenGL ES
   std::array<uint8_t, 3> textureData {}; // Recovering the texture's data (1 RGB pixel -> 3 values)
 
-  whiteTexture->bind();
+#if !defined(USE_OPENGL_ES)
+  {
+    texture1D->bind();
 
-  CHECK(Raz::Renderer::recoverTextureWidth(Raz::TextureType::TEXTURE_2D) == 1);
-  CHECK(Raz::Renderer::recoverTextureHeight(Raz::TextureType::TEXTURE_2D) == 1);
-  CHECK(Raz::Renderer::recoverTextureDepth(Raz::TextureType::TEXTURE_2D) == 1);
-  CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_2D) == Raz::TextureInternalFormat::RGB);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
+    CHECK(Raz::Renderer::recoverTextureWidth(Raz::TextureType::TEXTURE_1D) == 1);
+    CHECK(Raz::Renderer::recoverTextureHeight(Raz::TextureType::TEXTURE_1D) == 1);
+    CHECK(Raz::Renderer::recoverTextureDepth(Raz::TextureType::TEXTURE_1D) == 1);
+    CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_1D) == Raz::TextureInternalFormat::RGB);
+    CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_2D, 0, Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, textureData.data());
-  CHECK_FALSE(Raz::Renderer::hasErrors());
+    Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_1D, 0, Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, textureData.data());
+    CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  whiteTexture->unbind();
+    texture1D->unbind();
 
-  CHECK(textureData[0] == 255);
-  CHECK(textureData[1] == 255);
-  CHECK(textureData[2] == 255);
+    CHECK(textureData[0] == 255);
+    CHECK(textureData[1] == 0);
+    CHECK(textureData[2] == 0);
+  }
+#endif
+
+  {
+    texture2D->bind();
+
+    CHECK(Raz::Renderer::recoverTextureWidth(Raz::TextureType::TEXTURE_2D) == 1);
+    CHECK(Raz::Renderer::recoverTextureHeight(Raz::TextureType::TEXTURE_2D) == 1);
+    CHECK(Raz::Renderer::recoverTextureDepth(Raz::TextureType::TEXTURE_2D) == 1);
+    CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_2D) == Raz::TextureInternalFormat::RGB);
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+
+    Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_2D, 0, Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, textureData.data());
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+
+    texture2D->unbind();
+
+    CHECK(textureData[0] == 0);
+    CHECK(textureData[1] == 255);
+    CHECK(textureData[2] == 0);
+  }
+
+  {
+    texture3D->bind();
+
+    CHECK(Raz::Renderer::recoverTextureWidth(Raz::TextureType::TEXTURE_3D) == 1);
+    CHECK(Raz::Renderer::recoverTextureHeight(Raz::TextureType::TEXTURE_3D) == 1);
+    CHECK(Raz::Renderer::recoverTextureDepth(Raz::TextureType::TEXTURE_3D) == 1);
+    CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_3D) == Raz::TextureInternalFormat::RGB);
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+
+    Raz::Renderer::recoverTextureData(Raz::TextureType::TEXTURE_3D, 0, Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, textureData.data());
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+
+    texture3D->unbind();
+
+    CHECK(textureData[0] == 0);
+    CHECK(textureData[1] == 0);
+    CHECK(textureData[2] == 255);
+  }
 #endif
 
   // Creating another texture from the same preset gives a different one; both aren't linked
-  const Raz::Texture2DPtr whiteTexture2 = Raz::Texture2D::create(Raz::ColorPreset::White);
-  CHECK_FALSE(Raz::Renderer::hasErrors());
 
-  CHECK_FALSE(whiteTexture2.get() == whiteTexture.get());
-  CHECK_FALSE(whiteTexture2->getIndex() == whiteTexture->getIndex());
+#if !defined(USE_OPENGL_ES)
+  {
+    const Raz::Texture1DPtr texture1D2 = Raz::Texture1D::create(Raz::ColorPreset::White);
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+
+    CHECK_FALSE(texture1D2.get() == texture1D.get());
+    CHECK_FALSE(texture1D2->getIndex() == texture1D->getIndex());
+  }
+#endif
+
+  {
+    const Raz::Texture2DPtr texture2D2 = Raz::Texture2D::create(Raz::ColorPreset::White);
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+
+    CHECK_FALSE(texture2D2.get() == texture2D.get());
+    CHECK_FALSE(texture2D2->getIndex() == texture2D->getIndex());
+  }
+
+  {
+    const Raz::Texture3DPtr texture3D2 = Raz::Texture3D::create(Raz::ColorPreset::White);
+    CHECK_FALSE(Raz::Renderer::hasErrors());
+
+    CHECK_FALSE(texture3D2.get() == texture3D.get());
+    CHECK_FALSE(texture3D2->getIndex() == texture3D->getIndex());
+  }
 }

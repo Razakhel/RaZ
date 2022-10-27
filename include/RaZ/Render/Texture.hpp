@@ -97,6 +97,9 @@ public:
   Texture1D(TextureColorspace colorspace, TextureDataType dataType) : Texture1D() { setColorspace(colorspace, dataType); }
   Texture1D(unsigned int width, TextureColorspace colorspace) : Texture1D(colorspace) { resize(width); }
   Texture1D(unsigned int width, TextureColorspace colorspace, TextureDataType dataType);
+  /// Constructs a plain colored texture.
+  /// \param value Color to create the texture with.
+  explicit Texture1D(const Color& color) : Texture1D() { makePlainColored(color); }
 
   unsigned int getWidth() const { return m_width; }
 
@@ -109,6 +112,9 @@ public:
 
 private:
   void load() const override;
+  /// Fills the texture with a single pixel (creates a single-colored texture).
+  /// \param color Color to fill the texture with.
+  void makePlainColored(const Color& color);
 
   unsigned int m_width  = 0;
 };
@@ -122,7 +128,7 @@ public:
   Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace) : Texture2D(colorspace) { resize(width, height); }
   Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType);
   explicit Texture2D(const Image& image, bool createMipmaps = true) : Texture2D() { load(image, createMipmaps); }
-  /// Constructs an 1x1 plain colored texture.
+  /// Constructs a 1x1 plain colored texture.
   /// \param value Color to create the texture with.
   explicit Texture2D(const Color& color) : Texture2D() { makePlainColored(color); }
 
@@ -166,6 +172,9 @@ public:
   Texture3D(TextureColorspace colorspace, TextureDataType dataType) : Texture3D() { setColorspace(colorspace, dataType); }
   Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace) : Texture3D(colorspace) { resize(width, height, depth); }
   Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace, TextureDataType dataType);
+  /// Constructs a 1x1x1 plain colored texture.
+  /// \param value Color to create the texture with.
+  explicit Texture3D(const Color& color) : Texture3D() { makePlainColored(color); }
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -182,6 +191,9 @@ public:
 
 private:
   void load() const override;
+  /// Fills the texture with a single pixel (creates a single-colored 1x1x1 texture).
+  /// \param color Color to fill the texture with.
+  void makePlainColored(const Color& color);
 
   unsigned int m_width  = 0;
   unsigned int m_height = 0;
