@@ -2,7 +2,8 @@
 
 using namespace std::literals;
 
-static constexpr int textureSize = 512;
+static constexpr int textureSize  = 512;
+static constexpr int textureDepth = 16;
 
 int main() {
   try {
@@ -19,15 +20,14 @@ int main() {
     // Rendering //
     ///////////////
 
-    auto& render = world.addSystem<Raz::RenderSystem>(textureSize, textureSize + 105, "RaZ");
+    auto& render = world.addSystem<Raz::RenderSystem>(textureSize, textureSize, "RaZ");
 
     if (!Raz::Renderer::checkVersion(4, 3)) {
       throw std::runtime_error("Error: Compute is only available with an OpenGL 4.3 context or above; "
                                "please update your graphics drivers or try on another computer");
     }
 
-    // A camera is needed by the RenderSystem, but since we won't render anything there is no need to initialize it
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>();
+    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>(textureSize, textureSize);
 
     Raz::Window& window = world.getSystem<Raz::RenderSystem>().getWindow();
 
@@ -38,63 +38,83 @@ int main() {
     // Compute program //
     /////////////////////
 
-    Raz::Texture2D texture(textureSize, textureSize, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT);
-    Raz::Renderer::bindImageTexture(0, texture.getIndex(), 0, false, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
+    Raz::Texture3DPtr texture = Raz::Texture3D::create(textureSize, textureSize, textureDepth, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT);
+    Raz::Renderer::bindImageTexture(0, texture->getIndex(), 0, true, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
-    Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise_2d.comp"));
-    perlinNoise.execute(textureSize, textureSize);
+    Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise_3d.comp"));
+    perlinNoise.execute(textureSize, textureSize, textureDepth);
 
-    Raz::ComputeShaderProgram worleyNoise(Raz::ComputeShader(RAZ_ROOT "shaders/worley_noise_2d.comp"));
+    Raz::ComputeShaderProgram worleyNoise(Raz::ComputeShader(RAZ_ROOT "shaders/worley_noise_3d.comp"));
 
-    Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, texture.getIndex(), "Noise texture");
+    Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, texture->getIndex(), "Noise texture");
     Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, perlinNoise.getIndex(), "Perlin noise shader program");
     Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, worleyNoise.getIndex(), "Worley noise shader program");
     Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, perlinNoise.getShader().getIndex(), "Perlin noise compute shader");
     Raz::Renderer::setLabel(Raz::RenderObjectType::SHADER, worleyNoise.getShader().getIndex(), "Worley noise compute shader");
 
+    /////////////////////
+    // Display surface //
+    /////////////////////
+
+    // Creating a triangle just big enough to cover the screen
+    auto& surface = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Triangle(Raz::Vec3f(-0.42f, -0.42f, -1.f),
+                                                                                                                           Raz::Vec3f( 1.25f, -0.42f, -1.f),
+                                                                                                                           Raz::Vec3f(-0.42f,  1.25f, -1.f)),
+                                                                                                             Raz::Vec2f(0.f, 0.f),
+                                                                                                             Raz::Vec2f(2.f, 0.f),
+                                                                                                             Raz::Vec2f(0.f, 2.f)));
+
+    Raz::Material& surfaceMat = surface.setMaterial(Raz::Material(Raz::MaterialType::SINGLE_TEXTURE_3D));
+    surfaceMat.setTexture(texture, Raz::MaterialTexture::BaseColor);
+
+    Raz::RenderShaderProgram& surfaceProgram = surfaceMat.getProgram();
+
     /////////////
     // Overlay //
     /////////////
 
-    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Compute demo", Raz::Vec2f(window.getWidth(), window.getHeight()));
-
-    overlay.addTexture(texture, textureSize, textureSize);
+    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Compute demo", Raz::Vec2f(-1.f));
 
     Raz::OverlaySlider& perlinFactor = overlay.addSlider("Perlin noise factor", [&perlinNoise] (float value) {
       perlinNoise.use();
       perlinNoise.sendUniform("uniNoiseFactor", value);
-      perlinNoise.execute(textureSize, textureSize);
+      perlinNoise.execute(textureSize, textureSize, textureDepth);
     }, 0.001f, 0.1f, 0.01f);
 
-    Raz::OverlaySlider& perlinOctave = overlay.addSlider("Perlin noise octaves", [&perlinNoise] (float value) {
+    Raz::OverlaySlider& perlinOctaves = overlay.addSlider("Perlin noise octaves", [&perlinNoise] (float value) {
       perlinNoise.use();
       perlinNoise.sendUniform("uniOctaveCount", static_cast<int>(value));
-      perlinNoise.execute(textureSize, textureSize);
+      perlinNoise.execute(textureSize, textureSize, textureDepth);
     }, 1, 8, 1);
 
     Raz::OverlaySlider& worleyFactor = overlay.addSlider("Worley noise factor", [&worleyNoise] (float value) {
       worleyNoise.use();
       worleyNoise.sendUniform("uniNoiseFactor", value);
-      worleyNoise.execute(textureSize, textureSize);
+      worleyNoise.execute(textureSize, textureSize, textureDepth);
     }, 0.001f, 0.1f, 0.01f);
     worleyFactor.disable();
 
+    overlay.addSlider("Depth", [&surfaceProgram] (float value) {
+      surfaceProgram.use();
+      surfaceProgram.sendUniform("uniDepth", value / textureDepth);
+    }, 0.f, textureDepth, 0.f);
+
     overlay.addDropdown("Noise method", { "Perlin", "Worley" }, [&] (const std::string&, std::size_t index) {
       perlinFactor.disable();
-      perlinOctave.disable();
+      perlinOctaves.disable();
 
       worleyFactor.disable();
 
       switch (index) {
         case 0:
           perlinFactor.enable();
-          perlinOctave.enable();
-          perlinNoise.execute(textureSize, textureSize);
+          perlinOctaves.enable();
+          perlinNoise.execute(textureSize, textureSize, textureDepth);
           break;
 
         case 1:
           worleyFactor.enable();
-          worleyNoise.execute(textureSize, textureSize);
+          worleyNoise.execute(textureSize, textureSize, textureDepth);
           break;
 
         default:
