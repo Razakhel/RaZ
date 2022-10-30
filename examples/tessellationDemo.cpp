@@ -50,7 +50,7 @@ constexpr std::string_view tessEvalSource = R"(
 
   in MeshInfo tessMeshInfo[];
 
-  uniform bool uniMakeSphere = false;
+  uniform bool uniMakeSphere = true;
 
   out MeshInfo vertMeshInfo;
 
@@ -133,6 +133,9 @@ int main() {
 
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
     window.setCloseCallback([&app] () noexcept { app.quit(); });
+
+    // Enabling wireframe rendering by default; can be disabled from the overlay
+    Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, Raz::PolygonMode::LINE);
 
     //////////
     // Mesh //
@@ -231,13 +234,13 @@ int main() {
     }, [&materialProgram] () {
       materialProgram.use();
       materialProgram.sendUniform("uniMakeSphere", false);
-    }, false);
+    }, true);
 
     overlay.addCheckbox("Enable wireframe", [] () {
       Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, Raz::PolygonMode::LINE);
     }, [] () {
       Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, Raz::PolygonMode::FILL);
-    }, false);
+    }, true);
 
     app.run([&] (float deltaTime) {
       transform.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
