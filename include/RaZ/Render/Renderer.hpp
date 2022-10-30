@@ -148,6 +148,16 @@ enum class PolygonMode : unsigned int {
   FILL  = 6914 /* GL_FILL  */  ///<
 };
 
+enum class ClipOrigin : unsigned int {
+  LOWER_LEFT = 36001 /* GL_LOWER_LEFT */, ///<
+  UPPER_LEFT = 36002 /* GL_UPPER_LEFT */  ///<
+};
+
+enum class ClipDepth : unsigned int {
+  NEG_ONE_TO_ONE = 37726 /* GL_NEGATIVE_ONE_TO_ONE */, ///<
+  ZERO_TO_ONE    = 37727 /* GL_ZERO_TO_ONE         */  ///<
+};
+
 enum class PatchParameter : unsigned int {
   DEFAULT_OUTER_LEVEL = 36468 /* GL_PATCH_DEFAULT_OUTER_LEVEL */, ///< Default outer level used if no tessellation control shader exists.
   DEFAULT_INNER_LEVEL = 36467 /* GL_PATCH_DEFAULT_INNER_LEVEL */  ///< Default inner level used if no tessellation control shader exists.
@@ -873,6 +883,7 @@ public:
   static void setFaceCulling(FaceOrientation orientation);
 #if !defined(USE_OPENGL_ES)
   static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);
+  static void setClipControl(ClipOrigin origin, ClipDepth depth);
   static void setPatchVertexCount(int value);
   static void setPatchParameter(PatchParameter param, const float* values);
 #endif

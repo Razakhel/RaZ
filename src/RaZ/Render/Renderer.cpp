@@ -317,6 +317,16 @@ void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
   printConditionalErrors();
 }
 
+void Renderer::setClipControl(ClipOrigin origin, ClipDepth depth) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+  assert("Error: Setting clip control requires either OpenGL 4.5+ or the 'GL_ARB_clip_control' extension."
+      && (checkVersion(4, 5) || isExtensionSupported("GL_ARB_clip_control")));
+
+  glClipControl(static_cast<unsigned int>(origin), static_cast<unsigned int>(depth));
+
+  printConditionalErrors();
+}
+
 void Renderer::setPatchVertexCount(int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: Setting patch vertices requires OpenGL 4.0+." && checkVersion(4, 0));

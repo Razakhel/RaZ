@@ -190,6 +190,10 @@ void RenderSystem::initialize() {
   registerComponents<Camera, Light, MeshRenderer>();
 
 #if !defined(USE_OPENGL_ES)
+  // Setting the depth to a [0; 1] range instead of a [-1; 1] one is always a good thing, since the [-1; 0] subrange is never used anyway
+  if (Renderer::checkVersion(4, 5) || Renderer::isExtensionSupported("GL_ARB_clip_control"))
+    Renderer::setClipControl(ClipOrigin::LOWER_LEFT, ClipDepth::ZERO_TO_ONE);
+
   if (Renderer::checkVersion(4, 3)) {
     Renderer::setLabel(RenderObjectType::BUFFER, m_cameraUbo.getIndex(), "Camera UBO");
     Renderer::setLabel(RenderObjectType::BUFFER, m_lightsUbo.getIndex(), "Lights UBO");
