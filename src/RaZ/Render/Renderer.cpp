@@ -94,6 +94,17 @@ void Renderer::initialize() {
   getParameter(StateParameter::MAJOR_VERSION, &s_majorVersion);
   getParameter(StateParameter::MINOR_VERSION, &s_minorVersion);
 
+  // Recovering supported extensions
+  {
+    int extCount{};
+    getParameter(StateParameter::EXTENSION_COUNT, &extCount);
+
+    s_extensions.reserve(static_cast<std::size_t>(extCount));
+
+    for (int extIndex = 0; extIndex < extCount; ++extIndex)
+      s_extensions.emplace(getExtension(static_cast<unsigned int>(extIndex)));
+  }
+
 #if !defined(RAZ_PLATFORM_MAC) && !defined(USE_OPENGL_ES) // Setting the debug message callback provokes a crash on macOS & isn't available on OpenGL ES
   if (checkVersion(4, 3)) {
     enable(Capability::DEBUG_OUTPUT);

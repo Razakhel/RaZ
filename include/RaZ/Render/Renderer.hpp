@@ -8,6 +8,7 @@
 #include <bitset>
 #include <cstddef>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 namespace Raz {
@@ -821,6 +822,7 @@ public:
   /// \param minor Minor version.
   /// \return True if the given version is higher than or equal to the current one, false otherwise.
   static bool checkVersion(int major, int minor) noexcept { return (s_majorVersion > major || (s_majorVersion == major && s_minorVersion >= minor)); }
+  static bool isExtensionSupported(const std::string& extension) { return (s_extensions.find(extension) != s_extensions.cend()); }
   static void enable(Capability capability);
   static void disable(Capability capability);
   static bool isEnabled(Capability capability);
@@ -1289,6 +1291,7 @@ private:
 
   static inline int s_majorVersion {};
   static inline int s_minorVersion {};
+  static inline std::unordered_set<std::string> s_extensions {};
 };
 
 } // namespace Raz
