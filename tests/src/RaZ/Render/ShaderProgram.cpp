@@ -63,6 +63,8 @@ constexpr std::string_view fragSource = R"(
 )";
 
 constexpr std::string_view compSource = R"(
+  #extension GL_ARB_compute_shader : enable
+
   layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
   uniform int uniUnused;
@@ -71,7 +73,7 @@ constexpr std::string_view compSource = R"(
   uniform int uniInt[2];
   uniform uint uniUint;
 
-  layout(rgba32f, binding = 0) uniform image2D uniImage2D;
+  layout(rgba32f, binding = 0) uniform writeonly image2D uniImage2D;
 
   void main() {
     imageStore(uniImage2D, ivec2(uniInt[0] + uniInt[1], int(uniUint)), vec4(uniVec3, uniFloat[0] + uniFloat[1] + uniFloat[2]));
@@ -150,8 +152,8 @@ TEST_CASE("ShaderProgram move") {
     }
   }
 
-  // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::checkVersion(4, 3)) {
+  // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
+  if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     Raz::ComputeShaderProgram programBase;
     programBase.setShader(Raz::ComputeShader());
     programBase.updateShaders();
@@ -297,8 +299,8 @@ TEST_CASE("RenderShaderProgram uniforms") {
 }
 
 TEST_CASE("ComputeShaderProgram creation") {
-  // Compute shaders are only available in OpenGL 4.3+
-  if (!Raz::Renderer::checkVersion(4, 3))
+  // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
+  if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -334,8 +336,8 @@ TEST_CASE("ComputeShaderProgram creation") {
 }
 
 TEST_CASE("ComputeShaderProgram uniforms") {
-  // Compute shaders are only available in OpenGL 4.3+
-  if (!Raz::Renderer::checkVersion(4, 3))
+  // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
+  if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors

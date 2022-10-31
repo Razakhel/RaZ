@@ -1,6 +1,6 @@
 layout(local_size_x = 1, local_size_y = 1, local_size_x = 1) in;
 
-layout(r16f, binding = 0) uniform image3D uniNoiseMap;
+layout(r16f, binding = 0) uniform writeonly image3D uniNoiseMap;
 uniform float uniNoiseFactor = 0.01;
 uniform int uniOctaveCount   = 1;
 

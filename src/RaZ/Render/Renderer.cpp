@@ -319,7 +319,7 @@ void Renderer::setPolygonMode(FaceOrientation orientation, PolygonMode mode) {
 
 void Renderer::setClipControl(ClipOrigin origin, ClipDepth depth) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: Setting clip control requires either OpenGL 4.5+ or the 'GL_ARB_clip_control' extension."
+  assert("Error: Setting clip control requires OpenGL 4.5+ or the 'GL_ARB_clip_control' extension."
       && (checkVersion(4, 5) || isExtensionSupported("GL_ARB_clip_control")));
 
   glClipControl(static_cast<unsigned int>(origin), static_cast<unsigned int>(depth));
@@ -853,12 +853,14 @@ unsigned int Renderer::createShader(ShaderType type) {
 #if !defined(USE_OPENGL_ES)
   assert("Error: Creating a tessellation shader requires OpenGL 4.0+."
          && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION) || checkVersion(4, 0)));
-  assert("Error: Creating a compute shader requires OpenGL 4.3+." && (type != ShaderType::COMPUTE || (checkVersion(4, 3))));
+  assert("Error: Creating a compute shader requires OpenGL 4.3+ or the 'GL_ARB_compute_shader' extension."
+      && (type != ShaderType::COMPUTE || checkVersion(4, 3) || isExtensionSupported("GL_ARB_compute_shader")));
 #else
   assert("Error: Geometry shaders are unsupported with OpenGL ES." && type != ShaderType::GEOMETRY);
   assert("Error: Tessellation shaders are unsupported with OpenGL ES."
          && type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION);
-  assert("Error: Creating a compute shader requires OpenGL ES 3.1+." && (type != ShaderType::COMPUTE || (checkVersion(3, 1))));
+  assert("Error: Creating a compute shader requires OpenGL ES 3.1+ or the 'GL_ARB_compute_shader' extension."
+      && (type != ShaderType::COMPUTE || checkVersion(3, 1) || isExtensionSupported("GL_ARB_compute_shader")));
 #endif
 
   const unsigned int shaderIndex = glCreateShader(static_cast<unsigned int>(type));
@@ -1386,9 +1388,11 @@ void Renderer::drawElementsInstanced(PrimitiveType type, unsigned int primitiveC
 void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
-  assert("Error: Launching a compute operation requires OpenGL 4.3+." && checkVersion(4, 3));
+  assert("Error: Launching a compute operation requires OpenGL 4.3+ or the 'GL_ARB_compute_shader' extension."
+      && (checkVersion(4, 3) || isExtensionSupported("GL_ARB_compute_shader")));
 #else
-  assert("Error: Launching a compute operation requires OpenGL ES 3.1+." && checkVersion(3, 1));
+  assert("Error: Launching a compute operation requires OpenGL ES 3.1+ or the 'GL_ARB_compute_shader' extension."
+      && (checkVersion(3, 1) || isExtensionSupported("GL_ARB_compute_shader")));
 #endif
 
   glDispatchCompute(groupCountX, groupCountY, groupCountZ);

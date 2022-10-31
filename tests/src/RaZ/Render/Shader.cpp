@@ -73,8 +73,8 @@ TEST_CASE("Shader validity") {
     CHECK_FALSE(fragShader.isValid());
   }
 
-  // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::checkVersion(4, 3)) {
+  // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
+  if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     Raz::ComputeShader compShader;
     CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK(compShader.isValid());
@@ -140,8 +140,8 @@ TEST_CASE("Shader clone") {
     areShadersEqual(shaderFromSource, shaderFromSource.clone());
   }
 
-  // Compute shaders are only available in OpenGL 4.3+
-  if (Raz::Renderer::checkVersion(4, 3)) {
+  // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
+  if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     const Raz::ComputeShader shaderFromPath(shaderPath);
     areShadersEqual(shaderFromPath, shaderFromPath.clone());
 
@@ -227,16 +227,18 @@ TEST_CASE("Fragment shader from source") {
 }
 
 TEST_CASE("Compute shader from source") {
-  // Compute shaders are only available in OpenGL 4.3+
-  if (!Raz::Renderer::checkVersion(4, 3))
+  // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
+  if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string compSource = R"(
+    #extension GL_ARB_compute_shader : enable
+
     layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-    layout(rgba32f, binding = 0) uniform image2D uniOutput;
+    layout(rgba32f, binding = 0) uniform writeonly image2D uniOutput;
 
     void main() {
       imageStore(uniOutput, ivec2(0), vec4(0.0));
@@ -245,7 +247,7 @@ TEST_CASE("Compute shader from source") {
 
   // The #version tag is automatically added if not present; if it is, nothing is changed to the source
   checkShader(Raz::ComputeShader::loadFromSource(compSource));
-  checkShader(Raz::ComputeShader::loadFromSource("#version 430\n" + compSource));
+  checkShader(Raz::ComputeShader::loadFromSource("#version 420\n" + compSource)); // A minimum of OpenGL 4.2 is required for the extension to exist
 }
 
 TEST_CASE("Vertex shader imported") {
@@ -293,8 +295,8 @@ TEST_CASE("Fragment shader imported") {
 }
 
 TEST_CASE("Compute shader imported") {
-  // Compute shaders are only available in OpenGL 4.3+
-  if (!Raz::Renderer::checkVersion(4, 3))
+  // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
+  if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;
 
   Raz::Renderer::recoverErrors(); // Flushing errors
