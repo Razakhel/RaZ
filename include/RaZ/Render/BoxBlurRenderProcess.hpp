@@ -12,7 +12,8 @@ public:
   explicit BoxBlurRenderProcess(RenderGraph& renderGraph);
 
   void setInputBuffer(Texture2DPtr colorBuffer);
-  void setStrength(unsigned int strength);
+  void setOutputBuffer(Texture2DPtr colorBuffer);
+  void setStrength(unsigned int strength) const;
 };
 
 } // namespace Raz

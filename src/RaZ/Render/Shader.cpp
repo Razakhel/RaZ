@@ -47,7 +47,7 @@ void Shader::loadSource(const std::string& source) const {
       header += "\nprecision highp float;\nprecision highp int;";
 #endif
 
-    shaderSource = header + '\n' + shaderSource;
+    shaderSource = header + "\n#line 0\n" + shaderSource;
   }
 
   Renderer::sendShaderSource(m_index, shaderSource);
