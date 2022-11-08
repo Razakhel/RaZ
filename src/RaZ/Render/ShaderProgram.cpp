@@ -59,79 +59,94 @@ int ShaderProgram::recoverUniformLocation(const std::string& uniformName) const 
   return Renderer::recoverUniformLocation(m_index, uniformName.c_str());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, int value) const {
+void ShaderProgram::sendUniform(int index, int value) const {
   checkProgramUsed(*this);
-  Renderer::sendUniform(uniformIndex, value);
+  Renderer::sendUniform(index, value);
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, unsigned int value) const {
+void ShaderProgram::sendUniform(int index, unsigned int value) const {
   checkProgramUsed(*this);
-  Renderer::sendUniform(uniformIndex, value);
+  Renderer::sendUniform(index, value);
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, float value) const {
+void ShaderProgram::sendUniform(int index, float value) const {
   checkProgramUsed(*this);
-  Renderer::sendUniform(uniformIndex, value);
+  Renderer::sendUniform(index, value);
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec2i& vec) const {
+void ShaderProgram::sendUniform(int index, const int* values, std::size_t count) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector2i(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector1i(index, values, static_cast<int>(count));
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec3i& vec) const {
+void ShaderProgram::sendUniform(int index, const unsigned int* values, std::size_t count) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector3i(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector1ui(index, values, static_cast<int>(count));
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec4i& vec) const {
+void ShaderProgram::sendUniform(int index, const float* values, std::size_t count) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector4i(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector1(index, values, static_cast<int>(count));
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec2u& vec) const {
+void ShaderProgram::sendUniform(int index, const Vec2i& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector2ui(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector2i(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec3u& vec) const {
+void ShaderProgram::sendUniform(int index, const Vec3i& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector3ui(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector3i(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec4u& vec) const {
+void ShaderProgram::sendUniform(int index, const Vec4i& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector4ui(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector4i(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec2f& vec) const {
+void ShaderProgram::sendUniform(int index, const Vec2u& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector2(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector2ui(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec3f& vec) const {
+void ShaderProgram::sendUniform(int index, const Vec3u& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector3(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector3ui(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Vec4f& vec) const {
+void ShaderProgram::sendUniform(int index, const Vec4u& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformVector4(uniformIndex, vec.getDataPtr());
+  Renderer::sendUniformVector4ui(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Mat2f& mat) const {
+void ShaderProgram::sendUniform(int index, const Vec2f& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformMatrix2x2(uniformIndex, mat.getDataPtr());
+  Renderer::sendUniformVector2(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Mat3f& mat) const {
+void ShaderProgram::sendUniform(int index, const Vec3f& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformMatrix3x3(uniformIndex, mat.getDataPtr());
+  Renderer::sendUniformVector3(index, vec.getDataPtr());
 }
 
-void ShaderProgram::sendUniform(int uniformIndex, const Mat4f& mat) const {
+void ShaderProgram::sendUniform(int index, const Vec4f& vec) const {
   checkProgramUsed(*this);
-  Renderer::sendUniformMatrix4x4(uniformIndex, mat.getDataPtr());
+  Renderer::sendUniformVector4(index, vec.getDataPtr());
+}
+
+void ShaderProgram::sendUniform(int index, const Mat2f& mat) const {
+  checkProgramUsed(*this);
+  Renderer::sendUniformMatrix2x2(index, mat.getDataPtr());
+}
+
+void ShaderProgram::sendUniform(int index, const Mat3f& mat) const {
+  checkProgramUsed(*this);
+  Renderer::sendUniformMatrix3x3(index, mat.getDataPtr());
+}
+
+void ShaderProgram::sendUniform(int index, const Mat4f& mat) const {
+  checkProgramUsed(*this);
+  Renderer::sendUniformMatrix4x4(index, mat.getDataPtr());
 }
 
 ShaderProgram::~ShaderProgram() {

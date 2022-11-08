@@ -180,7 +180,7 @@ Texture1D::Texture1D(unsigned int width, TextureColorspace colorspace, TextureDa
   : Texture1D(colorspace, dataType) { resize(width); }
 
 void Texture1D::resize(unsigned int width) {
-  m_width  = width;
+  m_width = width;
 
   load();
 }
