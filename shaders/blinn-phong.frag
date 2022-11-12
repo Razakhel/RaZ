@@ -59,7 +59,6 @@ void main() {
   vec3 specular = vec3(0.0);
 
   for (uint lightIndex = 0u; lightIndex < uniLightCount; ++lightIndex) {
-    // Diffuse
     vec3 fullLightDir;
     float attenuation = uniLights[lightIndex].energy;
 
@@ -73,12 +72,16 @@ void main() {
     }
 
     vec3 lightDir = normalize(fullLightDir);
+    vec3 radiance = uniLights[lightIndex].color.rgb * attenuation;
 
-    diffuse += max(dot(lightDir, normal), 0.0) * color * attenuation;
+    // Diffuse
+    float lightAngle = max(dot(lightDir, normal), 0.0);
+    diffuse         += color * lightAngle * radiance;
 
     // Specular
-    vec3 halfDir = normalize(lightDir + viewDir);
-    specular    += uniLights[lightIndex].color.rgb * pow(max(dot(halfDir, normal), 0.0), 32.0) * specFactor * attenuation;
+    vec3 halfDir    = normalize(viewDir + lightDir);
+    float halfAngle = max(dot(halfDir, normal), 0.0);
+    specular       += specFactor * pow(halfAngle, 32.0) * radiance;
   }
 
   vec3 ambient  = color * 0.05;

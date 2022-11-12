@@ -14,9 +14,7 @@ constexpr std::string_view convolutionSource = {
 } // namespace
 
 ConvolutionRenderProcess::ConvolutionRenderProcess(RenderGraph& renderGraph, const Mat3f& kernel, std::string passName)
-  : MonoPassRenderProcess(renderGraph,
-                          FragmentShader::loadFromSource(convolutionSource),
-                          (!passName.empty() ? std::move(passName) : "Convolution")) { setKernel(kernel); }
+  : MonoPassRenderProcess(renderGraph, FragmentShader::loadFromSource(convolutionSource), std::move(passName)) { setKernel(kernel); }
 
 void ConvolutionRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
   const Vec2f invBufferSize(1.f / static_cast<float>(colorBuffer->getWidth()), 1.f / static_cast<float>(colorBuffer->getHeight()));

@@ -66,13 +66,13 @@ public:
   /// Gets the vector's W component.
   /// \return Reference to the W component.
   constexpr T& w() noexcept;
-  /// Computes the dot product (scalar product) between the current vector & the given one.
+  /// Computes the dot product (also known as scalar or inner product) between the current vector & the given one.
   /// The dot product calculates the projection of one of the vectors onto the other; the order doesn't matter.
   /// On normalized vectors, the returned value represents the cosine of the angle (in radians) between them.
   /// \param vec Vector to compute the dot product with.
   /// \return Dot product value.
   constexpr T dot(const Vector& vec) const noexcept;
-  /// Computes the cross product (vector product) between the current vector & the given one.
+  /// Computes the cross product (also known as vector product) between the current vector & the given one.
   /// The cross product generates a vector which is orthogonal to the two others.
   /// \param vec Vector to compute the cross product with.
   /// \return Computed orthogonal vector.
@@ -143,7 +143,7 @@ public:
   /// \param val Value to be substracted.
   /// \return Result of the vector substracted by the value.
   constexpr Vector operator-(T val) const noexcept;
-  /// Element-wise vector-vector multiplication operator.
+  /// Element-wise vector-vector multiplication operator (performs an [Hadamard product](https://en.wikipedia.org/wiki/Hadamard_product_(matrices)).
   /// \param vec Vector to be multiplied by.
   /// \return Result of the multiplied vectors.
   constexpr Vector operator*(const Vector& vec) const noexcept;
@@ -180,7 +180,7 @@ public:
   /// \param val Value to be substracted.
   /// \return Reference to the modified original vector.
   constexpr Vector& operator-=(T val) noexcept;
-  /// Element-wise vector-vector multiplication assignment operator.
+  /// Element-wise vector-vector multiplication assignment operator (performs an [Hadamard product](https://en.wikipedia.org/wiki/Hadamard_product_(matrices)).
   /// \param vec Vector to be multiplied by.
   /// \return Reference to the modified original vector.
   constexpr Vector& operator*=(const Vector& vec) noexcept;

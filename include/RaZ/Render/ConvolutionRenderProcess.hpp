@@ -11,9 +11,9 @@ template <typename T, std::size_t W, std::size_t H>
 class Matrix;
 using Mat3f = Matrix<float, 3, 3>;
 
-class ConvolutionRenderProcess final : public MonoPassRenderProcess {
+class ConvolutionRenderProcess : public MonoPassRenderProcess {
 public:
-  ConvolutionRenderProcess(RenderGraph& renderGraph, const Mat3f& kernel, std::string passName = {});
+  ConvolutionRenderProcess(RenderGraph& renderGraph, const Mat3f& kernel, std::string passName = "Convolution");
 
   void setInputBuffer(Texture2DPtr colorBuffer);
   void setOutputBuffer(Texture2DPtr colorBuffer);
