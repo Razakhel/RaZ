@@ -90,15 +90,17 @@ int main() {
     Raz::RenderGraph& renderGraph = render.getRenderGraph();
     Raz::RenderPass& geometryPass = renderGraph.getGeometryPass();
 
-    const auto depthBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
-    const auto colorBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto normalBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto specularBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGBA);
+    const auto depthBuffer        = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer        = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto blurredColorBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto normalBuffer       = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto specularBuffer     = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGBA);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, depthBuffer->getIndex(), "SSR depth buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, colorBuffer->getIndex(), "SSR color buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, blurredColorBuffer->getIndex(), "SSR blurred color buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, normalBuffer->getIndex(), "SSR normal buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, specularBuffer->getIndex(), "SSR specular buffer");
     }
@@ -109,14 +111,62 @@ int main() {
     geometryPass.addWriteColorTexture(normalBuffer, 1);
     geometryPass.addWriteColorTexture(specularBuffer, 2);
 
+    // Blur
+
+    auto& blur = renderGraph.addRenderProcess<Raz::BoxBlurRenderProcess>();
+    blur.addParent(geometryPass);
+    blur.setInputBuffer(colorBuffer);
+    blur.setOutputBuffer(blurredColorBuffer);
+    blur.setStrength(16);
+
     // SSR
 
     auto& ssr = renderGraph.addRenderProcess<Raz::SsrRenderProcess>();
-    ssr.addParent(geometryPass);
+    ssr.addParent(blur);
     ssr.setInputDepthBuffer(depthBuffer);
     ssr.setInputColorBuffer(colorBuffer);
+    ssr.setInputBlurredColorBuffer(blurredColorBuffer);
     ssr.setInputNormalBuffer(normalBuffer);
     ssr.setInputSpecularBuffer(specularBuffer);
+
+    /////////////
+    // Overlay //
+    /////////////
+
+    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - SSR demo", Raz::Vec2f(static_cast<float>(window.getWidth()) / 5.8f, window.getHeight()));
+
+    overlay.addCheckbox("Metallic walls", [&backWallProgram, &leftWallProgram, &rightWallProgram] () {
+      backWallProgram.setAttribute(1.f, Raz::MaterialAttribute::Metallic);
+      backWallProgram.sendAttributes();
+      leftWallProgram.setAttribute(1.f, Raz::MaterialAttribute::Metallic);
+      leftWallProgram.sendAttributes();
+      rightWallProgram.setAttribute(1.f, Raz::MaterialAttribute::Metallic);
+      rightWallProgram.sendAttributes();
+    }, [&backWallProgram, &leftWallProgram, &rightWallProgram] () {
+      backWallProgram.setAttribute(0.f, Raz::MaterialAttribute::Metallic);
+      backWallProgram.sendAttributes();
+      leftWallProgram.setAttribute(0.f, Raz::MaterialAttribute::Metallic);
+      leftWallProgram.sendAttributes();
+      rightWallProgram.setAttribute(0.f, Raz::MaterialAttribute::Metallic);
+      rightWallProgram.sendAttributes();
+    }, false);
+
+    overlay.addSeparator();
+
+    overlay.addLabel("Depth buffer");
+    overlay.addTexture(*depthBuffer, static_cast<unsigned int>(window.getWidth() / 6.45), static_cast<unsigned int>(window.getHeight() / 6.45));
+
+    overlay.addLabel("Color buffer");
+    overlay.addTexture(*colorBuffer, static_cast<unsigned int>(window.getWidth() / 6.45), static_cast<unsigned int>(window.getHeight() / 6.45));
+
+    overlay.addLabel("Blurred color buffer");
+    overlay.addTexture(*blurredColorBuffer, static_cast<unsigned int>(window.getWidth() / 6.45), static_cast<unsigned int>(window.getHeight() / 6.45));
+
+    overlay.addLabel("Normal buffer");
+    overlay.addTexture(*normalBuffer, static_cast<unsigned int>(window.getWidth() / 6.45), static_cast<unsigned int>(window.getHeight() / 6.45));
+
+    overlay.addLabel("Specular buffer");
+    overlay.addTexture(*specularBuffer, static_cast<unsigned int>(window.getWidth() / 6.45), static_cast<unsigned int>(window.getHeight() / 6.45));
 
     //////////////////////////
     // Starting application //

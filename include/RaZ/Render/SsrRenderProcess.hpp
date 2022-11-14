@@ -13,6 +13,7 @@ public:
 
   void setInputDepthBuffer(Texture2DPtr depthBuffer);
   void setInputColorBuffer(Texture2DPtr colorBuffer);
+  void setInputBlurredColorBuffer(Texture2DPtr blurredColorBuffer);
   void setInputNormalBuffer(Texture2DPtr normalBuffer);
   void setInputSpecularBuffer(Texture2DPtr specularBuffer);
   void setOutputBuffer(Texture2DPtr outputBuffer);

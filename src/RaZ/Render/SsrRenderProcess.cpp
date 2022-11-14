@@ -22,7 +22,14 @@ void SsrRenderProcess::setInputDepthBuffer(Texture2DPtr depthBuffer) {
 }
 
 void SsrRenderProcess::setInputColorBuffer(Texture2DPtr colorBuffer) {
+  if (!m_pass.hasReadTexture("uniSceneBuffers.blurredColor"))
+    setInputBlurredColorBuffer(colorBuffer);
+
   setInputBuffer(std::move(colorBuffer), "uniSceneBuffers.color");
+}
+
+void SsrRenderProcess::setInputBlurredColorBuffer(Texture2DPtr blurredColorBuffer) {
+  setInputBuffer(std::move(blurredColorBuffer), "uniSceneBuffers.blurredColor");
 }
 
 void SsrRenderProcess::setInputNormalBuffer(Texture2DPtr normalBuffer) {

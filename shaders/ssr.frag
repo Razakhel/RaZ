@@ -1,6 +1,7 @@
 struct Buffers {
   sampler2D depth;
   sampler2D color;
+  sampler2D blurredColor;
   sampler2D normal;
   sampler2D specular;
 };
@@ -23,7 +24,7 @@ layout(location = 0) out vec4 fragColor;
 const uint maxRaySteps    = 50u;
 const uint maxRefineSteps = 10u;
 
-vec3 refineRayHit(vec3 viewDir, vec3 viewPos) {
+vec2 refineRayHit(vec3 viewDir, vec3 viewPos) {
   for (uint refineStep = 0u; refineStep < maxRefineSteps; ++refineStep) {
     vec4 projPos = uniProjectionMat * vec4(viewPos, 1.0);
     projPos.xyz /= projPos.w;
@@ -47,10 +48,10 @@ vec3 refineRayHit(vec3 viewDir, vec3 viewPos) {
 
   vec2 projCoords = projPos.xy * 0.5 + 0.5;
 
-  return texture(uniSceneBuffers.color, projCoords).rgb;
+  return projCoords;
 }
 
-vec3 recoverReflectColor(vec3 viewDir, vec3 viewPos) {
+vec2 recoverReflectTexcoords(vec3 viewDir, vec3 viewPos) {
   viewDir *= 0.5;
 
   for (uint rayStep = 0u; rayStep < maxRaySteps; ++rayStep) {
@@ -72,7 +73,7 @@ vec3 recoverReflectColor(vec3 viewDir, vec3 viewPos) {
       return refineRayHit(viewDir, viewPos);
   }
 
-  return vec3(0.0);
+  return vec2(-1.0);
 }
 
 vec3 computeViewPosFromDepth(vec2 texcoords, float depth) {
@@ -104,7 +105,12 @@ void main() {
 
   vec3 viewReflectDir = normalize(reflect(viewFragDir, viewNormal));
 
-  vec3 reflectColor = recoverReflectColor(viewReflectDir, viewFragPos);
+  vec2 reflectTexcoords = recoverReflectTexcoords(viewReflectDir, viewFragPos);
+
+  if (reflectTexcoords.x < 0.0 || reflectTexcoords.y < 0.0) {
+    fragColor = vec4(pixelColor, 1.0);
+    return;
+  }
 
   vec4 specRough  = texture(uniSceneBuffers.specular, fragTexcoords);
   vec3 specular   = specRough.rgb;
@@ -113,5 +119,8 @@ void main() {
   float viewAngle = abs(dot(-viewFragDir, viewNormal));
   vec3 fresnel    = computeFresnel(viewAngle, specular);
 
-  fragColor = vec4(mix(pixelColor, reflectColor, fresnel), 1.0);
+  vec3 reflectColor        = texture(uniSceneBuffers.color, reflectTexcoords).rgb;
+  vec3 reflectBlurredColor = texture(uniSceneBuffers.blurredColor, reflectTexcoords).rgb;
+
+  fragColor = vec4(mix(pixelColor, mix(reflectColor, reflectBlurredColor, roughness), fresnel), 1.0);
 }
