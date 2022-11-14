@@ -38,7 +38,7 @@ int main() {
     // Compute program //
     /////////////////////
 
-    Raz::Texture3DPtr texture = Raz::Texture3D::create(textureSize, textureSize, textureDepth, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT);
+    Raz::Texture3DPtr texture = Raz::Texture3D::create(textureSize, textureSize, textureDepth, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT16);
     Raz::Renderer::bindImageTexture(0, texture->getIndex(), 0, true, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
     Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise_3d.comp"));

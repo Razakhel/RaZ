@@ -31,7 +31,7 @@ TEST_CASE("Texture creation") {
   CHECK(texture2D.getWidth() == 1);
   CHECK(texture2D.getHeight() == 2);
   CHECK(texture2D.getColorspace() == Raz::TextureColorspace::DEPTH);
-  CHECK(texture2D.getDataType() == Raz::TextureDataType::FLOAT); // A depth texture is always floating-point
+  CHECK(texture2D.getDataType() == Raz::TextureDataType::FLOAT32); // A depth texture is always 32-bit floating-point
 
   const Raz::Texture3D texture3D(3, 4, 5, Raz::TextureColorspace::RGBA);
   CHECK_FALSE(Raz::Renderer::hasErrors());
@@ -49,8 +49,8 @@ TEST_CASE("Texture move") {
 #if !defined(USE_OPENGL_ES) // 1D textures are unavailable with OpenGL ES
   Raz::Texture1D texture1D(1, Raz::TextureColorspace::GRAY, Raz::TextureDataType::BYTE);
 #endif
-  Raz::Texture2D texture2D(2, 3, Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
-  Raz::Texture3D texture3D(4, 5, 6, Raz::TextureColorspace::RGBA, Raz::TextureDataType::FLOAT);
+  Raz::Texture2D texture2D(2, 3, Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
+  Raz::Texture3D texture3D(4, 5, 6, Raz::TextureColorspace::RGBA, Raz::TextureDataType::FLOAT32);
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
 #if !defined(USE_OPENGL_ES)

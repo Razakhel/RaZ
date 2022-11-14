@@ -23,7 +23,7 @@ enum class TextureType : unsigned int;
 enum class TextureColorspace {
   INVALID = -1,
   GRAY = 0,
-  GRAY_ALPHA,
+  RG,
   RGB,
   RGBA,
   SRGB,
@@ -33,7 +33,8 @@ enum class TextureColorspace {
 
 enum class TextureDataType {
   BYTE,
-  FLOAT
+  FLOAT16,
+  FLOAT32
 };
 
 enum class TextureFilter {

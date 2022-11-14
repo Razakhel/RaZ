@@ -18,7 +18,7 @@ inline TextureFormat recoverFormat(TextureColorspace colorspace) {
     case TextureColorspace::GRAY:
       return TextureFormat::RED;
 
-    case TextureColorspace::GRAY_ALPHA:
+    case TextureColorspace::RG:
       return TextureFormat::RG;
 
     case TextureColorspace::RGB:
@@ -46,16 +46,16 @@ inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace,
       break;
 
     case TextureColorspace::GRAY:
-      return TextureInternalFormat::R16F;
+      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::R16F : TextureInternalFormat::R32F);
 
-    case TextureColorspace::GRAY_ALPHA:
-      return TextureInternalFormat::RG16F;
+    case TextureColorspace::RG:
+      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RG16F : TextureInternalFormat::RG32F);
 
     case TextureColorspace::RGB:
-      return TextureInternalFormat::RGB16F;
+      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGB16F : TextureInternalFormat::RGB32F);
 
     case TextureColorspace::RGBA:
-      return TextureInternalFormat::RGBA16F;
+      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGBA16F : TextureInternalFormat::RGBA32F);
 
     case TextureColorspace::SRGB:
       return TextureInternalFormat::SRGB8;
@@ -141,11 +141,12 @@ void Texture::setWrapping(TextureWrapping wrapping) const {
 }
 
 void Texture::setColorspace(TextureColorspace colorspace) {
-  setColorspace(colorspace, (colorspace == TextureColorspace::DEPTH ? TextureDataType::FLOAT : TextureDataType::BYTE));
+  setColorspace(colorspace, (colorspace == TextureColorspace::DEPTH ? TextureDataType::FLOAT32 : TextureDataType::BYTE));
 }
 
 void Texture::setColorspace(TextureColorspace colorspace, TextureDataType dataType) {
-  assert("Error: A depth texture must have a floating-point data type." && (colorspace != TextureColorspace::DEPTH || dataType == TextureDataType::FLOAT));
+  assert("Error: A depth texture must have a 32-bit floating-point data type."
+      && (colorspace != TextureColorspace::DEPTH || dataType == TextureDataType::FLOAT32));
   assert("Error: A depth texture cannot be three-dimensional." && (colorspace != TextureColorspace::DEPTH || m_type != TextureType::TEXTURE_3D));
 
   m_colorspace = colorspace;
@@ -195,7 +196,7 @@ void Texture1D::load() const {
                             recoverInternalFormat(m_colorspace, m_dataType),
                             m_width,
                             recoverFormat(m_colorspace),
-                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                            (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                             nullptr);
   unbind();
 }
@@ -234,7 +235,7 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
   m_width      = image.getWidth();
   m_height     = image.getHeight();
   m_colorspace = static_cast<TextureColorspace>(image.getColorspace());
-  m_dataType   = (image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT : TextureDataType::BYTE);
+  m_dataType   = (image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
 
   if (createMipmaps)
     setFilter(TextureFilter::LINEAR, TextureFilter::LINEAR, TextureFilter::LINEAR);
@@ -245,11 +246,11 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
 
   bind();
 
-  if (m_colorspace == TextureColorspace::GRAY || m_colorspace == TextureColorspace::GRAY_ALPHA) {
+  if (m_colorspace == TextureColorspace::GRAY || m_colorspace == TextureColorspace::RG) {
     const std::array<int, 4> swizzle = { static_cast<int>(TextureFormat::RED),
                                          static_cast<int>(TextureFormat::RED),
                                          static_cast<int>(TextureFormat::RED),
-                                         (m_colorspace == TextureColorspace::GRAY_ALPHA ? static_cast<int>(TextureFormat::GREEN) : 1) };
+                                         (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1) };
     Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_RGBA, swizzle.data());
   }
 
@@ -259,7 +260,7 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
                             m_width,
                             m_height,
                             recoverFormat(m_colorspace),
-                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                            (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                             image.getDataPtr());
 
   if (createMipmaps)
@@ -270,13 +271,13 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTextureData() is unavailable with OpenGL ES
 Image Texture2D::recoverImage() const {
-  Image img(m_width, m_height, static_cast<ImageColorspace>(m_colorspace), (m_dataType == TextureDataType::FLOAT ? ImageDataType::FLOAT : ImageDataType::BYTE));
+  Image img(m_width, m_height, static_cast<ImageColorspace>(m_colorspace), (m_dataType == TextureDataType::BYTE ? ImageDataType::BYTE : ImageDataType::FLOAT));
 
   bind();
   Renderer::recoverTextureData(TextureType::TEXTURE_2D,
                                0,
                                recoverFormat(m_colorspace),
-                               (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                               (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                                img.getDataPtr());
   unbind();
 
@@ -295,7 +296,7 @@ void Texture2D::load() const {
                             m_width,
                             m_height,
                             recoverFormat(m_colorspace),
-                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                            (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                             nullptr);
   unbind();
 }
@@ -337,7 +338,7 @@ void Texture3D::load() const {
                             m_height,
                             m_depth,
                             recoverFormat(m_colorspace),
-                            (m_dataType == TextureDataType::FLOAT ? PixelDataType::FLOAT : PixelDataType::UBYTE),
+                            (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                             nullptr);
   unbind();
 }

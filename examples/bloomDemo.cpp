@@ -55,7 +55,7 @@ int main() {
     Raz::RenderPass& geometryPass = renderGraph.getGeometryPass();
 
     const auto depthBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
-    const auto colorBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT);
+    const auto colorBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
