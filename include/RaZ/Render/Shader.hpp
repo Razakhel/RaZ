@@ -49,6 +49,7 @@ public:
 
   static VertexShader loadFromSource(const std::string& source);
   static VertexShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+  static VertexShader loadFromSource(const char* source) { return loadFromSource(std::string(source)); }
 
   VertexShader clone() const;
 };
@@ -60,6 +61,7 @@ public:
 
   static TessellationControlShader loadFromSource(const std::string& source);
   static TessellationControlShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+  static TessellationControlShader loadFromSource(const char* source) { return loadFromSource(std::string(source)); }
 
   TessellationControlShader clone() const;
 };
@@ -71,6 +73,7 @@ public:
 
   static TessellationEvaluationShader loadFromSource(const std::string& source);
   static TessellationEvaluationShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+  static TessellationEvaluationShader loadFromSource(const char* source) { return loadFromSource(std::string(source)); }
 
   TessellationEvaluationShader clone() const;
 };
@@ -82,6 +85,7 @@ public:
 
   static GeometryShader loadFromSource(const std::string& source);
   static GeometryShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+  static GeometryShader loadFromSource(const char* source) { return loadFromSource(std::string(source)); }
 
   GeometryShader clone() const;
 };
@@ -93,6 +97,7 @@ public:
 
   static FragmentShader loadFromSource(const std::string& source);
   static FragmentShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+  static FragmentShader loadFromSource(const char* source) { return loadFromSource(std::string(source)); }
 
   FragmentShader clone() const;
 };
@@ -104,6 +109,7 @@ public:
 
   static ComputeShader loadFromSource(const std::string& source);
   static ComputeShader loadFromSource(std::string_view source) { return loadFromSource(std::string(source)); }
+  static ComputeShader loadFromSource(const char* source) { return loadFromSource(std::string(source)); }
 
   ComputeShader clone() const;
 };

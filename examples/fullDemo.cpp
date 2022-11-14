@@ -2,8 +2,6 @@
 
 #include "DemoUtils.hpp"
 
-#include <iostream>
-
 using namespace std::literals;
 
 int main() {
