@@ -329,7 +329,8 @@ void Renderer::setClipControl(ClipOrigin origin, ClipDepth depth) {
 
 void Renderer::setPatchVertexCount(int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: Setting patch vertices requires OpenGL 4.0+." && checkVersion(4, 0));
+  assert("Error: Setting patch vertices requires OpenGL 4.0+ or the 'GL_ARB_tessellation_shader' extension."
+      && (checkVersion(4, 0) || isExtensionSupported("GL_ARB_tessellation_shader")));
   assert("Error: A patch needs at least one vertex." && value > 0);
 
   glPatchParameteri(GL_PATCH_VERTICES, value);
@@ -339,7 +340,8 @@ void Renderer::setPatchVertexCount(int value) {
 
 void Renderer::setPatchParameter(PatchParameter param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-  assert("Error: Setting a patch parameter requires OpenGL 4.0+." && checkVersion(4, 0));
+  assert("Error: Setting a patch parameter requires OpenGL 4.0+ or the 'GL_ARB_tessellation_shader' extension."
+      && (checkVersion(4, 0) || isExtensionSupported("GL_ARB_tessellation_shader")));
 
   glPatchParameterfv(static_cast<unsigned int>(param), values);
 
@@ -851,8 +853,9 @@ void Renderer::deleteProgram(unsigned int index) {
 unsigned int Renderer::createShader(ShaderType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 #if !defined(USE_OPENGL_ES)
-  assert("Error: Creating a tessellation shader requires OpenGL 4.0+."
-         && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION) || checkVersion(4, 0)));
+  assert("Error: Creating a tessellation shader requires OpenGL 4.0+ or the 'GL_ARB_tessellation_shader' extension."
+      && ((type != ShaderType::TESSELLATION_CONTROL && type != ShaderType::TESSELLATION_EVALUATION)
+      || checkVersion(4, 0) || isExtensionSupported("GL_ARB_tessellation_shader")));
   assert("Error: Creating a compute shader requires OpenGL 4.3+ or the 'GL_ARB_compute_shader' extension."
       && (type != ShaderType::COMPUTE || checkVersion(4, 3) || isExtensionSupported("GL_ARB_compute_shader")));
 #else

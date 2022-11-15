@@ -195,9 +195,9 @@ void RenderSystem::initialize() {
     Renderer::setClipControl(ClipOrigin::LOWER_LEFT, ClipDepth::ZERO_TO_ONE);
 
   if (Renderer::checkVersion(4, 3)) {
-    Renderer::setLabel(RenderObjectType::BUFFER, m_cameraUbo.getIndex(), "Camera UBO");
-    Renderer::setLabel(RenderObjectType::BUFFER, m_lightsUbo.getIndex(), "Lights UBO");
-    Renderer::setLabel(RenderObjectType::BUFFER, m_modelUbo.getIndex(), "Model UBO");
+    Renderer::setLabel(RenderObjectType::BUFFER, m_cameraUbo.getIndex(), "Camera uniform buffer");
+    Renderer::setLabel(RenderObjectType::BUFFER, m_lightsUbo.getIndex(), "Lights uniform buffer");
+    Renderer::setLabel(RenderObjectType::BUFFER, m_modelUbo.getIndex(), "Model uniform buffer");
   }
 #endif
 }

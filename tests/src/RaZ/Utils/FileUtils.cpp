@@ -7,20 +7,17 @@ using namespace std::literals;
 
 namespace {
 
-const Raz::FilePath filePath(RAZ_TESTS_ROOT "assets/misc/ͳεs†_fílè_测试.τxt");
+const Raz::FilePath encodedFilePath(RAZ_TESTS_ROOT "assets/misc/ͳεs†_fílè_测试.τxt");
+const Raz::FilePath asciiFilePath(RAZ_TESTS_ROOT "assets/misc/Test_file.txt");
 
 } // namespace
 
 TEST_CASE("FileUtils read file") {
-  std::string fileContent = Raz::FileUtils::readFile(filePath);
+  std::string fileContent = Raz::FileUtils::readFile(encodedFilePath);
   CHECK(fileContent.size() == 22); // This doesn't represent the actual character count due to the encoding
   CHECK(fileContent == "НΣļlõ ωθяŁĐ!\n");
 
-  fileContent = Raz::FileUtils::readFile(RAZ_TESTS_ROOT "assets/shaders/basic.tese");
-  CHECK(fileContent.size() == 86);
-  CHECK(fileContent == "layout(triangles, equal_spacing, ccw) in;\n"
-                       "\n"
-                       "void main() {\n"
-                       "  gl_Position = vec4(0.0);\n"
-                       "}\n");
+  fileContent = Raz::FileUtils::readFile(asciiFilePath);
+  CHECK(fileContent.size() == 13);
+  CHECK(fileContent == "Hello world!\n");
 }

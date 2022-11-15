@@ -22,6 +22,8 @@ constexpr std::string_view vertSource = R"(
 )";
 
 constexpr std::string_view tessCtrlSource = R"(
+  #extension GL_ARB_tessellation_shader : enable
+
   uniform int uniInt[2];
   uniform bool uniBool;
 
@@ -41,6 +43,8 @@ constexpr std::string_view tessCtrlSource = R"(
 )";
 
 constexpr std::string_view tessEvalSource = R"(
+  #extension GL_ARB_tessellation_shader : enable
+
   layout(quads, equal_spacing, ccw) in;
 
   uniform uint uniUint[3];
@@ -107,8 +111,8 @@ void checkUniformInfo(const std::unordered_map<std::string, UniformInfo>& corres
 
 TEST_CASE("ShaderProgram move") {
   {
-    // Tessellation shaders are only available in OpenGL 4.0+
-    const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0);
+    // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
+    const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0) || Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader");
 
     Raz::RenderShaderProgram programBase;
 
@@ -254,8 +258,8 @@ TEST_CASE("RenderShaderProgram creation") {
 TEST_CASE("RenderShaderProgram uniforms") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
-  // Tessellation shaders are only available in OpenGL 4.0+
-  const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0);
+  // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
+  const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0) || Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader");
 
   Raz::RenderShaderProgram program(Raz::VertexShader::loadFromSource(vertSource), Raz::FragmentShader::loadFromSource(fragSource));
   if (isTessellationSupported) {

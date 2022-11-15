@@ -115,8 +115,8 @@ int main() {
 
     auto& render = world.addSystem<Raz::RenderSystem>(1280u, 720u, "RaZ");
 
-    if (!Raz::Renderer::checkVersion(4, 0)) {
-      throw std::runtime_error("Error: Tessellation is only available with an OpenGL 4.0 context or above; "
+    if (!Raz::Renderer::checkVersion(4, 0) && !Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader")) {
+      throw std::runtime_error("Error: Tessellation is only available with an OpenGL 4.0 context or above, or with the 'GL_ARB_tessellation_shader' extension; "
                                "please update your graphics drivers or try on another computer");
     }
 

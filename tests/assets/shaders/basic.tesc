@@ -1,3 +1,6 @@
+// Enabling the extension (if supported) on the shader's side is required if GL <4.0
+#extension GL_ARB_tessellation_shader : enable
+
 layout(vertices = 3) out;
 
 void main() {
