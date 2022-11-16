@@ -10,14 +10,14 @@ bool RenderPass::isValid() const {
 
   const std::vector<std::pair<Texture2DPtr, unsigned int>>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
 
-  for (const Texture2DPtr& readTexture : m_readTextures) {
+  for (const auto& [texture, _] : m_program.getTextures()) {
     // If the same depth buffer exists both in read & write, the pass is invalid
-    if (readTexture->getColorspace() == TextureColorspace::DEPTH && m_writeFramebuffer.hasDepthBuffer()) {
-      if (readTexture.get() == &m_writeFramebuffer.getDepthBuffer())
+    if (texture->getColorspace() == TextureColorspace::DEPTH && m_writeFramebuffer.hasDepthBuffer()) {
+      if (texture.get() == &m_writeFramebuffer.getDepthBuffer())
         return false;
     }
 
-    const auto bufferIt = std::find_if(writeColorBuffers.cbegin(), writeColorBuffers.cend(), [&readTexture] (const auto& buffer) {
+    const auto bufferIt = std::find_if(writeColorBuffers.cbegin(), writeColorBuffers.cend(), [&readTexture = texture] (const auto& buffer) {
       return (readTexture == buffer.first);
     });
 
@@ -29,29 +29,9 @@ bool RenderPass::isValid() const {
   return true;
 }
 
-void RenderPass::addReadTexture(Texture2DPtr texture, const std::string& uniformName) {
-  m_readTextures.emplace_back(std::move(texture));
-
-  // TODO: this binding will be lost if the program is updated; store the uniform name
-  m_program.use();
-  m_program.sendUniform(uniformName, static_cast<int>(m_readTextures.size() - 1));
-}
-
-void RenderPass::removeReadTexture(const Texture2DPtr& texture) {
-  const auto textureIt = std::find(m_readTextures.cbegin(), m_readTextures.cend(), texture);
-  if (textureIt != m_readTextures.cend())
-    m_readTextures.erase(textureIt);
-}
-
-void RenderPass::bindTextures() const noexcept {
-  m_program.use();
-
-  unsigned int textureIndex = 0;
-
-  for (const Texture2DPtr& texture : m_readTextures) {
-    Renderer::activateTexture(textureIndex++);
-    texture->bind();
-  }
+void RenderPass::addReadTexture(TexturePtr texture, std::string uniformName) {
+  m_program.setTexture(std::move(texture), std::move(uniformName));
+  m_program.initTextures();
 }
 
 void RenderPass::execute() const {
@@ -63,7 +43,8 @@ void RenderPass::execute() const {
     Renderer::pushDebugGroup(m_name);
 #endif
 
-  bindTextures();
+  // Binding the program's textures marks it as used
+  m_program.bindTextures();
 
   if (!m_writeFramebuffer.isEmpty())
     m_writeFramebuffer.bind();

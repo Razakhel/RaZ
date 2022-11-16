@@ -5,6 +5,12 @@
 
 namespace {
 
+class TestShaderProgram : public Raz::ShaderProgram {
+public:
+  void loadShaders() const override {}
+  void compileShaders() const override {}
+};
+
 constexpr std::string_view vertSource = R"(
   uniform int uniUnused;
 
@@ -177,6 +183,94 @@ TEST_CASE("ShaderProgram move") {
   }
 }
 
+TEST_CASE("ShaderProgram attributes") {
+  TestShaderProgram program;
+
+  CHECK(program.getAttributeCount() == 0);
+
+  program.setAttribute(3, "attrib1");
+  CHECK(program.getAttributeCount() == 1);
+  REQUIRE(program.hasAttribute("attrib1")); // An attribute can be checked with its name only...
+  REQUIRE(program.hasAttribute<int>("attrib1")); // ... or including its type
+  CHECK_FALSE(program.hasAttribute<float>("attrib1")); // The given type must be the same as the one held for this check to be true
+  CHECK(program.getAttribute<int>("attrib1") == 3);
+
+  program.setAttribute(6.f, "attrib2");
+  CHECK(program.getAttributeCount() == 2);
+  REQUIRE(program.hasAttribute("attrib2"));
+  CHECK(program.getAttribute<float>("attrib2") == 6.f);
+
+  program.setAttribute(42, "attrib1");
+  CHECK(program.getAttributeCount() == 2); // The attribute already exists, none has been added
+  REQUIRE(program.hasAttribute("attrib1"));
+  CHECK(program.getAttribute<int>("attrib1") == 42); // But its value has been reassigned
+
+  program.removeAttribute("attrib1");
+  CHECK(program.getAttributeCount() == 1);
+  CHECK_FALSE(program.hasAttribute("attrib1"));
+
+  program.clearAttributes();
+  CHECK(program.getAttributeCount() == 0);
+  CHECK_FALSE(program.hasAttribute("attrib2"));
+}
+
+TEST_CASE("ShaderProgram textures") {
+  TestShaderProgram program;
+
+  CHECK(program.getTextureCount() == 0);
+
+  const auto tex2D = Raz::Texture2D::create();
+  const auto tex3D = Raz::Texture3D::create();
+
+  program.setTexture(tex2D, "tex2D");
+  CHECK(program.getTextureCount() == 1);
+  REQUIRE(program.hasTexture("tex2D")); // A texture's existence can be checked with either its uniform name...
+  CHECK(program.hasTexture(*tex2D)); // ... or the texture itself
+
+  CHECK(program.getTexture("tex2D").getIndex() == tex2D->getIndex()); // Textures can be recovered with either their uniform name...
+  CHECK(program.getTexture(0).getIndex() == tex2D->getIndex()); // ... or their index in the list
+
+  // The same texture can be paired with different uniform names
+  program.setTexture(tex2D, "tex2D2");
+  CHECK(program.getTextureCount() == 2);
+  REQUIRE(program.hasTexture("tex2D"));
+  REQUIRE(program.hasTexture("tex2D2"));
+  CHECK(program.hasTexture(*tex2D));
+  // Getting a texture with either of the uniform names returns the same
+  CHECK(program.getTexture("tex2D").getIndex() == program.getTexture("tex2D2").getIndex());
+
+  program.setTexture(tex3D, "tex3D");
+  CHECK(program.getTextureCount() == 3);
+  REQUIRE(program.hasTexture("tex3D"));
+  CHECK(program.hasTexture(program.getTexture("tex3D")));
+  CHECK(program.getTexture(2).getIndex() == program.getTexture("tex3D").getIndex());
+
+  program.setTexture(tex3D, "tex3D2");
+  CHECK(program.getTextureCount() == 4);
+  REQUIRE(program.hasTexture("tex3D2"));
+  CHECK(program.getTexture(2).getIndex() == program.getTexture(3).getIndex());
+
+  // Removing a specific texture removes all entries corresponding to it
+  program.removeTexture(*tex3D);
+  CHECK(program.getTextureCount() == 2);
+  CHECK_FALSE(program.hasTexture("tex3D"));
+  CHECK_FALSE(program.hasTexture("tex3D2"));
+
+  program.setTexture(Raz::Texture2D::create(), "tex2D");
+  CHECK(program.getTextureCount() == 2); // The texture already exists, none has been added
+  REQUIRE(program.hasTexture("tex2D"));
+  CHECK_FALSE(program.getTexture("tex2D").getIndex() == tex2D->getIndex()); // But its value has been reassigned
+
+  program.removeTexture("tex2D");
+  CHECK(program.getTextureCount() == 1);
+  CHECK_FALSE(program.hasTexture("tex2D"));
+  CHECK(program.hasTexture("tex2D2")); // The other entry remains
+
+  program.clearTextures();
+  CHECK(program.getTextureCount() == 0);
+  CHECK_FALSE(program.hasTexture("tex2D2"));
+}
+
 TEST_CASE("RenderShaderProgram creation") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
@@ -248,10 +342,6 @@ TEST_CASE("RenderShaderProgram creation") {
     program.link();
     CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK_FALSE(program.isLinked());
-
-    // Nor can it be used
-    program.use();
-    CHECK(Raz::Renderer::hasErrors());
   }
 }
 

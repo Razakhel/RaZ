@@ -14,16 +14,16 @@ namespace Raz::ObjFormat {
 namespace {
 
 template <typename T, std::size_t Size = 1>
-inline void writeAttribute(std::ofstream& file, std::string_view tag, const Material& material, std::string_view uniformName) {
-  if (!material.hasAttribute(uniformName.data()))
+inline void writeAttribute(std::ofstream& file, std::string_view tag, const RenderShaderProgram& program, std::string_view uniformName) {
+  if (!program.hasAttribute(uniformName.data()))
     return;
 
   file << '\t' << tag;
 
   if constexpr (Size == 1) {
-    file << ' ' << material.getAttribute<T>(uniformName.data());
+    file << ' ' << program.getAttribute<T>(uniformName.data());
   } else {
-    for (const T& value : material.getAttribute<Vector<T, Size>>(uniformName.data()).getData())
+    for (const T& value : program.getAttribute<Vector<T, Size>>(uniformName.data()).getData())
       file << ' ' << value;
   }
 
@@ -32,11 +32,11 @@ inline void writeAttribute(std::ofstream& file, std::string_view tag, const Mate
 
 #if !defined(USE_OPENGL_ES) // Texture::recoverImage() is unavailable with OpenGL ES
 inline void writeTexture(std::ofstream& file, std::string_view tag, const std::string& materialName, std::string_view suffix,
-                         const Material& material, std::string_view uniformName) {
-  if (!material.hasTexture(uniformName.data()))
+                         const RenderShaderProgram& program, std::string_view uniformName) {
+  if (!program.hasTexture(uniformName.data()))
     return;
 
-  const auto* texture = dynamic_cast<const Texture2D*>(&material.getTexture(uniformName.data()));
+  const auto* texture = dynamic_cast<const Texture2D*>(&program.getTexture(uniformName.data()));
 
   if (texture == nullptr || texture->getWidth() == 0 || texture->getHeight() == 0 || texture->getColorspace() == TextureColorspace::INVALID)
     return;
@@ -56,29 +56,29 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
   const std::string mtlFileName = mtlFilePath.recoverFileName(false).toUtf8();
 
   for (std::size_t matIndex = 0; matIndex < materials.size(); ++matIndex) {
-    const Material& material       = materials[matIndex];
-    const std::string materialName = mtlFileName + '_' + std::to_string(matIndex);
+    const RenderShaderProgram& matProgram = materials[matIndex].getProgram();
+    const std::string materialName        = mtlFileName + '_' + std::to_string(matIndex);
 
     mtlFile << "\nnewmtl " << materialName << '\n';
 
-    writeAttribute<float, 3>(mtlFile, "Kd", material, MaterialAttribute::BaseColor);
-    writeAttribute<float, 3>(mtlFile, "Ke", material, MaterialAttribute::Emissive);
-    writeAttribute<float, 3>(mtlFile, "Ka", material, MaterialAttribute::Ambient);
-    writeAttribute<float, 3>(mtlFile, "Ks", material, MaterialAttribute::Specular);
-    writeAttribute<float, 1>(mtlFile, "d",  material, MaterialAttribute::Transparency);
-    writeAttribute<float, 1>(mtlFile, "Pm", material, MaterialAttribute::Metallic);
-    writeAttribute<float, 1>(mtlFile, "Pr", material, MaterialAttribute::Roughness);
+    writeAttribute<float, 3>(mtlFile, "Kd", matProgram, MaterialAttribute::BaseColor);
+    writeAttribute<float, 3>(mtlFile, "Ke", matProgram, MaterialAttribute::Emissive);
+    writeAttribute<float, 3>(mtlFile, "Ka", matProgram, MaterialAttribute::Ambient);
+    writeAttribute<float, 3>(mtlFile, "Ks", matProgram, MaterialAttribute::Specular);
+    writeAttribute<float, 1>(mtlFile, "d",  matProgram, MaterialAttribute::Transparency);
+    writeAttribute<float, 1>(mtlFile, "Pm", matProgram, MaterialAttribute::Metallic);
+    writeAttribute<float, 1>(mtlFile, "Pr", matProgram, MaterialAttribute::Roughness);
 
 #if !defined(USE_OPENGL_ES)
-    writeTexture(mtlFile, "map_Kd",   materialName, "baseColor",    material, MaterialTexture::BaseColor);
-    writeTexture(mtlFile, "map_Ke",   materialName, "emissive",     material, MaterialTexture::Emissive);
-    writeTexture(mtlFile, "map_Ka",   materialName, "ambient",      material, MaterialTexture::Ambient);
-    writeTexture(mtlFile, "map_Ks",   materialName, "specular",     material, MaterialTexture::Specular);
-    writeTexture(mtlFile, "map_d",    materialName, "transparency", material, MaterialTexture::Transparency);
-    writeTexture(mtlFile, "map_bump", materialName, "bump",         material, MaterialTexture::Bump);
-    writeTexture(mtlFile, "norm",     materialName, "normal",       material, MaterialTexture::Normal);
-    writeTexture(mtlFile, "map_Pm",   materialName, "metallic",     material, MaterialTexture::Metallic);
-    writeTexture(mtlFile, "map_Pr",   materialName, "roughness",    material, MaterialTexture::Roughness);
+    writeTexture(mtlFile, "map_Kd",   materialName, "baseColor",    matProgram, MaterialTexture::BaseColor);
+    writeTexture(mtlFile, "map_Ke",   materialName, "emissive",     matProgram, MaterialTexture::Emissive);
+    writeTexture(mtlFile, "map_Ka",   materialName, "ambient",      matProgram, MaterialTexture::Ambient);
+    writeTexture(mtlFile, "map_Ks",   materialName, "specular",     matProgram, MaterialTexture::Specular);
+    writeTexture(mtlFile, "map_d",    materialName, "transparency", matProgram, MaterialTexture::Transparency);
+    writeTexture(mtlFile, "map_bump", materialName, "bump",         matProgram, MaterialTexture::Bump);
+    writeTexture(mtlFile, "norm",     materialName, "normal",       matProgram, MaterialTexture::Normal);
+    writeTexture(mtlFile, "map_Pm",   materialName, "metallic",     matProgram, MaterialTexture::Metallic);
+    writeTexture(mtlFile, "map_Pr",   materialName, "roughness",    matProgram, MaterialTexture::Roughness);
 #endif
   }
 }

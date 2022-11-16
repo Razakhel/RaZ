@@ -24,8 +24,10 @@ public:
   const std::string& getName() const { return m_name; }
   const RenderShaderProgram& getProgram() const { return m_program; }
   RenderShaderProgram& getProgram() { return m_program; }
-  std::size_t getReadTextureCount() const noexcept { return m_readTextures.size(); }
-  const Texture2D& getReadTexture(std::size_t textureIndex) const noexcept { return *m_readTextures[textureIndex]; }
+  std::size_t getReadTextureCount() const noexcept { return m_program.getTextureCount(); }
+  const Texture& getReadTexture(std::size_t textureIndex) const noexcept { return m_program.getTexture(textureIndex); }
+  bool hasReadTexture(const std::string& uniformName) const noexcept { return m_program.hasTexture(uniformName); }
+  const Texture& getReadTexture(const std::string& uniformName) const noexcept { return m_program.getTexture(uniformName); }
   const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
 
   void setName(std::string name) noexcept { m_name = std::move(name); }
@@ -35,9 +37,9 @@ public:
   /// \return True if the render pass is valid, false otherwise.
   /// \see RenderGraph::isValid()
   bool isValid() const;
-  void addReadTexture(Texture2DPtr texture, const std::string& uniformName);
-  void removeReadTexture(const Texture2DPtr& texture);
-  void clearReadTextures() { m_readTextures.clear(); }
+  void addReadTexture(TexturePtr texture, std::string uniformName);
+  void removeReadTexture(const Texture& texture) { m_program.removeTexture(texture); }
+  void clearReadTextures() { m_program.clearTextures(); }
   /// Sets the write depth buffer texture.
   /// \param texture Depth buffer texture to be set; must have a depth colorspace.
   void setWriteDepthTexture(Texture2DPtr texture) { m_writeFramebuffer.setDepthBuffer(std::move(texture)); }
@@ -56,8 +58,6 @@ public:
   void enable(bool enabled = true) { m_enabled = enabled; }
   /// Disables the render pass.
   void disable() { enable(false); }
-  /// Binds the pass' read textures to its program.
-  void bindTextures() const noexcept;
   /// Executes the render pass.
   void execute() const;
 
@@ -70,8 +70,6 @@ protected:
   bool m_enabled = true;
   std::string m_name {};
   RenderShaderProgram m_program {};
-
-  std::vector<Texture2DPtr> m_readTextures {};
   Framebuffer m_writeFramebuffer {};
 };
 

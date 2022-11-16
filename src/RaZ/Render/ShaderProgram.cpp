@@ -18,6 +18,44 @@ inline void checkProgramUsed([[maybe_unused]] const ShaderProgram& program) {
 ShaderProgram::ShaderProgram()
   : m_index{ Renderer::createProgram() } {}
 
+bool ShaderProgram::hasAttribute(const std::string& uniformName) const noexcept {
+  return (m_attributes.find(uniformName) != m_attributes.cend());
+}
+
+bool ShaderProgram::hasTexture(const Texture& texture) const noexcept {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&texture] (const auto& element) {
+    return (element.first->getIndex() == texture.getIndex());
+  });
+}
+
+bool ShaderProgram::hasTexture(const std::string& uniformName) const noexcept {
+  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&uniformName] (const auto& element) {
+    return (element.second == uniformName);
+  });
+}
+
+const Texture& ShaderProgram::getTexture(const std::string& uniformName) const {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
+    return (element.second == uniformName);
+  });
+
+  if (textureIt == m_textures.cend())
+    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+
+  return *textureIt->first;
+}
+
+void ShaderProgram::setTexture(TexturePtr texture, std::string uniformName) {
+  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
+    return (element.second == uniformName);
+  });
+
+  if (textureIt != m_textures.end())
+    textureIt->first = std::move(texture);
+  else
+    m_textures.emplace_back(std::move(texture), std::move(uniformName));
+}
+
 void ShaderProgram::link() const {
   Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
   Renderer::linkProgram(m_index);
@@ -42,20 +80,72 @@ void ShaderProgram::updateShaders() const {
   loadShaders();
   compileShaders();
   link();
+  sendAttributes();
+  initTextures();
 
   Logger::debug("[ShaderProgram] Updated shaders");
 }
 
-void ShaderProgram::createUniform(const std::string& uniformName) {
-  m_uniforms.emplace(uniformName, recoverUniformLocation(uniformName));
+void ShaderProgram::sendAttributes() const {
+  if (m_attributes.empty())
+    return;
+
+  use();
+
+  for (const auto& [name, attrib] : m_attributes)
+    std::visit([this, &uniformName = name] (const auto& value) { sendUniform(uniformName, value); }, attrib);
+}
+
+void ShaderProgram::removeAttribute(const std::string& uniformName) {
+  const auto attribIt = m_attributes.find(uniformName);
+
+  if (attribIt == m_attributes.end())
+    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+
+  m_attributes.erase(attribIt);
+}
+
+void ShaderProgram::initTextures() const {
+  if (m_textures.empty())
+    return;
+
+  use();
+
+  // TODO: binding indices should be user-definable to allow the same texture to be bound to multiple uniforms
+  int bindingIndex = 0;
+
+  for (const auto& [texture, name] : m_textures)
+    sendUniform(name, bindingIndex++);
+}
+
+void ShaderProgram::bindTextures() const {
+  use();
+
+  unsigned int textureIndex = 0;
+
+  for (const auto& [texture, _] : m_textures) {
+    Renderer::activateTexture(textureIndex++);
+    texture->bind();
+  }
+}
+
+void ShaderProgram::removeTexture(const Texture& texture) {
+  m_textures.erase(std::remove_if(m_textures.begin(), m_textures.end(), [&texture] (const auto& element) {
+    return (element.first->getIndex() == texture.getIndex());
+  }), m_textures.end());
+}
+
+void ShaderProgram::removeTexture(const std::string& uniformName) {
+  for (auto textureIt = m_textures.begin(); textureIt != m_textures.end(); ++textureIt) {
+    if (textureIt->second != uniformName)
+      continue;
+
+    m_textures.erase(textureIt);
+    return;
+  }
 }
 
 int ShaderProgram::recoverUniformLocation(const std::string& uniformName) const {
-  const auto uniform = m_uniforms.find(uniformName);
-
-  if (uniform != m_uniforms.cend())
-    return uniform->second;
-
   return Renderer::recoverUniformLocation(m_index, uniformName.c_str());
 }
 
@@ -265,6 +355,12 @@ RenderShaderProgram RenderShaderProgram::clone() const {
 
   program.link();
 
+  program.m_attributes = m_attributes;
+  program.m_textures   = m_textures;
+
+  sendAttributes();
+  initTextures();
+
   return program;
 }
 
@@ -345,7 +441,15 @@ void ComputeShaderProgram::setShader(ComputeShader&& compShader) {
 
 ComputeShaderProgram ComputeShaderProgram::clone() const {
   ComputeShaderProgram program;
+
   program.setShader(m_compShader.clone());
+
+  program.m_attributes = m_attributes;
+  program.m_textures   = m_textures;
+
+  sendAttributes();
+  initTextures();
+
   return program;
 }
 

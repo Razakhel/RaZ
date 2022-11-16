@@ -13,8 +13,8 @@ Material& MeshRenderer::setMaterial(Material&& material) {
   m_materials.clear();
 
   Material& newMaterial = m_materials.emplace_back(std::move(material));
-  newMaterial.sendAttributes();
-  newMaterial.initTextures();
+  newMaterial.getProgram().sendAttributes();
+  newMaterial.getProgram().initTextures();
 
   for (SubmeshRenderer& submeshRenderer : m_submeshRenderers)
     submeshRenderer.setMaterialIndex(0);
@@ -76,8 +76,8 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
 
 void MeshRenderer::loadMaterials() const {
   for (const Material& material : m_materials) {
-    material.sendAttributes();
-    material.initTextures();
+    material.getProgram().sendAttributes();
+    material.getProgram().initTextures();
   }
 }
 
@@ -85,7 +85,7 @@ void MeshRenderer::draw() const {
   for (const SubmeshRenderer& submeshRenderer : m_submeshRenderers) {
     if (submeshRenderer.getMaterialIndex() != std::numeric_limits<std::size_t>::max()) {
       assert("Error: The material index does not reference any existing material." && (submeshRenderer.getMaterialIndex() < m_materials.size()));
-      m_materials[submeshRenderer.getMaterialIndex()].bindTextures();
+      m_materials[submeshRenderer.getMaterialIndex()].getProgram().bindTextures();
     }
 
     submeshRenderer.draw();

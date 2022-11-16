@@ -48,20 +48,20 @@ Raz::MeshRenderer createMeshRenderer() {
   meshRenderer.addSubmeshRenderer().setMaterialIndex(1);
 
   {
-    Raz::Material& material = meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::COOK_TORRANCE));
-    material.setAttribute(Raz::Vec3f(1.f, 0.f, 0.f), Raz::MaterialAttribute::BaseColor);
-    material.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), Raz::MaterialAttribute::Emissive);
-    material.setAttribute(0.25f, Raz::MaterialAttribute::Metallic);
-    material.setAttribute(0.75f, Raz::MaterialAttribute::Roughness);
+    Raz::RenderShaderProgram& matProgram = meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::COOK_TORRANCE)).getProgram();
+    matProgram.setAttribute(Raz::Vec3f(1.f, 0.f, 0.f), Raz::MaterialAttribute::BaseColor);
+    matProgram.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), Raz::MaterialAttribute::Emissive);
+    matProgram.setAttribute(0.25f, Raz::MaterialAttribute::Metallic);
+    matProgram.setAttribute(0.75f, Raz::MaterialAttribute::Roughness);
   }
 
   {
-    Raz::Material& material = meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::BLINN_PHONG));
-    material.setAttribute(Raz::Vec3f(1.f, 0.f, 0.f), Raz::MaterialAttribute::BaseColor);
-    material.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), Raz::MaterialAttribute::Emissive);
-    material.setAttribute(Raz::Vec3f(0.f, 0.f, 1.f), Raz::MaterialAttribute::Ambient);
-    material.setAttribute(Raz::Vec3f(1.f, 0.f, 1.f), Raz::MaterialAttribute::Specular);
-    material.setAttribute(0.5f, Raz::MaterialAttribute::Transparency);
+    Raz::RenderShaderProgram& matProgram = meshRenderer.addMaterial(Raz::Material(Raz::MaterialType::BLINN_PHONG)).getProgram();
+    matProgram.setAttribute(Raz::Vec3f(1.f, 0.f, 0.f), Raz::MaterialAttribute::BaseColor);
+    matProgram.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), Raz::MaterialAttribute::Emissive);
+    matProgram.setAttribute(Raz::Vec3f(0.f, 0.f, 1.f), Raz::MaterialAttribute::Ambient);
+    matProgram.setAttribute(Raz::Vec3f(1.f, 0.f, 1.f), Raz::MaterialAttribute::Specular);
+    matProgram.setAttribute(0.5f, Raz::MaterialAttribute::Transparency);
   }
 
   return meshRenderer;
@@ -120,12 +120,12 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
   REQUIRE(meshRenderer.getMaterials().size() == 1);
 
-  const Raz::Material& material = meshRenderer.getMaterials().front();
+  const Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials().front().getProgram();
 
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.99f));
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.75f));
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient) == Raz::Vec3f(0.5f));
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular) == Raz::Vec3f(0.25f));
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.99f));
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.75f));
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient) == Raz::Vec3f(0.5f));
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular) == Raz::Vec3f(0.25f));
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -136,7 +136,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Diffuse map
   {
-    const auto& diffuseMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::BaseColor));
+    const auto& diffuseMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::BaseColor));
 
     CHECK(diffuseMap.getWidth() == 2);
     CHECK(diffuseMap.getHeight() == 2);
@@ -181,7 +181,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Emissive map
   {
-    const auto& emissiveMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Emissive));
+    const auto& emissiveMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Emissive));
 
     CHECK(emissiveMap.getWidth() == 2);
     CHECK(emissiveMap.getHeight() == 2);
@@ -220,7 +220,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Ambient map
   {
-    const auto& ambientMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Ambient));
+    const auto& ambientMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Ambient));
 
     CHECK(ambientMap.getWidth() == 2);
     CHECK(ambientMap.getHeight() == 2);
@@ -259,7 +259,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Specular map
   {
-    const auto& specularMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Specular));
+    const auto& specularMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Specular));
 
     CHECK(specularMap.getWidth() == 2);
     CHECK(specularMap.getHeight() == 2);
@@ -287,7 +287,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Transparency map
   {
-    const auto& transparencyMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Transparency));
+    const auto& transparencyMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Transparency));
 
     CHECK(transparencyMap.getWidth() == 2);
     CHECK(transparencyMap.getHeight() == 2);
@@ -315,7 +315,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
 
   // Bump map
   {
-    const auto& bumpMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Bump));
+    const auto& bumpMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Bump));
 
     CHECK(bumpMap.getWidth() == 2);
     CHECK(bumpMap.getHeight() == 2);
@@ -381,12 +381,12 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
   CHECK(meshRenderer.getSubmeshRenderers().front().getMaterialIndex() == 0);
   REQUIRE(meshRenderer.getMaterials().size() == 1);
 
-  const Raz::Material& material = meshRenderer.getMaterials().front();
+  const Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials().front().getProgram();
 
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.99f));
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.75f));
-  CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.5f);
-  CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.25f);
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.99f));
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.75f));
+  CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.5f);
+  CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.25f);
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -397,7 +397,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Albedo map
   {
-    const auto& albedoMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::BaseColor));
+    const auto& albedoMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::BaseColor));
 
     CHECK(albedoMap.getWidth() == 2);
     CHECK(albedoMap.getHeight() == 2);
@@ -442,7 +442,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Emissive map
   {
-    const auto& emissiveMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Emissive));
+    const auto& emissiveMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Emissive));
 
     CHECK(emissiveMap.getWidth() == 2);
     CHECK(emissiveMap.getHeight() == 2);
@@ -481,7 +481,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Normal map
   {
-    const auto& normalMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Normal));
+    const auto& normalMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Normal));
 
     CHECK(normalMap.getWidth() == 2);
     CHECK(normalMap.getHeight() == 2);
@@ -520,7 +520,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Metallic map
   {
-    const auto& metallicMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Metallic));
+    const auto& metallicMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Metallic));
 
     CHECK(metallicMap.getWidth() == 2);
     CHECK(metallicMap.getHeight() == 2);
@@ -548,7 +548,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Roughness map
   {
-    const auto& roughnessMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Roughness));
+    const auto& roughnessMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Roughness));
 
     CHECK(roughnessMap.getWidth() == 2);
     CHECK(roughnessMap.getHeight() == 2);
@@ -576,7 +576,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
 
   // Ambient occlusion map
   {
-    const auto& ambientOcclusionMap = static_cast<const Raz::Texture2D&>(material.getTexture(Raz::MaterialTexture::Ambient));
+    const auto& ambientOcclusionMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Ambient));
 
     CHECK(ambientOcclusionMap.getWidth() == 2);
     CHECK(ambientOcclusionMap.getHeight() == 2);
@@ -656,11 +656,11 @@ TEST_CASE("ObjFormat save") {
     // A default Cook-Torrance material is added if none has been imported
     CHECK(meshRendererData.getMaterials().size() == 1);
 
-    const Raz::Material& material = meshRendererData.getMaterials().front();
-    CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
-    CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 0.f, 0.f)));
-    CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
-    CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 1.f);
+    const Raz::RenderShaderProgram& matProgram = meshRendererData.getMaterials().front().getProgram();
+    CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 1.f, 1.f)));
+    CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 0.f, 0.f)));
+    CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
+    CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 1.f);
   }
 
   const Raz::MeshRenderer meshRenderer = createMeshRenderer();
@@ -679,20 +679,20 @@ TEST_CASE("ObjFormat save") {
     CHECK(meshRendererData.getMaterials().size() == 2);
 
     {
-      const Raz::Material& material = meshRendererData.getMaterials()[0];
-      CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
-      CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
-      CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.25f);
-      CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.75f);
+      const Raz::RenderShaderProgram& matProgram = meshRendererData.getMaterials()[0].getProgram();
+      CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
+      CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.25f);
+      CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.75f);
     }
 
     {
-      const Raz::Material& material = meshRendererData.getMaterials()[1];
-      CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
-      CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
-      CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient).strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
-      CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular).strictlyEquals(Raz::Vec3f(1.f, 0.f, 1.f)));
-      CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Transparency) == 0.5f);
+      const Raz::RenderShaderProgram& matProgram = meshRendererData.getMaterials()[1].getProgram();
+      CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
+      CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
+      CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient).strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
+      CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular).strictlyEquals(Raz::Vec3f(1.f, 0.f, 1.f)));
+      CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Transparency) == 0.5f);
     }
   }
 }

@@ -151,7 +151,7 @@ int main() {
 
     overlay.addSeparator();
 
-    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getTexture(0)), 256, 256);
+    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 256, 256);
 
     overlay.addSeparator();
 

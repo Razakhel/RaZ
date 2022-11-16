@@ -64,10 +64,8 @@ int main() {
                                                                                                              Raz::Vec2f(2.f, 0.f),
                                                                                                              Raz::Vec2f(0.f, 2.f)));
 
-    Raz::Material& surfaceMat = surface.setMaterial(Raz::Material(Raz::MaterialType::SINGLE_TEXTURE_3D));
-    surfaceMat.setTexture(texture, Raz::MaterialTexture::BaseColor);
-
-    Raz::RenderShaderProgram& surfaceProgram = surfaceMat.getProgram();
+    Raz::RenderShaderProgram& surfaceProgram = surface.setMaterial(Raz::Material(Raz::MaterialType::SINGLE_TEXTURE_3D)).getProgram();
+    surfaceProgram.setTexture(texture, Raz::MaterialTexture::BaseColor);
 
     /////////////
     // Overlay //

@@ -2,69 +2,66 @@
 
 #include "RaZ/Render/Material.hpp"
 
-TEST_CASE("Material attributes") {
+TEST_CASE("Material predefined types") {
   Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
-  CHECK(material.getAttributeCount() == 4);
 
-  REQUIRE(material.hasAttribute(Raz::MaterialAttribute::BaseColor));
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(1.f));
-  REQUIRE(material.hasAttribute(Raz::MaterialAttribute::Metallic));
-  CHECK(material.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
+  CHECK(material.getProgram().getAttributeCount() == 4);
+  REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor));
+  CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(1.f));
+  REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive));
+  CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.f));
+  REQUIRE(material.getProgram().hasAttribute<float>(Raz::MaterialAttribute::Metallic));
+  CHECK(material.getProgram().getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
+  REQUIRE(material.getProgram().hasAttribute<float>(Raz::MaterialAttribute::Roughness));
+  CHECK(material.getProgram().getAttribute<float>(Raz::MaterialAttribute::Roughness) == 1.f);
 
-  material.setAttribute(Raz::Vec3f(0.f), Raz::MaterialAttribute::BaseColor);
-  CHECK(material.getAttributeCount() == 4); // The attribute already exists, none has been added
-  REQUIRE(material.hasAttribute(Raz::MaterialAttribute::BaseColor));
-  CHECK(material.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.f)); // But its value has been changed
+  CHECK(material.getProgram().getTextureCount() == 6);
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::BaseColor));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Emissive));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Normal));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Metallic));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Roughness));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Ambient));
 
-  material.removeAttribute(Raz::MaterialAttribute::BaseColor);
-  CHECK(material.getAttributeCount() == 3);
-  CHECK_FALSE(material.hasAttribute(Raz::MaterialAttribute::BaseColor));
+  material.getProgram().clearAttributes();
+  material.getProgram().clearTextures();
+  material.loadType(Raz::MaterialType::BLINN_PHONG);
 
-  material.clearAttributes();
-  CHECK(material.getAttributeCount() == 0);
+  CHECK(material.getProgram().getAttributeCount() == 5);
+  REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor));
+  CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(1.f));
+  REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive));
+  CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.f));
+  REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient));
+  CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient) == Raz::Vec3f(1.f));
+  REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular));
+  CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular) == Raz::Vec3f(1.f));
+  REQUIRE(material.getProgram().hasAttribute<float>(Raz::MaterialAttribute::Transparency));
+  CHECK(material.getProgram().getAttribute<float>(Raz::MaterialAttribute::Transparency) == 1.f);
 
-  material.setAttribute(42, "test");
-  CHECK(material.getAttributeCount() == 1);
-  REQUIRE(material.hasAttribute("test"));
-  CHECK(material.getAttribute<int>("test") == 42);
-}
+  CHECK(material.getProgram().getTextureCount() == 6);
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::BaseColor));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Emissive));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Ambient));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Specular));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Transparency));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Bump));
 
-TEST_CASE("Material textures") {
-  Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
-  CHECK(material.getTextureCount() == 6);
+  material.getProgram().clearAttributes();
+  material.getProgram().clearTextures();
+  material.loadType(Raz::MaterialType::SINGLE_TEXTURE_2D);
 
-  CHECK(material.hasTexture(Raz::MaterialTexture::BaseColor));
+  CHECK(material.getProgram().getAttributeCount() == 0);
 
-  // Textures can be recovered with either their index in the list or their uniform name
-  const unsigned int origTextureIndex = material.getTexture(Raz::MaterialTexture::BaseColor).getIndex();
-  CHECK(material.getTexture(0).getIndex() == origTextureIndex);
+  CHECK(material.getProgram().getTextureCount() == 1);
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::BaseColor));
 
-  material.setTexture(Raz::Texture2D::create(), Raz::MaterialTexture::BaseColor);
-  CHECK(material.getTextureCount() == 6); // The texture already exists, none has been added
-  REQUIRE(material.hasTexture(Raz::MaterialTexture::BaseColor));
-  CHECK_FALSE(material.getTexture(Raz::MaterialTexture::BaseColor).getIndex() == origTextureIndex); // But its value has been changed
+  material.getProgram().clearAttributes();
+  material.getProgram().clearTextures();
+  material.loadType(Raz::MaterialType::SINGLE_TEXTURE_3D);
 
-  material.removeTexture(Raz::MaterialTexture::BaseColor);
-  CHECK(material.getTextureCount() == 5);
-  CHECK_FALSE(material.hasTexture(Raz::MaterialTexture::BaseColor));
+  CHECK(material.getProgram().getAttributeCount() == 0);
 
-  material.clearTextures();
-  CHECK(material.getTextureCount() == 0);
-
-  Raz::Texture2DPtr texture = Raz::Texture2D::create();
-  material.setTexture(texture, "test");
-  CHECK(material.getTextureCount() == 1);
-  REQUIRE(material.hasTexture("test"));
-  CHECK(material.hasTexture(*texture)); // Can be checked with either the uniform name or the texture itself
-
-  // The same texture can be paired with different uniform names
-  material.setTexture(texture, "test2");
-  CHECK(material.getTextureCount() == 2);
-  REQUIRE(material.hasTexture("test2"));
-  CHECK(material.hasTexture(*texture));
-  // Getting a texture with either of the uniform names returns the same
-  CHECK(material.getTexture("test").getIndex() == material.getTexture("test2").getIndex());
-
-  material.removeTexture(*texture);
-  CHECK(material.getTextureCount() == 0); // Removing with a texture removes all associated entries
+  CHECK(material.getProgram().getTextureCount() == 1);
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::BaseColor));
 }

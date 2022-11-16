@@ -31,7 +31,7 @@ TEST_CASE("RenderPass validity") {
   CHECK_FALSE(initialPass.isValid());
   CHECK_FALSE(nextPass.isValid()); // The color buffer is defined as both read & write in the second pass
 
-  initialPass.removeReadTexture(depthBuffer);
+  initialPass.removeReadTexture(*depthBuffer);
   CHECK(initialPass.isValid()); // The depth buffer is only set as write, the pass is valid again
   CHECK_FALSE(nextPass.isValid());
 

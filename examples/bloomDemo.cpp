@@ -88,9 +88,9 @@ int main() {
     overlay.addSeparator();
 
     overlay.addSlider("Emissive strength", [&meshRenderer] (float value) {
-      Raz::Material& material = meshRenderer.getMaterials().front();
-      material.setAttribute(Raz::Vec3f(value), Raz::MaterialAttribute::Emissive);
-      material.sendAttributes();
+      Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials().front().getProgram();
+      matProgram.setAttribute(Raz::Vec3f(value), Raz::MaterialAttribute::Emissive);
+      matProgram.sendAttributes();
     }, 0.f, 10.f, 0.f);
 
     overlay.addSlider("White light energy", [&whiteLight, &render] (float value) noexcept {

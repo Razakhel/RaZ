@@ -7,11 +7,14 @@
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Shader.hpp"
+#include "RaZ/Render/Texture.hpp"
 
 #include <limits>
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <variant>
+#include <vector>
 
 namespace Raz {
 
@@ -23,28 +26,81 @@ public:
   ShaderProgram(ShaderProgram&&) noexcept = default;
 
   unsigned int getIndex() const { return m_index; }
+  /// Checks if an attribute has been set with the given uniform name.
+  /// \param uniformName Uniform name to be checked.
+  /// \return True if an attribute exists with the given name, false otherwise.
+  bool hasAttribute(const std::string& uniformName) const noexcept;
+  /// Checks if an attribute has been set with the given uniform name and type.
+  /// \tparam T Type to be checked.
+  /// \param uniformName Uniform name to be checked.
+  /// \return True if an attribute exists with the given name and type, false otherwise.
+  template <typename T> bool hasAttribute(const std::string& uniformName) const noexcept;
+  std::size_t getAttributeCount() const noexcept { return m_attributes.size(); }
+  /// Fetches an attribute's value from its uniform name.
+  /// \tparam T Type of the attribute to get. It MUST be the same type the uniform has been set with.
+  /// \param uniformName Uniform name of the attribute to get.
+  /// \return Attribute found.
+  template <typename T> const T& getAttribute(const std::string& uniformName) const noexcept;
+  /// Checks if there is a texture entry with the given texture.
+  /// \param texture Texture to find.
+  /// \return True if an entry has been found, false otherwise.
+  bool hasTexture(const Texture& texture) const noexcept;
+  /// Checks if there is a texture entry with the given uniform name.
+  /// \param uniformName Uniform name to find.
+  /// \return True if an entry has been found, false otherwise.
+  bool hasTexture(const std::string& uniformName) const noexcept;
+  const std::vector<std::pair<TexturePtr, std::string>>& getTextures() const noexcept { return m_textures; }
+  std::size_t getTextureCount() const noexcept { return m_textures.size(); }
+  const Texture& getTexture(std::size_t index) const noexcept { return *m_textures[index].first; }
+  const Texture& getTexture(const std::string& uniformName) const;
+
+  /// Sets an attribute to be sent to the shaders. If the uniform name already exists, replaces the attribute's value.
+  /// \tparam T Type of the attribute to set. Must be a type handled by ShaderProgram::sendUniform().
+  /// \param attribVal Attribute to set.
+  /// \param uniformName Uniform name of the attribute to set.
+  template <typename T> void setAttribute(T&& attribVal, std::string uniformName);
+  /// Sets a texture to be bound to the shaders. If the uniform name already exists, replaces the texture.
+  /// \param texture Texture to set.
+  /// \param uniformName Uniform name to bind the texture to.
+  void setTexture(TexturePtr texture, std::string uniformName);
 
   /// Loads all the shaders contained by the program.
   virtual void loadShaders() const = 0;
   /// Compiles all the shaders contained by the program.
   virtual void compileShaders() const = 0;
   /// Links the program to the graphics card.
+  /// \note Linking a program resets all its attributes' values and textures' bindings; you may want to call sendAttributes() & initTextures() afterwards.
   void link() const;
   /// Checks if the program has been successfully linked.
   /// \return True if the program is linked, false otherwise.
   bool isLinked() const;
-  /// Tells the graphics card to use the program.
+  /// Marks the program as used.
   void use() const;
   /// Checks if the program is currently defined as used.
   bool isUsed() const;
-  /// Loads & compiles all the shaders contained by the program, then links & uses it.
+  /// Loads & compiles all the shaders contained by the program, links it and initializes its attributes & textures.
   void updateShaders() const;
-  /// Creates a uniform & registers its location (ID) used by the program.
-  /// \param name Name of the uniform to be created.
-  void createUniform(const std::string& name);
+  /// Sends the program's attributes as uniforms.
+  void sendAttributes() const;
+  /// Removes an attribute given its uniform name.
+  /// \param uniformName Uniform name of the attribute to remove.
+  void removeAttribute(const std::string& uniformName);
+  /// Removes all attributes in the program.
+  void clearAttributes() { m_attributes.clear(); }
+  /// Sets the program's textures' binding points.
+  void initTextures() const;
+  /// Binds the program's textures.
+  void bindTextures() const;
+  /// Removes all entries associated with the given texture.
+  /// \param texture Texture to remove the entries for.
+  void removeTexture(const Texture& texture);
+  /// Removes the entry associated with the given uniform name.
+  /// \param uniformName Uniform name to remove the entry for.
+  void removeTexture(const std::string& uniformName);
+  /// Removes all textures associated to the program.
+  void clearTextures() { m_textures.clear(); }
   /// Gets the uniform's location (ID) corresponding to the given name.
   /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).
-  /// \warning The location will be recovered faster if previously registered with createUniform(). For reusability, create it first.
   /// \param name Name of the uniform to recover the location from.
   /// \return Location (ID) of the uniform.
   int recoverUniformLocation(const std::string& name) const;
@@ -207,8 +263,10 @@ public:
 protected:
   OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
 
-private:
-  std::unordered_map<std::string, int> m_uniforms {};
+  using Attribute = std::variant<int, unsigned int, float, Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f, Mat2f, Mat3f, Mat4f>;
+  std::unordered_map<std::string, Attribute> m_attributes {};
+
+  std::vector<std::pair<TexturePtr, std::string>> m_textures {};
 };
 
 class RenderShaderProgram final : public ShaderProgram {
@@ -288,5 +346,7 @@ private:
 };
 
 } // namespace Raz
+
+#include "RaZ/Render/ShaderProgram.inl"
 
 #endif // RAZ_SHADERPROGRAM_HPP
