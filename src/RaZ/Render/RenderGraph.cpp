@@ -6,6 +6,19 @@
 
 namespace Raz {
 
+namespace {
+
+constexpr std::string_view gammaCorrectionSource = {
+#include "gamma_correction.frag.embed"
+};
+
+} // namespace
+
+RenderGraph::RenderGraph() : m_gammaCorrectionPass(FragmentShader::loadFromSource(gammaCorrectionSource), "Gamma correction") {
+  m_gammaCorrectionPass.getProgram().setAttribute(1.f / 2.2f, "uniInvGamma");
+  m_gammaCorrectionPass.getProgram().sendAttributes();
+}
+
 bool RenderGraph::isValid() const {
   for (const std::unique_ptr<RenderPass>& renderPass : m_nodes) {
     if (!renderPass->isValid())
@@ -110,6 +123,9 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
     execute(*renderPass);
 
   m_executedPasses.clear();
+
+  // TODO: the last pass' output buffer must be bound to be read by the gamma correction pass
+  m_gammaCorrectionPass.execute();
 }
 
 void RenderGraph::execute(const RenderPass& renderPass) {

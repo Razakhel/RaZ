@@ -13,5 +13,5 @@ uniform Material uniMaterial;
 layout(location = 0) out vec4 fragColor;
 
 void main() {
-  fragColor = vec4(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, 1.0);
+  fragColor = vec4(pow(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)), 1.0);
 }

@@ -18,7 +18,7 @@ class RenderGraph : public Graph<RenderPass> {
   friend RenderSystem;
 
 public:
-  RenderGraph() = default;
+  RenderGraph();
   RenderGraph(const RenderGraph&) = delete;
   RenderGraph(RenderGraph&&) noexcept = delete;
 
@@ -47,6 +47,7 @@ private:
   void execute(const RenderPass& renderPass);
 
   RenderPass m_geometryPass {};
+  RenderPass m_gammaCorrectionPass {};
   std::vector<std::unique_ptr<RenderProcess>> m_renderProcesses {};
   std::unordered_set<const RenderPass*> m_executedPasses {};
 };

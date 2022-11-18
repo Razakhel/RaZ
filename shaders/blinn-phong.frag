@@ -50,7 +50,7 @@ layout(location = 1) out vec3 fragNormal;
 layout(location = 2) out vec4 fragSpecular;
 
 void main() {
-  vec3 color      = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.baseColor;
+  vec3 color      = pow(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
   vec3 specFactor = texture(uniMaterial.specularMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.specular;
   vec3 normal     = vertMeshInfo.vertTBNMatrix[2];
   vec3 viewDir    = normalize(uniCameraPos - vertMeshInfo.vertPosition);

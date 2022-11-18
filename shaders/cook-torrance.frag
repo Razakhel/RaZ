@@ -91,7 +91,6 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 }
 
 void main() {
-  // Gamma correction for albedo (sRGB presumed)
   vec3 albedo     = pow(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
   float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
   float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
@@ -151,10 +150,8 @@ void main() {
   vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
   vec3 color    = ambient + lightRadiance + emissive;
 
-  // HDR tone mapping
+  // Reinhard tone mapping; this is temporary and will be removed later
   color = color / (color + vec3(1.0));
-  // Gamma correction
-  color = pow(color, vec3(1.0 / 2.2));
 
   fragColor    = vec4(color, 1.0);
   fragNormal   = normal * 0.5 + 0.5;
