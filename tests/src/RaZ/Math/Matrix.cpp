@@ -256,7 +256,13 @@ TEST_CASE("Matrix/matrix operations") {
                                -362.2228f,  -1020.829f,   7389.801442f,
                                 318.5148f,   1072.291f,  -4583.526632f);
 
+  // Clang 14+ (at least between 14.0.0 & 14.0.6 at the time of writing), only in Release, has apparently a slightly different behavior
+  //   and does not give the same value in the 3rd row, 1st column
+#if defined(RAZ_COMPILER_CLANG) && defined(RAZ_CONFIG_RELEASE) && __clang_major__ >= 14
+  CHECK_THAT(mat31 * mat32, IsNearlyEqualToMatrix(res3132, 0.000001f));
+#else
   CHECK(mat31 * mat32 == res3132);
+#endif
   CHECK(mat32 * mat31 == res3231);
 
   CHECK(mat31 * Raz::Mat3f::identity() == mat31);
