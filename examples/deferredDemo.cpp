@@ -81,6 +81,12 @@ constexpr std::string_view displayFragSource = R"(
     vec3 normal      = normalRough.rgb;
     float roughness  = normalRough.a;
 
+    if (depth == 1.0) {
+      // Overriding clear color for the background
+      fragColor = vec4(vec3(0.15), 1.0);
+      return;
+    }
+
     if (fragTexcoords.y > 0.5) {
       if (fragTexcoords.x < 0.5)
         fragColor = vec4(vec3(depth), 1.0);

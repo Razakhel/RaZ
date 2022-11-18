@@ -18,13 +18,16 @@ class RenderGraph : public Graph<RenderPass> {
   friend RenderSystem;
 
 public:
-  RenderGraph() = default;
+  RenderGraph();
   RenderGraph(const RenderGraph&) = delete;
   RenderGraph(RenderGraph&&) noexcept = delete;
 
   bool isValid() const;
   const RenderPass& getGeometryPass() const { return m_geometryPass; }
   RenderPass& getGeometryPass() { return m_geometryPass; }
+
+  void setFinalBuffer(Texture2DPtr texture);
+  void setGammaStrength(float gammaStrength);
 
   /// Adds a render process to the graph.
   /// \tparam RenderProcessT Type of the process to add; must be derived from RenderProcess.
@@ -50,6 +53,7 @@ private:
   void executePass(const RenderPass& renderPass);
 
   RenderPass m_geometryPass {};
+  RenderPass m_gammaCorrectionPass {};
   std::vector<std::unique_ptr<RenderProcess>> m_renderProcesses {};
   std::unordered_set<const RenderPass*> m_executedPasses {};
 };

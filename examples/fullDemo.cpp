@@ -64,6 +64,7 @@ int main() {
     const auto blurredBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
     const auto vignetteBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
     const auto filmGrainBuffer  = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto finalBuffer      = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
@@ -73,6 +74,7 @@ int main() {
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, blurredBuffer->getIndex(), "Blurred buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, vignetteBuffer->getIndex(), "Vignette buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, filmGrainBuffer->getIndex(), "Film grain buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, finalBuffer->getIndex(), "Final buffer");
     }
 #endif
 
@@ -111,7 +113,10 @@ int main() {
 
     auto& pixelization = renderGraph.addRenderProcess<Raz::PixelizationRenderProcess>();
     pixelization.setInputBuffer(filmGrainBuffer);
+    pixelization.setOutputBuffer(finalBuffer);
     pixelization.addParent(filmGrain);
+
+    renderGraph.setFinalBuffer(finalBuffer);
 
     ////////////
     // Camera //
@@ -274,6 +279,10 @@ end)";
     overlay.addSlider("Pixelization strength",
                       [&pixelization] (float value) { pixelization.setStrength(value); },
                       0.f, 1.f, 0.f);
+
+    overlay.addSlider("Gamma strength",
+                      [&renderGraph] (float value) { renderGraph.setGammaStrength(value); },
+                      0.1f, 5.f, 2.2f);
 
     overlay.addSeparator();
 

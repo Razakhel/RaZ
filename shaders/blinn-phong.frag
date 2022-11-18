@@ -95,9 +95,6 @@ void main() {
   vec3 emissive   = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
   vec3 finalColor = ambient + diffuse + specular + emissive;
 
-  // Gamma correction; this is temporary and will be removed later
-  finalColor = pow(finalColor, vec3(1.0 / 2.2));
-
   fragColor    = vec4(finalColor, alpha);
   fragNormal   = normal * 0.5 + 0.5;
   fragSpecular = vec4(specFactor, 1.0 - max(specFactor.x, max(specFactor.y, specFactor.z)));

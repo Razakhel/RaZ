@@ -114,7 +114,7 @@ Window::Window(RenderSystem& renderSystem,
     glfwMakeContextCurrent(m_windowHandle);
 
   Renderer::initialize();
-  setClearColor(0.15f, 0.15f, 0.15f);
+  setClearColor(Vec4f(Vec3f(std::pow(0.15f, 2.2f)), 1.f)); // Gamma uncorrected clear color
 
   glfwSetFramebufferSizeCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int newWidth, int newHeight) {
     static_cast<const Window*>(glfwGetWindowUserPointer(windowHandle))->m_renderSystem->resizeViewport(static_cast<unsigned int>(newWidth),

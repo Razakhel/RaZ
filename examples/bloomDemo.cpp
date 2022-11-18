@@ -55,11 +55,13 @@ int main() {
 
     const auto depthBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
     const auto colorBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
+    const auto finalBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, depthBuffer->getIndex(), "Depth buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, colorBuffer->getIndex(), "Color buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, finalBuffer->getIndex(), "Final buffer");
     }
 #endif
 
@@ -71,6 +73,9 @@ int main() {
     auto& bloom = renderGraph.addRenderProcess<Raz::BloomRenderProcess>();
     bloom.addParent(geometryPass);
     bloom.setInputColorBuffer(colorBuffer);
+    bloom.setOutputBuffer(finalBuffer);
+
+    renderGraph.setFinalBuffer(finalBuffer);
 
     /////////////
     // Overlay //

@@ -10,6 +10,19 @@
 
 namespace Raz {
 
+namespace {
+
+constexpr std::string_view gammaCorrectionSource = {
+#include "gamma_correction.frag.embed"
+};
+
+} // namespace
+
+RenderGraph::RenderGraph() : m_gammaCorrectionPass(FragmentShader::loadFromSource(gammaCorrectionSource), "Gamma correction") {
+  setGammaStrength(2.2f);
+  m_gammaCorrectionPass.disable(); // The pass is disabled at first, a final buffer must be given to be corrected
+}
+
 bool RenderGraph::isValid() const {
   for (const std::unique_ptr<RenderPass>& renderPass : m_nodes) {
     if (!renderPass->isValid())
@@ -17,6 +30,17 @@ bool RenderGraph::isValid() const {
   }
 
   return true;
+}
+
+void RenderGraph::setFinalBuffer(Texture2DPtr texture) {
+  m_gammaCorrectionPass.addReadTexture(std::move(texture), "uniBuffer");
+  m_gammaCorrectionPass.enable();
+}
+
+void RenderGraph::setGammaStrength(float gammaStrength) {
+  RenderShaderProgram& gammaProgram = m_gammaCorrectionPass.getProgram();
+  gammaProgram.setAttribute(1.f / gammaStrength, "uniInvGamma");
+  gammaProgram.sendAttributes();
 }
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
@@ -58,6 +82,9 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
     executePass(*renderPass);
 
   m_executedPasses.clear();
+
+  // TODO: the last pass' output buffer must be bound to be read by the gamma correction pass
+  m_gammaCorrectionPass.execute();
 }
 
 void RenderGraph::executeGeometryPass(RenderSystem& renderSystem) const {

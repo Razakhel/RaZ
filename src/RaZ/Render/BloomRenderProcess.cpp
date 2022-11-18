@@ -115,7 +115,6 @@ constexpr std::string_view finalSource = R"(
 
     // The following is technically incorrect, since tone mapping must be done on the whole scene at the very end of the rendering. This will be removed later
     blurredColor = blurredColor / (blurredColor + vec3(1.0)); // Tone mapping
-    blurredColor = pow(blurredColor, vec3(1.0 / 2.2)); // Gamma correction
 
     fragColor = vec4(originalColor + blurredColor, 1.0);
   }

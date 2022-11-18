@@ -123,12 +123,12 @@ TextureFormat recoverFormat(ImageColorspace colorspace) {
 
 TextureInternalFormat recoverInternalFormat(ImageColorspace colorspace, ImageDataType dataType) {
   if (dataType == ImageDataType::BYTE) {
-    // RGB(A) images are supposed to be treated as sRGB(A) textures; this will be the case in the future
+    // RGB(A) images are treated as sRGB(A) textures
 
-    if (/*colorspace == ImageColorspace::RGB || */colorspace == ImageColorspace::SRGB)
+    if (colorspace == ImageColorspace::RGB || colorspace == ImageColorspace::SRGB)
       return TextureInternalFormat::SRGB8;
 
-    if (/*colorspace == ImageColorspace::RGBA || */colorspace == ImageColorspace::SRGBA)
+    if (colorspace == ImageColorspace::RGBA || colorspace == ImageColorspace::SRGBA)
       return TextureInternalFormat::SRGBA8;
 
     // If the image is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
