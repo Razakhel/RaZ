@@ -19,15 +19,10 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
 
   Renderer::resizeViewport(0, 0, m_sceneWidth, m_sceneHeight);
 
-#if !defined(RAZ_NO_WINDOW)
-  if (m_window)
-    m_window->resize(m_sceneWidth, m_sceneHeight);
-#endif
-
   if (m_cameraEntity)
     m_cameraEntity->getComponent<Camera>().resizeViewport(m_sceneWidth, m_sceneHeight);
 
-  m_renderGraph.resizeViewport(width, height);
+  m_renderGraph.resizeViewport(m_sceneWidth, m_sceneHeight);
 }
 
 bool RenderSystem::update([[maybe_unused]] float deltaTime) {

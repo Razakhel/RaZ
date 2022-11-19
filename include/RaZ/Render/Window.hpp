@@ -4,6 +4,7 @@
 #define RAZ_WINDOW_HPP
 
 #include "RaZ/Data/Image.hpp"
+#include "RaZ/Data/OwnerValue.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Overlay.hpp"
 #include "RaZ/Utils/EnumUtils.hpp"
@@ -15,6 +16,7 @@
 
 namespace Raz {
 
+class RenderSystem;
 class Window;
 using WindowPtr = std::unique_ptr<Window>;
 
@@ -40,10 +42,11 @@ enum class WindowSetting : unsigned int {
   AUTOFOCUS      = 512, ///< Focuses the window every time it is shown.
 #endif
 
-  DEFAULT    = FOCUSED /*| RESIZABLE*/ | VISIBLE | DECORATED, ///< Default window settings.
-  WINDOWED   = DEFAULT | MAXIMIZED,                           ///< Windowed full-screen window (with decorations).
-  BORDERLESS = FOCUSED | VISIBLE,                             ///< Borderless full-screen window (without decorations).
-  INVISIBLE  = 0                                              ///< Invisible window.
+  DEFAULT       = FOCUSED | RESIZABLE | VISIBLE | DECORATED, ///< Default window settings.
+  NON_RESIZABLE = FOCUSED | VISIBLE | DECORATED,             ///< Default window settings without resizing capabilities.
+  WINDOWED      = DEFAULT | MAXIMIZED,                       ///< Windowed full-screen window (with decorations).
+  BORDERLESS    = FOCUSED /*| MAXIMIZED*/ | VISIBLE,         ///< Borderless full-screen window (without decorations).
+  INVISIBLE     = 0                                          ///< Invisible window.
 };
 MAKE_ENUM_FLAG(WindowSetting)
 
@@ -51,12 +54,14 @@ MAKE_ENUM_FLAG(WindowSetting)
 class Window {
 public:
   /// Creates a window.
+  /// \param renderSystem Render system containing this window.
   /// \param width Width of the window.
   /// \param height Height of the window.
   /// \param title Title of the window.
   /// \param settings Settings to create the window with.
   /// \param antiAliasingSampleCount Number of anti-aliasing samples.
-  Window(unsigned int width, unsigned int height,
+  Window(RenderSystem& renderSystem,
+         unsigned int width, unsigned int height,
          const std::string& title = {},
          WindowSetting settings = WindowSetting::DEFAULT,
          uint8_t antiAliasingSampleCount = 1);
@@ -65,10 +70,6 @@ public:
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
-  const InputCallbacks& getCallbacks() const { return m_callbacks; }
-  InputCallbacks& getCallbacks() { return m_callbacks; }
-  const CloseCallback& getCloseCallback() const { return m_closeCallback; }
-  CloseCallback& getCloseCallback() { return m_closeCallback; }
 #if !defined(RAZ_NO_OVERLAY)
   Overlay& getOverlay() noexcept { return m_overlay; }
 #endif
@@ -85,6 +86,12 @@ public:
   /// \param width New window width.
   /// \param height New window height.
   void resize(unsigned int width, unsigned int height);
+  /// Sets the window in a fullscreen mode, taking the whole main monitor's screen.
+  /// \note To quit fullscreen, call makeWindowed().
+  /// \see makeWindowed()
+  void makeFullscreen();
+  /// Sets the window in its windowed mode.
+  void makeWindowed();
   /// Changes the face culling's state.
   /// Enables or disables face culling according to the given parameter.
   /// \param value Value to apply.
@@ -166,10 +173,14 @@ public:
   ~Window() { close(); }
 
 private:
-  unsigned int m_width {};
-  unsigned int m_height {};
+  OwnerValue<GLFWwindow*, nullptr> m_windowHandle {};
+  RenderSystem* m_renderSystem {};
 
-  GLFWwindow* m_windowHandle {};
+  int m_width {};
+  int m_height {};
+  int m_posX {};
+  int m_posY {};
+
   InputCallbacks m_callbacks {};
   CloseCallback m_closeCallback {};
 

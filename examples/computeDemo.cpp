@@ -20,7 +20,7 @@ int main() {
     // Rendering //
     ///////////////
 
-    auto& render = world.addSystem<Raz::RenderSystem>(textureSize, textureSize, "RaZ");
+    auto& render = world.addSystem<Raz::RenderSystem>(textureSize, textureSize, "RaZ", Raz::WindowSetting::NON_RESIZABLE);
 
     if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
       throw std::runtime_error("Error: Compute is only available with an OpenGL 4.3 context or above, or with the 'GL_ARB_compute_shader' extension; "

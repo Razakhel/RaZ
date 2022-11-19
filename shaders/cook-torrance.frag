@@ -117,8 +117,8 @@ void main() {
     if (uniLights[lightIndex].position.w != 0.0) {
       fullLightDir = uniLights[lightIndex].position.xyz - vertMeshInfo.vertPosition;
 
-      float sqrDist = dot(fullLightDir, fullLightDir);
-      attenuation  /= sqrDist;
+      float sqDist = dot(fullLightDir, fullLightDir);
+      attenuation /= sqDist;
     } else {
       fullLightDir = -uniLights[lightIndex].direction.xyz;
     }

@@ -19,7 +19,8 @@ int main() {
     // Rendering //
     ///////////////
 
-    auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
+    // TODO: resizing the window does not resize the bloom's buffers properly yet
+    auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ", Raz::WindowSetting::NON_RESIZABLE);
 
     Raz::Window& window = render.getWindow();
 

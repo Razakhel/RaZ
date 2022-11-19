@@ -38,7 +38,7 @@ public:
                const std::string& windowTitle,
                WindowSetting settings = WindowSetting::DEFAULT,
                uint8_t antiAliasingSampleCount = 1)
-    : m_window{ Window::create(sceneWidth, sceneHeight, windowTitle, settings, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
+    : m_window{ Window::create(*this, sceneWidth, sceneHeight, windowTitle, settings, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
 #endif
 
 #if !defined(RAZ_NO_WINDOW)
@@ -56,7 +56,7 @@ public:
   void setCubemap(Cubemap&& cubemap);
 
 #if !defined(RAZ_NO_WINDOW)
-  void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(width, height, title); }
+  void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(*this, width, height, title); }
 #endif
   void resizeViewport(unsigned int width, unsigned int height);
   bool update(float deltaTime) override;

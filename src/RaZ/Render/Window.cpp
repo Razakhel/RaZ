@@ -13,6 +13,7 @@
 
 #include "GLFW/glfw3.h"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Render/RenderSystem.hpp"
 #include "RaZ/Render/Window.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
@@ -22,10 +23,11 @@
 
 namespace Raz {
 
-Window::Window(unsigned int width, unsigned int height,
+Window::Window(RenderSystem& renderSystem,
+               unsigned int width, unsigned int height,
                const std::string& title,
                WindowSetting settings,
-               uint8_t antiAliasingSampleCount) : m_width{ width }, m_height{ height } {
+               uint8_t antiAliasingSampleCount) : m_renderSystem{ &renderSystem }, m_width{ static_cast<int>(width) }, m_height{ static_cast<int>(height) } {
   Logger::debug("[Window] Initializing...");
 
   glfwSetErrorCallback([] (int errorCode, const char* description) {
@@ -35,7 +37,12 @@ Window::Window(unsigned int width, unsigned int height,
   if (!glfwInit())
     throw std::runtime_error("Error: Failed to initialize GLFW");
 
+#if !defined(USE_OPENGL_ES)
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#else
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+#endif
 
 #if defined(RAZ_CONFIG_DEBUG)
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
@@ -76,7 +83,7 @@ Window::Window(unsigned int width, unsigned int height,
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
 
-    m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
+    m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, nullptr);
 
     if (m_windowHandle)
       break;
@@ -90,17 +97,20 @@ Window::Window(unsigned int width, unsigned int height,
     throw std::runtime_error("Error: Failed to create GLFW Window");
   }
 #else
-  m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, nullptr);
+  m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, nullptr);
 #endif
 
   glfwSetWindowUserPointer(m_windowHandle, this);
   glfwMakeContextCurrent(m_windowHandle);
 
+  glfwGetWindowPos(m_windowHandle, &m_posX, &m_posY);
+
   Renderer::initialize();
   setClearColor(0.15f, 0.15f, 0.15f);
 
-  glfwSetFramebufferSizeCallback(m_windowHandle, [] (GLFWwindow*, int newWidth, int newHeight) {
-    Renderer::resizeViewport(0, 0, static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
+  glfwSetFramebufferSizeCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int newWidth, int newHeight) {
+    static_cast<const Window*>(glfwGetWindowUserPointer(windowHandle))->m_renderSystem->resizeViewport(static_cast<unsigned int>(newWidth),
+                                                                                                       static_cast<unsigned int>(newHeight));
   });
 
 #if !defined(RAZ_NO_OVERLAY)
@@ -126,10 +136,24 @@ void Window::setIcon(const Image& img) const {
 }
 
 void Window::resize(unsigned int width, unsigned int height) {
-  m_width  = width;
-  m_height = height;
+  m_width  = static_cast<int>(width);
+  m_height = static_cast<int>(height);
 
   glfwSetWindowSize(m_windowHandle, static_cast<int>(width), static_cast<int>(height));
+}
+
+void Window::makeFullscreen() {
+  glfwGetWindowSize(m_windowHandle, &m_width, &m_height);
+  glfwGetWindowPos(m_windowHandle, &m_posX, &m_posY);
+
+  GLFWmonitor* monitor    = glfwGetPrimaryMonitor();
+  const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+  glfwSetWindowMonitor(m_windowHandle, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+}
+
+void Window::makeWindowed() {
+  glfwSetWindowMonitor(m_windowHandle, nullptr, m_posX, m_posY, m_width, m_height, GLFW_DONT_CARE);
 }
 
 void Window::enableFaceCulling(bool value) const {
@@ -212,9 +236,8 @@ void Window::setMouseMoveCallback(std::function<void(double, double)> func) {
 void Window::setCloseCallback(std::function<void()> func) {
   m_closeCallback = std::move(func);
 
-  glfwSetWindowCloseCallback(m_windowHandle, [] (GLFWwindow* window) {
-    const CloseCallback& closeCallback = static_cast<Window*>(glfwGetWindowUserPointer(window))->getCloseCallback();
-    closeCallback();
+  glfwSetWindowCloseCallback(m_windowHandle, [] (GLFWwindow* windowHandle) {
+    static_cast<const Window*>(glfwGetWindowUserPointer(windowHandle))->m_closeCallback();
   });
 }
 
@@ -244,7 +267,7 @@ void Window::updateCallbacks() const {
         return;
 #endif
 
-      InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks();
+      InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks;
       const auto& keyCallbacks  = std::get<0>(callbacks);
 
       for (const auto& callback : keyCallbacks) {
@@ -292,7 +315,7 @@ void Window::updateCallbacks() const {
         return;
 #endif
 
-      InputCallbacks& callbacks  = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks();
+      InputCallbacks& callbacks  = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks;
       const auto& mouseCallbacks = std::get<1>(callbacks);
 
       for (const auto& callback : mouseCallbacks) {
@@ -326,7 +349,7 @@ void Window::updateCallbacks() const {
         return;
 #endif
 
-      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks());
+      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks);
       scrollCallback(xOffset, yOffset);
     });
   }
@@ -334,7 +357,7 @@ void Window::updateCallbacks() const {
   // Mouse move input
   if (std::get<2>(std::get<3>(m_callbacks))) {
     glfwSetCursorPosCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xPosition, double yPosition) {
-      MouseMoveCallback& moveCallback = std::get<3>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->getCallbacks());
+      MouseMoveCallback& moveCallback = std::get<3>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks);
 
       double& xPrevPos = std::get<0>(moveCallback);
       double& yPrevPos = std::get<1>(moveCallback);

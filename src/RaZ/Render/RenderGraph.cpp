@@ -16,6 +16,8 @@ bool RenderGraph::isValid() const {
 }
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
+  m_geometryPass.resizeWriteBuffers(width, height);
+
   for (std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->resizeWriteBuffers(width, height); // TODO: resizing all write buffers will only work if they have all been created with equal dimensions
 

@@ -32,6 +32,17 @@ int main() {
 
     window.addKeyCallback(Raz::Keyboard::F5, [&renderSystem] (float /* deltaTime */) { renderSystem.updateShaders(); });
 
+    window.addKeyCallback(Raz::Keyboard::F11, [&window] (float) noexcept {
+      static bool isFullScreen = false;
+
+      if (isFullScreen)
+        window.makeWindowed();
+      else
+        window.makeFullscreen();
+
+      isFullScreen = !isFullScreen;
+    }, Raz::Input::ONCE);
+
     // Allowing to quit the application by pressing the Escape key
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
     // Quitting the application when the close button is clicked
@@ -135,6 +146,7 @@ int main() {
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Full demo", Raz::Vec2f(window.getWidth() / 4, window.getHeight()));
 
     DemoUtils::insertOverlayCameraControlsHelp(overlay);
+    overlay.addLabel("Press F11 to toggle fullscreen.");
 
     overlay.addSeparator();
 

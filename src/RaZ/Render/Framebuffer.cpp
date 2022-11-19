@@ -122,8 +122,6 @@ void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
 
   for (const auto& [colorBuffer, _] : m_colorBuffers)
     colorBuffer->resize(width, height);
-
-  mapBuffers(); // TODO: may be unnecessary
 }
 
 void Framebuffer::mapBuffers() const {
