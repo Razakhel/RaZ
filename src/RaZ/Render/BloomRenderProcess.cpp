@@ -9,7 +9,7 @@ namespace Raz {
 
 namespace {
 
-constexpr int passCount = 8;
+constexpr int passCount = 5;
 
 constexpr std::string_view thresholdSource = R"(
   in vec2 fragTexcoords;
@@ -308,28 +308,25 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
   m_finalPass->resizeWriteBuffers(width, height);
 
   for (std::size_t i = 0; i < m_downscaleBuffers.size(); ++i) {
-    const auto sizeFactor        = static_cast<unsigned int>(2 * (i + 1));
-    const unsigned int newWidth  = width / sizeFactor;
-    const unsigned int newHeight = height / sizeFactor;
+    width  /= 2;
+    height /= 2;
 
-    m_downscalePasses[i]->resizeWriteBuffers(newWidth, newHeight);
+    const Vec2f invBufferSize(1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
 
-    const Vec2f invBufferSize(1.f / static_cast<float>(newWidth), 1.f / static_cast<float>(newHeight));
+    m_downscalePasses[i]->resizeWriteBuffers(width, height);
+
     m_downscalePasses[i]->getProgram().use();
     m_downscalePasses[i]->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
-  }
 
-  for (std::size_t i = 0; i < m_upscaleBuffers.size(); ++i) {
-    const auto correspDownscaleIndex = m_downscaleBuffers.size() - i - 2;
-    const auto sizeFactor        = static_cast<unsigned int>(2 * (correspDownscaleIndex + 1));
-    const unsigned int newWidth  = width / sizeFactor;
-    const unsigned int newHeight = height / sizeFactor;
+    if (i >= m_upscalePasses.size())
+      break;
 
-    m_upscalePasses[i]->resizeWriteBuffers(newWidth, newHeight);
+    const std::size_t correspIndex = m_downscaleBuffers.size() - i - 2;
 
-    const Vec2f invBufferSize(1.f / static_cast<float>(newWidth), 1.f / static_cast<float>(newHeight));
-    m_upscalePasses[i]->getProgram().use();
-    m_upscalePasses[i]->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
+    m_upscalePasses[correspIndex]->resizeWriteBuffers(width, height);
+
+    m_upscalePasses[correspIndex]->getProgram().use();
+    m_upscalePasses[correspIndex]->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
   }
 }
 
