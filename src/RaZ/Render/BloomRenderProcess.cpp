@@ -123,7 +123,7 @@ constexpr std::string_view finalSource = R"(
 
 } // namespace
 
-BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int frameWidth, unsigned int frameHeight) : RenderProcess(renderGraph) {
+BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph) : RenderProcess(renderGraph) {
   // Based on Fabrice "froyok" Piquet's bloom, itself based on the one used in Unreal Engine 4/Call of Duty: Advanced Warfare
   // See: https://www.froyok.fr/blog/2021-12-ue4-custom-bloom/
 
@@ -134,7 +134,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
   m_thresholdPass = &renderGraph.addNode(FragmentShader::loadFromSource(thresholdSource), "Bloom thresholding");
   setThresholdValue(0.75f); // Tone mapping is applied before the bloom, thus no value above 1 exist here. This value will be changed later
 
-  const auto thresholdBuffer = Texture2D::create(frameWidth, frameHeight, TextureColorspace::RGB, TextureDataType::FLOAT16);
+  const auto thresholdBuffer = Texture2D::create(TextureColorspace::RGB, TextureDataType::FLOAT16);
   m_thresholdPass->addWriteColorTexture(thresholdBuffer, 0);
 
 #if !defined(USE_OPENGL_ES)
@@ -175,14 +175,8 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
 
     downscalePass.addReadTexture((downscalePassIndex == 0 ? thresholdBuffer : m_downscaleBuffers[downscalePassIndex - 1].lock()), "uniPrevDownscaledBuffer");
 
-    const auto bufferWidth  = frameWidth / static_cast<unsigned int>(2 * (downscalePassIndex + 1));
-    const auto bufferHeight = frameHeight / static_cast<unsigned int>(2 * (downscalePassIndex + 1));
-
-    const auto downscaledBuffer = Texture2D::create(bufferWidth, bufferHeight, TextureColorspace::RGB, TextureDataType::FLOAT16);
+    const auto downscaledBuffer = Texture2D::create(TextureColorspace::RGB, TextureDataType::FLOAT16);
     downscalePass.addWriteColorTexture(downscaledBuffer, 0);
-
-    const Vec2f invBufferSize(1.f / static_cast<float>(bufferWidth), 1.f / static_cast<float>(bufferHeight));
-    downscalePass.getProgram().sendUniform("uniInvBufferSize", invBufferSize);
 
     m_downscalePasses[downscalePassIndex]  = &downscalePass;
     m_downscaleBuffers[downscalePassIndex] = downscaledBuffer;
@@ -231,14 +225,8 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
     upscalePass.addReadTexture(m_downscaleBuffers[correspDownscalePassIndex].lock(), "uniDownscaledBuffer");
     upscalePass.addReadTexture((upscalePassIndex == 0 ? m_downscaleBuffers.back() : m_upscaleBuffers[upscalePassIndex - 1]).lock(), "uniPrevUpscaledBuffer");
 
-    const auto bufferWidth  = frameWidth / static_cast<unsigned int>(2 * (correspDownscalePassIndex + 1));
-    const auto bufferHeight = frameHeight / static_cast<unsigned int>(2 * (correspDownscalePassIndex + 1));
-
-    const auto upscaledBuffer = Texture2D::create(bufferWidth, bufferHeight, TextureColorspace::RGB, TextureDataType::FLOAT16);
+    const auto upscaledBuffer = Texture2D::create(TextureColorspace::RGB, TextureDataType::FLOAT16);
     upscalePass.addWriteColorTexture(upscaledBuffer, 0);
-
-    const Vec2f invBufferSize(1.f / static_cast<float>(bufferWidth), 1.f / static_cast<float>(bufferHeight));
-    upscalePass.getProgram().sendUniform("uniInvBufferSize", invBufferSize);
 
     m_upscalePasses[upscalePassIndex]  = &upscalePass;
     m_upscaleBuffers[upscalePassIndex] = upscaledBuffer;
@@ -246,7 +234,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph, unsigned int fr
     // Although each upscaling pass is technically dependent on the matching downscaling one, the render graph only needs
     //  direct dependencies, that is, passes that can be executed anytime after their parents have been. In this case, we need
     //  to execute each one sequentially whenever the previous upscaling pass has finished anyway. Hence, although we could, we
-    //  do not set any dependency between upscaling & downscaling passes except for the first one
+    //  do not set any dependency between upscaling & downscaling passes aside from the first one
 
     upscalePass.addParents((upscalePassIndex == 0 ? *m_downscalePasses.back() : *m_upscalePasses[upscalePassIndex - 1]));
 
@@ -316,19 +304,38 @@ void BloomRenderProcess::addChild(RenderProcess& childProcess) {
 }
 
 void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) {
+  m_thresholdPass->resizeWriteBuffers(width, height);
+  m_finalPass->resizeWriteBuffers(width, height);
+
   for (std::size_t i = 0; i < m_downscaleBuffers.size(); ++i) {
-    const auto sizeFactor = static_cast<unsigned int>(2 * (i + 1));
-    m_downscaleBuffers[i].lock()->resize(width / sizeFactor, height / sizeFactor);
+    const auto sizeFactor        = static_cast<unsigned int>(2 * (i + 1));
+    const unsigned int newWidth  = width / sizeFactor;
+    const unsigned int newHeight = height / sizeFactor;
+
+    m_downscalePasses[i]->resizeWriteBuffers(newWidth, newHeight);
+
+    const Vec2f invBufferSize(1.f / static_cast<float>(newWidth), 1.f / static_cast<float>(newHeight));
+    m_downscalePasses[i]->getProgram().use();
+    m_downscalePasses[i]->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
   }
 
   for (std::size_t i = 0; i < m_upscaleBuffers.size(); ++i) {
     const auto correspDownscaleIndex = m_downscaleBuffers.size() - i - 2;
-    const auto sizeFactor = static_cast<unsigned int>(2 * (correspDownscaleIndex + 1));
-    m_upscaleBuffers[i].lock()->resize(width / sizeFactor, height / sizeFactor);
+    const auto sizeFactor        = static_cast<unsigned int>(2 * (correspDownscaleIndex + 1));
+    const unsigned int newWidth  = width / sizeFactor;
+    const unsigned int newHeight = height / sizeFactor;
+
+    m_upscalePasses[i]->resizeWriteBuffers(newWidth, newHeight);
+
+    const Vec2f invBufferSize(1.f / static_cast<float>(newWidth), 1.f / static_cast<float>(newHeight));
+    m_upscalePasses[i]->getProgram().use();
+    m_upscalePasses[i]->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
   }
 }
 
 void BloomRenderProcess::setInputColorBuffer(Texture2DPtr colorBuffer) {
+  resizeBuffers(colorBuffer->getWidth(), colorBuffer->getHeight());
+
   m_thresholdPass->addReadTexture(colorBuffer, "uniColorBuffer");
   m_finalPass->addReadTexture(std::move(colorBuffer), "uniOriginalColorBuffer");
 }

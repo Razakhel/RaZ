@@ -153,7 +153,9 @@ void Texture::setColorspace(TextureColorspace colorspace, TextureDataType dataTy
   m_dataType   = dataType;
 
   load();
-  setFilter((m_colorspace == TextureColorspace::DEPTH ? TextureFilter::NEAREST : TextureFilter::LINEAR)); // TODO: this should not be done every time
+
+  if (m_colorspace == TextureColorspace::DEPTH)
+    setFilter(TextureFilter::NEAREST);
 }
 
 Texture::~Texture() {
@@ -170,6 +172,7 @@ Texture::Texture(TextureType type) : m_type{ type } {
   Renderer::generateTexture(m_index);
   Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
 
+  setFilter(TextureFilter::LINEAR);
   setWrapping(TextureWrapping::CLAMP);
 }
 

@@ -19,8 +19,7 @@ int main() {
     // Rendering //
     ///////////////
 
-    // TODO: resizing the window does not resize the bloom's buffers properly yet
-    auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ", Raz::WindowSetting::NON_RESIZABLE);
+    auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
 
     Raz::Window& window = render.getWindow();
 
@@ -70,7 +69,7 @@ int main() {
 
     // Bloom
 
-    auto& bloom = renderGraph.addRenderProcess<Raz::BloomRenderProcess>(window.getWidth(), window.getHeight());
+    auto& bloom = renderGraph.addRenderProcess<Raz::BloomRenderProcess>();
     bloom.addParent(geometryPass);
     bloom.setInputColorBuffer(colorBuffer);
 
