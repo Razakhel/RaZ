@@ -81,7 +81,7 @@ inline bool endsWith(const std::wstring& text, const std::wstring& token) {
 /// \param character Character to be transformed.
 /// \return Lowercase character.
 inline char toLowercase(char& character) {
-  character = static_cast<char>(std::tolower(character));
+  character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
   return character;
 }
 
@@ -113,7 +113,7 @@ inline std::wstring& toLowercase(std::wstring& text) {
 /// \param character Character to be transformed.
 /// \return Uppercase character.
 inline char toUppercase(char& character) {
-  character = static_cast<char>(std::toupper(character));
+  character = static_cast<char>(std::toupper(static_cast<unsigned char>(character)));
   return character;
 }
 
@@ -209,8 +209,8 @@ inline std::wstring toUppercaseCopy(std::wstring text) {
 /// \param text String to be trimmed.
 /// \return Reference to the trimmed string.
 inline std::string& trimLeft(std::string& text) {
-  text.erase(text.begin(), std::find_if(text.begin(), text.end(), [] (int c) {
-    return !std::isspace(c);
+  text.erase(text.begin(), std::find_if_not(text.begin(), text.end(), [] (unsigned char c) {
+    return std::isspace(c);
   }));
   return text;
 }
@@ -219,8 +219,8 @@ inline std::string& trimLeft(std::string& text) {
 /// \param text Wide string to be trimmed.
 /// \return Reference to the trimmed wide string.
 inline std::wstring& trimLeft(std::wstring& text) {
-  text.erase(text.begin(), std::find_if(text.begin(), text.end(), [] (wchar_t c) {
-    return !std::iswspace(c);
+  text.erase(text.begin(), std::find_if_not(text.begin(), text.end(), [] (wchar_t c) {
+    return std::iswspace(c);
   }));
   return text;
 }
@@ -229,8 +229,8 @@ inline std::wstring& trimLeft(std::wstring& text) {
 /// \param text String to be trimmed.
 /// \return Reference to the trimmed string.
 inline std::string& trimRight(std::string& text) {
-  text.erase(std::find_if(text.rbegin(), text.rend(), [] (int c) {
-    return !std::isspace(c);
+  text.erase(std::find_if_not(text.rbegin(), text.rend(), [] (unsigned char c) {
+    return std::isspace(c);
   }).base(), text.end());
   return text;
 }
@@ -239,8 +239,8 @@ inline std::string& trimRight(std::string& text) {
 /// \param text Wide string to be trimmed.
 /// \return Reference to the trimmed wide string.
 inline std::wstring& trimRight(std::wstring& text) {
-  text.erase(std::find_if(text.rbegin(), text.rend(), [] (wchar_t c) {
-    return !std::iswspace(c);
+  text.erase(std::find_if_not(text.rbegin(), text.rend(), [] (wchar_t c) {
+    return std::iswspace(c);
   }).base(), text.end());
   return text;
 }

@@ -11,7 +11,7 @@ namespace Raz {
 
 class BloomRenderProcess final : public RenderProcess {
 public:
-  BloomRenderProcess(RenderGraph& renderGraph);
+  explicit BloomRenderProcess(RenderGraph& renderGraph);
 
   bool isEnabled() const noexcept override;
   RenderPass& getThresholdPass() noexcept { return *m_thresholdPass; }
