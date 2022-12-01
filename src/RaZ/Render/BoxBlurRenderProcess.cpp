@@ -18,8 +18,8 @@ BoxBlurRenderProcess::BoxBlurRenderProcess(RenderGraph& renderGraph)
 
 void BoxBlurRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
   const Vec2f invBufferSize(1.f / static_cast<float>(colorBuffer->getWidth()), 1.f / static_cast<float>(colorBuffer->getHeight()));
-  m_pass.getProgram().use();
-  m_pass.getProgram().sendUniform("uniInvBufferSize", invBufferSize);
+  m_pass.getProgram().setAttribute(invBufferSize, "uniInvBufferSize");
+  m_pass.getProgram().sendAttributes();
 
   MonoPassRenderProcess::setInputBuffer(std::move(colorBuffer), "uniBuffer");
 }
@@ -29,8 +29,8 @@ void BoxBlurRenderProcess::setOutputBuffer(Texture2DPtr colorBuffer) {
 }
 
 void BoxBlurRenderProcess::setStrength(unsigned int strength) const {
-  m_pass.getProgram().use();
-  m_pass.getProgram().sendUniform("uniKernelSize", static_cast<int>(strength));
+  m_pass.getProgram().setAttribute(static_cast<int>(strength), "uniKernelSize");
+  m_pass.getProgram().sendAttributes();
 }
 
 } // namespace Raz

@@ -25,8 +25,8 @@ GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph) :
   /////////////////////
 
   m_horizontalPass = &renderGraph.addNode(FragmentShader::loadFromSource(gaussianBlurSource), "Gaussian blur (horizontal)");
-  m_horizontalPass->getProgram().use();
-  m_horizontalPass->getProgram().sendUniform("uniBlurDirection", Vec2f(1.f, 0.f));
+  m_horizontalPass->getProgram().setAttribute(Vec2f(1.f, 0.f), "uniBlurDirection");
+  m_horizontalPass->getProgram().sendAttributes();
 
 #if !defined(USE_OPENGL_ES)
   if (Renderer::checkVersion(4, 3)) {
@@ -41,8 +41,8 @@ GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph) :
   ///////////////////
 
   m_verticalPass = &renderGraph.addNode(FragmentShader::loadFromSource(gaussianBlurSource), "Gaussian blur (vertical)");
-  m_verticalPass->getProgram().use();
-  m_verticalPass->getProgram().sendUniform("uniBlurDirection", Vec2f(0.f, 1.f));
+  m_verticalPass->getProgram().setAttribute(Vec2f(0.f, 1.f), "uniBlurDirection");
+  m_verticalPass->getProgram().sendAttributes();
 
   m_verticalPass->addReadTexture(m_horizontalBuffer, "uniBuffer");
 
@@ -91,11 +91,11 @@ void GaussianBlurRenderProcess::resizeBuffers(unsigned int width, unsigned int h
 
   const Vec2f invBufferSize(1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
 
-  m_horizontalPass->getProgram().use();
-  m_horizontalPass->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
+  m_horizontalPass->getProgram().setAttribute(invBufferSize, "uniInvBufferSize");
+  m_horizontalPass->getProgram().sendAttributes();
 
-  m_verticalPass->getProgram().use();
-  m_verticalPass->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
+  m_verticalPass->getProgram().setAttribute(invBufferSize, "uniInvBufferSize");
+  m_verticalPass->getProgram().sendAttributes();
 }
 
 void GaussianBlurRenderProcess::setInputBuffer(Texture2DPtr inputBuffer) {

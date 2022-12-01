@@ -174,6 +174,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd4571 # SEH exceptions aren't caught since Visual C++ 7.1
             /wd5045 # Spectre mitigation
             /wd5246 # Initialization of subobject should be wrapped in braces
+            /wd5264 # const(expr) variable not used
 
             # Warnings triggered by the FBX SDK
             /wd4266 # No override available (function is hidden)
@@ -198,6 +199,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd5105 # Undefined macro expansion
             /wd5204 # Class with virtual functions but no virtual destructor
             /wd5220 # Non-static volatile member doesn't imply non-trivial move/copy ctor/operator=
+            /wd5262 # Implicit fallthrough
         )
 
         # To automatically export all the classes & functions

@@ -74,8 +74,8 @@ inline const MeshRenderer& getDisplayCube() {
 
     RenderShaderProgram& program = meshRenderer.addMaterial().getProgram();
     program.setShaders(VertexShader::loadFromSource(vertSource), FragmentShader::loadFromSource(fragSource));
-    program.use();
-    program.sendUniform("uniSkybox", 0);
+    program.setAttribute(0, "uniSkybox");
+    program.sendAttributes();
 
     meshRenderer.load(mesh, RenderMode::TRIANGLE);
     meshRenderer.getSubmeshRenderers().front().setMaterialIndex(0);

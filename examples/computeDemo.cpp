@@ -74,27 +74,27 @@ int main() {
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Compute demo", Raz::Vec2f(-1.f));
 
     Raz::OverlaySlider& perlinFactor = overlay.addSlider("Perlin noise factor", [&perlinNoise] (float value) {
-      perlinNoise.use();
-      perlinNoise.sendUniform("uniNoiseFactor", value);
+      perlinNoise.setAttribute(value, "uniNoiseFactor");
+      perlinNoise.sendAttributes();
       perlinNoise.execute(textureSize, textureSize, textureDepth);
     }, 0.001f, 0.1f, 0.01f);
 
     Raz::OverlaySlider& perlinOctaves = overlay.addSlider("Perlin noise octaves", [&perlinNoise] (float value) {
-      perlinNoise.use();
-      perlinNoise.sendUniform("uniOctaveCount", static_cast<int>(value));
+      perlinNoise.setAttribute(static_cast<int>(value), "uniOctaveCount");
+      perlinNoise.sendAttributes();
       perlinNoise.execute(textureSize, textureSize, textureDepth);
     }, 1, 8, 1);
 
     Raz::OverlaySlider& worleyFactor = overlay.addSlider("Worley noise factor", [&worleyNoise] (float value) {
-      worleyNoise.use();
-      worleyNoise.sendUniform("uniNoiseFactor", value);
+      worleyNoise.setAttribute(value, "uniNoiseFactor");
+      worleyNoise.sendAttributes();
       worleyNoise.execute(textureSize, textureSize, textureDepth);
     }, 0.001f, 0.1f, 0.01f);
     worleyFactor.disable();
 
     overlay.addSlider("Depth", [&surfaceProgram] (float value) {
-      surfaceProgram.use();
-      surfaceProgram.sendUniform("uniDepth", value / textureDepth);
+      surfaceProgram.setAttribute(value / textureDepth, "uniDepth");
+      surfaceProgram.sendAttributes();
     }, 0.f, textureDepth, 0.f);
 
     overlay.addDropdown("Noise method", { "Perlin", "Worley" }, [&] (const std::string&, std::size_t index) {

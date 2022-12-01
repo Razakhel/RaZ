@@ -315,8 +315,8 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
 
     m_downscalePasses[i]->resizeWriteBuffers(width, height);
 
-    m_downscalePasses[i]->getProgram().use();
-    m_downscalePasses[i]->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
+    m_downscalePasses[i]->getProgram().setAttribute(invBufferSize, "uniInvBufferSize");
+    m_downscalePasses[i]->getProgram().sendAttributes();
 
     if (i >= m_upscalePasses.size())
       break;
@@ -325,8 +325,8 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
 
     m_upscalePasses[correspIndex]->resizeWriteBuffers(width, height);
 
-    m_upscalePasses[correspIndex]->getProgram().use();
-    m_upscalePasses[correspIndex]->getProgram().sendUniform("uniInvBufferSize", invBufferSize);
+    m_upscalePasses[correspIndex]->getProgram().setAttribute(invBufferSize, "uniInvBufferSize");
+    m_upscalePasses[correspIndex]->getProgram().sendAttributes();
   }
 }
 
@@ -347,8 +347,8 @@ void BloomRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer) {
 }
 
 void BloomRenderProcess::setThresholdValue(float threshold) {
-  m_thresholdPass->getProgram().use();
-  m_thresholdPass->getProgram().sendUniform("uniThreshold", threshold);
+  m_thresholdPass->getProgram().setAttribute(threshold, "uniThreshold");
+  m_thresholdPass->getProgram().sendAttributes();
 }
 
 } // namespace Raz

@@ -220,20 +220,20 @@ int main() {
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Tessellation demo", Raz::Vec2f(-1.f));
 
     overlay.addSlider("Outer level", [&materialProgram] (float newVal) {
-      materialProgram.use();
-      materialProgram.sendUniform("uniTessLevelOuter", newVal);
+      materialProgram.setAttribute(newVal, "uniTessLevelOuter");
+      materialProgram.sendAttributes();
     }, 1.f, 64.f, 4.f);
     overlay.addSlider("Inner level", [&materialProgram] (float newVal) {
-      materialProgram.use();
-      materialProgram.sendUniform("uniTessLevelInner", newVal);
+      materialProgram.setAttribute(newVal, "uniTessLevelInner");
+      materialProgram.sendAttributes();
     }, 1.f, 64.f, 4.f);
 
     overlay.addCheckbox("Make sphere", [&materialProgram] () {
-      materialProgram.use();
-      materialProgram.sendUniform("uniMakeSphere", true);
+      materialProgram.setAttribute(true, "uniMakeSphere");
+      materialProgram.sendAttributes();
     }, [&materialProgram] () {
-      materialProgram.use();
-      materialProgram.sendUniform("uniMakeSphere", false);
+      materialProgram.setAttribute(false, "uniMakeSphere");
+      materialProgram.sendAttributes();
     }, true);
 
     overlay.addCheckbox("Enable wireframe", [] () {

@@ -18,8 +18,8 @@ ConvolutionRenderProcess::ConvolutionRenderProcess(RenderGraph& renderGraph, con
 
 void ConvolutionRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
   const Vec2f invBufferSize(1.f / static_cast<float>(colorBuffer->getWidth()), 1.f / static_cast<float>(colorBuffer->getHeight()));
-  m_pass.getProgram().use();
-  m_pass.getProgram().sendUniform("uniInvBufferSize", invBufferSize);
+  m_pass.getProgram().setAttribute(invBufferSize, "uniInvBufferSize");
+  m_pass.getProgram().sendAttributes();
 
   MonoPassRenderProcess::setInputBuffer(std::move(colorBuffer), "uniBuffer");
 }
@@ -29,8 +29,8 @@ void ConvolutionRenderProcess::setOutputBuffer(Texture2DPtr colorBuffer) {
 }
 
 void ConvolutionRenderProcess::setKernel(const Mat3f& kernel) const {
-  m_pass.getProgram().use();
-  m_pass.getProgram().sendUniform("uniKernel", kernel.getDataPtr(), 9);
+  m_pass.getProgram().setAttribute(std::vector<float>(kernel.getDataPtr(), kernel.getDataPtr() + 9), "uniKernel");
+  m_pass.getProgram().sendAttributes();
 }
 
 } // namespace Raz

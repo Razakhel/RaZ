@@ -128,6 +128,7 @@ int main() {
 
     auto& meshSound = mesh.addComponent<Raz::Sound>(Raz::WavFormat::load(RAZ_ROOT "assets/sounds/wave_seagulls.wav"));
     meshSound.repeat(true);
+    meshSound.setGain(0.f);
     meshSound.play();
 
     // Adding a Listener component, so that the sound's volume decays over the camera's distance to the source
@@ -155,7 +156,7 @@ int main() {
 
     overlay.addSeparator();
 
-    overlay.addSlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 1.f);
+    overlay.addSlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 0.f);
 
     overlay.addSlider("Blur strength",
                       [&boxBlur] (float value) { boxBlur.setStrength(static_cast<unsigned int>(value)); },
