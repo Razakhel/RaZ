@@ -131,6 +131,18 @@ public:
   /// \param values Floating-point values to be sent.
   /// \param count Number of values to be sent.
   void sendUniform(int index, const float* values, std::size_t count) const;
+  /// Sends a list of integers as uniform.
+  /// \param index Index of the uniform to send the data to.
+  /// \param values Integers to be sent.
+  void sendUniform(int index, const std::vector<int>& values) const { sendUniform(index, values.data(), values.size()); }
+  /// Sends a list of unsigned integers as uniform.
+  /// \param index Index of the uniform to send the data to.
+  /// \param values Unsigned integers to be sent.
+  void sendUniform(int index, const std::vector<unsigned int>& values) const { sendUniform(index, values.data(), values.size()); }
+  /// Sends a list of floating-point values as uniform.
+  /// \param index Index of the uniform to send the data to.
+  /// \param values Floating-point values to be sent.
+  void sendUniform(int index, const std::vector<float>& values) const { sendUniform(index, values.data(), values.size()); }
   /// Sends an integer 2D vector as uniform.
   /// \param index Index of the uniform to send the vector's data to.
   /// \param vec Vector to be sent.
@@ -206,6 +218,18 @@ public:
   /// \param values Floating-point values to be sent.
   /// \param count Number of values to be sent.
   void sendUniform(const std::string& name, const float* values, std::size_t count) const { sendUniform(recoverUniformLocation(name), values, count); }
+  /// Sends a list of integers as uniform, which location will be retrieved with its name.
+  /// \param name Name of the uniform to retrieve the location from.
+  /// \param values Integers to be sent.
+  void sendUniform(const std::string& name, const std::vector<int>& values) const { sendUniform(recoverUniformLocation(name), values); }
+  /// Sends a list of unsigned integers as uniform, which location will be retrieved with its name.
+  /// \param name Name of the uniform to retrieve the location from.
+  /// \param values Unsigned integers to be sent.
+  void sendUniform(const std::string& name, const std::vector<unsigned int>& values) const { sendUniform(recoverUniformLocation(name), values); }
+  /// Sends a list of floating-point values as uniform, which location will be retrieved with its name.
+  /// \param name Name of the uniform to retrieve the location from.
+  /// \param values Floating-point values to be sent.
+  void sendUniform(const std::string& name, const std::vector<float>& values) const { sendUniform(recoverUniformLocation(name), values); }
   /// Sends an integer 2D vector as uniform, which location will be retrieved with its name.
   /// \param name Name of the uniform to retrieve the location from.
   /// \param vec Vector to be sent.
@@ -263,7 +287,10 @@ public:
 protected:
   OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
 
-  using Attribute = std::variant<int, unsigned int, float, Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f, Mat2f, Mat3f, Mat4f>;
+  using Attribute = std::variant<int, unsigned int, float,
+                                 Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f,
+                                 Mat2f, Mat3f, Mat4f,
+                                 std::vector<int>, std::vector<unsigned int>, std::vector<float>>;
   std::unordered_map<std::string, Attribute> m_attributes {};
 
   std::vector<std::pair<TexturePtr, std::string>> m_textures {};
