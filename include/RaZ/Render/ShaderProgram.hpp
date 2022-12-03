@@ -58,11 +58,11 @@ public:
   /// \tparam T Type of the attribute to set. Must be a type handled by ShaderProgram::sendUniform().
   /// \param attribVal Attribute to set.
   /// \param uniformName Uniform name of the attribute to set.
-  template <typename T> void setAttribute(T&& attribVal, std::string uniformName);
+  template <typename T> void setAttribute(T&& attribVal, const std::string& uniformName);
   /// Sets a texture to be bound to the shaders. If the uniform name already exists, replaces the texture.
   /// \param texture Texture to set.
   /// \param uniformName Uniform name to bind the texture to.
-  void setTexture(TexturePtr texture, std::string uniformName);
+  void setTexture(TexturePtr texture, const std::string& uniformName);
 
   /// Loads all the shaders contained by the program.
   virtual void loadShaders() const = 0;
@@ -70,16 +70,16 @@ public:
   virtual void compileShaders() const = 0;
   /// Links the program to the graphics card.
   /// \note Linking a program resets all its attributes' values and textures' bindings; you may want to call sendAttributes() & initTextures() afterwards.
-  void link() const;
+  void link();
   /// Checks if the program has been successfully linked.
   /// \return True if the program is linked, false otherwise.
   bool isLinked() const;
+  /// Loads & compiles all the shaders contained by the program, links it and initializes its attributes & textures.
+  void updateShaders();
   /// Marks the program as used.
   void use() const;
   /// Checks if the program is currently defined as used.
   bool isUsed() const;
-  /// Loads & compiles all the shaders contained by the program, links it and initializes its attributes & textures.
-  void updateShaders() const;
   /// Sends the program's attributes as uniforms.
   void sendAttributes() const;
   /// Removes an attribute given its uniform name.
@@ -287,13 +287,20 @@ public:
 protected:
   OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
 
-  using Attribute = std::variant<int, unsigned int, float,
-                                 Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f,
-                                 Mat2f, Mat3f, Mat4f,
-                                 std::vector<int>, std::vector<unsigned int>, std::vector<float>>;
+  struct Attribute {
+    int location = -1;
+    std::variant<int, unsigned int, float,
+                 Vec2i, Vec3i, Vec4i, Vec2u, Vec3u, Vec4u, Vec2f, Vec3f, Vec4f,
+                 Mat2f, Mat3f, Mat4f,
+                 std::vector<int>, std::vector<unsigned int>, std::vector<float>> value {};
+  };
   std::unordered_map<std::string, Attribute> m_attributes {};
 
   std::vector<std::pair<TexturePtr, std::string>> m_textures {};
+
+private:
+  /// Updates all attributes' uniform locations.
+  void updateAttributesLocations();
 };
 
 class RenderShaderProgram final : public ShaderProgram {

@@ -13,6 +13,9 @@ int main() {
 
     Raz::Window& window = render.getWindow();
 
+    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+    window.setCloseCallback([&app] () noexcept { app.quit(); });
+
     Raz::Entity& camera = world.addEntity();
     auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
     auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 10.f, 25.f));
@@ -58,9 +61,6 @@ int main() {
 
     Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
     light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -1.f, -1.f), 1.f, Raz::Vec3f(1.f));
-
-    render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
-    render.getWindow().setCloseCallback([&app] () noexcept { app.quit(); });
 
     app.run();
   } catch (const std::exception& exception) {

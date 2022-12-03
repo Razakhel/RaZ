@@ -94,13 +94,13 @@ void RenderSystem::updateLights() const {
 void RenderSystem::updateShaders() const {
   m_renderGraph.updateShaders();
 
-  for (const Entity* entity : m_entities) {
+  for (Entity* entity : m_entities) {
     if (!entity->hasComponent<MeshRenderer>())
       continue;
 
-    const auto& meshRenderer = entity->getComponent<MeshRenderer>();
+    auto& meshRenderer = entity->getComponent<MeshRenderer>();
 
-    for (const Material& material : meshRenderer.getMaterials())
+    for (Material& material : meshRenderer.getMaterials())
       material.getProgram().updateShaders();
 
     updateMaterials(meshRenderer);

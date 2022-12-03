@@ -9,8 +9,13 @@ int main() {
 
     auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
 
+    Raz::Window& window = render.getWindow();
+
+    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+    window.setCloseCallback([&app] () noexcept { app.quit(); });
+
     Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-    camera.addComponent<Raz::Camera>(render.getWindow().getWidth(), render.getWindow().getHeight());
+    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
     Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
     mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
@@ -20,9 +25,6 @@ int main() {
                                    -Raz::Axis::Z,               // Direction
                                    1.f,                         // Energy
                                    Raz::ColorPreset::White);    // Color
-
-    render.getWindow().addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
-    render.getWindow().setCloseCallback([&app] () noexcept { app.quit(); });
 
     app.run();
   } catch (const std::exception& exception) {

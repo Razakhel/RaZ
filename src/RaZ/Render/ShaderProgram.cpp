@@ -45,7 +45,7 @@ const Texture& ShaderProgram::getTexture(const std::string& uniformName) const {
   return *textureIt->first;
 }
 
-void ShaderProgram::setTexture(TexturePtr texture, std::string uniformName) {
+void ShaderProgram::setTexture(TexturePtr texture, const std::string& uniformName) {
   const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
     return (element.second == uniformName);
   });
@@ -53,12 +53,15 @@ void ShaderProgram::setTexture(TexturePtr texture, std::string uniformName) {
   if (textureIt != m_textures.end())
     textureIt->first = std::move(texture);
   else
-    m_textures.emplace_back(std::move(texture), std::move(uniformName));
+    m_textures.emplace_back(std::move(texture), uniformName);
 }
 
-void ShaderProgram::link() const {
+void ShaderProgram::link() {
   Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
+
   Renderer::linkProgram(m_index);
+  updateAttributesLocations();
+
   Logger::debug("[ShaderProgram] Linked");
 }
 
@@ -66,15 +69,7 @@ bool ShaderProgram::isLinked() const {
   return Renderer::isProgramLinked(m_index);
 }
 
-void ShaderProgram::use() const {
-  Renderer::useProgram(m_index);
-}
-
-bool ShaderProgram::isUsed() const {
-  return (Renderer::getCurrentProgram() == m_index);
-}
-
-void ShaderProgram::updateShaders() const {
+void ShaderProgram::updateShaders() {
   Logger::debug("[ShaderProgram] Updating shaders...");
 
   loadShaders();
@@ -86,14 +81,26 @@ void ShaderProgram::updateShaders() const {
   Logger::debug("[ShaderProgram] Updated shaders");
 }
 
+void ShaderProgram::use() const {
+  Renderer::useProgram(m_index);
+}
+
+bool ShaderProgram::isUsed() const {
+  return (Renderer::getCurrentProgram() == m_index);
+}
+
 void ShaderProgram::sendAttributes() const {
   if (m_attributes.empty())
     return;
 
   use();
 
-  for (const auto& [name, attrib] : m_attributes)
-    std::visit([this, &uniformName = name] (const auto& value) { sendUniform(uniformName, value); }, attrib);
+  for (const auto& [name, attrib] : m_attributes) {
+    if (attrib.location == -1)
+      continue;
+
+    std::visit([this, location = attrib.location] (const auto& value) { sendUniform(location, value); }, attrib.value);
+  }
 }
 
 void ShaderProgram::removeAttribute(const std::string& uniformName) {
@@ -246,6 +253,11 @@ ShaderProgram::~ShaderProgram() {
   Logger::debug("[ShaderProgram] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteProgram(m_index);
   Logger::debug("[ShaderProgram] Destroyed");
+}
+
+void ShaderProgram::updateAttributesLocations() {
+  for (auto& [name, attrib] : m_attributes)
+    attrib.location = recoverUniformLocation(name);
 }
 
 void RenderShaderProgram::setVertexShader(VertexShader&& vertShader) {

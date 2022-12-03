@@ -23,6 +23,9 @@ int main() {
 
     Raz::Window& window = render.getWindow();
 
+    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
+    window.setCloseCallback([&app] () noexcept { app.quit(); });
+
     Raz::Entity& camera = world.addEntity();
     auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
     auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
@@ -43,9 +46,6 @@ int main() {
                                                                                               1.f, Raz::Vec3f(0.f, 1.f, 1.f));
     auto& redLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -5.f, -1.f),
                                                                                              1.f, Raz::Vec3f(1.f, 0.f, 0.f));
-
-    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
-    window.setCloseCallback([&app] () noexcept { app.quit(); });
 
     ///////////
     // Bloom //

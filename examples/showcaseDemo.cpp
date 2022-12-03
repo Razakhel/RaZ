@@ -103,6 +103,9 @@ int main() {
     Raz::Window& window = render.getWindow();
     window.enableVerticalSync();
 
+    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
+    window.setCloseCallback([&app] () noexcept { app.quit(); });
+
     /////////////////
     // Mesh entity //
     /////////////////
@@ -184,9 +187,6 @@ int main() {
     window.setMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {
       cameraTrans.translate(0.f, 0.f, -0.5f * static_cast<float>(yOffset));
     });
-
-    window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) noexcept { app.quit(); });
-    window.setCloseCallback([&app] () noexcept { app.quit(); });
 
     //////////////////
     // Display help //
