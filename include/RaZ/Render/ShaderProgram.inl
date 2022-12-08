@@ -17,10 +17,12 @@ template <typename T>
 void ShaderProgram::setAttribute(T&& attribVal, const std::string& uniformName) {
   const auto attrIt = m_attributes.find(uniformName);
 
-  if (attrIt != m_attributes.end())
+  if (attrIt != m_attributes.end()) {
     attrIt->second.value = std::forward<T>(attribVal);
-  else
-    m_attributes.emplace(uniformName, Attribute{ recoverUniformLocation(uniformName), std::forward<T>(attribVal) });
+  } else {
+    const int locationIndex = (isLinked() ? recoverUniformLocation(uniformName) : -1);
+    m_attributes.emplace(uniformName, Attribute{ locationIndex, std::forward<T>(attribVal) });
+  }
 }
 
 } // namespace Raz

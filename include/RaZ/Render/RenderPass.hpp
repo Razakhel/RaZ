@@ -37,7 +37,7 @@ public:
   /// \return True if the render pass is valid, false otherwise.
   /// \see RenderGraph::isValid()
   bool isValid() const;
-  void addReadTexture(TexturePtr texture, std::string uniformName);
+  void addReadTexture(TexturePtr texture, const std::string& uniformName);
   void removeReadTexture(const Texture& texture) { m_program.removeTexture(texture); }
   void clearReadTextures() { m_program.clearTextures(); }
   /// Sets the write depth buffer texture.

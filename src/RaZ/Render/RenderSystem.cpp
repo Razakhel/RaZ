@@ -109,10 +109,11 @@ void RenderSystem::updateShaders() const {
 
 void RenderSystem::updateMaterials(const MeshRenderer& meshRenderer) const {
   for (const Material& material : meshRenderer.getMaterials()) {
-    material.getProgram().sendAttributes();
-    material.getProgram().initTextures();
-
     const RenderShaderProgram& materialProgram = material.getProgram();
+
+    materialProgram.sendAttributes();
+    materialProgram.initTextures();
+
     m_cameraUbo.bindUniformBlock(materialProgram, "uboCameraInfo", 0);
     m_lightsUbo.bindUniformBlock(materialProgram, "uboLightsInfo", 1);
     m_modelUbo.bindUniformBlock(materialProgram, "uboModelInfo", 2);

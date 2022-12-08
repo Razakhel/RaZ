@@ -29,8 +29,8 @@ bool RenderPass::isValid() const {
   return true;
 }
 
-void RenderPass::addReadTexture(TexturePtr texture, std::string uniformName) {
-  m_program.setTexture(std::move(texture), std::move(uniformName));
+void RenderPass::addReadTexture(TexturePtr texture, const std::string& uniformName) {
+  m_program.setTexture(std::move(texture), uniformName);
   m_program.initTextures();
 }
 

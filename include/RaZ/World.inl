@@ -4,7 +4,7 @@ namespace Raz {
 
 template <typename Sys, typename... Args>
 Sys& World::addSystem(Args&&... args) {
-  static_assert(std::is_base_of_v<System, Sys>, "Error: Added system must be derived from System.");
+  static_assert(std::is_base_of_v<System, Sys>, "Error: The added system must be derived from System.");
 
   const std::size_t sysId = System::getId<Sys>();
 
@@ -19,7 +19,7 @@ Sys& World::addSystem(Args&&... args) {
 
 template <typename Sys>
 bool World::hasSystem() const {
-  static_assert(std::is_base_of_v<System, Sys>, "Error: Checked system must be derived from System.");
+  static_assert(std::is_base_of_v<System, Sys>, "Error: The checked system must be derived from System.");
 
   const std::size_t sysId = System::getId<Sys>();
   return ((sysId < m_systems.size()) && m_systems[sysId]);
@@ -27,7 +27,7 @@ bool World::hasSystem() const {
 
 template <typename Sys>
 const Sys& World::getSystem() const {
-  static_assert(std::is_base_of_v<System, Sys>, "Error: Fetched system must be derived from System.");
+  static_assert(std::is_base_of_v<System, Sys>, "Error: The fetched system must be derived from System.");
 
   if (hasSystem<Sys>())
     return static_cast<const Sys&>(*m_systems[System::getId<Sys>()]);
@@ -37,7 +37,7 @@ const Sys& World::getSystem() const {
 
 template <typename Sys>
 void World::removeSystem() {
-  static_assert(std::is_base_of_v<System, Sys>, "Error: Removed system must be derived from System.");
+  static_assert(std::is_base_of_v<System, Sys>, "Error: The removed system must be derived from System.");
 
   if (hasSystem<Sys>())
     m_systems[System::getId<Sys>()].reset();

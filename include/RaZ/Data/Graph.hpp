@@ -88,7 +88,7 @@ protected:
 /// \tparam NodeT Type of the graph's nodes. Must be a type derived from GraphNode.
 template <typename NodeT>
 class Graph {
-  static_assert(std::is_base_of_v<GraphNode<NodeT>, NodeT>, "Error: Graph node type must be derived from GraphNode.");
+  static_assert(std::is_base_of_v<GraphNode<NodeT>, NodeT>, "Error: The graph node type must be derived from GraphNode.");
 
   using NodePtr = std::unique_ptr<NodeT>;
 

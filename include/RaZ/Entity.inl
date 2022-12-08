@@ -4,7 +4,7 @@ namespace Raz {
 
 template <typename Comp, typename... Args>
 Comp& Entity::addComponent(Args&&... args) {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: Added component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, Comp>, "Error: The added component must be derived from Component.");
 
   const std::size_t compId = Component::getId<Comp>();
 
@@ -19,21 +19,21 @@ Comp& Entity::addComponent(Args&&... args) {
 
 template <typename Comp>
 std::tuple<Comp&> Entity::addComponents() {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: Added component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, Comp>, "Error: The added component must be derived from Component.");
 
   return std::forward_as_tuple(addComponent<Comp>());
 }
 
 template <typename Comp1, typename Comp2, typename... C>
 std::tuple<Comp1&, Comp2&, C...> Entity::addComponents() {
-  static_assert(std::is_base_of_v<Component, Comp1>, "Error: Added component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, Comp1>, "Error: The added component must be derived from Component.");
 
   return std::tuple_cat(std::forward_as_tuple(addComponent<Comp1>()), addComponents<Comp2, C...>());
 }
 
 template <typename Comp>
 bool Entity::hasComponent() const {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: Checked component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, Comp>, "Error: The checked component must be derived from Component.");
 
   const std::size_t compId = Component::getId<Comp>();
   return ((compId < m_components.size()) && m_enabledComponents[compId]);
@@ -41,7 +41,7 @@ bool Entity::hasComponent() const {
 
 template <typename Comp>
 const Comp& Entity::getComponent() const {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: Fetched component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, Comp>, "Error: The fetched component must be derived from Component.");
 
   if (hasComponent<Comp>())
     return static_cast<const Comp&>(*m_components[Component::getId<Comp>()]);
@@ -51,7 +51,7 @@ const Comp& Entity::getComponent() const {
 
 template <typename Comp>
 void Entity::removeComponent() {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: Removed component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, Comp>, "Error: The removed component must be derived from Component.");
 
   if (hasComponent<Comp>()) {
     const std::size_t compId = Component::getId<Comp>();
