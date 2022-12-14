@@ -1,8 +1,9 @@
 #include "RaZ/Entity.hpp"
 #include "RaZ/World.hpp"
+#if defined(RAZ_USE_AUDIO)
 #include "RaZ/Audio/Sound.hpp"
-#include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/WavFormat.hpp"
+#endif
 #include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
@@ -172,6 +173,8 @@ void setupAddLight(const Raz::Transform& transform, Raz::World& world, Raz::Wind
   }, Raz::Input::ONCE);
 }
 
+#if defined(RAZ_USE_AUDIO)
+
 void setupSoundControls(const Raz::Sound& sound, Raz::Window& window) {
   // Toggling play/pause
   window.addKeyCallback(Raz::Keyboard::NUM0, [&sound] (float /* deltaTime */) noexcept {
@@ -192,6 +195,8 @@ void setupAddSound(const Raz::Transform& transform, const Raz::FilePath& soundPa
     newSound.addComponent<Raz::Transform>(transform.getPosition());
   }, Raz::Input::ONCE);
 }
+
+#endif // RAZ_USE_AUDIO
 
 void insertOverlayCameraControlsHelp(Raz::OverlayWindow& overlayWindow) {
   overlayWindow.addLabel("Press WASD to fly the camera around,");

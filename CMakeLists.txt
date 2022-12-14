@@ -273,29 +273,48 @@ endif ()
 # RaZ - OpenAL #
 ################
 
-find_package(OpenAL REQUIRED)
+find_package(OpenAL)
+option(RAZ_USE_AUDIO "Enable audio capabilities (requires OpenAL to be installed)" ${OpenAL_FOUND})
 
-target_include_directories(RaZ SYSTEM PUBLIC ${OPENAL_INCLUDE_DIRS})
-target_link_libraries(RaZ PUBLIC ${OPENAL_LIBS})
+if (RAZ_USE_AUDIO)
+    if (NOT OpenAL_FOUND)
+        message(SEND_ERROR "Audio required but OpenAL not found; please review its location")
+    endif ()
+
+    target_include_directories(RaZ SYSTEM PRIVATE ${OPENAL_INCLUDE_DIRS})
+    target_link_libraries(RaZ PRIVATE ${OPENAL_LIBS})
+    target_compile_definitions(RaZ PUBLIC RAZ_USE_AUDIO)
+else ()
+    file(
+        GLOB
+        RAZ_AUDIO_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Audio/*"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Data/WavLoad.cpp"
+
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Audio/*"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Data/WavFormat.hpp"
+    )
+
+    list(REMOVE_ITEM RAZ_FILES ${RAZ_AUDIO_FILES})
+endif ()
 
 #########################
 # RaZ - FBX file format #
 #########################
 
-if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_GCC AND NOT MINGW) # FBX SDK unavailable for MinGW, which is considered as GCC
-    option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" OFF)
+if (RAZ_COMPILER_MSVC OR (RAZ_COMPILER_GCC AND NOT MINGW)) # FBX SDK unavailable for MinGW, which is considered as GCC
+    find_package(FBX)
+    option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" ${FBX_FOUND})
 
     if (RAZ_USE_FBX)
-        find_package(FBX)
-
-        if (FBX_FOUND)
-            set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} "${FBX_LIBS}")
-
-            target_compile_definitions(RaZ PUBLIC ${FBX_DEFINITIONS})
-            target_include_directories(RaZ SYSTEM PUBLIC "${FBX_INCLUDE_DIRS}")
-
-            message(STATUS "[RaZ] FBX SDK linked")
+        if (NOT FBX_FOUND)
+            message(SEND_ERROR "FBX required but SDK not found; please review its location")
         endif ()
+
+        target_include_directories(RaZ SYSTEM PRIVATE ${FBX_INCLUDE_DIRS})
+        target_link_libraries(RaZ PRIVATE ${FBX_LIBS})
+        target_compile_definitions(RaZ PUBLIC RAZ_USE_FBX ${FBX_DEFINITIONS})
     endif ()
 endif ()
 
@@ -418,9 +437,11 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ" DESTINATION include)
 
 # Installing DLL files into the bin/ folder
 if (RAZ_COMPILER_MSVC)
-    install(FILES "${OPENAL_DLL}" RENAME "OpenAL32.dll" DESTINATION "bin/$<CONFIG>")
+    if (RAZ_USE_AUDIO)
+        install(FILES "${OPENAL_DLL}" RENAME "OpenAL32.dll" DESTINATION "bin/$<CONFIG>")
+    endif ()
 
-    if (RAZ_USE_FBX AND FBX_FOUND)
+    if (RAZ_USE_FBX)
         install(FILES "${FBX_DLL}" DESTINATION "bin/$<CONFIG>")
     endif ()
 endif ()

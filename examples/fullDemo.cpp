@@ -132,6 +132,7 @@ int main() {
     // Audio //
     ///////////
 
+#if defined(RAZ_USE_AUDIO)
     auto& audio = world.addSystem<Raz::AudioSystem>();
 
     auto& meshSound = mesh.addComponent<Raz::Sound>(Raz::WavFormat::load(RAZ_ROOT "assets/sounds/wave_seagulls.wav"));
@@ -146,6 +147,7 @@ int main() {
 
     DemoUtils::setupSoundControls(meshSound, window);
     DemoUtils::setupAddSound(cameraTrans, RAZ_ROOT "assets/sounds/wave_seagulls.wav", world, window);
+#endif // RAZ_USE_AUDIO
 
     /////////////
     // Overlay //
@@ -165,7 +167,9 @@ int main() {
 
     overlay.addSeparator();
 
+#if defined(RAZ_USE_AUDIO)
     overlay.addSlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 0.f);
+#endif // RAZ_USE_AUDIO
 
     overlay.addSlider("Blur strength",
                       [&boxBlur] (float value) { boxBlur.setStrength(static_cast<unsigned int>(value)); },
@@ -183,19 +187,19 @@ int main() {
 
     overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 200, 200);
 
-#if !defined(USE_OPENGL_ES)
+#if !defined(USE_OPENGL_ES) // GPU timing capabilities are not available with OpenGL ES
     overlay.addSeparator();
 
     Raz::OverlayPlot& plot = overlay.addPlot("Profiler", 100, {}, "Time (ms)");
     Raz::OverlayPlotEntry& geomPlot     = plot.addEntry("Geometry");
     Raz::OverlayPlotEntry& blurPlot     = plot.addEntry("Blur");
     Raz::OverlayPlotEntry& vignettePlot = plot.addEntry("Vignette");
-#endif
+#endif // USE_OPENGL_ES
 
     overlay.addSeparator();
 
     DemoUtils::insertOverlayFrameSpeed(overlay);
-#endif
+#endif // RAZ_NO_OVERLAY
 
     //////////////////////////
     // Starting application //

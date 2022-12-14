@@ -61,7 +61,6 @@ set(
     src/*.cpp
     src/RaZ/*.cpp
     src/RaZ/Animation/*.cpp
-    src/RaZ/Audio/*.cpp
     src/RaZ/Data/*.cpp
     src/RaZ/Math/*.cpp
     src/RaZ/Physics/*.cpp
@@ -70,6 +69,10 @@ set(
 
     include/*.hpp
 )
+
+if (RAZ_USE_AUDIO)
+    list(APPEND RAZ_TESTS_SRC src/RaZ/Audio/*.cpp)
+endif ()
 
 file(
     GLOB

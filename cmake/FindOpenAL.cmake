@@ -1,11 +1,13 @@
-######################
-# Finding OpenAL SDK #
-######################
+##################
+# Finding OpenAL #
+##################
 
 if (WIN32 OR CYGWIN)
+    set(OPENAL_ROOT_DIR "" CACHE PATH "Path to your OpenAL root directory")
+
     # If a directory is manually specified, use it to search for the needed files; otherwise, an attempt to find it is made
-    if (OPENAL_SDK_ROOT)
-        set(OPENAL_SEARCH_PATHS ${OPENAL_SDK_ROOT})
+    if (OPENAL_ROOT_DIR)
+        set(OPENAL_SEARCH_PATHS ${OPENAL_ROOT_DIR})
     else ()
         if (WIN32)
             file(
@@ -46,7 +48,6 @@ if (WIN32 OR CYGWIN)
             ${OPENAL_SEARCH_PATHS}
         PATH_SUFFIXES
             lib64 lib libs64 libs libs/Win64
-        REQUIRED
     )
 
     if (WIN32)
@@ -105,14 +106,15 @@ find_path(
         ${OPENAL_SEARCH_PATHS}
     PATH_SUFFIXES
         include/AL include/OpenAL include AL OpenAL
-    REQUIRED
 )
 
-set(OpenAL_FOUND ON)
+if (OPENAL_LIBS AND OPENAL_INCLUDE_DIRS)
+    set(OpenAL_FOUND ON)
 
-message("[OpenAL] Found:")
-message("  - Include directory: ${OPENAL_INCLUDE_DIRS}")
-message("  - Library: ${OPENAL_LIBS}")
-if (WIN32)
-    message("  - DLL: ${OPENAL_DLL}")
+    message("[OpenAL] Found:")
+    message("  - Include directory: ${OPENAL_INCLUDE_DIRS}")
+    message("  - Library: ${OPENAL_LIBS}")
+    if (WIN32)
+        message("  - DLL: ${OPENAL_DLL}")
+    endif ()
 endif ()

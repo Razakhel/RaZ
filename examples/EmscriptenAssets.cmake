@@ -282,20 +282,22 @@ target_link_options(
 # Assets - SoundDemo #
 ######################
 
-set(
-    RaZ_SoundDemo_ASSETS
+if (RAZ_USE_AUDIO)
+    set(
+        RaZ_SoundDemo_ASSETS
 
-    assets/sounds/wave_seagulls.wav
-)
+        assets/sounds/wave_seagulls.wav
+    )
 
-foreach (ASSET_PATH ${RaZ_SoundDemo_ASSETS})
-    target_link_options(RaZ_SoundDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
-endforeach ()
+    foreach (ASSET_PATH ${RaZ_SoundDemo_ASSETS})
+        target_link_options(RaZ_SoundDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+    endforeach ()
 
-target_link_options(
-    RaZ_SoundDemo
+    target_link_options(
+        RaZ_SoundDemo
 
-    PRIVATE
+        PRIVATE
 
-    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
-)
+        "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+    )
+endif ()
