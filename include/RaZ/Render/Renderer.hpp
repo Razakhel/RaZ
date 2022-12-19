@@ -772,6 +772,21 @@ enum class RegionBarrierType : unsigned int {
 };
 MAKE_ENUM_FLAG(RegionBarrierType)
 
+enum class QueryType : unsigned int {
+#if !defined(USE_OPENGL_ES)
+  SAMPLES                       = 35092 /* GL_SAMPLES_PASSED                        */, ///<
+#endif
+  ANY_SAMPLES                   = 35887 /* GL_ANY_SAMPLES_PASSED                    */, ///<
+  ANY_SAMPLES_CONSERVATIVE      = 36202 /* GL_ANY_SAMPLES_PASSED_CONSERVATIVE       */, ///<
+#if !defined(USE_OPENGL_ES)
+  PRIMITIVES                    = 35975 /* GL_PRIMITIVES_GENERATED                  */, ///<
+#endif
+  TRANSFORM_FEEDBACK_PRIMITIVES = 35976 /* GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN */, ///<
+#if !defined(USE_OPENGL_ES)
+  TIME_ELAPSED                  = 35007 /* GL_TIME_ELAPSED                          */  ///<
+#endif
+};
+
 enum class RenderObjectType : unsigned int {
   BUFFER             = 33504                                                   /* GL_BUFFER             */, ///<
   TEXTURE            = 5890                                                    /* GL_TEXTURE            */, ///<
@@ -1249,6 +1264,16 @@ public:
   /// \note Requires OpenGL 4.5+ or ES 3.1+.
   /// \param type Type of the barrier to be set.
   static void setMemoryBarrierByRegion(RegionBarrierType type);
+  static void generateQueries(unsigned int count, unsigned int* indices);
+  static void generateQuery(unsigned int& index) { generateQueries(1, &index); }
+  static void beginQuery(QueryType type, unsigned int index);
+  static void endQuery(QueryType type);
+#if !defined (USE_OPENGL_ES)
+  static void recoverQueryResult(unsigned int index, int64_t& result);
+  static void recoverQueryResult(unsigned int index, uint64_t& result);
+#endif
+  static void deleteQueries(unsigned int count, unsigned int* indices);
+  static void deleteQuery(unsigned int& index) { deleteQueries(1, &index); }
 #if !defined (USE_OPENGL_ES)
   /// Assigns a label to a graphic object.
   /// \note Requires OpenGL 4.3+.

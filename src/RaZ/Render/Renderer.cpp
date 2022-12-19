@@ -1429,6 +1429,56 @@ void Renderer::setMemoryBarrierByRegion(RegionBarrierType type) {
   printConditionalErrors();
 }
 
+void Renderer::generateQueries(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenQueries(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
+void Renderer::beginQuery(QueryType type, unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBeginQuery(static_cast<unsigned int>(type), index);
+
+  printConditionalErrors();
+}
+
+void Renderer::endQuery(QueryType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glEndQuery(static_cast<unsigned int>(type));
+
+  printConditionalErrors();
+}
+
+#if !defined(USE_OPENGL_ES)
+void Renderer::recoverQueryResult(unsigned int index, int64_t& result) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetQueryObjecti64v(index, GL_QUERY_RESULT, &result);
+
+  printConditionalErrors();
+}
+
+void Renderer::recoverQueryResult(unsigned int index, uint64_t& result) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetQueryObjectui64v(index, GL_QUERY_RESULT, &result);
+
+  printConditionalErrors();
+}
+#endif
+
+void Renderer::deleteQueries(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteQueries(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
 #if !defined(USE_OPENGL_ES)
 void Renderer::setLabel(RenderObjectType type, unsigned int objectIndex, const char* label) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
