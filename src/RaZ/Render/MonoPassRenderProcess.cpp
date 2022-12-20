@@ -41,6 +41,10 @@ void MonoPassRenderProcess::addChild(RenderProcess& childProcess) {
   childProcess.addParent(m_pass);
 }
 
+float MonoPassRenderProcess::recoverElapsedTime() const {
+  return m_pass.recoverElapsedTime();
+}
+
 void MonoPassRenderProcess::setInputBuffer(Texture2DPtr inputBuffer, const std::string& uniformName) {
   m_pass.addReadTexture(std::move(inputBuffer), uniformName);
 }

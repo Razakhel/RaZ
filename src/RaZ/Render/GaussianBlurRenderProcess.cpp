@@ -98,6 +98,10 @@ void GaussianBlurRenderProcess::resizeBuffers(unsigned int width, unsigned int h
   m_verticalPass->getProgram().sendAttributes();
 }
 
+float GaussianBlurRenderProcess::recoverElapsedTime() const {
+  return m_horizontalPass->recoverElapsedTime() + m_verticalPass->recoverElapsedTime();
+}
+
 void GaussianBlurRenderProcess::setInputBuffer(Texture2DPtr inputBuffer) {
   m_horizontalBuffer->setColorspace(inputBuffer->getColorspace(), inputBuffer->getDataType());
   resizeBuffers(inputBuffer->getWidth(), inputBuffer->getHeight());

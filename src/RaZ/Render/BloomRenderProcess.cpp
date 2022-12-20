@@ -330,6 +330,18 @@ void BloomRenderProcess::resizeBuffers(unsigned int width, unsigned int height) 
   }
 }
 
+float BloomRenderProcess::recoverElapsedTime() const {
+  float time = m_thresholdPass->recoverElapsedTime() + m_finalPass->recoverElapsedTime();
+
+  for (const RenderPass* pass : m_downscalePasses)
+    time += pass->recoverElapsedTime();
+
+  for (const RenderPass* pass : m_upscalePasses)
+    time += pass->recoverElapsedTime();
+
+  return time;
+}
+
 void BloomRenderProcess::setInputColorBuffer(Texture2DPtr colorBuffer) {
   resizeBuffers(colorBuffer->getWidth(), colorBuffer->getHeight());
 

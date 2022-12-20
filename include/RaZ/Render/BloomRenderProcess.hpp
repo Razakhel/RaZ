@@ -32,6 +32,7 @@ public:
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
   void resizeBuffers(unsigned int width, unsigned int height) override;
+  float recoverElapsedTime() const override;
   void setInputColorBuffer(Texture2DPtr colorBuffer);
   void setOutputBuffer(Texture2DPtr outputBuffer);
   void setThresholdValue(float threshold);

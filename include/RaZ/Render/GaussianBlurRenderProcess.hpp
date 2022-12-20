@@ -21,6 +21,7 @@ public:
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
   void resizeBuffers(unsigned int width, unsigned int height) override;
+  float recoverElapsedTime() const override;
   void setInputBuffer(Texture2DPtr inputBuffer);
   void setOutputBuffer(Texture2DPtr outputBuffer);
 

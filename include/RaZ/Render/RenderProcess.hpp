@@ -27,6 +27,10 @@ public:
   virtual void addChild(RenderPass& childPass) = 0;
   virtual void addChild(RenderProcess& childProcess) = 0;
   virtual void resizeBuffers([[maybe_unused]] unsigned int width, [[maybe_unused]] unsigned int height) {}
+  /// Recovers the elapsed time (in milliseconds) of the process' execution.
+  /// \note This action is not available with OpenGL ES and will always return 0.
+  /// \return Time taken to execute the process.
+  virtual float recoverElapsedTime() const { return 0.f; }
 
   virtual ~RenderProcess() = default;
 

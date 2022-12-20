@@ -22,6 +22,7 @@ public:
   void addParent(RenderProcess& parentProcess) override;
   void addChild(RenderPass& childPass) override;
   void addChild(RenderProcess& childProcess) override;
+  float recoverElapsedTime() const override;
 
 protected:
   void setInputBuffer(Texture2DPtr inputBuffer, const std::string& uniformName);
