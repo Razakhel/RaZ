@@ -26,9 +26,8 @@ int main() {
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
-    Raz::Entity& camera = world.addEntity();
-    auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-    auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
+    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
     DemoUtils::setupCameraControls(camera, window);
 
@@ -125,7 +124,7 @@ int main() {
     overlay.addSeparator();
 
     overlay.addLabel("Thresholded color");
-    overlay.addTexture(bloom.getThresholdPass().getFramebuffer().getColorBuffer(0), window.getWidth() / 5, window.getHeight() / 5);
+    overlay.addTexture(bloom.getThresholdPass().getFramebuffer().getColorBuffer(0), window.getWidth() / 7, window.getHeight() / 7);
 
     overlay.addSeparator();
 
@@ -148,8 +147,8 @@ int main() {
 
         downscaleTexture.enable();
         downscaleTexture.setTexture(bloom.getDownscaleBuffer(newIndex - 1),
-                                    window.getWidth() / static_cast<unsigned int>(5 * newIndex),
-                                    window.getHeight() / static_cast<unsigned int>(5 * newIndex));
+                                    window.getWidth() / static_cast<unsigned int>(7 * newIndex),
+                                    window.getHeight() / static_cast<unsigned int>(7 * newIndex));
       });
     }
 
@@ -172,10 +171,18 @@ int main() {
 
         upscaleTexture.enable();
         upscaleTexture.setTexture(bloom.getUpscaleBuffer(newIndex - 1),
-                                  window.getWidth() / static_cast<unsigned int>(5 * (bloom.getUpscaleBufferCount() - newIndex + 1)),
-                                  window.getHeight() / static_cast<unsigned int>(5 * (bloom.getUpscaleBufferCount() - newIndex + 1)));
+                                  window.getWidth() / static_cast<unsigned int>(7 * (bloom.getUpscaleBufferCount() - newIndex + 1)),
+                                  window.getHeight() / static_cast<unsigned int>(7 * (bloom.getUpscaleBufferCount() - newIndex + 1)));
       });
     }
+
+#if !defined(USE_OPENGL_ES)
+    overlay.addSeparator();
+
+    Raz::OverlayPlot& plot = overlay.addPlot({}, 100, {}, "Time (ms)");
+    Raz::OverlayPlotEntry& geomPlot  = plot.addEntry("Geometry");
+    Raz::OverlayPlotEntry& bloomPlot = plot.addEntry("Bloom");
+#endif
 
     overlay.addSeparator();
 
@@ -187,6 +194,11 @@ int main() {
 
     app.run([&] (float deltaTime) {
       meshTrans.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
+
+#if !defined(USE_OPENGL_ES)
+      geomPlot.push(geometryPass.recoverElapsedTime());
+      bloomPlot.push(bloom.recoverElapsedTime());
+#endif
     });
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occured: "s + exception.what());

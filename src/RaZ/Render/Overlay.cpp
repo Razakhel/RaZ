@@ -3,6 +3,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 #include "imgui/misc/cpp/imgui_stdlib.h"
+#include "implot/implot.h"
 #include "RaZ/Render/Overlay.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
@@ -19,6 +20,8 @@ void Overlay::initialize(GLFWwindow* windowHandle) const {
   IMGUI_CHECKVERSION();
 
   ImGui::CreateContext();
+  ImPlot::CreateContext();
+
   ImGui::StyleColorsDark();
 
   ImGui_ImplGlfw_InitForOpenGL(windowHandle, false);
@@ -75,6 +78,7 @@ void Overlay::destroy() const {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
 
+  ImPlot::DestroyContext();
   ImGui::DestroyContext();
 
   Logger::debug("[Overlay] Destroyed");
@@ -113,6 +117,10 @@ void OverlayTexture::setTexture(const Texture2D& texture, unsigned int maxWidth,
 
 void OverlayTexture::setTexture(const Texture2D& texture) noexcept {
   setTexture(texture, texture.getWidth(), texture.getHeight());
+}
+
+OverlayPlotEntry& OverlayPlot::addEntry(std::string name, OverlayPlotType type) {
+  return *m_entries.emplace_back(std::make_unique<OverlayPlotEntry>(OverlayPlotEntry(std::move(name), type, m_maxValCount)));
 }
 
 OverlayWindow::OverlayWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) noexcept
@@ -180,6 +188,11 @@ OverlayTexture& OverlayWindow::addTexture(const Texture2D& texture) {
 
 OverlayProgressBar& OverlayWindow::addProgressBar(int minVal, int maxVal, bool showValues) {
   return static_cast<OverlayProgressBar&>(*m_elements.emplace_back(std::make_unique<OverlayProgressBar>(minVal, maxVal, showValues)));
+}
+
+OverlayPlot& OverlayWindow::addPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel, std::string yAxisLabel) {
+  return static_cast<OverlayPlot&>(*m_elements.emplace_back(std::make_unique<OverlayPlot>(std::move(label), maxValCount,
+                                                                                          std::move(xAxisLabel), std::move(yAxisLabel))));
 }
 
 OverlaySeparator& OverlayWindow::addSeparator() {
@@ -350,6 +363,31 @@ void OverlayWindow::render() const {
         ImGui::ProgressBar(static_cast<float>(progressBar.m_minVal + progressBar.m_curVal) / static_cast<float>(progressBar.m_maxVal),
                            ImVec2(-1.f, 0.f),
                            (text.empty() ? nullptr : text.c_str()));
+
+        break;
+      }
+
+      case OverlayElementType::PLOT:
+      {
+        auto& plot = static_cast<OverlayPlot&>(*element);
+
+        if (ImPlot::BeginPlot(plot.m_label.c_str(), ImVec2(-1, 200), ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect)) {
+          ImPlot::SetupAxes(plot.m_xAxisLabel.c_str(), plot.m_yAxisLabel.c_str(), ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_LockMin);
+          ImPlot::SetupAxisLimitsConstraints(ImAxis_X1, 0.0, static_cast<double>(plot.m_maxValCount - 1));
+          ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 100.0, ImPlotCond_Once);
+          ImPlot::SetupMouseText(ImPlotLocation_NorthEast);
+
+          for (const std::unique_ptr<OverlayPlotEntry>& entry : plot.m_entries) {
+            if (entry->m_type == OverlayPlotType::SHADED) {
+              ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL, 0.5f);
+              ImPlot::PlotShaded(entry->m_name.c_str(), entry->m_values.data(), static_cast<int>(entry->m_values.size()));
+            } else {
+              ImPlot::PlotLine(entry->m_name.c_str(), entry->m_values.data(), static_cast<int>(entry->m_values.size()));
+            }
+          }
+
+          ImPlot::EndPlot();
+        }
 
         break;
       }

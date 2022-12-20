@@ -28,9 +28,15 @@ enum class OverlayElementType {
   DROPDOWN,
   TEXTURE,
   PROGRESS_BAR,
+  PLOT,
   SEPARATOR,
   FRAME_TIME,
   FPS_COUNTER
+};
+
+enum class OverlayPlotType {
+  LINE,
+  SHADED
 };
 
 /// Overlay class, used to render GUI elements (labels, buttons, checkboxes, ...) into a Window.
@@ -271,6 +277,43 @@ private:
   bool m_showValues {};
 };
 
+class OverlayPlotEntry {
+  friend class OverlayPlot;
+  friend OverlayWindow;
+
+public:
+  void push(float value) {
+    m_values.erase(m_values.begin());
+    m_values.emplace_back(value);
+  }
+
+private:
+  OverlayPlotEntry(std::string name, OverlayPlotType type, std::size_t maxValCount)
+    : m_name{ std::move(name) }, m_type{ type }, m_values(maxValCount) {}
+
+  std::string m_name {};
+  OverlayPlotType m_type {};
+  std::vector<float> m_values {};
+};
+
+class OverlayPlot final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel = {}, std::string yAxisLabel = {})
+    : OverlayElement(std::move(label)), m_maxValCount{ maxValCount }, m_xAxisLabel{ std::move(xAxisLabel) }, m_yAxisLabel{ std::move(yAxisLabel) } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::PLOT; }
+
+  OverlayPlotEntry& addEntry(std::string name, OverlayPlotType type = OverlayPlotType::LINE);
+
+private:
+  std::vector<std::unique_ptr<OverlayPlotEntry>> m_entries {};
+  std::size_t m_maxValCount {};
+  std::string m_xAxisLabel {};
+  std::string m_yAxisLabel {};
+};
+
 class OverlaySeparator final : public OverlayElement {
 public:
   OverlayElementType getType() const override { return OverlayElementType::SEPARATOR; }
@@ -382,6 +425,13 @@ public:
   /// \param showValues Show values ("<current>/<maximum>") instead of percentage.
   /// \return Reference to the newly added progress bar.
   [[nodiscard]] OverlayProgressBar& addProgressBar(int minVal, int maxVal, bool showValues = false);
+  /// Adds a plot on the overlay window.
+  /// \param label Text to be displayed beside the plot.
+  /// \param maxValCount Maximum number of values to plot.
+  /// \param xAxisLabel Label to be displayed on the X axis.
+  /// \param yAxisLabel Label to be displayed on the Y axis.
+  /// \return Reference to the newly added plot.
+  [[nodiscard]] OverlayPlot& addPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel = {}, std::string yAxisLabel = {});
   /// Adds an horizontal separator on the overlay window.
   /// \return Reference to the newly added separator.
   OverlaySeparator& addSeparator();

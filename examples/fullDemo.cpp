@@ -164,7 +164,15 @@ int main() {
 
     overlay.addSeparator();
 
-    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 256, 256);
+    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 200, 200);
+
+#if !defined(USE_OPENGL_ES)
+    overlay.addSeparator();
+
+    Raz::OverlayPlot& plot = overlay.addPlot("Profiler", 100, {}, "Time (ms)");
+    Raz::OverlayPlotEntry& geomPlot = plot.addEntry("Geometry");
+    Raz::OverlayPlotEntry& blurPlot = plot.addEntry("Blur");
+#endif
 
     overlay.addSeparator();
 
@@ -175,7 +183,14 @@ int main() {
     // Starting application //
     //////////////////////////
 
+#if !defined(USE_OPENGL_ES)
+    app.run([&] (float) {
+      geomPlot.push(geometryPass.recoverElapsedTime());
+      blurPlot.push(boxBlur.recoverElapsedTime());
+    });
+#else
     app.run();
+#endif
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occured: "s + exception.what());
   }
