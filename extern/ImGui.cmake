@@ -26,6 +26,8 @@ set(
     ${IMGUI_SRC}
     imgui/*.h
     imgui/misc/cpp/*.cpp
+    implot/*.h
+    implot/*.cpp
 )
 
 file(
@@ -55,11 +57,7 @@ target_include_directories(
     PUBLIC
 
     ${CMAKE_CURRENT_SOURCE_DIR}
-
-    PRIVATE
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/imgui # Needed for imgui_stdlib.cpp
-    glew/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/imgui # Needed for imgui_stdlib.cpp & implot.h
 )
 
 # Disabling all compilers warnings
