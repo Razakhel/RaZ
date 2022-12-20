@@ -38,9 +38,13 @@ void RenderPass::execute() const {
   if (!m_enabled)
     return;
 
-#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+#if !defined(USE_OPENGL_ES)
+  m_timer.start();
+
+#if defined(RAZ_CONFIG_DEBUG)
   if (Renderer::checkVersion(4, 3) && !m_name.empty())
     Renderer::pushDebugGroup(m_name);
+#endif
 #endif
 
   // Binding the program's textures marks it as used
@@ -51,9 +55,13 @@ void RenderPass::execute() const {
   m_writeFramebuffer.display();
   m_writeFramebuffer.unbind();
 
-#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+#if !defined(USE_OPENGL_ES)
+  m_timer.stop();
+
+#if defined(RAZ_CONFIG_DEBUG)
   if (Renderer::checkVersion(4, 3) && !m_name.empty())
     Renderer::popDebugGroup();
+#endif
 #endif
 }
 

@@ -5,12 +5,17 @@
 
 #include "RaZ/Data/Graph.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
+#if !defined(USE_OPENGL_ES)
+#include "RaZ/Render/RenderTimer.hpp"
+#endif
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Texture.hpp"
 
 namespace Raz {
 
-class RenderPass : public GraphNode<RenderPass> {
+class RenderPass final : public GraphNode<RenderPass> {
+  friend class RenderGraph;
+
 public:
   RenderPass() = default;
   RenderPass(VertexShader&& vertShader, FragmentShader&& fragShader, std::string passName = {}) noexcept
@@ -29,6 +34,16 @@ public:
   bool hasReadTexture(const std::string& uniformName) const noexcept { return m_program.hasTexture(uniformName); }
   const Texture& getReadTexture(const std::string& uniformName) const noexcept { return m_program.getTexture(uniformName); }
   const Framebuffer& getFramebuffer() const { return m_writeFramebuffer; }
+  /// Recovers the elapsed time (in milliseconds) of the pass' execution.
+  /// \note This action is not available with OpenGL ES and will always return 0.
+  /// \return Time taken to execute the pass.
+  float recoverElapsedTime() const noexcept {
+#if !defined(USE_OPENGL_ES)
+    return m_timer.recoverTime();
+#else
+    return 0.f;
+#endif
+  }
 
   void setName(std::string name) noexcept { m_name = std::move(name); }
   void setProgram(RenderShaderProgram&& program) { m_program = std::move(program); }
@@ -66,11 +81,15 @@ public:
 
   ~RenderPass() override = default;
 
-protected:
+private:
   bool m_enabled = true;
   std::string m_name {};
   RenderShaderProgram m_program {};
   Framebuffer m_writeFramebuffer {};
+
+#if !defined(USE_OPENGL_ES)
+  RenderTimer m_timer {};
+#endif
 };
 
 } // namespace Raz

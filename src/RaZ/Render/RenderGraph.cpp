@@ -35,11 +35,15 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
 
   Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
 
-  const Framebuffer& geometryFramebuffer = m_geometryPass.getFramebuffer();
+  const Framebuffer& geometryFramebuffer = m_geometryPass.m_writeFramebuffer;
 
-#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+#if !defined(USE_OPENGL_ES)
+  m_geometryPass.m_timer.start();
+
+#if defined(RAZ_CONFIG_DEBUG)
   if (Renderer::checkVersion(4, 3))
     Renderer::pushDebugGroup("Geometry pass");
+#endif
 #endif
 
   if (!geometryFramebuffer.isEmpty())
@@ -89,9 +93,13 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
 
   geometryFramebuffer.unbind();
 
-#if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
+#if !defined(USE_OPENGL_ES)
+  m_geometryPass.m_timer.stop();
+
+#if defined(RAZ_CONFIG_DEBUG)
   if (Renderer::checkVersion(4, 3))
     Renderer::popDebugGroup();
+#endif
 #endif
 
   m_executedPasses.reserve(m_nodes.size() + 1);
@@ -107,7 +115,7 @@ void RenderGraph::execute(const RenderPass& renderPass) {
   if (m_executedPasses.find(&renderPass) != m_executedPasses.cend())
     return;
 
-  for (const RenderPass* parentPass : renderPass.getParents())
+  for (const RenderPass* parentPass : renderPass.m_parents)
     execute(*parentPass);
 
   renderPass.execute();
