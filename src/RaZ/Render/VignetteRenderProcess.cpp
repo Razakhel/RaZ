@@ -1,0 +1,51 @@
+#include "RaZ/Data/Color.hpp"
+#include "RaZ/Render/VignetteRenderProcess.hpp"
+#include "RaZ/Render/RenderPass.hpp"
+
+#include <string_view>
+
+namespace Raz {
+
+namespace {
+
+constexpr std::string_view vignetteSource = {
+#include "vignette.frag.embed"
+};
+
+} // namespace
+
+VignetteRenderProcess::VignetteRenderProcess(RenderGraph& renderGraph)
+  : MonoPassRenderProcess(renderGraph, FragmentShader::loadFromSource(vignetteSource), "Vignette") {
+  setStrength(0.25f);
+  setOpacity(1.f);
+  setColor(Raz::ColorPreset::Black);
+}
+
+void VignetteRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
+  const float frameRatio(static_cast<float>(colorBuffer->getWidth()) / static_cast<float>(colorBuffer->getHeight()));
+  m_pass.getProgram().setAttribute(frameRatio, "uniFrameRatio");
+  m_pass.getProgram().sendAttributes();
+
+  MonoPassRenderProcess::setInputBuffer(std::move(colorBuffer), "uniBuffer");
+}
+
+void VignetteRenderProcess::setOutputBuffer(Texture2DPtr colorBuffer) {
+  MonoPassRenderProcess::setOutputBuffer(std::move(colorBuffer), 0);
+}
+
+void VignetteRenderProcess::setStrength(float strength) const {
+  m_pass.getProgram().setAttribute(strength, "uniStrength");
+  m_pass.getProgram().sendAttributes();
+}
+
+void VignetteRenderProcess::setOpacity(float opacity) const {
+  m_pass.getProgram().setAttribute(opacity, "uniOpacity");
+  m_pass.getProgram().sendAttributes();
+}
+
+void VignetteRenderProcess::setColor(const Color& color) const {
+  m_pass.getProgram().setAttribute(color, "uniColor");
+  m_pass.getProgram().sendAttributes();
+}
+
+} // namespace Raz

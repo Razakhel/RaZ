@@ -48,15 +48,16 @@ int main() {
     // Quitting the application when the close button is clicked
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
-    ///////////////
-    // Blur pass //
-    ///////////////
+    //////////////////
+    // Post effects //
+    //////////////////
 
     Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
     Raz::RenderPass& geometryPass = renderSystem.getGeometryPass();
 
-    const auto depthBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
-    const auto colorBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto depthBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto blurredBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
@@ -72,7 +73,14 @@ int main() {
 
     auto& boxBlur = renderGraph.addRenderProcess<Raz::BoxBlurRenderProcess>();
     boxBlur.setInputBuffer(colorBuffer);
+    boxBlur.setOutputBuffer(blurredBuffer);
     boxBlur.addParent(geometryPass);
+
+    // Vignette
+
+    auto& vignette = renderGraph.addRenderProcess<Raz::VignetteRenderProcess>();
+    vignette.setInputBuffer(blurredBuffer);
+    vignette.addParent(boxBlur);
 
     ////////////
     // Camera //
@@ -144,7 +152,8 @@ int main() {
     /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Full demo", Raz::Vec2f(window.getWidth() / 4, window.getHeight()));
+    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Full demo",
+                                                                Raz::Vec2f(static_cast<float>(window.getWidth()) / 3.25f, window.getHeight()));
 
     DemoUtils::insertOverlayCameraControlsHelp(overlay);
     overlay.addLabel("Press F11 to toggle fullscreen.");
@@ -162,6 +171,14 @@ int main() {
                       [&boxBlur] (float value) { boxBlur.setStrength(static_cast<unsigned int>(value)); },
                       1.f, 16.f, 1.f);
 
+    overlay.addSlider("Vignette strength",
+                      [&vignette] (float value) { vignette.setStrength(value); },
+                      0.f, 1.f, 0.25f);
+
+    overlay.addSlider("Vignette opacity",
+                      [&vignette] (float value) { vignette.setOpacity(value); },
+                      0.f, 1.f, 1.f);
+
     overlay.addSeparator();
 
     overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 200, 200);
@@ -170,8 +187,9 @@ int main() {
     overlay.addSeparator();
 
     Raz::OverlayPlot& plot = overlay.addPlot("Profiler", 100, {}, "Time (ms)");
-    Raz::OverlayPlotEntry& geomPlot = plot.addEntry("Geometry");
-    Raz::OverlayPlotEntry& blurPlot = plot.addEntry("Blur");
+    Raz::OverlayPlotEntry& geomPlot     = plot.addEntry("Geometry");
+    Raz::OverlayPlotEntry& blurPlot     = plot.addEntry("Blur");
+    Raz::OverlayPlotEntry& vignettePlot = plot.addEntry("Vignette");
 #endif
 
     overlay.addSeparator();
@@ -187,6 +205,7 @@ int main() {
     app.run([&] (float) {
       geomPlot.push(geometryPass.recoverElapsedTime());
       blurPlot.push(boxBlur.recoverElapsedTime());
+      vignettePlot.push(vignette.recoverElapsedTime());
     });
 #else
     app.run();
