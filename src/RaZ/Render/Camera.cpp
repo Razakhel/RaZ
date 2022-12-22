@@ -17,21 +17,14 @@ Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
 void Camera::setFieldOfView(Radiansf fieldOfView) {
   m_fieldOfView = fieldOfView;
 
-  computeProjectionMatrix();
-  computeInverseProjectionMatrix();
-}
-
-void Camera::setOrthoBoundX(float boundX) {
-  m_orthoBoundX = boundX;
-
-  if (m_projType == ProjectionType::ORTHOGRAPHIC) {
+  if (m_projType == ProjectionType::PERSPECTIVE) {
     computeProjectionMatrix();
     computeInverseProjectionMatrix();
   }
 }
 
-void Camera::setOrthoBoundY(float boundY) {
-  m_orthoBoundY = boundY;
+void Camera::setOrthographicBound(float bound) {
+  m_orthoBound = bound;
 
   if (m_projType == ProjectionType::ORTHOGRAPHIC) {
     computeProjectionMatrix();
@@ -40,6 +33,9 @@ void Camera::setOrthoBoundY(float boundY) {
 }
 
 void Camera::setProjectionType(ProjectionType projType) {
+  if (projType == m_projType)
+    return; // No need to recompute the projection matrix
+
   m_projType = projType;
 
   computeProjectionMatrix();
@@ -84,24 +80,27 @@ const Mat4f& Camera::computePerspectiveMatrix() {
   return m_projMat;
 }
 
-const Mat4f& Camera::computeOrthographicMatrix(float right, float left, float top, float bottom, float near, float far) {
-  const float xDist = right - left;
-  const float yDist = top - bottom;
-  const float zDist = far - near;
+const Mat4f& Camera::computeOrthographicMatrix(float minX, float maxX, float minY, float maxY, float minZ, float maxZ) {
+  const float invDistX = 1.f / (maxX - minX);
+  const float invDistY = 1.f / (maxY - minY);
+  const float invDistZ = 1.f / (maxZ - minZ);
 
-  m_projMat = Mat4f( 2.f / xDist,             0.f,                     0.f,                  0.f,
-                     0.f,                     2.f / yDist,             0.f,                  0.f,
-                     0.f,                     0.f,                    -2.f / zDist,          0.f,
-                    -(right + left) / xDist, -(top + bottom) / yDist, -(far + near) / zDist, 1.f);
+  m_projMat = Mat4f(2.f * invDistX, 0.f,             0.f,            -(maxX + minX) * invDistX,
+                    0.f,            2.f * invDistY,  0.f,            -(maxY + minY) * invDistY,
+                    0.f,            0.f,            -2.f * invDistZ, -(maxZ + minZ) * invDistZ,
+                    0.f,            0.f,             0.f,             1.f);
 
   return m_projMat;
 }
 
+const Mat4f& Camera::computeOrthographicMatrix() {
+  const float orthoRatio = m_orthoBound * m_frameRatio;
+  return computeOrthographicMatrix(-orthoRatio, orthoRatio, -m_orthoBound, m_orthoBound, -m_farPlane, m_farPlane);
+}
+
 const Mat4f& Camera::computeProjectionMatrix() {
-  if (m_projType == ProjectionType::ORTHOGRAPHIC) {
-    const float orthoX = m_orthoBoundX * m_frameRatio;
-    return computeOrthographicMatrix(orthoX, -orthoX, m_orthoBoundY, -m_orthoBoundY, m_nearPlane, m_farPlane);
-  }
+  if (m_projType == ProjectionType::ORTHOGRAPHIC)
+    return computeOrthographicMatrix();
 
   return computePerspectiveMatrix();
 }
@@ -112,7 +111,12 @@ const Mat4f& Camera::computeInverseProjectionMatrix() {
 }
 
 void Camera::resizeViewport(unsigned int frameWidth, unsigned int frameHeight) {
-  m_frameRatio = static_cast<float>(frameWidth) / static_cast<float>(frameHeight);
+  const float newRatio = static_cast<float>(frameWidth) / static_cast<float>(frameHeight);
+
+  if (newRatio == m_frameRatio)
+    return; // No need to recompute the projection matrix
+
+  m_frameRatio = newRatio;
 
   computeProjectionMatrix();
   computeInverseProjectionMatrix();

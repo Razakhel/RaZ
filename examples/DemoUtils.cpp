@@ -44,16 +44,14 @@ void setupCameraControls(Raz::Entity& cameraEntity, Raz::Window& window) {
     const float moveVal = (-10.f * deltaTime) * cameraSpeed;
 
     cameraTransform.move(0.f, 0.f, moveVal);
-    camera.setOrthoBoundX(camera.getOrthoBoundX() + moveVal);
-    camera.setOrthoBoundY(camera.getOrthoBoundY() + moveVal);
+    camera.setOrthographicBound(camera.getOrthographicBound() + moveVal);
   });
 
   window.addKeyCallback(Raz::Keyboard::S, [&cameraTransform, &camera] (float deltaTime) {
     const float moveVal = (10.f * deltaTime) * cameraSpeed;
 
     cameraTransform.move(0.f, 0.f, moveVal);
-    camera.setOrthoBoundX(camera.getOrthoBoundX() + moveVal);
-    camera.setOrthoBoundY(camera.getOrthoBoundY() + moveVal);
+    camera.setOrthographicBound(camera.getOrthographicBound() + moveVal);
   });
 
   window.addKeyCallback(Raz::Keyboard::A, [&cameraTransform] (float deltaTime) {

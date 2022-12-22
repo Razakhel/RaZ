@@ -25,18 +25,17 @@ enum class ProjectionType : uint8_t {
   ORTHOGRAPHIC
 };
 
-/// Camera class, simulating a point of view for a scene to be rendered from.
+/// Camera simulating a point of view for a scene to be rendered from.
 class Camera final : public Component {
 public:
   Camera() = default;
   Camera(unsigned int frameWidth, unsigned int frameHeight,
          Radiansf fieldOfView = Degreesf(45.f),
-         float nearPlane = 0.1f, float farPlane = 100.f,
+         float nearPlane = 0.1f, float farPlane = 1000.f,
          ProjectionType projType = ProjectionType::PERSPECTIVE);
 
   Radiansf getFieldOfView() const { return m_fieldOfView; }
-  float getOrthoBoundX() const { return m_orthoBoundX; }
-  float getOrthoBoundY() const { return m_orthoBoundY; }
+  float getOrthographicBound() const { return m_orthoBound; }
   CameraType getCameraType() const { return m_cameraType; }
   const Mat4f& getViewMatrix() const { return m_viewMat; }
   const Mat4f& getInverseViewMatrix() const { return m_invViewMat; }
@@ -44,42 +43,45 @@ public:
   const Mat4f& getInverseProjectionMatrix() const { return m_invProjMat; }
 
   void setFieldOfView(Radiansf fieldOfView);
-  void setOrthoBoundX(float boundX);
-  void setOrthoBoundY(float boundY);
+  void setOrthographicBound(float bound);
   void setCameraType(CameraType camType) { m_cameraType = camType; }
   void setProjectionType(ProjectionType projType);
   void setTarget(const Vec3f& target) { m_target = target; }
 
-  /// Standard 'free fly' view matrix computation.
+  /// Computes the standard "free fly" view matrix.
   /// \param cameraTransform Transform component of the camera.
   /// \return Reference to the computed view matrix.
   const Mat4f& computeViewMatrix(const Transform& cameraTransform);
-  /// 'Look at' view matrix computation.
+  /// Computes the "look at" view matrix.
   /// \param position Position of the camera.
   /// \return Reference to the computed view matrix.
   const Mat4f& computeLookAt(const Vec3f& position);
-  /// Inverse view matrix computation.
+  /// Computes the inverse view matrix.
   /// \return Reference to the computed inverse view matrix.
   const Mat4f& computeInverseViewMatrix();
-  /// Projection matrix computation.
-  /// According to projection's type, either perspective or orthographic will be computed.
-  /// \return Reference to the computed perspective/orthographic matrix.
-  const Mat4f& computeProjectionMatrix();
-  /// Perspective projection matrix computation.
+  /// Computes the perspective projection matrix.
   /// \return Reference to the computed perspective projection matrix.
   const Mat4f& computePerspectiveMatrix();
-  /// Orthographic projection matrix computation.
-  /// \param right Right limit of the projection frustum.
-  /// \param left Left limit of the projection frustum.
-  /// \param top Top limit of the projection frustum.
-  /// \param bottom Bottom limit of the projection frustum.
-  /// \param near Near limit of the projection frustum.
-  /// \param far Far limit of the projection frustum.
+  /// Computes the orthographic projection matrix.
+  /// \param minX Minimum X limit of the projection frustum.
+  /// \param maxX Maximum X limit of the projection frustum.
+  /// \param minY Minimum Y limit of the projection frustum.
+  /// \param maxY Maximum Y limit of the projection frustum.
+  /// \param minZ Minimum Z limit of the projection frustum.
+  /// \param maxZ Maximum Z limit of the projection frustum.
   /// \return Reference to the computed orthographic projection matrix.
-  const Mat4f& computeOrthographicMatrix(float right, float left, float top, float bottom, float near, float far);
-  /// Inverse projection matrix computation.
-  /// According to projection's type, either perspective or orthographic will be computed.
-  /// \return Reference to the computed inverse perspective/orthographic projection matrix.
+  const Mat4f& computeOrthographicMatrix(float minX, float maxX, float minY, float maxY, float minZ, float maxZ);
+  /// Computes the orthographic projection matrix using the camera's orthographic bounds.
+  /// \see setOrthographicBound()
+  /// \return Reference to the computed orthographic projection matrix.
+  const Mat4f& computeOrthographicMatrix();
+  /// Computes the projection matrix.
+  /// Depending on the projection type, either perspective or orthographic will be computed.
+  /// \return Reference to the computed projection matrix.
+  const Mat4f& computeProjectionMatrix();
+  /// Computes the inverse projection matrix.
+  /// Depending on the projection type, either perspective or orthographic will be computed.
+  /// \return Reference to the computed inverse projection matrix.
   const Mat4f& computeInverseProjectionMatrix();
   /// Resizes the viewport.
   /// Resizing the viewport recomputes the projection matrix.
@@ -108,9 +110,8 @@ private:
   float m_frameRatio     = 1.f;
   Radiansf m_fieldOfView = Degreesf(45.f);
   float m_nearPlane      = 0.1f;
-  float m_farPlane       = 100.f;
-  float m_orthoBoundX    = 1.f;
-  float m_orthoBoundY    = 1.f;
+  float m_farPlane       = 1000.f;
+  float m_orthoBound     = 1.f;
 
   CameraType m_cameraType   = CameraType::FREE_FLY;
   ProjectionType m_projType = ProjectionType::PERSPECTIVE;
