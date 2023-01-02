@@ -266,6 +266,7 @@ void OverlayWindow::render() const {
       {
         auto& slider = static_cast<OverlaySlider&>(*element);
 
+        ImGui::SetNextItemWidth(std::min(ImGui::CalcItemWidth(), 210.f));
         if (ImGui::SliderFloat(slider.m_label.c_str(), &slider.m_currentValue, slider.m_minValue, slider.m_maxValue))
           slider.m_actionSlide(slider.m_currentValue);
 

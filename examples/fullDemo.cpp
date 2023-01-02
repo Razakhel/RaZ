@@ -55,9 +55,10 @@ int main() {
     Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
     Raz::RenderPass& geometryPass = renderSystem.getGeometryPass();
 
-    const auto depthBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
-    const auto colorBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto blurredBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto depthBuffer      = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer      = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto chromAberrBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto blurredBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
@@ -69,12 +70,19 @@ int main() {
     geometryPass.setWriteDepthTexture(depthBuffer); // A depth buffer is always needed
     geometryPass.addWriteColorTexture(colorBuffer, 0);
 
+    // Chromatic aberration
+
+    auto& chromaticAberration = renderGraph.addRenderProcess<Raz::ChromaticAberrationRenderProcess>();
+    chromaticAberration.setInputBuffer(colorBuffer);
+    chromaticAberration.setOutputBuffer(chromAberrBuffer);
+    chromaticAberration.addParent(geometryPass);
+
     // Blur
 
     auto& boxBlur = renderGraph.addRenderProcess<Raz::BoxBlurRenderProcess>();
-    boxBlur.setInputBuffer(colorBuffer);
+    boxBlur.setInputBuffer(chromAberrBuffer);
     boxBlur.setOutputBuffer(blurredBuffer);
-    boxBlur.addParent(geometryPass);
+    boxBlur.addParent(chromaticAberration);
 
     // Vignette
 
@@ -155,7 +163,7 @@ int main() {
 
 #if !defined(RAZ_NO_OVERLAY)
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Full demo",
-                                                                Raz::Vec2f(static_cast<float>(window.getWidth()) / 3.25f, window.getHeight()));
+                                                                Raz::Vec2f(static_cast<float>(window.getWidth()) / 3.3f, window.getHeight()));
 
     DemoUtils::insertOverlayCameraControlsHelp(overlay);
     overlay.addLabel("Press F11 to toggle fullscreen.");
@@ -171,6 +179,10 @@ int main() {
     overlay.addSlider("Sound volume", [&meshSound] (float value) noexcept { meshSound.setGain(value); }, 0.f, 1.f, 0.f);
 #endif // RAZ_USE_AUDIO
 
+    overlay.addSlider("Chrom. aberr. strength",
+                      [&chromaticAberration] (float value) { chromaticAberration.setStrength(value); },
+                      -15.f, 15.f, 0.f);
+
     overlay.addSlider("Blur strength",
                       [&boxBlur] (float value) { boxBlur.setStrength(static_cast<unsigned int>(value)); },
                       1.f, 16.f, 1.f);
@@ -185,15 +197,16 @@ int main() {
 
     overlay.addSeparator();
 
-    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 200, 200);
+    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 175, 175);
 
 #if !defined(USE_OPENGL_ES) // GPU timing capabilities are not available with OpenGL ES
     overlay.addSeparator();
 
     Raz::OverlayPlot& plot = overlay.addPlot("Profiler", 100, {}, "Time (ms)");
-    Raz::OverlayPlotEntry& geomPlot     = plot.addEntry("Geometry");
-    Raz::OverlayPlotEntry& blurPlot     = plot.addEntry("Blur");
-    Raz::OverlayPlotEntry& vignettePlot = plot.addEntry("Vignette");
+    Raz::OverlayPlotEntry& geomPlot       = plot.addEntry("Geometry");
+    Raz::OverlayPlotEntry& chromAberrPlot = plot.addEntry("Chrom. aberr.");
+    Raz::OverlayPlotEntry& blurPlot       = plot.addEntry("Blur");
+    Raz::OverlayPlotEntry& vignettePlot   = plot.addEntry("Vignette");
 #endif // USE_OPENGL_ES
 
     overlay.addSeparator();
@@ -208,6 +221,7 @@ int main() {
 #if !defined(USE_OPENGL_ES)
     app.run([&] (float) {
       geomPlot.push(geometryPass.recoverElapsedTime());
+      chromAberrPlot.push(chromaticAberration.recoverElapsedTime());
       blurPlot.push(boxBlur.recoverElapsedTime());
       vignettePlot.push(vignette.recoverElapsedTime());
     });

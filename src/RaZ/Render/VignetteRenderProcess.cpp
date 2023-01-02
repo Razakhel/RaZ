@@ -18,7 +18,7 @@ VignetteRenderProcess::VignetteRenderProcess(RenderGraph& renderGraph)
   : MonoPassRenderProcess(renderGraph, FragmentShader::loadFromSource(vignetteSource), "Vignette") {
   setStrength(0.25f);
   setOpacity(1.f);
-  setColor(Raz::ColorPreset::Black);
+  setColor(ColorPreset::Black);
 }
 
 void VignetteRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {

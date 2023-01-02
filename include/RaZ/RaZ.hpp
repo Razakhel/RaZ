@@ -42,6 +42,7 @@
 #include "Render/BloomRenderProcess.hpp"
 #include "Render/BoxBlurRenderProcess.hpp"
 #include "Render/Camera.hpp"
+#include "Render/ChromaticAberrationRenderProcess.hpp"
 #include "Render/ConvolutionRenderProcess.hpp"
 #include "Render/Cubemap.hpp"
 #include "Render/Framebuffer.hpp"
