@@ -183,10 +183,33 @@ Texture1D::Texture1D()
 Texture1D::Texture1D(unsigned int width, TextureColorspace colorspace, TextureDataType dataType)
   : Texture1D(colorspace, dataType) { resize(width); }
 
+Texture1D::Texture1D(const Color& color, unsigned int width) : Texture1D() {
+  m_width = width;
+
+  fill(color);
+}
+
 void Texture1D::resize(unsigned int width) {
   m_width = width;
 
   load();
+}
+
+void Texture1D::fill(const Color& color) {
+  m_colorspace = TextureColorspace::RGB;
+  m_dataType   = TextureDataType::BYTE;
+
+  const std::vector<Vec3b> values(m_width * 3, Vec3b(color));
+
+  bind();
+  Renderer::sendImageData1D(TextureType::TEXTURE_1D,
+                            0,
+                            TextureInternalFormat::RGB,
+                            m_width,
+                            TextureFormat::RGB,
+                            PixelDataType::UBYTE,
+                            values.data());
+  unbind();
 }
 
 void Texture1D::load() const {
@@ -203,16 +226,6 @@ void Texture1D::load() const {
                             nullptr);
   unbind();
 }
-
-void Texture1D::makePlainColored(const Color& color) {
-  m_width      = 1;
-  m_colorspace = TextureColorspace::RGB;
-  m_dataType   = TextureDataType::BYTE;
-
-  bind();
-  Renderer::sendImageData1D(TextureType::TEXTURE_1D, 0, TextureInternalFormat::RGB, 1, TextureFormat::RGB, PixelDataType::UBYTE, Vec3b(color).getDataPtr());
-  unbind();
-}
 #endif
 
 Texture2D::Texture2D()
@@ -220,6 +233,13 @@ Texture2D::Texture2D()
 
 Texture2D::Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType)
   : Texture2D(colorspace, dataType) { resize(width, height); }
+
+Texture2D::Texture2D(const Color& color, unsigned int width, unsigned int height) : Texture2D() {
+  m_width  = width;
+  m_height = height;
+
+  fill(color);
+}
 
 void Texture2D::resize(unsigned int width, unsigned int height) {
   m_width  = width;
@@ -231,7 +251,7 @@ void Texture2D::resize(unsigned int width, unsigned int height) {
 void Texture2D::load(const Image& image, bool createMipmaps) {
   if (image.isEmpty()) {
     // Image not found, defaulting texture to pure white
-    makePlainColored(ColorPreset::White);
+    fill(ColorPreset::White);
     return;
   }
 
@@ -272,6 +292,24 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
   unbind();
 }
 
+void Texture2D::fill(const Color& color) {
+  m_colorspace = TextureColorspace::RGB;
+  m_dataType   = TextureDataType::BYTE;
+
+  const std::vector<Vec3b> values(m_width * m_height * 3, Vec3b(color));
+
+  bind();
+  Renderer::sendImageData2D(TextureType::TEXTURE_2D,
+                            0,
+                            TextureInternalFormat::RGB,
+                            m_width,
+                            m_height,
+                            TextureFormat::RGB,
+                            PixelDataType::UBYTE,
+                            values.data());
+  unbind();
+}
+
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTextureData() is unavailable with OpenGL ES
 Image Texture2D::recoverImage() const {
   Image img(m_width, m_height, static_cast<ImageColorspace>(m_colorspace), (m_dataType == TextureDataType::BYTE ? ImageDataType::BYTE : ImageDataType::FLOAT));
@@ -304,22 +342,19 @@ void Texture2D::load() const {
   unbind();
 }
 
-void Texture2D::makePlainColored(const Color& color) {
-  m_width      = 1;
-  m_height     = 1;
-  m_colorspace = TextureColorspace::RGB;
-  m_dataType   = TextureDataType::BYTE;
-
-  bind();
-  Renderer::sendImageData2D(TextureType::TEXTURE_2D, 0, TextureInternalFormat::RGB, 1, 1, TextureFormat::RGB, PixelDataType::UBYTE, Vec3b(color).getDataPtr());
-  unbind();
-}
-
 Texture3D::Texture3D()
   : Texture(TextureType::TEXTURE_3D) {}
 
 Texture3D::Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace, TextureDataType dataType)
   : Texture3D(colorspace, dataType) { resize(width, height, depth); }
+
+Texture3D::Texture3D(const Color& color, unsigned int width, unsigned int height, unsigned int depth) : Texture3D() {
+  m_width  = width;
+  m_height = height;
+  m_depth  = depth;
+
+  fill(color);
+}
 
 void Texture3D::resize(unsigned int width, unsigned int height, unsigned int depth) {
   m_width  = width;
@@ -327,6 +362,25 @@ void Texture3D::resize(unsigned int width, unsigned int height, unsigned int dep
   m_depth  = depth;
 
   load();
+}
+
+void Texture3D::fill(const Color& color) {
+  m_colorspace = TextureColorspace::RGB;
+  m_dataType   = TextureDataType::BYTE;
+
+  const std::vector<Vec3b> values(m_width * m_height * m_depth * 3, Vec3b(color));
+
+  bind();
+  Renderer::sendImageData3D(TextureType::TEXTURE_3D,
+                            0,
+                            TextureInternalFormat::RGB,
+                            m_width,
+                            m_height,
+                            m_depth,
+                            TextureFormat::RGB,
+                            PixelDataType::UBYTE,
+                            values.data());
+  unbind();
 }
 
 void Texture3D::load() const {
@@ -343,18 +397,6 @@ void Texture3D::load() const {
                             recoverFormat(m_colorspace),
                             (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                             nullptr);
-  unbind();
-}
-
-void Texture3D::makePlainColored(const Color& color) {
-  m_width      = 1;
-  m_height     = 1;
-  m_depth      = 1;
-  m_colorspace = TextureColorspace::RGB;
-  m_dataType   = TextureDataType::BYTE;
-
-  bind();
-  Renderer::sendImageData3D(TextureType::TEXTURE_3D, 0, TextureInternalFormat::RGB, 1, 1, 1, TextureFormat::RGB, PixelDataType::UBYTE, Vec3b(color).getDataPtr());
   unbind();
 }
 
