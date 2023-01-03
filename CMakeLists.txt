@@ -274,6 +274,12 @@ endif ()
 ################
 
 find_package(OpenAL)
+
+if (RAZ_USE_EMSCRIPTEN)
+    # Emscripten's FindOpenAL.cmake script historically sets the capitalized found variable, but always finds it anyway
+    set(OpenAL_FOUND ON)
+endif ()
+
 option(RAZ_USE_AUDIO "Enable audio capabilities (requires OpenAL to be installed)" ${OpenAL_FOUND})
 
 if (RAZ_USE_AUDIO)
@@ -281,8 +287,11 @@ if (RAZ_USE_AUDIO)
         message(SEND_ERROR "Audio required but OpenAL not found; please review its location")
     endif ()
 
-    target_include_directories(RaZ SYSTEM PRIVATE ${OPENAL_INCLUDE_DIRS})
-    target_link_libraries(RaZ PRIVATE ${OPENAL_LIBS})
+    if (NOT RAZ_USE_EMSCRIPTEN)
+        # Emscripten manages the includes & library on its own; adding the include directory messes up predefined types
+        target_include_directories(RaZ SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
+        target_link_libraries(RaZ PRIVATE ${OPENAL_LIBRARY})
+    endif ()
     target_compile_definitions(RaZ PUBLIC RAZ_USE_AUDIO)
 else ()
     file(
@@ -312,8 +321,8 @@ if (RAZ_COMPILER_MSVC OR (RAZ_COMPILER_GCC AND NOT MINGW)) # FBX SDK unavailable
             message(SEND_ERROR "FBX required but SDK not found; please review its location")
         endif ()
 
-        target_include_directories(RaZ SYSTEM PRIVATE ${FBX_INCLUDE_DIRS})
-        target_link_libraries(RaZ PRIVATE ${FBX_LIBS})
+        target_include_directories(RaZ SYSTEM PRIVATE ${FBX_INCLUDE_DIR})
+        target_link_libraries(RaZ PRIVATE ${FBX_LIBRARY})
         target_compile_definitions(RaZ PUBLIC RAZ_USE_FBX ${FBX_DEFINITIONS})
     endif ()
 endif ()

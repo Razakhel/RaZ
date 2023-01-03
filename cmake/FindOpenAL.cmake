@@ -37,7 +37,7 @@ if (WIN32 OR CYGWIN)
     endif ()
 
     find_library(
-        OPENAL_LIBS
+        OPENAL_LIBRARY
 
         NAMES
             OpenAL al openal OpenAL32
@@ -67,7 +67,7 @@ if (WIN32 OR CYGWIN)
         )
     endif ()
 elseif (APPLE)
-    set(OPENAL_LIBS "-framework OpenAL")
+    set(OPENAL_LIBRARY "-framework OpenAL")
 
     file(
         GLOB
@@ -80,7 +80,7 @@ elseif (APPLE)
         "/usr/local/opt/openal*"
     )
 else () # Linux
-    set(OPENAL_LIBS openal)
+    set(OPENAL_LIBRARY openal)
 
     file(
         GLOB
@@ -94,7 +94,7 @@ else () # Linux
 endif ()
 
 find_path(
-    OPENAL_INCLUDE_DIRS
+    OPENAL_INCLUDE_DIR
 
     NAMES
         AL/al.h
@@ -108,12 +108,12 @@ find_path(
         include/AL include/OpenAL include AL OpenAL
 )
 
-if (OPENAL_LIBS AND OPENAL_INCLUDE_DIRS)
+if (OPENAL_LIBRARY AND OPENAL_INCLUDE_DIR)
     set(OpenAL_FOUND ON)
 
     message("[OpenAL] Found:")
-    message("  - Include directory: ${OPENAL_INCLUDE_DIRS}")
-    message("  - Library: ${OPENAL_LIBS}")
+    message("  - Include directory: ${OPENAL_INCLUDE_DIR}")
+    message("  - Library: ${OPENAL_LIBRARY}")
     if (WIN32)
         message("  - DLL: ${OPENAL_DLL}")
     endif ()

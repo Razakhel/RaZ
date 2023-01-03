@@ -35,7 +35,7 @@ else ()
 endif ()
 
 find_path(
-    FBX_INCLUDE_DIRS
+    FBX_INCLUDE_DIR
 
     NAMES
         fbxsdk.h
@@ -54,7 +54,7 @@ else ()
 endif ()
 
 find_library(
-    FBX_LIBS
+    FBX_LIBRARY
 
     NAMES
         libfbxsdk
@@ -92,18 +92,18 @@ if (WIN32)
     )
 endif ()
 
-if (FBX_LIBS AND FBX_INCLUDE_DIRS)
+if (FBX_LIBRARY AND FBX_INCLUDE_DIR)
     set(FBX_FOUND ON)
     set(FBX_DEFINITIONS -DFBXSDK_SHARED)
 
     message("[FBX] Found:")
-    message("  - Include directory: ${FBX_INCLUDE_DIRS}")
-    message("  - Library: ${FBX_LIBS}")
+    message("  - Include directory: ${FBX_INCLUDE_DIR}")
+    message("  - Library: ${FBX_LIBRARY}")
     if (WIN32)
         message("  - DLL: ${FBX_DLL}")
     endif ()
 
     if (UNIX)
-        list(APPEND FBX_LIBS xml2) # The SDK requires libxml2
+        list(APPEND FBX_LIBRARY xml2) # The SDK requires libxml2
     endif ()
 endif ()
