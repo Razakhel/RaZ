@@ -153,7 +153,7 @@ Sound load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Couldn't open the WAV file '" + filePath + "'");
+    throw std::invalid_argument("Error: Could not open the WAV file '" + filePath + "'");
 
   const WavInfo info = validateWav(file);
 

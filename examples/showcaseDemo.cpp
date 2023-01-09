@@ -48,7 +48,7 @@ inline void loadCerberusScene(Raz::Entity& mesh, const Raz::RenderSystem& render
   meshTrans.setScale(2.5f);
 }
 
-#if defined(FBX_ENABLED)
+#if defined(RAZ_USE_FBX)
 inline void loadShaderBallScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
   auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
   meshRenderer       = Raz::FbxFormat::load(RAZ_ROOT "assets/meshes/shaderBall.fbx").second;
@@ -135,7 +135,7 @@ int main() {
     Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Showcase demo", Raz::Vec2f(-1.f));
 
     std::vector<std::string> scenes = { "Sponza", "Ball", "Shield", "Cerberus" };
-#if defined(FBX_ENABLED)
+#if defined(RAZ_USE_FBX)
     scenes.emplace_back("Shader ball");
 #endif
 
@@ -145,7 +145,7 @@ int main() {
         case 1: loadBallScene(mesh, render); break;
         case 2: loadShieldScene(mesh, render); break;
         case 3: loadCerberusScene(mesh, render); break;
-#if defined(FBX_ENABLED)
+#if defined(RAZ_USE_FBX)
         case 4: loadShaderBallScene(mesh, render); break;
 #endif
         default: break;
@@ -176,7 +176,7 @@ int main() {
     window.addKeyCallback(Raz::Keyboard::B, [&mesh, &render] (float /* deltaTime */) { loadBallScene(mesh, render); }, Raz::Input::ONCE);
     window.addKeyCallback(Raz::Keyboard::S, [&mesh, &render] (float /* deltaTime */) { loadShieldScene(mesh, render); }, Raz::Input::ONCE);
     window.addKeyCallback(Raz::Keyboard::C, [&mesh, &render] (float /* deltaTime */) { loadCerberusScene(mesh, render); }, Raz::Input::ONCE);
-#if defined(FBX_ENABLED)
+#if defined(RAZ_USE_FBX)
     window.addKeyCallback(Raz::Keyboard::D, [&mesh, &render] (float /* deltaTime */) { loadShaderBallScene(mesh, render); });
 #endif
 
@@ -201,7 +201,7 @@ int main() {
     std::cout << "\tB: Load Ball scene\n";
     std::cout << "\tS: Load Shield scene\n";
     std::cout << "\tC: Load Cerberus scene\n";
-#if defined(FBX_ENABLED)
+#if defined(RAZ_USE_FBX)
     std::cout << "\tD: Load ShaderBall scene\n";
 #endif
     std::cout << '\n';

@@ -19,7 +19,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
     MeshRenderer meshRenderer(mesh);
     return { std::move(mesh), std::move(meshRenderer) };
   } else if (fileExt == "fbx") {
-#if defined(FBX_ENABLED)
+#if defined(RAZ_USE_FBX)
     return FbxFormat::load(filePath);
 #else
     throw std::invalid_argument("[MeshFormat] FBX format unsupported; check that you enabled its usage when building RaZ (if on a supported platform).");

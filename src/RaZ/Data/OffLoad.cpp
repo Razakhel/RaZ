@@ -13,7 +13,7 @@ Mesh load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Couldn't open the OFF file '" + filePath + '\'');
+    throw std::invalid_argument("Error: Could not open the OFF file '" + filePath + '\'');
 
   Mesh mesh;
   Submesh& submesh = mesh.addSubmesh();

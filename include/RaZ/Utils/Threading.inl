@@ -25,10 +25,10 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, FuncT&& action, unsig
   if (static_cast<std::ptrdiff_t>(beginIndex) >= static_cast<std::ptrdiff_t>(endIndex))
     throw std::invalid_argument("Error: The given index range is invalid");
 
-  const auto totalRangeCount = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
-
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
+
+  const auto totalRangeCount = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
 
   const std::size_t maxThreadCount   = std::min(static_cast<std::size_t>(threadCount), totalRangeCount);
   const std::size_t threadRangeCount = (totalRangeCount + maxThreadCount / 2) / maxThreadCount;

@@ -27,7 +27,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file) {
-    Logger::error("[ObjLoad] Couldn't open the MTL file '" + mtlFilePath + "'.");
+    Logger::error("[ObjLoad] Could not open the MTL file '" + mtlFilePath + "'.");
     materials.emplace_back(MaterialType::COOK_TORRANCE);
     return;
   }
