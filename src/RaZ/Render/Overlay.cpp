@@ -190,9 +190,10 @@ OverlayProgressBar& OverlayWindow::addProgressBar(int minVal, int maxVal, bool s
   return static_cast<OverlayProgressBar&>(*m_elements.emplace_back(std::make_unique<OverlayProgressBar>(minVal, maxVal, showValues)));
 }
 
-OverlayPlot& OverlayWindow::addPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel, std::string yAxisLabel) {
+OverlayPlot& OverlayWindow::addPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel, std::string yAxisLabel, float maxHeight) {
   return static_cast<OverlayPlot&>(*m_elements.emplace_back(std::make_unique<OverlayPlot>(std::move(label), maxValCount,
-                                                                                          std::move(xAxisLabel), std::move(yAxisLabel))));
+                                                                                          std::move(xAxisLabel), std::move(yAxisLabel),
+                                                                                          maxHeight)));
 }
 
 OverlaySeparator& OverlayWindow::addSeparator() {
@@ -372,9 +373,9 @@ void OverlayWindow::render() const {
       {
         auto& plot = static_cast<OverlayPlot&>(*element);
 
-        if (ImPlot::BeginPlot(plot.m_label.c_str(), ImVec2(-1, 200), ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect)) {
+        if (ImPlot::BeginPlot(plot.m_label.c_str(), ImVec2(-1, plot.m_maxHeight), ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect)) {
           ImPlot::SetupAxes(plot.m_xAxisLabel.c_str(), plot.m_yAxisLabel.c_str(), ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_LockMin);
-          ImPlot::SetupAxisLimitsConstraints(ImAxis_X1, 0.0, static_cast<double>(plot.m_maxValCount - 1));
+          ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, static_cast<double>(plot.m_maxValCount - 1), ImPlotCond_Always);
           ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 100.0, ImPlotCond_Once);
           ImPlot::SetupMouseText(ImPlotLocation_NorthEast);
 

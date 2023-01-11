@@ -202,7 +202,7 @@ int main() {
 #if !defined(USE_OPENGL_ES) // GPU timing capabilities are not available with OpenGL ES
     overlay.addSeparator();
 
-    Raz::OverlayPlot& plot = overlay.addPlot("Profiler", 100, {}, "Time (ms)");
+    Raz::OverlayPlot& plot = overlay.addPlot("Profiler", 100, {}, "Time (ms)", 200.f);
     Raz::OverlayPlotEntry& geomPlot       = plot.addEntry("Geometry");
     Raz::OverlayPlotEntry& chromAberrPlot = plot.addEntry("Chrom. aberr.");
     Raz::OverlayPlotEntry& blurPlot       = plot.addEntry("Blur");

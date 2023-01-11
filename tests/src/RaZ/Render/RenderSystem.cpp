@@ -127,4 +127,29 @@ TEST_CASE("RenderSystem overlay render") {
 
     overlay2.disable();
   }
+
+  {
+    Raz::OverlayWindow& overlay3 = window.getOverlay().addWindow("RaZ - Overlay test 3", Raz::Vec2f(window.getWidth(), window.getHeight()));
+    Raz::OverlayPlot& plot = overlay3.addPlot("Plot", 5, "X", "Y", -1.f);
+
+    Raz::OverlayPlotEntry& entry1 = plot.addEntry("1", Raz::OverlayPlotType::LINE);
+    entry1.push(0.f);
+    entry1.push(50.f);
+    entry1.push(75.f);
+    entry1.push(25.f);
+    entry1.push(10.f);
+    entry1.push(50.f); // Pushing more values than the allowed amount will erase those in front
+
+    Raz::OverlayPlotEntry& entry2 = plot.addEntry("2", Raz::OverlayPlotType::SHADED);
+    entry2.push(50.f);
+    entry2.push(15.f);
+    entry2.push(30.f);
+    entry2.push(0.f);
+    entry2.push(60.f);
+    entry2.push(40.f); // Like the above, pushing this final value will remove the first one
+
+    CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay3_base.png", true)));
+
+    overlay3.disable();
+  }
 }

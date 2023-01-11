@@ -300,8 +300,12 @@ class OverlayPlot final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel = {}, std::string yAxisLabel = {})
-    : OverlayElement(std::move(label)), m_maxValCount{ maxValCount }, m_xAxisLabel{ std::move(xAxisLabel) }, m_yAxisLabel{ std::move(yAxisLabel) } {}
+  OverlayPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel = {}, std::string yAxisLabel = {}, float maxHeight = -1.f)
+    : OverlayElement(std::move(label)),
+      m_maxValCount{ maxValCount },
+      m_xAxisLabel{ std::move(xAxisLabel) },
+      m_yAxisLabel{ std::move(yAxisLabel) },
+      m_maxHeight{ maxHeight } {}
 
   OverlayElementType getType() const override { return OverlayElementType::PLOT; }
 
@@ -312,6 +316,7 @@ private:
   std::size_t m_maxValCount {};
   std::string m_xAxisLabel {};
   std::string m_yAxisLabel {};
+  float m_maxHeight {};
 };
 
 class OverlaySeparator final : public OverlayElement {
@@ -430,8 +435,11 @@ public:
   /// \param maxValCount Maximum number of values to plot.
   /// \param xAxisLabel Label to be displayed on the X axis.
   /// \param yAxisLabel Label to be displayed on the Y axis.
+  /// \param maxHeight Maximum height of the plot widget. If strictly lower than 0, automatically resizes the plot to fit the window's content.
   /// \return Reference to the newly added plot.
-  [[nodiscard]] OverlayPlot& addPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel = {}, std::string yAxisLabel = {});
+  [[nodiscard]] OverlayPlot& addPlot(std::string label, std::size_t maxValCount,
+                                     std::string xAxisLabel = {}, std::string yAxisLabel = {},
+                                     float maxHeight = -1.f);
   /// Adds an horizontal separator on the overlay window.
   /// \return Reference to the newly added separator.
   OverlaySeparator& addSeparator();
