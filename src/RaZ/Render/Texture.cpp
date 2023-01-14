@@ -255,6 +255,13 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
     return;
   }
 
+#if defined(USE_OPENGL_ES)
+  if ((image.getWidth() & (image.getWidth() - 1)) != 0 || (image.getHeight() & (image.getHeight() - 1)) != 0) {
+    Logger::warn("[Texture] The given image's dimensions (" + std::to_string(image.getWidth()) + 'x' + std::to_string(image.getHeight())
+               + ") are not powers of two; this can give unexpected results.");
+  }
+#endif
+
   m_width      = image.getWidth();
   m_height     = image.getHeight();
   m_colorspace = static_cast<TextureColorspace>(image.getColorspace());
@@ -270,11 +277,11 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
   bind();
 
   if (m_colorspace == TextureColorspace::GRAY || m_colorspace == TextureColorspace::RG) {
-    const std::array<int, 4> swizzle = { static_cast<int>(TextureFormat::RED),
-                                         static_cast<int>(TextureFormat::RED),
-                                         static_cast<int>(TextureFormat::RED),
-                                         (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1) };
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_RGBA, swizzle.data());
+    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_R, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_G, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_B, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_A,
+                                  (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1));
   }
 
   Renderer::sendImageData2D(TextureType::TEXTURE_2D,

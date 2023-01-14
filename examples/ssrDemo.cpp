@@ -31,30 +31,35 @@ int main() {
 
     DemoUtils::setupCameraControls(camera, window);
 
+    ///////////
+    // Scene //
+    ///////////
+
     const auto checkerboard = Raz::Texture2D::create(Raz::ImageFormat::load(RAZ_ROOT "assets/textures/checkerboard.png"));
     const auto normalMap    = Raz::Texture2D::create(Raz::ImageFormat::load(RAZ_ROOT "assets/textures/rustediron_normal.png"));
+    const Raz::Mesh planeMesh(Raz::Plane(0.f), 10.f, 10.f);
 
     auto& floor        = world.addEntityWithComponent<Raz::Transform>();
-    auto& floorProgram = floor.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Plane(0.f), 10.f, 10.f)).getMaterials().front().getProgram();
+    auto& floorProgram = floor.addComponent<Raz::MeshRenderer>(planeMesh).getMaterials().front().getProgram();
     floorProgram.setTexture(checkerboard, Raz::MaterialTexture::Roughness);
     floorProgram.setTexture(normalMap, Raz::MaterialTexture::Normal);
 
     auto& backWall        = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 10.f, -10.f), Raz::Quaternionf(90_deg, Raz::Axis::X));
-    auto& backWallProgram = backWall.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Plane(0.f), 10.f, 10.f)).getMaterials().front().getProgram();
+    auto& backWallProgram = backWall.addComponent<Raz::MeshRenderer>(planeMesh).getMaterials().front().getProgram();
     backWallProgram.setAttribute(Raz::ColorPreset::Cyan, Raz::MaterialAttribute::BaseColor);
     backWallProgram.setTexture(checkerboard, Raz::MaterialTexture::BaseColor);
     backWallProgram.setTexture(checkerboard, Raz::MaterialTexture::Roughness);
     backWallProgram.setTexture(normalMap, Raz::MaterialTexture::Normal);
 
     auto& leftWall        = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(-10.f, 10.f, 0.f), Raz::Quaternionf(-90_deg, Raz::Axis::Z));
-    auto& leftWallProgram = leftWall.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Plane(0.f), 10.f, 10.f)).getMaterials().front().getProgram();
+    auto& leftWallProgram = leftWall.addComponent<Raz::MeshRenderer>(planeMesh).getMaterials().front().getProgram();
     leftWallProgram.setAttribute(Raz::ColorPreset::Magenta, Raz::MaterialAttribute::BaseColor);
     leftWallProgram.setTexture(checkerboard, Raz::MaterialTexture::BaseColor);
     leftWallProgram.setTexture(checkerboard, Raz::MaterialTexture::Roughness);
     leftWallProgram.setTexture(normalMap, Raz::MaterialTexture::Normal);
 
     auto& rightWall        = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(10.f, 10.f, 0.f), Raz::Quaternionf(90_deg, Raz::Axis::Z));
-    auto& rightWallProgram = rightWall.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Plane(0.f), 10.f, 10.f)).getMaterials().front().getProgram();
+    auto& rightWallProgram = rightWall.addComponent<Raz::MeshRenderer>(planeMesh).getMaterials().front().getProgram();
     rightWallProgram.setAttribute(Raz::ColorPreset::Yellow, Raz::MaterialAttribute::BaseColor);
     rightWallProgram.setTexture(checkerboard, Raz::MaterialTexture::BaseColor);
     rightWallProgram.setTexture(checkerboard, Raz::MaterialTexture::Roughness);
@@ -67,13 +72,13 @@ int main() {
     redBoxMat.getProgram().setAttribute(0.f, Raz::MaterialAttribute::Roughness);
 
     auto& greenBall      = world.addEntity();
-    auto& greenBallTrans = greenBall.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 1.f, 0.f));
+    auto& greenBallTrans = greenBall.addComponent<Raz::Transform>();
     auto& greenBallMat   = greenBall.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Sphere({}, 1.f), 30.f, Raz::SphereMeshType::UV)).getMaterials().front();
     greenBallMat.getProgram().setAttribute(Raz::ColorPreset::Green, Raz::MaterialAttribute::BaseColor);
     greenBallMat.getProgram().setAttribute(0.f, Raz::MaterialAttribute::Roughness);
 
     auto& blueBall      = world.addEntity();
-    auto& blueBallTrans = blueBall.addComponent<Raz::Transform>(Raz::Vec3f(3.f, 1.f, 0.f));
+    auto& blueBallTrans = blueBall.addComponent<Raz::Transform>();
     auto& blueBallMat   = blueBall.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Sphere({}, 1.f), 30.f, Raz::SphereMeshType::UV)).getMaterials().front();
     blueBallMat.getProgram().setAttribute(Raz::ColorPreset::Blue, Raz::MaterialAttribute::BaseColor);
     blueBallMat.getProgram().setAttribute(0.f, Raz::MaterialAttribute::Roughness);
@@ -178,8 +183,8 @@ int main() {
       const float sinTime = std::sin(totalTime);
 
       redBoxTrans.rotate(Raz::Quaternionf(90_deg * deltaTime, Raz::Vec3f(0.f, 0.707106769f, 0.707106769f)));
-      greenBallTrans.translate(0.f, sinTime * deltaTime, 0.f);
-      blueBallTrans.translate(-sinTime * deltaTime, 0.f, 0.f);
+      greenBallTrans.setPosition(0.f, 2.f + sinTime, 0.f);
+      blueBallTrans.setPosition(2.f - sinTime, 1.f, 0.f);
 
       totalTime += deltaTime;
     });

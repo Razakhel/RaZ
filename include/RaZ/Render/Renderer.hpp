@@ -249,7 +249,13 @@ enum class TextureParam : unsigned int {
   WRAP_S         = 10242 /* GL_TEXTURE_WRAP_S       */, ///<
   WRAP_T         = 10243 /* GL_TEXTURE_WRAP_T       */, ///<
   WRAP_R         = 32882 /* GL_TEXTURE_WRAP_R       */, ///<
+  SWIZZLE_R      = 36418 /* GL_TEXTURE_SWIZZLE_R    */, ///<
+  SWIZZLE_G      = 36419 /* GL_TEXTURE_SWIZZLE_G    */, ///<
+  SWIZZLE_B      = 36420 /* GL_TEXTURE_SWIZZLE_B    */, ///<
+  SWIZZLE_A      = 36421 /* GL_TEXTURE_SWIZZLE_A    */, ///<
+#if !defined(USE_OPENGL_ES)
   SWIZZLE_RGBA   = 36422 /* GL_TEXTURE_SWIZZLE_RGBA */  ///<
+#endif
 };
 
 enum class TextureParamValue : unsigned int {
