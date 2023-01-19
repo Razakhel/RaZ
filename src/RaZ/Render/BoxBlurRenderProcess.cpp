@@ -16,11 +16,14 @@ constexpr std::string_view boxBlurSource = {
 BoxBlurRenderProcess::BoxBlurRenderProcess(RenderGraph& renderGraph)
   : MonoPassRenderProcess(renderGraph, FragmentShader::loadFromSource(boxBlurSource), "Box blur") { setStrength(1); }
 
-void BoxBlurRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
-  const Vec2f invBufferSize(1.f / static_cast<float>(colorBuffer->getWidth()), 1.f / static_cast<float>(colorBuffer->getHeight()));
+void BoxBlurRenderProcess::resizeBuffers(unsigned int width, unsigned int height) {
+  const Vec2f invBufferSize(1.f / static_cast<float>(width), 1.f / static_cast<float>(height));
   m_pass.getProgram().setAttribute(invBufferSize, "uniInvBufferSize");
   m_pass.getProgram().sendAttributes();
+}
 
+void BoxBlurRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
+  resizeBuffers(colorBuffer->getWidth(), colorBuffer->getHeight());
   MonoPassRenderProcess::setInputBuffer(std::move(colorBuffer), "uniBuffer");
 }
 

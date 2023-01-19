@@ -13,6 +13,7 @@ class VignetteRenderProcess final : public MonoPassRenderProcess {
 public:
   explicit VignetteRenderProcess(RenderGraph& renderGraph);
 
+  void resizeBuffers(unsigned int width, unsigned int height) override;
   void setInputBuffer(Texture2DPtr colorBuffer);
   void setOutputBuffer(Texture2DPtr colorBuffer);
   void setStrength(float strength) const;

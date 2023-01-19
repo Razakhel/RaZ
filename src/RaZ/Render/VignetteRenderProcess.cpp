@@ -21,11 +21,14 @@ VignetteRenderProcess::VignetteRenderProcess(RenderGraph& renderGraph)
   setColor(ColorPreset::Black);
 }
 
-void VignetteRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
-  const float frameRatio(static_cast<float>(colorBuffer->getWidth()) / static_cast<float>(colorBuffer->getHeight()));
+void VignetteRenderProcess::resizeBuffers(unsigned int width, unsigned int height) {
+  const float frameRatio = static_cast<float>(width) / static_cast<float>(height);
   m_pass.getProgram().setAttribute(frameRatio, "uniFrameRatio");
   m_pass.getProgram().sendAttributes();
+}
 
+void VignetteRenderProcess::setInputBuffer(Texture2DPtr colorBuffer) {
+  resizeBuffers(colorBuffer->getWidth(), colorBuffer->getHeight());
   MonoPassRenderProcess::setInputBuffer(std::move(colorBuffer), "uniBuffer");
 }
 

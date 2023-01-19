@@ -15,6 +15,7 @@ class ConvolutionRenderProcess : public MonoPassRenderProcess {
 public:
   ConvolutionRenderProcess(RenderGraph& renderGraph, const Mat3f& kernel, std::string passName = "Convolution");
 
+  void resizeBuffers(unsigned int width, unsigned int height) override;
   void setInputBuffer(Texture2DPtr colorBuffer);
   void setOutputBuffer(Texture2DPtr colorBuffer);
   void setKernel(const Mat3f& kernel) const;
