@@ -75,12 +75,12 @@ struct Degrees {
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param deg Degrees to be compared with.
   /// \return True if degrees' values are nearly equal, false otherwise.
-  constexpr bool operator==(const Degrees& deg) const { return FloatUtils::areNearlyEqual(value, deg.value); }
+  constexpr bool operator==(const Degrees& deg) const noexcept { return FloatUtils::areNearlyEqual(value, deg.value); }
   /// Checks if the current degrees angle is different from another given one.
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param deg Degrees to be compared with.
   /// \return True if degrees' values are different, false otherwise.
-  constexpr bool operator!=(const Degrees& deg) const { return !(*this == deg); }
+  constexpr bool operator!=(const Degrees& deg) const noexcept { return !(*this == deg); }
   /// Implicit degrees' value type conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Degrees object of the new type.
@@ -163,12 +163,12 @@ struct Radians {
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param rad Radians to be compared with.
   /// \return True if radians' values are nearly equal, false otherwise.
-  constexpr bool operator==(const Radians& rad) const { return FloatUtils::areNearlyEqual(value, rad.value); }
+  constexpr bool operator==(const Radians& rad) const noexcept { return FloatUtils::areNearlyEqual(value, rad.value); }
   /// Checks if the current radians angle is different from another given one.
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param rad Radians to be compared with.
   /// \return True if radians' values are different, false otherwise.
-  constexpr bool operator!=(const Radians& rad) const { return !(*this == rad); }
+  constexpr bool operator!=(const Radians& rad) const noexcept { return !(*this == rad); }
   /// Implicit radians' value type conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Radians object of the new type.

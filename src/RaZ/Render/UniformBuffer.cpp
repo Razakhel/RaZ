@@ -36,7 +36,12 @@ void UniformBuffer::bindUniformBlock(const ShaderProgram& program, unsigned int 
 }
 
 void UniformBuffer::bindUniformBlock(const ShaderProgram& program, const std::string& uboName, unsigned int shaderBindingIndex) const {
-  bindUniformBlock(program, Renderer::recoverUniformBlockIndex(program.getIndex(), uboName.c_str()), shaderBindingIndex);
+  const unsigned int blockIndex = Renderer::recoverUniformBlockIndex(program.getIndex(), uboName.c_str());
+
+  if (blockIndex == std::numeric_limits<unsigned int>::max())
+    return; // The uniform buffer is either not declared or unused in the given shader program; not binding anything
+
+  bindUniformBlock(program, blockIndex, shaderBindingIndex);
 }
 
 void UniformBuffer::bindBase(unsigned int bufferBindingIndex) const {
