@@ -66,6 +66,7 @@
 #include "Render/UniformBuffer.hpp"
 #include "Render/VignetteRenderProcess.hpp"
 #include "Render/Window.hpp"
+#include "Script/LuaWrapper.hpp"
 #include "Utils/CompilerUtils.hpp"
 #include "Utils/EnumUtils.hpp"
 #include "Utils/FilePath.hpp"

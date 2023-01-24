@@ -218,6 +218,7 @@ set(
     src/RaZ/Math/*.cpp
     src/RaZ/Physics/*.cpp
     src/RaZ/Render/*.cpp
+    src/RaZ/Script/*.cpp
     src/RaZ/Utils/*.cpp
 
     include/RaZ/*.hpp
@@ -232,6 +233,7 @@ set(
     include/RaZ/Physics/*.hpp
     include/RaZ/Render/*.hpp
     include/RaZ/Render/*.inl
+    include/RaZ/Script/*.hpp
     include/RaZ/Utils/*.hpp
     include/RaZ/Utils/*.inl
 )
@@ -410,6 +412,18 @@ endif ()
 
 if (RAZ_USE_SOL2)
     target_link_libraries(RaZ PRIVATE Sol2 Lua)
+else ()
+    file(
+        GLOB
+        RAZ_LUA_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Script/*"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Script/*"
+    )
+
+    list(REMOVE_ITEM RAZ_FILES ${RAZ_LUA_FILES})
+
+    target_compile_definitions(RaZ PUBLIC RAZ_NO_LUA)
 endif ()
 
 # Compiling RaZ's sources

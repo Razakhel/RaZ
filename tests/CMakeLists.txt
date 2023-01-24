@@ -74,6 +74,10 @@ if (RAZ_USE_AUDIO)
     list(APPEND RAZ_TESTS_SRC src/RaZ/Audio/*.cpp)
 endif ()
 
+if (RAZ_USE_SOL2)
+    list(APPEND RAZ_TESTS_SRC src/RaZ/Script/*.cpp)
+endif ()
+
 file(
     GLOB
     RAZ_TESTS_FILES
