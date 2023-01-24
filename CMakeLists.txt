@@ -408,6 +408,10 @@ else ()
     target_compile_definitions(RaZ PUBLIC RAZ_NO_OVERLAY)
 endif ()
 
+if (RAZ_USE_SOL2)
+    target_link_libraries(RaZ PRIVATE Sol2 Lua)
+endif ()
+
 # Compiling RaZ's sources
 target_sources(RaZ PRIVATE ${RAZ_FILES})
 

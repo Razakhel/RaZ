@@ -176,6 +176,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd5246 # Initialization of subobject should be wrapped in braces
             /wd5264 # const(expr) variable not used
 
+            # Warnings triggered by Sol
+            /wd4371 # Class layout may have changed from a previous compiler version due to better packing
+
             # Warnings triggered by the FBX SDK
             /wd4266 # No override available (function is hidden)
             /wd4365 # Signed/unsigned mismatch (implicit conversion)
@@ -217,6 +220,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
             ${COMPILER_FLAGS}
             /permissive- # Improving standard compliance
+            /bigobj # Allowing object files to be bigger
             /EHsc # Enabling exceptions
             /utf-8 # Forcing MSVC to actually handle files as UTF-8
             /Zc:__cplusplus # Forcing the __cplusplus definition to be of the proper value

@@ -25,3 +25,8 @@ option(RAZ_USE_IMGUI "Compile & use ImGui" ON)
 if (RAZ_USE_IMGUI)
     include(ImGui)
 endif ()
+
+option(RAZ_USE_SOL2 "Use Sol2" ON)
+if (RAZ_USE_SOL2)
+    include(Sol2)
+endif ()
