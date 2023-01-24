@@ -8,18 +8,12 @@ add_library(libpng OBJECT)
 
 target_compile_features(libpng PRIVATE c_std_11)
 
-set(
-    PNG_SRC
-
-    png/*.c
-    png/*.h
-)
-
 file(
     GLOB
     PNG_FILES
 
-    ${PNG_SRC}
+    png/*.c
+    png/*.h
 )
 
 # Building libpng

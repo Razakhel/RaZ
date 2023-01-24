@@ -15,18 +15,12 @@ elseif (RAZ_PLATFORM_MAC)
     set(GLEW_LINKER_FLAGS OpenGL::GL)
 endif ()
 
-set(
-    GLEW_SRC
-
-    glew/src/*.c
-    glew/include/GL/*.h
-)
-
 file(
     GLOB
     GLEW_FILES
 
-    ${GLEW_SRC}
+    glew/src/*.c
+    glew/include/GL/*.h
 )
 
 # Building GLEW

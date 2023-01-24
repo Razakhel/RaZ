@@ -18,21 +18,15 @@ target_compile_features(ImGui PRIVATE cxx_std_17)
 # The needed Freetype header ft2build.h seems to be found only when calling aux_source_directory(); this call is thus kept instead of manually finding files
 aux_source_directory(imgui IMGUI_SRC)
 
-set(
-    IMGUI_SRC
-
-    ${IMGUI_SRC}
-    imgui/*.h
-    imgui/misc/cpp/*.cpp
-    implot/*.h
-    implot/*.cpp
-)
-
 file(
     GLOB_RECURSE
     IMGUI_FILES
 
     ${IMGUI_SRC}
+    imgui/misc/cpp/*.cpp
+    imgui/*.h
+    implot/*.cpp
+    implot/*.h
 )
 
 if (NOT RAZ_USE_GLFW AND NOT RAZ_USE_EMSCRIPTEN)
