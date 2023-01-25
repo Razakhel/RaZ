@@ -24,6 +24,7 @@ public:
   static bool executeFromFile(const FilePath& filePath);
 
 private:
+  static void registerAnimationTypes();
   static void registerDataTypes();
   static void registerMathTypes();
   static void registerUtilsTypes();

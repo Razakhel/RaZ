@@ -31,30 +31,39 @@ TEST_CASE("Skeleton rotation chain") {
   // Applying a rotation on the root joint
   root.rotate(rootRotation);
 
-  const Raz::Mat4f rootRotationMat = rootRotation.computeMatrix();
-
   // Checking that the rotation has been applied to the root joint...
-  CHECK_THAT(root.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotationMat));
+  CHECK_THAT(root.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
+  CHECK_THAT(root.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotation.computeMatrix()));
 
   // ... and to every subsequent joint
-  CHECK_THAT(child1.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotationMat));
-  CHECK_THAT(child11.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotationMat));
-  CHECK_THAT(child12.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotationMat));
-  CHECK_THAT(child2.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotationMat));
+  CHECK_THAT(child1.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
+  CHECK_THAT(child11.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
+  CHECK_THAT(child12.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
+  CHECK_THAT(child2.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
 
-  const Raz::Quaternionf child1Rotation(180_deg, Raz::Axis::X);
+  const Raz::Quaternionf child1Rotation(-180_deg, Raz::Axis::Y);
 
   // However, when applying a rotation on a joint further in the tree
   child1.rotate(child1Rotation);
 
-  const Raz::Mat4f resChild1RotationMat = (rootRotation * child1Rotation).computeMatrix();
-
   // Checking that child1 and its children have been affected...
-  CHECK_THAT(child1.computeTransformMatrix(), IsNearlyEqualToMatrix(resChild1RotationMat));
-  CHECK_THAT(child11.computeTransformMatrix(), IsNearlyEqualToMatrix(resChild1RotationMat));
-  CHECK_THAT(child12.computeTransformMatrix(), IsNearlyEqualToMatrix(resChild1RotationMat));
+  CHECK_THAT(child1.getRotation(), IsNearlyEqualToQuaternion(Raz::Quaternionf::identity()));
+  CHECK_THAT(child11.getRotation(), IsNearlyEqualToQuaternion(Raz::Quaternionf::identity()));
+  CHECK_THAT(child12.getRotation(), IsNearlyEqualToQuaternion(Raz::Quaternionf::identity()));
 
   // ... but not the other joints
-  CHECK_THAT(root.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotationMat));
-  CHECK_THAT(child2.computeTransformMatrix(), IsNearlyEqualToMatrix(rootRotationMat));
+  CHECK_THAT(root.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
+  CHECK_THAT(child2.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
+
+  root.removeChildren(child1, child2);
+  CHECK(root.isIsolated());
+
+  root.rotate(child1Rotation);
+
+  // Since the root now doesn't have any child, only itself has been transformed
+  CHECK_THAT(root.getRotation(), IsNearlyEqualToQuaternion(Raz::Quaternionf::identity()));
+  CHECK_THAT(child1.getRotation(), IsNearlyEqualToQuaternion(Raz::Quaternionf::identity()));
+  CHECK_THAT(child11.getRotation(), IsNearlyEqualToQuaternion(Raz::Quaternionf::identity()));
+  CHECK_THAT(child12.getRotation(), IsNearlyEqualToQuaternion(Raz::Quaternionf::identity()));
+  CHECK_THAT(child2.getRotation(), IsNearlyEqualToQuaternion(rootRotation));
 }

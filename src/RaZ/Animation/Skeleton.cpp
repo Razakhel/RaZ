@@ -2,6 +2,13 @@
 
 namespace Raz {
 
+void SkeletonJoint::rotate(const Quaternionf& rotation) {
+  m_rotation *= rotation;
+
+  for (SkeletonJoint* child : m_children)
+    child->rotate(rotation);
+}
+
 Mat4f SkeletonJoint::computeTransformMatrix() const {
   Mat4f transformMat = m_rotation.computeMatrix();
   transformMat[12]   = m_translation.x();
@@ -9,13 +16,6 @@ Mat4f SkeletonJoint::computeTransformMatrix() const {
   transformMat[14]   = m_translation.z();
 
   return transformMat;
-}
-
-void SkeletonJoint::rotate(const Quaternionf& rotation) {
-  m_rotation *= rotation;
-
-  for (SkeletonJoint* child : m_children)
-    child->rotate(rotation);
 }
 
 } // namespace Raz

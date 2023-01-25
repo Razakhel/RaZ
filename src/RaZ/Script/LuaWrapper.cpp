@@ -9,6 +9,7 @@
 namespace Raz {
 
 void LuaWrapper::registerTypes() {
+  registerAnimationTypes();
   registerDataTypes();
   registerMathTypes();
   registerUtilsTypes();

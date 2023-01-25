@@ -22,10 +22,9 @@ public:
   void setRotation(const Quaternionf& rotation) { m_rotation = rotation; }
   void setTranslation(const Vec3f& translation) { m_translation = translation; }
 
-  Mat4f computeTransformMatrix() const;
-
   void rotate(const Quaternionf& rotation);
   void translate(const Vec3f& translation) { m_translation += translation; }
+  Mat4f computeTransformMatrix() const;
 
   SkeletonJoint& operator=(const SkeletonJoint&) = delete;
   SkeletonJoint& operator=(SkeletonJoint&& joint) noexcept = default;
