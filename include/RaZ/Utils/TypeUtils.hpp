@@ -7,6 +7,31 @@
 
 namespace Raz::TypeUtils {
 
+template <typename... Args>
+struct ConstOverload {
+  template <typename RetT, typename T>
+  constexpr auto operator()(RetT (T::*ptr)(Args...) const) const noexcept { return ptr; }
+};
+
+template <typename... Args>
+struct NonConstOverload {
+  template <typename RetT, typename T>
+  constexpr auto operator()(RetT (T::*ptr)(Args...)) const noexcept { return ptr; }
+};
+
+template <typename... Args>
+struct Overload : ConstOverload<Args...>, NonConstOverload<Args...> {
+  using ConstOverload<Args...>::operator();
+  using NonConstOverload<Args...>::operator();
+
+  template <typename RetT>
+  constexpr auto operator()(RetT (*ptr)(Args...)) const noexcept { return ptr; }
+};
+
+template <typename... Args> constexpr ConstOverload<Args...> PickConstOverload {};
+template <typename... Args> constexpr NonConstOverload<Args...> PickNonConstOverload {};
+template <typename... Args> constexpr Overload<Args...> PickOverload {};
+
 /// Recovers a string of the given type's name at compile-time.
 /// \tparam T Type to recover the name of.
 /// \return String representing the type's name.
