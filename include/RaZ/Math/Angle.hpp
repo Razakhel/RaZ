@@ -17,8 +17,8 @@ template <typename T>
 struct Degrees {
   static_assert(std::is_floating_point_v<T>, "Error: Degrees' type must be floating point.");
 
-  constexpr explicit Degrees(T val) : value{ val } {}
-  constexpr explicit Degrees(Radians<T> rad) : value{ rad.value * 180 / Pi<T> } {}
+  constexpr explicit Degrees(T val) noexcept : value{ val } {}
+  constexpr explicit Degrees(Radians<T> rad) noexcept : value{ rad.value * 180 / Pi<T> } {}
   constexpr Degrees(const Degrees&) = default;
   constexpr Degrees(Degrees&&) noexcept = default;
 
@@ -30,47 +30,47 @@ struct Degrees {
   constexpr Degrees& operator=(Degrees&&) noexcept = default;
   /// Degrees negation operator.
   /// \return Negated degrees object.
-  constexpr Degrees operator-() const { return Degrees(-value); }
+  constexpr Degrees operator-() const noexcept { return Degrees(-value); }
   /// Degrees-value addition operator.
   /// \tparam ValT Type of the value to be added.
   /// \param val Value to be added.
   /// \return Result of the degrees object summed with the value.
-  template <typename ValT> constexpr Degrees operator+(ValT val) const { return Degrees(value + static_cast<T>(val)); }
+  template <typename ValT> constexpr Degrees operator+(ValT val) const noexcept { return Degrees(value + static_cast<T>(val)); }
   /// Degrees-value substraction operator.
   /// \tparam ValT Type of the value to be substracted.
   /// \param val Value to be substracted.
   /// \return Result of the degrees object substracted by the value.
-  template <typename ValT> constexpr Degrees operator-(ValT val) const { return Degrees(value - static_cast<T>(val)); }
+  template <typename ValT> constexpr Degrees operator-(ValT val) const noexcept { return Degrees(value - static_cast<T>(val)); }
   /// Degrees-value multiplication operator.
   /// \tparam ValT Type of the value to be multiplied by.
   /// \param val Value to be multiplied by.
   /// \return Result of the degrees object multiplied by the value.
-  template <typename ValT> constexpr Degrees operator*(ValT val) const { return Degrees(value * static_cast<T>(val)); }
+  template <typename ValT> constexpr Degrees operator*(ValT val) const noexcept { return Degrees(value * static_cast<T>(val)); }
   /// Degrees-value division operator.
   /// \tparam ValT Type of the value to be divided by.
   /// \param val Value to be divided by.
   /// \return Result of the degrees object divided by the value.
-  template <typename ValT> constexpr Degrees operator/(ValT val) const { return Degrees(value / static_cast<T>(val)); }
+  template <typename ValT> constexpr Degrees operator/(ValT val) const noexcept { return Degrees(value / static_cast<T>(val)); }
   /// Radians-value addition assignment operator.
   /// \tparam ValT Type of the value to be added.
   /// \param val Value to be added.
   /// \return Reference to the modified original degrees object.
-  template <typename ValT> constexpr Degrees& operator+=(ValT val) { value += static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Degrees& operator+=(ValT val) noexcept { value += static_cast<T>(val); return *this; }
   /// Radians-value substraction assignment operator.
   /// \tparam ValT Type of the value to be substracted.
   /// \param val Value to be substracted.
   /// \return Reference to the modified original degrees object.
-  template <typename ValT> constexpr Degrees& operator-=(ValT val) { value -= static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Degrees& operator-=(ValT val) noexcept { value -= static_cast<T>(val); return *this; }
   /// Radians-value multiplication assignment operator.
   /// \tparam ValT Type of the value to be multiplied by.
   /// \param val Value to be multiplied by.
   /// \return Reference to the modified original degrees object.
-  template <typename ValT> constexpr Degrees& operator*=(ValT val) { value *= static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Degrees& operator*=(ValT val) noexcept { value *= static_cast<T>(val); return *this; }
   /// Radians-value division assignment operator.
   /// \tparam ValT Type of the value to be divided by.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original degrees object.
-  template <typename ValT> constexpr Degrees& operator/=(ValT val) { value /= static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Degrees& operator/=(ValT val) noexcept { value /= static_cast<T>(val); return *this; }
   /// Checks if the current degrees angle is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param deg Degrees to be compared with.
@@ -84,11 +84,11 @@ struct Degrees {
   /// Implicit degrees' value type conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Degrees object of the new type.
-  template <typename T2> constexpr operator Degrees<T2>() const { return Degrees<T2>(static_cast<T2>(value)); }
+  template <typename T2> constexpr operator Degrees<T2>() const noexcept { return Degrees<T2>(static_cast<T2>(value)); }
   /// Implicit degrees to radians conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Radians object of the new type.
-  template <typename T2> constexpr operator Radians<T2>() const { return Radians<T2>(Degrees<T2>(static_cast<T2>(value))); }
+  template <typename T2> constexpr operator Radians<T2>() const noexcept { return Radians<T2>(Degrees<T2>(static_cast<T2>(value))); }
 
   T value;
 };
@@ -105,8 +105,8 @@ template <typename T>
 struct Radians {
   static_assert(std::is_floating_point_v<T>, "Error: Radians' type must be floating point.");
 
-  constexpr explicit Radians(T val) : value{ val } {}
-  constexpr explicit Radians(Degrees<T> deg) : value{ deg.value * Pi<T> / 180 } {}
+  constexpr explicit Radians(T val) noexcept : value{ val } {}
+  constexpr explicit Radians(Degrees<T> deg) noexcept : value{ deg.value * Pi<T> / 180 } {}
   Radians(const Radians&) = default;
   Radians(Radians&&) noexcept = default;
 
@@ -118,47 +118,47 @@ struct Radians {
   Radians& operator=(Radians&&) noexcept = default;
   /// Radians negation operator.
   /// \return Negated radians object.
-  constexpr Radians operator-() const { return Radians(-value); }
+  constexpr Radians operator-() const noexcept { return Radians(-value); }
   /// Radians-value addition operator.
   /// \tparam ValT Type of the value to be added.
   /// \param val Value to be added.
   /// \return Result of the radians object summed with the value.
-  template <typename ValT> constexpr Radians operator+(ValT val) const { return Radians(value + static_cast<T>(val)); }
+  template <typename ValT> constexpr Radians operator+(ValT val) const noexcept { return Radians(value + static_cast<T>(val)); }
   /// Radians-value substraction operator.
   /// \tparam ValT Type of the value to be substracted.
   /// \param val Value to be substracted.
   /// \return Result of the radians object substracted by the value.
-  template <typename ValT> constexpr Radians operator-(ValT val) const { return Radians(value - static_cast<T>(val)); }
+  template <typename ValT> constexpr Radians operator-(ValT val) const noexcept { return Radians(value - static_cast<T>(val)); }
   /// Radians-value multiplication operator.
   /// \tparam ValT Type of the value to be multiplied by.
   /// \param val Value to be multiplied by.
   /// \return Result of the radians object multiplied by the value.
-  template <typename ValT> constexpr Radians operator*(ValT val) const { return Radians(value * static_cast<T>(val)); }
+  template <typename ValT> constexpr Radians operator*(ValT val) const noexcept { return Radians(value * static_cast<T>(val)); }
   /// Radians-value division operator.
   /// \tparam ValT Type of the value to be divided by.
   /// \param val Value to be divided by.
   /// \return Result of the radians object divided by the value.
-  template <typename ValT> constexpr Radians operator/(ValT val) const { return Radians(value / static_cast<T>(val)); }
+  template <typename ValT> constexpr Radians operator/(ValT val) const noexcept { return Radians(value / static_cast<T>(val)); }
   /// Radians-value addition assignment operator.
   /// \tparam ValT Type of the value to be added.
   /// \param val Value to be added.
   /// \return Reference to the modified original radians object.
-  template <typename ValT> constexpr Radians& operator+=(ValT val) { value += static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Radians& operator+=(ValT val) noexcept { value += static_cast<T>(val); return *this; }
   /// Radians-value substraction assignment operator.
   /// \tparam ValT Type of the value to be substracted.
   /// \param val Value to be substracted.
   /// \return Reference to the modified original radians object.
-  template <typename ValT> constexpr Radians& operator-=(ValT val) { value -= static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Radians& operator-=(ValT val) noexcept { value -= static_cast<T>(val); return *this; }
   /// Radians-value multiplication assignment operator.
   /// \tparam ValT Type of the value to be multiplied by.
   /// \param val Value to be multiplied by.
   /// \return Reference to the modified original radians object.
-  template <typename ValT> constexpr Radians& operator*=(ValT val) { value *= static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Radians& operator*=(ValT val) noexcept { value *= static_cast<T>(val); return *this; }
   /// Radians-value division assignment operator.
   /// \tparam ValT Type of the value to be divided by.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original radians object.
-  template <typename ValT> constexpr Radians& operator/=(ValT val) { value /= static_cast<T>(val); return *this; }
+  template <typename ValT> constexpr Radians& operator/=(ValT val) noexcept { value /= static_cast<T>(val); return *this; }
   /// Checks if the current radians angle is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param rad Radians to be compared with.
@@ -172,11 +172,11 @@ struct Radians {
   /// Implicit radians' value type conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Radians object of the new type.
-  template <typename T2> constexpr operator Radians<T2>() const { return Radians<T2>(static_cast<T2>(value)); }
+  template <typename T2> constexpr operator Radians<T2>() const noexcept { return Radians<T2>(static_cast<T2>(value)); }
   /// Implicit radians to degrees conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Degrees object of the new type.
-  template <typename T2> constexpr operator Degrees<T2>() const { return Degrees<T2>(Radians<T2>(static_cast<T2>(value))); }
+  template <typename T2> constexpr operator Degrees<T2>() const noexcept { return Degrees<T2>(Radians<T2>(static_cast<T2>(value))); }
 
   T value;
 };
@@ -192,15 +192,19 @@ namespace Literals {
 /// Degrees user-defined literal.
 /// \param val Value in degrees.
 /// \return Degrees object containing the given value.
-constexpr Degreesld operator ""_deg(unsigned long long val) { return Degreesld(static_cast<long double>(val)); }
+constexpr Degreesld operator ""_deg(unsigned long long val) noexcept { return Degreesld(static_cast<long double>(val)); }
 /// Degrees user-defined literal.
 /// \param val Value in degrees.
 /// \return Degrees object containing the given value.
-constexpr Degreesld operator ""_deg(long double val) { return Degreesld(val); }
+constexpr Degreesld operator ""_deg(long double val) noexcept { return Degreesld(val); }
 /// Radians user-defined literal.
 /// \param val Value in radians.
 /// \return Radians object containing the given value.
-constexpr Radiansld operator ""_rad(long double val) { return Radiansld(val); }
+constexpr Radiansld operator ""_rad(unsigned long long val) noexcept { return Radiansld(static_cast<long double>(val)); }
+/// Radians user-defined literal.
+/// \param val Value in radians.
+/// \return Radians object containing the given value.
+constexpr Radiansld operator ""_rad(long double val) noexcept { return Radiansld(val); }
 
 } // namespace Literals
 
