@@ -26,26 +26,34 @@ public:
   void setRotation(const Quaternionf& rotation);
   void setRotation(Radiansf angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis)); }
   void setScale(const Vec3f& scale);
-  void setScale(float val) { setScale(val, val, val); }
   void setScale(float x, float y, float z) { setScale(Vec3f(x, y, z)); }
+  void setScale(float val) { setScale(val, val, val); }
   void setUpdated(bool updated) { m_updated = updated; }
 
+  /// Moves by the given values in relative coordinates (takes rotation into account).
+  /// \param displacement Displacement to be moved by.
+  void move(const Vec3f& displacement) { translate(m_rotation * displacement); }
   /// Moves by the given values in relative coordinates (takes rotation into account).
   /// \param x Value of X to be moved by.
   /// \param y Value of Y to be moved by.
   /// \param z Value of Z to be moved by.
   void move(float x, float y, float z) { move(Vec3f(x, y, z)); }
-  /// Moves by the given values in relative coordinates (takes rotation into account).
-  /// \param displacement Displacement to be moved by.
-  void move(const Vec3f& displacement) { translate(m_rotation * displacement); }
+  /// Translates by the given values in absolute coordinates (does not take rotation into account).
+  /// \param displacement Displacement to be translated by.
+  void translate(const Vec3f& displacement) { translate(displacement.x(), displacement.y(), displacement.z()); }
   /// Translates by the given values in absolute coordinates (does not take rotation into account).
   /// \param x Value of X to be translated by.
   /// \param y Value of Y to be translated by.
   /// \param z Value of Z to be translated by.
   void translate(float x, float y, float z);
-  /// Translates by the given values in absolute coordinates (does not take rotation into account).
-  /// \param displacement Displacement to be translated by.
-  void translate(const Vec3f& displacement) { translate(displacement.x(), displacement.y(), displacement.z()); }
+  /// Rotates by the given quaternion.
+  /// \param rotation Rotation quaternion to rotate by.
+  void rotate(const Quaternionf& rotation);
+  /// Rotates by the given angle around the given axis.
+  /// The axis must be a normalized vector for this function to work properly.
+  /// \param angle Angle to rotate by.
+  /// \param axis Axis to rotate around.
+  void rotate(Radiansf angle, const Vec3f& axis);
   /// Rotates around the given axes. This locks the up vector, preventing any rolling effect.
   /// \param xAngle Value of X to rotate around.
   /// \param yAngle Value of Y to rotate around.
@@ -55,14 +63,10 @@ public:
   /// \param yAngle Value of Y to rotate around.
   /// \param zAngle Value of Z to rotate around.
   void rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle);
-  /// Rotates by the given quaternion.
-  /// \param rotation Rotation quaternion to rotate by.
-  void rotate(const Quaternionf& rotation);
-  /// Rotates by the given angle around the given axis.
-  /// The axis must be a normalized vector for this function to work properly.
-  /// \param angle Angle to rotate by.
-  /// \param axis Axis to rotate around.
-  void rotate(Radiansf angle, const Vec3f& axis);
+  /// Scales by the given values.
+  /// The scaling is a coefficient: scaling by a value of 2 doubles the size, while a value of 0.5 shrinks it by half.
+  /// \param values Values to be scaled by.
+  void scale(const Vec3f& values) { scale(values.x(), values.y(), values.z()); }
   /// Scales by the given values.
   /// The scaling is a coefficient: scaling by a value of 2 doubles the size, while a value of 0.5 shrinks it by half.
   /// \param x Value of X to be scaled by.
@@ -73,10 +77,6 @@ public:
   /// The scaling is a coefficient: scaling by a value of 2 doubles the size, while a value of 0.5 shrinks it by half.
   /// \param val Value to be scaled by.
   void scale(float val) { scale(val, val, val); }
-  /// Scales by the given values.
-  /// The scaling is a coefficient: scaling by a value of 2 doubles the size, while a value of 0.5 shrinks it by half.
-  /// \param values Values to be scaled by.
-  void scale(const Vec3f& values) { scale(values.x(), values.y(), values.z()); }
   /// Computes the translation matrix (identity matrix with the translation in the last row).
   /// \param reverseTranslation True if the translation should be reversed (negated), false otherwise.
   /// \return Translation matrix.

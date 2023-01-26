@@ -91,10 +91,6 @@ public:
   /// Default move assignment operator.
   /// \return Reference to the moved quaternion.
   constexpr Quaternion& operator=(Quaternion&&) noexcept = default;
-  /// Quaternion-vector multiplication. Rotates a given vector from the current quaternion's rotation. The quaternion must be normalized.
-  /// \param vec Vector to be rotated.
-  /// \return Rotated vector.
-  constexpr Vec3<T> operator*(const Vec3<T>& vec) const noexcept;
   /// Quaternions multiplication.
   /// \param quat Quaternion to be multiplied by.
   /// \return Result of the multiplied quaternions.
@@ -128,8 +124,21 @@ private:
   Vec3<T> m_complexes {};
 };
 
+/// Quaternion-vector multiplication. Rotates the vector by the rotation represented by the quaternion. The quaternion must be normalized.
+/// \tparam T Type of the quaternion's & vector's data.
+/// \param quat Quaternion to rotate by.
+/// \param vec Vector to be rotated.
+/// \return Rotated vector.
 template <typename T>
-Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat);
+constexpr Vec3<T> operator*(const Quaternion<T>& quat, const Vec3<T>& vec) noexcept;
+
+/// Vector-quaternion multiplication. Rotates the vector by the inverse rotation represented by the quaternion. The quaternion must be normalized.
+/// \tparam T Type of the vector's & quaternion's data.
+/// \param vec Vector to be rotated.
+/// \param quat Quaternion to rotate by.
+/// \return Rotated vector.
+template <typename T>
+constexpr Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat) noexcept;
 
 // Deduction guides
 

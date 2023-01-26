@@ -121,17 +121,6 @@ constexpr Mat4<T> Quaternion<T>::computeMatrix() const noexcept(std::is_integral
 }
 
 template <typename T>
-constexpr Vec3<T> Quaternion<T>::operator*(const Vec3<T>& vec) const noexcept {
-  // Quaternion/vector multiplications are supposed to be made with unit quaternions only, hence the conjugation instead of the inversion
-  // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
-  // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
-
-  Quaternion<T> vecQuat(0.f, vec.x(), vec.y(), vec.z());
-  vecQuat = *this * vecQuat * conjugate();
-  return vecQuat.m_complexes;
-}
-
-template <typename T>
 constexpr Quaternion<T> Quaternion<T>::operator*(const Quaternion& quat) const noexcept {
   Quaternion<T> res = *this;
   res *= quat;
@@ -185,7 +174,18 @@ constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T currCoeff,
 }
 
 template <typename T>
-Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat) {
+constexpr Vec3<T> operator*(const Quaternion<T>& quat, const Vec3<T>& vec) noexcept {
+  // Quaternion/vector multiplications are supposed to be made with unit quaternions only, hence the conjugation instead of the inversion
+  // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
+  // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
+
+  Quaternion<T> vecQuat(0.f, vec.x(), vec.y(), vec.z());
+  vecQuat = quat * vecQuat * quat.conjugate();
+  return Vec3<T>(vecQuat.x(), vecQuat.y(), vecQuat.z());
+}
+
+template <typename T>
+constexpr Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat) noexcept {
   // Quaternion/vector multiplications are supposed to be made with unit quaternions only, hence the conjugation instead of the inversion
   // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
   // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors

@@ -8,6 +8,10 @@
 
 namespace Raz {
 
+void LuaWrapper::registerTypes() {
+  registerMathTypes();
+}
+
 bool LuaWrapper::execute(const std::string& code) {
   if (code.empty())
     return false;

@@ -13,6 +13,7 @@ class FilePath;
 
 class LuaWrapper {
 public:
+  static void registerTypes();
   /// Executes a script from a string.
   /// \param code Code to be executed.
   /// \return True if the script has been executed without errors, false otherwise.
@@ -23,6 +24,8 @@ public:
   static bool executeFromFile(const FilePath& filePath);
 
 private:
+  static void registerMathTypes();
+
   static sol::state& getState();
 };
 

@@ -377,42 +377,6 @@ constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const noexcept(std::
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Vector<T, H> Matrix<T, W, H>::operator*(const Vector<T, W>& vec) const noexcept {
-  // This multiplication is made assuming the vector to be vertical
-  Vector<T, H> res;
-
-  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
-    const std::size_t finalWidthIndex = widthIndex * H;
-
-    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex)
-      res[heightIndex] += m_data[finalWidthIndex + heightIndex] * vec[widthIndex];
-  }
-
-  return res;
-}
-
-template <typename T, std::size_t W, std::size_t H>
-template <std::size_t WI, std::size_t HI>
-constexpr Matrix<T, H, WI> Matrix<T, W, H>::operator*(const Matrix<T, WI, HI>& mat) const noexcept {
-  static_assert(W == HI, "Error: Input matrix's width must be equal to current matrix's height.");
-
-  Matrix<T, H, WI> res;
-
-  for (std::size_t widthIndex = 0; widthIndex < WI; ++widthIndex) {
-    const std::size_t finalWidthIndex = widthIndex * H;
-
-    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
-      T& val = res[finalWidthIndex + heightIndex];
-
-      for (std::size_t stride = 0; stride < W; ++stride)
-        val += getElement(stride, heightIndex) * mat.getElement(widthIndex, stride);
-    }
-  }
-
-  return res;
-}
-
-template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] += mat[i];
@@ -549,6 +513,41 @@ constexpr void Matrix<T, W, H>::setColumns(Vec&& vec, Vecs&&... args) noexcept {
 
   if constexpr (sizeof...(args) > 0)
     setColumns(std::forward<Vecs>(args)...);
+}
+
+template <typename T, std::size_t W, std::size_t H, std::size_t WI, std::size_t HI>
+constexpr Matrix<T, H, WI> operator*(const Matrix<T, W, H>& mat1, const Matrix<T, WI, HI>& mat2) noexcept {
+  static_assert(W == HI, "Error: The left-hand matrix's width must be equal to the right-hand matrix's height.");
+
+  Matrix<T, H, WI> res;
+
+  for (std::size_t widthIndex = 0; widthIndex < WI; ++widthIndex) {
+    const std::size_t finalWidthIndex = widthIndex * H;
+
+    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
+      T& val = res[finalWidthIndex + heightIndex];
+
+      for (std::size_t stride = 0; stride < W; ++stride)
+        val += mat1.getElement(stride, heightIndex) * mat2.getElement(widthIndex, stride);
+    }
+  }
+
+  return res;
+}
+
+template <typename T, std::size_t W, std::size_t H>
+constexpr Vector<T, H> operator*(const Matrix<T, W, H>& mat, const Vector<T, W>& vec) noexcept {
+  // This multiplication is made assuming the vector to be vertical
+  Vector<T, H> res;
+
+  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
+    const std::size_t finalWidthIndex = widthIndex * H;
+
+    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex)
+      res[heightIndex] += mat[finalWidthIndex + heightIndex] * vec[widthIndex];
+  }
+
+  return res;
 }
 
 } // namespace Raz

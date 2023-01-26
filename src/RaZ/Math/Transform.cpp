@@ -25,6 +25,16 @@ void Transform::translate(float x, float y, float z) {
   m_updated = true;
 }
 
+void Transform::rotate(const Quaternionf& rotation) {
+  m_rotation *= rotation;
+  m_updated   = true;
+}
+
+void Transform::rotate(Radiansf angle, const Vec3f& axis) {
+  assert("Error: Rotation axis must be normalized." && FloatUtils::areNearlyEqual(axis.computeLength(), 1.f));
+  rotate(Quaternionf(angle, axis));
+}
+
 void Transform::rotate(Radiansf xAngle, Radiansf yAngle) {
   const Quaternionf xQuat(xAngle, Axis::X);
   const Quaternionf yQuat(yAngle, Axis::Y);
@@ -40,17 +50,6 @@ void Transform::rotate(Radiansf xAngle, Radiansf yAngle, Radiansf zAngle) {
   m_rotation *= zQuat * xQuat * yQuat;
 
   m_updated = true;
-}
-
-void Transform::rotate(const Quaternionf& rotation) {
-  m_rotation *= rotation;
-  m_updated   = true;
-}
-
-void Transform::rotate(Radiansf angle, const Vec3f& axis) {
-  assert("Error: Rotation axis must be normalized." && FloatUtils::areNearlyEqual(axis.computeLength(), 1.f));
-
-  rotate(Quaternionf(angle, axis));
 }
 
 void Transform::scale(float x, float y, float z) {

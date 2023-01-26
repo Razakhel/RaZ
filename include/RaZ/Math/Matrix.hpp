@@ -136,17 +136,6 @@ public:
   /// \param val Value to be divided by.
   /// \return Result of the matrix divided by the value.
   constexpr Matrix operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
-  /// Matrix-vector multiplication operator (assumes the vector to be vertical).
-  /// \param vec Vector to be multiplied by.
-  /// \return Result of the matrix-vector multiplication.
-  constexpr Vector<T, H> operator*(const Vector<T, W>& vec) const noexcept;
-  /// Matrix-matrix multiplication operator.
-  /// \tparam WI Input matrix's width.
-  /// \tparam HI Input matrix's height.
-  /// \param mat Matrix to be multiplied by.
-  /// \return Result of the multiplied matrices.
-  template <std::size_t WI, std::size_t HI>
-  constexpr Matrix<T, H, WI> operator*(const Matrix<T, WI, HI>& mat) const noexcept;
   /// Element-wise matrix-matrix addition assignment operator.
   /// \param mat Matrix to be added.
   /// \return Reference to the modified original matrix.
@@ -230,6 +219,27 @@ private:
 
   std::array<T, W * H> m_data {};
 };
+
+/// Matrix-matrix multiplication operator.
+/// \tparam W Width of the left-hand matrix.
+/// \tparam H Height of the left-hand matrix & width of the resulting one.
+/// \tparam WI Width of the right-hand matrix & height of the resulting one.
+/// \tparam HI Height of the right-hand matrix.
+/// \param mat1 Left-hand matrix.
+/// \param mat2 Right-hand matrix.
+/// \return Result of the multiplied matrices.
+template <typename T, std::size_t W, std::size_t H, std::size_t WI, std::size_t HI>
+constexpr Matrix<T, H, WI> operator*(const Matrix<T, WI, H>& mat1, const Matrix<T, WI, HI>& mat2) noexcept;
+
+/// Matrix-vector multiplication operator (assumes the vector to be vertical).
+/// \tparam T Type of the matrix's & vector's data.
+/// \tparam W Width of the matrix & size of the input vector.
+/// \tparam H Height of the matrix & size of the resulting vector.
+/// \param mat Left-hand matrix.
+/// \param vec Right-hand vector.
+/// \return Result of the matrix-vector multiplication.
+template <typename T, std::size_t W, std::size_t H>
+constexpr Vector<T, H> operator*(const Matrix<T, W, H>& mat, const Vector<T, W>& vec) noexcept;
 
 // Aliases
 

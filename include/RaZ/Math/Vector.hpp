@@ -159,11 +159,6 @@ public:
   /// \param val Value to be divided by.
   /// \return Result of the vector divided by the value.
   constexpr Vector operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
-  /// Vector-matrix multiplication operator (assumes the vector to be horizontal).
-  /// \tparam W Width of the input matrix.
-  /// \param mat Matrix to be multiplied by.
-  /// \return Result of the vector-matrix multiplication.
-  template <std::size_t W> constexpr Vector<T, W> operator*(const Matrix<T, W, Size>& mat) const noexcept;
   /// Element-wise vector-vector addition assignment operator.
   /// \param vec Vector to be added.
   /// \return Reference to the modified original vector.
@@ -241,6 +236,16 @@ constexpr Vector<T, Size> operator+(T val, const Vector<T, Size>& vec) noexcept 
 /// \return Multiplied vector.
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> operator*(T val, const Vector<T, Size>& vec) noexcept { return vec * val; }
+
+/// Vector-matrix multiplication operator (assumes the vector to be horizontal).
+/// \tparam T Type of the vector's & matrix's data.
+/// \tparam Size Size of the input vector & height of the matrix.
+/// \tparam W Width of the matrix & size of the resulting vector.
+/// \param vec Left-hand vector.
+/// \param mat Right-hand matrix.
+/// \return Result of the vector-matrix multiplication.
+template <typename T, std::size_t Size, std::size_t W>
+constexpr Vector<T, W> operator*(const Vector<T, Size>& vec, const Matrix<T, W, Size>& mat) noexcept;
 
 // Deduction guides
 

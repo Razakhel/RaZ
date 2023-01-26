@@ -180,22 +180,6 @@ constexpr Vector<T, Size> Vector<T, Size>::operator/(T val) const noexcept(std::
 }
 
 template <typename T, std::size_t Size>
-template <std::size_t W>
-constexpr Vector<T, W> Vector<T, Size>::operator*(const Matrix<T, W, Size>& mat) const noexcept {
-  // This multiplication is made assuming the vector to be horizontal
-  Vector<T, W> res;
-
-  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
-    const std::size_t finalWidthIndex = widthIndex * Size;
-
-    for (std::size_t heightIndex = 0; heightIndex < Size; ++heightIndex)
-      res[widthIndex] += m_data[heightIndex] * mat[finalWidthIndex + heightIndex];
-  }
-
-  return res;
-}
-
-template <typename T, std::size_t Size>
 constexpr Vector<T, Size>& Vector<T, Size>::operator+=(const Vector& vec) noexcept {
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] += vec[i];
@@ -270,6 +254,21 @@ std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec) {
   stream << " ]";
 
   return stream;
+}
+
+template <typename T, std::size_t Size, std::size_t W>
+constexpr Vector<T, W> operator*(const Vector<T, Size>& vec, const Matrix<T, W, Size>& mat) noexcept {
+  // This multiplication is made assuming the vector to be horizontal
+  Vector<T, W> res;
+
+  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
+    const std::size_t finalWidthIndex = widthIndex * Size;
+
+    for (std::size_t heightIndex = 0; heightIndex < Size; ++heightIndex)
+      res[widthIndex] += vec[heightIndex] * mat[finalWidthIndex + heightIndex];
+  }
+
+  return res;
 }
 
 } // namespace Raz
