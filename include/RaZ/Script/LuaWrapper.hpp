@@ -24,6 +24,7 @@ public:
   static bool executeFromFile(const FilePath& filePath);
 
 private:
+  static void registerDataTypes();
   static void registerMathTypes();
   static void registerUtilsTypes();
 

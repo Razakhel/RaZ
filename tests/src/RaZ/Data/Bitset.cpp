@@ -98,10 +98,10 @@ TEST_CASE("Bitset printing") {
   std::stringstream stream;
 
   stream << fullOnes;
-  CHECK(stream.str() == "[ 1; 1; 1; 1; 1; 1 ]");
+  CHECK(stream.str() == "[ 1, 1, 1, 1, 1, 1 ]");
 
   stream.str(""); // Clearing the stream
 
   stream << alternated1;
-  CHECK(stream.str() == "[ 1; 0; 1; 0; 1; 0 ]");
+  CHECK(stream.str() == "[ 1, 0, 1, 0, 1, 0 ]");
 }

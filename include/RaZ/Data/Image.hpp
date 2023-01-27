@@ -19,9 +19,6 @@ using ImageDataBPtr = std::unique_ptr<ImageDataB>;
 struct ImageDataF;
 using ImageDataFPtr = std::unique_ptr<ImageDataF>;
 
-class Image;
-using ImagePtr = std::unique_ptr<Image>;
-
 enum class ImageColorspace {
   GRAY = 0,
   GRAY_ALPHA,
@@ -139,8 +136,6 @@ public:
   uint8_t getChannelCount() const noexcept { return m_channelCount; }
   const void* getDataPtr() const noexcept { return m_data->getDataPtr(); }
   void* getDataPtr() noexcept { return m_data->getDataPtr(); }
-
-  template <typename... Args> static ImagePtr create(Args&&... args) { return std::make_unique<Image>(std::forward<Args>(args)...); }
 
   /// Checks if the image doesn't contain data.
   /// \return True if the image has no data, false otherwise.
