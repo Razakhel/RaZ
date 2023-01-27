@@ -42,6 +42,11 @@ public:
   /// \note Does nothing in a configuration other than Debug, unless RAZ_FORCE_DEBUG_LOG is defined.
   /// \note Requires a logging level of "debug" or above.
   /// \param message Message to be printed.
+  static void debug(const char* message) { debug(std::string(message)); }
+  /// Prints a debug message.
+  /// \note Does nothing in a configuration other than Debug, unless RAZ_FORCE_DEBUG_LOG is defined.
+  /// \note Requires a logging level of "debug" or above.
+  /// \param message Message to be printed.
   static void debug(const std::string& message);
 #else
   static void debug(const char*) {}

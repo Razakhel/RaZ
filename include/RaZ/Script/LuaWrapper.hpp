@@ -25,6 +25,7 @@ public:
 
 private:
   static void registerMathTypes();
+  static void registerUtilsTypes();
 
   static sol::state& getState();
 };

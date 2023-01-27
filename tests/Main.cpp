@@ -19,6 +19,7 @@ int main(int argc, char* argv[]) {
 #if !defined(RAZ_NO_LUA)
   // Initializing the Lua wrapper
   Raz::LuaWrapper::registerTypes();
+  Raz::LuaWrapper::execute("RAZ_TESTS_ROOT = \"" RAZ_TESTS_ROOT "\""); // Adding the root path definition as a global variable
 #endif
 
   // Rendering tests require an OpenGL context to be created, which is done by the Window; the following instruction instantiates it

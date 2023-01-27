@@ -53,6 +53,28 @@ TEST_CASE("FilePath save special chars") {
 TEST_CASE("FilePath concatenation") {
   const Raz::FilePath testPath = "tèstPâth";
 
+  // operator+(char)
+  {
+    const char c = 'i';
+
+    std::string concat = c + testPath;
+    CHECK(concat == "itèstPâth");
+
+    concat = testPath + c;
+    CHECK(concat == "tèstPâthi");
+  }
+
+  // operator+(wchar_t)
+  {
+    const wchar_t c = L'î';
+
+    std::wstring concat = c + testPath;
+    CHECK(concat == L"îtèstPâth");
+
+    concat = testPath + c;
+    CHECK(concat == L"tèstPâthî");
+  }
+
   // operator+(char*)
   {
     const char* str = "_chär_";

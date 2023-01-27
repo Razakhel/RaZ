@@ -77,6 +77,8 @@ public:
 
   FilePath& operator=(const FilePath&) = default;
   FilePath& operator=(FilePath&&) noexcept = default;
+  std::string operator+(char c) const { return toUtf8() + c; }
+  std::wstring operator+(wchar_t c) const { return toWide() + c; }
   std::string operator+(const char* pathStr) const { return toUtf8() + pathStr; }
   std::wstring operator+(const wchar_t* pathStr) const { return toWide() + pathStr; }
   std::string operator+(const std::string& pathStr) const { return toUtf8() + pathStr; }
@@ -102,6 +104,14 @@ public:
 private:
   StringType m_path {};
 };
+
+static inline std::string operator+(char c, const FilePath& filePath) {
+  return c + filePath.toUtf8();
+}
+
+static inline std::wstring operator+(wchar_t c, const FilePath& filePath) {
+  return c + filePath.toWide();
+}
 
 static inline std::string operator+(const char* pathStr, const FilePath& filePath) {
   return pathStr + filePath.toUtf8();

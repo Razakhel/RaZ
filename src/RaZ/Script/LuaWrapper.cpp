@@ -10,6 +10,7 @@ namespace Raz {
 
 void LuaWrapper::registerTypes() {
   registerMathTypes();
+  registerUtilsTypes();
 }
 
 bool LuaWrapper::execute(const std::string& code) {

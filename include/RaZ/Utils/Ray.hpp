@@ -15,7 +15,7 @@ class Quad;
 class AABB;
 class OBB;
 
-/// Ray hit used to get informations from a ray intersection.
+/// Ray hit used to get information from a ray intersection.
 struct RayHit {
   Vec3f position {};
   Vec3f normal {};
@@ -25,7 +25,7 @@ struct RayHit {
 /// Ray defined by an origin and a normalized direction.
 class Ray {
 public:
-  constexpr Ray(const Vec3f& origin, const Vec3f& direction)
+  constexpr Ray(const Vec3f& origin, const Vec3f& direction) noexcept
     : m_origin{ origin }, m_direction{ direction }, m_invDirection((direction.x() != 0.f ? 1.f / direction.x() : std::numeric_limits<float>::infinity()),
                                                                    (direction.y() != 0.f ? 1.f / direction.y() : std::numeric_limits<float>::infinity()),
                                                                    (direction.z() != 0.f ? 1.f / direction.z() : std::numeric_limits<float>::infinity())) {}
