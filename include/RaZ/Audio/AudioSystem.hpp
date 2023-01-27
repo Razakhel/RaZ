@@ -14,6 +14,10 @@ public:
   /// \see recoverDevices()
   explicit AudioSystem(const char* deviceName = nullptr);
 
+  /// Recovers the names of all available audio devices.
+  /// \return List of the available devices' names, or an empty list if the required extension is unsupported.
+  static std::vector<std::string> recoverDevices();
+
   /// Opens the audio device corresponding to the given name.
   /// \param deviceName Name of the device to open, or nullptr to open the default one.
   /// \see recoverDevices()
@@ -23,10 +27,6 @@ public:
   std::string recoverCurrentDevice() const;
   bool update(float deltaTime) override;
   void destroy() override;
-
-  /// Recovers the names of all available audio devices.
-  /// \return List of the available devices' names, or an empty list if the required extension is unsupported.
-  static std::vector<std::string> recoverDevices();
 
   ~AudioSystem() override { destroy(); }
 

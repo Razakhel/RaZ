@@ -130,7 +130,7 @@ Vec3f Sound::recoverVelocity() const noexcept {
   return velocity;
 }
 
-void Sound::repeat(bool repeat) const noexcept {
+void Sound::setRepeat(bool repeat) const noexcept {
   alSourcei(m_source, AL_LOOPING, repeat);
   checkError("Failed to change the sound's repeat state");
 }

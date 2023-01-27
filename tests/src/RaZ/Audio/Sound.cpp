@@ -7,14 +7,14 @@
 #include "RaZ/Utils/Threading.hpp"
 
 TEST_CASE("Sound initialization") {
-  Raz::AudioSystem audio; // Initializing the audio device & context, needed before all audio action
+  const Raz::AudioSystem audio; // Initializing the audio device & context, needed before all audio action
 
-  Raz::Sound sound;
+  const Raz::Sound sound;
   CHECK(sound.getBufferIndex() != std::numeric_limits<unsigned int>::max());
 }
 
 TEST_CASE("Sound move") {
-  Raz::AudioSystem audio;
+  const Raz::AudioSystem audio;
 
   Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
   REQUIRE(sound.getBufferIndex() != std::numeric_limits<unsigned int>::max());
@@ -87,7 +87,7 @@ TEST_CASE("Sound move") {
 }
 
 TEST_CASE("Sound WAV import") {
-  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
+  const Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
   // Since no AudioSystem has been created, the Sound's buffer index cannot be valid. This is not the purpose of this test anyway
 
   CHECK(sound.getFormat() == Raz::SoundFormat::MONO_I16);
@@ -95,9 +95,9 @@ TEST_CASE("Sound WAV import") {
 }
 
 TEST_CASE("Sound operations") {
-  Raz::AudioSystem audio;
+  const Raz::AudioSystem audio;
 
-  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
+  const Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
   REQUIRE(sound.getBufferIndex() != std::numeric_limits<unsigned int>::max());
 
   sound.setGain(0.f); // Nobody wants his ears assaulted by a wild sound when launching tests

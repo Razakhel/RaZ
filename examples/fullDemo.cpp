@@ -144,7 +144,7 @@ int main() {
     auto& audio = world.addSystem<Raz::AudioSystem>();
 
     auto& meshSound = mesh.addComponent<Raz::Sound>(Raz::WavFormat::load(RAZ_ROOT "assets/sounds/wave_seagulls.wav"));
-    meshSound.repeat(true);
+    meshSound.setRepeat(true);
     meshSound.setGain(0.f);
     meshSound.play();
 

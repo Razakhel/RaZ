@@ -3,7 +3,6 @@
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Utils/Logger.hpp"
-#include "RaZ/Utils/StrUtils.hpp"
 
 #include <AL/alc.h>
 
@@ -37,6 +36,24 @@ inline void checkError(void* device, const std::string& errorMsg) {
 AudioSystem::AudioSystem(const char* deviceName) {
   registerComponents<Sound, Listener>();
   openDevice(deviceName);
+}
+
+std::vector<std::string> AudioSystem::recoverDevices() {
+  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty vector
+    return {};
+
+  std::vector<std::string> devices;
+
+  // This recovers all devices' names in a single string, each name separated by a null character ('\0'), and ending with two of those
+  // For example: "First device\0Second device\0Third device\0\0"
+  const char* devicesNames = alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER);
+
+  while (devicesNames[0] != '\0') {
+    devices.emplace_back(devicesNames); // This automatically fills the string until the first \0
+    devicesNames += devices.back().size() + 1;
+  }
+
+  return devices;
 }
 
 void AudioSystem::openDevice(const char* deviceName) {
@@ -138,24 +155,6 @@ void AudioSystem::destroy() {
   }
 
   Logger::debug("[AudioSystem] Destroyed");
-}
-
-std::vector<std::string> AudioSystem::recoverDevices() {
-  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty vector
-    return {};
-
-  std::vector<std::string> devices;
-
-  // This recovers all devices' names in a single string, each name separated by a null character ('\0'), and ending with two of those
-  // For example: "First device\0Second device\0Third device\0\0"
-  const char* devicesNames = alcGetString(nullptr, ALC_ALL_DEVICES_SPECIFIER);
-
-  while (devicesNames[0] != '\0') {
-    devices.emplace_back(devicesNames); // This automatically fills the string until the first \0
-    devicesNames += devices.back().size() + 1;
-  }
-
-  return devices;
 }
 
 } // namespace Raz

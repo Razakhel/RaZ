@@ -87,7 +87,7 @@ public:
   Vec3f recoverVelocity() const noexcept;
   /// Sets the sound's repeat state.
   /// \param repeat Repeat state; true if the sound should be repeated, false otherwise.
-  void repeat(bool repeat) const noexcept;
+  void setRepeat(bool repeat) const noexcept;
   /// Plays the sound.
   void play() const noexcept;
   /// Pauses the sound.
