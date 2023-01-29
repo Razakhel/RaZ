@@ -81,7 +81,7 @@ void loadJoint(std::ifstream& file, std::unordered_map<std::string, SkeletonJoin
     if (file.peek() == '}') // Reaching the end of scope, no other joint is declared on this level
       break;
 
-    loadJoint(file, joints, skeleton, currentJoint);
+    loadJoint(file, joints, skeleton, parentJoint);
   }
 }
 
