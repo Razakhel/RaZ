@@ -28,6 +28,7 @@ private:
   static void registerAudioTypes();
   static void registerDataTypes();
   static void registerMathTypes();
+  static void registerPhysicsTypes();
   static void registerUtilsTypes();
 
   static sol::state& getState();

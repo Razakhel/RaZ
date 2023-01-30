@@ -10,13 +10,15 @@ namespace Raz {
 
 class Collider final : public Component {
 public:
+  Collider() = default;
   explicit Collider(Shape&& shape) { setShape(std::move(shape)); }
   Collider(const Collider&) = delete;
   Collider(Collider&&) noexcept = default;
 
   ShapeType getShapeType() const noexcept { return m_shapeType; }
-  const Shape& getShape() const noexcept { assert("Error: No collider shape defined." && m_colliderShape); return *m_colliderShape; }
-  Shape& getShape() noexcept { assert("Error: No collider shape defined." && m_colliderShape); return *m_colliderShape; }
+  bool hasShape() const noexcept { return (m_colliderShape != nullptr); }
+  const Shape& getShape() const noexcept { assert("Error: No collider shape defined." && hasShape()); return *m_colliderShape; }
+  Shape& getShape() noexcept { assert("Error: No collider shape defined." && hasShape()); return *m_colliderShape; }
   template <typename ShapeT> const ShapeT& getShape() const noexcept;
   template <typename ShapeT> ShapeT& getShape() noexcept { return const_cast<ShapeT&>(static_cast<const Collider*>(this)->getShape<ShapeT>()); }
 
