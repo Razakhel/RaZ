@@ -48,6 +48,11 @@ public:
   void setName(std::string name) noexcept { m_name = std::move(name); }
   void setProgram(RenderShaderProgram&& program) { m_program = std::move(program); }
 
+  /// Changes the render pass' enabled state.
+  /// \param enabled True if the render pass should be enabled, false if it should be disabled.
+  void enable(bool enabled = true) { m_enabled = enabled; }
+  /// Disables the render pass.
+  void disable() { enable(false); }
   /// Checks that the current render pass is valid, that is, if none of its buffer has been defined as both read & write.
   /// \return True if the render pass is valid, false otherwise.
   /// \see RenderGraph::isValid()
@@ -68,11 +73,6 @@ public:
   /// \param width New buffers width.
   /// \param height New buffers height.
   void resizeWriteBuffers(unsigned int width, unsigned int height) { m_writeFramebuffer.resizeBuffers(width, height); }
-  /// Changes the render pass' enabled state.
-  /// \param enabled True if the render pass should be enabled, false if it should be disabled.
-  void enable(bool enabled = true) { m_enabled = enabled; }
-  /// Disables the render pass.
-  void disable() { enable(false); }
   /// Executes the render pass.
   void execute() const;
 

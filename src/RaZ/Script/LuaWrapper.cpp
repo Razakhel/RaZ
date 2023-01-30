@@ -14,6 +14,7 @@ void LuaWrapper::registerTypes() {
   registerDataTypes();
   registerMathTypes();
   registerPhysicsTypes();
+  registerRenderTypes();
   registerUtilsTypes();
 }
 
