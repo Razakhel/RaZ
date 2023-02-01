@@ -56,23 +56,14 @@ public:
   void setCubemap(Cubemap&& cubemap);
 
 #if !defined(RAZ_NO_WINDOW)
-  void createWindow(unsigned int width, unsigned int height, const std::string& title = "") { m_window = Window::create(*this, width, height, title); }
+  void createWindow(unsigned int width, unsigned int height,
+                    const std::string& title = {},
+                    WindowSetting settings = WindowSetting::DEFAULT,
+                    uint8_t antiAliasingSampleCount = 1) { m_window = Window::create(*this, width, height, title, settings, antiAliasingSampleCount); }
 #endif
   void resizeViewport(unsigned int width, unsigned int height);
   bool update(float deltaTime) override;
-  void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
-  void sendInverseViewMatrix(const Mat4f& invViewMat) const { m_cameraUbo.sendData(invViewMat, sizeof(Mat4f)); }
-  void sendProjectionMatrix(const Mat4f& projMat) const { m_cameraUbo.sendData(projMat, sizeof(Mat4f) * 2); }
-  void sendInverseProjectionMatrix(const Mat4f& invProjMat) const { m_cameraUbo.sendData(invProjMat, sizeof(Mat4f) * 3); }
-  void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_cameraUbo.sendData(viewProjMat, sizeof(Mat4f) * 4); }
-  void sendCameraPosition(const Vec3f& cameraPos) const { m_cameraUbo.sendData(cameraPos, sizeof(Mat4f) * 5); }
   void sendCameraMatrices() const;
-  /// Updates a single light, sending its data to the GPU.
-  /// \warning The lights UBO needs to be bound before calling this function.
-  /// \note If resetting a removed light or updating one not yet known by the application, call updateLights() instead to fully take that change into account.
-  /// \param entity Light entity to be updated; if not a directional light, needs to have a Transform component.
-  /// \param lightIndex Index of the light to be updated.
-  void updateLight(const Entity& entity, unsigned int lightIndex) const;
   /// Updates all lights referenced by the RenderSystem, sending their data to the GPU.
   void updateLights() const;
   void updateShaders() const;
@@ -92,6 +83,18 @@ protected:
 private:
   void initialize();
   void initialize(unsigned int sceneWidth, unsigned int sceneHeight);
+  void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
+  void sendInverseViewMatrix(const Mat4f& invViewMat) const { m_cameraUbo.sendData(invViewMat, sizeof(Mat4f)); }
+  void sendProjectionMatrix(const Mat4f& projMat) const { m_cameraUbo.sendData(projMat, sizeof(Mat4f) * 2); }
+  void sendInverseProjectionMatrix(const Mat4f& invProjMat) const { m_cameraUbo.sendData(invProjMat, sizeof(Mat4f) * 3); }
+  void sendViewProjectionMatrix(const Mat4f& viewProjMat) const { m_cameraUbo.sendData(viewProjMat, sizeof(Mat4f) * 4); }
+  void sendCameraPosition(const Vec3f& cameraPos) const { m_cameraUbo.sendData(cameraPos, sizeof(Mat4f) * 5); }
+  /// Updates a single light, sending its data to the GPU.
+  /// \warning The lights UBO needs to be bound before calling this function.
+  /// \note If resetting a removed light or updating one not yet known by the application, call updateLights() instead to fully take that change into account.
+  /// \param entity Light entity to be updated; if not a directional light, needs to have a Transform component.
+  /// \param lightIndex Index of the light to be updated.
+  void updateLight(const Entity& entity, unsigned int lightIndex) const;
 
   unsigned int m_sceneWidth {};
   unsigned int m_sceneHeight {};
