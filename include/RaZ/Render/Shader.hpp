@@ -6,7 +6,6 @@
 #include "RaZ/Data/OwnerValue.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
-#include <limits>
 #include <string>
 
 namespace Raz {
@@ -31,14 +30,14 @@ public:
   Shader& operator=(const Shader&) = delete;
   Shader& operator=(Shader&&) noexcept = default;
 
-  ~Shader() { destroy(); }
+  virtual ~Shader() { destroy(); }
 
 protected:
   Shader() = default;
 
   void loadSource(const std::string& source) const;
 
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
+  OwnerValue<unsigned int> m_index {};
   FilePath m_path {};
 };
 

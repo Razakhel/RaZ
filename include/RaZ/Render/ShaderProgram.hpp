@@ -9,7 +9,6 @@
 #include "RaZ/Render/Shader.hpp"
 #include "RaZ/Render/Texture.hpp"
 
-#include <limits>
 #include <optional>
 #include <string>
 #include <unordered_map>
@@ -285,7 +284,7 @@ public:
   virtual ~ShaderProgram();
 
 protected:
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
+  OwnerValue<unsigned int> m_index {};
 
   struct Attribute {
     int location = -1;

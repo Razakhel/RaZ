@@ -5,8 +5,6 @@
 
 #include "RaZ/Data/OwnerValue.hpp"
 
-#include <limits>
-
 namespace Raz {
 
 class Image;
@@ -45,7 +43,7 @@ public:
   ~Cubemap();
 
 private:
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
+  OwnerValue<unsigned int> m_index {};
 };
 
 } // namespace Raz

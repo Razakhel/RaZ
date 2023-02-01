@@ -19,7 +19,7 @@ TEST_CASE("Cubemap move") {
   CHECK(movedCubemapCtor.getIndex() == cubemapIndex);
 
   // The moved cubemap is now invalid
-  CHECK(cubemap.getIndex() == std::numeric_limits<unsigned int>::max());
+  CHECK(cubemap.getIndex() == 0);
 
   // Move assignment operator
 

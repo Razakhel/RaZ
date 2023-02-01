@@ -6,7 +6,6 @@
 #include "RaZ/Data/OwnerValue.hpp"
 
 #include <cassert>
-#include <limits>
 #include <vector>
 
 namespace Raz {
@@ -71,7 +70,7 @@ public:
   ~Framebuffer();
 
 private:
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
+  OwnerValue<unsigned int> m_index {};
   Texture2DPtr m_depthBuffer {};
   std::vector<std::pair<Texture2DPtr, unsigned int>> m_colorBuffers {};
 };

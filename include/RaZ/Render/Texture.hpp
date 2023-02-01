@@ -5,7 +5,6 @@
 
 #include "RaZ/Data/OwnerValue.hpp"
 
-#include <limits>
 #include <memory>
 
 namespace Raz {
@@ -83,7 +82,7 @@ protected:
 
   virtual void load() const = 0;
 
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
+  OwnerValue<unsigned int> m_index {};
   TextureType m_type {};
 
   TextureColorspace m_colorspace = TextureColorspace::INVALID;

@@ -9,8 +9,6 @@
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Renderer.hpp"
 
-#include <limits>
-
 namespace Raz {
 
 enum class UniformBufferUsage {
@@ -48,7 +46,7 @@ public:
   ~UniformBuffer();
 
 private:
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_index {};
+  OwnerValue<unsigned int> m_index {};
 };
 
 } // namespace Raz

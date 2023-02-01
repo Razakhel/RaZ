@@ -10,7 +10,7 @@ TEST_CASE("Texture creation") {
 #if !defined(USE_OPENGL_ES) // 1D textures are unavailable with OpenGL ES
   const Raz::Texture1D texture1D; // A texture can be created without dimensions and colorspace/data type
   CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(texture1D.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(texture1D.getIndex() != 0);
   CHECK(texture1D.getWidth() == 0);
   CHECK(texture1D.getColorspace() == Raz::TextureColorspace::INVALID); // If no colorspace is given, an invalid one is assigned
   CHECK(texture1D.getDataType() == Raz::TextureDataType::BYTE);
@@ -18,7 +18,7 @@ TEST_CASE("Texture creation") {
 
   Raz::Texture2D texture2D(Raz::TextureColorspace::GRAY); // A texture can be created with colorspace/data type, but without dimensions
   CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(texture2D.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(texture2D.getIndex() != 0);
   CHECK(texture2D.getWidth() == 0);
   CHECK(texture2D.getHeight() == 0);
   CHECK(texture2D.getColorspace() == Raz::TextureColorspace::GRAY);
@@ -27,7 +27,7 @@ TEST_CASE("Texture creation") {
   texture2D.resize(1, 2);
   texture2D.setColorspace(Raz::TextureColorspace::DEPTH);
   CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(texture2D.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(texture2D.getIndex() != 0);
   CHECK(texture2D.getWidth() == 1);
   CHECK(texture2D.getHeight() == 2);
   CHECK(texture2D.getColorspace() == Raz::TextureColorspace::DEPTH);
@@ -35,7 +35,7 @@ TEST_CASE("Texture creation") {
 
   const Raz::Texture3D texture3D(3, 4, 5, Raz::TextureColorspace::RGBA);
   CHECK_FALSE(Raz::Renderer::hasErrors());
-  CHECK(texture3D.getIndex() != std::numeric_limits<unsigned int>::max());
+  CHECK(texture3D.getIndex() != 0);
   CHECK(texture3D.getWidth() == 3);
   CHECK(texture3D.getHeight() == 4);
   CHECK(texture3D.getDepth() == 5);
@@ -74,10 +74,10 @@ TEST_CASE("Texture move") {
   const Raz::TextureDataType dataType3D     = texture3D.getDataType();
 
 #if !defined(USE_OPENGL_ES)
-  CHECK(texture1DIndex != std::numeric_limits<unsigned int>::max());
+  CHECK(texture1DIndex != 0);
 #endif
-  CHECK(texture2DIndex != std::numeric_limits<unsigned int>::max());
-  CHECK(texture3DIndex != std::numeric_limits<unsigned int>::max());
+  CHECK(texture2DIndex != 0);
+  CHECK(texture3DIndex != 0);
 
   // Move ctor
 
@@ -110,10 +110,10 @@ TEST_CASE("Texture move") {
 
   // The moved textures are now invalid
 #if !defined(USE_OPENGL_ES)
-  CHECK(texture1D.getIndex() == std::numeric_limits<unsigned int>::max());
+  CHECK(texture1D.getIndex() == 0);
 #endif
-  CHECK(texture2D.getIndex() == std::numeric_limits<unsigned int>::max());
-  CHECK(texture3D.getIndex() == std::numeric_limits<unsigned int>::max());
+  CHECK(texture2D.getIndex() == 0);
+  CHECK(texture3D.getIndex() == 0);
 
   // Move assignment operator
 
