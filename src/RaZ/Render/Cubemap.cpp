@@ -158,6 +158,11 @@ void Cubemap::load(const Image& right, const Image& left, const Image& top, cons
   bind();
 
   constexpr auto mapImage = [] (const Image& img, TextureType type) {
+    if (img.isEmpty()) {
+      Logger::error("[Cubemap] Empty image given as cubemap face.");
+      return;
+    }
+
     Renderer::sendImageData2D(type,
                               0,
                               recoverInternalFormat(img.getColorspace(), img.getDataType()),
