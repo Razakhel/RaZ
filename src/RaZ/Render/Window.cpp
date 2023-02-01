@@ -129,6 +129,21 @@ void Window::setTitle(const std::string& title) const {
 }
 
 void Window::setIcon(const Image& img) const {
+  if (img.isEmpty()) {
+    Logger::error("[Window] Empty image given as window icon.");
+    return;
+  }
+
+  if (img.getColorspace() != ImageColorspace::RGBA) {
+    Logger::error("[Window] The window icon can only be created from an image having an RGBA colorspace.");
+    return;
+  }
+
+  if (img.getDataType() != ImageDataType::BYTE) {
+    Logger::error("[Window] The window icon can only be created from an image having byte data.");
+    return;
+  }
+
   const GLFWimage icon = { static_cast<int>(img.getWidth()),
                            static_cast<int>(img.getHeight()),
                            const_cast<unsigned char*>(static_cast<const uint8_t*>(img.getDataPtr())) };
