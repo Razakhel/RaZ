@@ -117,6 +117,8 @@ Window::Window(RenderSystem& renderSystem,
   m_overlay.initialize(m_windowHandle);
 #endif
 
+  ++s_refCounter;
+
   Logger::debug("[Window] Initialized");
 }
 
@@ -438,15 +440,21 @@ void Window::setShouldClose() const {
 }
 
 void Window::close() {
+  if (!m_windowHandle.isValid())
+    return;
+
   Logger::debug("[Window] Closing...");
 
+  --s_refCounter;
+
+  if (s_refCounter == 0) {
 #if !defined(RAZ_NO_OVERLAY)
-  m_overlay.destroy();
+    m_overlay.destroy();
 #endif
 
-  glfwTerminate();
-
-  m_windowHandle = nullptr;
+    glfwTerminate();
+    m_windowHandle = nullptr;
+  }
 
   Logger::debug("[Window] Closed");
 }

@@ -175,6 +175,8 @@ public:
   ~Window() { close(); }
 
 private:
+  static inline int s_refCounter = 0;
+
   OwnerValue<GLFWwindow*, nullptr> m_windowHandle {};
   RenderSystem* m_renderSystem {};
 
