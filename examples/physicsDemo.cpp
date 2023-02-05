@@ -60,7 +60,7 @@ int main() {
     floor.addComponent<Raz::Collider>(Raz::Plane(0.f));
 
     Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
-    light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -1.f, -1.f), 1.f, Raz::Vec3f(1.f));
+    light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -1.f, -1.f), 1.f, Raz::ColorPreset::White);
 
     app.run();
   } catch (const std::exception& exception) {

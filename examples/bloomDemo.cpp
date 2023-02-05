@@ -36,15 +36,15 @@ int main() {
     auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
 
     auto& whiteLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Z,
-                                                                                               3.f, Raz::Vec3f(1.f));
+                                                                                               3.f, Raz::ColorPreset::White);
     auto& yellowLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(5.f, 0.f, -1.f),
-                                                                                                1.f, Raz::Vec3f(1.f, 1.f, 0.f));
+                                                                                                1.f, Raz::ColorPreset::Yellow);
     auto& purpleLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(-5.f, 0.f, -1.f),
-                                                                                                1.f, Raz::Vec3f(1.f, 0.f, 1.f));
+                                                                                                1.f, Raz::ColorPreset::Magenta);
     auto& cyanLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, 5.f, -1.f),
-                                                                                              1.f, Raz::Vec3f(0.f, 1.f, 1.f));
+                                                                                              1.f, Raz::ColorPreset::Cyan);
     auto& redLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -5.f, -1.f),
-                                                                                             1.f, Raz::Vec3f(1.f, 0.f, 0.f));
+                                                                                             1.f, Raz::ColorPreset::Red);
 
     ///////////
     // Bloom //

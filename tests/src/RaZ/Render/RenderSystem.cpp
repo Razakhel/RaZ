@@ -61,15 +61,15 @@ TEST_CASE("RenderSystem Cook-Torrance ball") {
 
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_TESTS_ROOT "../assets/meshes/ball.obj").second);
 
-  world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 1.5f)).addComponent<Raz::Light>(Raz::LightType::POINT, 1.5f, Raz::Vec3f(1.f));
+  world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 1.5f)).addComponent<Raz::Light>(Raz::LightType::POINT, 1.5f, Raz::ColorPreset::White);
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(5.f, 0.f, -1.f).normalize(),
-                                                                          1.f, Raz::Vec3f(1.f, 1.f, 0.f));
+                                                                          1.f, Raz::ColorPreset::Yellow);
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(-5.f, 0.f, -1.f).normalize(),
-                                                                          1.f, Raz::Vec3f(1.f, 0.f, 1.f));
+                                                                          1.f, Raz::ColorPreset::Magenta);
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, 5.f, -1.f).normalize(),
-                                                                          1.f, Raz::Vec3f(0.f, 1.f, 1.f));
+                                                                          1.f, Raz::ColorPreset::Cyan);
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, -5.f, -1.f).normalize(),
-                                                                          1.f, Raz::Vec3f(1.f, 0.f, 0.f));
+                                                                          1.f, Raz::ColorPreset::Red);
 
   CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true)));
 
