@@ -114,7 +114,7 @@ Window::Window(RenderSystem& renderSystem,
   });
 
 #if !defined(RAZ_NO_OVERLAY)
-  m_overlay.initialize(m_windowHandle);
+  Overlay::initialize(m_windowHandle);
 #endif
 
   ++s_refCounter;
@@ -449,7 +449,7 @@ void Window::close() {
 
   if (s_refCounter == 0) {
 #if !defined(RAZ_NO_OVERLAY)
-    m_overlay.destroy();
+    Overlay::destroy();
 #endif
 
     glfwTerminate();

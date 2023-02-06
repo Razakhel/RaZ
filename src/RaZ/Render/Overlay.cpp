@@ -11,30 +11,6 @@
 
 namespace Raz {
 
-void Overlay::initialize(GLFWwindow* windowHandle) const {
-  if (ImGui::GetCurrentContext() != nullptr)
-    return; // The overlay has already been initialized
-
-  Logger::debug("[Overlay] Initializing...");
-
-  IMGUI_CHECKVERSION();
-
-  ImGui::CreateContext();
-  ImPlot::CreateContext();
-
-  ImGui::StyleColorsDark();
-
-  ImGui_ImplGlfw_InitForOpenGL(windowHandle, false);
-
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
-  ImGui_ImplOpenGL3_Init("#version 330 core");
-#else
-  ImGui_ImplOpenGL3_Init("#version 300 es");
-#endif
-
-  Logger::debug("[Overlay] Initialized");
-}
-
 OverlayWindow& Overlay::addWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) {
   return *m_windows.emplace_back(std::make_unique<OverlayWindow>(std::move(title), initSize, initPos));
 }
@@ -69,7 +45,31 @@ void Overlay::render() const {
 #endif
 }
 
-void Overlay::destroy() const {
+void Overlay::initialize(GLFWwindow* windowHandle) {
+  if (ImGui::GetCurrentContext() != nullptr)
+    return; // The overlay has already been initialized
+
+  Logger::debug("[Overlay] Initializing...");
+
+  IMGUI_CHECKVERSION();
+
+  ImGui::CreateContext();
+  ImPlot::CreateContext();
+
+  ImGui::StyleColorsDark();
+
+  ImGui_ImplGlfw_InitForOpenGL(windowHandle, false);
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  ImGui_ImplOpenGL3_Init("#version 330 core");
+#else
+  ImGui_ImplOpenGL3_Init("#version 300 es");
+#endif
+
+  Logger::debug("[Overlay] Initialized");
+}
+
+void Overlay::destroy() {
   if (ImGui::GetCurrentContext() == nullptr)
     return; // The overlay has already been destroyed
 

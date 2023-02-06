@@ -43,6 +43,7 @@ enum class OverlayPlotType {
 /// Overlay class, used to render GUI elements (labels, buttons, checkboxes, ...) into a Window.
 class Overlay {
   friend OverlayWindow;
+  friend class Window;
 
 public:
   Overlay() = default;
@@ -51,9 +52,6 @@ public:
 
   bool isEmpty() const noexcept { return m_windows.empty(); }
 
-  /// Initializes ImGui with the containing window.
-  /// \param windowHandle Handle to initialize the overlay with.
-  void initialize(GLFWwindow* windowHandle) const;
   /// Adds a new overlay window.
   /// \param title Window title.
   /// \param initSize Initial window size. If both X & Y are strictly lower than 0, automatically resizes the window from its content.
@@ -68,13 +66,17 @@ public:
   bool hasMouseFocus() const;
   /// Renders the overlay.
   void render() const;
-  /// Destroys the overlay.
-  void destroy() const;
 
   Overlay& operator=(const Overlay&) = delete;
   Overlay& operator=(Overlay&&) noexcept = default;
 
 private:
+  /// Initializes ImGui with the containing window.
+  /// \param windowHandle Handle to initialize the overlay with.
+  static void initialize(GLFWwindow* windowHandle);
+  /// Destroys the overlay.
+  static void destroy();
+
   std::vector<std::unique_ptr<OverlayWindow>> m_windows {};
 };
 
