@@ -17,10 +17,6 @@ inline BufferDataUsage recoverDataUsage(UniformBufferUsage usage) {
 
 } // namespace
 
-UniformBuffer::UniformBuffer() {
-  Renderer::generateBuffer(m_index);
-}
-
 UniformBuffer::UniformBuffer(unsigned int size, UniformBufferUsage usage) : UniformBuffer() {
   Logger::debug("[UniformBuffer] Creating (with size: " + std::to_string(size) + ")...");
 
@@ -67,6 +63,10 @@ UniformBuffer::~UniformBuffer() {
   Logger::debug("[UniformBuffer] Destroying (ID: " + std::to_string(m_index) + ")...");
   Renderer::deleteBuffer(m_index);
   Logger::debug("[UniformBuffer] Destroyed");
+}
+
+UniformBuffer::UniformBuffer() {
+  Renderer::generateBuffer(m_index);
 }
 
 } // namespace Raz

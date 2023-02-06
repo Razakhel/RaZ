@@ -19,7 +19,6 @@ enum class UniformBufferUsage {
 
 class UniformBuffer {
 public:
-  UniformBuffer();
   explicit UniformBuffer(unsigned int size, UniformBufferUsage usage = UniformBufferUsage::DYNAMIC);
   UniformBuffer(const UniformBuffer&) = delete;
   UniformBuffer(UniformBuffer&&) noexcept = default;
@@ -46,6 +45,8 @@ public:
   ~UniformBuffer();
 
 private:
+  UniformBuffer();
+
   OwnerValue<unsigned int> m_index {};
 };
 
