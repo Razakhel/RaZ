@@ -3,6 +3,7 @@
 #ifndef RAZ_OVERLAY_HPP
 #define RAZ_OVERLAY_HPP
 
+#include "RaZ/Data/Color.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 #include <functional>
@@ -118,17 +119,21 @@ class OverlayColoredLabel final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  explicit OverlayColoredLabel(std::string label, Vec4f color) : OverlayElement(std::move(label)), m_color{ color } {}
+  explicit OverlayColoredLabel(std::string label, const Color& color, float alpha = 1.f)
+    : OverlayElement(std::move(label)), m_color{ color }, m_alpha{ alpha } {}
 
   OverlayElementType getType() const override { return OverlayElementType::COLORED_LABEL; }
   const std::string& getText() const noexcept { return m_label; }
-  const Vec4f& getColor() const noexcept { return m_color; }
+  const Color& getColor() const noexcept { return m_color; }
+  float getAlpha() const noexcept { return m_alpha; }
 
   void setText(std::string text) { m_label = std::move(text); }
-  void setText(std::string text, Vec4f color);
+  void setColor(const Color& color, float alpha = 1.f);
+  void setAlpha(float alpha) { m_alpha = alpha; }
 
 private:
-  Vec4f m_color {};
+  Color m_color {};
+  float m_alpha = 1.f;
 };
 
 class OverlayButton final : public OverlayElement {
@@ -363,8 +368,9 @@ public:
   /// Adds a colored label on the overlay window.
   /// \param label Text to be displayed.
   /// \param color Color to display the text with.
+  /// \param alpha Transparency to apply to the text (between 0 for fully transparent and 1 for fully opaque).
   /// \return Reference to the newly added colored label.
-  OverlayColoredLabel& addColoredLabel(std::string label, const Vec4f& color);
+  OverlayColoredLabel& addColoredLabel(std::string label, const Color& color, float alpha = 1.f);
   /// Adds a colored label on the overlay window.
   /// \param label Text to be displayed.
   /// \param red Text color's red component.

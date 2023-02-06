@@ -102,8 +102,8 @@ TEST_CASE("RenderSystem overlay render") {
   {
     Raz::OverlayWindow& overlay1 = window.getOverlay().addWindow("RaZ - Overlay test 1", Raz::Vec2f(window.getWidth(), window.getHeight()));
     overlay1.addLabel("Label");
-    overlay1.addColoredLabel("Label red", Raz::Vec4f(1.f, 0.f, 0.f, 1.f));
-    overlay1.addColoredLabel("Label cyan", Raz::Vec4f(0.f, 1.f, 1.f, 1.f));
+    overlay1.addColoredLabel("Label red", Raz::ColorPreset::Red);
+    overlay1.addColoredLabel("Label cyan", 0.f, 1.f, 1.f);
     overlay1.addButton("Button", [] () noexcept {});
     overlay1.addCheckbox("Checkbox on", [] () noexcept {}, [] () noexcept {}, true);
     overlay1.addCheckbox("Checkbox off", [] () noexcept {}, [] () noexcept {}, false);
