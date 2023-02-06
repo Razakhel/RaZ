@@ -15,6 +15,8 @@ class Entity;
 class RenderSystem;
 
 class RenderGraph : public Graph<RenderPass> {
+  friend RenderSystem;
+
 public:
   RenderGraph() = default;
   RenderGraph(const RenderGraph&) = delete;
@@ -32,14 +34,16 @@ public:
   template <typename RenderProcessT, typename... Args> RenderProcessT& addRenderProcess(Args&&... args);
   void resizeViewport(unsigned int width, unsigned int height);
   void updateShaders() const;
-  /// Executes the render graph, executing all passes starting with the geometry's.
-  /// \param renderSystem Render system executing the render graph.
-  void execute(RenderSystem& renderSystem);
 
   RenderGraph& operator=(const RenderGraph&) = delete;
   RenderGraph& operator=(RenderGraph&&) noexcept = delete;
 
 private:
+  /// Executes the render graph, executing all passes starting with the geometry's.
+  /// \param renderSystem Render system executing the render graph.
+  void execute(RenderSystem& renderSystem);
+  /// Executes a render pass, which in turn recursively executes its parents if they have not already been in the current frame.
+  /// \param renderPass Render pass to be executed.
   void execute(const RenderPass& renderPass);
 
   RenderPass m_geometryPass {};

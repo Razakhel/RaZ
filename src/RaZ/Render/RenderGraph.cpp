@@ -32,6 +32,7 @@ void RenderGraph::updateShaders() const {
 
 void RenderGraph::execute(RenderSystem& renderSystem) {
   assert("Error: The render system needs a camera for the render graph to be executed." && (renderSystem.m_cameraEntity != nullptr));
+  assert("Error: The camera referenced by the render system needs a transform component." && renderSystem.m_cameraEntity->hasComponent<Transform>());
 
   Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
 
