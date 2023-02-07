@@ -35,7 +35,7 @@ public:
   float recoverElapsedTime() const override;
   void setInputColorBuffer(Texture2DPtr colorBuffer);
   void setOutputBuffer(Texture2DPtr outputBuffer);
-  void setThresholdValue(float threshold);
+  void setThresholdValue(float threshold) const;
 
 private:
   RenderPass* m_thresholdPass {};

@@ -1,7 +1,12 @@
 #include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Transform.hpp"
+#include "RaZ/Render/BloomRenderProcess.hpp"
+#include "RaZ/Render/BoxBlurRenderProcess.hpp"
 #include "RaZ/Render/Camera.hpp"
+#include "RaZ/Render/ChromaticAberrationRenderProcess.hpp"
+#include "RaZ/Render/ConvolutionRenderProcess.hpp"
+#include "RaZ/Render/GaussianBlurRenderProcess.hpp"
 #include "RaZ/Render/GraphicObjects.hpp"
 #include "RaZ/Render/Light.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
@@ -10,6 +15,8 @@
 #include "RaZ/Render/RenderSystem.hpp"
 #include "RaZ/Render/Shader.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
+#include "RaZ/Render/SsrRenderProcess.hpp"
+#include "RaZ/Render/VignetteRenderProcess.hpp"
 #include "RaZ/Render/Window.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
@@ -454,11 +461,18 @@ void LuaWrapper::registerRenderTypes() {
                                                 [] (RenderGraph& g, FragmentShader& s, std::string n) { g.addNode(std::move(s), std::move(n)); });
     renderGraph["removeNode"]   = &RenderGraph::removeNode;
 
-    renderGraph["isValid"]          = &RenderGraph::isValid;
-    renderGraph["getGeometryPass"]  = PickNonConstOverload<>(&RenderGraph::getGeometryPass);
-    // TODO: bind render processes
-    renderGraph["resizeViewport"]   = &RenderGraph::resizeViewport;
-    renderGraph["updateShaders"]    = &RenderGraph::updateShaders;
+    renderGraph["isValid"]                             = &RenderGraph::isValid;
+    renderGraph["getGeometryPass"]                     = PickNonConstOverload<>(&RenderGraph::getGeometryPass);
+    renderGraph["addBloomRenderProcess"]               = &RenderGraph::addRenderProcess<BloomRenderProcess>;
+    renderGraph["addBoxBlurRenderProcess"]             = &RenderGraph::addRenderProcess<BoxBlurRenderProcess>;
+    renderGraph["addChromaticAberrationRenderProcess"] = &RenderGraph::addRenderProcess<ChromaticAberrationRenderProcess>;
+    renderGraph["addConvolutionRenderProcess"]         = sol::overload(&RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&>,
+                                                                       &RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&, std::string>);
+    renderGraph["addGaussianBlurRenderProcess"]        = &RenderGraph::addRenderProcess<GaussianBlurRenderProcess>;
+    renderGraph["addSsrRenderProcess"]                 = &RenderGraph::addRenderProcess<SsrRenderProcess>;
+    renderGraph["addVignetteRenderProcess"]            = &RenderGraph::addRenderProcess<VignetteRenderProcess>;
+    renderGraph["resizeViewport"]                      = &RenderGraph::resizeViewport;
+    renderGraph["updateShaders"]                       = &RenderGraph::updateShaders;
   }
 
   {
@@ -506,6 +520,110 @@ void LuaWrapper::registerRenderTypes() {
     renderPass["clearWriteTextures"]   = &RenderPass::clearWriteTextures;
     renderPass["resizeWriteBuffers"]   = &RenderPass::resizeWriteBuffers;
     renderPass["execute"]              = &RenderPass::execute;
+  }
+
+  // RenderProcess
+  {
+    {
+      auto bloomRenderProcess = state.new_usertype<BloomRenderProcess>("BloomRenderProcess",
+                                                                       sol::constructors<BloomRenderProcess(RenderGraph&)>(),
+                                                                       sol::base_classes, sol::bases<RenderProcess>());
+      bloomRenderProcess["getThresholdPass"]        = &BloomRenderProcess::getThresholdPass;
+      bloomRenderProcess["getDownscalePassCount"]   = &BloomRenderProcess::getDownscalePassCount;
+      bloomRenderProcess["getDownscalePass"]        = PickNonConstOverload<std::size_t>(&BloomRenderProcess::getDownscalePass);
+      bloomRenderProcess["getDownscaleBufferCount"] = &BloomRenderProcess::getDownscaleBufferCount;
+      bloomRenderProcess["getDownscaleBuffer"]      = [] (BloomRenderProcess& b, std::size_t i) { return &b.getDownscaleBuffer(i); };
+      bloomRenderProcess["getUpscalePassCount"]     = &BloomRenderProcess::getUpscalePassCount;
+      bloomRenderProcess["getUpscalePass"]          = PickNonConstOverload<std::size_t>(&BloomRenderProcess::getUpscalePass);
+      bloomRenderProcess["getUpscaleBufferCount"]   = &BloomRenderProcess::getUpscaleBufferCount;
+      bloomRenderProcess["getUpscaleBuffer"]        = [] (BloomRenderProcess& b, std::size_t i) { return &b.getUpscaleBuffer(i); };
+      bloomRenderProcess["setInputColorBuffer"]     = &BloomRenderProcess::setInputColorBuffer;
+      bloomRenderProcess["setOutputBuffer"]         = &BloomRenderProcess::setOutputBuffer;
+      bloomRenderProcess["setThresholdValue"]       = &BloomRenderProcess::setThresholdValue;
+    }
+
+    {
+      auto boxBlurRenderProcess = state.new_usertype<BoxBlurRenderProcess>("BoxBlurRenderProcess",
+                                                                           sol::constructors<BoxBlurRenderProcess(RenderGraph&)>(),
+                                                                           sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+      boxBlurRenderProcess["setInputBuffer"]  = &BoxBlurRenderProcess::setInputBuffer;
+      boxBlurRenderProcess["setOutputBuffer"] = &BoxBlurRenderProcess::setOutputBuffer;
+      boxBlurRenderProcess["setStrength"]     = &BoxBlurRenderProcess::setStrength;
+    }
+
+    {
+      auto chromAberrRenderProcess = state.new_usertype<ChromaticAberrationRenderProcess>("ChromaticAberrationRenderProcess",
+                                                                                          sol::constructors<ChromaticAberrationRenderProcess(RenderGraph&)>(),
+                                                                                          sol::base_classes, sol::bases<MonoPassRenderProcess,
+                                                                                                                        RenderProcess>());
+      chromAberrRenderProcess["setInputBuffer"]  = &ChromaticAberrationRenderProcess::setInputBuffer;
+      chromAberrRenderProcess["setOutputBuffer"] = &ChromaticAberrationRenderProcess::setOutputBuffer;
+      chromAberrRenderProcess["setStrength"]     = &ChromaticAberrationRenderProcess::setStrength;
+      chromAberrRenderProcess["setDirection"]    = &ChromaticAberrationRenderProcess::setDirection;
+      chromAberrRenderProcess["setMaskTexture"]  = &ChromaticAberrationRenderProcess::setMaskTexture;
+    }
+
+    {
+      auto convolutionRenderProcess = state.new_usertype<ConvolutionRenderProcess>("ConvolutionRenderProcess",
+                                                                                   sol::constructors<ConvolutionRenderProcess(RenderGraph&, const Mat3f&),
+                                                                                                     ConvolutionRenderProcess(RenderGraph&, const Mat3f&,
+                                                                                                                              std::string)>(),
+                                                                                   sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+      convolutionRenderProcess["setInputBuffer"]  = &ConvolutionRenderProcess::setInputBuffer;
+      convolutionRenderProcess["setOutputBuffer"] = &ConvolutionRenderProcess::setOutputBuffer;
+      convolutionRenderProcess["setKernel"]       = &ConvolutionRenderProcess::setKernel;
+    }
+
+    {
+      auto gaussianBlurRenderProcess = state.new_usertype<GaussianBlurRenderProcess>("GaussianBlurRenderProcess",
+                                                                                     sol::constructors<GaussianBlurRenderProcess(RenderGraph&)>(),
+                                                                                     sol::base_classes, sol::bases<RenderProcess>());
+      gaussianBlurRenderProcess["getHorizontalPass"] = [] (GaussianBlurRenderProcess& gb) { return &gb.getHorizontalPass(); };
+      gaussianBlurRenderProcess["getVerticalPass"]   = [] (GaussianBlurRenderProcess& gb) { return &gb.getVerticalPass(); };
+      gaussianBlurRenderProcess["setInputBuffer"]    = &GaussianBlurRenderProcess::setInputBuffer;
+      gaussianBlurRenderProcess["setOutputBuffer"]   = &GaussianBlurRenderProcess::setOutputBuffer;
+    }
+
+    {
+      state.new_usertype<MonoPassRenderProcess>("MonoPassRenderProcess", sol::no_constructor, sol::base_classes, sol::bases<RenderProcess>());
+    }
+
+    {
+      sol::usertype<RenderProcess> renderProcess = state.new_usertype<RenderProcess>("RenderProcess", sol::no_constructor);
+      renderProcess["isEnabled"]          = &RenderProcess::isEnabled;
+      renderProcess["setState"]           = &RenderProcess::setState;
+      renderProcess["enable"]             = &RenderProcess::enable;
+      renderProcess["disable"]            = &RenderProcess::disable;
+      renderProcess["addParent"]          = sol::overload(PickOverload<RenderPass&>(&RenderProcess::addParent),
+                                                          PickOverload<RenderProcess&>(&RenderProcess::addParent));
+      renderProcess["addChild"]           = sol::overload(PickOverload<RenderPass&>(&RenderProcess::addChild),
+                                                          PickOverload<RenderProcess&>(&RenderProcess::addChild));
+      renderProcess["resizeBuffers"]      = &RenderProcess::resizeBuffers;
+      renderProcess["recoverElapsedTime"] = &RenderProcess::recoverElapsedTime;
+    }
+
+    {
+      auto ssrRenderProcess = state.new_usertype<SsrRenderProcess>("SsrRenderProcess",
+                                                                   sol::constructors<SsrRenderProcess(RenderGraph&)>(),
+                                                                   sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+      ssrRenderProcess["setInputDepthBuffer"]        = &SsrRenderProcess::setInputDepthBuffer;
+      ssrRenderProcess["setInputColorBuffer"]        = &SsrRenderProcess::setInputColorBuffer;
+      ssrRenderProcess["setInputBlurredColorBuffer"] = &SsrRenderProcess::setInputBlurredColorBuffer;
+      ssrRenderProcess["setInputNormalBuffer"]       = &SsrRenderProcess::setInputNormalBuffer;
+      ssrRenderProcess["setInputSpecularBuffer"]     = &SsrRenderProcess::setInputSpecularBuffer;
+      ssrRenderProcess["setOutputBuffer"]            = &SsrRenderProcess::setOutputBuffer;
+    }
+
+    {
+      auto vignetteRenderProcess = state.new_usertype<VignetteRenderProcess>("VignetteRenderProcess",
+                                                                             sol::constructors<VignetteRenderProcess(RenderGraph&)>(),
+                                                                             sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+      vignetteRenderProcess["setInputBuffer"]  = &VignetteRenderProcess::setInputBuffer;
+      vignetteRenderProcess["setOutputBuffer"] = &VignetteRenderProcess::setOutputBuffer;
+      vignetteRenderProcess["setStrength"]     = &VignetteRenderProcess::setStrength;
+      vignetteRenderProcess["setOpacity"]      = &VignetteRenderProcess::setOpacity;
+      vignetteRenderProcess["setColor"]        = &VignetteRenderProcess::setColor;
+    }
   }
 
   {

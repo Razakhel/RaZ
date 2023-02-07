@@ -358,7 +358,7 @@ void BloomRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer) {
 #endif
 }
 
-void BloomRenderProcess::setThresholdValue(float threshold) {
+void BloomRenderProcess::setThresholdValue(float threshold) const {
   m_thresholdPass->getProgram().setAttribute(threshold, "uniThreshold");
   m_thresholdPass->getProgram().sendAttributes();
 }
