@@ -26,6 +26,7 @@ public:
 private:
   static void registerAnimationTypes();
   static void registerAudioTypes();
+  static void registerCoreTypes();
   static void registerDataTypes();
   static void registerMathTypes();
   static void registerPhysicsTypes();

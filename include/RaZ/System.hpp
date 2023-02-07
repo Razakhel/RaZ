@@ -70,7 +70,7 @@ protected:
   Bitset m_acceptedComponents {};
 
 private:
-  static inline std::size_t m_maxId = 0;
+  static inline std::size_t s_maxId = 0;
 };
 
 } // namespace Raz

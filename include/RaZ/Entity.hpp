@@ -29,6 +29,12 @@ public:
 
   template <typename... Args> static EntityPtr create(Args&&... args) { return std::make_unique<Entity>(std::forward<Args>(args)...); }
 
+  /// Changes the entity's enabled state.
+  /// Enables or disables the entity according to the given parameter.
+  /// \param enabled True if the entity should be enabled, false if it should be disabled.
+  void enable(bool enabled = true) noexcept { m_enabled = enabled; }
+  /// Disables the entity.
+  void disable() noexcept { enable(false); }
   /// Adds a component to be held by the entity.
   /// \tparam Comp Type of the component to be added.
   /// \tparam Args Types of the arguments to be forwarded to the given component.
@@ -62,12 +68,6 @@ public:
   /// Removes the given component from the entity.
   /// \tparam Comp Type of the component to be removed.
   template <typename Comp> void removeComponent();
-  /// Changes the entity's enabled state.
-  /// Enables or disables the entity according to the given parameter.
-  /// \param enabled True if the entity should be enabled, false if it should be disabled.
-  void enable(bool enabled = true) noexcept { m_enabled = enabled; }
-  /// Disables the entity.
-  void disable() noexcept { enable(false); }
 
   Entity& operator=(const Entity&) = delete;
   Entity& operator=(Entity&&) noexcept = delete;
