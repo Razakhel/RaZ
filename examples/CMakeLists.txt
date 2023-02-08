@@ -55,6 +55,11 @@ target_link_libraries(RaZ_MinDemo RaZ_Examples)
 add_executable(RaZ_PhysicsDemo physicsDemo.cpp)
 target_link_libraries(RaZ_PhysicsDemo RaZ_Examples)
 
+if (RAZ_USE_SOL2)
+    add_executable(RaZ_ScriptDemo scriptDemo.cpp)
+    target_link_libraries(RaZ_ScriptDemo RaZ_Examples)
+endif()
+
 add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
 target_link_libraries(RaZ_ShowcaseDemo RaZ_Examples)
 
@@ -83,6 +88,10 @@ if (RAZ_USE_EMSCRIPTEN)
     if (RAZ_USE_AUDIO)
         set_target_properties(RaZ_SoundDemo PROPERTIES SUFFIX ".html")
     endif ()
+
+    if (RAZ_USE_SOL2)
+        set_target_properties(RaZ_ScriptDemo PROPERTIES SUFFIX ".html")
+    endif()
 
     include(EmscriptenAssets.cmake)
 endif ()
