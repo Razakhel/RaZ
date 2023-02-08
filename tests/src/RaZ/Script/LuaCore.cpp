@@ -28,6 +28,16 @@ TEST_CASE("LuaCore Entity") {
     entity:disable()
     assert(not entity:isEnabled())
     assert(entity:getEnabledComponents() ~= nil)
+
+    entity:addComponent(Camera.new())
+    entity:addComponent(Collider.new())
+    entity:addComponent(Light.new(LightType.POINT, 1))
+    entity:addComponent(Listener.new())
+    entity:addComponent(Mesh.new())
+    entity:addComponent(MeshRenderer.new())
+    entity:addComponent(RigidBody.new(0, 0))
+    entity:addComponent(Sound.new())
+    entity:addComponent(Transform.new())
   )"));
 }
 
