@@ -566,6 +566,13 @@ TEST_CASE("LuaRender RenderSystem") {
     renderSystem:saveToImage(FilePath.new("téstÊxpørt.png"))
     renderSystem:saveToImage(FilePath.new("téstÊxpørt.png"), TextureFormat.DEPTH)
     renderSystem:saveToImage(FilePath.new("téstÊxpørt.png"), TextureFormat.RGBA, PixelDataType.UBYTE)
+
+    assert(renderSystem:getAcceptedComponents() ~= nil)
+    assert(not renderSystem:containsEntity(Entity.new(0)))
+    -- RenderSystem::update() is not tested, as it requires a specific setup
+    --assert(renderSystem:update(0))
+    assert(renderSystem:step(0))
+    renderSystem:destroy()
   )"));
 
 #if !defined(RAZ_NO_WINDOW)

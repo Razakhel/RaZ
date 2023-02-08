@@ -28,6 +28,12 @@ TEST_CASE("LuaPhysics PhysicsSystem") {
     physicsSystem.friction = 0.25
     assert(physicsSystem.gravity == Axis.Y)
     assert(physicsSystem.friction == 0.25)
+
+    assert(physicsSystem:getAcceptedComponents() ~= nil)
+    assert(not physicsSystem:containsEntity(Entity.new(0)))
+    assert(physicsSystem:update(0))
+    assert(physicsSystem:step(0))
+    physicsSystem:destroy()
   )"));
 }
 

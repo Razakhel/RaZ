@@ -4,18 +4,24 @@
 
 TEST_CASE("LuaAudio AudioSystem") {
   CHECK(Raz::LuaWrapper::execute(R"(
-    local audio = AudioSystem.new()
-    audio       = AudioSystem.new(AudioSystem.recoverDevices()[1])
-    assert(audio:recoverCurrentDevice() ~= "")
+    local audioSystem = AudioSystem.new()
+    audioSystem       = AudioSystem.new(AudioSystem.recoverDevices()[1])
 
-    audio:openDevice("invalid device")
-    assert(audio:recoverCurrentDevice() == "")
+    assert(audioSystem:recoverCurrentDevice() ~= "")
+    audioSystem:openDevice("invalid device")
+    assert(audioSystem:recoverCurrentDevice() == "")
+
+    assert(audioSystem:getAcceptedComponents() ~= nil)
+    assert(not audioSystem:containsEntity(Entity.new(0)))
+    assert(audioSystem:update(0))
+    assert(audioSystem:step(0))
+    audioSystem:destroy()
   )"));
 }
 
 TEST_CASE("LuaAudio Listener") {
   CHECK(Raz::LuaWrapper::execute(R"(
-    local audio = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
+    local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
     local listener = Listener.new()
     listener       = Listener.new(Vec3f.new(1))
@@ -41,7 +47,7 @@ TEST_CASE("LuaAudio Listener") {
 
 TEST_CASE("LuaAudio Sound") {
   CHECK(Raz::LuaWrapper::execute(R"(
-    local audio = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
+    local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
     local sound = Sound.new()
     sound       = WavFormat.load(FilePath.new(RAZ_TESTS_ROOT .. "assets/sounds/notif_ting.wav"))

@@ -53,6 +53,12 @@ TEST_CASE("LuaData BvhSystem") {
     assert(bvhRootNode:isLeaf())
     assert(bvhRootNode:query(Ray.new(Vec3f.new(), Axis.Z)) == nil)
     assert(bvhRootNode:query(Ray.new(Vec3f.new(), Axis.Z), rayHit) == nil)
+
+    assert(bvhSystem:getAcceptedComponents() ~= nil)
+    assert(not bvhSystem:containsEntity(Entity.new(0)))
+    assert(bvhSystem:update(0))
+    assert(bvhSystem:step(0))
+    bvhSystem:destroy()
   )"));
 }
 
