@@ -3,13 +3,25 @@
 #ifndef RAZ_SUBMESH_HPP
 #define RAZ_SUBMESH_HPP
 
-#include "RaZ/Render/GraphicObjects.hpp"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Shape.hpp"
 
-#include <functional>
-#include <memory>
+#include <vector>
 
 namespace Raz {
+
+struct Vertex {
+  Vec3f position {};
+  Vec2f texcoords {};
+  Vec3f normal {};
+  Vec3f tangent {};
+
+  std::size_t operator()() const { return tangent.hash(normal.hash(texcoords.hash(position.hash(0)))); }
+  bool operator==(const Vertex& vert) const noexcept { return (position == vert.position)
+                                                           && (texcoords == vert.texcoords)
+                                                           && (normal == vert.normal)
+                                                           && (tangent == vert.tangent); }
+};
 
 class Submesh {
 public:

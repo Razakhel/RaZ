@@ -1,5 +1,6 @@
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/Framebuffer.hpp"
+#include "RaZ/Render/GraphicObjects.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/Texture.hpp"
