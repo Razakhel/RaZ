@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.11)
+
+if (POLICY CMP0092)
+    cmake_policy(SET CMP0092 NEW) # Removing the default /W3 from MSVC targets (CMake 3.15+)
+endif ()
+
 project(RaZ)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")

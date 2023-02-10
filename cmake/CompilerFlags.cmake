@@ -205,13 +205,8 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd5262 # Implicit fallthrough
         )
 
-        # To automatically export all the classes & functions
+        # Automatically export all classes & functions
         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-
-        # CMake automatically appends /W3 to the standard flags, which produces a warning with MSVC when adding another level; this has to be removed
-        # TODO: if possible, this should be done per target, not globally
-        string(REGEX REPLACE "/W[0-4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-        string(REGEX REPLACE "/W[0-4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     endif ()
 
     if (COMPILER_MSVC OR COMPILER_CLANG_CL)
