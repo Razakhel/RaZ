@@ -21,6 +21,9 @@ inline void GLAPIENTRY callbackDebugLog(GLenum source,
   if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
     return;
 
+  if (id == 131218)
+    return; // "Shader is being recompiled based on GL state". May be avoidable, but disabled for now
+
   std::string errorMsg = "[OpenGL]\n\t";
 
   switch (source) {
