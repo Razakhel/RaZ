@@ -99,7 +99,7 @@ constexpr Quaternion<T> Quaternion<T>::inverse() const noexcept {
 }
 
 template <typename T>
-constexpr Mat4<T> Quaternion<T>::computeMatrix() const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
+constexpr Mat4<T> Quaternion<T>::computeMatrix() const noexcept {
   const T invSqNorm = 1 / computeSquaredNorm();
 
   const T xx = (2 * m_complexes.x() * m_complexes.x()) * invSqNorm;

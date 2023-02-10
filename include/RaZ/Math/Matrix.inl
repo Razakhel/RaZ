@@ -363,14 +363,14 @@ constexpr Matrix<T, W, H> Matrix<T, W, H>::operator*(T val) const noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const noexcept {
   Matrix<T, W, H> res = *this;
   res /= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
+constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const noexcept {
   Matrix<T, W, H> res = *this;
   res /= val;
   return res;
@@ -419,14 +419,14 @@ constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator*=(T val) noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] /= mat[i];
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) noexcept {
   for (T& it : m_data)
     it /= val;
   return *this;

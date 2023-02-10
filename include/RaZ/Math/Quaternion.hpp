@@ -83,7 +83,7 @@ public:
   /// Computes the rotation matrix represented by the quaternion.
   /// This operation automatically scales the matrix so that it returns a unit one.
   /// \return Rotation matrix.
-  constexpr Mat4<T> computeMatrix() const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Mat4<T> computeMatrix() const noexcept;
 
   /// Default copy assignment operator.
   /// \return Reference to the copied quaternion.
@@ -111,7 +111,7 @@ public:
   constexpr bool operator!=(const Quaternion& quat) const noexcept { return !(*this == quat); }
   /// Matrix conversion operator; computes the rotation matrix represented by the quaternion.
   /// \return Rotation matrix.
-  constexpr operator Mat4<T>() const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559) { return computeMatrix(); }
+  constexpr operator Mat4<T>() const noexcept { return computeMatrix(); }
   /// Output stream operator.
   /// \param stream Stream to output into.
   /// \param quat Quaternion to be output.

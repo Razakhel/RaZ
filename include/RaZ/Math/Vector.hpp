@@ -154,11 +154,11 @@ public:
   /// Element-wise vector-vector division operator.
   /// \param vec Vector to be divided by.
   /// \return Result of the summed vectors.
-  constexpr Vector operator/(const Vector& vec) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Vector operator/(const Vector& vec) const noexcept;
   /// Element-wise vector-value division operator.
   /// \param val Value to be divided by.
   /// \return Result of the vector divided by the value.
-  constexpr Vector operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Vector operator/(T val) const noexcept;
   /// Element-wise vector-vector addition assignment operator.
   /// \param vec Vector to be added.
   /// \return Reference to the modified original vector.
@@ -187,11 +187,11 @@ public:
   /// Element-wise vector-vector division assignment operator.
   /// \param vec Vector to be divided by.
   /// \return Reference to the modified original vector.
-  constexpr Vector& operator/=(const Vector& vec) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Vector& operator/=(const Vector& vec) noexcept;
   /// Element-wise vector-value division assignment operator.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original vector.
-  constexpr Vector& operator/=(T val) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Vector& operator/=(T val) noexcept;
   /// Element fetching operator given its index.
   /// \param index Element's index.
   /// \return Constant reference to the fetched element.

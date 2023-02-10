@@ -131,11 +131,11 @@ public:
   /// Element-wise matrix-matrix division operator.
   /// \param mat Matrix to be divided by.
   /// \return Result of the divided matrices.
-  constexpr Matrix operator/(const Matrix& mat) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Matrix operator/(const Matrix& mat) const noexcept;
   /// Element-wise matrix-value division operator.
   /// \param val Value to be divided by.
   /// \return Result of the matrix divided by the value.
-  constexpr Matrix operator/(T val) const noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Matrix operator/(T val) const noexcept;
   /// Element-wise matrix-matrix addition assignment operator.
   /// \param mat Matrix to be added.
   /// \return Reference to the modified original matrix.
@@ -163,11 +163,11 @@ public:
   /// Element-wise matrix-matrix division assignment operator.
   /// \param mat Matrix to be divided by.
   /// \return Reference to the modified original matrix.
-  constexpr Matrix& operator/=(const Matrix& mat) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Matrix& operator/=(const Matrix& mat) noexcept;
   /// Element-wise matrix-value division assignment operator.
   /// \param val Value to be divided by.
   /// \return Reference to the modified original matrix.
-  constexpr Matrix& operator/=(T val) noexcept(std::is_integral_v<T> || std::numeric_limits<T>::is_iec559);
+  constexpr Matrix& operator/=(T val) noexcept;
   /// Matrix-matrix multiplication assignment operator.
   /// \param mat Matrix to be multiplied by.
   /// \return Reference to the modified original matrix.
