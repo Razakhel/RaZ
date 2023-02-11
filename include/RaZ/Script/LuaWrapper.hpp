@@ -29,6 +29,7 @@ private:
   static void registerCoreTypes();
   static void registerDataTypes();
   static void registerMathTypes();
+  static void registerOverlayTypes();
   static void registerPhysicsTypes();
   static void registerRenderTypes();
   static void registerUtilsTypes();
