@@ -15,6 +15,11 @@ namespace WavFormat {
 /// \return Imported sound.
 Sound load(const FilePath& filePath);
 
+/// Saves a sound to a WAV file.
+/// \param filePath File to which to save the sound.
+/// \param sound Sound to export data from.
+void save(const FilePath& filePath, const Sound& sound);
+
 } // namespace WavFormat
 
 } // namespace Raz

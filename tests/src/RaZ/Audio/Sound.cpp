@@ -3,7 +3,6 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Data/WavFormat.hpp"
-#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Threading.hpp"
 
 TEST_CASE("Sound initialization") {
@@ -84,14 +83,6 @@ TEST_CASE("Sound move") {
   CHECK(movedSoundCtor.recoverGain() == movedSoundOpGain);
   CHECK(movedSoundCtor.recoverPosition() == movedSoundOpPosition);
   CHECK(movedSoundCtor.recoverVelocity() == movedSoundOpVelocity);
-}
-
-TEST_CASE("Sound WAV import") {
-  const Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
-  // Since no AudioSystem has been created, the Sound's buffer index cannot be valid. This is not the purpose of this test anyway
-
-  CHECK(sound.getFormat() == Raz::SoundFormat::MONO_I16);
-  CHECK(sound.getFrequency() == 48000);
 }
 
 TEST_CASE("Sound operations") {

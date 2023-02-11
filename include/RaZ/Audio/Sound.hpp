@@ -141,6 +141,7 @@ public:
 
   static SoundFormat& getFormat(Sound& sound) { return sound.m_format; }
   static int& getFrequency(Sound& sound) { return sound.m_frequency; }
+  static const std::vector<std::byte>& getData(const Sound& sound) { return sound.m_data; }
   static std::vector<std::byte>& getData(Sound& sound) { return sound.m_data; }
 };
 

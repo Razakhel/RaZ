@@ -96,7 +96,7 @@ inline WavInfo validateWav(std::ifstream& file) {
   file.read(reinterpret_cast<char*>(bytes.data()), 4); // Bytes per second (frequency * bytes per block)
   info.bytesPerSecond = fromLittleEndian(bytes);
 
-  file.read(reinterpret_cast<char*>(bytes.data()), 2); // Bytes per block (bits per sample / 8 * channelCount)
+  file.read(reinterpret_cast<char*>(bytes.data()), 2); // Bytes per block (bits per sample / 8 * channel count)
   info.bytesPerBlock = fromLittleEndian(bytes[0], bytes[1]);
 
   file.read(reinterpret_cast<char*>(bytes.data()), 2); // Bits per sample (bit depth)
