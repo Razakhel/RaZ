@@ -21,6 +21,7 @@ void LuaWrapper::registerTypes() {
   registerShaderTypes();
   registerTextureTypes();
   registerUtilsTypes();
+  registerWindowTypes();
 }
 
 bool LuaWrapper::execute(const std::string& code) {

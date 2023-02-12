@@ -36,6 +36,7 @@ private:
   static void registerShaderTypes();
   static void registerTextureTypes();
   static void registerUtilsTypes();
+  static void registerWindowTypes();
 
   static sol::state& getState();
 };
