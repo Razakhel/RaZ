@@ -32,6 +32,7 @@ private:
   static void registerOverlayTypes();
   static void registerPhysicsTypes();
   static void registerRenderTypes();
+  static void registerRenderGraphTypes();
   static void registerShaderTypes();
   static void registerUtilsTypes();
 
