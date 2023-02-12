@@ -34,6 +34,7 @@ private:
   static void registerRenderTypes();
   static void registerRenderGraphTypes();
   static void registerShaderTypes();
+  static void registerTextureTypes();
   static void registerUtilsTypes();
 
   static sol::state& getState();

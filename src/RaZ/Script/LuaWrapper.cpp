@@ -19,6 +19,7 @@ void LuaWrapper::registerTypes() {
   registerRenderTypes();
   registerRenderGraphTypes();
   registerShaderTypes();
+  registerTextureTypes();
   registerUtilsTypes();
 }
 
