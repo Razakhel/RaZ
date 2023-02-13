@@ -8,7 +8,6 @@
 #include "RaZ/Utils/Shape.hpp"
 
 #include <functional>
-#include <memory>
 
 namespace Raz {
 

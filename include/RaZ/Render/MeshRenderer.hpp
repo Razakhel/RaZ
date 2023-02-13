@@ -7,8 +7,6 @@
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/SubmeshRenderer.hpp"
 
-#include <memory>
-
 namespace Raz {
 
 class Mesh;

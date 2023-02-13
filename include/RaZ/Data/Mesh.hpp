@@ -7,8 +7,6 @@
 #include "RaZ/Data/Submesh.hpp"
 #include "RaZ/Utils/Shape.hpp"
 
-#include <memory>
-
 namespace Raz {
 
 class FilePath;

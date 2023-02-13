@@ -9,8 +9,6 @@
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 
-#include <memory>
-
 namespace Raz {
 
 class Transform;

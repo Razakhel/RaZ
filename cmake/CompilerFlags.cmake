@@ -171,6 +171,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /wd4061 # Enum value in a switch not explicitly handled by a case label
             /wd4242 # Conversion from T1 to T2, possible loss of data (any type)
             /wd4244 # Conversion from T1 to T2, possible loss of data (specific types)
+            /wd4312 # Conversion from T1 to T2 of greater size
             /wd4571 # SEH exceptions aren't caught since Visual C++ 7.1
             /wd5045 # Spectre mitigation
             /wd5246 # Initialization of subobject should be wrapped in braces
@@ -178,6 +179,9 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
             # Warnings triggered by Sol
             /wd4371 # Class layout may have changed from a previous compiler version due to better packing
+            /wd4582 # Constructor not implicitly called
+            /wd4583 # Destructor not implicitly called
+            /wd5243 # Using incomplete class can cause ODR violation
 
             # Warnings triggered by the FBX SDK
             /wd4266 # No override available (function is hidden)
