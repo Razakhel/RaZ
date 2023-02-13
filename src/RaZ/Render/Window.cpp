@@ -12,6 +12,7 @@
 #endif
 
 #include "GLFW/glfw3.h"
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 #include "RaZ/Render/Window.hpp"

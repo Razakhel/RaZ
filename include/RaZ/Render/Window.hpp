@@ -3,9 +3,7 @@
 #ifndef RAZ_WINDOW_HPP
 #define RAZ_WINDOW_HPP
 
-#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/OwnerValue.hpp"
-#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Overlay.hpp"
 #include "RaZ/Utils/EnumUtils.hpp"
 #include "RaZ/Utils/Input.hpp"
@@ -16,6 +14,7 @@
 
 namespace Raz {
 
+class Image;
 class RenderSystem;
 class Window;
 using WindowPtr = std::unique_ptr<Window>;

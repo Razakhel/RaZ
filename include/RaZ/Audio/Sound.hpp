@@ -6,7 +6,6 @@
 #include "RaZ/Component.hpp"
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Data/OwnerValue.hpp"
-#include "RaZ/Math/Vector.hpp"
 
 #include <cstddef>
 #include <limits>
@@ -15,6 +14,10 @@
 namespace Raz {
 
 namespace Internal { class SoundAccess; }
+
+template <typename T, std::size_t Size>
+class Vector;
+using Vec3f = Vector<float, 3>;
 
 enum class SoundState : int {
   INITIAL = 4113 /* AL_INITIAL */, ///< Initial state, nothing is happening.
@@ -55,7 +58,7 @@ public:
   float recoverGain() const noexcept;
   /// Sets the audio source's position.
   /// \param position New source's position.
-  void setPosition(const Vec3f& position) const noexcept { setPosition(position.x(), position.y(), position.z()); }
+  void setPosition(const Vec3f& position) const noexcept;
   /// Sets the audio source's position.
   /// \param x New source's X position.
   /// \param y New source's Y position.
@@ -66,7 +69,7 @@ public:
   Vec3f recoverPosition() const noexcept;
   /// Sets the audio source's velocity.
   /// \param velocity New source's velocity.
-  void setVelocity(const Vec3f& velocity) const noexcept { setVelocity(velocity.x(), velocity.y(), velocity.z()); }
+  void setVelocity(const Vec3f& velocity) const noexcept;
   /// Sets the audio source's velocity.
   /// \param x New source's X velocity.
   /// \param y New source's Y velocity.

@@ -1,6 +1,8 @@
 #include "Catch.hpp"
 
 #include "RaZ/Animation/Skeleton.hpp"
+#include "RaZ/Math/Angle.hpp"
+#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Quaternion.hpp"
 
 using namespace Raz::Literals;

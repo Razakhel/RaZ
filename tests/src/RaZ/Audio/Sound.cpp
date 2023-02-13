@@ -3,6 +3,7 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Data/WavFormat.hpp"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Threading.hpp"
 
 TEST_CASE("Sound initialization") {

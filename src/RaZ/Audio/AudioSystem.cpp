@@ -1,6 +1,7 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Utils/Logger.hpp"
 

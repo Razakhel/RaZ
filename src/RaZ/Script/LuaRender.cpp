@@ -1,3 +1,4 @@
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/GraphicObjects.hpp"

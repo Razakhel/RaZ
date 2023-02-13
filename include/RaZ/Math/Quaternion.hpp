@@ -3,14 +3,23 @@
 #ifndef RAZ_QUATERNION_HPP
 #define RAZ_QUATERNION_HPP
 
-#include "RaZ/Math/Angle.hpp"
-#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 namespace Raz {
 
 template <typename T>
+struct Degrees;
+
+template <typename T, std::size_t W, std::size_t H>
+class Matrix;
+template <typename T>
+using Mat4 = Matrix<T, 4, 4>;
+
+template <typename T>
 class Quaternion;
+
+template <typename T>
+struct Radians;
 
 template <typename T>
 std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat);

@@ -4,12 +4,16 @@
 #define RAZ_UNIFORMBUFFER_HPP
 
 #include "RaZ/Data/OwnerValue.hpp"
-#include "RaZ/Math/Matrix.hpp"
-#include "RaZ/Math/Vector.hpp"
-#include "RaZ/Render/ShaderProgram.hpp"
-#include "RaZ/Render/Renderer.hpp"
 
 namespace Raz {
+
+class ShaderProgram;
+
+template <typename T, std::size_t W, std::size_t H>
+class Matrix;
+
+template <typename T, std::size_t Size>
+class Vector;
 
 enum class UniformBufferUsage {
   STATIC,  ///< Data is assumed to never change.
@@ -31,13 +35,12 @@ public:
   void bindRange(unsigned int bufferBindingIndex, std::ptrdiff_t offset, std::ptrdiff_t size) const;
   void bind() const;
   void unbind() const;
-  template <typename T> void sendData(T data, unsigned int offset) const { Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER, offset, sizeof(T), &data); }
+  template <typename T>
+  void sendData(T data, unsigned int offset) const noexcept { sendData(&data, sizeof(T), offset); }
   template <typename T, std::size_t Size>
-  void sendData(const Vector<T, Size>& vec, unsigned int offset) const { Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER,
-                                                                                                     offset, sizeof(vec), vec.getDataPtr()); }
+  void sendData(const Vector<T, Size>& vec, unsigned int offset) const noexcept { sendData(vec.getDataPtr(), sizeof(vec), offset); }
   template <typename T, std::size_t W, std::size_t H>
-  void sendData(const Matrix<T, W, H>& mat, unsigned int offset) const { Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER,
-                                                                                                     offset, sizeof(mat), mat.getDataPtr()); }
+  void sendData(const Matrix<T, W, H>& mat, unsigned int offset) const noexcept { sendData(mat.getDataPtr(), sizeof(mat), offset); }
 
   UniformBuffer& operator=(const UniformBuffer&) = delete;
   UniformBuffer& operator=(UniformBuffer&&) noexcept = default;
@@ -46,6 +49,8 @@ public:
 
 private:
   UniformBuffer();
+
+  void sendData(const void* data, std::ptrdiff_t size, unsigned int offset) const noexcept;
 
   OwnerValue<unsigned int> m_index {};
 };

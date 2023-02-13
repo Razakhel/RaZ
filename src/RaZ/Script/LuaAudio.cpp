@@ -1,6 +1,8 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Math/Matrix.hpp"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
 
@@ -33,7 +35,8 @@ void LuaWrapper::registerAudioTypes() {
                                                                     sol::base_classes, sol::bases<Component>());
     listener["position"]                  = sol::property(&Listener::recoverPosition, &Listener::setPosition);
     listener["velocity"]                  = sol::property(&Listener::recoverVelocity, &Listener::setVelocity);
-    listener["setOrientation"]            = sol::overload(PickOverload<const Vec3f&, const Vec3f&>(&Listener::setOrientation),
+    listener["setOrientation"]            = sol::overload(PickOverload<const Vec3f&>(&Listener::setOrientation),
+                                                          PickOverload<const Vec3f&, const Vec3f&>(&Listener::setOrientation),
                                                           PickOverload<const Mat3f&>(&Listener::setOrientation));
     listener["recoverOrientation"]        = &Listener::recoverOrientation;
     listener["recoverForwardOrientation"] = &Listener::recoverForwardOrientation;

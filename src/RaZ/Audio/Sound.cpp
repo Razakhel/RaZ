@@ -1,4 +1,5 @@
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
@@ -102,6 +103,10 @@ float Sound::recoverGain() const noexcept {
   return gain;
 }
 
+void Sound::setPosition(const Vec3f& position) const noexcept {
+  setPosition(position.x(), position.y(), position.z());
+}
+
 void Sound::setPosition(float x, float y, float z) const noexcept {
   alSource3f(m_source, AL_POSITION, x, y, z);
   checkError("Failed to set the source's position");
@@ -114,6 +119,10 @@ Vec3f Sound::recoverPosition() const noexcept {
   checkError("Failed to recover the source's position");
 
   return position;
+}
+
+void Sound::setVelocity(const Vec3f& velocity) const noexcept {
+  setVelocity(velocity.x(), velocity.y(), velocity.z());
 }
 
 void Sound::setVelocity(float x, float y, float z) const noexcept {

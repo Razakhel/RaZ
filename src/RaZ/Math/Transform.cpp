@@ -1,3 +1,5 @@
+#include "RaZ/Math/Angle.hpp"
+#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
 
 namespace Raz {
@@ -10,6 +12,10 @@ void Transform::setPosition(const Vec3f& position) {
 void Transform::setRotation(const Quaternionf& rotation) {
   m_rotation = rotation;
   m_updated  = true;
+}
+
+void Transform::setRotation(Radiansf angle, const Vec3f& axis) {
+  setRotation(Quaternionf(angle, axis));
 }
 
 void Transform::setScale(const Vec3f& scale) {

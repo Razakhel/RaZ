@@ -4,7 +4,6 @@
 #define RAZ_OVERLAY_HPP
 
 #include "RaZ/Data/Color.hpp"
-#include "RaZ/Math/Vector.hpp"
 
 #include <functional>
 #include <memory>

@@ -1,4 +1,6 @@
 #include "RaZ/Audio/Listener.hpp"
+#include "RaZ/Math/Matrix.hpp"
+#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <AL/al.h>
@@ -68,6 +70,10 @@ Vec3f Listener::recoverVelocity() const noexcept {
   return velocity;
 }
 
+void Listener::setOrientation(const Vec3f& forwardDirection) const noexcept {
+  setOrientation(forwardDirection, Axis::Y);
+}
+
 void Listener::setOrientation(const Vec3f& forwardDirection, const Vec3f& upDirection) const noexcept {
   assert("Error: The Listener's forward direction must be normalized." && FloatUtils::areNearlyEqual(forwardDirection.computeLength(), 1.f));
   assert("Error: The Listener's up direction must be normalized." && FloatUtils::areNearlyEqual(upDirection.computeLength(), 1.f));
@@ -90,6 +96,14 @@ std::pair<Vec3f, Vec3f> Listener::recoverOrientation() const noexcept {
   checkError("Failed to recover the listener's orientation");
 
   return { Vec3f(orientation[0], orientation[1], orientation[2]), Vec3f(orientation[3], orientation[4], orientation[5]) };
+}
+
+Vec3f Listener::recoverForwardOrientation() const noexcept {
+  return recoverOrientation().first;
+}
+
+Vec3f Listener::recoverUpOrientation() const noexcept {
+  return recoverOrientation().second;
 }
 
 } // namespace Raz

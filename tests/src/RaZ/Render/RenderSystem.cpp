@@ -2,6 +2,7 @@
 #include "TestUtils.hpp"
 
 #include "RaZ/World.hpp"
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/ObjFormat.hpp"

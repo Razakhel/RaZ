@@ -4,9 +4,8 @@
 #define RAZ_RENDERSYSTEM_HPP
 
 #include "RaZ/System.hpp"
-#include "RaZ/Math/Matrix.hpp"
-#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Render/Cubemap.hpp"
+#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Render/Window.hpp"

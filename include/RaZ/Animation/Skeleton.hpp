@@ -4,10 +4,13 @@
 #define RAZ_SKELETON_HPP
 
 #include "RaZ/Data/Graph.hpp"
-#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Quaternion.hpp"
 
 namespace Raz {
+
+template <typename T, std::size_t W, std::size_t H>
+class Matrix;
+using Mat4f = Matrix<float, 4, 4>;
 
 class SkeletonJoint final : public GraphNode<SkeletonJoint> {
 public:

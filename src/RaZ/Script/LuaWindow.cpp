@@ -1,3 +1,4 @@
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 #include "RaZ/Render/Window.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"

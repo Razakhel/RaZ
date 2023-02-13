@@ -1,4 +1,5 @@
 #include "RaZ/Animation/Skeleton.hpp"
+#include "RaZ/Math/Matrix.hpp"
 
 namespace Raz {
 

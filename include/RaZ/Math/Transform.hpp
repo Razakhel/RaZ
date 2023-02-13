@@ -4,11 +4,18 @@
 #define RAZ_TRANSFORM_HPP
 
 #include "RaZ/Component.hpp"
-#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 namespace Raz {
+
+template <typename T, std::size_t W, std::size_t H>
+class Matrix;
+using Mat4f = Matrix<float, 4, 4>;
+
+template <typename T>
+struct Radians;
+using Radiansf = Radians<float>;
 
 /// Transform class which handles 3D transformations (translation/rotation/scale).
 class Transform final : public Component {
@@ -24,7 +31,7 @@ public:
   void setPosition(const Vec3f& position);
   void setPosition(float x, float y, float z) { setPosition(Vec3f(x, y, z)); }
   void setRotation(const Quaternionf& rotation);
-  void setRotation(Radiansf angle, const Vec3f& axis) { setRotation(Quaternionf(angle, axis)); }
+  void setRotation(Radiansf angle, const Vec3f& axis);
   void setScale(const Vec3f& scale);
   void setScale(float x, float y, float z) { setScale(Vec3f(x, y, z)); }
   void setScale(float val) { setScale(val, val, val); }

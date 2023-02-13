@@ -1,3 +1,5 @@
+#include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
@@ -67,6 +69,10 @@ UniformBuffer::~UniformBuffer() {
 
 UniformBuffer::UniformBuffer() {
   Renderer::generateBuffer(m_index);
+}
+
+void UniformBuffer::sendData(const void* data, std::ptrdiff_t size, unsigned int offset) const noexcept {
+  Renderer::sendBufferSubData(BufferType::UNIFORM_BUFFER, offset, size, data);
 }
 
 } // namespace Raz
