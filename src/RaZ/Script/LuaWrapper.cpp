@@ -15,6 +15,7 @@ void LuaWrapper::registerTypes() {
   registerDataTypes();
   registerFileFormatTypes();
   registerMathTypes();
+  registerMatrixTypes();
   registerMeshTypes();
   registerMeshRendererTypes();
   registerOverlayTypes();
