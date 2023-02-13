@@ -28,6 +28,7 @@ private:
   static void registerAudioTypes();
   static void registerCoreTypes();
   static void registerDataTypes();
+  static void registerFileFormatTypes();
   static void registerMathTypes();
   static void registerMeshRendererTypes();
   static void registerOverlayTypes();

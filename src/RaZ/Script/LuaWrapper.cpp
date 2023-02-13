@@ -13,6 +13,7 @@ void LuaWrapper::registerTypes() {
   registerAudioTypes();
   registerCoreTypes();
   registerDataTypes();
+  registerFileFormatTypes();
   registerMathTypes();
   registerMeshRendererTypes();
   registerOverlayTypes();
