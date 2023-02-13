@@ -37,6 +37,7 @@ private:
   static void registerRenderTypes();
   static void registerRenderGraphTypes();
   static void registerShaderTypes();
+  static void registerShapeTypes();
   static void registerTextureTypes();
   static void registerUtilsTypes();
   static void registerWindowTypes();
