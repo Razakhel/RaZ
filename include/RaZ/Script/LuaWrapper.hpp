@@ -40,6 +40,7 @@ private:
   static void registerShapeTypes();
   static void registerTextureTypes();
   static void registerUtilsTypes();
+  static void registerVectorTypes();
   static void registerWindowTypes();
 
   static sol::state& getState();

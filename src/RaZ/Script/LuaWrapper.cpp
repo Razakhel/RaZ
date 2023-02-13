@@ -25,6 +25,7 @@ void LuaWrapper::registerTypes() {
   registerShapeTypes();
   registerTextureTypes();
   registerUtilsTypes();
+  registerVectorTypes();
   registerWindowTypes();
 }
 

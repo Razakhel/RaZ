@@ -5,7 +5,6 @@
 
 #include <array>
 #include <cmath>
-#include <limits>
 #include <ostream>
 
 namespace Raz {
