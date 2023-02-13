@@ -30,6 +30,7 @@ private:
   static void registerDataTypes();
   static void registerFileFormatTypes();
   static void registerMathTypes();
+  static void registerMeshTypes();
   static void registerMeshRendererTypes();
   static void registerOverlayTypes();
   static void registerPhysicsTypes();
