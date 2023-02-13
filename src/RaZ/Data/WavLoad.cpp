@@ -166,30 +166,30 @@ Sound load(const FilePath& filePath) {
   switch (info.bitsPerSample) {
     case 8:
       if (info.channelCount == 1)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_U8;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::MONO_U8;
       else if (info.channelCount == 2)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_U8;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::STEREO_U8;
       break;
 
     case 16:
       if (info.channelCount == 1)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_I16;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::MONO_I16;
       else if (info.channelCount == 2)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_I16;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::STEREO_I16;
       break;
 
     case 32:
       if (info.channelCount == 1)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_F32;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::MONO_F32;
       else if (info.channelCount == 2)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_F32;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::STEREO_F32;
       break;
 
     case 64:
       if (info.channelCount == 1)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::MONO_F64;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::MONO_F64;
       else if (info.channelCount == 2)
-        Internal::SoundAccess::getFormat(sound) = SoundFormat::STEREO_F64;
+        Internal::SoundAccess::getFormat(sound) = AudioFormat::STEREO_F64;
       break;
 
     default:

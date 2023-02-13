@@ -46,23 +46,23 @@ void save(const FilePath& filePath, const Sound& sound) {
   uint8_t bitCount {};
 
   switch (sound.getFormat()) {
-    case SoundFormat::MONO_U8:
-    case SoundFormat::STEREO_U8:
+    case AudioFormat::MONO_U8:
+    case AudioFormat::STEREO_U8:
       bitCount = 8;
       break;
 
-    case SoundFormat::MONO_I16:
-    case SoundFormat::STEREO_I16:
+    case AudioFormat::MONO_I16:
+    case AudioFormat::STEREO_I16:
       bitCount = 16;
       break;
 
-    case SoundFormat::MONO_F32:
-    case SoundFormat::STEREO_F32:
+    case AudioFormat::MONO_F32:
+    case AudioFormat::STEREO_F32:
       bitCount = 32;
       break;
 
-    case SoundFormat::MONO_F64:
-    case SoundFormat::STEREO_F64:
+    case AudioFormat::MONO_F64:
+    case AudioFormat::STEREO_F64:
       bitCount = 64;
       break;
 
@@ -75,17 +75,17 @@ void save(const FilePath& filePath, const Sound& sound) {
   uint16_t channelCount {};
 
   switch (sound.getFormat()) {
-    case SoundFormat::MONO_U8:
-    case SoundFormat::MONO_I16:
-    case SoundFormat::MONO_F32:
-    case SoundFormat::MONO_F64:
+    case AudioFormat::MONO_U8:
+    case AudioFormat::MONO_I16:
+    case AudioFormat::MONO_F32:
+    case AudioFormat::MONO_F64:
       channelCount = 1;
       break;
 
-    case SoundFormat::STEREO_U8:
-    case SoundFormat::STEREO_I16:
-    case SoundFormat::STEREO_F32:
-    case SoundFormat::STEREO_F64:
+    case AudioFormat::STEREO_U8:
+    case AudioFormat::STEREO_I16:
+    case AudioFormat::STEREO_F32:
+    case AudioFormat::STEREO_F64:
       channelCount = 2;
       break;
 

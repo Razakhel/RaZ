@@ -8,7 +8,7 @@ TEST_CASE("WavFormat load/save") {
   const Raz::Sound origSound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
   // Since no AudioSystem has been created, the Sound's buffer index cannot be valid. This is not the purpose of this test anyway
 
-  CHECK(origSound.getFormat() == Raz::SoundFormat::MONO_I16);
+  CHECK(origSound.getFormat() == Raz::AudioFormat::MONO_I16);
   CHECK(origSound.getFrequency() == 48000);
 
   Raz::WavFormat::save("téstÊxpørt.wav", origSound);

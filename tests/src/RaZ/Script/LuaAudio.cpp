@@ -53,7 +53,7 @@ TEST_CASE("LuaAudio Sound") {
     sound       = WavFormat.load(FilePath.new(RAZ_TESTS_ROOT .. "assets/sounds/notif_ting.wav"))
 
     assert(sound:getBufferIndex() >= 0)
-    assert(sound:getFormat() == SoundFormat.MONO_I16)
+    assert(sound:getFormat() == AudioFormat.MONO_I16)
     assert(sound:getFrequency() == 48000)
 
     sound:init()

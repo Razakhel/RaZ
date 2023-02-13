@@ -53,12 +53,12 @@ void Sound::load() {
   stop(); // Making sure the sound isn't paused or currently playing
   alSourcei(m_source, AL_BUFFER, 0); // Detaching the previous buffer (if any) from the source
 
-  if ((m_format == SoundFormat::MONO_F32 || m_format == SoundFormat::STEREO_F32) && !alIsExtensionPresent("AL_EXT_float32")) {
+  if ((m_format == AudioFormat::MONO_F32 || m_format == AudioFormat::STEREO_F32) && !alIsExtensionPresent("AL_EXT_float32")) {
     Logger::error("[Sound] Float sound format is not supported by the audio driver.");
     return;
   }
 
-  if ((m_format == SoundFormat::MONO_F64 || m_format == SoundFormat::STEREO_F64) && !alIsExtensionPresent("AL_EXT_double")) {
+  if ((m_format == AudioFormat::MONO_F64 || m_format == AudioFormat::STEREO_F64) && !alIsExtensionPresent("AL_EXT_double")) {
     Logger::error("[Sound] Double sound format is not supported by the audio driver.");
     return;
   }

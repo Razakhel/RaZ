@@ -63,15 +63,15 @@ void LuaWrapper::registerAudioTypes() {
     sound["isStopped"]          = &Sound::isStopped;
     sound["recoverElapsedTime"] = &Sound::recoverElapsedTime;
 
-    state.new_enum<SoundFormat>("SoundFormat", {
-      { "MONO_U8",    SoundFormat::MONO_U8 },
-      { "STEREO_U8",  SoundFormat::STEREO_U8 },
-      { "MONO_I16",   SoundFormat::MONO_I16 },
-      { "STEREO_I16", SoundFormat::STEREO_I16 },
-      { "MONO_F32",   SoundFormat::MONO_F32 },
-      { "STEREO_F32", SoundFormat::STEREO_F32 },
-      { "MONO_F64",   SoundFormat::MONO_F64 },
-      { "STEREO_F64", SoundFormat::STEREO_F64 }
+    state.new_enum<AudioFormat>("AudioFormat", {
+      { "MONO_U8", AudioFormat::MONO_U8 },
+      { "STEREO_U8", AudioFormat::STEREO_U8 },
+      { "MONO_I16", AudioFormat::MONO_I16 },
+      { "STEREO_I16", AudioFormat::STEREO_I16 },
+      { "MONO_F32", AudioFormat::MONO_F32 },
+      { "STEREO_F32", AudioFormat::STEREO_F32 },
+      { "MONO_F64", AudioFormat::MONO_F64 },
+      { "STEREO_F64", AudioFormat::STEREO_F64 }
     });
   }
 }

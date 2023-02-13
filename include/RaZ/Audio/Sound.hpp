@@ -4,6 +4,7 @@
 #define RAZ_SOUND_HPP
 
 #include "RaZ/Component.hpp"
+#include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Data/OwnerValue.hpp"
 #include "RaZ/Math/Vector.hpp"
 
@@ -14,17 +15,6 @@
 namespace Raz {
 
 namespace Internal { class SoundAccess; }
-
-enum class SoundFormat : int {
-  MONO_U8    = 4352  /* AL_FORMAT_MONO8             */, ///< Mono format on 8 unsigned bits (0 to 255).
-  STEREO_U8  = 4353  /* AL_FORMAT_STEREO8           */, ///< Stereo format on 8 unsigned bits (0 to 255).
-  MONO_I16   = 4354  /* AL_FORMAT_MONO16            */, ///< Mono format on 16 signed bits (-32768 to 32767).
-  STEREO_I16 = 4355  /* AL_FORMAT_STEREO16          */, ///< Stereo format on 16 signed bits (-32768 to 32767).
-  MONO_F32   = 65552 /* AL_FORMAT_MONO_FLOAT32      */, ///< Mono format on 32 floating-point bits (float).
-  STEREO_F32 = 65553 /* AL_FORMAT_STEREO_FLOAT32    */, ///< Stereo format on 32 floating-point bits (float).
-  MONO_F64   = 65554 /* AL_FORMAT_MONO_DOUBLE_EXT   */, ///< Mono format on 64 floating-point bits (double).
-  STEREO_F64 = 65555 /* AL_FORMAT_STEREO_DOUBLE_EXT */  ///< Stereo format on 64 floating-point bits (double).
-};
 
 enum class SoundState : int {
   INITIAL = 4113 /* AL_INITIAL */, ///< Initial state, nothing is happening.
@@ -42,7 +32,7 @@ public:
   Sound(Sound&&) noexcept = default;
 
   constexpr unsigned int getBufferIndex() const noexcept { return m_buffer; }
-  constexpr SoundFormat getFormat() const noexcept { return m_format; }
+  constexpr AudioFormat getFormat() const noexcept { return m_format; }
   constexpr int getFrequency() const noexcept { return m_frequency; }
 
   /// Initializes the sound.
@@ -126,7 +116,7 @@ private:
   OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_buffer {};
   OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_source {};
 
-  SoundFormat m_format {};
+  AudioFormat m_format {};
   int m_frequency {};
   std::vector<std::byte> m_data {};
 };
@@ -139,7 +129,7 @@ class SoundAccess {
 public:
   SoundAccess() = delete;
 
-  static SoundFormat& getFormat(Sound& sound) { return sound.m_format; }
+  static AudioFormat& getFormat(Sound& sound) { return sound.m_format; }
   static int& getFrequency(Sound& sound) { return sound.m_frequency; }
   static const std::vector<std::byte>& getData(const Sound& sound) { return sound.m_data; }
   static std::vector<std::byte>& getData(Sound& sound) { return sound.m_data; }

@@ -19,7 +19,7 @@ TEST_CASE("Sound move") {
   REQUIRE(sound.getBufferIndex() != std::numeric_limits<unsigned int>::max());
 
   const unsigned int bufferIndex = sound.getBufferIndex();
-  const Raz::SoundFormat format  = sound.getFormat();
+  const Raz::AudioFormat format  = sound.getFormat();
   const int frequency   = sound.getFrequency();
   constexpr float pitch = 0.123f;
   constexpr float gain  = 0.987f;
