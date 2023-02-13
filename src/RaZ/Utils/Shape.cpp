@@ -315,7 +315,7 @@ Vec3f AABB::computeProjection(const Vec3f& point) const {
 
 // OBB functions
 
-void OBB::setRotation(const Mat3f& rotation) {
+void OBB::setRotation(const Quaternionf& rotation) {
   m_rotation    = rotation;
   m_invRotation = m_rotation.inverse();
 }

@@ -104,9 +104,9 @@ TEST_CASE("LuaUtils Shape") {
     assert(line:computeSquaredLength() == 12)
 
     local obb = OBB.new(Vec3f.new(-1), Vec3f.new(1))
-    obb       = OBB.new(Vec3f.new(-1), Vec3f.new(1), Mat3f.identity())
+    obb       = OBB.new(Vec3f.new(-1), Vec3f.new(1), Quaternionf.identity())
     obb       = OBB.new(aabb)
-    obb       = OBB.new(aabb, Mat3f.identity())
+    obb       = OBB.new(aabb, Quaternionf.identity())
     assert(obb:getMinPosition() == aabb:getMinPosition())
     assert(obb:getMaxPosition() == aabb:getMaxPosition())
     assert(obb:computeHalfExtents() == aabb:computeHalfExtents())

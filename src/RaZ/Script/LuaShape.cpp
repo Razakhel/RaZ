@@ -34,9 +34,9 @@ void LuaWrapper::registerShapeTypes() {
   {
     sol::usertype<OBB> obb = state.new_usertype<OBB>("OBB",
                                                      sol::constructors<OBB(const Vec3f&, const Vec3f&),
-                                                                       OBB(const Vec3f&, const Vec3f&, const Mat3f),
+                                                                       OBB(const Vec3f&, const Vec3f&, const Quaternionf&),
                                                                        OBB(const AABB&),
-                                                                       OBB(const AABB&, const Mat3f&)>(),
+                                                                       OBB(const AABB&, const Quaternionf&)>(),
                                                      sol::base_classes, sol::bases<Shape>());
     obb["getMinPosition"]     = &OBB::getMinPosition;
     obb["getMaxPosition"]     = &OBB::getMaxPosition;

@@ -1,5 +1,6 @@
 #include "RaZ/Data/BvhSystem.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
 
 namespace Raz {

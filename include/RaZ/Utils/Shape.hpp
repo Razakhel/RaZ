@@ -4,7 +4,7 @@
 #define RAZ_SHAPE_HPP
 
 #include "RaZ/Component.hpp"
-#include "RaZ/Math/Matrix.hpp"
+#include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Ray.hpp"
 
@@ -650,15 +650,17 @@ private:
 ///
 class OBB final : public Shape {
 public:
-  OBB(const Vec3f& minPos, const Vec3f& maxPos, const Mat3f& rotation = Mat3f::identity()) noexcept : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
-  explicit OBB(const AABB& aabb, const Mat3f& rotation = Mat3f::identity()) noexcept : m_aabb{ aabb }, m_rotation{ rotation } {}
+  OBB(const Vec3f& minPos, const Vec3f& maxPos) noexcept : m_aabb(minPos, maxPos) {}
+  OBB(const Vec3f& minPos, const Vec3f& maxPos, const Quaternionf& rotation) noexcept : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
+  explicit OBB(const AABB& aabb) noexcept : m_aabb{ aabb } {}
+  OBB(const AABB& aabb, const Quaternionf& rotation) noexcept : m_aabb{ aabb }, m_rotation{ rotation } {}
 
   ShapeType getType() const noexcept override { return ShapeType::OBB; }
   const Vec3f& getMinPosition() const { return m_aabb.getMinPosition(); }
   const Vec3f& getMaxPosition() const { return m_aabb.getMaxPosition(); }
-  const Mat3f& getRotation() const { return m_rotation; }
+  const Quaternionf& getRotation() const { return m_rotation; }
 
-  void setRotation(const Mat3f& rotation);
+  void setRotation(const Quaternionf& rotation);
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -739,8 +741,8 @@ public:
 
 private:
   AABB m_aabb;
-  Mat3f m_rotation {};
-  Mat3f m_invRotation {};
+  Quaternionf m_rotation    = Quaternionf::identity();
+  Quaternionf m_invRotation = Quaternionf::identity();
 };
 
 } // namespace Raz
