@@ -4,14 +4,20 @@
 #define RAZ_COLLIDER_HPP
 
 #include "RaZ/Component.hpp"
-#include "RaZ/Utils/Shape.hpp"
+
+#include <cassert>
 
 namespace Raz {
+
+class Ray;
+struct RayHit;
+class Shape;
+enum class ShapeType;
 
 class Collider final : public Component {
 public:
   Collider() = default;
-  explicit Collider(Shape&& shape) { setShape(std::move(shape)); }
+  explicit Collider(Shape&& shape);
   Collider(const Collider&) = delete;
   Collider(Collider&&) noexcept = default;
 

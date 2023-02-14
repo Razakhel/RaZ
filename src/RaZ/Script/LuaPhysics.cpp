@@ -2,6 +2,7 @@
 #include "RaZ/Physics/PhysicsSystem.hpp"
 #include "RaZ/Physics/RigidBody.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
+#include "RaZ/Utils/Shape.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1

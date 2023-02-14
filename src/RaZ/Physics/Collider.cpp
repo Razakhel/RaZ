@@ -1,6 +1,11 @@
 #include "RaZ/Physics/Collider.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 namespace Raz {
+
+Collider::Collider(Shape&& shape) {
+  setShape(std::move(shape));
+}
 
 void Collider::setShape(Shape&& shape) {
   m_shapeType = shape.getType();

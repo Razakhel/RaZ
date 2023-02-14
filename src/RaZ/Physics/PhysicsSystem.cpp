@@ -2,6 +2,7 @@
 #include "RaZ/Physics/Collider.hpp"
 #include "RaZ/Physics/RigidBody.hpp"
 #include "RaZ/Physics/PhysicsSystem.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 namespace Raz {
 

@@ -5,6 +5,7 @@
 #include "RaZ/Physics/Collider.hpp"
 #include "RaZ/Physics/PhysicsSystem.hpp"
 #include "RaZ/Physics/RigidBody.hpp"
+#include "RaZ/Utils/Shape.hpp"
 
 TEST_CASE("PhysicsSystem basic") {
   Raz::PhysicsSystem physics;
