@@ -57,9 +57,11 @@ public:
   /// \return Source's gain.
   float recoverGain() const noexcept;
   /// Sets the audio source's position.
+  /// \note Note that positional audio will only be effective with sounds having a mono format.
   /// \param position New source's position.
   void setPosition(const Vec3f& position) const noexcept;
   /// Sets the audio source's position.
+  /// \note Note that positional audio will only be effective with sounds having a mono format.
   /// \param x New source's X position.
   /// \param y New source's Y position.
   /// \param z New source's Z position.

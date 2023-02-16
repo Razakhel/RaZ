@@ -124,7 +124,9 @@ OverlayPlotEntry& OverlayPlot::addEntry(std::string name, OverlayPlotType type) 
 }
 
 OverlayWindow::OverlayWindow(std::string title, const Vec2f& initSize, const Vec2f& initPos) noexcept
-  : m_title{ std::move(title) }, m_currentSize{ initSize }, m_currentPos{ initPos } {}
+  : m_title{ std::move(title) }, m_currentSize{ initSize }, m_currentPos{ initPos } {
+  assert("Error: The overlay window title cannot be empty." && !m_title.empty());
+}
 
 OverlayLabel& OverlayWindow::addLabel(std::string label) {
   return static_cast<OverlayLabel&>(*m_elements.emplace_back(std::make_unique<OverlayLabel>(std::move(label))));
