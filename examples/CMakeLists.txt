@@ -96,13 +96,13 @@ if (RAZ_USE_EMSCRIPTEN)
     include(EmscriptenAssets.cmake)
 endif ()
 
-# If FBX SDK used with MSVC, copy the DLL into the examples/ folder to link it properly
-if (MSVC)
+# Copying DLLs to the examples folder to link the libraries properly
+if (WIN32)
     if (RAZ_USE_AUDIO)
         file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/examples/OpenAL32.dll")
     endif ()
 
-    if (RAZ_USE_FBX)
+    if (MSVC AND RAZ_USE_FBX)
         file(COPY "${FBX_DLL}" DESTINATION "${CMAKE_BINARY_DIR}/examples/")
     endif ()
 endif ()

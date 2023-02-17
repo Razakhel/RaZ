@@ -5,6 +5,7 @@
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include <AL/al.h>
 #include <AL/alc.h>
 
 #include <string>
@@ -37,6 +38,9 @@ inline void checkError(void* device, const std::string& errorMsg) {
 AudioSystem::AudioSystem(const char* deviceName) {
   registerComponents<Sound, Listener>();
   openDevice(deviceName);
+
+  if (m_device && m_context && alGetString(AL_RENDERER) != std::string_view("OpenAL Soft"))
+    Logger::warn("[OpenAL] Standard OpenAL detected; make sure to use OpenAL Soft to get all possible features");
 }
 
 std::vector<std::string> AudioSystem::recoverDevices() {
