@@ -15,6 +15,8 @@ namespace Raz {
 
 namespace Internal { class SoundAccess; }
 
+class SoundEffectSlot;
+
 template <typename T, std::size_t Size>
 class Vector;
 using Vec3f = Vector<float, 3>;
@@ -80,6 +82,13 @@ public:
   /// Recovers the velocity of the sound emitter.
   /// \return Sound's velocity.
   Vec3f recoverVelocity() const noexcept;
+#if !defined(__EMSCRIPTEN__)
+  /// Links a sound effect slot to the current sound.
+  /// \param slot Slot to be linked.
+  void linkSlot(const SoundEffectSlot& slot) const noexcept;
+  /// Unlinks any sound effect slot from the current sound.
+  void unlinkSlot() const noexcept;
+#endif
   /// Sets the sound's repeat state.
   /// \param repeat Repeat state; true if the sound should be repeated, false otherwise.
   void setRepeat(bool repeat) const noexcept;

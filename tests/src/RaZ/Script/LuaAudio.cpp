@@ -59,16 +59,13 @@ TEST_CASE("LuaAudio Sound") {
     sound:init()
     sound:load()
 
-    sound.pitch = 0.5
-    assert(sound.pitch == 0.5)
-
-    sound.gain = 0
-    assert(sound.gain == 0)
-
+    sound.pitch    = 0.5
+    sound.gain     = 0
     sound.position = Vec3f.new(1, 2, 3)
-    assert(sound.position == Vec3f.new(1, 2, 3))
-
     sound.velocity = Vec3f.new(0, 0, 10)
+    assert(sound.pitch == 0.5)
+    assert(sound.gain == 0)
+    assert(sound.position == Vec3f.new(1, 2, 3))
     assert(sound.velocity == Vec3f.new(0, 0, 10))
 
     sound:setRepeat(false)
@@ -81,4 +78,69 @@ TEST_CASE("LuaAudio Sound") {
     sound:rewind()
     assert(sound:recoverElapsedTime() == 0)
   )"));
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
+
+    local sound = Sound.new()
+    sound:linkSlot(SoundEffectSlot.new())
+    sound:unlinkSlot()
+  )"));
+#endif
 }
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+TEST_CASE("LuaAudio SoundEffect") {
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
+
+    local soundEffect = SoundEffect.new()
+
+    assert(soundEffect:getIndex() >= 0)
+    soundEffect:init()
+
+    local reverbParams = ReverberationParams.new()
+    reverbParams.density                        = 0
+    reverbParams.diffusion                      = 0
+    reverbParams.gain                           = 0
+    reverbParams.gainHighFrequency              = 0
+    reverbParams.gainLowFrequency               = 0
+    reverbParams.decayTime                      = 0.1
+    reverbParams.decayHighFrequencyRatio        = 0.1
+    reverbParams.decayLowFrequencyRatio         = 0.1
+    reverbParams.reflectionsGain                = 0
+    reverbParams.reflectionsDelay               = 0
+    reverbParams.reflectionsPan                 = { 0, 0, 0 }
+    reverbParams.lateReverbGain                 = 0
+    reverbParams.lateReverbDelay                = 0
+    reverbParams.lateReverbPan                  = { 0, 0, 0 }
+    reverbParams.echoTime                       = 0.075
+    reverbParams.echoDepth                      = 0
+    reverbParams.modulationTime                 = 0.04
+    reverbParams.modulationDepth                = 0
+    reverbParams.airAbsorptionGainHighFrequency = 0.892
+    reverbParams.highFrequencyReference         = 1000
+    reverbParams.lowFrequencyReference          = 20
+    reverbParams.roomRolloffFactor              = 0
+    reverbParams.decayHighFrequencyLimit        = false
+    soundEffect:load(reverbParams)
+
+    soundEffect:reset()
+    soundEffect:destroy()
+  )"));
+}
+
+TEST_CASE("LuaAudio SoundEffectSlot") {
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
+
+    local soundEffectSlot = SoundEffectSlot.new()
+
+    assert(soundEffectSlot:getIndex() >= 0)
+    soundEffectSlot:init()
+    soundEffectSlot:loadEffect(SoundEffect.new())
+    soundEffectSlot:destroy()
+  )"));
+}
+#endif

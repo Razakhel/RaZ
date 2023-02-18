@@ -12,6 +12,8 @@
 #include "Audio/AudioSystem.hpp"
 #include "Audio/Listener.hpp"
 #include "Audio/Sound.hpp"
+#include "Audio/SoundEffect.hpp"
+#include "Audio/SoundEffectSlot.hpp"
 #include "Data/Bitset.hpp"
 #include "Data/BvhFormat.hpp"
 #include "Data/BvhSystem.hpp"

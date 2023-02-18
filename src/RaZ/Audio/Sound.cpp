@@ -1,9 +1,12 @@
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Audio/SoundEffectSlot.hpp"
 #include "RaZ/Math/Vector.hpp"
-#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <AL/al.h>
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#include <AL/efx.h>
+#endif
 
 namespace Raz {
 
@@ -139,6 +142,18 @@ Vec3f Sound::recoverVelocity() const noexcept {
   return velocity;
 }
 
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+void Sound::linkSlot(const SoundEffectSlot& slot) const noexcept {
+  alSource3i(m_source, AL_AUXILIARY_SEND_FILTER, static_cast<int>(slot.getIndex()), 0, AL_FILTER_NULL);
+  checkError("Failed to link the sound effect slot to the sound");
+}
+
+void Sound::unlinkSlot() const noexcept {
+  alSource3i(m_source, AL_AUXILIARY_SEND_FILTER, 0, 0, AL_FILTER_NULL);
+  checkError("Failed to unlink the sound effect slot from the sound");
+}
+#endif
+
 void Sound::setRepeat(bool repeat) const noexcept {
   alSourcei(m_source, AL_LOOPING, repeat);
   checkError("Failed to change the sound's repeat state");
@@ -187,25 +202,27 @@ void Sound::destroy() {
 
   Logger::debug("[Sound] Destroying...");
 
-  if (m_source.isValid()) {
+  if (m_source.isValid() && alIsSource(m_source)) {
     Logger::debug("[Sound] Destroying source (ID: " + std::to_string(m_source) + ")...");
 
     alDeleteSources(1, &m_source.get());
     checkError("Failed to delete source");
-    m_source.reset();
 
     Logger::debug("[Sound] Destroyed source");
   }
 
-  if (m_buffer.isValid()) {
+  m_source.reset();
+
+  if (m_buffer.isValid() && alIsBuffer(m_buffer)) {
     Logger::debug("[Sound] Destroying buffer (ID: " + std::to_string(m_buffer) + ")...");
 
     alDeleteBuffers(1, &m_buffer.get());
     checkError("Failed to delete buffer");
-    m_buffer.reset();
 
     Logger::debug("[Sound] Destroyed buffer");
   }
+
+  m_buffer.reset();
 
   Logger::debug("[Sound] Destroyed");
 }

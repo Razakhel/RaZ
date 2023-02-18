@@ -72,6 +72,11 @@ set(
 
 if (RAZ_USE_AUDIO)
     list(APPEND RAZ_TESTS_SRC src/RaZ/Audio/*.cpp)
+
+    if (WIN32)
+        # Copying OpenAL's DLL to the tests folder
+        file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/tests/OpenAL32.dll")
+    endif ()
 endif ()
 
 if (RAZ_USE_SOL2)
@@ -89,8 +94,8 @@ file(
 # RaZ Tests - FBX file format #
 ###############################
 
-# If FBX SDK used with MSVC, copy the DLL into the tests/ folder to link it properly
-if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)
+if (MSVC AND RAZ_USE_FBX)
+    # Copying the FBX SDK's DLL to the tests folder
     file(COPY "${FBX_DLL}" DESTINATION "${CMAKE_BINARY_DIR}/tests/")
 else ()
     list(

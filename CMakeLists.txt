@@ -285,6 +285,18 @@ find_package(OpenAL)
 if (RAZ_USE_EMSCRIPTEN)
     # Emscripten's FindOpenAL.cmake script historically sets the capitalized found variable, but always finds it anyway
     set(OpenAL_FOUND ON)
+
+    # Emscripten's OpenAL implementation does not (yet?) support audio effects
+    list(
+        REMOVE_ITEM
+        RAZ_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Audio/SoundEffect.cpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Audio/SoundEffectSlot.cpp"
+
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Audio/SoundEffect.hpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/Audio/SoundEffectSlot.hpp"
+    )
 endif ()
 
 option(RAZ_USE_AUDIO "Enable audio capabilities (requires OpenAL to be installed)" ${OpenAL_FOUND})

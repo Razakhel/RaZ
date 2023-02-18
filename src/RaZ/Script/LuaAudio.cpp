@@ -1,6 +1,8 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Audio/SoundEffect.hpp"
+#include "RaZ/Audio/SoundEffectSlot.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
@@ -56,6 +58,10 @@ void LuaWrapper::registerAudioTypes() {
     sound["gain"]               = sol::property(&Sound::recoverGain, &Sound::setGain);
     sound["position"]           = sol::property(&Sound::recoverPosition, PickOverload<const Vec3f&>(&Sound::setPosition));
     sound["velocity"]           = sol::property(&Sound::recoverVelocity, PickOverload<const Vec3f&>(&Sound::setVelocity));
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+    sound["linkSlot"]           = &Sound::linkSlot;
+    sound["unlinkSlot"]         = &Sound::unlinkSlot;
+#endif
     sound["setRepeat"]          = &Sound::setRepeat;
     sound["play"]               = &Sound::play;
     sound["pause"]              = &Sound::pause;
@@ -77,6 +83,53 @@ void LuaWrapper::registerAudioTypes() {
       { "STEREO_F64", AudioFormat::STEREO_F64 }
     });
   }
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+  {
+    sol::usertype<SoundEffect> soundEffect = state.new_usertype<SoundEffect>("SoundEffect",
+                                                                             sol::constructors<SoundEffect()>());
+    soundEffect["getIndex"] = &SoundEffect::getIndex;
+    soundEffect["init"]     = &SoundEffect::init;
+    soundEffect["load"]     = &SoundEffect::load;
+    soundEffect["reset"]    = &SoundEffect::reset;
+    soundEffect["destroy"]  = &SoundEffect::destroy;
+
+    sol::usertype<ReverberationParams> reverbParams = state.new_usertype<ReverberationParams>("ReverberationParams",
+                                                                                              sol::constructors<ReverberationParams()>());
+    reverbParams["density"]                        = &ReverberationParams::density;
+    reverbParams["diffusion"]                      = &ReverberationParams::diffusion;
+    reverbParams["gain"]                           = &ReverberationParams::gain;
+    reverbParams["gainHighFrequency"]              = &ReverberationParams::gainHighFrequency;
+    reverbParams["gainLowFrequency"]               = &ReverberationParams::gainLowFrequency;
+    reverbParams["decayTime"]                      = &ReverberationParams::decayTime;
+    reverbParams["decayHighFrequencyRatio"]        = &ReverberationParams::decayHighFrequencyRatio;
+    reverbParams["decayLowFrequencyRatio"]         = &ReverberationParams::decayLowFrequencyRatio;
+    reverbParams["reflectionsGain"]                = &ReverberationParams::reflectionsGain;
+    reverbParams["reflectionsDelay"]               = &ReverberationParams::reflectionsDelay;
+    reverbParams["reflectionsPan"]                 = &ReverberationParams::reflectionsPan;
+    reverbParams["lateReverbGain"]                 = &ReverberationParams::lateReverbGain;
+    reverbParams["lateReverbDelay"]                = &ReverberationParams::lateReverbDelay;
+    reverbParams["lateReverbPan"]                  = &ReverberationParams::lateReverbPan;
+    reverbParams["echoTime"]                       = &ReverberationParams::echoTime;
+    reverbParams["echoDepth"]                      = &ReverberationParams::echoDepth;
+    reverbParams["modulationTime"]                 = &ReverberationParams::modulationTime;
+    reverbParams["modulationDepth"]                = &ReverberationParams::modulationDepth;
+    reverbParams["airAbsorptionGainHighFrequency"] = &ReverberationParams::airAbsorptionGainHighFrequency;
+    reverbParams["highFrequencyReference"]         = &ReverberationParams::highFrequencyReference;
+    reverbParams["lowFrequencyReference"]          = &ReverberationParams::lowFrequencyReference;
+    reverbParams["roomRolloffFactor"]              = &ReverberationParams::roomRolloffFactor;
+    reverbParams["decayHighFrequencyLimit"]        = &ReverberationParams::decayHighFrequencyLimit;
+  }
+
+  {
+    sol::usertype<SoundEffectSlot> soundEffectSlot = state.new_usertype<SoundEffectSlot>("SoundEffectSlot",
+                                                                                         sol::constructors<SoundEffectSlot()>());
+    soundEffectSlot["getIndex"]   = &SoundEffectSlot::getIndex;
+    soundEffectSlot["init"]       = &SoundEffectSlot::init;
+    soundEffectSlot["loadEffect"] = &SoundEffectSlot::loadEffect;
+    soundEffectSlot["destroy"]    = &SoundEffectSlot::destroy;
+  }
+#endif
 }
 
 } // namespace Raz
