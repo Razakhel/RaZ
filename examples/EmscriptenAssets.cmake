@@ -316,6 +316,7 @@ if (RAZ_USE_AUDIO)
     set(
         RaZ_SoundDemo_ASSETS
 
+        assets/sounds/knock.wav
         assets/sounds/wave_seagulls.wav
     )
 
