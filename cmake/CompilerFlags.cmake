@@ -88,7 +88,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
                 ${COMPILER_FLAGS}
                 -Wduplicated-cond
-                -Wnull-dereference
+                #-Wnull-dereference # Lua bindings (Sol) generate a lot of these
             )
         endif ()
 
