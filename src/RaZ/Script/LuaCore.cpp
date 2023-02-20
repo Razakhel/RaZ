@@ -27,16 +27,7 @@ void LuaWrapper::registerCoreTypes() {
     application["getDeltaTime"] = &Application::getDeltaTime;
     application["addWorld"]     = &Application::addWorld<>;
     application["run"]          = sol::overload([] (Application& app) { app.run(); },
-                                                [] (Application& app, const sol::protected_function& func) {
-      app.run([&func] (float deltaTime) {
-        const auto result = func(deltaTime);
-
-        if (!result.valid()) {
-            sol::error err = result;
-            throw std::runtime_error(std::move(err));
-        }
-      });
-    });
+                                                [] (Application& app, const std::function<void(float)>& func) { app.run(func); });
     application["runOnce"]      = &Application::runOnce;
     application["quit"]         = &Application::quit;
   }
