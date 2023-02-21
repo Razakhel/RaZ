@@ -1,6 +1,7 @@
-#include "GL/glew.h"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
+
+#include "GL/glew.h"
 
 #include <algorithm>
 #include <array>
@@ -10,7 +11,7 @@ namespace Raz {
 
 namespace {
 
-#if !defined(USE_OPENGL_ES)
+#if !defined(RAZ_PLATFORM_MAC) && !defined(USE_OPENGL_ES)
 inline void GLAPIENTRY callbackDebugLog(GLenum source,
                                         GLenum type,
                                         unsigned int id,

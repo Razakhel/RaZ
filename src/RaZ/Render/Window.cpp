@@ -85,7 +85,7 @@ Window::Window(RenderSystem& renderSystem,
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
 
-    m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, nullptr);
+    m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, glfwGetCurrentContext());
 
     if (m_windowHandle)
       break;
@@ -99,13 +99,14 @@ Window::Window(RenderSystem& renderSystem,
     throw std::runtime_error("Error: Failed to create GLFW Window");
   }
 #else
-  m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, nullptr);
+  m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, glfwGetCurrentContext());
 #endif
 
   glfwSetWindowUserPointer(m_windowHandle, this);
-  glfwMakeContextCurrent(m_windowHandle);
-
   glfwGetWindowPos(m_windowHandle, &m_posX, &m_posY);
+
+  if (glfwGetCurrentContext() == nullptr)
+    glfwMakeContextCurrent(m_windowHandle);
 
   Renderer::initialize();
   setClearColor(0.15f, 0.15f, 0.15f);
