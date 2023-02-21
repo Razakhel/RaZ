@@ -4,7 +4,7 @@
 
 #define SOL_ALL_SAFETIES_ON 1
 #define SOL_PRINT_ERRORS 0
-#include <sol/sol.hpp>
+#include "sol/sol.hpp"
 
 namespace Raz {
 

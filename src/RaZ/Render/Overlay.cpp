@@ -1,13 +1,14 @@
-#include "GLFW/glfw3.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-#include "imgui/misc/cpp/imgui_stdlib.h"
-#include "implot/implot.h"
 #include "RaZ/Render/Overlay.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
+
+#include "GLFW/glfw3.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include "misc/cpp/imgui_stdlib.h"
+#include "implot.h"
 
 namespace Raz {
 

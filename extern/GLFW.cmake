@@ -135,12 +135,11 @@ target_sources(GLFW PRIVATE ${GLFW_FILES})
 
 target_include_directories(
     GLFW
-
     SYSTEM
-    PUBLIC
 
-    glfw/include
-    glfw/deps
+    PUBLIC
+        glfw/include
+        glfw/deps
 )
 
 target_compile_definitions(GLFW PUBLIC ${GLFW_DEFINITIONS})

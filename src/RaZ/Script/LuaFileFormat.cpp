@@ -19,7 +19,7 @@
 #include "RaZ/Utils/TypeUtils.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
-#include <sol/sol.hpp>
+#include "sol/sol.hpp"
 
 namespace Raz {
 

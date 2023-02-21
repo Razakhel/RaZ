@@ -44,12 +44,11 @@ target_sources(ImGui PRIVATE ${IMGUI_FILES})
 
 target_include_directories(
     ImGui
-
     SYSTEM
-    PUBLIC
 
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/imgui # Needed for imgui_stdlib.cpp & implot.h
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/imgui
+        ${CMAKE_CURRENT_SOURCE_DIR}/implot
 )
 
 # Disabling all compilers warnings

@@ -116,9 +116,8 @@ target_include_directories(
     RaZ_Tests
 
     PRIVATE
-
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    "${CMAKE_HOME_DIRECTORY}/extern"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
+        "${CMAKE_HOME_DIRECTORY}/extern"
 )
 
 # Adding a definition for the tests root path, so that it can be used in tests instead of full relative paths

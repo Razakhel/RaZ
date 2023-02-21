@@ -1,3 +1,9 @@
+#include "RaZ/Data/Image.hpp"
+#include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Render/RenderSystem.hpp"
+#include "RaZ/Render/Window.hpp"
+#include "RaZ/Utils/Logger.hpp"
+
 // GLEW is needed for V-sync management
 #include "GL/glew.h"
 #if defined(RAZ_PLATFORM_WINDOWS)
@@ -6,17 +12,12 @@
 #include "GL/glxew.h"
 #endif
 
+#include "GLFW/glfw3.h"
+
 #if !defined(RAZ_NO_OVERLAY)
 // Needed to set ImGui's callbacks
-#include "imgui/imgui_impl_glfw.h"
+#include "imgui_impl_glfw.h"
 #endif
-
-#include "GLFW/glfw3.h"
-#include "RaZ/Data/Image.hpp"
-#include "RaZ/Render/Renderer.hpp"
-#include "RaZ/Render/RenderSystem.hpp"
-#include "RaZ/Render/Window.hpp"
-#include "RaZ/Utils/Logger.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten/html5.h>
