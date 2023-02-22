@@ -222,7 +222,7 @@ int main() {
       meshTrans.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
     });
   } catch (const std::exception& exception) {
-    Raz::Logger::error("Exception occured: "s + exception.what());
+    Raz::Logger::error("Exception occurred: "s + exception.what());
   }
 
   return EXIT_SUCCESS;

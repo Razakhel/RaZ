@@ -35,6 +35,11 @@ endif ()
 
 target_compile_options(RaZ_Examples INTERFACE ${RAZ_EXAMPLES_DISABLED_WARNINGS})
 
+if (RAZ_USE_AUDIO)
+    add_executable(RaZ_AudioDemo audioDemo.cpp)
+    target_link_libraries(RaZ_AudioDemo RaZ_Examples)
+endif ()
+
 add_executable(RaZ_BloomDemo bloomDemo.cpp)
 target_link_libraries(RaZ_BloomDemo RaZ_Examples)
 
@@ -63,11 +68,6 @@ endif()
 add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
 target_link_libraries(RaZ_ShowcaseDemo RaZ_Examples)
 
-if (RAZ_USE_AUDIO)
-    add_executable(RaZ_SoundDemo soundDemo.cpp)
-    target_link_libraries(RaZ_SoundDemo RaZ_Examples)
-endif ()
-
 add_executable(RaZ_SSRDemo ssrDemo.cpp)
 target_link_libraries(RaZ_SSRDemo RaZ_Examples)
 
@@ -86,7 +86,7 @@ if (RAZ_USE_EMSCRIPTEN)
     set_target_properties(RaZ_SSRDemo      PROPERTIES SUFFIX ".html")
 
     if (RAZ_USE_AUDIO)
-        set_target_properties(RaZ_SoundDemo PROPERTIES SUFFIX ".html")
+        set_target_properties(RaZ_AudioDemo PROPERTIES SUFFIX ".html")
     endif ()
 
     if (RAZ_USE_SOL2)

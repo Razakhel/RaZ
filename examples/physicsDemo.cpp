@@ -64,7 +64,7 @@ int main() {
 
     app.run();
   } catch (const std::exception& exception) {
-    Raz::Logger::error("Exception occured: "s + exception.what());
+    Raz::Logger::error("Exception occurred: "s + exception.what());
   }
 
   return EXIT_SUCCESS;

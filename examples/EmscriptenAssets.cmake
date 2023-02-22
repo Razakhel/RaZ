@@ -1,4 +1,29 @@
 ######################
+# Assets - AudioDemo #
+######################
+
+if (RAZ_USE_AUDIO)
+    set(
+        RaZ_AudioDemo_ASSETS
+
+        assets/sounds/knock.wav
+        assets/sounds/wave_seagulls.wav
+    )
+
+    foreach (ASSET_PATH ${RaZ_AudioDemo_ASSETS})
+        target_link_options(RaZ_AudioDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+    endforeach ()
+
+    target_link_options(
+        RaZ_AudioDemo
+
+        PRIVATE
+
+        "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+    )
+endif ()
+
+######################
 # Assets - BloomDemo #
 ######################
 
@@ -307,31 +332,6 @@ target_link_options(
     "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
 )
-
-######################
-# Assets - SoundDemo #
-######################
-
-if (RAZ_USE_AUDIO)
-    set(
-        RaZ_SoundDemo_ASSETS
-
-        assets/sounds/knock.wav
-        assets/sounds/wave_seagulls.wav
-    )
-
-    foreach (ASSET_PATH ${RaZ_SoundDemo_ASSETS})
-        target_link_options(RaZ_SoundDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
-    endforeach ()
-
-    target_link_options(
-        RaZ_SoundDemo
-
-        PRIVATE
-
-        "SHELL:-s ALLOW_MEMORY_GROWTH=1"
-    )
-endif ()
 
 ####################
 # Assets - SSRDemo #
