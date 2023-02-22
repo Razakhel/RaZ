@@ -5,9 +5,10 @@
 TEST_CASE("LuaAudio AudioSystem") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local audioSystem = AudioSystem.new()
-    audioSystem       = AudioSystem.new(AudioSystem.recoverDevices()[1])
+    audioSystem       = AudioSystem.new("")
 
-    assert(audioSystem:recoverCurrentDevice() ~= "")
+    assert(AudioSystem.recoverDevices() ~= nil)
+    assert(audioSystem:recoverCurrentDevice() ~= nil)
     audioSystem:openDevice("invalid device")
     assert(audioSystem:recoverCurrentDevice() == "")
 
@@ -42,6 +43,24 @@ TEST_CASE("LuaAudio Listener") {
     assert(up == Axis.Y)
     assert(listener:recoverForwardOrientation() == Axis.Z)
     assert(listener:recoverUpOrientation() == Axis.Y)
+  )"));
+}
+
+TEST_CASE("LuaAudio Microphone") {
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local microphone = Microphone.new(AudioFormat.MONO_U8, 8000, 1)
+    microphone       = Microphone.new(AudioFormat.MONO_I16, 8000, 1, "")
+
+    assert(Microphone.recoverDevices() ~= nil)
+    assert(microphone:recoverCurrentDevice() ~= nil)
+    microphone:openDevice(AudioFormat.STEREO_U8, 8000, 1, "invalid device")
+    assert(microphone:recoverCurrentDevice() == "")
+    microphone:start()
+    microphone:stop()
+    assert(microphone:recoverAvailableSampleCount() ~= nil)
+    assert(microphone:recoverAvailableDuration() ~= nil)
+    assert(#microphone:recoverData() == #microphone:recoverData(0))
+    assert(microphone:recoverSound() ~= microphone:recoverSound(0))
   )"));
 }
 

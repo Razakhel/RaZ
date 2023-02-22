@@ -30,6 +30,7 @@ enum class SoundState : int {
 
 class Sound final : public Component {
   friend Internal::SoundAccess;
+  friend class Microphone;
 
 public:
   Sound() { init(); }

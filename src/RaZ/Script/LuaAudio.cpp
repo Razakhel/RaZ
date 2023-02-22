@@ -1,5 +1,6 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Listener.hpp"
+#include "RaZ/Audio/Microphone.hpp"
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Audio/SoundEffect.hpp"
 #include "RaZ/Audio/SoundEffectSlot.hpp"
@@ -54,6 +55,24 @@ void LuaWrapper::registerAudioTypes() {
     listener["recoverOrientation"]        = &Listener::recoverOrientation;
     listener["recoverForwardOrientation"] = &Listener::recoverForwardOrientation;
     listener["recoverUpOrientation"]      = &Listener::recoverUpOrientation;
+  }
+
+  {
+    sol::usertype<Microphone> microphone = state.new_usertype<Microphone>("Microphone",
+                                                                          sol::constructors<Microphone(AudioFormat, unsigned int, float),
+                                                                                            Microphone(AudioFormat, unsigned int, float, const char*)>());
+    microphone["recoverDevices"]              = &Microphone::recoverDevices;
+    microphone["openDevice"]                  = sol::overload([] (Microphone& m, AudioFormat fmt, unsigned int freq, float d) { m.openDevice(fmt, freq, d); },
+                                                              PickOverload<AudioFormat, unsigned int, float, const char*>(&Microphone::openDevice));
+    microphone["recoverCurrentDevice"]        = &Microphone::recoverCurrentDevice;
+    microphone["start"]                       = &Microphone::start;
+    microphone["stop"]                        = &Microphone::stop;
+    microphone["recoverAvailableSampleCount"] = &Microphone::recoverAvailableSampleCount;
+    microphone["recoverAvailableDuration"]    = &Microphone::recoverAvailableDuration;
+    microphone["recoverData"]                 = sol::overload([] (Microphone& m) { return m.recoverData(); },
+                                                              PickOverload<float>(&Microphone::recoverData));
+    microphone["recoverSound"]                = sol::overload([] (Microphone& m) { return m.recoverSound(); },
+                                                              PickOverload<float>(&Microphone::recoverSound));
   }
 
   {

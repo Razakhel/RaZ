@@ -21,8 +21,8 @@ enum class AudioFormat : int {
 class AudioSystem final : public System {
 public:
   /// Creates a system handling audio.
-  /// \param deviceName Name of the audio device to open; nullptr to use the default one.
-  /// \see recoverDevices()
+  /// \param deviceName Name of the audio device to open, or nullptr to use the default one.
+  /// \see AudioSystem::recoverDevices()
   explicit AudioSystem(const char* deviceName = nullptr);
 
   /// Recovers the names of all available audio devices.
@@ -30,11 +30,11 @@ public:
   static std::vector<std::string> recoverDevices();
 
   /// Opens the audio device corresponding to the given name.
-  /// \param deviceName Name of the device to open, or nullptr to open the default one.
-  /// \see recoverDevices()
+  /// \param deviceName Name of the audio device to open, or nullptr to open the default one.
+  /// \see AudioSystem::recoverDevices()
   void openDevice(const char* deviceName);
   /// Recovers the name of the current audio device.
-  /// \return Current device's name, or an empty string if the required extension is unsupported.
+  /// \return The current device's name, or an empty string if the required extension is unsupported.
   std::string recoverCurrentDevice() const;
   bool update(float deltaTime) override;
   void destroy() override;
