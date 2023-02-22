@@ -193,9 +193,13 @@ OverlayProgressBar& OverlayWindow::addProgressBar(int minVal, int maxVal, bool s
   return static_cast<OverlayProgressBar&>(*m_elements.emplace_back(std::make_unique<OverlayProgressBar>(minVal, maxVal, showValues)));
 }
 
-OverlayPlot& OverlayWindow::addPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel, std::string yAxisLabel, float maxHeight) {
+OverlayPlot& OverlayWindow::addPlot(std::string label, std::size_t maxValCount,
+                                    std::string xAxisLabel, std::string yAxisLabel,
+                                    float minYVal, float maxYVal, bool lockYAxis,
+                                    float maxHeight) {
   return static_cast<OverlayPlot&>(*m_elements.emplace_back(std::make_unique<OverlayPlot>(std::move(label), maxValCount,
                                                                                           std::move(xAxisLabel), std::move(yAxisLabel),
+                                                                                          minYVal, maxYVal, lockYAxis,
                                                                                           maxHeight)));
 }
 
@@ -380,9 +384,10 @@ void OverlayWindow::render() const {
         auto& plot = static_cast<OverlayPlot&>(*element);
 
         if (ImPlot::BeginPlot(plot.m_label.c_str(), ImVec2(-1, plot.m_maxHeight), ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect)) {
-          ImPlot::SetupAxes(plot.m_xAxisLabel.c_str(), plot.m_yAxisLabel.c_str(), ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_LockMin);
+          ImPlot::SetupAxes(plot.m_xAxisLabel.c_str(), plot.m_yAxisLabel.c_str(),
+                            ImPlotAxisFlags_NoTickLabels, (plot.m_lockY ? ImPlotAxisFlags_Lock : ImPlotAxisFlags_None));
           ImPlot::SetupAxisLimits(ImAxis_X1, 0.0, static_cast<double>(plot.m_maxValCount - 1), ImPlotCond_Always);
-          ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 100.0, ImPlotCond_Once);
+          ImPlot::SetupAxisLimits(ImAxis_Y1, static_cast<double>(plot.m_minYVal), static_cast<double>(plot.m_maxYVal), ImPlotCond_Once);
           ImPlot::SetupMouseText(ImPlotLocation_NorthEast);
 
           for (const std::unique_ptr<OverlayPlotEntry>& entry : plot.m_entries) {

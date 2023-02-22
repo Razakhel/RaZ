@@ -306,11 +306,17 @@ class OverlayPlot final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayPlot(std::string label, std::size_t maxValCount, std::string xAxisLabel = {}, std::string yAxisLabel = {}, float maxHeight = -1.f)
+  OverlayPlot(std::string label, std::size_t maxValCount,
+              std::string xAxisLabel = {}, std::string yAxisLabel = {},
+              float minYVal = 0.f, float maxYVal = 100.f, bool lockYAxis = false,
+              float maxHeight = -1.f)
     : OverlayElement(std::move(label)),
       m_maxValCount{ maxValCount },
       m_xAxisLabel{ std::move(xAxisLabel) },
       m_yAxisLabel{ std::move(yAxisLabel) },
+      m_minYVal{ minYVal },
+      m_maxYVal{ maxYVal },
+      m_lockY{ lockYAxis },
       m_maxHeight{ maxHeight } {}
 
   OverlayElementType getType() const override { return OverlayElementType::PLOT; }
@@ -322,6 +328,9 @@ private:
   std::size_t m_maxValCount {};
   std::string m_xAxisLabel {};
   std::string m_yAxisLabel {};
+  float m_minYVal {};
+  float m_maxYVal {};
+  bool m_lockY {};
   float m_maxHeight {};
 };
 
@@ -440,12 +449,16 @@ public:
   /// Adds a plot on the overlay window.
   /// \param label Text to be displayed beside the plot.
   /// \param maxValCount Maximum number of values to plot.
-  /// \param xAxisLabel Label to be displayed on the X axis.
-  /// \param yAxisLabel Label to be displayed on the Y axis.
+  /// \param xAxisLabel Label to be displayed on the X (horizontal) axis.
+  /// \param yAxisLabel Label to be displayed on the Y (vertical) axis.
+  /// \param minYVal Minimum value on the Y (vertical) axis.
+  /// \param maxYVal Maximum value on the Y (vertical) axis.
+  /// \param lockYAxis Whether to allow panning & zooming on the Y (vertical) axis.
   /// \param maxHeight Maximum height of the plot widget. If strictly lower than 0, automatically resizes the plot to fit the window's content.
   /// \return Reference to the newly added plot.
   [[nodiscard]] OverlayPlot& addPlot(std::string label, std::size_t maxValCount,
                                      std::string xAxisLabel = {}, std::string yAxisLabel = {},
+                                     float minYVal = 0.f, float maxYVal = 100.f, bool lockYAxis = false,
                                      float maxHeight = -1.f);
   /// Adds an horizontal separator on the overlay window.
   /// \return Reference to the newly added separator.

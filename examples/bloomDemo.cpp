@@ -179,7 +179,7 @@ int main() {
 #if !defined(USE_OPENGL_ES)
     overlay.addSeparator();
 
-    Raz::OverlayPlot& plot = overlay.addPlot({}, 100, {}, "Time (ms)", 200.f);
+    Raz::OverlayPlot& plot = overlay.addPlot({}, 100, {}, "Time (ms)", 0.f, 100.f, false, 200.f);
     Raz::OverlayPlotEntry& geomPlot  = plot.addEntry("Geometry");
     Raz::OverlayPlotEntry& bloomPlot = plot.addEntry("Bloom");
 #endif

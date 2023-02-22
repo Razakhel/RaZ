@@ -131,7 +131,7 @@ TEST_CASE("RenderSystem overlay render") {
 
   {
     Raz::OverlayWindow& overlay3 = window.getOverlay().addWindow("RaZ - Overlay test 3", Raz::Vec2f(window.getWidth(), window.getHeight()));
-    Raz::OverlayPlot& plot = overlay3.addPlot("Plot", 5, "X", "Y", -1.f);
+    Raz::OverlayPlot& plot = overlay3.addPlot("Plot", 5, "X", "Y", 0.f, 100.f, false, -1.f);
 
     Raz::OverlayPlotEntry& entry1 = plot.addEntry("1", Raz::OverlayPlotType::LINE);
     entry1.push(0.f);

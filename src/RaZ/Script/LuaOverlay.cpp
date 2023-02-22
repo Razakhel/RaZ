@@ -104,8 +104,14 @@ void LuaWrapper::registerOverlayTypes() {
                                                                                                  OverlayPlot(std::string, std::size_t, std::string),
                                                                                                  OverlayPlot(std::string, std::size_t, std::string,
                                                                                                              std::string),
-                                                                                                 OverlayPlot(std::string, std::size_t, std::string,
-                                                                                                             std::string, float)>(),
+                                                                                                 OverlayPlot(std::string, std::size_t, std::string, std::string,
+                                                                                                             float),
+                                                                                                 OverlayPlot(std::string, std::size_t, std::string, std::string,
+                                                                                                             float, float),
+                                                                                                 OverlayPlot(std::string, std::size_t, std::string, std::string,
+                                                                                                             float, float, bool),
+                                                                                                 OverlayPlot(std::string, std::size_t, std::string, std::string,
+                                                                                                             float, float, bool, float)>(),
                                                                                sol::base_classes, sol::bases<OverlayElement>());
       overlayPlot["addEntry"] = sol::overload([] (OverlayPlot& p, std::string n) { return p.addEntry(std::move(n)); },
                                               PickOverload<std::string, OverlayPlotType>(&OverlayPlot::addEntry));
@@ -205,9 +211,16 @@ void LuaWrapper::registerOverlayTypes() {
     overlayWindow["addPlot"]         = sol::overload([] (OverlayWindow& w, std::string l, std::size_t c) { return &w.addPlot(std::move(l), c); },
                                                      [] (OverlayWindow& w, std::string l, std::size_t c,
                                                          std::string x) { return &w.addPlot(std::move(l), c, std::move(x)); },
-                                                     [] (OverlayWindow& w, std::string l, std::size_t c,
-                                                         std::string x, std::string y) { return &w.addPlot(std::move(l), c, std::move(x), std::move(y)); },
-                                                     PickOverload<std::string, std::size_t, std::string, std::string, float>(&OverlayWindow::addPlot));
+                                                     [] (OverlayWindow& w, std::string l, std::size_t c, std::string x,
+                                                         std::string y) { return &w.addPlot(std::move(l), c, std::move(x), std::move(y)); },
+                                                     [] (OverlayWindow& w, std::string l, std::size_t c, std::string x, std::string y,
+                                                         float min) { return &w.addPlot(std::move(l), c, std::move(x), std::move(y), min); },
+                                                     [] (OverlayWindow& w, std::string l, std::size_t c, std::string x, std::string y, float min,
+                                                         float max) { return &w.addPlot(std::move(l), c, std::move(x), std::move(y), min, max); },
+                                                     [] (OverlayWindow& w, std::string l, std::size_t c, std::string x, std::string y, float min, float max,
+                                                         bool lock) { return &w.addPlot(std::move(l), c, std::move(x), std::move(y), min, max, lock); },
+                                                     PickOverload<std::string, std::size_t, std::string, std::string,
+                                                                  float, float, bool, float>(&OverlayWindow::addPlot));
     overlayWindow["addSeparator"]    = &OverlayWindow::addSeparator;
     overlayWindow["addFrameTime"]    = &OverlayWindow::addFrameTime;
     overlayWindow["addFpsCounter"]   = &OverlayWindow::addFpsCounter;
