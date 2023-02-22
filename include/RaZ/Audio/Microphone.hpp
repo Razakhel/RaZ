@@ -15,10 +15,10 @@ public:
   /// \param format Format in which to record.
   /// \param frequency Sampling frequency in which to record, in Hertz.
   /// \param duration Amount of time to record, in seconds. This is a minimum; the actual available duration may exceed this value.
-  /// \param deviceName Name of the audio capture device to open, or nullptr to use the default one.
+  /// \param deviceName Name of the audio capture device to open; if empty, will use the default one.
   /// \see Microphone::recoverDevices()
-  Microphone(AudioFormat format, unsigned int frequency, float duration, const char* deviceName = nullptr) { openDevice(format, frequency,
-                                                                                                                        duration, deviceName); }
+  Microphone(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName = {}) { openDevice(format, frequency,
+                                                                                                                          duration, deviceName); }
   Microphone(const Microphone&) = delete;
   Microphone(Microphone&&) = delete;
 
@@ -30,9 +30,9 @@ public:
   /// \param format Format in which to record.
   /// \param frequency Sampling frequency in which to record, in Hertz.
   /// \param duration Amount of time to record, in seconds. This is a minimum; the actual available duration may exceed this value.
-  /// \param deviceName Name of the audio capture device to open, or nullptr to open the default one.
+  /// \param deviceName Name of the audio capture device to open; if empty, will use the default one.
   /// \see Microphone::recoverDevices()
-  void openDevice(AudioFormat format, unsigned int frequency, float duration, const char* deviceName = nullptr);
+  void openDevice(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName = {});
   /// Recovers the name of the current audio capture device.
   /// \return The current device's name, or an empty string if the required extension is unsupported.
   std::string recoverCurrentDevice() const;

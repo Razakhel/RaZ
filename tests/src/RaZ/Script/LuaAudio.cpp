@@ -9,6 +9,7 @@ TEST_CASE("LuaAudio AudioSystem") {
 
     assert(AudioSystem.recoverDevices() ~= nil)
     assert(audioSystem:recoverCurrentDevice() ~= nil)
+    audioSystem:openDevice()
     audioSystem:openDevice("invalid device")
     assert(audioSystem:recoverCurrentDevice() == "")
 

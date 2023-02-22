@@ -35,7 +35,7 @@ inline void checkError(void* device, const std::string& errorMsg) {
 
 } // namespace
 
-AudioSystem::AudioSystem(const char* deviceName) {
+AudioSystem::AudioSystem(const std::string& deviceName) {
   registerComponents<Sound, Listener>();
   openDevice(deviceName);
 
@@ -61,12 +61,12 @@ std::vector<std::string> AudioSystem::recoverDevices() {
   return devices;
 }
 
-void AudioSystem::openDevice(const char* deviceName) {
-  Logger::debug("[AudioSystem] Opening " + (deviceName ? + "device '" + std::string(deviceName) + '\'' : "default device") + "...");
+void AudioSystem::openDevice(const std::string& deviceName) {
+  Logger::debug("[AudioSystem] Opening " + (!deviceName.empty() ? + "device '" + deviceName + '\'' : "default device") + "...");
 
   destroy();
 
-  m_device = alcOpenDevice(deviceName);
+  m_device = alcOpenDevice((!deviceName.empty() ? deviceName.c_str() : nullptr));
   if (!m_device) {
     Logger::error("[OpenAL] Failed to open an audio device.");
     return;

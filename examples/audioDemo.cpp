@@ -69,12 +69,14 @@ int main() {
 
     bool isRepeating        = false;
     bool moveSource         = false;
-    bool isCapturing        = false;
-    bool isCaptureStereo    = false;
-    uint8_t captureBitDepth = 8;
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
     bool effectEnabled = false;
 #endif
+
+    std::string captureDevice;
+    bool isCapturing        = false;
+    bool isCaptureStereo    = false;
+    uint8_t captureBitDepth = 8;
 
     Raz::OverlayWindow& overlayAudio = window.getOverlay().addWindow("Audio info", overlayAudioSize);
 
@@ -105,8 +107,9 @@ int main() {
 
     overlayAudio.addDropdown("Input device",
                              Raz::Microphone::recoverDevices(),
-                             [&microphone, &isCaptureStereo, &captureBitDepth] (const std::string& name, std::size_t) {
-      microphone.openDevice(recoverFormat(isCaptureStereo, captureBitDepth), 16000, 1.f, name.c_str());
+                             [&captureDevice, &microphone, &isCaptureStereo, &captureBitDepth] (const std::string& name, std::size_t) {
+      captureDevice = name;
+      microphone.openDevice(recoverFormat(isCaptureStereo, captureBitDepth), 16000, 1.f, captureDevice);
     });
 #else
     overlayAudio.addLabel("Output & input devices cannot be changed with Emscripten");
@@ -199,18 +202,20 @@ int main() {
 
     overlayMic.addDropdown("Channels",
                            { "Mono", "Stereo" },
-                           [&isCaptureStereo, &captureBitDepth, &microphone, &isCapturing, &stereoPlot, &monoPlot] (const std::string&, std::size_t i) {
+                           [&isCaptureStereo, &captureBitDepth, &microphone, &captureDevice,
+                            &isCapturing, &stereoPlot, &monoPlot] (const std::string&, std::size_t i) {
       isCaptureStereo = (i == 1);
-      microphone.openDevice(recoverFormat(isCaptureStereo, captureBitDepth), 16000, 1.f);
+      microphone.openDevice(recoverFormat(isCaptureStereo, captureBitDepth), 16000, 1.f, captureDevice);
       isCapturing = false;
 
       stereoPlot.enable(isCaptureStereo);
       monoPlot.enable(!isCaptureStereo);
     }, 0);
 
-    overlayMic.addDropdown("Bit depth", { "8", "16" }, [&captureBitDepth, &isCaptureStereo, &microphone, &isCapturing] (const std::string&, std::size_t i) {
+    overlayMic.addDropdown("Bit depth", { "8", "16" }, [&captureBitDepth, &isCaptureStereo, &microphone, &captureDevice,
+                                                        &isCapturing] (const std::string&, std::size_t i) {
       captureBitDepth = (i == 0 ? 8 : 16);
-      microphone.openDevice(recoverFormat(isCaptureStereo, captureBitDepth), 16000, 1.f);
+      microphone.openDevice(recoverFormat(isCaptureStereo, captureBitDepth), 16000, 1.f, captureDevice);
       isCapturing = false;
     }, 0);
 

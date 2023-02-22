@@ -101,8 +101,8 @@ std::vector<std::string> Microphone::recoverDevices() {
   return devices;
 }
 
-void Microphone::openDevice(AudioFormat format, unsigned int frequency, float duration, const char* deviceName) {
-  Logger::debug("[Microphone] Opening " + (deviceName ? + "device '" + std::string(deviceName) + '\'' : "default capture device") + "...");
+void Microphone::openDevice(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName) {
+  Logger::debug("[Microphone] Opening capture " + (!deviceName.empty() ? + "device '" + deviceName + '\'' : "default device") + "...");
 
   destroy();
 
@@ -116,7 +116,8 @@ void Microphone::openDevice(AudioFormat format, unsigned int frequency, float du
     return;
   }
 
-  m_device = alcCaptureOpenDevice(deviceName, frequency, static_cast<int>(format), static_cast<int>(duration * static_cast<float>(frequency)));
+  m_device = alcCaptureOpenDevice((!deviceName.empty() ? deviceName.c_str() : nullptr), frequency,
+                                  static_cast<int>(format), static_cast<int>(duration * static_cast<float>(frequency)));
   if (!m_device) {
     Logger::error("[OpenAL] Failed to open an audio capture device.");
     return;

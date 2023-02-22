@@ -22,10 +22,11 @@ void LuaWrapper::registerAudioTypes() {
   {
     sol::usertype<AudioSystem> audioSystem = state.new_usertype<AudioSystem>("AudioSystem",
                                                                              sol::constructors<AudioSystem(),
-                                                                                               AudioSystem(const char*)>(),
+                                                                                               AudioSystem(const std::string&)>(),
                                                                              sol::base_classes, sol::bases<System>());
     audioSystem["recoverDevices"]       = &AudioSystem::recoverDevices;
-    audioSystem["openDevice"]           = &AudioSystem::openDevice;
+    audioSystem["openDevice"]           = sol::overload([] (AudioSystem& s) { s.openDevice(); },
+                                                        PickOverload<const std::string&>(&AudioSystem::openDevice));
     audioSystem["recoverCurrentDevice"] = &AudioSystem::recoverCurrentDevice;
 
     state.new_enum<AudioFormat>("AudioFormat", {
@@ -60,10 +61,11 @@ void LuaWrapper::registerAudioTypes() {
   {
     sol::usertype<Microphone> microphone = state.new_usertype<Microphone>("Microphone",
                                                                           sol::constructors<Microphone(AudioFormat, unsigned int, float),
-                                                                                            Microphone(AudioFormat, unsigned int, float, const char*)>());
+                                                                                            Microphone(AudioFormat, unsigned int, float,
+                                                                                                       const std::string&)>());
     microphone["recoverDevices"]              = &Microphone::recoverDevices;
     microphone["openDevice"]                  = sol::overload([] (Microphone& m, AudioFormat fmt, unsigned int freq, float d) { m.openDevice(fmt, freq, d); },
-                                                              PickOverload<AudioFormat, unsigned int, float, const char*>(&Microphone::openDevice));
+                                                              PickOverload<AudioFormat, unsigned int, float, const std::string&>(&Microphone::openDevice));
     microphone["recoverCurrentDevice"]        = &Microphone::recoverCurrentDevice;
     microphone["start"]                       = &Microphone::start;
     microphone["stop"]                        = &Microphone::stop;
