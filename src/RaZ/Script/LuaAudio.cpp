@@ -26,6 +26,17 @@ void LuaWrapper::registerAudioTypes() {
     audioSystem["recoverDevices"]       = &AudioSystem::recoverDevices;
     audioSystem["openDevice"]           = &AudioSystem::openDevice;
     audioSystem["recoverCurrentDevice"] = &AudioSystem::recoverCurrentDevice;
+
+    state.new_enum<AudioFormat>("AudioFormat", {
+      { "MONO_U8", AudioFormat::MONO_U8 },
+      { "STEREO_U8", AudioFormat::STEREO_U8 },
+      { "MONO_I16", AudioFormat::MONO_I16 },
+      { "STEREO_I16", AudioFormat::STEREO_I16 },
+      { "MONO_F32", AudioFormat::MONO_F32 },
+      { "STEREO_F32", AudioFormat::STEREO_F32 },
+      { "MONO_F64", AudioFormat::MONO_F64 },
+      { "STEREO_F64", AudioFormat::STEREO_F64 }
+    });
   }
 
   {
@@ -71,17 +82,6 @@ void LuaWrapper::registerAudioTypes() {
     sound["isPaused"]           = &Sound::isPaused;
     sound["isStopped"]          = &Sound::isStopped;
     sound["recoverElapsedTime"] = &Sound::recoverElapsedTime;
-
-    state.new_enum<AudioFormat>("AudioFormat", {
-      { "MONO_U8", AudioFormat::MONO_U8 },
-      { "STEREO_U8", AudioFormat::STEREO_U8 },
-      { "MONO_I16", AudioFormat::MONO_I16 },
-      { "STEREO_I16", AudioFormat::STEREO_I16 },
-      { "MONO_F32", AudioFormat::MONO_F32 },
-      { "STEREO_F32", AudioFormat::STEREO_F32 },
-      { "MONO_F64", AudioFormat::MONO_F64 },
-      { "STEREO_F64", AudioFormat::STEREO_F64 }
-    });
   }
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)

@@ -132,7 +132,7 @@ private:
 
   AudioFormat m_format {};
   int m_frequency {};
-  std::vector<std::byte> m_data {};
+  std::vector<uint8_t> m_data {};
 };
 
 namespace Internal {
@@ -145,8 +145,8 @@ public:
 
   static AudioFormat& getFormat(Sound& sound) { return sound.m_format; }
   static int& getFrequency(Sound& sound) { return sound.m_frequency; }
-  static const std::vector<std::byte>& getData(const Sound& sound) { return sound.m_data; }
-  static std::vector<std::byte>& getData(Sound& sound) { return sound.m_data; }
+  static const std::vector<uint8_t>& getData(const Sound& sound) { return sound.m_data; }
+  static std::vector<uint8_t>& getData(Sound& sound) { return sound.m_data; }
 };
 
 } // namespace Internal

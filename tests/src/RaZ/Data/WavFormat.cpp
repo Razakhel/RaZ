@@ -17,8 +17,8 @@ TEST_CASE("WavFormat load/save") {
   CHECK(savedSound.getFormat() == origSound.getFormat());
   CHECK(savedSound.getFrequency() == origSound.getFrequency());
 
-  const std::vector<std::byte>& origSoundData  = Raz::Internal::SoundAccess::getData(origSound);
-  const std::vector<std::byte>& savedSoundData = Raz::Internal::SoundAccess::getData(savedSound);
+  const std::vector<uint8_t>& origSoundData  = Raz::Internal::SoundAccess::getData(origSound);
+  const std::vector<uint8_t>& savedSoundData = Raz::Internal::SoundAccess::getData(savedSound);
   REQUIRE(savedSoundData.size() == origSoundData.size());
   CHECK(std::equal(savedSoundData.cbegin(), savedSoundData.cend(), origSoundData.cbegin()));
 }

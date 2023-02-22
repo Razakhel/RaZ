@@ -203,7 +203,7 @@ Sound load(const FilePath& filePath) {
   Internal::SoundAccess::getFrequency(sound) = static_cast<int>(info.frequency);
 
   // Reading the actual audio data from the file
-  std::vector<std::byte>& soundData = Internal::SoundAccess::getData(sound);
+  std::vector<uint8_t>& soundData = Internal::SoundAccess::getData(sound);
   soundData.resize(info.dataSize);
   file.read(reinterpret_cast<char*>(soundData.data()), static_cast<std::streamsize>(soundData.size()));
 

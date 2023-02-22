@@ -26,7 +26,7 @@ void save(const FilePath& filePath, const Sound& sound) {
   if (!file)
     throw std::invalid_argument("Error: Unable to create a WAV file as '" + filePath + "'; path to file must exist");
 
-  const std::vector<std::byte>& soundData = Internal::SoundAccess::getData(sound);
+  const std::vector<uint8_t>& soundData = Internal::SoundAccess::getData(sound);
 
   ////////////
   // Header //
