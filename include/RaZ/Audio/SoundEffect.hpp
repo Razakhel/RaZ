@@ -37,6 +37,36 @@ struct ReverberationParams {
   bool decayHighFrequencyLimit         = true;              ///<
 };
 
+enum class SoundWaveform {
+  SINUSOID = 0, ///< Sinusoid wave, giving smooth modulations.
+  TRIANGLE = 1  ///< Triangle wave, giving sharp modulations.
+};
+
+struct ChorusParams {
+  SoundWaveform waveform = SoundWaveform::TRIANGLE; ///< Waveform of the effect.
+  int phase              = 90;                      ///< Must be between [-180: 180].
+  float rate             = 1.1f;                    ///< Modulation speed, in Hertz. Must be between [0; 10].
+  float depth            = 0.1f;                    ///< Modulation frequency range. Must be between [0; 1].
+  float feedback         = 0.25f;                   ///< Must be between [-1; 1].
+  float delay            = 0.016f;                  ///< Must be between [0; 0.016].
+};
+
+struct DistortionParams {
+  float edge          = 0.2f;   ///< Must be between [0; 1].
+  float gain          = 0.05f;  ///< Must be between [0.01; 1].
+  float lowpassCutoff = 8000.f; ///< Must be between [80; 24000].
+  float eqCenter      = 3600.f; ///< Must be between [80; 24000].
+  float eqBandwidth   = 3600.f; ///< Must be between [80; 24000].
+};
+
+struct EchoParams {
+  float delay          = 0.1f; ///< Delay between each echo, in seconds. Must be between [0; 0.207].
+  float leftRightDelay = 0.1f; ///< Delay between left & right echoes, in seconds; 0 disables stereo. Must be between [0; 0.404].
+  float damping        = 0.5f; ///< Must be between [0; 0.99].
+  float feedback       = 0.5f; ///< Falloff ratio of each subsequent echo. Must be between [0; 1].
+  float spread         = -1.f; ///< Must be between [-1; 1].
+};
+
 class SoundEffect {
 public:
   SoundEffect() { init(); }
@@ -52,6 +82,15 @@ public:
   /// Loads the given reverberation effect parameters.
   /// \param params Parameters to be loaded.
   void load(const ReverberationParams& params);
+  /// Loads the given chorus effect parameters.
+  /// \param params Parameters to be loaded.
+  void load(const ChorusParams& params);
+  /// Loads the given distortion effect parameters.
+  /// \param params Parameters to be loaded.
+  void load(const DistortionParams& params);
+  /// Loads the given echo effect parameters.
+  /// \param params Parameters to be loaded.
+  void load(const EchoParams& params);
   /// Resets the effect, removing any currently assigned.
   void reset();
   /// Destroys the sound effect.

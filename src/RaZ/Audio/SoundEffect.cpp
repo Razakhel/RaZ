@@ -134,6 +134,64 @@ void SoundEffect::load(const ReverberationParams& params) {
   checkError("Failed to set the reverberation effect");
 }
 
+void SoundEffect::load(const ChorusParams& params) {
+  alGetError(); // Flushing errors
+
+  alEffecti(m_index, AL_EFFECT_TYPE, AL_EFFECT_CHORUS);
+
+  if (alGetError() != AL_NO_ERROR) {
+    Logger::error("[OpenAL] Failed to set the chorus effect.");
+    return;
+  }
+
+  alEffecti(m_index, AL_CHORUS_WAVEFORM, static_cast<int>(params.waveform));
+  alEffecti(m_index, AL_CHORUS_PHASE, params.phase);
+  alEffectf(m_index, AL_CHORUS_RATE, params.rate);
+  alEffectf(m_index, AL_CHORUS_DEPTH, params.depth);
+  alEffectf(m_index, AL_CHORUS_FEEDBACK, params.feedback);
+  alEffectf(m_index, AL_CHORUS_DELAY, params.delay);
+
+  checkError("Failed to set the chorus effect's parameters");
+}
+
+void SoundEffect::load(const DistortionParams& params) {
+  alGetError(); // Flushing errors
+
+  alEffecti(m_index, AL_EFFECT_TYPE, AL_EFFECT_DISTORTION);
+
+  if (alGetError() != AL_NO_ERROR) {
+    Logger::error("[OpenAL] Failed to set the distortion effect.");
+    return;
+  }
+
+  alEffectf(m_index, AL_DISTORTION_EDGE, params.edge);
+  alEffectf(m_index, AL_DISTORTION_GAIN, params.gain);
+  alEffectf(m_index, AL_DISTORTION_LOWPASS_CUTOFF, params.lowpassCutoff);
+  alEffectf(m_index, AL_DISTORTION_EQCENTER, params.eqCenter);
+  alEffectf(m_index, AL_DISTORTION_EQBANDWIDTH, params.eqBandwidth);
+
+  checkError("Failed to set the distortion effect's parameters");
+}
+
+void SoundEffect::load(const EchoParams& params) {
+  alGetError(); // Flushing errors
+
+  alEffecti(m_index, AL_EFFECT_TYPE, AL_EFFECT_ECHO);
+
+  if (alGetError() != AL_NO_ERROR) {
+    Logger::error("[OpenAL] Failed to set the echo effect.");
+    return;
+  }
+
+  alEffectf(m_index, AL_ECHO_DELAY, params.delay);
+  alEffectf(m_index, AL_ECHO_LRDELAY, params.leftRightDelay);
+  alEffectf(m_index, AL_ECHO_DAMPING, params.damping);
+  alEffectf(m_index, AL_ECHO_FEEDBACK, params.feedback);
+  alEffectf(m_index, AL_ECHO_SPREAD, params.spread);
+
+  checkError("Failed to set the echo effect's parameters");
+}
+
 void SoundEffect::reset() {
   alGetError(); // Flushing errors
 

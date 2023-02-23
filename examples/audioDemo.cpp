@@ -9,7 +9,12 @@ constexpr Raz::Vec2f overlayAudioSize(baseWindowWidth, 80.f);
 constexpr Raz::Vec2f overlaySoundSize(baseWindowWidth, 220.f);
 constexpr Raz::Vec2f overlayMicSize(baseWindowWidth, 330.f);
 constexpr auto baseWindowHeight = static_cast<unsigned int>(overlayAudioSize.y() + overlaySoundSize.y() + overlayMicSize.y());
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
 constexpr Raz::Vec2f overlayReverbSize(487.f, 655.f);
+constexpr Raz::Vec2f overlayChorusSize(320.f, 170.f);
+constexpr Raz::Vec2f overlayDistortionSize(350.f, 147.f);
+constexpr Raz::Vec2f overlayEchoSize(320.f, 147.f);
+#endif
 
 constexpr Raz::AudioFormat recoverFormat(bool isStereo, uint8_t bitDepth) {
   return (isStereo ? (bitDepth == 8 ? Raz::AudioFormat::STEREO_U8 : Raz::AudioFormat::STEREO_I16)
@@ -55,23 +60,32 @@ int main() {
     // Sound effects are not (yet?) available with Emscripten's own OpenAL implementation
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
     Raz::SoundEffect reverb;
-    Raz::SoundEffectSlot effectSlot;
-
     Raz::ReverberationParams reverbParams {};
     reverb.load(reverbParams);
 
-    effectSlot.loadEffect(reverb);
+    Raz::SoundEffect chorus;
+    Raz::ChorusParams chorusParams {};
+    chorus.load(chorusParams);
+
+    Raz::SoundEffect distortion;
+    Raz::DistortionParams distortionParams {};
+    distortion.load(distortionParams);
+
+    Raz::SoundEffect echo;
+    Raz::EchoParams echoParams {};
+    echo.load(echoParams);
+
+    Raz::SoundEffect* enabledEffect = nullptr;
+
+    Raz::SoundEffectSlot effectSlot;
 #endif
 
     /////////////
     // Overlay //
     /////////////
 
-    bool isRepeating        = false;
-    bool moveSource         = false;
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
-    bool effectEnabled = false;
-#endif
+    bool isRepeating = false;
+    bool moveSource  = false;
 
     std::string captureDevice;
     bool isCapturing        = false;
@@ -81,13 +95,11 @@ int main() {
     Raz::OverlayWindow& overlayAudio = window.getOverlay().addWindow("Audio info", overlayAudioSize);
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
-    overlayAudio.addDropdown("Output device",
-                             Raz::AudioSystem::recoverDevices(),
-                             [&audio, &soundComp, &isRepeating, &reverb, &reverbParams, &effectSlot, &effectEnabled] (const std::string& name, std::size_t) {
+    overlayAudio.addDropdown("Output device", Raz::AudioSystem::recoverDevices(), [&] (const std::string& name, std::size_t) {
       const float gain  = soundComp.recoverGain();
       const float pitch = soundComp.recoverPitch();
 
-      audio.openDevice(name.c_str());
+      audio.openDevice(name);
 
       soundComp.init();
       soundComp.load();
@@ -98,11 +110,21 @@ int main() {
       reverb.init();
       reverb.load(reverbParams);
 
-      effectSlot.init();
-      effectSlot.loadEffect(reverb);
+      chorus.init();
+      chorus.load(chorusParams);
 
-      if (effectEnabled)
+      distortion.init();
+      distortion.load(distortionParams);
+
+      echo.init();
+      echo.load(echoParams);
+
+      effectSlot.init();
+
+      if (enabledEffect) {
+        effectSlot.loadEffect(*enabledEffect);
         soundComp.linkSlot(effectSlot);
+      }
     });
 
     overlayAudio.addDropdown("Input device",
@@ -115,13 +137,13 @@ int main() {
     overlayAudio.addLabel("Output & input devices cannot be changed with Emscripten");
 #endif
 
+    ///////////
+    // Sound //
+    ///////////
+
     Raz::OverlayWindow& overlaySound = window.getOverlay().addWindow("Sound params", overlaySoundSize, Raz::Vec2f(0.f, overlayAudioSize.y()));
 
-    overlaySound.addDropdown("Sound", { "Knock", "Wave seagulls" }, [&soundComp, &isRepeating
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
-                                                                     , &effectSlot, &reverb, &effectEnabled
-#endif
-                                                                     ] (const std::string&, std::size_t i) {
+    overlaySound.addDropdown("Sound", { "Knock", "Wave seagulls" }, [&] (const std::string&, std::size_t i) {
       const float gain  = soundComp.recoverGain();
       const float pitch = soundComp.recoverPitch();
 
@@ -141,9 +163,7 @@ int main() {
       soundComp.setPitch(pitch);
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
-      effectSlot.loadEffect(reverb);
-
-      if (effectEnabled)
+      if (enabledEffect)
         soundComp.linkSlot(effectSlot);
 #endif
     });
@@ -177,6 +197,10 @@ int main() {
     overlaySound.addSlider("Sound pitch", [&soundComp] (float val) noexcept {
       soundComp.setPitch(val);
     }, 0.f, 1.f, 1.f);
+
+    ////////////////
+    // Microphone //
+    ////////////////
 
     Raz::OverlayWindow& overlayMic = window.getOverlay().addWindow("Microphone params",
                                                                    overlayMicSize,
@@ -219,22 +243,76 @@ int main() {
       isCapturing = false;
     }, 0);
 
+    ///////////////////
+    // Sound effects //
+    ///////////////////
+
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
     Raz::OverlayWindow& overlayReverb = window.getOverlay().addWindow("Reverb params", overlayReverbSize, Raz::Vec2f(baseWindowWidth - 20, 0.f));
     overlayReverb.disable();
+    Raz::OverlayWindow& overlayChorus = window.getOverlay().addWindow("Chorus params", overlayChorusSize, Raz::Vec2f(baseWindowWidth - 20, 0.f));
+    overlayChorus.disable();
+    Raz::OverlayWindow& overlayDistortion = window.getOverlay().addWindow("Distortion params", overlayDistortionSize, Raz::Vec2f(baseWindowWidth - 20, 0.f));
+    overlayDistortion.disable();
+    Raz::OverlayWindow& overlayEcho = window.getOverlay().addWindow("Echo params", overlayEchoSize, Raz::Vec2f(baseWindowWidth - 20, 0.f));
+    overlayEcho.disable();
 
-    overlaySound.addCheckbox("Enable reverb", [&effectEnabled, &soundComp, &effectSlot, &overlayReverb, &window] () noexcept {
-      effectEnabled = true;
+    overlaySound.addDropdown("Sound effect",
+                             { "None", "Reverberation", "Chorus", "Distortion", "Echo" },
+                             [&] (const std::string&, std::size_t i) noexcept {
+      overlayReverb.enable(i == 1);
+      overlayChorus.enable(i == 2);
+      overlayDistortion.enable(i == 3);
+      overlayEcho.enable(i == 4);
+
+      if (i == 0) {
+        enabledEffect = nullptr;
+        soundComp.unlinkSlot();
+        window.resize(baseWindowWidth, baseWindowHeight);
+        return;
+      }
+
+      unsigned int newWindowWidth = baseWindowWidth;
+      unsigned int overlayHeight {};
+
+      switch (i) {
+        case 1:
+          enabledEffect   = &reverb;
+          newWindowWidth += static_cast<unsigned int>(overlayReverbSize.x());
+          overlayHeight   = static_cast<unsigned int>(overlayReverbSize.y());
+          break;
+
+        case 2:
+          enabledEffect   = &chorus;
+          newWindowWidth += static_cast<unsigned int>(overlayChorusSize.x());
+          overlayHeight   = static_cast<unsigned int>(overlayChorusSize.y());
+          break;
+
+        case 3:
+          enabledEffect   = &distortion;
+          newWindowWidth += static_cast<unsigned int>(overlayDistortionSize.x());
+          overlayHeight   = static_cast<unsigned int>(overlayDistortionSize.y());
+          break;
+
+        case 4:
+          enabledEffect   = &echo;
+          newWindowWidth += static_cast<unsigned int>(overlayEchoSize.x());
+          overlayHeight   = static_cast<unsigned int>(overlayEchoSize.y());
+          break;
+
+        default:
+          break;
+      }
+
+      window.resize(newWindowWidth - 40, std::max(baseWindowHeight, overlayHeight));
+
+      effectSlot.loadEffect(*enabledEffect);
       soundComp.linkSlot(effectSlot);
-      overlayReverb.enable();
-      window.resize(baseWindowWidth + static_cast<unsigned int>(overlayReverbSize.x()) - 40,
-                    std::max(baseWindowHeight, static_cast<unsigned int>(overlayReverbSize.y())));
-    }, [&effectEnabled, &soundComp, &overlayReverb, &window] () noexcept {
-      effectEnabled = false;
-      soundComp.unlinkSlot();
-      overlayReverb.disable();
-      window.resize(baseWindowWidth, baseWindowHeight);
-    }, false);
+    }, 0);
+
+    /////////////////////////
+    // Reveberation params //
+    /////////////////////////
 
     overlayReverb.addSlider("Density", [&reverbParams, &reverb, &effectSlot] (float val) {
       reverbParams.density = val;
@@ -401,6 +479,114 @@ int main() {
       reverb.load(reverbParams);
       effectSlot.loadEffect(reverb);
     }, reverbParams.decayHighFrequencyLimit);
+
+    ///////////////////
+    // Chorus params //
+    ///////////////////
+
+    overlayChorus.addDropdown("Waveform", { "Sinusoid", "Triangle" }, [&chorusParams, &chorus, &effectSlot] (const std::string&, std::size_t i) {
+      chorusParams.waveform = static_cast<Raz::SoundWaveform>(i);
+      chorus.load(chorusParams);
+      effectSlot.loadEffect(chorus);
+    }, static_cast<std::size_t>(chorusParams.waveform));
+
+    overlayChorus.addSlider("Phase", [&chorusParams, &chorus, &effectSlot] (float val) {
+      chorusParams.phase = static_cast<int>(val);
+      chorus.load(chorusParams);
+      effectSlot.loadEffect(chorus);
+    }, -180.f, 180.f, static_cast<float>(chorusParams.phase));
+
+    overlayChorus.addSlider("Rate", [&chorusParams, &chorus, &effectSlot] (float val) {
+      chorusParams.rate = val;
+      chorus.load(chorusParams);
+      effectSlot.loadEffect(chorus);
+    }, 0.f, 10.f, chorusParams.rate);
+
+    overlayChorus.addSlider("Depth", [&chorusParams, &chorus, &effectSlot] (float val) {
+      chorusParams.depth = val;
+      chorus.load(chorusParams);
+      effectSlot.loadEffect(chorus);
+    }, 0.f, 1.f, chorusParams.depth);
+
+    overlayChorus.addSlider("Feedback", [&chorusParams, &chorus, &effectSlot] (float val) {
+      chorusParams.feedback = val;
+      chorus.load(chorusParams);
+      effectSlot.loadEffect(chorus);
+    }, -1.f, 1.f, chorusParams.feedback);
+
+    overlayChorus.addSlider("Delay", [&chorusParams, &chorus, &effectSlot] (float val) {
+      chorusParams.delay = val;
+      chorus.load(chorusParams);
+      effectSlot.loadEffect(chorus);
+    }, 0.f, 0.016f, chorusParams.delay);
+
+    ///////////////////////
+    // Distortion params //
+    ///////////////////////
+
+    overlayDistortion.addSlider("Edge", [&distortionParams, &distortion, &effectSlot] (float val) {
+      distortionParams.edge = val;
+      distortion.load(distortionParams);
+      effectSlot.loadEffect(distortion);
+    }, 0.f, 1.f, distortionParams.edge);
+
+    overlayDistortion.addSlider("Gain", [&distortionParams, &distortion, &effectSlot] (float val) {
+      distortionParams.gain = val;
+      distortion.load(distortionParams);
+      effectSlot.loadEffect(distortion);
+    }, 0.01f, 1.f, distortionParams.gain);
+
+    overlayDistortion.addSlider("Lowpass cutoff", [&distortionParams, &distortion, &effectSlot] (float val) {
+      distortionParams.lowpassCutoff = val;
+      distortion.load(distortionParams);
+      effectSlot.loadEffect(distortion);
+    }, 80.f, 24000.f, distortionParams.lowpassCutoff);
+
+    overlayDistortion.addSlider("Eq. center", [&distortionParams, &distortion, &effectSlot] (float val) {
+      distortionParams.eqCenter = val;
+      distortion.load(distortionParams);
+      effectSlot.loadEffect(distortion);
+    }, 80.f, 24000.f, distortionParams.eqCenter);
+
+    overlayDistortion.addSlider("Eq. bandwidth", [&distortionParams, &distortion, &effectSlot] (float val) {
+      distortionParams.eqBandwidth = val;
+      distortion.load(distortionParams);
+      effectSlot.loadEffect(distortion);
+    }, 80.f, 24000.f, distortionParams.eqBandwidth);
+
+    /////////////////
+    // Echo params //
+    /////////////////
+
+    overlayEcho.addSlider("Delay", [&echoParams, &echo, &effectSlot] (float val) {
+      echoParams.delay = val;
+      echo.load(echoParams);
+      effectSlot.loadEffect(echo);
+    }, 0.f, 0.207f, echoParams.delay);
+
+    overlayEcho.addSlider("Left/right delay", [&echoParams, &echo, &effectSlot] (float val) {
+      echoParams.leftRightDelay = val;
+      echo.load(echoParams);
+      effectSlot.loadEffect(echo);
+    }, 0.f, 0.404f, echoParams.leftRightDelay);
+
+    overlayEcho.addSlider("Damping", [&echoParams, &echo, &effectSlot] (float val) {
+      echoParams.damping = val;
+      echo.load(echoParams);
+      effectSlot.loadEffect(echo);
+    }, 0.f, 0.99f, echoParams.damping);
+
+    overlayEcho.addSlider("Feedback", [&echoParams, &echo, &effectSlot] (float val) {
+      echoParams.feedback = val;
+      echo.load(echoParams);
+      effectSlot.loadEffect(echo);
+    }, 0.f, 1.f, echoParams.feedback);
+
+    overlayEcho.addSlider("Spread", [&echoParams, &echo, &effectSlot] (float val) {
+      echoParams.spread = val;
+      echo.load(echoParams);
+      effectSlot.loadEffect(echo);
+    }, -1.f, 1.f, echoParams.spread);
 #endif
 
     //////////////////////////

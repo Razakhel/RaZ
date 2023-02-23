@@ -111,35 +111,71 @@ void LuaWrapper::registerAudioTypes() {
                                                                              sol::constructors<SoundEffect()>());
     soundEffect["getIndex"] = &SoundEffect::getIndex;
     soundEffect["init"]     = &SoundEffect::init;
-    soundEffect["load"]     = &SoundEffect::load;
+    soundEffect["load"]     = sol::overload(PickOverload<const ReverberationParams&>(&SoundEffect::load),
+                                            PickOverload<const ChorusParams&>(&SoundEffect::load),
+                                            PickOverload<const DistortionParams&>(&SoundEffect::load),
+                                            PickOverload<const EchoParams&>(&SoundEffect::load));
     soundEffect["reset"]    = &SoundEffect::reset;
     soundEffect["destroy"]  = &SoundEffect::destroy;
 
-    sol::usertype<ReverberationParams> reverbParams = state.new_usertype<ReverberationParams>("ReverberationParams",
-                                                                                              sol::constructors<ReverberationParams()>());
-    reverbParams["density"]                        = &ReverberationParams::density;
-    reverbParams["diffusion"]                      = &ReverberationParams::diffusion;
-    reverbParams["gain"]                           = &ReverberationParams::gain;
-    reverbParams["gainHighFrequency"]              = &ReverberationParams::gainHighFrequency;
-    reverbParams["gainLowFrequency"]               = &ReverberationParams::gainLowFrequency;
-    reverbParams["decayTime"]                      = &ReverberationParams::decayTime;
-    reverbParams["decayHighFrequencyRatio"]        = &ReverberationParams::decayHighFrequencyRatio;
-    reverbParams["decayLowFrequencyRatio"]         = &ReverberationParams::decayLowFrequencyRatio;
-    reverbParams["reflectionsGain"]                = &ReverberationParams::reflectionsGain;
-    reverbParams["reflectionsDelay"]               = &ReverberationParams::reflectionsDelay;
-    reverbParams["reflectionsPan"]                 = &ReverberationParams::reflectionsPan;
-    reverbParams["lateReverbGain"]                 = &ReverberationParams::lateReverbGain;
-    reverbParams["lateReverbDelay"]                = &ReverberationParams::lateReverbDelay;
-    reverbParams["lateReverbPan"]                  = &ReverberationParams::lateReverbPan;
-    reverbParams["echoTime"]                       = &ReverberationParams::echoTime;
-    reverbParams["echoDepth"]                      = &ReverberationParams::echoDepth;
-    reverbParams["modulationTime"]                 = &ReverberationParams::modulationTime;
-    reverbParams["modulationDepth"]                = &ReverberationParams::modulationDepth;
-    reverbParams["airAbsorptionGainHighFrequency"] = &ReverberationParams::airAbsorptionGainHighFrequency;
-    reverbParams["highFrequencyReference"]         = &ReverberationParams::highFrequencyReference;
-    reverbParams["lowFrequencyReference"]          = &ReverberationParams::lowFrequencyReference;
-    reverbParams["roomRolloffFactor"]              = &ReverberationParams::roomRolloffFactor;
-    reverbParams["decayHighFrequencyLimit"]        = &ReverberationParams::decayHighFrequencyLimit;
+    // Effects
+    {
+      sol::usertype<ReverberationParams> reverbParams = state.new_usertype<ReverberationParams>("ReverberationParams",
+                                                                                                sol::constructors<ReverberationParams()>());
+      reverbParams["density"]                        = &ReverberationParams::density;
+      reverbParams["diffusion"]                      = &ReverberationParams::diffusion;
+      reverbParams["gain"]                           = &ReverberationParams::gain;
+      reverbParams["gainHighFrequency"]              = &ReverberationParams::gainHighFrequency;
+      reverbParams["gainLowFrequency"]               = &ReverberationParams::gainLowFrequency;
+      reverbParams["decayTime"]                      = &ReverberationParams::decayTime;
+      reverbParams["decayHighFrequencyRatio"]        = &ReverberationParams::decayHighFrequencyRatio;
+      reverbParams["decayLowFrequencyRatio"]         = &ReverberationParams::decayLowFrequencyRatio;
+      reverbParams["reflectionsGain"]                = &ReverberationParams::reflectionsGain;
+      reverbParams["reflectionsDelay"]               = &ReverberationParams::reflectionsDelay;
+      reverbParams["reflectionsPan"]                 = &ReverberationParams::reflectionsPan;
+      reverbParams["lateReverbGain"]                 = &ReverberationParams::lateReverbGain;
+      reverbParams["lateReverbDelay"]                = &ReverberationParams::lateReverbDelay;
+      reverbParams["lateReverbPan"]                  = &ReverberationParams::lateReverbPan;
+      reverbParams["echoTime"]                       = &ReverberationParams::echoTime;
+      reverbParams["echoDepth"]                      = &ReverberationParams::echoDepth;
+      reverbParams["modulationTime"]                 = &ReverberationParams::modulationTime;
+      reverbParams["modulationDepth"]                = &ReverberationParams::modulationDepth;
+      reverbParams["airAbsorptionGainHighFrequency"] = &ReverberationParams::airAbsorptionGainHighFrequency;
+      reverbParams["highFrequencyReference"]         = &ReverberationParams::highFrequencyReference;
+      reverbParams["lowFrequencyReference"]          = &ReverberationParams::lowFrequencyReference;
+      reverbParams["roomRolloffFactor"]              = &ReverberationParams::roomRolloffFactor;
+      reverbParams["decayHighFrequencyLimit"]        = &ReverberationParams::decayHighFrequencyLimit;
+
+      state.new_enum<SoundWaveform>("SoundWaveform", {
+        { "SINUSOID", SoundWaveform::SINUSOID },
+        { "TRIANGLE", SoundWaveform::TRIANGLE }
+      });
+
+      sol::usertype<ChorusParams> chorusParams = state.new_usertype<ChorusParams>("ChorusParams",
+                                                                                  sol::constructors<ChorusParams()>());
+      chorusParams["waveform"] = &ChorusParams::waveform;
+      chorusParams["phase"]    = &ChorusParams::phase;
+      chorusParams["rate"]     = &ChorusParams::rate;
+      chorusParams["depth"]    = &ChorusParams::depth;
+      chorusParams["feedback"] = &ChorusParams::feedback;
+      chorusParams["delay"]    = &ChorusParams::delay;
+
+      sol::usertype<DistortionParams> distortionParams = state.new_usertype<DistortionParams>("DistortionParams",
+                                                                                              sol::constructors<DistortionParams()>());
+      distortionParams["edge"]          = &DistortionParams::edge;
+      distortionParams["gain"]          = &DistortionParams::gain;
+      distortionParams["lowpassCutoff"] = &DistortionParams::lowpassCutoff;
+      distortionParams["eqCenter"]      = &DistortionParams::eqCenter;
+      distortionParams["eqBandwidth"]   = &DistortionParams::eqBandwidth;
+
+      sol::usertype<EchoParams> echoParams = state.new_usertype<EchoParams>("EchoParams",
+                                                                            sol::constructors<EchoParams()>());
+      echoParams["delay"]          = &EchoParams::delay;
+      echoParams["leftRightDelay"] = &EchoParams::leftRightDelay;
+      echoParams["damping"]        = &EchoParams::damping;
+      echoParams["feedback"]       = &EchoParams::feedback;
+      echoParams["spread"]         = &EchoParams::spread;
+    }
   }
 
   {

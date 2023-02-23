@@ -146,6 +146,31 @@ TEST_CASE("LuaAudio SoundEffect") {
     reverbParams.decayHighFrequencyLimit        = false
     soundEffect:load(reverbParams)
 
+    local chorusParams = ChorusParams.new()
+    chorusParams.waveform = SoundWaveform.SINUSOID
+    chorusParams.phase    = 0
+    chorusParams.rate     = 0
+    chorusParams.depth    = 0
+    chorusParams.feedback = 0
+    chorusParams.delay    = 0
+    soundEffect:load(chorusParams)
+
+    local distortionParams = DistortionParams.new()
+    distortionParams.edge          = 0
+    distortionParams.gain          = 0.01
+    distortionParams.lowpassCutoff = 80
+    distortionParams.eqCenter      = 80
+    distortionParams.eqBandwidth   = 80
+    soundEffect:load(distortionParams)
+
+    local echoParams = EchoParams.new()
+    echoParams.delay          = 0
+    echoParams.leftRightDelay = 0
+    echoParams.damping        = 0
+    echoParams.feedback       = 0
+    echoParams.spread         = 0
+    soundEffect:load(distortionParams)
+
     soundEffect:reset()
     soundEffect:destroy()
   )"));
