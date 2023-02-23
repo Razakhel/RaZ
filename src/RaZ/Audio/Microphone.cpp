@@ -162,22 +162,30 @@ float Microphone::recoverAvailableDuration() const noexcept {
 }
 
 std::vector<uint8_t> Microphone::recoverData(float maxDuration) const {
+  std::vector<uint8_t> data;
+  recoverData(data, maxDuration);
+
+  return data;
+}
+
+void Microphone::recoverData(std::vector<uint8_t>& data, float maxDuration) const {
+  data.clear();
+
   if (maxDuration == 0.f)
-    return {};
+    return;
 
   int sampleCount = recoverAvailableSampleCount();
 
   if (sampleCount <= 0)
-    return {};
+    return;
 
   if (maxDuration > 0.f)
     sampleCount = std::min(sampleCount, static_cast<int>(maxDuration * static_cast<float>(m_frequency)));
 
-  std::vector<uint8_t> data(recoverFrameSize(m_format) * sampleCount);
+  data.resize(recoverFrameSize(m_format) * sampleCount);
+
   alcCaptureSamples(static_cast<ALCdevice*>(m_device), data.data(), sampleCount);
   checkError(m_device, "Failed to recover captured data");
-
-  return data;
 }
 
 Sound Microphone::recoverSound(float maxDuration) const {

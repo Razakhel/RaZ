@@ -407,6 +407,8 @@ int main() {
     // Starting application //
     //////////////////////////
 
+    std::vector<uint8_t> captureData;
+
     app.run([&] (float deltaTime) {
       static float globalTime = 0.f;
       globalTime += deltaTime;
@@ -414,7 +416,7 @@ int main() {
       soundTrans.setPosition((moveSource ? Raz::Vec3f(std::sin(globalTime) * 3.f, 0.f, 1.f) : Raz::Vec3f(0.f)));
 
       if (isCapturing) {
-        const std::vector<uint8_t> captureData = microphone.recoverData();
+        microphone.recoverData(captureData);
 
         // Stereo data is interleaved: the left capture is first, then the right (L, R, L, R, ...)
 
