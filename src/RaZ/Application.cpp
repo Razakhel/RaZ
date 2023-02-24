@@ -1,4 +1,5 @@
 #include "RaZ/Application.hpp"
+#include "RaZ/World.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
@@ -6,6 +7,10 @@
 #endif
 
 namespace Raz {
+
+Application::Application(std::size_t worldCount) {
+  m_worlds.reserve(worldCount);
+}
 
 void Application::run() {
   Logger::debug("[Application] Running...");
@@ -25,12 +30,13 @@ bool Application::runOnce() {
   const auto currentTime = std::chrono::system_clock::now();
   m_deltaTime            = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
   m_lastFrameTime        = currentTime;
+  m_globalTime          += m_deltaTime;
 
   for (std::size_t worldIndex = 0; worldIndex < m_worlds.size(); ++worldIndex) {
     if (!m_activeWorlds[worldIndex])
       continue;
 
-    if (!m_worlds[worldIndex].update(m_deltaTime))
+    if (!m_worlds[worldIndex]->update(m_deltaTime))
       m_activeWorlds.setBit(worldIndex, false);
   }
 

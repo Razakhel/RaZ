@@ -3,19 +3,24 @@
 #ifndef RAZ_APPLICATION_HPP
 #define RAZ_APPLICATION_HPP
 
-#include "RaZ/World.hpp"
+#include "RaZ/Data/Bitset.hpp"
 
 #include <chrono>
+#include <memory>
 
 namespace Raz {
 
+class World;
+using WorldPtr = std::unique_ptr<World>;
+
 class Application {
 public:
-  explicit Application(std::size_t worldCount = 1) { m_worlds.reserve(worldCount); }
+  explicit Application(std::size_t worldCount = 1);
 
-  const std::vector<World>& getWorlds() const { return m_worlds; }
-  std::vector<World>& getWorlds() { return m_worlds; }
+  const std::vector<WorldPtr>& getWorlds() const { return m_worlds; }
+  std::vector<WorldPtr>& getWorlds() { return m_worlds; }
   float getDeltaTime() const { return m_deltaTime; }
+  float getGlobalTime() const { return m_globalTime; }
 
   /// Adds a World into the Application.
   /// \tparam Args Types of the arguments to be forwarded to the World.
@@ -35,11 +40,12 @@ public:
   void quit() { m_isRunning = false; }
 
 private:
-  std::vector<World> m_worlds {};
+  std::vector<WorldPtr> m_worlds {};
   Bitset m_activeWorlds {};
 
   std::chrono::time_point<std::chrono::system_clock> m_lastFrameTime = std::chrono::system_clock::now();
-  float m_deltaTime {};
+  float m_deltaTime {}; ///< Time elapsed since the application's last execution, in seconds.
+  float m_globalTime = 0.f; ///< Time elapsed since the application started, in seconds.
   bool m_isRunning = true;
 };
 

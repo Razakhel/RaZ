@@ -6,10 +6,10 @@ namespace Raz {
 
 template <typename... Args>
 World& Application::addWorld(Args&&... args) {
-  m_worlds.emplace_back(std::forward<Args>(args)...);
+  m_worlds.emplace_back(std::make_unique<World>(std::forward<Args>(args)...));
   m_activeWorlds.setBit(m_worlds.size() - 1);
 
-  return m_worlds.back();
+  return *m_worlds.back();
 }
 
 template <typename FuncT>

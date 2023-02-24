@@ -595,11 +595,8 @@ int main() {
 
     std::vector<uint8_t> captureData;
 
-    app.run([&] (float deltaTime) {
-      static float globalTime = 0.f;
-      globalTime += deltaTime;
-
-      soundTrans.setPosition((moveSource ? Raz::Vec3f(std::sin(globalTime) * 3.f, 0.f, 1.f) : Raz::Vec3f(0.f)));
+    app.run([&] (float) {
+      soundTrans.setPosition((moveSource ? Raz::Vec3f(std::sin(app.getGlobalTime()) * 3.f, 0.f, 1.f) : Raz::Vec3f(0.f)));
 
       if (isCapturing) {
         microphone.recoverData(captureData);

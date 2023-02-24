@@ -31,11 +31,8 @@ local light = world:addEntity()
 light:addComponent(Transform.new())
 light:addComponent(Light.new(LightType.DIRECTIONAL, -Axis.Z, 1, ColorPreset.White))
 
-local globalTime = 0
 app:run(function (deltaTime)
-    globalTime = globalTime + deltaTime
-
     shieldTrans:rotate(Radiansf.new(Degreesf.new(90 * deltaTime)), Vec3f.new(1, 1, 1):normalize())
-    cubeTrans.position  = Vec3f.new(-2, math.sin(globalTime * 3), 0)
-    sphereTrans.scaling = Vec3f.new(math.sin(globalTime * 2) * 0.25 + 0.75)
+    cubeTrans.position  = Vec3f.new(-2, math.sin(app:getGlobalTime() * 3), 0)
+    sphereTrans.scaling = Vec3f.new(math.sin(app:getGlobalTime() * 2) * 0.25 + 0.75)
 end)

@@ -13,6 +13,7 @@ TEST_CASE("LuaCore Application") {
     application:run(function () end)
     assert(not application:runOnce())
     assert(application:getDeltaTime() >= 0)
+    assert(application:getGlobalTime() >= 0)
     application:quit()
   )"));
 }
