@@ -4,11 +4,24 @@
 
 TEST_CASE("LuaCore Application") {
   CHECK(Raz::LuaWrapper::execute(R"(
+    local frameTimeInfo = FrameTimeInfo.new()
+
+    frameTimeInfo.deltaTime    = 0
+    frameTimeInfo.globalTime   = 0
+    frameTimeInfo.substepCount = 0
+    frameTimeInfo.substepTime  = 0
+    assert(frameTimeInfo.deltaTime == 0)
+    assert(frameTimeInfo.globalTime == 0)
+    assert(frameTimeInfo.substepCount == 0)
+    assert(frameTimeInfo.substepTime == 0)
+
     local application = Application.new()
     application       = Application.new(1)
 
     application:addWorld()
     assert(#application:getWorlds() == 1)
+    application.fixedTimeStep = 0.5
+    assert(application.fixedTimeStep == 0.5)
     application:run()
     application:run(function () end)
     assert(not application:runOnce())
@@ -49,7 +62,7 @@ TEST_CASE("LuaCore World") {
 
     world:addEntity()
     world:removeEntity(world:addEntity(true))
-    world:update(0)
+    world:update(FrameTimeInfo.new())
     world:refresh()
     world:destroy()
 

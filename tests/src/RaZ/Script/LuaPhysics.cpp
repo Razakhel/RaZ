@@ -31,8 +31,7 @@ TEST_CASE("LuaPhysics PhysicsSystem") {
 
     assert(physicsSystem:getAcceptedComponents() ~= nil)
     assert(not physicsSystem:containsEntity(Entity.new(0)))
-    assert(physicsSystem:update(0))
-    assert(physicsSystem:step(0))
+    assert(physicsSystem:update(FrameTimeInfo.new()))
     physicsSystem:destroy()
   )"));
 }

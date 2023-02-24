@@ -38,7 +38,7 @@ public:
   /// Recovers the name of the current audio device.
   /// \return The current device's name, or an empty string if the required extension is unsupported.
   std::string recoverCurrentDevice() const;
-  bool update(float deltaTime) override;
+  bool update(const FrameTimeInfo& timeInfo) override;
   void destroy() override;
 
   ~AudioSystem() override { destroy(); }

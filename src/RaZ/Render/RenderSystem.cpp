@@ -1,3 +1,4 @@
+#include "RaZ/Application.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Math/Transform.hpp"
@@ -26,7 +27,7 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   m_renderGraph.resizeViewport(m_sceneWidth, m_sceneHeight);
 }
 
-bool RenderSystem::update([[maybe_unused]] float deltaTime) {
+bool RenderSystem::update([[maybe_unused]] const FrameTimeInfo& timeInfo) {
   m_cameraUbo.bindBase(0);
   m_lightsUbo.bindBase(1);
   m_modelUbo.bindBase(2);
@@ -39,7 +40,7 @@ bool RenderSystem::update([[maybe_unused]] float deltaTime) {
 
 #if !defined(RAZ_NO_WINDOW)
   if (m_window)
-    return m_window->run(deltaTime);
+    return m_window->run(timeInfo.deltaTime);
 #endif
 
   return true;

@@ -1,9 +1,9 @@
 #include "Catch.hpp"
 
 #include "RaZ/Entity.hpp"
+#include "RaZ/System.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Transform.hpp"
-#include "RaZ/System.hpp"
 
 class TestSystem : public Raz::System {
 public:
@@ -12,7 +12,7 @@ public:
   void linkEntity(const Raz::EntityPtr& entity) override { System::linkEntity(entity); }
   void unlinkEntity(const Raz::EntityPtr& entity) override { System::unlinkEntity(entity); }
 
-  bool update(float /* deltaTime */) override { return true; }
+  bool update(const Raz::FrameTimeInfo&) override { return true; }
 };
 
 TEST_CASE("System basic") {

@@ -21,25 +21,14 @@ void World::removeEntity(const Entity& entity) {
   m_entities.erase(iter);
 }
 
-bool World::update(float deltaTime) {
+bool World::update(const FrameTimeInfo& timeInfo) {
   refresh();
-
-  // The fixed time step may need to be user-definable later; moreover, it should probably be handled by the Application
-  constexpr float fixedTimeStep = 0.016666f;
 
   for (std::size_t systemIndex = 0; systemIndex < m_systems.size(); ++systemIndex) {
     if (!m_activeSystems[systemIndex])
       continue;
 
-    System& system = *m_systems[systemIndex];
-
-    bool isSystemActive = system.update(deltaTime);
-    m_remainingTime    += deltaTime;
-
-    while (m_remainingTime >= fixedTimeStep) {
-      isSystemActive   = system.step(fixedTimeStep) && isSystemActive;
-      m_remainingTime -= fixedTimeStep;
-    }
+    const bool isSystemActive = m_systems[systemIndex]->update(timeInfo);
 
     if (!isSystemActive)
       m_activeSystems.setBit(systemIndex, false);

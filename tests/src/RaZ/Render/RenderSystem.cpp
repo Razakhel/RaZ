@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 #include "TestUtils.hpp"
 
+#include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
@@ -18,7 +19,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath =
   Raz::Window& window = TestUtils::getWindow();
 
   // Rendering a frame of the scene by updating the World's RenderSystem & running the Window
-  world.update(0.f);
+  world.update({});
   window.run(0.f);
 
   // Recovering the rendered frame into an image
@@ -42,7 +43,7 @@ TEST_CASE("RenderSystem accepted components") {
   Raz::Entity& meshRenderer = world.addEntityWithComponent<Raz::MeshRenderer>();
   Raz::Entity& light        = world.addEntityWithComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::X, 1.f);
 
-  world.update(0.f);
+  world.update({});
 
   CHECK(render.containsEntity(camera));
   CHECK(render.containsEntity(meshRenderer));

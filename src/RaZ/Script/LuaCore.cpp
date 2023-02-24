@@ -20,12 +20,20 @@ void LuaWrapper::registerCoreTypes() {
   sol::state& state = getState();
 
   {
+    sol::usertype<FrameTimeInfo> frameTimeInfo = state.new_usertype<FrameTimeInfo>("FrameTimeInfo",
+                                                                                   sol::constructors<FrameTimeInfo()>());
+    frameTimeInfo["deltaTime"]    = &FrameTimeInfo::deltaTime;
+    frameTimeInfo["globalTime"]   = &FrameTimeInfo::globalTime;
+    frameTimeInfo["substepCount"] = &FrameTimeInfo::substepCount;
+    frameTimeInfo["substepTime"]  = &FrameTimeInfo::substepTime;
+
     sol::usertype<Application> application = state.new_usertype<Application>("Application",
                                                                              sol::constructors<Application(),
                                                                                                Application(std::size_t)>());
     application["getWorlds"]     = PickNonConstOverload<>(&Application::getWorlds);
     application["getDeltaTime"]  = &Application::getDeltaTime;
     application["getGlobalTime"] = &Application::getGlobalTime;
+    application["fixedTimeStep"] = sol::property(&Application::getFixedTimeStep, &Application::setFixedTimeStep);
     application["addWorld"]      = &Application::addWorld<>;
     application["run"]           = sol::overload([] (Application& app) { app.run(); },
                                                  [] (Application& app, const std::function<void(float)>& func) { app.run(func); });
@@ -42,7 +50,6 @@ void LuaWrapper::registerCoreTypes() {
     system["getAcceptedComponents"] = &System::getAcceptedComponents;
     system["containsEntity"]        = &System::containsEntity;
     system["update"]                = &System::update;
-    system["step"]                  = &System::step;
     system["destroy"]               = &System::destroy;
   }
 

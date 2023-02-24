@@ -1,5 +1,6 @@
 #include "Catch.hpp"
 
+#include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Listener.hpp"
@@ -14,7 +15,7 @@ TEST_CASE("AudioSystem accepted components") {
   Raz::Entity& sound    = world.addEntityWithComponent<Raz::Sound>();
   Raz::Entity& listener = world.addEntityWithComponents<Raz::Listener, Raz::Transform>(); // AudioSystem::update() needs a Listener with a Transform component
 
-  world.update(0.f);
+  world.update({});
 
   CHECK(audio.containsEntity(sound));
   CHECK(audio.containsEntity(listener));

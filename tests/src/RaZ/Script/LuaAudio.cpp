@@ -15,8 +15,7 @@ TEST_CASE("LuaAudio AudioSystem") {
 
     assert(audioSystem:getAcceptedComponents() ~= nil)
     assert(not audioSystem:containsEntity(Entity.new(0)))
-    assert(audioSystem:update(0))
-    assert(audioSystem:step(0))
+    assert(audioSystem:update(FrameTimeInfo.new()))
     audioSystem:destroy()
   )"));
 }

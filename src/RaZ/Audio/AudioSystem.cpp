@@ -93,7 +93,7 @@ std::string AudioSystem::recoverCurrentDevice() const {
   return alcGetString(static_cast<ALCdevice*>(m_device), ALC_ALL_DEVICES_SPECIFIER);
 }
 
-bool AudioSystem::update(float /* deltaTime */) {
+bool AudioSystem::update(const FrameTimeInfo&) {
 #if defined(RAZ_CONFIG_DEBUG)
   // Checking that only one Listener exists
   bool hasOneListener = false;

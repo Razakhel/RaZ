@@ -61,7 +61,7 @@ public:
                     uint8_t antiAliasingSampleCount = 1) { m_window = Window::create(*this, width, height, title, settings, antiAliasingSampleCount); }
 #endif
   void resizeViewport(unsigned int width, unsigned int height);
-  bool update(float deltaTime) override;
+  bool update(const FrameTimeInfo& timeInfo) override;
   void sendCameraMatrices() const;
   /// Updates all lights referenced by the RenderSystem, sending their data to the GPU.
   void updateLights() const;

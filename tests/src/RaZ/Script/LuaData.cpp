@@ -56,8 +56,7 @@ TEST_CASE("LuaData BvhSystem") {
 
     assert(bvhSystem:getAcceptedComponents() ~= nil)
     assert(not bvhSystem:containsEntity(Entity.new(0)))
-    assert(bvhSystem:update(0))
-    assert(bvhSystem:step(0))
+    assert(bvhSystem:update(FrameTimeInfo.new()))
     bvhSystem:destroy()
   )"));
 }

@@ -21,7 +21,7 @@ public:
     m_friction = friction;
   }
 
-  bool step(float deltaTime) override;
+  bool update(const FrameTimeInfo& timeInfo) override;
 
 private:
   void solveConstraints();

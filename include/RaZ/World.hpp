@@ -8,6 +8,10 @@
 
 namespace Raz {
 
+struct FrameTimeInfo;
+class World;
+using WorldPtr = std::unique_ptr<World>;
+
 /// World class handling systems & entities.
 class World {
 public:
@@ -65,9 +69,9 @@ public:
   /// \param entity Entity to be removed.
   void removeEntity(const Entity& entity);
   /// Updates the world, updating all the systems it contains.
-  /// \param deltaTime Time elapsed since the last update.
+  /// \param timeInfo Time-related frame information.
   /// \return True if the world still has active systems, false otherwise.
-  bool update(float deltaTime);
+  bool update(const FrameTimeInfo& timeInfo);
   /// Refreshes the world, optimizing the entities & linking/unlinking entities to systems if needed.
   void refresh();
   /// Destroys the world, releasing all its entities & systems.
@@ -88,8 +92,6 @@ private:
   std::vector<EntityPtr> m_entities {};
   std::size_t m_activeEntityCount = 0;
   std::size_t m_maxEntityIndex = 0;
-
-  float m_remainingTime {}; ///< Extra time remaining after executing the systems' fixed step update.
 };
 
 } // namespace Raz

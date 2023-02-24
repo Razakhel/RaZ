@@ -576,8 +576,7 @@ TEST_CASE("LuaRender RenderSystem") {
     assert(renderSystem:getAcceptedComponents() ~= nil)
     assert(not renderSystem:containsEntity(Entity.new(0)))
     -- RenderSystem::update() is not tested, as it requires a specific setup
-    --assert(renderSystem:update(0))
-    assert(renderSystem:step(0))
+    --assert(renderSystem:update(FrameTimeInfo.new()))
     renderSystem:destroy()
   )"));
 

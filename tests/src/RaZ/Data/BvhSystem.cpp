@@ -1,5 +1,6 @@
 #include "Catch.hpp"
 
+#include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Data/BvhSystem.hpp"
 #include "RaZ/Data/Mesh.hpp"
@@ -11,7 +12,7 @@ TEST_CASE("BvhSystem accepted components") {
 
   Raz::Entity& mesh = world.addEntityWithComponent<Raz::Mesh>();
 
-  world.update(0.f);
+  world.update({});
 
   CHECK(bvh.containsEntity(mesh));
 }
@@ -50,7 +51,7 @@ TEST_CASE("BvhSystem build") {
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update(0.f);
+  world.update({});
 
   //           root
   //          /    \
@@ -82,7 +83,7 @@ TEST_CASE("BvhSystem build") {
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update(0.f);
+  world.update({});
 
   //           root
   //          /    \
@@ -126,7 +127,7 @@ TEST_CASE("BvhSystem build") {
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update(0.f);
+  world.update({});
 
   //          ----- root -----
   //          |              |
@@ -205,7 +206,7 @@ TEST_CASE("BvhSystem query") {
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update(0.f);
+  world.update({});
 
   Raz::RayHit hit;
 

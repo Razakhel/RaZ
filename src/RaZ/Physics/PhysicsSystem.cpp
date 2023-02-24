@@ -1,3 +1,4 @@
+#include "RaZ/Application.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Physics/Collider.hpp"
 #include "RaZ/Physics/RigidBody.hpp"
@@ -10,36 +11,38 @@ PhysicsSystem::PhysicsSystem() {
   registerComponents<Collider, RigidBody>();
 }
 
-bool PhysicsSystem::step(float deltaTime) {
-  const float relativeFriction = std::pow(m_friction, deltaTime);
+bool PhysicsSystem::update(const FrameTimeInfo& timeInfo) {
+  for (int i = 0; i < timeInfo.substepCount; ++i) {
+    const float relativeFriction = std::pow(m_friction, timeInfo.substepTime);
 
-  for (Entity* entity : m_entities) {
-    if (!entity->isEnabled() || !entity->hasComponent<RigidBody>())
-      continue;
+    for (Entity* entity : m_entities) {
+      if (!entity->isEnabled() || !entity->hasComponent<RigidBody>())
+        continue;
 
-    auto& rigidBody = entity->getComponent<RigidBody>();
+      auto& rigidBody = entity->getComponent<RigidBody>();
 
-    if (rigidBody.getMass() <= 0.f)
-      continue;
+      if (rigidBody.getMass() <= 0.f)
+        continue;
 
-    const Vec3f acceleration = (rigidBody.getMass() * m_gravity + rigidBody.getForces()) * rigidBody.getInvMass();
-    const Vec3f oldVelocity  = rigidBody.getVelocity();
+      const Vec3f acceleration = (rigidBody.getMass() * m_gravity + rigidBody.getForces()) * rigidBody.getInvMass();
+      const Vec3f oldVelocity  = rigidBody.getVelocity();
 
-    const Vec3f velocity = oldVelocity * relativeFriction + acceleration * deltaTime;
-    rigidBody.setVelocity(velocity);
+      const Vec3f velocity = oldVelocity * relativeFriction + acceleration * timeInfo.substepTime;
+      rigidBody.setVelocity(velocity);
 
-    auto& transform = entity->getComponent<Transform>();
+      auto& transform = entity->getComponent<Transform>();
 
-    rigidBody.m_oldPosition = transform.getPosition();
-    transform.translate((oldVelocity + velocity) * 0.5f * deltaTime);
+      rigidBody.m_oldPosition = transform.getPosition();
+      transform.translate((oldVelocity + velocity) * 0.5f * timeInfo.substepTime);
 
-    // The following acceleration calculation should be added to the translation to get a more accurate result:
-    //    acceleration * deltaTime * deltaTime * 0.5f
-    //  However, the acceleration would be multiplied by a tiny factor, making its effect barely noticeable
-    //  for a standard acceleration value. As such, it is left out of the displacement equation
+      // The following acceleration calculation should be added to the translation to get a more accurate result:
+      //    acceleration * deltaTime * deltaTime * 0.5f
+      //  However, the acceleration would be multiplied by a tiny factor, making its effect barely noticeable
+      //  for a standard acceleration value. As such, it is left out of the displacement equation
+    }
+
+    solveConstraints();
   }
-
-  solveConstraints();
 
   return true;
 }

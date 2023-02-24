@@ -10,6 +10,7 @@
 
 namespace Raz {
 
+struct FrameTimeInfo;
 class System;
 using SystemPtr = std::unique_ptr<System>;
 
@@ -34,14 +35,10 @@ public:
   /// \param entity Entity to be checked.
   /// \return True if the system contains the entity, false otherwise.
   bool containsEntity(const Entity& entity) const noexcept;
-  /// Updates the system with a variable time step. For a constant step update, use step().
-  /// \param deltaTime Time elapsed since the last update.
+  /// Updates the system.
+  /// \param timeInfo Time-related frame information.
   /// \return True if the system is still active, false otherwise.
-  virtual bool update([[maybe_unused]] float deltaTime) { return true; }
-  /// Updates the system with a fixed time step, independent of the frame rate. If fixed steps are not needed, use update().
-  /// \param deltaTime Step time elapsed since the last update.
-  /// \return True if the system is still active, false otherwise.
-  virtual bool step([[maybe_unused]] float deltaTime) { return true; }
+  virtual bool update([[maybe_unused]] const FrameTimeInfo& timeInfo) { return true; }
   /// Destroys the system.
   virtual void destroy() {}
 

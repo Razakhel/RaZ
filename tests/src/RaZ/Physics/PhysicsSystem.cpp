@@ -1,5 +1,6 @@
 #include "Catch.hpp"
 
+#include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Physics/Collider.hpp"
@@ -26,7 +27,7 @@ TEST_CASE("PhysicsSystem accepted components") {
   Raz::Entity& rigidBody = world.addEntityWithComponent<Raz::RigidBody>(1.f, 1.f); // RenderSystem::update() needs a Camera with a Transform component
   Raz::Entity& collider  = world.addEntityWithComponent<Raz::Collider>(Raz::Plane(0.f));
 
-  world.update(0.f);
+  world.update({});
 
   CHECK(physics.containsEntity(rigidBody));
   CHECK(physics.containsEntity(collider));
@@ -34,6 +35,12 @@ TEST_CASE("PhysicsSystem accepted components") {
 
 TEST_CASE("PhysicsSystem rigid bodies collision") {
   Raz::World world(4);
+
+  float remainingTime {};
+  const auto updateWorld = [&world, &remainingTime] (float duration, float substepTime = 0.016666f) {
+    world.update(Raz::FrameTimeInfo{ duration, 0.f, static_cast<int>((duration + remainingTime) / substepTime), substepTime });
+    remainingTime = std::fmod(duration, substepTime);
+  };
 
   world.addSystem<Raz::PhysicsSystem>();
 
@@ -54,7 +61,7 @@ TEST_CASE("PhysicsSystem rigid bodies collision") {
   // Adding a plane collider as the floor
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Collider>(Raz::Plane(0.f, Raz::Axis::Y));
 
-  world.update(0.f);
+  updateWorld(0.f);
 
   // The delta time being 0, no particle has moved
   CHECK(bouncyParticleTransform.getPosition().strictlyEquals(initParticlePos));
@@ -64,8 +71,8 @@ TEST_CASE("PhysicsSystem rigid bodies collision") {
   CHECK(staticParticleTransform.getPosition().strictlyEquals(initParticlePos));
   CHECK(staticParticleRigidBody.getVelocity().strictlyEquals(Raz::Vec3f(0.f)));
 
-  // The world will internally split the given time in fixed time steps to guarantee the physics system's numerical stability
-  world.update(0.02f);
+  // The system should internally update itself in several fixed time steps to guarantee its numerical stability
+  updateWorld(0.02f);
 
   // The particles have started moving downards
   CHECK(bouncyParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.998638f, 0.f));
@@ -76,7 +83,7 @@ TEST_CASE("PhysicsSystem rigid bodies collision") {
   CHECK(staticParticleRigidBody.getVelocity().strictlyEquals(Raz::Vec3f(0.f)));
 
   // Updating to right before the collision
-  world.update(0.44f);
+  updateWorld(0.44f);
 
   CHECK(bouncyParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.0143348f, 0.f));
   CHECK(bouncyParticleRigidBody.getVelocity() == Raz::Vec3f(0.f, -4.3641448f, 0.f));
@@ -85,8 +92,8 @@ TEST_CASE("PhysicsSystem rigid bodies collision") {
   CHECK(staticParticleTransform.getPosition().strictlyEquals(initParticlePos));
   CHECK(staticParticleRigidBody.getVelocity().strictlyEquals(Raz::Vec3f(0.f)));
 
-  // Collision with the floor happens on the next step
-  world.update(0.01f);
+  // Collision with the floor happens on the following step
+  updateWorld(0.01f);
 
   // Particles having collided with the floor, they now have an upward velocity
   CHECK(bouncyParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.002f, 0.f));
@@ -96,7 +103,7 @@ TEST_CASE("PhysicsSystem rigid bodies collision") {
   CHECK(staticParticleTransform.getPosition().strictlyEquals(initParticlePos));
   CHECK(staticParticleRigidBody.getVelocity().strictlyEquals(Raz::Vec3f(0.f)));
 
-  world.update(0.03f);
+  updateWorld(0.03f);
 
   // After more steps, due to the velocity difference, the two particles' positions have been desynchronized
   CHECK(bouncyParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.139680699f, 0.f));
