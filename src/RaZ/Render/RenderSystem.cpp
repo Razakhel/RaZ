@@ -27,10 +27,24 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   m_renderGraph.resizeViewport(m_sceneWidth, m_sceneHeight);
 }
 
-bool RenderSystem::update([[maybe_unused]] const FrameTimeInfo& timeInfo) {
+bool RenderSystem::update(const FrameTimeInfo& timeInfo) {
   m_cameraUbo.bindBase(0);
   m_lightsUbo.bindBase(1);
-  m_modelUbo.bindBase(2);
+  m_timeUbo.bindBase(2);
+  m_modelUbo.bindBase(3);
+
+  // TODO: this should be made only once at the passes' shader programs' initialization (as is done when updating shaders), not every frame
+  //   Forcing to update shaders when adding a new pass would not be ideal either, as it implies many operations. Find a better & user-friendly way
+  for (std::size_t i = 0; i < m_renderGraph.getNodeCount(); ++i) {
+    const RenderShaderProgram& passProgram = m_renderGraph.getNode(i).getProgram();
+    m_cameraUbo.bindUniformBlock(passProgram, "uboCameraInfo", 0);
+    m_lightsUbo.bindUniformBlock(passProgram, "uboLightsInfo", 1);
+    m_timeUbo.bindUniformBlock(passProgram, "uboTimeInfo", 2);
+  }
+
+  m_timeUbo.bind();
+  m_timeUbo.sendData(timeInfo.deltaTime, 0);
+  m_timeUbo.sendData(timeInfo.globalTime, sizeof(float));
 
   m_renderGraph.execute(*this);
 
@@ -79,6 +93,13 @@ void RenderSystem::updateLights() const {
 void RenderSystem::updateShaders() const {
   m_renderGraph.updateShaders();
 
+  for (std::size_t i = 0; i < m_renderGraph.getNodeCount(); ++i) {
+    const RenderShaderProgram& passProgram = m_renderGraph.getNode(i).getProgram();
+    m_cameraUbo.bindUniformBlock(passProgram, "uboCameraInfo", 0);
+    m_lightsUbo.bindUniformBlock(passProgram, "uboLightsInfo", 1);
+    m_timeUbo.bindUniformBlock(passProgram, "uboTimeInfo", 2);
+  }
+
   for (Entity* entity : m_entities) {
     if (!entity->hasComponent<MeshRenderer>())
       continue;
@@ -101,7 +122,8 @@ void RenderSystem::updateMaterials(const MeshRenderer& meshRenderer) const {
 
     m_cameraUbo.bindUniformBlock(materialProgram, "uboCameraInfo", 0);
     m_lightsUbo.bindUniformBlock(materialProgram, "uboLightsInfo", 1);
-    m_modelUbo.bindUniformBlock(materialProgram, "uboModelInfo", 2);
+    m_timeUbo.bindUniformBlock(materialProgram, "uboTimeInfo", 2);
+    m_modelUbo.bindUniformBlock(materialProgram, "uboModelInfo", 3);
   }
 }
 
@@ -157,6 +179,8 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
 }
 
 void RenderSystem::initialize() {
+  registerComponents<Camera, Light, MeshRenderer>();
+
   // TODO: this Renderer initialization is technically useless; the RenderSystem needs to have it initialized before construction
   //  (either manually or through the Window's initialization), since it constructs the RenderGraph's rendering objects
   //  As such, if reaching here, the Renderer is necessarily already functional. Ideally, this call below should be the only one in the whole program
@@ -168,8 +192,6 @@ void RenderSystem::initialize() {
   Renderer::enable(Capability::CUBEMAP_SEAMLESS);
 #endif
 
-  registerComponents<Camera, Light, MeshRenderer>();
-
 #if !defined(USE_OPENGL_ES)
   // Setting the depth to a [0; 1] range instead of a [-1; 1] one is always a good thing, since the [-1; 0] subrange is never used anyway
   if (Renderer::checkVersion(4, 5) || Renderer::isExtensionSupported("GL_ARB_clip_control"))
@@ -178,6 +200,7 @@ void RenderSystem::initialize() {
   if (Renderer::checkVersion(4, 3)) {
     Renderer::setLabel(RenderObjectType::BUFFER, m_cameraUbo.getIndex(), "Camera uniform buffer");
     Renderer::setLabel(RenderObjectType::BUFFER, m_lightsUbo.getIndex(), "Lights uniform buffer");
+    Renderer::setLabel(RenderObjectType::BUFFER, m_timeUbo.getIndex(), "Time uniform buffer");
     Renderer::setLabel(RenderObjectType::BUFFER, m_modelUbo.getIndex(), "Model uniform buffer");
   }
 #endif

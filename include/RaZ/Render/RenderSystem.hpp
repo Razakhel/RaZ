@@ -106,6 +106,7 @@ private:
   RenderGraph m_renderGraph {};
   UniformBuffer m_cameraUbo = UniformBuffer(sizeof(Mat4f) * 5 + sizeof(Vec4f), UniformBufferUsage::DYNAMIC);
   UniformBuffer m_lightsUbo = UniformBuffer(sizeof(Vec4f) * 4 * 100 + sizeof(Vec4u), UniformBufferUsage::DYNAMIC);
+  UniformBuffer m_timeUbo   = UniformBuffer(sizeof(float) * 2, UniformBufferUsage::STREAM);
   UniformBuffer m_modelUbo  = UniformBuffer(sizeof(Mat4f), UniformBufferUsage::STREAM);
 
   std::optional<Cubemap> m_cubemap {};
