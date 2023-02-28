@@ -1,9 +1,11 @@
+#include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/ObjFormat.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <fstream>
@@ -15,8 +17,15 @@ namespace Raz::ObjFormat {
 namespace {
 
 inline Texture2DPtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
+  const FilePath fullTexturePath = mtlFilePath.recoverPathToFile() + textureFilePath;
+
+  if (!FileUtils::isReadable(fullTexturePath)) {
+    Logger::warn("[ObjLoad] Cannot load texture '" + fullTexturePath + "'; either the file does not exist or it cannot be opened.");
+    return nullptr;
+  }
+
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-  return Texture2D::create(ImageFormat::load(mtlFilePath.recoverPathToFile() + textureFilePath, true), true);
+  return Texture2D::create(ImageFormat::load(fullTexturePath, true), true);
 }
 
 inline void loadMtl(const FilePath& mtlFilePath,
@@ -67,6 +76,9 @@ inline void loadMtl(const FilePath& mtlFilePath,
     } else if (tag[0] == 'm') {          // Import texture
       const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
 
+      if (map == nullptr)
+        continue;
+
       if (tag[4] == 'K') {               // Standard maps
         if (tag[5] == 'd')               // Diffuse/albedo map [map_Kd]
           material.getProgram().setTexture(map, MaterialTexture::BaseColor);
@@ -94,10 +106,16 @@ inline void loadMtl(const FilePath& mtlFilePath,
       if (tag[1] == 'r')                 // Transparency factor (alias, 1 - d) [Tr]
         material.getProgram().setAttribute(1.f - std::stof(nextValue), MaterialAttribute::Transparency);
     } else if (tag[0] == 'b') {         // Bump map (alias) [bump]
-      material.getProgram().setTexture(loadTexture(mtlFilePath, nextValue), MaterialTexture::Bump);
+      const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
+
+      if (map)
+        material.getProgram().setTexture(map, MaterialTexture::Bump);
     } else if (tag[0] == 'n') {
       if (tag[1] == 'o') {               // Normal map [norm]
-        material.getProgram().setTexture(loadTexture(mtlFilePath, nextValue), MaterialTexture::Normal);
+        const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
+
+        if (map)
+          material.getProgram().setTexture(map, MaterialTexture::Normal);
       } else if (tag[1] == 'e') {        // New material [newmtl]
         materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
 

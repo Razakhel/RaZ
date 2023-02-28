@@ -4,6 +4,7 @@
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <fbxsdk.h>
@@ -11,6 +12,16 @@
 namespace Raz::FbxFormat {
 
 namespace {
+
+inline Texture2DPtr loadTexture(const FilePath& textureFilePath) {
+  if (!FileUtils::isReadable(textureFilePath)) {
+    Logger::warn("[FbxLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
+    return nullptr;
+  }
+
+  // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
+  return Texture2D::create(ImageFormat::load(textureFilePath, true), true);
+}
 
 void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, const FilePath& filePath) {
   for (int matIndex = 0; matIndex < scene->GetMaterialCount(); ++matIndex) {
@@ -57,61 +68,47 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
 
     const auto* diffuseTexture = static_cast<fbxsdk::FbxFileTexture*>(diffuse.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (diffuseTexture) {
-      const std::string diffuseTexturePath = texturePath + diffuseTexture->GetRelativeFileName();
+      Texture2DPtr diffuseMap = loadTexture(texturePath + diffuseTexture->GetRelativeFileName());
 
-      try {
-        material.getProgram().setTexture(Texture2D::create(ImageFormat::load(diffuseTexturePath, true)), MaterialTexture::BaseColor);
-      } catch (...) {
-        Logger::error("[FBX] Failed to load diffuse map '" + diffuseTexturePath + "'.");
-      }
+      if (diffuseMap)
+        material.getProgram().setTexture(std::move(diffuseMap), MaterialTexture::BaseColor);
     }
 
     const auto* emissiveTexture = static_cast<fbxsdk::FbxFileTexture*>(emissive.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (emissiveTexture) {
-      const std::string emissiveTexturePath = texturePath + emissiveTexture->GetRelativeFileName();
+      Texture2DPtr emissiveMap = loadTexture(texturePath + emissiveTexture->GetRelativeFileName());
 
-      try {
-        material.getProgram().setTexture(Texture2D::create(ImageFormat::load(emissiveTexturePath, true)), MaterialTexture::Emissive);
-      } catch (...) {
-        Logger::error("[FBX] Failed to load emissive map '" + emissiveTexturePath + "'.");
-      }
+      if (emissiveMap)
+        material.getProgram().setTexture(std::move(emissiveMap), MaterialTexture::Emissive);
     }
 
     const auto* ambientTexture = static_cast<fbxsdk::FbxFileTexture*>(ambient.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (ambientTexture) {
-      const std::string ambientTexturePath = texturePath + ambientTexture->GetRelativeFileName();
+      Texture2DPtr ambientMap = loadTexture(texturePath + ambientTexture->GetRelativeFileName());
 
-      try {
-        material.getProgram().setTexture(Texture2D::create(ImageFormat::load(ambientTexturePath, true)), MaterialTexture::Ambient);
-      } catch (...) {
-        Logger::error("[FBX] Failed to load ambient map '" + ambientTexturePath + "'.");
-      }
+      if (ambientMap)
+        material.getProgram().setTexture(std::move(ambientMap), MaterialTexture::Ambient);
     }
 
     const auto* specularTexture = static_cast<fbxsdk::FbxFileTexture*>(specular.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (specularTexture) {
-      const std::string specularTexturePath = texturePath + specularTexture->GetRelativeFileName();
+      Texture2DPtr specularMap = loadTexture(texturePath + specularTexture->GetRelativeFileName());
 
-      try {
-        material.getProgram().setTexture(Texture2D::create(ImageFormat::load(specularTexturePath, true)), MaterialTexture::Specular);
-      } catch (...) {
-        Logger::error("[FBX] Failed to load specular map '" + specularTexturePath + "'.");
-      }
+      if (specularMap)
+        material.getProgram().setTexture(std::move(specularMap), MaterialTexture::Specular);
     }
 
     // Normal map not yet handled for standard materials
     /*
-    const auto normMapProp = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sNormalMap);
-    if (normMapProp.IsValid()) {
-      const auto* normalMap = static_cast<fbxsdk::FbxFileTexture*>(normMapProp.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
-      if (normalMap) {
-        const std::string normalMapPath = texturePath + normalMap->GetRelativeFileName();
+    const auto normalMapProp = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sNormalMap);
+    if (normalMapProp.IsValid()) {
+      const auto* normalTexture = static_cast<fbxsdk::FbxFileTexture*>(normalMapProp.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
 
-        try {
-          material.getProgram().setTexture(Texture2D::create(ImageFormat::load(normalMapPath, true)), MaterialTexture::Normal);
-        } catch (...) {
-          Logger::error("[FBX] Failed to load normal map '" + normalMapPath + "'.");
-        }
+      if (normalTexture) {
+        Texture2DPtr normalMap = loadTexture(texturePath + normalTexture->GetRelativeFileName());
+
+        if (normalMap)
+          material.getProgram().setTexture(std::move(normalMap), MaterialTexture::Normal);
       }
     }
     */
