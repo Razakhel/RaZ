@@ -12,6 +12,12 @@ const Raz::FilePath asciiFilePath(RAZ_TESTS_ROOT "assets/misc/Test_file.txt");
 
 } // namespace
 
+TEST_CASE("FileUtils is readable") {
+  CHECK(Raz::FileUtils::isReadable(encodedFilePath));
+  CHECK(Raz::FileUtils::isReadable(asciiFilePath));
+  CHECK_FALSE(Raz::FileUtils::isReadable("this_file_does_not_exist.txt"));
+}
+
 TEST_CASE("FileUtils read file") {
   std::string fileContent = Raz::FileUtils::readFile(encodedFilePath);
   CHECK(fileContent.size() == 22); // This doesn't represent the actual character count due to the encoding

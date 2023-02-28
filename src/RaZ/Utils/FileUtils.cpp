@@ -5,6 +5,10 @@
 
 namespace Raz::FileUtils {
 
+bool isReadable(const FilePath& filePath) {
+  return std::ifstream(filePath).good();
+}
+
 std::string readFile(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios::in | std::ios::binary | std::ios::ate);
 

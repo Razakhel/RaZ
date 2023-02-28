@@ -11,6 +11,11 @@ class FilePath;
 
 namespace FileUtils {
 
+/// Checks if a file is readable (exists and can be opened).
+/// \param filePath Path to the file to be checked.
+/// \return True if the file is readable, false otherwise.
+bool isReadable(const FilePath& filePath);
+
 /// Reads a whole file into a string.
 /// \note The returned string is not trimmed: there can be spaces or empty lines at the beginning or the end if they exist in the file.
 /// \param filePath Path to the file to read.
