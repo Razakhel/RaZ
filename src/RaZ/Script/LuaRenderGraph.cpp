@@ -3,6 +3,7 @@
 #include "RaZ/Render/BoxBlurRenderProcess.hpp"
 #include "RaZ/Render/ChromaticAberrationRenderProcess.hpp"
 #include "RaZ/Render/ConvolutionRenderProcess.hpp"
+#include "RaZ/Render/FilmGrainRenderProcess.hpp"
 #include "RaZ/Render/GaussianBlurRenderProcess.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
@@ -39,6 +40,7 @@ void LuaWrapper::registerRenderGraphTypes() {
     renderGraph["addChromaticAberrationRenderProcess"] = &RenderGraph::addRenderProcess<ChromaticAberrationRenderProcess>;
     renderGraph["addConvolutionRenderProcess"]         = sol::overload(&RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&>,
                                                                        &RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&, std::string>);
+    renderGraph["addFilmGrainRenderProcess"]           = &RenderGraph::addRenderProcess<FilmGrainRenderProcess>;
     renderGraph["addGaussianBlurRenderProcess"]        = &RenderGraph::addRenderProcess<GaussianBlurRenderProcess>;
     renderGraph["addSsrRenderProcess"]                 = &RenderGraph::addRenderProcess<SsrRenderProcess>;
     renderGraph["addVignetteRenderProcess"]            = &RenderGraph::addRenderProcess<VignetteRenderProcess>;

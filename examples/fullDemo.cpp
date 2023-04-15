@@ -55,15 +55,22 @@ int main() {
     Raz::RenderGraph& renderGraph = renderSystem.getRenderGraph();
     Raz::RenderPass& geometryPass = renderSystem.getGeometryPass();
 
+    // For demonstration purposes, a buffer is created here for each process' output. However, this is far from ideal;
+    //   always reuse buffers across passes whenever you can, as it may save a lot of memory
+    // Note though that a buffer cannot be set as both read & write in the same pass or process
     const auto depthBuffer      = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
     const auto colorBuffer      = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
     const auto chromAberrBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
     const auto blurredBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto vignetteBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, depthBuffer->getIndex(), "Depth buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, colorBuffer->getIndex(), "Color buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, chromAberrBuffer->getIndex(), "Chrom. aberr. buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, blurredBuffer->getIndex(), "Blurred buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, vignetteBuffer->getIndex(), "Vignette buffer");
     }
 #endif
 
@@ -88,7 +95,14 @@ int main() {
 
     auto& vignette = renderGraph.addRenderProcess<Raz::VignetteRenderProcess>();
     vignette.setInputBuffer(blurredBuffer);
+    vignette.setOutputBuffer(vignetteBuffer);
     vignette.addParent(boxBlur);
+
+    // Film grain
+
+    auto& filmGrain = renderGraph.addRenderProcess<Raz::FilmGrainRenderProcess>();
+    filmGrain.setInputBuffer(vignetteBuffer);
+    filmGrain.addParent(vignette);
 
     ////////////
     // Camera //
@@ -162,8 +176,7 @@ int main() {
     /////////////
 
 #if !defined(RAZ_NO_OVERLAY)
-    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Full demo",
-                                                                Raz::Vec2f(static_cast<float>(window.getWidth()) / 3.3f, window.getHeight()));
+    Raz::OverlayWindow& overlay = window.getOverlay().addWindow("RaZ - Full demo", Raz::Vec2f(-1.f));
 
     DemoUtils::insertOverlayCameraControlsHelp(overlay);
     overlay.addLabel("Press F11 to toggle fullscreen.");
@@ -195,9 +208,13 @@ int main() {
                       [&vignette] (float value) { vignette.setOpacity(value); },
                       0.f, 1.f, 1.f);
 
+    overlay.addSlider("Film grain strength",
+                      [&filmGrain] (float value) { filmGrain.setStrength(value); },
+                      0.f, 1.f, 0.05f);
+
     overlay.addSeparator();
 
-    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 175, 175);
+    overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 100, 100);
 
 #if !defined(USE_OPENGL_ES) // GPU timing capabilities are not available with OpenGL ES
     overlay.addSeparator();
@@ -207,6 +224,7 @@ int main() {
     Raz::OverlayPlotEntry& chromAberrPlot = plot.addEntry("Chrom. aberr.");
     Raz::OverlayPlotEntry& blurPlot       = plot.addEntry("Blur");
     Raz::OverlayPlotEntry& vignettePlot   = plot.addEntry("Vignette");
+    Raz::OverlayPlotEntry& filmGrainPlot  = plot.addEntry("Film grain");
 #endif // USE_OPENGL_ES
 
     overlay.addSeparator();
@@ -224,6 +242,7 @@ int main() {
       chromAberrPlot.push(chromaticAberration.recoverElapsedTime());
       blurPlot.push(boxBlur.recoverElapsedTime());
       vignettePlot.push(vignette.recoverElapsedTime());
+      filmGrainPlot.push(filmGrain.recoverElapsedTime());
     });
 #else
     app.run();
