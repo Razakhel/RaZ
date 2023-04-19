@@ -57,6 +57,7 @@
 #include "Render/MeshRenderer.hpp"
 #include "Render/MonoPassRenderProcess.hpp"
 #include "Render/Overlay.hpp"
+#include "Render/PixelizationRenderProcess.hpp"
 #include "Render/Renderer.hpp"
 #include "Render/RenderGraph.hpp"
 #include "Render/RenderPass.hpp"

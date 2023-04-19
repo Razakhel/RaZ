@@ -5,6 +5,7 @@
 #include "RaZ/Render/ConvolutionRenderProcess.hpp"
 #include "RaZ/Render/FilmGrainRenderProcess.hpp"
 #include "RaZ/Render/GaussianBlurRenderProcess.hpp"
+#include "RaZ/Render/PixelizationRenderProcess.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Render/SsrRenderProcess.hpp"
@@ -42,6 +43,7 @@ void LuaWrapper::registerRenderGraphTypes() {
                                                                        &RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&, std::string>);
     renderGraph["addFilmGrainRenderProcess"]           = &RenderGraph::addRenderProcess<FilmGrainRenderProcess>;
     renderGraph["addGaussianBlurRenderProcess"]        = &RenderGraph::addRenderProcess<GaussianBlurRenderProcess>;
+    renderGraph["addPixelizationRenderProcess"]        = &RenderGraph::addRenderProcess<PixelizationRenderProcess>;
     renderGraph["addSsrRenderProcess"]                 = &RenderGraph::addRenderProcess<SsrRenderProcess>;
     renderGraph["addVignetteRenderProcess"]            = &RenderGraph::addRenderProcess<VignetteRenderProcess>;
     renderGraph["resizeViewport"]                      = &RenderGraph::resizeViewport;

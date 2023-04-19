@@ -63,6 +63,7 @@ int main() {
     const auto chromAberrBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
     const auto blurredBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
     const auto vignetteBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto filmGrainBuffer  = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
@@ -71,6 +72,7 @@ int main() {
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, chromAberrBuffer->getIndex(), "Chrom. aberr. buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, blurredBuffer->getIndex(), "Blurred buffer");
       Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, vignetteBuffer->getIndex(), "Vignette buffer");
+      Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, filmGrainBuffer->getIndex(), "Film grain buffer");
     }
 #endif
 
@@ -102,7 +104,14 @@ int main() {
 
     auto& filmGrain = renderGraph.addRenderProcess<Raz::FilmGrainRenderProcess>();
     filmGrain.setInputBuffer(vignetteBuffer);
+    filmGrain.setOutputBuffer(filmGrainBuffer);
     filmGrain.addParent(vignette);
+
+    // Pixelization
+
+    auto& pixelization = renderGraph.addRenderProcess<Raz::PixelizationRenderProcess>();
+    pixelization.setInputBuffer(filmGrainBuffer);
+    pixelization.addParent(filmGrain);
 
     ////////////
     // Camera //
@@ -212,6 +221,10 @@ int main() {
                       [&filmGrain] (float value) { filmGrain.setStrength(value); },
                       0.f, 1.f, 0.05f);
 
+    overlay.addSlider("Pixelization strength",
+                      [&pixelization] (float value) { pixelization.setStrength(value); },
+                      0.f, 1.f, 0.f);
+
     overlay.addSeparator();
 
     overlay.addTexture(static_cast<const Raz::Texture2D&>(meshRenderComp.getMaterials().front().getProgram().getTexture(0)), 100, 100);
@@ -220,11 +233,12 @@ int main() {
     overlay.addSeparator();
 
     Raz::OverlayPlot& plot = overlay.addPlot("Profiler", 100, {}, "Time (ms)", 0.f, 100.f, false, 200.f);
-    Raz::OverlayPlotEntry& geomPlot       = plot.addEntry("Geometry");
-    Raz::OverlayPlotEntry& chromAberrPlot = plot.addEntry("Chrom. aberr.");
-    Raz::OverlayPlotEntry& blurPlot       = plot.addEntry("Blur");
-    Raz::OverlayPlotEntry& vignettePlot   = plot.addEntry("Vignette");
-    Raz::OverlayPlotEntry& filmGrainPlot  = plot.addEntry("Film grain");
+    Raz::OverlayPlotEntry& geomPlot         = plot.addEntry("Geometry");
+    Raz::OverlayPlotEntry& chromAberrPlot   = plot.addEntry("Chrom. aberr.");
+    Raz::OverlayPlotEntry& blurPlot         = plot.addEntry("Blur");
+    Raz::OverlayPlotEntry& vignettePlot     = plot.addEntry("Vignette");
+    Raz::OverlayPlotEntry& filmGrainPlot    = plot.addEntry("Film grain");
+    Raz::OverlayPlotEntry& pixelizationPlot = plot.addEntry("Pixelization");
 #endif // USE_OPENGL_ES
 
     overlay.addSeparator();
@@ -243,6 +257,7 @@ int main() {
       blurPlot.push(boxBlur.recoverElapsedTime());
       vignettePlot.push(vignette.recoverElapsedTime());
       filmGrainPlot.push(filmGrain.recoverElapsedTime());
+      pixelizationPlot.push(pixelization.recoverElapsedTime());
     });
 #else
     app.run();
