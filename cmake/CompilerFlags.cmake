@@ -11,6 +11,8 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
     if (CMAKE_CXX_COMPILER MATCHES "/em\\+\\+.*$") # Emscripten
         set(COMPILER_EMSCRIPTEN ON)
+    elseif (MINGW)
+        set(COMPILER_MINGW ON)
     elseif (MSVC AND NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang") # MSVC
         set(COMPILER_MSVC ON)
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang") # Clang
@@ -211,6 +213,16 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
         # Automatically export all classes & functions
         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+    endif ()
+
+    if (COMPILER_MINGW)
+        set(
+            COMPILER_FLAGS
+
+            ${COMPILER_FLAGS}
+            -Wa,-mbig-obj # Allowing big object files
+            -fuse-ld=lld # Using LLVM LLD as the linker
+        )
     endif ()
 
     if (COMPILER_MSVC OR COMPILER_CLANG_CL)

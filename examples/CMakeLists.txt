@@ -100,6 +100,7 @@ endif ()
 if (WIN32)
     if (RAZ_USE_AUDIO)
         file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/examples/OpenAL32.dll")
+        file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/examples/libopenal-1.dll")
     endif ()
 
     if (MSVC AND RAZ_USE_FBX)

@@ -56,7 +56,7 @@ if (WIN32 OR CYGWIN)
             OPENAL_DLL
 
             NAMES
-                soft_oal.dll
+                soft_oal.dll libopenal-1.dll
             HINTS
                 ENV OPENALDIR
                 ENV OPENAL_SDK_PATH

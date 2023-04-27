@@ -76,6 +76,7 @@ if (RAZ_USE_AUDIO)
     if (WIN32)
         # Copying OpenAL's DLL to the tests folder
         file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/tests/OpenAL32.dll")
+        file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/tests/libopenal-1.dll")
     endif ()
 endif ()
 
