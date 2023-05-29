@@ -39,9 +39,10 @@ TEST_CASE("RenderSystem accepted components") {
 
   auto& render = world.addSystem<Raz::RenderSystem>(0, 0);
 
-  Raz::Entity& camera       = world.addEntityWithComponents<Raz::Camera, Raz::Transform>(); // RenderSystem::update() needs a Camera with a Transform component
-  Raz::Entity& meshRenderer = world.addEntityWithComponent<Raz::MeshRenderer>();
-  Raz::Entity& light        = world.addEntityWithComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::X, 1.f);
+  // RenderSystem::update() needs a Camera with a Transform component
+  const Raz::Entity& camera       = world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
+  const Raz::Entity& meshRenderer = world.addEntityWithComponent<Raz::MeshRenderer>();
+  const Raz::Entity& light        = world.addEntityWithComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::X, 1.f);
 
   world.update({});
 
@@ -53,7 +54,7 @@ TEST_CASE("RenderSystem accepted components") {
 TEST_CASE("RenderSystem Cook-Torrance ball") {
   Raz::World world(7);
 
-  Raz::Window& window = TestUtils::getWindow();
+  const Raz::Window& window = TestUtils::getWindow();
 
   auto& renderSystem = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
 

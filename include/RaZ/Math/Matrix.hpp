@@ -4,6 +4,7 @@
 #define RAZ_MATRIX_HPP
 
 #include <array>
+#include <cstdint>
 #include <ostream>
 
 namespace Raz {

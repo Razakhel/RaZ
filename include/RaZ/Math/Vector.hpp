@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <ostream>
 
 namespace Raz {
