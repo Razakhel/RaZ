@@ -38,6 +38,7 @@ private:
   static void registerPhysicsTypes();
   static void registerRenderTypes();
   static void registerRenderGraphTypes();
+  static void registerRenderSystemTypes();
   static void registerShaderTypes();
   static void registerShaderProgramTypes();
   static void registerShapeTypes();
