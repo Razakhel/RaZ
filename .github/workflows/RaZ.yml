@@ -22,7 +22,7 @@ jobs:
           - Release
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # Installing the needed packages:
     #   - GLEW & X11 as graphical dependencies
@@ -108,7 +108,7 @@ jobs:
       run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
         path: |
@@ -133,7 +133,7 @@ jobs:
           - Release
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
       # Installing OpenAL-soft to handle the audio part
     - name: Build setup
@@ -166,7 +166,7 @@ jobs:
       run: cmake --install . --prefix C:/RaZ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
         path: |
@@ -190,7 +190,7 @@ jobs:
           - Release
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # Installing OpenAL-soft to handle the audio part
     - name: Packages installation
@@ -224,7 +224,7 @@ jobs:
       run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
         path: |
@@ -249,7 +249,7 @@ jobs:
           - Release
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Updating packages' repo & installing only the needed packages:
       #   - GL & X11 as needed graphical dependencies
@@ -269,7 +269,7 @@ jobs:
 
       # Caching Emscripten's installation; this avoids installing it on every build
       - name: Emscripten caching
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: emsdk
         with:
           path: ~/emsdk
