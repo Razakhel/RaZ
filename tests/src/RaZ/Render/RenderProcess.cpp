@@ -8,6 +8,7 @@
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/ConvolutionRenderProcess.hpp"
 #include "RaZ/Render/FilmGrainRenderProcess.hpp"
+#include "RaZ/Render/PixelizationRenderProcess.hpp"
 #include "RaZ/Render/RenderProcess.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 #include "RaZ/Render/Window.hpp"
@@ -101,4 +102,31 @@ TEST_CASE("FilmGrainRenderProcess execution") {
 
   filmGrain.setStrength(0.5f);
   CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/film_grain_strong.png", true), 0.062f));
+}
+
+TEST_CASE("PixelizationRenderProcess execution") {
+  Raz::World world(1);
+
+  const Raz::Window& window = TestUtils::getWindow();
+
+  auto& render = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  // RenderSystem::update() needs a Camera with a Transform component
+  world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
+
+  const Raz::Image baseImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true);
+  REQUIRE(baseImg.getWidth() == window.getWidth());
+  REQUIRE(baseImg.getHeight() == window.getHeight());
+
+  Raz::Texture2DPtr input = Raz::Texture2D::create(baseImg);
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+
+  auto& pixelization = render.getRenderGraph().addRenderProcess<Raz::PixelizationRenderProcess>();
+  pixelization.setInputBuffer(std::move(input));
+  pixelization.setOutputBuffer(output);
+
+  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(baseImg));
+
+  pixelization.setStrength(0.75f);
+  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_pixelated.png", true)));
 }
