@@ -18,6 +18,6 @@ float hash(vec2 vec) {
 }
 
 void main() {
-  float grain = (hash(fragTexcoords * vec2(312.24, 1030.057) * uniGlobalTime) * 2.0 - 1.0) * uniStrength;
+  float grain = (hash(fragTexcoords * vec2(312.24, 1030.057) * (uniGlobalTime + 1.0)) * 2.0 - 1.0) * uniStrength;
   fragColor   = vec4(texture(uniBuffer, fragTexcoords).rgb + vec3(grain), 1.0);
 }
