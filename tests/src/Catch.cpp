@@ -33,7 +33,7 @@ bool IsNearlyEqualToImage::match(const Raz::Image& base) const {
   if (!m_diffImgPath.isEmpty() && m_diffValueCount != 0)
     Raz::ImageFormat::save(m_diffImgPath, diffImg, true);
 
-  return (m_avgDiff < (base.getDataType() == Raz::ImageDataType::FLOAT ? 0.04f : 10.f));
+  return (m_avgDiff < (base.getDataType() == Raz::ImageDataType::FLOAT ? m_ratioTol : 255.f * m_ratioTol));
 }
 
 std::string IsNearlyEqualToImage::describe() const {

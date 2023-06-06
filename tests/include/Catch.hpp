@@ -215,9 +215,10 @@ class IsNearlyEqualToImage final : public Catch::MatcherBase<Raz::Image> {
 public:
   /// Creates an instance of a near-equality image check custom matcher.
   /// \param comparison Image to be compared with.
+  /// \param ratioTol Tolerance ratio to compare the images with, between [0; 1].
   /// \param diffImgPath Path to the image containing the differences to be output. If empty, no image will be saved.
-  explicit IsNearlyEqualToImage(const Raz::Image& comparison, Raz::FilePath diffImgPath = {})
-    : m_comparison{ comparison }, m_diffImgPath{ std::move(diffImgPath) } {}
+  explicit IsNearlyEqualToImage(const Raz::Image& comparison, float ratioTol = 0.04f, Raz::FilePath diffImgPath = {})
+    : m_comparison{ comparison }, m_ratioTol{ ratioTol }, m_diffImgPath{ std::move(diffImgPath) } {}
 
   /// Checks if the given image has nearly equal values compared to the comparison one.
   /// \param base Base image to compare to.
@@ -237,6 +238,7 @@ private:
   mutable float m_minDiff = std::numeric_limits<float>::max();
   mutable float m_maxDiff {};
   mutable float m_avgDiff {};
+  float m_ratioTol {};
   Raz::FilePath m_diffImgPath {};
 };
 
