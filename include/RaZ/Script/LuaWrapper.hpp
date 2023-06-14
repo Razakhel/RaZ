@@ -12,6 +12,8 @@ namespace Raz {
 class FilePath;
 
 class LuaWrapper {
+  friend class LuaEnvironment;
+
 public:
   static void registerTypes();
   /// Executes a script from a string.
