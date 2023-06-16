@@ -24,6 +24,8 @@ namespace Raz {
 class FilePath;
 
 class LuaEnvironment {
+  friend class LuaScript;
+
 public:
   LuaEnvironment();
   LuaEnvironment(const LuaEnvironment&) = delete;

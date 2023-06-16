@@ -72,6 +72,7 @@
 #include "Render/VignetteRenderProcess.hpp"
 #include "Render/Window.hpp"
 #include "Script/LuaEnvironment.hpp"
+#include "Script/LuaScript.hpp"
 #include "Script/LuaWrapper.hpp"
 #include "Utils/CompilerUtils.hpp"
 #include "Utils/EnumUtils.hpp"
