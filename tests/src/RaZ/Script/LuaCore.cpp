@@ -52,6 +52,26 @@ TEST_CASE("LuaCore Entity") {
     entity:addComponent(RigidBody.new(0, 0))
     entity:addComponent(Sound.new())
     entity:addComponent(Transform.new())
+
+    assert(entity:hasCamera())
+    assert(entity:hasCollider())
+    assert(entity:hasLight())
+    assert(entity:hasListener())
+    assert(entity:hasMesh())
+    assert(entity:hasMeshRenderer())
+    assert(entity:hasRigidBody())
+    assert(entity:hasSound())
+    assert(entity:hasTransform())
+
+    assert(entity:getCamera() ~= nil)
+    assert(entity:getCollider() ~= nil)
+    assert(entity:getLight() ~= nil)
+    assert(entity:getListener() ~= nil)
+    assert(entity:getMesh() ~= nil)
+    assert(entity:getMeshRenderer() ~= nil)
+    assert(entity:getRigidBody() ~= nil)
+    assert(entity:getSound() ~= nil)
+    assert(entity:getTransform() ~= nil)
   )"));
 }
 

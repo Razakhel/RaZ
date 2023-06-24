@@ -45,6 +45,24 @@ void LuaWrapper::registerEntityTypes() {
                                                     RigidBody,
                                                     Sound,
                                                     Transform>();
+    entity["hasCamera"]            = &Entity::hasComponent<Camera>;
+    entity["hasCollider"]          = &Entity::hasComponent<Collider>;
+    entity["hasLight"]             = &Entity::hasComponent<Light>;
+    entity["hasListener"]          = &Entity::hasComponent<Listener>;
+    entity["hasMesh"]              = &Entity::hasComponent<Mesh>;
+    entity["hasMeshRenderer"]      = &Entity::hasComponent<MeshRenderer>;
+    entity["hasRigidBody"]         = &Entity::hasComponent<RigidBody>;
+    entity["hasSound"]             = &Entity::hasComponent<Sound>;
+    entity["hasTransform"]         = &Entity::hasComponent<Transform>;
+    entity["getCamera"]            = [] (Entity& e) { return &e.getComponent<Camera>(); };
+    entity["getCollider"]          = [] (Entity& e) { return &e.getComponent<Collider>(); };
+    entity["getLight"]             = [] (Entity& e) { return &e.getComponent<Light>(); };
+    entity["getListener"]          = [] (Entity& e) { return &e.getComponent<Listener>(); };
+    entity["getMesh"]              = [] (Entity& e) { return &e.getComponent<Mesh>(); };
+    entity["getMeshRenderer"]      = [] (Entity& e) { return &e.getComponent<MeshRenderer>(); };
+    entity["getRigidBody"]         = [] (Entity& e) { return &e.getComponent<RigidBody>(); };
+    entity["getSound"]             = [] (Entity& e) { return &e.getComponent<Sound>(); };
+    entity["getTransform"]         = [] (Entity& e) { return &e.getComponent<Transform>(); };
   }
 }
 
