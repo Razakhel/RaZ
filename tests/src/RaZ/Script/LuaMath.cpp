@@ -202,6 +202,8 @@ TEST_CASE("LuaMath Quaternion") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local quat = Quaternionf.new(1, 0, 0, 0)
     quat       = Quaternionf.identity()
+    quat       = Quaternionf.new(Degreesf.new(180), Axis.Y)
+    quat       = Quaternionf.new(Degreesf.new(180), 0, 1, 0)
     quat       = Quaternionf.new(Radiansf.new(Constant.Pi), Axis.Y)
     quat       = Quaternionf.new(Radiansf.new(Constant.Pi), 0, 1, 0)
 

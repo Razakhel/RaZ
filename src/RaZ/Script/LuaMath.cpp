@@ -101,6 +101,8 @@ void LuaWrapper::registerMathTypes() {
   {
     sol::usertype<Quaternionf> quaternionf = state.new_usertype<Quaternionf>("Quaternionf",
                                                                              sol::constructors<Quaternionf(float, float, float, float),
+                                                                                               Quaternionf(Degreesf, const Vec3f&),
+                                                                                               Quaternionf(Degreesf, float, float, float),
                                                                                                Quaternionf(Radiansf, const Vec3f&),
                                                                                                Quaternionf(Radiansf, float, float, float)>());
     quaternionf["w"]                  = &Quaternionf::w;
