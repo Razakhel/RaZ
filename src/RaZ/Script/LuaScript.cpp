@@ -2,9 +2,7 @@
 #include "RaZ/Script/LuaScript.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 
-#define SOL_ALL_SAFETIES_ON 1
 #define SOL_SAFE_GETTER 0 // Allowing implicit conversion to bool
-#define SOL_PRINT_ERRORS 0
 #include "sol/sol.hpp"
 
 namespace Raz {
@@ -24,8 +22,9 @@ void LuaScript::loadCodeFromFile(const FilePath& filePath) {
 }
 
 bool LuaScript::update(const FrameTimeInfo& timeInfo) const {
-  const sol::function updateFunc = m_environment.get("update");
-  return updateFunc(timeInfo);
+  const sol::unsafe_function updateFunc = m_environment.get("update");
+  const sol::unsafe_function_result updateRes = updateFunc(timeInfo);
+  return (updateRes.get_type() == sol::type::none || updateRes);
 }
 
 } // namespace Raz

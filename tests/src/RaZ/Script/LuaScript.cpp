@@ -30,7 +30,7 @@ TEST_CASE("LuaScript code") {
 
 TEST_CASE("LuaScript execution") {
   Raz::LuaScript script("function update() end");
-  CHECK_FALSE(script.update({})); // update() does not return anything, which is the same as returning false
+  CHECK(script.update({})); // update() does not return anything, which is the same as returning true
 
   script.loadCode("function update() return nil end");
   CHECK_FALSE(script.update({})); // Returning nil is the same as returning false
