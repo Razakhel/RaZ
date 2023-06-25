@@ -9,28 +9,32 @@
 namespace Raz {
 
 void LuaWrapper::registerTypes() {
-  registerAnimationTypes();
-  registerAudioTypes();
-  registerCoreTypes();
-  registerDataTypes();
-  registerEntityTypes();
-  registerFileFormatTypes();
-  registerMathTypes();
-  registerMatrixTypes();
-  registerMeshTypes();
-  registerMeshRendererTypes();
-  registerOverlayTypes();
-  registerPhysicsTypes();
-  registerRenderTypes();
-  registerRenderGraphTypes();
-  registerRenderSystemTypes();
-  registerShaderTypes();
-  registerShaderProgramTypes();
-  registerShapeTypes();
-  registerTextureTypes();
-  registerUtilsTypes();
-  registerVectorTypes();
-  registerWindowTypes();
+  [[maybe_unused]] static const bool _ = [] () {
+    registerAnimationTypes();
+    registerAudioTypes();
+    registerCoreTypes();
+    registerDataTypes();
+    registerEntityTypes();
+    registerFileFormatTypes();
+    registerMathTypes();
+    registerMatrixTypes();
+    registerMeshTypes();
+    registerMeshRendererTypes();
+    registerOverlayTypes();
+    registerPhysicsTypes();
+    registerRenderTypes();
+    registerRenderGraphTypes();
+    registerRenderSystemTypes();
+    registerShaderTypes();
+    registerShaderProgramTypes();
+    registerShapeTypes();
+    registerTextureTypes();
+    registerUtilsTypes();
+    registerVectorTypes();
+    registerWindowTypes();
+
+    return true;
+  }();
 }
 
 bool LuaWrapper::execute(const std::string& code) {
