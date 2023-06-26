@@ -28,6 +28,27 @@ TEST_CASE("LuaScript code") {
   CHECK(script.getEnvironment().exists("update"));
 }
 
+TEST_CASE("LuaScript register") {
+  Raz::LuaScript script("function update () return entity1 == entity2 end");
+  const Raz::Entity entity(0);
+
+  CHECK_FALSE(script.getEnvironment().exists("entity1"));
+  CHECK_FALSE(script.getEnvironment().exists("entity2"));
+
+  script.registerEntity(entity, "entity1");
+  CHECK(script.getEnvironment().exists("entity1"));
+  script.registerEntity(entity, "entity2");
+  CHECK(script.getEnvironment().exists("entity2"));
+
+  CHECK(script.update({})); // Both entities are the same
+
+  script.loadCode("function update () end");
+
+  // Setting code unregisters all existing symbols
+  CHECK_FALSE(script.getEnvironment().exists("entity1"));
+  CHECK_FALSE(script.getEnvironment().exists("entity2"));
+}
+
 TEST_CASE("LuaScript execution") {
   Raz::LuaScript script("function update() end");
   CHECK(script.update({})); // update() does not return anything, which is the same as returning true

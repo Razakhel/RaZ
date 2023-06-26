@@ -1,3 +1,4 @@
+#include "RaZ/Entity.hpp"
 #include "RaZ/Script/LuaEnvironment.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/FilePath.hpp"
@@ -50,7 +51,11 @@ void LuaEnvironment::clear() {
 
 LuaEnvironment::~LuaEnvironment() = default;
 
-sol::object LuaEnvironment::get(const char* name) const {
+void LuaEnvironment::registerEntity(const Entity& entity, const std::string& name) {
+  m_environment->operator[](name) = &entity;
+}
+
+sol::reference LuaEnvironment::get(const char* name) const {
   return m_environment->operator[](name);
 }
 

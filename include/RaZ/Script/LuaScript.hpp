@@ -29,6 +29,10 @@ public:
   /// \note This clears the script's environment, effectively unregistering all existing symbols.
   /// \param filePath Path to the script to be loaded.
   void loadCodeFromFile(const FilePath& filePath);
+  /// Registers an entity to a variable, making it accessible from the script.
+  /// \param entity Entity to be registered.
+  /// \param name Name of the variable to bind the entity to.
+  void registerEntity(const Entity& entity, const std::string& name) { m_environment.registerEntity(entity, name); }
   /// Executes the script's update function.
   /// \warning If the update function does not return anything or returns nil, this call will always return false.
   /// \warning If the update function does return anything other than a boolean, this call will always return true.

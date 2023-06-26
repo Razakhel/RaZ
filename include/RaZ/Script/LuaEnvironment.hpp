@@ -14,13 +14,11 @@ using reference = basic_reference<false>;
 template <typename> struct basic_environment;
 using environment = basic_environment<reference>;
 
-template <typename> class basic_object;
-using object = basic_object<reference>;
-
 } // namespace sol
 
 namespace Raz {
 
+class Entity;
 class FilePath;
 
 class LuaEnvironment {
@@ -53,7 +51,14 @@ public:
   ~LuaEnvironment();
 
 private:
-  sol::object get(const char* name) const;
+  /// Registers an entity to a variable, making it accessible from the environment.
+  /// \param entity Entity to be registered.
+  /// \param name Name of the variable to bind the entity to.
+  void registerEntity(const Entity& entity, const std::string& name);
+  /// Gets an abstract object to a symbol.
+  /// \param name Name of the symbol to get the object from.
+  /// \return Reference object tied to the symbol.
+  sol::reference get(const char* name) const;
 
   std::unique_ptr<sol::environment> m_environment {};
 };
