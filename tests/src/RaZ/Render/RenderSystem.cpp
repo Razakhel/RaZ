@@ -37,7 +37,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath =
 TEST_CASE("RenderSystem accepted components") {
   Raz::World world(3);
 
-  auto& render = world.addSystem<Raz::RenderSystem>(0, 0);
+  auto& renderSystem = world.addSystem<Raz::RenderSystem>(0, 0);
 
   // RenderSystem::update() needs a Camera with a Transform component
   const Raz::Entity& camera       = world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
@@ -46,9 +46,9 @@ TEST_CASE("RenderSystem accepted components") {
 
   world.update({});
 
-  CHECK(render.containsEntity(camera));
-  CHECK(render.containsEntity(meshRenderer));
-  CHECK(render.containsEntity(light));
+  CHECK(renderSystem.containsEntity(camera));
+  CHECK(renderSystem.containsEntity(meshRenderer));
+  CHECK(renderSystem.containsEntity(light));
 }
 
 TEST_CASE("RenderSystem Cook-Torrance ball") {

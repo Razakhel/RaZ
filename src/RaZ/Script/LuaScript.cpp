@@ -1,11 +1,17 @@
 #include "RaZ/Application.hpp"
 #include "RaZ/Script/LuaScript.hpp"
+#include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 
 #define SOL_SAFE_GETTER 0 // Allowing implicit conversion to bool
 #include "sol/sol.hpp"
 
 namespace Raz {
+
+LuaScript::LuaScript(const std::string& code) {
+  Raz::LuaWrapper::registerTypes();
+  loadCode(code);
+}
 
 void LuaScript::loadCode(const std::string& code) {
   m_environment.clear();

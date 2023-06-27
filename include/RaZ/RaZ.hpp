@@ -74,6 +74,7 @@
 #include "Script/LuaEnvironment.hpp"
 #include "Script/LuaScript.hpp"
 #include "Script/LuaWrapper.hpp"
+#include "Script/ScriptSystem.hpp"
 #include "Utils/CompilerUtils.hpp"
 #include "Utils/EnumUtils.hpp"
 #include "Utils/FilePath.hpp"

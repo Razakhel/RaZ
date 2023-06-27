@@ -11,11 +11,11 @@
 namespace Raz {
 
 class FilePath;
-class FrameTimeInfo;
+struct FrameTimeInfo;
 
 class LuaScript final : public Component {
 public:
-  explicit LuaScript(const std::string& code) { loadCode(code); }
+  explicit LuaScript(const std::string& code);
 
   const LuaEnvironment& getEnvironment() const { return m_environment; }
 
