@@ -14,6 +14,8 @@ class FilePath;
 struct FrameTimeInfo;
 
 class LuaScript final : public Component {
+  friend class ScriptSystem;
+
 public:
   explicit LuaScript(const std::string& code);
 
@@ -42,6 +44,11 @@ public:
   bool update(const FrameTimeInfo& timeInfo) const;
 
 private:
+  /// Executes the script's setup function.
+  /// \retval true If the setup function has been been executed successfully, or if it does not exist.
+  /// \retval false If the setup function exists and is invalid.
+  bool setup() const;
+
   LuaEnvironment m_environment {};
 };
 

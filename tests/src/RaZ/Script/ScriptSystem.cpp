@@ -18,6 +18,32 @@ TEST_CASE("ScriptSystem accepted components") {
   CHECK(scriptSystem.containsEntity(luaScript));
 }
 
+TEST_CASE("ScriptSystem setup") {
+  Raz::World world;
+
+  world.addSystem<Raz::ScriptSystem>();
+
+  Raz::Entity& entity = world.addEntity();
+  const Raz::Transform& entityTrans = entity.addComponent<Raz::Transform>(Raz::Vec3f(1.f));
+
+  Raz::LuaScript& luaScript = world.addEntity().addComponent<Raz::LuaScript>(R"(
+    function setup()
+      entity:getTransform():translate(Vec3f.new(1))
+    end
+
+    function update() end
+  )");
+
+  luaScript.registerEntity(entity, "entity");
+  REQUIRE(luaScript.getEnvironment().exists("entity"));
+
+  CHECK(entityTrans.getPosition() == Raz::Vec3f(1.f));
+  world.update({});
+  CHECK(entityTrans.getPosition() == Raz::Vec3f(2.f)); // The setup function is executed only once, when the system links the entity containing the script
+  world.update({});
+  CHECK(entityTrans.getPosition() == Raz::Vec3f(2.f)); // Updating the world again does not execute the setup
+}
+
 TEST_CASE("ScriptSystem update") {
   Raz::World world;
 

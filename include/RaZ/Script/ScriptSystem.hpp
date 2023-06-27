@@ -13,6 +13,11 @@ public:
   ScriptSystem();
 
   bool update(const FrameTimeInfo& timeInfo) override;
+
+private:
+  /// Links the entity to the system and calls the script's setup function.
+  /// \param entity Entity to be linked.
+  void linkEntity(const EntityPtr& entity) override;
 };
 
 } // namespace Raz

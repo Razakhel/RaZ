@@ -33,4 +33,17 @@ bool LuaScript::update(const FrameTimeInfo& timeInfo) const {
   return (updateRes.get_type() == sol::type::none || updateRes);
 }
 
+bool LuaScript::setup() const {
+  if (!m_environment.exists("setup"))
+    return true;
+
+  const sol::reference setupRef = m_environment.get("setup");
+
+  if (setupRef.get_type() != sol::type::function)
+    return true;
+
+  const sol::unsafe_function setupFunc = setupRef;
+  return setupFunc().valid();
+}
+
 } // namespace Raz

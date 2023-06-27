@@ -17,4 +17,11 @@ bool ScriptSystem::update(const FrameTimeInfo& timeInfo) {
   return res;
 }
 
+void ScriptSystem::linkEntity(const EntityPtr& entity) {
+  System::linkEntity(entity);
+
+  if (!entity->getComponent<LuaScript>().setup())
+    throw std::invalid_argument("Error: The Lua script failed to be setup");
+}
+
 } // namespace Raz
