@@ -159,6 +159,27 @@ int main() {
     DemoUtils::setupLightControls(light, renderSystem, window);
     DemoUtils::setupAddLight(cameraTrans, world, window);
 
+    ///////////////
+    // Scripting //
+    ///////////////
+
+    world.addSystem<Raz::ScriptSystem>();
+
+    auto& script = world.addEntity().addComponent<Raz::LuaScript>(R"(
+      local rotAngle = Degreesf.new(20)
+
+      function setup()
+        mesh:getTransform().rotation = Quaternionf.new(-rotAngle, Axis.Y)
+      end
+
+      function update(timeInfo)
+        local angle = rotAngle * math.sin(timeInfo.globalTime) * timeInfo.deltaTime
+        mesh:getTransform():rotate(Quaternionf.new(angle, Axis.Y))
+      end
+    )");
+
+    script.registerEntity(mesh, "mesh");
+
     ///////////
     // Audio //
     ///////////
