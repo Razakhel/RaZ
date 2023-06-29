@@ -165,20 +165,19 @@ int main() {
 
     world.addSystem<Raz::ScriptSystem>();
 
-    auto& script = world.addEntity().addComponent<Raz::LuaScript>(R"(
+    auto& luaScript = mesh.addComponent<Raz::LuaScript>(R"(
       local rotAngle = Degreesf.new(20)
 
       function setup()
-        mesh:getTransform().rotation = Quaternionf.new(-rotAngle, Axis.Y)
+        -- 'this' always represents the entity containing the script
+        this:getTransform().rotation = Quaternionf.new(-rotAngle, Axis.Y)
       end
 
       function update(timeInfo)
         local angle = rotAngle * math.sin(timeInfo.globalTime) * timeInfo.deltaTime
-        mesh:getTransform():rotate(Quaternionf.new(angle, Axis.Y))
+        this:getTransform():rotate(Quaternionf.new(angle, Axis.Y))
       end
     )");
-
-    script.registerEntity(mesh, "mesh");
 
     ///////////
     // Audio //

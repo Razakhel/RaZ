@@ -15,7 +15,7 @@ public:
   bool update(const FrameTimeInfo& timeInfo) override;
 
 private:
-  /// Links the entity to the system and calls the script's setup function.
+  /// Links the entity to the system, registering the entity to the script and calling the script's setup function.
   /// \param entity Entity to be linked.
   void linkEntity(const EntityPtr& entity) override;
 };

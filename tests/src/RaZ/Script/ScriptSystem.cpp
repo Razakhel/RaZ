@@ -18,6 +18,30 @@ TEST_CASE("ScriptSystem accepted components") {
   CHECK(scriptSystem.containsEntity(luaScript));
 }
 
+TEST_CASE("ScriptSystem registration") {
+  Raz::World world;
+
+  world.addSystem<Raz::ScriptSystem>();
+
+  Raz::Entity& entity = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(1.f));
+
+  Raz::LuaScript& luaScript = entity.addComponent<Raz::LuaScript>(R"(
+    function update()
+      -- 'this' is automatically defined to the entity holding the script; the same entity is also registered as 'entity'
+      return this == entity and this:getTransform().position == Vec3f.new(1)
+    end
+  )");
+
+  CHECK_FALSE(luaScript.getEnvironment().exists("this")); // 'this' represents the entity containing the script, but is set later on entity linking
+
+  luaScript.registerEntity(entity, "entity");
+  CHECK(luaScript.getEnvironment().exists("entity"));
+
+  world.update({});
+  CHECK(luaScript.getEnvironment().exists("this")); // 'this' has now been set
+  CHECK(luaScript.update({}));
+}
+
 TEST_CASE("ScriptSystem setup") {
   Raz::World world;
 
@@ -26,16 +50,13 @@ TEST_CASE("ScriptSystem setup") {
   Raz::Entity& entity = world.addEntity();
   const Raz::Transform& entityTrans = entity.addComponent<Raz::Transform>(Raz::Vec3f(1.f));
 
-  Raz::LuaScript& luaScript = world.addEntity().addComponent<Raz::LuaScript>(R"(
+  entity.addComponent<Raz::LuaScript>(R"(
     function setup()
-      entity:getTransform():translate(Vec3f.new(1))
+      this:getTransform():translate(Vec3f.new(1))
     end
 
     function update() end
   )");
-
-  luaScript.registerEntity(entity, "entity");
-  REQUIRE(luaScript.getEnvironment().exists("entity"));
 
   CHECK(entityTrans.getPosition() == Raz::Vec3f(1.f));
   world.update({});
@@ -52,15 +73,12 @@ TEST_CASE("ScriptSystem update") {
   Raz::Entity& entity = world.addEntity();
   const Raz::Transform& entityTrans = entity.addComponent<Raz::Transform>(Raz::Vec3f(1.f));
 
-  Raz::LuaScript& luaScript = world.addEntity().addComponent<Raz::LuaScript>(R"(
+  entity.addComponent<Raz::LuaScript>(R"(
     function update(timeInfo)
-      entity:getTransform():translate(Vec3f.new(timeInfo.deltaTime))
+      this:getTransform():translate(Vec3f.new(timeInfo.deltaTime))
       return true
     end
   )");
-
-  luaScript.registerEntity(entity, "entity");
-  REQUIRE(luaScript.getEnvironment().exists("entity"));
 
   CHECK(entityTrans.getPosition() == Raz::Vec3f(1.f));
   world.update({ 1.f });

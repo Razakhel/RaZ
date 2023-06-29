@@ -14,6 +14,8 @@ LuaScript::LuaScript(const std::string& code) {
 }
 
 void LuaScript::loadCode(const std::string& code) {
+  const sol::object owningEntity = m_environment.get("this");
+
   m_environment.clear();
 
   if (!m_environment.execute(code))
@@ -21,6 +23,11 @@ void LuaScript::loadCode(const std::string& code) {
 
   if (m_environment.get("update").get_type() != sol::type::function)
     throw std::invalid_argument("Error: A Lua script must have an update() function");
+
+  if (owningEntity.is<Entity>()) {
+    m_environment.registerEntity(owningEntity.as<Entity>(), "this");
+    setup();
+  }
 }
 
 void LuaScript::loadCodeFromFile(const FilePath& filePath) {
@@ -33,17 +40,19 @@ bool LuaScript::update(const FrameTimeInfo& timeInfo) const {
   return (updateRes.get_type() == sol::type::none || updateRes);
 }
 
-bool LuaScript::setup() const {
+void LuaScript::setup() const {
   if (!m_environment.exists("setup"))
-    return true;
+    return;
 
   const sol::reference setupRef = m_environment.get("setup");
 
   if (setupRef.get_type() != sol::type::function)
-    return true;
+    return;
 
   const sol::unsafe_function setupFunc = setupRef;
-  return setupFunc().valid();
+
+  if (!setupFunc().valid())
+    throw std::runtime_error("Error: The Lua script failed to be setup");
 }
 
 } // namespace Raz

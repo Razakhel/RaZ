@@ -72,9 +72,6 @@ public:
   Entity& operator=(const Entity&) = delete;
   Entity& operator=(Entity&&) noexcept = delete;
 
-protected:
-  Entity() = default;
-
 private:
   std::size_t m_id {};
   bool m_enabled {};

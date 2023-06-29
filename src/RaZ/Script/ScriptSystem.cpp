@@ -20,8 +20,9 @@ bool ScriptSystem::update(const FrameTimeInfo& timeInfo) {
 void ScriptSystem::linkEntity(const EntityPtr& entity) {
   System::linkEntity(entity);
 
-  if (!entity->getComponent<LuaScript>().setup())
-    throw std::invalid_argument("Error: The Lua script failed to be setup");
+  auto& luaScript = entity->getComponent<LuaScript>();
+  luaScript.registerEntity(*entity, "this");
+  luaScript.setup();
 }
 
 } // namespace Raz

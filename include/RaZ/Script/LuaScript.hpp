@@ -44,10 +44,9 @@ public:
   bool update(const FrameTimeInfo& timeInfo) const;
 
 private:
-  /// Executes the script's setup function.
-  /// \retval true If the setup function has been been executed successfully, or if it does not exist.
-  /// \retval false If the setup function exists and is invalid.
-  bool setup() const;
+  /// Executes the script's setup function. Does nothing if none exists.
+  /// \throws std::runtime_error If the setup function has not been executed correctly.
+  void setup() const;
 
   LuaEnvironment m_environment {};
 };
