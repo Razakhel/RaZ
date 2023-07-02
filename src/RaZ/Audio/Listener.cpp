@@ -42,6 +42,22 @@ Listener::Listener(const Vec3f& position, const Mat3f& viewMatrix) {
   setOrientation(viewMatrix);
 }
 
+void Listener::setGain(float gain) const noexcept {
+  assert("Error: The listener's gain must be positive." && gain >= 0.f);
+
+  alListenerf(AL_GAIN, gain);
+  checkError("Failed to set the listener's gain");
+}
+
+float Listener::recoverGain() const noexcept {
+  float gain {};
+
+  alGetListenerf(AL_GAIN, &gain);
+  checkError("Failed to recover the listener's gain");
+
+  return gain;
+}
+
 void Listener::setPosition(const Vec3f& position) const noexcept {
   alListener3f(AL_POSITION, position.x(), position.y(), position.z());
   checkError("Failed to set the listener's position");

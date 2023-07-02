@@ -29,6 +29,9 @@ TEST_CASE("LuaAudio Listener") {
     listener       = Listener.new(Vec3f.new(1), Axis.Z, Axis.Y)
     listener       = Listener.new(Vec3f.new(1), Mat3f.identity())
 
+    listener.gain = 0.25
+    assert(listener.gain == 0.25)
+
     listener.position = Vec3f.new(1, 2, 3)
     assert(listener.position == Vec3f.new(1, 2, 3))
 

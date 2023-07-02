@@ -5,7 +5,7 @@ using namespace std::literals;
 namespace {
 
 constexpr unsigned int baseWindowWidth = 375;
-constexpr Raz::Vec2f overlayAudioSize(baseWindowWidth, 80.f);
+constexpr Raz::Vec2f overlayAudioSize(baseWindowWidth, 100.f);
 constexpr Raz::Vec2f overlaySoundSize(baseWindowWidth, 220.f);
 constexpr Raz::Vec2f overlayMicSize(baseWindowWidth, 330.f);
 constexpr auto baseWindowHeight = static_cast<unsigned int>(overlayAudioSize.y() + overlaySoundSize.y() + overlayMicSize.y());
@@ -43,13 +43,17 @@ int main() {
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>(); // The RenderSystem needs a Camera
+    // The RenderSystem requires an entity with Camera & Transform components
+    world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
     ///////////
     // Audio //
     ///////////
 
     auto& audio = world.addSystem<Raz::AudioSystem>();
+
+    // The Listener entity requires a Transform component
+    auto& listener = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Listener>();
 
     Raz::Entity& sound = world.addEntity();
     auto& soundTrans   = sound.addComponent<Raz::Transform>();
@@ -96,16 +100,19 @@ int main() {
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
     overlayAudio.addDropdown("Output device", Raz::AudioSystem::recoverDevices(), [&] (const std::string& name, std::size_t) {
-      const float gain  = soundComp.recoverGain();
-      const float pitch = soundComp.recoverPitch();
+      const float listenerGain = listener.recoverGain();
+      const float soundGain    = soundComp.recoverGain();
+      const float soundPitch   = soundComp.recoverPitch();
 
       audio.openDevice(name);
+
+      listener.setGain(listenerGain);
 
       soundComp.init();
       soundComp.load();
       soundComp.setRepeat(isRepeating);
-      soundComp.setGain(gain);
-      soundComp.setPitch(pitch);
+      soundComp.setGain(soundGain);
+      soundComp.setPitch(soundPitch);
 
       reverb.init();
       reverb.load(reverbParams);
@@ -136,6 +143,10 @@ int main() {
 #else
     overlayAudio.addLabel("Output & input devices cannot be changed with Emscripten");
 #endif
+
+    overlayAudio.addSlider("Listener gain", [&listener] (float val) noexcept {
+      listener.setGain(val);
+    }, 0.f, 1.f, 1.f);
 
     ///////////
     // Sound //

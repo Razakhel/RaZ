@@ -48,6 +48,7 @@ void LuaWrapper::registerAudioTypes() {
                                                                                       Listener(const Vec3f&, const Vec3f&, const Vec3f&),
                                                                                       Listener(const Vec3f&, const Mat3f&)>(),
                                                                     sol::base_classes, sol::bases<Component>());
+    listener["gain"]                      = sol::property(&Listener::recoverGain, &Listener::setGain);
     listener["position"]                  = sol::property(&Listener::recoverPosition, &Listener::setPosition);
     listener["velocity"]                  = sol::property(&Listener::recoverVelocity, &Listener::setVelocity);
     listener["setOrientation"]            = sol::overload(PickOverload<const Vec3f&>(&Listener::setOrientation),

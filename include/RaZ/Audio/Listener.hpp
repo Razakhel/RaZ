@@ -24,6 +24,12 @@ public:
   Listener(const Listener&) = delete;
   Listener(Listener&&) noexcept = default;
 
+  /// Sets the listener's gain (master volume).
+  /// \param gain Listener's gain; must be positive. 1 is the default.
+  void setGain(float gain) const noexcept;
+  /// Recovers the listener's gain (master volume).
+  /// \return Listener's gain.
+  float recoverGain() const noexcept;
   void setPosition(const Vec3f& position) const noexcept;
   Vec3f recoverPosition() const noexcept;
   void setVelocity(const Vec3f& velocity) const noexcept;
