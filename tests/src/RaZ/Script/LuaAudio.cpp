@@ -42,9 +42,9 @@ TEST_CASE("LuaAudio Listener") {
     listener:setOrientation(Mat3f.identity())
 
     local forward, up = listener:recoverOrientation()
-    assert(forward == Axis.Z)
+    assert(forward == -Axis.Z)
     assert(up == Axis.Y)
-    assert(listener:recoverForwardOrientation() == Axis.Z)
+    assert(listener:recoverForwardOrientation() == -Axis.Z)
     assert(listener:recoverUpOrientation() == Axis.Y)
   )"));
 }

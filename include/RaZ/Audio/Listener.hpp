@@ -41,9 +41,10 @@ public:
   /// \param forwardDirection Forward direction to be set.
   /// \param upDirection Up direction to be set.
   void setOrientation(const Vec3f& forwardDirection, const Vec3f& upDirection) const noexcept;
-  /// Sets the listener's forward & up orientation from the matrix's 3rd & 2nd row respectively.
-  /// \param transformMatrix Transform matrix from which to extract the orientation.
-  void setOrientation(const Mat3f& transformMatrix) const noexcept;
+  /// Sets the listener's forward & up orientation, respectively taken from the given rotation matrix's 3rd & 2nd columns.
+  /// \note The forward direction is reversed, as the engine uses a right-handed coordinate system with its Z pointing to the viewer.
+  /// \param rotationMatrix Rotation matrix from which to extract the orientation.
+  void setOrientation(const Mat3f& rotationMatrix) const noexcept;
   std::pair<Vec3f, Vec3f> recoverOrientation() const noexcept;
   Vec3f recoverForwardOrientation() const noexcept;
   Vec3f recoverUpOrientation() const noexcept;

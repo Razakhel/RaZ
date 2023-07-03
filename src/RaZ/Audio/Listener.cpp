@@ -100,9 +100,8 @@ void Listener::setOrientation(const Vec3f& forwardDirection, const Vec3f& upDire
   checkError("Failed to set the listener's orientation");
 }
 
-void Listener::setOrientation(const Mat3f& transformMatrix) const noexcept {
-  // The transform matrix contains the forward & up directions in its 3rd & 2nd row, respectively
-  setOrientation(transformMatrix.recoverRow(2).normalize(), transformMatrix.recoverRow(1).normalize());
+void Listener::setOrientation(const Mat3f& rotationMatrix) const noexcept {
+  setOrientation(-rotationMatrix.recoverColumn(2).normalize(), rotationMatrix.recoverColumn(1).normalize());
 }
 
 std::pair<Vec3f, Vec3f> Listener::recoverOrientation() const noexcept {
