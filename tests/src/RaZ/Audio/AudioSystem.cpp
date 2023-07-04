@@ -5,15 +5,18 @@
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Audio/Sound.hpp"
+#include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Transform.hpp"
+
+using namespace Raz::Literals;
 
 TEST_CASE("AudioSystem accepted components") {
   Raz::World world(2);
 
   auto& audio = world.addSystem<Raz::AudioSystem>();
 
-  Raz::Entity& sound    = world.addEntityWithComponent<Raz::Sound>();
-  Raz::Entity& listener = world.addEntityWithComponents<Raz::Listener, Raz::Transform>(); // AudioSystem::update() needs a Listener with a Transform component
+  const Raz::Entity& sound    = world.addEntityWithComponent<Raz::Sound>();
+  const Raz::Entity& listener = world.addEntityWithComponents<Raz::Listener, Raz::Transform>(); // The Listener entity requires a Transform component
 
   world.update({});
 
@@ -23,12 +26,12 @@ TEST_CASE("AudioSystem accepted components") {
 
 TEST_CASE("AudioSystem initialization") {
   {
-    Raz::AudioSystem audio;
+    const Raz::AudioSystem audio;
     CHECK_FALSE(audio.recoverCurrentDevice().empty()); // If it is actually empty, audio features won't be available on this platform
   }
 
   {
-    Raz::AudioSystem audio("non-existing device");
+    const Raz::AudioSystem audio("non-existing device");
     CHECK(audio.recoverCurrentDevice().empty());
   }
 }
@@ -36,8 +39,46 @@ TEST_CASE("AudioSystem initialization") {
 TEST_CASE("AudioSystem devices recovery") {
   const std::vector<std::string> devices = Raz::AudioSystem::recoverDevices();
 
-  Raz::AudioSystem audio;
+  const Raz::AudioSystem audio;
   const std::string currentDevice = audio.recoverCurrentDevice();
 
   CHECK(std::find(devices.cbegin(), devices.cend(), currentDevice) != devices.cend());
+}
+
+TEST_CASE("AudioSystem attributes update") {
+  Raz::World world;
+
+  world.addSystem<Raz::AudioSystem>();
+
+  Raz::Entity& listener = world.addEntity();
+  auto& listenerComp    = listener.addComponent<Raz::Listener>();
+  auto& listenerTrans   = listener.addComponent<Raz::Transform>();
+
+  Raz::Entity& sound1 = world.addEntity();
+  auto& sound1Comp    = sound1.addComponent<Raz::Sound>();
+  auto& sound1Trans   = sound1.addComponent<Raz::Transform>();
+
+  Raz::Entity& sound2 = world.addEntity();
+  auto& sound2Comp    = sound2.addComponent<Raz::Sound>();
+  auto& sound2Trans   = sound2.addComponent<Raz::Transform>();
+
+  world.update({});
+
+  CHECK(listenerComp.recoverPosition() == listenerTrans.getPosition());
+  CHECK(listenerComp.recoverForwardOrientation() == -Raz::Axis::Z);
+  CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::Y);
+  CHECK(sound1Comp.recoverPosition() == sound1Trans.getPosition());
+  CHECK(sound2Comp.recoverPosition() == sound2Trans.getPosition());
+
+  listenerTrans.translate(Raz::Vec3f(1.f));
+  listenerTrans.rotate(-90_deg, -90_deg);
+  sound1Trans.translate(Raz::Vec3f(1.f));
+  sound2Trans.translate(Raz::Vec3f(-1.f));
+  world.update({});
+
+  CHECK(listenerComp.recoverPosition() == listenerTrans.getPosition());
+  CHECK(listenerComp.recoverForwardOrientation() == -Raz::Axis::Y);
+  CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::X);
+  CHECK(sound1Comp.recoverPosition() == sound1Trans.getPosition());
+  CHECK(sound2Comp.recoverPosition() == sound2Trans.getPosition());
 }
