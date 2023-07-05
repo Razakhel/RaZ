@@ -11,6 +11,7 @@
 #include "RaZ/Render/PixelizationRenderProcess.hpp"
 #include "RaZ/Render/RenderProcess.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
+#include "RaZ/Render/VignetteRenderProcess.hpp"
 #include "RaZ/Render/Window.hpp"
 
 namespace {
@@ -50,7 +51,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::Texture2DPtr& output, const
 } // namespace
 
 TEST_CASE("ConvolutionRenderProcess execution") {
-  Raz::World world(1);
+  Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();
 
@@ -82,7 +83,7 @@ TEST_CASE("ConvolutionRenderProcess execution") {
 }
 
 TEST_CASE("FilmGrainRenderProcess execution") {
-  Raz::World world(1);
+  Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();
 
@@ -105,7 +106,7 @@ TEST_CASE("FilmGrainRenderProcess execution") {
 }
 
 TEST_CASE("PixelizationRenderProcess execution") {
-  Raz::World world(1);
+  Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();
 
@@ -129,4 +130,29 @@ TEST_CASE("PixelizationRenderProcess execution") {
 
   pixelization.setStrength(0.75f);
   CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_pixelated.png", true)));
+}
+
+TEST_CASE("VignetteRenderProcess execution") {
+  Raz::World world;
+
+  const Raz::Window& window = TestUtils::getWindow();
+
+  auto& render = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  // RenderSystem::update() needs a Camera with a Transform component
+  world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
+
+  Raz::Texture2DPtr input = Raz::Texture2D::create(Raz::ColorPreset::White, window.getWidth(), window.getHeight());
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+
+  auto& vignette = render.getRenderGraph().addRenderProcess<Raz::VignetteRenderProcess>();
+  vignette.setInputBuffer(std::move(input));
+  vignette.setOutputBuffer(output);
+
+  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/vignette_weak_black.png", true)));
+
+  vignette.setStrength(1.f);
+  vignette.setOpacity(0.5f);
+  vignette.setColor(Raz::ColorPreset::Red);
+  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/vignette_strong_red.png", true)));
 }
