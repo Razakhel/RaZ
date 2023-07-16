@@ -20,7 +20,7 @@ public:
   Listener() = default;
   explicit Listener(const Vec3f& position) { setPosition(position); }
   Listener(const Vec3f& position, const Vec3f& forwardDirection, const Vec3f& upDirection);
-  Listener(const Vec3f& position, const Mat3f& viewMatrix);
+  Listener(const Vec3f& position, const Mat3f& rotationMatrix);
   Listener(const Listener&) = delete;
   Listener(Listener&&) noexcept = default;
 

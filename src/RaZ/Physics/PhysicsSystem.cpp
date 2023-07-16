@@ -12,9 +12,9 @@ PhysicsSystem::PhysicsSystem() {
 }
 
 bool PhysicsSystem::update(const FrameTimeInfo& timeInfo) {
-  for (int i = 0; i < timeInfo.substepCount; ++i) {
-    const float relativeFriction = std::pow(m_friction, timeInfo.substepTime);
+  const float relativeFriction = std::pow(m_friction, timeInfo.substepTime);
 
+  for (int i = 0; i < timeInfo.substepCount; ++i) {
     for (Entity* entity : m_entities) {
       if (!entity->isEnabled() || !entity->hasComponent<RigidBody>())
         continue;

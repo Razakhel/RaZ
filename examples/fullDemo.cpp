@@ -194,7 +194,7 @@ int main() {
     // Adding a Listener component, so that the sound's volume decays over the camera's distance to the source
     // Passing its initial position and/or orientation is optional, since they will be sent every time the camera moves,
     //  but recommended so that the sound instantly takes that information into account
-    camera.addComponent<Raz::Listener>(cameraTrans.getPosition(), Raz::Mat3f(cameraTrans.computeTransformMatrix()));
+    camera.addComponent<Raz::Listener>(cameraTrans.getPosition(), Raz::Mat3f(cameraTrans.getRotation().computeMatrix()));
 
     DemoUtils::setupSoundControls(meshSound, window);
     DemoUtils::setupAddSound(cameraTrans, RAZ_ROOT "assets/sounds/wave_seagulls.wav", world, window);

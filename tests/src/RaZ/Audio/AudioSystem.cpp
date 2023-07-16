@@ -7,6 +7,7 @@
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Transform.hpp"
+#include "RaZ/Physics/RigidBody.hpp"
 
 using namespace Raz::Literals;
 
@@ -50,35 +51,47 @@ TEST_CASE("AudioSystem attributes update") {
 
   world.addSystem<Raz::AudioSystem>();
 
-  Raz::Entity& listener = world.addEntity();
-  auto& listenerComp    = listener.addComponent<Raz::Listener>();
-  auto& listenerTrans   = listener.addComponent<Raz::Transform>();
+  Raz::Entity& listener   = world.addEntity();
+  auto& listenerComp      = listener.addComponent<Raz::Listener>();
+  auto& listenerTrans     = listener.addComponent<Raz::Transform>();
+  auto& listenerRigidBody = listener.addComponent<Raz::RigidBody>(0.f, 0.f);
 
-  Raz::Entity& sound1 = world.addEntity();
-  auto& sound1Comp    = sound1.addComponent<Raz::Sound>();
-  auto& sound1Trans   = sound1.addComponent<Raz::Transform>();
+  Raz::Entity& sound1   = world.addEntity();
+  auto& sound1Comp      = sound1.addComponent<Raz::Sound>();
+  auto& sound1Trans     = sound1.addComponent<Raz::Transform>();
+  auto& sound1RigidBody = sound1.addComponent<Raz::RigidBody>(0.f, 0.f);
 
-  Raz::Entity& sound2 = world.addEntity();
-  auto& sound2Comp    = sound2.addComponent<Raz::Sound>();
-  auto& sound2Trans   = sound2.addComponent<Raz::Transform>();
+  Raz::Entity& sound2   = world.addEntity();
+  auto& sound2Comp      = sound2.addComponent<Raz::Sound>();
+  auto& sound2Trans     = sound2.addComponent<Raz::Transform>();
+  auto& sound2RigidBody = sound2.addComponent<Raz::RigidBody>(0.f, 0.f);
 
   world.update({});
 
   CHECK(listenerComp.recoverPosition() == listenerTrans.getPosition());
   CHECK(listenerComp.recoverForwardOrientation() == -Raz::Axis::Z);
   CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::Y);
+  CHECK(listenerComp.recoverVelocity() == listenerRigidBody.getVelocity());
   CHECK(sound1Comp.recoverPosition() == sound1Trans.getPosition());
+  CHECK(sound1Comp.recoverVelocity() == sound1RigidBody.getVelocity());
   CHECK(sound2Comp.recoverPosition() == sound2Trans.getPosition());
+  CHECK(sound2Comp.recoverVelocity() == sound2RigidBody.getVelocity());
 
   listenerTrans.translate(Raz::Vec3f(1.f));
   listenerTrans.rotate(-90_deg, -90_deg);
+  listenerRigidBody.setVelocity(Raz::Vec3f(1.f));
   sound1Trans.translate(Raz::Vec3f(1.f));
+  sound1RigidBody.setVelocity(Raz::Vec3f(1.f));
   sound2Trans.translate(Raz::Vec3f(-1.f));
+  sound2RigidBody.setVelocity(Raz::Vec3f(-1.f));
   world.update({});
 
   CHECK(listenerComp.recoverPosition() == listenerTrans.getPosition());
   CHECK(listenerComp.recoverForwardOrientation() == -Raz::Axis::Y);
   CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::X);
+  CHECK(listenerComp.recoverVelocity() == listenerRigidBody.getVelocity());
   CHECK(sound1Comp.recoverPosition() == sound1Trans.getPosition());
+  CHECK(sound1Comp.recoverVelocity() == sound1RigidBody.getVelocity());
   CHECK(sound2Comp.recoverPosition() == sound2Trans.getPosition());
+  CHECK(sound2Comp.recoverVelocity() == sound2RigidBody.getVelocity());
 }

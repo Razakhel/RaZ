@@ -37,9 +37,9 @@ Listener::Listener(const Vec3f& position, const Vec3f& forwardDir, const Vec3f& 
   setOrientation(forwardDir, upDir);
 }
 
-Listener::Listener(const Vec3f& position, const Mat3f& viewMatrix) {
+Listener::Listener(const Vec3f& position, const Mat3f& rotationMatrix) {
   setPosition(position);
-  setOrientation(viewMatrix);
+  setOrientation(rotationMatrix);
 }
 
 void Listener::setGain(float gain) const noexcept {

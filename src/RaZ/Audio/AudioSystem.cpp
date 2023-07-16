@@ -3,6 +3,7 @@
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
+#include "RaZ/Physics/RigidBody.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include <AL/al.h>
@@ -113,6 +114,10 @@ bool AudioSystem::update(const FrameTimeInfo&) {
           //soundTrans.setUpdated(false);
         //}
       }
+
+      // TODO: velocity should be set only if it has been updated since last time
+      if (entity->hasComponent<RigidBody>())
+        sound.setVelocity(entity->getComponent<RigidBody>().getVelocity());
     }
 
     if (entity->hasComponent<Listener>()) {
@@ -128,10 +133,13 @@ bool AudioSystem::update(const FrameTimeInfo&) {
 
       //if (listenerTrans.hasUpdated()) {
         listener.setPosition(listenerTrans.getPosition());
-        listener.setOrientation(Mat3f(listenerTrans.computeTransformMatrix()));
+        listener.setOrientation(Mat3f(listenerTrans.getRotation().computeMatrix()));
 
         //listenerTrans.setUpdated(false);
       //}
+
+      if (entity->hasComponent<RigidBody>())
+        listener.setVelocity(entity->getComponent<RigidBody>().getVelocity());
     }
   }
 
