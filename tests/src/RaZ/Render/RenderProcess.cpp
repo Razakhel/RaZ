@@ -6,6 +6,7 @@
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
+#include "RaZ/Render/ChromaticAberrationRenderProcess.hpp"
 #include "RaZ/Render/ConvolutionRenderProcess.hpp"
 #include "RaZ/Render/FilmGrainRenderProcess.hpp"
 #include "RaZ/Render/PixelizationRenderProcess.hpp"
@@ -49,6 +50,48 @@ Raz::Image renderFrame(Raz::World& world, const Raz::Texture2DPtr& output, const
 }
 
 } // namespace
+
+TEST_CASE("ChromaticAberrationRenderProcess execution") {
+  Raz::World world;
+
+  const Raz::Window& window = TestUtils::getWindow();
+
+  auto& render = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  // RenderSystem::update() needs a Camera with a Transform component
+  world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
+
+  const Raz::Image baseImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true);
+  REQUIRE(baseImg.getWidth() == window.getWidth());
+  REQUIRE(baseImg.getHeight() == window.getHeight());
+
+  Raz::Texture2DPtr input = Raz::Texture2D::create(baseImg);
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+
+  auto& chromaticAberration = render.getRenderGraph().addRenderProcess<Raz::ChromaticAberrationRenderProcess>();
+  chromaticAberration.setInputBuffer(std::move(input));
+  chromaticAberration.setOutputBuffer(output);
+
+  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(baseImg));
+
+  // 1
+  // 0
+  // 1
+  Raz::Image img(1, 3, Raz::ImageColorspace::GRAY);
+  static_cast<uint8_t*>(img.getDataPtr())[0] = 255;
+  static_cast<uint8_t*>(img.getDataPtr())[1] = 0;
+  static_cast<uint8_t*>(img.getDataPtr())[2] = 255;
+
+  auto texture = Raz::Texture2D::create(img, false);
+  texture->setFilter(Raz::TextureFilter::NEAREST);
+  texture->setWrapping(Raz::TextureWrapping::CLAMP);
+
+  chromaticAberration.setStrength(5.f);
+  chromaticAberration.setDirection(Raz::Vec2f(1.f, 1.f));
+  chromaticAberration.setMaskTexture(std::move(texture));
+  CHECK_THAT(renderFrame(world, output),
+             IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_chromatic_aberration.png", true)));
+}
 
 TEST_CASE("ConvolutionRenderProcess execution") {
   Raz::World world;
