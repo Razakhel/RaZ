@@ -1,6 +1,5 @@
 #include "RaZ/Data/Image.hpp"
 
-#include <cassert>
 #include <stdexcept>
 
 namespace Raz {
@@ -59,48 +58,68 @@ Image::Image(unsigned int width, unsigned int height, ImageColorspace colorspace
   m_width  = width;
   m_height = height;
 
-  const std::size_t imageDataSize = m_width * m_height * m_channelCount;
+  const std::size_t imgDataSize = m_width * m_height * m_channelCount;
 
   if (m_dataType == ImageDataType::FLOAT)
-    m_data = ImageDataF::create(imageDataSize);
+    m_data = ImageDataF::create(imgDataSize);
   else
-    m_data = ImageDataB::create(imageDataSize);
+    m_data = ImageDataB::create(imgDataSize);
 }
 
-Image::Image(const Image& image) : m_width{ image.m_width },
-                                   m_height{ image.m_height },
-                                   m_colorspace{ image.m_colorspace },
-                                   m_dataType{ image.m_dataType },
-                                   m_channelCount{ image.m_channelCount } {
-  if (image.m_data == nullptr)
+Image::Image(const Image& img) : m_width{ img.m_width },
+                                 m_height{ img.m_height },
+                                 m_colorspace{ img.m_colorspace },
+                                 m_dataType{ img.m_dataType },
+                                 m_channelCount{ img.m_channelCount } {
+  if (img.m_data == nullptr)
     return;
 
-  switch (image.m_dataType) {
+  switch (img.m_dataType) {
     case ImageDataType::BYTE:
-      m_data = ImageDataB::create(*static_cast<ImageDataB*>(image.m_data.get()));
+      m_data = ImageDataB::create(*static_cast<ImageDataB*>(img.m_data.get()));
       break;
 
     case ImageDataType::FLOAT:
-      m_data = ImageDataF::create(*static_cast<ImageDataF*>(image.m_data.get()));
+      m_data = ImageDataF::create(*static_cast<ImageDataF*>(img.m_data.get()));
       break;
   }
 }
 
-Image& Image::operator=(const Image& image) {
-  m_width        = image.m_width;
-  m_height       = image.m_height;
-  m_colorspace   = image.m_colorspace;
-  m_dataType     = image.m_dataType;
-  m_channelCount = image.m_channelCount;
+uint8_t Image::recoverByteValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const {
+  assert("Error: Getting a byte value requires the image to be of a byte type." && m_dataType == ImageDataType::BYTE);
+  return recoverValue<uint8_t>(widthIndex, heightIndex, channelIndex);
+}
 
-  if (image.m_data) {
-    switch (image.m_dataType) {
+float Image::recoverFloatValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const {
+  assert("Error: Getting a float value requires the image to be of a float type." && m_dataType == ImageDataType::FLOAT);
+  return recoverValue<float>(widthIndex, heightIndex, channelIndex);
+}
+
+void Image::setByteValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex, uint8_t val) {
+  assert("Error: Setting a byte value requires the image to be of a byte type." && m_dataType == ImageDataType::BYTE);
+  setValue(widthIndex, heightIndex, channelIndex, val);
+}
+
+void Image::setFloatValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex, float val) {
+  assert("Error: Setting a float value requires the image to be of a float type." && m_dataType == ImageDataType::FLOAT);
+  setValue(widthIndex, heightIndex, channelIndex, val);
+}
+
+Image& Image::operator=(const Image& img) {
+  m_width        = img.m_width;
+  m_height       = img.m_height;
+  m_colorspace   = img.m_colorspace;
+  m_dataType     = img.m_dataType;
+  m_channelCount = img.m_channelCount;
+
+  if (img.m_data) {
+    switch (img.m_dataType) {
       case ImageDataType::BYTE:
-        m_data = ImageDataB::create(*static_cast<ImageDataB*>(image.m_data.get()));
+        m_data = ImageDataB::create(*static_cast<ImageDataB*>(img.m_data.get()));
         break;
 
       case ImageDataType::FLOAT:
-        m_data = ImageDataF::create(*static_cast<ImageDataF*>(image.m_data.get()));
+        m_data = ImageDataF::create(*static_cast<ImageDataF*>(img.m_data.get()));
         break;
     }
   } else {

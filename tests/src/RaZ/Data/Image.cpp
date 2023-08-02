@@ -1,7 +1,6 @@
 #include "Catch.hpp"
 
 #include "RaZ/Data/Image.hpp"
-#include "RaZ/Utils/FilePath.hpp"
 
 #include <numeric>
 
@@ -41,10 +40,57 @@ TEST_CASE("Image dimensions creation") {
   CHECK_FALSE(imgSmall.isEmpty());
 }
 
+TEST_CASE("Image value access") {
+  {
+    Raz::Image imgByte(1, 1, Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
+    REQUIRE(imgByte.getChannelCount() == 3);
+    CHECK(imgByte.recoverByteValue(0, 0, 0) == 0);
+    CHECK(imgByte.recoverByteValue(0, 0, 1) == 0);
+    CHECK(imgByte.recoverByteValue(0, 0, 2) == 0);
+
+    imgByte.setByteValue(0, 0, 0, 1);
+    imgByte.setByteValue(0, 0, 1, 2);
+    imgByte.setByteValue(0, 0, 2, 3);
+    CHECK(imgByte.recoverByteValue(0, 0, 0) == 1);
+    CHECK(imgByte.recoverByteValue(0, 0, 1) == 2);
+    CHECK(imgByte.recoverByteValue(0, 0, 2) == 3);
+  }
+
+  {
+    Raz::Image imgFloat(2, 2, Raz::ImageColorspace::GRAY_ALPHA, Raz::ImageDataType::FLOAT);
+    REQUIRE(imgFloat.getChannelCount() == 2);
+    CHECK(imgFloat.recoverFloatValue(0, 0, 0) == 0.f);
+    CHECK(imgFloat.recoverFloatValue(0, 0, 1) == 0.f);
+    CHECK(imgFloat.recoverFloatValue(1, 0, 0) == 0.f);
+    CHECK(imgFloat.recoverFloatValue(1, 0, 1) == 0.f);
+    CHECK(imgFloat.recoverFloatValue(0, 1, 0) == 0.f);
+    CHECK(imgFloat.recoverFloatValue(0, 1, 1) == 0.f);
+    CHECK(imgFloat.recoverFloatValue(1, 1, 0) == 0.f);
+    CHECK(imgFloat.recoverFloatValue(1, 1, 1) == 0.f);
+
+    imgFloat.setFloatValue(0, 0, 0, 1.f);
+    imgFloat.setFloatValue(0, 0, 1, 2.f);
+    imgFloat.setFloatValue(1, 0, 0, 3.f);
+    imgFloat.setFloatValue(1, 0, 1, 4.f);
+    imgFloat.setFloatValue(0, 1, 0, 5.f);
+    imgFloat.setFloatValue(0, 1, 1, 6.f);
+    imgFloat.setFloatValue(1, 1, 0, 7.f);
+    imgFloat.setFloatValue(1, 1, 1, 8.f);
+    CHECK(imgFloat.recoverFloatValue(0, 0, 0) == 1.f);
+    CHECK(imgFloat.recoverFloatValue(0, 0, 1) == 2.f);
+    CHECK(imgFloat.recoverFloatValue(1, 0, 0) == 3.f);
+    CHECK(imgFloat.recoverFloatValue(1, 0, 1) == 4.f);
+    CHECK(imgFloat.recoverFloatValue(0, 1, 0) == 5.f);
+    CHECK(imgFloat.recoverFloatValue(0, 1, 1) == 6.f);
+    CHECK(imgFloat.recoverFloatValue(1, 1, 0) == 7.f);
+    CHECK(imgFloat.recoverFloatValue(1, 1, 1) == 8.f);
+  }
+}
+
 TEST_CASE("Image equality") {
-  Raz::Image imgB1(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
-  Raz::Image imgB2(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
-  Raz::Image imgB3(2, 2, Raz::ImageColorspace::GRAY_ALPHA, Raz::ImageDataType::BYTE);
+  const Raz::Image imgB1(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
+  const Raz::Image imgB2(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
+  const Raz::Image imgB3(2, 2, Raz::ImageColorspace::GRAY_ALPHA, Raz::ImageDataType::BYTE);
 
   CHECK(imgB1 == imgB1);
   CHECK_THAT(imgB1, IsNearlyEqualToImage(imgB1)); // The images are already strictly equal to each other
@@ -53,9 +99,9 @@ TEST_CASE("Image equality") {
   CHECK(imgB2 != imgB3); // Their colorspace and channel count are different
   CHECK_THROWS(IsNearlyEqualToImage(imgB2).match(imgB3)); // The matcher throws on different colorspaces/channel counts
 
-  Raz::Image imgF1(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
-  Raz::Image imgF2(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
-  Raz::Image imgF3(2, 2, Raz::ImageColorspace::GRAY_ALPHA, Raz::ImageDataType::FLOAT);
+  const Raz::Image imgF1(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
+  const Raz::Image imgF2(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT);
+  const Raz::Image imgF3(2, 2, Raz::ImageColorspace::GRAY_ALPHA, Raz::ImageDataType::FLOAT);
 
   CHECK(imgF1 == imgF1);
   CHECK_THAT(imgF1, IsNearlyEqualToImage(imgF1));
@@ -71,7 +117,7 @@ TEST_CASE("Image equality") {
     Raz::Image imgB2Copy = imgB2;
     CHECK(imgB2Copy == imgB2);
 
-    static_cast<uint8_t*>(imgB2Copy.getDataPtr())[0] = 1;
+    imgB2Copy.setByteValue(0, 0, 0, 1);
 
     CHECK(imgB2Copy != imgB2); // Same dimensions, same data type, but different content
     CHECK_THAT(imgB2Copy, IsNearlyEqualToImage(imgB2)); // The near-equality check has a tolerance high enough to deem them nearly equal
@@ -81,7 +127,7 @@ TEST_CASE("Image equality") {
     Raz::Image imgF2Copy = imgF2;
     CHECK(imgF2Copy == imgF2);
 
-    static_cast<float*>(imgF2Copy.getDataPtr())[0] = 0.01f;
+    imgF2Copy.setFloatValue(0, 0, 0, 0.01f);
 
     CHECK(imgF2Copy != imgF2); // Same as above, their content are not strictly equal
     CHECK_THAT(imgF2Copy, IsNearlyEqualToImage(imgF2)); // But they are nearly equal to each other
@@ -92,7 +138,7 @@ TEST_CASE("Image copy/move") {
   Raz::Image imgBase(3, 3, Raz::ImageColorspace::RGB);
 
   auto* imgData = static_cast<uint8_t*>(imgBase.getDataPtr());
-  std::iota(imgData, imgData + 9, static_cast<uint8_t>(0));
+  std::iota(imgData, imgData + imgBase.getWidth() * imgBase.getHeight() * imgBase.getChannelCount(), static_cast<uint8_t>(0));
 
   Raz::Image imgCopy(imgBase); // Copy constructor
   CHECK_FALSE(imgCopy.isEmpty());

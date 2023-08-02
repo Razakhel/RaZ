@@ -84,6 +84,13 @@ TEST_CASE("LuaData Image") {
     assert(img:getDataType() == ImageDataType.FLOAT)
     assert(img:getChannelCount() == 4)
     assert(not img:isEmpty())
+    img:setFloatValue(0, 0, 0, 3.0)
+    assert(img:recoverFloatValue(0, 0, 0) == 3.0)
+
+    img = Image.new(1, 1, ImageColorspace.SRGB, ImageDataType.BYTE)
+    assert(img:getChannelCount() == 3)
+    img:setByteValue(0, 0, 0, 127)
+    assert(img:recoverByteValue(0, 0, 0) == 127)
 
     local pngPath = FilePath.new(RAZ_TESTS_ROOT .. "assets/images/dëfàùltTêst.png")
     local tgaPath = FilePath.new(RAZ_TESTS_ROOT .. "assets/images/dëfàùltTêst.tga")

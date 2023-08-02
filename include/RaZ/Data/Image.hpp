@@ -3,6 +3,7 @@
 #ifndef RAZ_IMAGE_HPP
 #define RAZ_IMAGE_HPP
 
+#include <cassert>
 #include <memory>
 #include <vector>
 
@@ -126,7 +127,7 @@ public:
   Image() = default;
   explicit Image(ImageColorspace colorspace, ImageDataType dataType = ImageDataType::BYTE);
   Image(unsigned int width, unsigned int height, ImageColorspace colorspace, ImageDataType dataType = ImageDataType::BYTE);
-  Image(const Image& image);
+  Image(const Image& img);
   Image(Image&&) noexcept = default;
 
   unsigned int getWidth() const noexcept { return m_width; }
@@ -140,8 +141,36 @@ public:
   /// Checks if the image doesn't contain data.
   /// \return True if the image has no data, false otherwise.
   bool isEmpty() const { return (!m_data || m_data->isEmpty()); }
+  /// Gets a byte value from the image.
+  /// \note The image must have a byte data type for this function to execute properly.
+  /// \param widthIndex Width index of the value to be fetched.
+  /// \param heightIndex Height index of the value to be fetched.
+  /// \param channelIndex Channel index of the value to be fetched.
+  /// \return Value at the given location.
+  uint8_t recoverByteValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const;
+  /// Gets a float value from the image.
+  /// \note The image must have a float data type for this function to execute properly.
+  /// \param widthIndex Width index of the value to be fetched.
+  /// \param heightIndex Height index of the value to be fetched.
+  /// \param channelIndex Channel index of the value to be fetched.
+  /// \return Value at the given location.
+  float recoverFloatValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const;
+  /// Sets a byte value in the image.
+  /// \note The image must have a byte data type for this function to execute properly.
+  /// \param widthIndex Width index of the value to be set.
+  /// \param heightIndex Height index of the value to be set.
+  /// \param channelIndex Channel index of the value to be set.
+  /// \param val Value to be set.
+  void setByteValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex, uint8_t val);
+  /// Sets a float value in the image.
+  /// \note The image must have a float data type for this function to execute properly.
+  /// \param widthIndex Width index of the value to be set.
+  /// \param heightIndex Height index of the value to be set.
+  /// \param channelIndex Channel index of the value to be set.
+  /// \param val Value to be set.
+  void setFloatValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex, float val);
 
-  Image& operator=(const Image& image);
+  Image& operator=(const Image& img);
   Image& operator=(Image&&) noexcept = default;
   /// Checks if the current image is equal to another given one.
   /// Their inner data must be of the same type.
@@ -155,6 +184,26 @@ public:
   bool operator!=(const Image& img) const { return !(*this == img); }
 
 private:
+  constexpr std::size_t computeIndex(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const noexcept {
+    assert("Error: The given width index is invalid." && widthIndex < m_width);
+    assert("Error: The given height index is invalid." && heightIndex < m_height);
+    assert("Error: The given channel index is invalid." && channelIndex < m_channelCount);
+
+    return heightIndex * m_width * m_channelCount + widthIndex * m_channelCount + channelIndex;
+  }
+
+  template <typename T>
+  T recoverValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const {
+    const std::size_t valIndex = computeIndex(widthIndex, heightIndex, channelIndex);
+    return static_cast<const T*>(m_data->getDataPtr())[valIndex];
+  }
+
+  template <typename T>
+  void setValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex, T val) {
+    const std::size_t valIndex = computeIndex(widthIndex, heightIndex, channelIndex);
+    static_cast<T*>(m_data->getDataPtr())[valIndex] = val;
+  }
+
   unsigned int m_width {};
   unsigned int m_height {};
   ImageColorspace m_colorspace {};

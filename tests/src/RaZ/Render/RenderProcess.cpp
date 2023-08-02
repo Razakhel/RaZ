@@ -78,9 +78,9 @@ TEST_CASE("ChromaticAberrationRenderProcess execution") {
   // 0
   // 1
   Raz::Image img(1, 3, Raz::ImageColorspace::GRAY);
-  static_cast<uint8_t*>(img.getDataPtr())[0] = 255;
-  static_cast<uint8_t*>(img.getDataPtr())[1] = 0;
-  static_cast<uint8_t*>(img.getDataPtr())[2] = 255;
+  img.setByteValue(0, 0, 0, 255);
+  img.setByteValue(0, 1, 0, 0);
+  img.setByteValue(0, 2, 0, 255);
 
   auto texture = Raz::Texture2D::create(img, false);
   texture->setFilter(Raz::TextureFilter::NEAREST);

@@ -95,12 +95,16 @@ void LuaWrapper::registerDataTypes() {
                                                                              Image(ImageColorspace, ImageDataType),
                                                                              Image(unsigned int, unsigned int, ImageColorspace),
                                                                              Image(unsigned int, unsigned int, ImageColorspace, ImageDataType)>());
-    image["getWidth"]        = &Image::getWidth;
-    image["getHeight"]       = &Image::getHeight;
-    image["getColorspace"]   = &Image::getColorspace;
-    image["getDataType"]     = &Image::getDataType;
-    image["getChannelCount"] = &Image::getChannelCount;
-    image["isEmpty"]         = &Image::isEmpty;
+    image["getWidth"]          = &Image::getWidth;
+    image["getHeight"]         = &Image::getHeight;
+    image["getColorspace"]     = &Image::getColorspace;
+    image["getDataType"]       = &Image::getDataType;
+    image["getChannelCount"]   = &Image::getChannelCount;
+    image["isEmpty"]           = &Image::isEmpty;
+    image["recoverByteValue"]  = &Image::recoverByteValue;
+    image["recoverFloatValue"] = &Image::recoverFloatValue;
+    image["setByteValue"]      = &Image::setByteValue;
+    image["setFloatValue"]     = &Image::setFloatValue;
 
     state.new_enum<ImageColorspace>("ImageColorspace", {
       { "GRAY",       ImageColorspace::GRAY },

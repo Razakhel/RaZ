@@ -147,8 +147,6 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     const Raz::Image diffuseImg = diffuseMap.recoverImage();
     REQUIRE_FALSE(diffuseImg.isEmpty());
 
-    const auto* diffuseData = static_cast<const uint8_t*>(diffuseImg.getDataPtr());
-
     // RGBR image with alpha, flipped vertically: verifying that values are BRRG with 50% opacity
 
     // ---------
@@ -157,25 +155,25 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     // | B | R |
     // ---------
 
-    CHECK(diffuseData[0] == 0);
-    CHECK(diffuseData[1] == 0);
-    CHECK(diffuseData[2] == 255);
-    CHECK(diffuseData[3] == 127);
+    CHECK(diffuseImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(diffuseImg.recoverByteValue(0, 0, 1) == 0);
+    CHECK(diffuseImg.recoverByteValue(0, 0, 2) == 255);
+    CHECK(diffuseImg.recoverByteValue(0, 0, 3) == 127);
 
-    CHECK(diffuseData[4] == 255);
-    CHECK(diffuseData[5] == 0);
-    CHECK(diffuseData[6] == 0);
-    CHECK(diffuseData[7] == 127);
+    CHECK(diffuseImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(diffuseImg.recoverByteValue(1, 0, 1) == 0);
+    CHECK(diffuseImg.recoverByteValue(1, 0, 2) == 0);
+    CHECK(diffuseImg.recoverByteValue(1, 0, 3) == 127);
 
-    CHECK(diffuseData[8]  == 255);
-    CHECK(diffuseData[9]  == 0);
-    CHECK(diffuseData[10] == 0);
-    CHECK(diffuseData[11] == 127);
+    CHECK(diffuseImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(diffuseImg.recoverByteValue(0, 1, 1) == 0);
+    CHECK(diffuseImg.recoverByteValue(0, 1, 2) == 0);
+    CHECK(diffuseImg.recoverByteValue(0, 1, 3) == 127);
 
-    CHECK(diffuseData[12] == 0);
-    CHECK(diffuseData[13] == 255);
-    CHECK(diffuseData[14] == 0);
-    CHECK(diffuseData[15] == 127);
+    CHECK(diffuseImg.recoverByteValue(1, 1, 0) == 0);
+    CHECK(diffuseImg.recoverByteValue(1, 1, 1) == 255);
+    CHECK(diffuseImg.recoverByteValue(1, 1, 2) == 0);
+    CHECK(diffuseImg.recoverByteValue(1, 1, 3) == 127);
 #endif
   }
 
@@ -192,29 +190,27 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     const Raz::Image emissiveImg = emissiveMap.recoverImage();
     REQUIRE_FALSE(emissiveImg.isEmpty());
 
-    const auto* emissiveData = static_cast<const uint8_t*>(emissiveImg.getDataPtr());
-
     // ---------
     // | R | R |
     // |-------|
     // | R | R |
     // ---------
 
-    CHECK(emissiveData[0] == 255);
-    CHECK(emissiveData[1] == 0);
-    CHECK(emissiveData[2] == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 0, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(0, 0, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 0, 2) == 0);
 
-    CHECK(emissiveData[3] == 255);
-    CHECK(emissiveData[4] == 0);
-    CHECK(emissiveData[5] == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(1, 0, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 0, 2) == 0);
 
-    CHECK(emissiveData[6] == 255);
-    CHECK(emissiveData[7] == 0);
-    CHECK(emissiveData[8] == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(0, 1, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 1, 2) == 0);
 
-    CHECK(emissiveData[9]  == 255);
-    CHECK(emissiveData[10] == 0);
-    CHECK(emissiveData[11] == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 1, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(1, 1, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 1, 2) == 0);
 #endif
   }
 
@@ -231,29 +227,27 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     const Raz::Image ambientImg = ambientMap.recoverImage();
     REQUIRE_FALSE(ambientImg.isEmpty());
 
-    const auto* ambientData = static_cast<const uint8_t*>(ambientImg.getDataPtr());
-
     // ---------
     // | B | B |
     // |-------|
     // | B | B |
     // ---------
 
-    CHECK(ambientData[0] == 0);
-    CHECK(ambientData[1] == 0);
-    CHECK(ambientData[2] == 255);
+    CHECK(ambientImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(ambientImg.recoverByteValue(0, 0, 1) == 0);
+    CHECK(ambientImg.recoverByteValue(0, 0, 2) == 255);
 
-    CHECK(ambientData[3] == 0);
-    CHECK(ambientData[4] == 0);
-    CHECK(ambientData[5] == 255);
+    CHECK(ambientImg.recoverByteValue(1, 0, 0) == 0);
+    CHECK(ambientImg.recoverByteValue(1, 0, 1) == 0);
+    CHECK(ambientImg.recoverByteValue(1, 0, 2) == 255);
 
-    CHECK(ambientData[6] == 0);
-    CHECK(ambientData[7] == 0);
-    CHECK(ambientData[8] == 255);
+    CHECK(ambientImg.recoverByteValue(0, 1, 0) == 0);
+    CHECK(ambientImg.recoverByteValue(0, 1, 1) == 0);
+    CHECK(ambientImg.recoverByteValue(0, 1, 2) == 255);
 
-    CHECK(ambientData[9]  == 0);
-    CHECK(ambientData[10] == 0);
-    CHECK(ambientData[11] == 255);
+    CHECK(ambientImg.recoverByteValue(1, 1, 0) == 0);
+    CHECK(ambientImg.recoverByteValue(1, 1, 1) == 0);
+    CHECK(ambientImg.recoverByteValue(1, 1, 2) == 255);
 #endif
   }
 
@@ -270,18 +264,16 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     const Raz::Image specularImg = specularMap.recoverImage();
     REQUIRE_FALSE(specularImg.isEmpty());
 
-    const auto* specularData = static_cast<const uint8_t*>(specularImg.getDataPtr());
-
     // ---------
     // | X |   |
     // |-------|
     // |   | X |
     // ---------
 
-    CHECK(specularData[0] == 0);
-    CHECK(specularData[1] == 255);
-    CHECK(specularData[2] == 255);
-    CHECK(specularData[3] == 0);
+    CHECK(specularImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(specularImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(specularImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(specularImg.recoverByteValue(1, 1, 0) == 0);
 #endif
   }
 
@@ -298,18 +290,16 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     const Raz::Image transparencyImg = transparencyMap.recoverImage();
     REQUIRE_FALSE(transparencyImg.isEmpty());
 
-    const auto* transparencyData = static_cast<const uint8_t*>(transparencyImg.getDataPtr());
-
     // ---------
     // | X | X |
     // |-------|
     // | X | X |
     // ---------
 
-    CHECK(transparencyData[0] == 255);
-    CHECK(transparencyData[1] == 255);
-    CHECK(transparencyData[2] == 255);
-    CHECK(transparencyData[3] == 255);
+    CHECK(transparencyImg.recoverByteValue(0, 0, 0) == 255);
+    CHECK(transparencyImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(transparencyImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(transparencyImg.recoverByteValue(1, 1, 0) == 255);
 #endif
   }
 
@@ -326,18 +316,16 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     const Raz::Image bumpImg = bumpMap.recoverImage();
     REQUIRE_FALSE(bumpImg.isEmpty());
 
-    const auto* bumpData = static_cast<const uint8_t*>(bumpImg.getDataPtr());
-
     // ---------
     // |   |   |
     // |-------|
     // |   |   |
     // ---------
 
-    CHECK(bumpData[0] == 0);
-    CHECK(bumpData[1] == 0);
-    CHECK(bumpData[2] == 0);
-    CHECK(bumpData[3] == 0);
+    CHECK(bumpImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(bumpImg.recoverByteValue(1, 0, 0) == 0);
+    CHECK(bumpImg.recoverByteValue(0, 1, 0) == 0);
+    CHECK(bumpImg.recoverByteValue(1, 1, 0) == 0);
 #endif
   }
 }
@@ -408,8 +396,6 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     const Raz::Image albedoImg = albedoMap.recoverImage();
     REQUIRE_FALSE(albedoImg.isEmpty());
 
-    const auto* albedoData = static_cast<const uint8_t*>(albedoImg.getDataPtr());
-
     // RGBR image with alpha, flipped vertically: verifying that values are BRRG with 50% opacity
 
     // ---------
@@ -418,25 +404,25 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     // | B | R |
     // ---------
 
-    CHECK(albedoData[0] == 0);
-    CHECK(albedoData[1] == 0);
-    CHECK(albedoData[2] == 255);
-    CHECK(albedoData[3] == 127);
+    CHECK(albedoImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(albedoImg.recoverByteValue(0, 0, 1) == 0);
+    CHECK(albedoImg.recoverByteValue(0, 0, 2) == 255);
+    CHECK(albedoImg.recoverByteValue(0, 0, 3) == 127);
 
-    CHECK(albedoData[4] == 255);
-    CHECK(albedoData[5] == 0);
-    CHECK(albedoData[6] == 0);
-    CHECK(albedoData[7] == 127);
+    CHECK(albedoImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(albedoImg.recoverByteValue(1, 0, 1) == 0);
+    CHECK(albedoImg.recoverByteValue(1, 0, 2) == 0);
+    CHECK(albedoImg.recoverByteValue(1, 0, 3) == 127);
 
-    CHECK(albedoData[8]  == 255);
-    CHECK(albedoData[9]  == 0);
-    CHECK(albedoData[10] == 0);
-    CHECK(albedoData[11] == 127);
+    CHECK(albedoImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(albedoImg.recoverByteValue(0, 1, 1) == 0);
+    CHECK(albedoImg.recoverByteValue(0, 1, 2) == 0);
+    CHECK(albedoImg.recoverByteValue(0, 1, 3) == 127);
 
-    CHECK(albedoData[12] == 0);
-    CHECK(albedoData[13] == 255);
-    CHECK(albedoData[14] == 0);
-    CHECK(albedoData[15] == 127);
+    CHECK(albedoImg.recoverByteValue(1, 1, 0) == 0);
+    CHECK(albedoImg.recoverByteValue(1, 1, 1) == 255);
+    CHECK(albedoImg.recoverByteValue(1, 1, 2) == 0);
+    CHECK(albedoImg.recoverByteValue(1, 1, 3) == 127);
 #endif
   }
 
@@ -453,29 +439,27 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     const Raz::Image emissiveImg = emissiveMap.recoverImage();
     REQUIRE_FALSE(emissiveImg.isEmpty());
 
-    const auto* emissiveData = static_cast<const uint8_t*>(emissiveImg.getDataPtr());
-
     // ---------
     // | R | R |
     // |-------|
     // | R | R |
     // ---------
 
-    CHECK(emissiveData[0] == 255);
-    CHECK(emissiveData[1] == 0);
-    CHECK(emissiveData[2] == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 0, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(0, 0, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 0, 2) == 0);
 
-    CHECK(emissiveData[3] == 255);
-    CHECK(emissiveData[4] == 0);
-    CHECK(emissiveData[5] == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(1, 0, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 0, 2) == 0);
 
-    CHECK(emissiveData[6] == 255);
-    CHECK(emissiveData[7] == 0);
-    CHECK(emissiveData[8] == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(0, 1, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(0, 1, 2) == 0);
 
-    CHECK(emissiveData[9]  == 255);
-    CHECK(emissiveData[10] == 0);
-    CHECK(emissiveData[11] == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 1, 0) == 255);
+    CHECK(emissiveImg.recoverByteValue(1, 1, 1) == 0);
+    CHECK(emissiveImg.recoverByteValue(1, 1, 2) == 0);
 #endif
   }
 
@@ -492,29 +476,27 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     const Raz::Image normalImg = normalMap.recoverImage();
     REQUIRE_FALSE(normalImg.isEmpty());
 
-    const auto* normalData = static_cast<const uint8_t*>(normalImg.getDataPtr());
-
     // ---------
     // | B | B |
     // |-------|
     // | B | B |
     // ---------
 
-    CHECK(normalData[0] == 0);
-    CHECK(normalData[1] == 0);
-    CHECK(normalData[2] == 255);
+    CHECK(normalImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(normalImg.recoverByteValue(0, 0, 1) == 0);
+    CHECK(normalImg.recoverByteValue(0, 0, 2) == 255);
 
-    CHECK(normalData[3] == 0);
-    CHECK(normalData[4] == 0);
-    CHECK(normalData[5] == 255);
+    CHECK(normalImg.recoverByteValue(1, 0, 0) == 0);
+    CHECK(normalImg.recoverByteValue(1, 0, 1) == 0);
+    CHECK(normalImg.recoverByteValue(1, 0, 2) == 255);
 
-    CHECK(normalData[6] == 0);
-    CHECK(normalData[7] == 0);
-    CHECK(normalData[8] == 255);
+    CHECK(normalImg.recoverByteValue(0, 1, 0) == 0);
+    CHECK(normalImg.recoverByteValue(0, 1, 1) == 0);
+    CHECK(normalImg.recoverByteValue(0, 1, 2) == 255);
 
-    CHECK(normalData[9]  == 0);
-    CHECK(normalData[10] == 0);
-    CHECK(normalData[11] == 255);
+    CHECK(normalImg.recoverByteValue(1, 1, 0) == 0);
+    CHECK(normalImg.recoverByteValue(1, 1, 1) == 0);
+    CHECK(normalImg.recoverByteValue(1, 1, 2) == 255);
 #endif
   }
 
@@ -531,18 +513,16 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     const Raz::Image metallicImg = metallicMap.recoverImage();
     REQUIRE_FALSE(metallicImg.isEmpty());
 
-    const auto* metallicData = static_cast<const uint8_t*>(metallicImg.getDataPtr());
-
     // ---------
     // | X | X |
     // |-------|
     // | X | X |
     // ---------
 
-    CHECK(metallicData[0] == 255);
-    CHECK(metallicData[1] == 255);
-    CHECK(metallicData[2] == 255);
-    CHECK(metallicData[3] == 255);
+    CHECK(metallicImg.recoverByteValue(0, 0, 0) == 255);
+    CHECK(metallicImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(metallicImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(metallicImg.recoverByteValue(1, 1, 0) == 255);
 #endif
   }
 
@@ -559,18 +539,16 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     const Raz::Image roughnessImg = roughnessMap.recoverImage();
     REQUIRE_FALSE(roughnessImg.isEmpty());
 
-    const auto* roughnessData = static_cast<const uint8_t*>(roughnessImg.getDataPtr());
-
     // ---------
     // |   |   |
     // |-------|
     // |   |   |
     // ---------
 
-    CHECK(roughnessData[0] == 0);
-    CHECK(roughnessData[1] == 0);
-    CHECK(roughnessData[2] == 0);
-    CHECK(roughnessData[3] == 0);
+    CHECK(roughnessImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(roughnessImg.recoverByteValue(1, 0, 0) == 0);
+    CHECK(roughnessImg.recoverByteValue(0, 1, 0) == 0);
+    CHECK(roughnessImg.recoverByteValue(1, 1, 0) == 0);
 #endif
   }
 
@@ -587,18 +565,16 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     const Raz::Image ambientOcclusionImg = ambientOcclusionMap.recoverImage();
     REQUIRE_FALSE(ambientOcclusionImg.isEmpty());
 
-    const auto* ambientOccData = static_cast<const uint8_t*>(ambientOcclusionImg.getDataPtr());
-
     // ---------
     // | X |   |
     // |-------|
     // |   | X |
     // ---------
 
-    CHECK(ambientOccData[0] == 0);
-    CHECK(ambientOccData[1] == 255);
-    CHECK(ambientOccData[2] == 255);
-    CHECK(ambientOccData[3] == 0);
+    CHECK(ambientOcclusionImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(ambientOcclusionImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(ambientOcclusionImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(ambientOcclusionImg.recoverByteValue(1, 1, 0) == 0);
 #endif
   }
 }
