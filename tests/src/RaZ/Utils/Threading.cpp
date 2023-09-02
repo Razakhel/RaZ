@@ -111,4 +111,15 @@ TEST_CASE("Threading iterator parallelization - indivisible size") {
   CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
+TEST_CASE("Threading parallelization empty input") {
+  CHECK_NOTHROW(Raz::Threading::parallelize(std::initializer_list<std::function<void()>>()));
+
+  CHECK_THROWS(Raz::Threading::parallelize(0, 0, [] (const Raz::Threading::IndexRange&) noexcept {}));
+
+  std::vector<int> values;
+  REQUIRE(values.begin() == values.end());
+  CHECK_THROWS(Raz::Threading::parallelize(values.begin(), values.end(), [] (const Raz::Threading::IterRange<std::vector<int>::iterator>&) noexcept {}));
+  CHECK_THROWS(Raz::Threading::parallelize(values, [] (const Raz::Threading::IterRange<std::vector<int>::iterator>&) noexcept {}));
+}
+
 #endif // RAZ_THREADS_AVAILABLE
