@@ -52,7 +52,7 @@ private:
   std::vector<unsigned int> m_lineIndices {};
   std::vector<unsigned int> m_triangleIndices {};
 
-  AABB m_boundingBox = AABB(Vec3f(), Vec3f());
+  AABB m_boundingBox = AABB(Vec3f(0.f), Vec3f(0.f));
 };
 
 } // namespace Raz
