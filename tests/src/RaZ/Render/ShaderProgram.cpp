@@ -83,7 +83,7 @@ constexpr std::string_view compSource = R"(
   uniform int uniInt[2];
   uniform uint uniUint;
 
-  layout(rgba32f, binding = 0) uniform writeonly image2D uniImage2D;
+  layout(rgba32f, binding = 0) uniform writeonly restrict image2D uniImage2D;
 
   void main() {
     imageStore(uniImage2D, ivec2(uniInt[0] + uniInt[1], int(uniUint)), vec4(uniVec3, uniFloat[0] + uniFloat[1] + uniFloat[2]));
