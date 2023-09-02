@@ -70,7 +70,6 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             -Wno-format-nonliteral
         )
 
-        # Enabling some other warnings available since GCC 5
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
             set(
                 COMPILER_FLAGS
@@ -83,7 +82,6 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             )
         endif ()
 
-        # Enabling some other warnings available since GCC 6
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 6)
             set(
                 COMPILER_FLAGS
@@ -94,7 +92,6 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             )
         endif ()
 
-        # Enabling some other warnings available since GCC 7
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
             set(
                 COMPILER_FLAGS
@@ -148,19 +145,27 @@ function(add_compiler_flags TARGET_NAME SCOPE)
                 COMPILER_FLAGS
 
                 ${COMPILER_FLAGS}
-                # Other warning flags not recognized by clang-cl
+                # Other flags not recognized by clang-cl
                 -pedantic
                 -pedantic-errors
             )
         endif ()
 
-        # Disabling some warnings available since Clang 5
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
             set(
                 COMPILER_FLAGS
 
                 ${COMPILER_FLAGS}
                 -Wno-unused-template
+            )
+        endif ()
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
+            set(
+                COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                -Wno-unsafe-buffer-usage
             )
         endif ()
     elseif (COMPILER_MSVC)
@@ -234,16 +239,78 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             /bigobj # Allowing object files to be bigger
             /EHsc # Enabling exceptions
             /utf-8 # Forcing MSVC to actually handle files as UTF-8
-            /Zc:__cplusplus # Forcing the __cplusplus definition to be of the proper value
-            /Zc:externConstexpr # Allowing external linkage for "extern constexpr" variables
-            #/Zc:lambda # Forcing lambdas' parsing to be standard compliant; to be removed in C++20 (implied by /std:c++20)
+
+            # Forcing inline functions to have their definition in each translation units they're called from (required from C++11 onward)
+            # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-inline-remove-unreferenced-comdat
+            /Zc:inline
+
+            # Forcing the compiler to consider the operator new always potentially throwing, allowing several optimizations
+            # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-throwingnew-assume-operator-new-throws
+            /Zc:throwingNew
+
+            # Adds carets to the compiler's error output, which can make its messages more readable
+            # See: https://learn.microsoft.com/en-us/cpp/build/reference/diagnostics-compiler-diagnostic-options
+            /diagnostics:caret
         )
 
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16.5)
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.13)
             set(COMPILER_FLAGS
 
                 ${COMPILER_FLAGS}
-                /Zc:preprocessor # Forcing the preprocessor to be compliant with C++11 and above
+                # Allowing external linkage for 'extern constexpr' variables
+                # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-externconstexpr
+                /Zc:externConstexpr
+            )
+        endif ()
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.14)
+            set(COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                # Forcing the '__cplusplus' definition to be of the proper value
+                # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-cplusplus
+                /Zc:__cplusplus
+            )
+        endif ()
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.25)
+            set(COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                # Forcing the preprocessor to be compliant with C++11 and above
+                # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-preprocessor
+                /Zc:preprocessor
+            )
+        endif ()
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.28)
+            set(COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                # Forcing lambdas' parsing to be standard compliant
+                # To be removed in C++20 (implied by /std:c++20)
+                # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-lambda
+                /Zc:lambda
+            )
+        endif ()
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.34)
+            set(COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                # Forcing standard enumeration type deduction
+                # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-enumtypes
+                /Zc:enumTypes
+            )
+        endif ()
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.35)
+            set(COMPILER_FLAGS
+
+                ${COMPILER_FLAGS}
+                # Forcing template parameters' names to not be reused (shadowed)
+                # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-templatescope
+                /Zc:templateScope
             )
         endif ()
     endif ()
