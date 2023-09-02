@@ -2,6 +2,36 @@
 
 #include "RaZ/Data/Mesh.hpp"
 
+TEST_CASE("Mesh basic") {
+  Raz::Mesh mesh;
+  CHECK(mesh.getSubmeshes().empty());
+  CHECK(mesh.getBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
+  CHECK(mesh.recoverVertexCount() == 0);
+  CHECK(mesh.recoverTriangleCount() == 0);
+
+  CHECK_NOTHROW(mesh.computeTangents()); // Attempting to compute tangents for an empty mesh does nothing
+
+  const Raz::AABB& boundingBox = mesh.computeBoundingBox();
+  CHECK(boundingBox == Raz::AABB(Raz::Vec3f(std::numeric_limits<float>::max()), Raz::Vec3f(std::numeric_limits<float>::lowest())));
+  CHECK(boundingBox == mesh.getBoundingBox());
+
+  Raz::Submesh& submesh = mesh.addSubmesh();
+  CHECK(mesh.getSubmeshes().size() == 1);
+
+  submesh.getVertices() = {
+    Raz::Vertex{ Raz::Vec3f(-1.f) },
+    Raz::Vertex{ Raz::Vec3f(0.f) },
+    Raz::Vertex{ Raz::Vec3f(1.f) }
+  };
+  submesh.getTriangleIndices() = { 0, 1, 2 };
+  CHECK(mesh.recoverVertexCount() == 3);
+  CHECK(mesh.recoverTriangleCount() == 1);
+
+  mesh.computeBoundingBox();
+  CHECK(boundingBox == Raz::AABB(Raz::Vec3f(-1.f), Raz::Vec3f(1.f)));
+  CHECK(boundingBox == mesh.getBoundingBox());
+}
+
 TEST_CASE("Mesh plane") {
   const Raz::Plane plane(1.5f, Raz::Axis::Y);
 

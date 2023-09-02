@@ -72,7 +72,7 @@ private:
   void createIcosphere(const Sphere& sphere, uint32_t subdivCount);
 
   std::vector<Submesh> m_submeshes {};
-  AABB m_boundingBox = AABB(Vec3f(), Vec3f());
+  AABB m_boundingBox = AABB(Vec3f(0.f), Vec3f(0.f));
 };
 
 } // namespace Raz
