@@ -16,11 +16,16 @@ struct Vertex {
   Vec3f normal {};
   Vec3f tangent {};
 
-  std::size_t operator()() const { return tangent.hash(normal.hash(texcoords.hash(position.hash(0)))); }
-  bool operator==(const Vertex& vert) const noexcept { return (position == vert.position)
-                                                           && (texcoords == vert.texcoords)
-                                                           && (normal == vert.normal)
-                                                           && (tangent == vert.tangent); }
+  constexpr bool strictlyEquals(const Vertex& vert) const noexcept { return position.strictlyEquals(vert.position)
+                                                                         && texcoords.strictlyEquals(vert.texcoords)
+                                                                         && normal.strictlyEquals(vert.normal)
+                                                                         && tangent.strictlyEquals(vert.tangent); }
+
+  constexpr bool operator==(const Vertex& vert) const noexcept { return (position == vert.position)
+                                                                     && (texcoords == vert.texcoords)
+                                                                     && (normal == vert.normal)
+                                                                     && (tangent == vert.tangent); }
+  constexpr bool operator!=(const Vertex& vert) const noexcept { return !(*this == vert); }
 };
 
 class Submesh {
@@ -56,5 +61,16 @@ private:
 };
 
 } // namespace Raz
+
+/// Specialization of std::hash for Vertex.
+template <>
+struct std::hash<Raz::Vertex> {
+  /// Computes the hash of the given vertex.
+  /// \param vert Vertex to compute the hash of.
+  /// \return Vertex's hash value.
+  constexpr std::size_t operator()(const Raz::Vertex& vert) const noexcept {
+    return vert.tangent.hash(vert.normal.hash(vert.texcoords.hash(vert.position.hash(0))));
+  }
+};
 
 #endif // RAZ_SUBMESH_HPP
