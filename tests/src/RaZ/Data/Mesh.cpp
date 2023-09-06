@@ -9,8 +9,6 @@ TEST_CASE("Mesh basic") {
   CHECK(mesh.recoverVertexCount() == 0);
   CHECK(mesh.recoverTriangleCount() == 0);
 
-  CHECK_NOTHROW(mesh.computeTangents()); // Attempting to compute tangents for an empty mesh does nothing
-
   const Raz::AABB& boundingBox = mesh.computeBoundingBox();
   CHECK(boundingBox == Raz::AABB(Raz::Vec3f(std::numeric_limits<float>::max()), Raz::Vec3f(std::numeric_limits<float>::lowest())));
   CHECK(boundingBox == mesh.getBoundingBox());
@@ -30,6 +28,56 @@ TEST_CASE("Mesh basic") {
   mesh.computeBoundingBox();
   CHECK(boundingBox == Raz::AABB(Raz::Vec3f(-1.f), Raz::Vec3f(1.f)));
   CHECK(boundingBox == mesh.getBoundingBox());
+}
+
+TEST_CASE("Mesh tangents") {
+  Raz::Mesh mesh;
+
+  CHECK_NOTHROW(mesh.computeTangents()); // Attempting to compute tangents on an empty mesh does nothing
+
+  //      2
+  //     / \
+  //    /   \
+  //   0-----1
+
+  Raz::Submesh& submesh = mesh.addSubmesh();
+  submesh.getVertices() = {
+    Raz::Vertex{ Raz::Vec3f(-1.f, -1.f, 0.f) },
+    Raz::Vertex{ Raz::Vec3f(1.f, -1.f, 0.f) },
+    Raz::Vertex{ Raz::Vec3f(0.f, 1.f, 0.f) }
+  };
+  submesh.getTriangleIndices() = { 0, 1, 2 }; // Tangent computation needs triangles to iterate over
+
+  mesh.computeTangents();
+  CHECK(submesh.getVertices()[0].tangent == Raz::Vec3f(0.f)); // Tangents are null as they require valid texcoords
+  CHECK(submesh.getVertices()[1].tangent == Raz::Vec3f(0.f));
+  CHECK(submesh.getVertices()[2].tangent == Raz::Vec3f(0.f));
+
+  submesh.getVertices()[0].texcoords = Raz::Vec2f(0.f, 0.f);
+  submesh.getVertices()[1].texcoords = Raz::Vec2f(1.f, 0.f);
+  submesh.getVertices()[2].texcoords = Raz::Vec2f(0.5f, 1.f);
+
+  mesh.computeTangents();
+  CHECK(submesh.getVertices()[0].tangent == Raz::Axis::X);
+  CHECK(submesh.getVertices()[1].tangent == Raz::Axis::X);
+  CHECK(submesh.getVertices()[2].tangent == Raz::Axis::X);
+
+  //   3--2
+  //   | / \
+  //   |/   \
+  //   0-----1
+
+  submesh.getVertices().emplace_back(Raz::Vertex{ Raz::Vec3f(-1.f, 1.f, 1.f), Raz::Vec2f(0.f, 1.f) });
+  submesh.getTriangleIndices().insert(submesh.getTriangleIndices().end(), { 0, 2, 3 });
+
+  const Raz::Vec3f triangle2Tangent = (Raz::Axis::X - Raz::Axis::Z).normalize();
+  const Raz::Vec3f mixedTangent     = (Raz::Axis::X - Raz::Axis::Z + Raz::Axis::X).normalize();
+
+  mesh.computeTangents();
+  CHECK(submesh.getVertices()[0].tangent == mixedTangent); // The vertices linked to both triangles have their tangents mixed
+  CHECK(submesh.getVertices()[1].tangent == Raz::Axis::X); // The first triangle's isolated vertex has the same tangent as before
+  CHECK(submesh.getVertices()[2].tangent == mixedTangent);
+  CHECK(submesh.getVertices()[3].tangent == triangle2Tangent);
 }
 
 TEST_CASE("Mesh plane") {

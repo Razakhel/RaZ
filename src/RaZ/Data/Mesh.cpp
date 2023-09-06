@@ -255,6 +255,9 @@ void Mesh::computeTangents() {
 
   Threading::parallelize(m_submeshes, [] (const auto& range) noexcept {
     for (Submesh& submesh : range) {
+      for (Vertex& vertex : submesh.getVertices())
+        vertex.tangent = Vec3f(0.f, 0.f, 0.f);
+
       for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
         Vertex& firstVert  = submesh.getVertices()[submesh.getTriangleIndices()[i    ]];
         Vertex& secondVert = submesh.getVertices()[submesh.getTriangleIndices()[i + 1]];
