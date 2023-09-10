@@ -2,6 +2,20 @@
 
 #include "RaZ/Data/Color.hpp"
 
+TEST_CASE("Color components") {
+  Raz::Color color;
+  CHECK(color.red() == 0.f);
+  CHECK(color.green() == 0.f);
+  CHECK(color.blue() == 0.f);
+
+  color.red()   = 1.f;
+  color.green() = 2.f;
+  color.blue()  = 3.f;
+  CHECK(color.red() == 1.f);
+  CHECK(color.green() == 2.f);
+  CHECK(color.blue() == 3.f);
+}
+
 TEST_CASE("Color float/byte conversion") {
   CHECK(Raz::Vec3b(Raz::Color(0.f, 0.f, 0.f)).strictlyEquals(Raz::Vec3b(0, 0, 0)));
   CHECK(Raz::Vec3f(Raz::Color(0, 0, 0)).strictlyEquals(Raz::Vec3f(0.f, 0.f, 0.f)));

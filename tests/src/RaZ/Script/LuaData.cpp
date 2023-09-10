@@ -67,6 +67,9 @@ TEST_CASE("LuaData Color") {
     assert(Color.new(Vec3f.new(1, 0, 0)) == ColorPreset.Red)
     assert(Color.new(0, 1, 0) == ColorPreset.Green)
     assert(Color.new(0x0000FF) == ColorPreset.Blue)
+    assert(ColorPreset.MediumRed:red() == 1)
+    assert(ColorPreset.MediumGreen:green() == 1)
+    assert(ColorPreset.MediumBlue:blue() == 1)
     assert(ColorPreset.Gray:toVec():strictlyEquals(Vec3f.new(0.5)))
   )"));
 }

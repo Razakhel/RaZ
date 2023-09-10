@@ -22,7 +22,14 @@ public:
   constexpr explicit Color(const Vec3b& values) : Color(values[0], values[1], values[2]) {}
   constexpr explicit Color(uint32_t value) : Color(static_cast<uint8_t>((value & 0xFF0000) >> 16u),
                                                    static_cast<uint8_t>((value & 0x00FF00) >> 8u),
-                                                   static_cast<uint8_t>((value & 0x0000FF))) {}
+                                                   static_cast<uint8_t>(value & 0x0000FF)) {}
+
+  constexpr float red() const noexcept { return m_values[0]; }
+  constexpr float& red() noexcept { return m_values[0]; }
+  constexpr float green() const noexcept { return m_values[1]; }
+  constexpr float& green() noexcept { return m_values[1]; }
+  constexpr float blue() const noexcept { return m_values[2]; }
+  constexpr float& blue() noexcept { return m_values[2]; }
 
   constexpr operator const Vec3f&() const noexcept { return m_values; }
   constexpr explicit operator Vec3b() const noexcept { return Vec3b(m_values[0] * 255, m_values[1] * 255, m_values[2] * 255); }

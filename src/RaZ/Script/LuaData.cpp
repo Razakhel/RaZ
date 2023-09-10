@@ -71,6 +71,9 @@ void LuaWrapper::registerDataTypes() {
                                                                              Color(float, float, float),
                                                                              Color(const Vec3b&),
                                                                              Color(uint32_t)>());
+    color["red"]   = PickConstOverload<>(&Color::red);
+    color["green"] = PickConstOverload<>(&Color::green);
+    color["blue"]  = PickConstOverload<>(&Color::blue);
     color["toVec"] = &Color::operator const Vec3f&;
 
     sol::table colorPreset     = state["ColorPreset"].get_or_create<sol::table>();
