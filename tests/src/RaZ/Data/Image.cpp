@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Data/Image.hpp"
+#include "RaZ/Math/Vector.hpp"
 
 #include <numeric>
 
@@ -54,6 +55,9 @@ TEST_CASE("Image value access") {
     CHECK(imgByte.recoverByteValue(0, 0, 0) == 1);
     CHECK(imgByte.recoverByteValue(0, 0, 1) == 2);
     CHECK(imgByte.recoverByteValue(0, 0, 2) == 3);
+
+    imgByte.setPixel(0, 0, Raz::Vec3b(4, 5, 6));
+    CHECK(imgByte.recoverPixel<uint8_t, 3>(0, 0) == Raz::Vec3b(4, 5, 6));
   }
 
   {
@@ -84,6 +88,15 @@ TEST_CASE("Image value access") {
     CHECK(imgFloat.recoverFloatValue(0, 1, 1) == 6.f);
     CHECK(imgFloat.recoverFloatValue(1, 1, 0) == 7.f);
     CHECK(imgFloat.recoverFloatValue(1, 1, 1) == 8.f);
+
+    imgFloat.setPixel(0, 0, Raz::Vec2f(9.f, 10.f));
+    imgFloat.setPixel(0, 1, Raz::Vec2f(11.f, 12.f));
+    imgFloat.setPixel(1, 0, Raz::Vec2f(13.f, 14.f));
+    imgFloat.setPixel(1, 1, Raz::Vec2f(15.f, 16.f));
+    CHECK(imgFloat.recoverPixel<float, 2>(0, 0) == Raz::Vec2f(9.f, 10.f));
+    CHECK(imgFloat.recoverPixel<float, 2>(0, 1) == Raz::Vec2f(11.f, 12.f));
+    CHECK(imgFloat.recoverPixel<float, 2>(1, 0) == Raz::Vec2f(13.f, 14.f));
+    CHECK(imgFloat.recoverPixel<float, 2>(1, 1) == Raz::Vec2f(15.f, 16.f));
   }
 }
 
@@ -117,7 +130,7 @@ TEST_CASE("Image equality") {
     Raz::Image imgB2Copy = imgB2;
     CHECK(imgB2Copy == imgB2);
 
-    imgB2Copy.setByteValue(0, 0, 0, 1);
+    imgB2Copy.setPixel(0, 0, static_cast<uint8_t>(1));
 
     CHECK(imgB2Copy != imgB2); // Same dimensions, same data type, but different content
     CHECK_THAT(imgB2Copy, IsNearlyEqualToImage(imgB2)); // The near-equality check has a tolerance high enough to deem them nearly equal
@@ -127,7 +140,7 @@ TEST_CASE("Image equality") {
     Raz::Image imgF2Copy = imgF2;
     CHECK(imgF2Copy == imgF2);
 
-    imgF2Copy.setFloatValue(0, 0, 0, 0.01f);
+    imgF2Copy.setPixel(0, 0, 0.01f);
 
     CHECK(imgF2Copy != imgF2); // Same as above, their content are not strictly equal
     CHECK_THAT(imgF2Copy, IsNearlyEqualToImage(imgF2)); // But they are nearly equal to each other

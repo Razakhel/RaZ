@@ -20,6 +20,9 @@ using ImageDataBPtr = std::unique_ptr<ImageDataB>;
 struct ImageDataF;
 using ImageDataFPtr = std::unique_ptr<ImageDataF>;
 
+template <typename T, std::size_t Size>
+class Vector;
+
 enum class ImageColorspace {
   GRAY = 0,
   GRAY_ALPHA,
@@ -155,6 +158,23 @@ public:
   /// \param channelIndex Channel index of the value to be fetched.
   /// \return Value at the given location.
   float recoverFloatValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const;
+  /// Gets a single-component pixel from the image.
+  /// \note This gets a single value, hence requires an image with a single channel.
+  /// \tparam T Type of the pixel to be fetched.
+  /// \param widthIndex Width index of the pixel to be fetched.
+  /// \param heightIndex Height index of the pixel to be fetched.
+  /// \return Pixel at the given location.
+  template <typename T>
+  T recoverPixel(std::size_t widthIndex, std::size_t heightIndex) const;
+  /// Gets a pixel from the image with multiple components.
+  /// \note The image requires having a channel count equal to the given value count.
+  /// \tparam T Type of the pixel to be fetched.
+  /// \tparam N Number of values to be fetched. Must be equal to the image's channel count.
+  /// \param widthIndex Width index of the pixel to be fetched.
+  /// \param heightIndex Height index of the pixel to be fetched.
+  /// \return Pixel at the given location.
+  template <typename T, std::size_t N>
+  Vector<T, N> recoverPixel(std::size_t widthIndex, std::size_t heightIndex) const;
   /// Sets a byte value in the image.
   /// \note The image must have a byte data type for this function to execute properly.
   /// \param widthIndex Width index of the value to be set.
@@ -169,6 +189,22 @@ public:
   /// \param channelIndex Channel index of the value to be set.
   /// \param val Value to be set.
   void setFloatValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex, float val);
+  /// Sets a pixel in the image.
+  /// \tparam T Type of the pixel to be set.
+  /// \param widthIndex Width index of the pixel to be set.
+  /// \param heightIndex Height index of the pixel to be set.
+  /// \param val Value to be set.
+  template <typename T>
+  void setPixel(std::size_t widthIndex, std::size_t heightIndex, T val);
+  /// Sets a pixel in the image with multiple components.
+  /// \note The image requires having a channel count equal to the given value count.
+  /// \tparam T Type of the pixel to be set.
+  /// \tparam N Number of values to be set. Must be equal to the image's channel count.
+  /// \param widthIndex Width index of the pixel to be set.
+  /// \param heightIndex Height index of the pixel to be set.
+  /// \param values Values to be set.
+  template <typename T, std::size_t N>
+  void setPixel(std::size_t widthIndex, std::size_t heightIndex, const Vector<T, N>& values);
 
   Image& operator=(const Image& img);
   Image& operator=(Image&&) noexcept = default;
@@ -184,12 +220,15 @@ public:
   bool operator!=(const Image& img) const { return !(*this == img); }
 
 private:
-  constexpr std::size_t computeIndex(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const noexcept {
+  constexpr std::size_t computeIndex(std::size_t widthIndex, std::size_t heightIndex) const noexcept {
     assert("Error: The given width index is invalid." && widthIndex < m_width);
     assert("Error: The given height index is invalid." && heightIndex < m_height);
-    assert("Error: The given channel index is invalid." && channelIndex < m_channelCount);
+    return heightIndex * m_width * m_channelCount + widthIndex * m_channelCount;
+  }
 
-    return heightIndex * m_width * m_channelCount + widthIndex * m_channelCount + channelIndex;
+  constexpr std::size_t computeIndex(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex) const noexcept {
+    assert("Error: The given channel index is invalid." && channelIndex < m_channelCount);
+    return computeIndex(widthIndex, heightIndex) + channelIndex;
   }
 
   template <typename T>
@@ -214,5 +253,7 @@ private:
 };
 
 } // namespace Raz
+
+#include "RaZ/Data/Image.inl"
 
 #endif // RAZ_IMAGE_HPP
