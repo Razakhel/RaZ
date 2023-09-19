@@ -210,6 +210,10 @@ public:
   /// \param vec Vector to be compared with.
   /// \return True if vectors are different, else otherwise.
   constexpr bool operator!=(const Vector& vec) const noexcept { return !(*this == vec); }
+  /// Vector's value type conversion operator.
+  /// \tparam T2 Type to convert the vector's values to.
+  /// \return Vector object of the new type.
+  template <typename T2> constexpr explicit operator Vector<T2, Size>() const noexcept;
   /// Output stream operator.
   /// \param stream Stream to output into.
   /// \param vec Vector to be output.

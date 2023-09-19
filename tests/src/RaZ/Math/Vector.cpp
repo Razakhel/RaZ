@@ -268,6 +268,15 @@ TEST_CASE("Vector less-than") {
   CHECK_FALSE(std::less<Raz::Vec4f>()(vec4f1 + std::numeric_limits<float>::epsilon(), vec4f1));
 }
 
+TEST_CASE("Vector conversion") {
+  CHECK(Raz::Vec3f(vec3b1) == Raz::Vec3f(31.f, 8.f, 12.f));
+  CHECK(Raz::Vec3b(vec3i1) == Raz::Vec3b(208, 0, 54)); // Values are underflowed & overflowed
+  CHECK(Raz::Vec3i(vec3f1) == Raz::Vec3i(3, 42, 0)); // Results are truncated, not rounded
+  CHECK(Raz::Vec4u(vec4f1) == Raz::Vec4u(84, 2, 0, 847));
+  CHECK(Raz::Vec4d(vec4f2) == Raz::Vec4d(13.010000228881835, 0.1500000059604644, 84.8000030517578, 72.0));
+  CHECK(Raz::Vec4f(vec4f2).strictlyEquals(vec4f2));
+}
+
 TEST_CASE("Vector printing") {
   std::stringstream stream;
 

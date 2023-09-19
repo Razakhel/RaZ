@@ -244,6 +244,15 @@ constexpr bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const noe
 }
 
 template <typename T, std::size_t Size>
+template <typename T2>
+constexpr Vector<T, Size>::operator Vector<T2, Size>() const noexcept {
+  Vector<T2, Size> res;
+  for (std::size_t i = 0; i < Size; ++i)
+    res[i] = static_cast<T2>(m_data[i]);
+  return res;
+}
+
+template <typename T, std::size_t Size>
 std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec) {
   using PrintT = std::conditional_t<std::is_same_v<T, uint8_t>, int, T>;
 
