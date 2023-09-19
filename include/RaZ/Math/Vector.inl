@@ -245,10 +245,12 @@ constexpr bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const noe
 
 template <typename T, std::size_t Size>
 std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec) {
-  stream << "[ " << vec[0];
+  using PrintT = std::conditional_t<std::is_same_v<T, uint8_t>, int, T>;
+
+  stream << "[ " << static_cast<PrintT>(vec[0]);
 
   for (std::size_t i = 1; i < Size; ++i)
-    stream << ", " << vec[i];
+    stream << ", " << static_cast<PrintT>(vec[i]);
 
   stream << " ]";
 
