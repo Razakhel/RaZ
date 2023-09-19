@@ -68,6 +68,33 @@ TEST_CASE("Vector indexing") {
   CHECK(vecCopy.w() == vec4f1.w() + 2.f);
 }
 
+TEST_CASE("Vector dot") {
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().dot(std::declval<Raz::Vec3b>())), uint64_t>);
+  CHECK(vec3b1.dot(vec3b2) == 3528);
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3i>().dot(std::declval<Raz::Vec3i>())), uint64_t>);
+  CHECK(vec3i1.dot(vec3i2) == 301836);
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3f>().dot(std::declval<Raz::Vec3f>())), float>);
+  CHECK(vec3f1.dot(vec3f1) == vec3f1.computeSquaredLength());
+  CHECK_THAT(vec3f1.dot(vec3f1), IsNearlyEqualTo(1774.876276f));
+  CHECK_THAT(vec3f1.dot(vec3f2), IsNearlyEqualTo(3711.708354f));
+  CHECK(vec3f1.dot(vec3f2) == vec3f2.dot(vec3f1)); // A · B == B · A
+
+  CHECK_THAT(vec4f1.dot(vec4f2), IsNearlyEqualTo(62091.98f));
+}
+
+TEST_CASE("Vector cross") {
+  // The cross product cannot be computed for unsigned types or sizes other than 3
+
+  CHECK(vec3i1.cross(vec3i1) == Raz::Vec3i(0));
+  CHECK(vec3i1.cross(vec3i2) == Raz::Vec3i(19829036, 13869944, 50784));
+
+  CHECK_THAT(vec3f1.cross(vec3f1), IsNearlyEqualToVector(Raz::Vec3f(0.f), 0.00001f)); // Clang in Release gives values above the default tolerance
+  CHECK(vec3f1.cross(vec3f2) == Raz::Vec3f(224.1855f, 453.09156f, -22588.965f));
+  CHECK(vec3f1.cross(vec3f2) == -vec3f2.cross(vec3f1)); // A x B == -(B x A)
+}
+
 TEST_CASE("Vector/scalar operations") {
   CHECK((vec3f1 + 3.5f) == Raz::Vec3f(6.68f, 45.5f, 4.374f));
   CHECK((vec3f2 - 74.42f) == Raz::Vec3f(466.99f, -27.17f, -68.099f));
@@ -99,16 +126,17 @@ TEST_CASE("Vector/scalar operations") {
 }
 
 TEST_CASE("Vector/vector operations") {
+  CHECK((vec3b1 + vec3b2) == Raz::Vec3b(79, 7, 12)); // Values are overflowed
+  CHECK((vec3i1 - vec3i2) == Raz::Vec3i(-788, 1058, 18724));
+
+  CHECK(-vec3f1 == Raz::Vec3f(-3.18f, -42.f, -0.874f));
+  CHECK((vec3f1 + vec3f1) == vec3f1 * 2);
   CHECK((vec3f1 - vec3f1) == Raz::Vec3f(0.f));
   CHECK((vec3f1 * vec3f2) == Raz::Vec3f(1721.6838f, 1984.5f, 5.524554f));
+  CHECK((vec3f1 / vec3f2) == Raz::Vec3f(0.00587355f, 0.888889f, 0.1382692f));
 
-  CHECK(vec3f1.dot(vec3f1) == vec3f1.computeSquaredLength());
-  CHECK_THAT(vec3f1.dot(vec3f1), IsNearlyEqualTo(1774.876276f));
-  CHECK_THAT(vec3f1.dot(vec3f2), IsNearlyEqualTo(3711.708354f));
-  CHECK(vec3f1.dot(vec3f2) == vec3f2.dot(vec3f1)); // A · B == B · A
-
-  CHECK(vec3f1.cross(vec3f2) == Raz::Vec3f(224.1855f, 453.09156f, -22588.965f));
-  CHECK(vec3f1.cross(vec3f2) == -vec3f2.cross(vec3f1)); // A x B == -(B x A)
+  CHECK_THAT((vec4f1 * vec4f2), IsNearlyEqualToVector(Raz::Vec4f(1098.9547f, 0.3, 0.0848, 60992.64)));
+  CHECK_THAT((vec4f1 / vec4f2), IsNearlyEqualToVector(Raz::Vec4f(6.4926977, 13.333333, 0.0000117, 11.765555)));
 }
 
 TEST_CASE("Vector/matrix operations") {

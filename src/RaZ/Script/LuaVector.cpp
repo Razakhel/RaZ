@@ -28,7 +28,7 @@ void LuaWrapper::registerVectorTypes() {
                                                                              Vec2f(const Vec3f&)>());
     vec2f["x"]                    = PickConstOverload<>(&Vec2f::x);
     vec2f["y"]                    = PickConstOverload<>(&Vec2f::y);
-    vec2f["dot"]                  = &Vec2f::dot;
+    vec2f["dot"]                  = &Vec2f::dot<>;
     vec2f["reflect"]              = &Vec2f::reflect;
     vec2f["computeLength"]        = &Vec2f::computeLength;
     vec2f["computeSquaredLength"] = &Vec2f::computeSquaredLength;
@@ -59,7 +59,7 @@ void LuaWrapper::registerVectorTypes() {
     vec3f["x"]                    = PickConstOverload<>(&Vec3f::x);
     vec3f["y"]                    = PickConstOverload<>(&Vec3f::y);
     vec3f["z"]                    = PickConstOverload<>(&Vec3f::z);
-    vec3f["dot"]                  = &Vec3f::dot;
+    vec3f["dot"]                  = &Vec3f::dot<>;
     vec3f["cross"]                = &Vec3f::cross;
     vec3f["reflect"]              = &Vec3f::reflect;
     vec3f["computeLength"]        = &Vec3f::computeLength;
@@ -97,7 +97,7 @@ void LuaWrapper::registerVectorTypes() {
     vec4f["y"]                    = PickConstOverload<>(&Vec4f::y);
     vec4f["z"]                    = PickConstOverload<>(&Vec4f::z);
     vec4f["w"]                    = PickConstOverload<>(&Vec4f::w);
-    vec4f["dot"]                  = &Vec4f::dot;
+    vec4f["dot"]                  = &Vec4f::dot<>;
     vec4f["reflect"]              = &Vec4f::reflect;
     vec4f["computeLength"]        = &Vec4f::computeLength;
     vec4f["computeSquaredLength"] = &Vec4f::computeSquaredLength;

@@ -73,16 +73,18 @@ constexpr T& Vector<T, Size>::w() noexcept {
 }
 
 template <typename T, std::size_t Size>
-constexpr T Vector<T, Size>::dot(const Vector& vec) const noexcept {
-  T res {};
+template <typename DotT>
+constexpr DotT Vector<T, Size>::dot(const Vector& vec) const noexcept {
+  DotT res {};
   for (std::size_t i = 0; i < Size; ++i)
-    res += m_data[i] * vec[i];
+    res += static_cast<DotT>(m_data[i]) * static_cast<DotT>(vec[i]);
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const noexcept {
   static_assert(Size == 3, "Error: Both vectors must be 3 dimensional to compute a cross product.");
+  static_assert(std::is_signed_v<T>, "Error: The cross product can only be computed with vectors of a signed type.");
 
   Vector<T, Size> res;
 

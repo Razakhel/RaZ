@@ -69,16 +69,18 @@ public:
   /// Computes the dot product (also known as scalar or inner product) between the current vector & the given one.
   /// The dot product calculates the projection of one of the vectors onto the other; the order doesn't matter.
   /// On normalized vectors, the returned value represents the cosine of the angle (in radians) between them.
+  /// \tparam DotT Type of the dot product's result. For vectors of an integral type, it is defined to a large unsigned integer type to avoid overflows.
   /// \param vec Vector to compute the dot product with.
   /// \return Dot product value.
-  constexpr T dot(const Vector& vec) const noexcept;
+  template <typename DotT = std::conditional_t<std::is_integral_v<T>, uint64_t, T>>
+  constexpr DotT dot(const Vector& vec) const noexcept;
   /// Computes the cross product (also known as vector product) between the current vector & the given one.
   /// The cross product generates a vector which is orthogonal to the two others.
   /// \param vec Vector to compute the cross product with.
   /// \return Computed orthogonal vector.
   constexpr Vector cross(const Vector& vec) const noexcept;
   /// Computes the reflection of the current vector over a direction.
-  /// The calling vector is assumed to be incident (directed to the surface it is reflected on).
+  /// The current vector is assumed to be incident (directed to the surface it is reflected on).
   /// \imageSize{vector_reflect.jpg, height: 20%; width: 20%;}
   /// \image html vector_reflect.jpg "Incident vector reflection"
   /// \param normal Direction to compute the reflection over.
