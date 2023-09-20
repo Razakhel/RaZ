@@ -33,8 +33,8 @@ void LuaWrapper::registerVectorTypes() {
     vec2f["computeSquaredLength"] = &Vec2f::computeSquaredLength<>;
     vec2f["computeLength"]        = &Vec2f::computeLength<>;
     vec2f["normalize"]            = &Vec2f::normalize<>;
-    vec2f["lerp"]                 = &Vec2f::lerp;
-    vec2f["nlerp"]                = &Vec2f::nlerp;
+    vec2f["lerp"]                 = &Vec2f::lerp<>;
+    vec2f["nlerp"]                = &Vec2f::nlerp<>;
     vec2f["strictlyEquals"]       = &Vec2f::strictlyEquals;
     vec2f.set_function(sol::meta_function::unary_minus, PickOverload<>(&Vec2f::operator-));
     vec2f.set_function(sol::meta_function::addition, sol::overload(PickOverload<const Vec2f&>(&Vec2f::operator+),
@@ -65,8 +65,8 @@ void LuaWrapper::registerVectorTypes() {
     vec3f["computeSquaredLength"] = &Vec3f::computeSquaredLength<>;
     vec3f["computeLength"]        = &Vec3f::computeLength<>;
     vec3f["normalize"]            = &Vec3f::normalize<>;
-    vec3f["lerp"]                 = &Vec3f::lerp;
-    vec3f["nlerp"]                = &Vec3f::nlerp;
+    vec3f["lerp"]                 = &Vec3f::lerp<>;
+    vec3f["nlerp"]                = &Vec3f::nlerp<>;
     vec3f["strictlyEquals"]       = &Vec3f::strictlyEquals;
     vec3f.set_function(sol::meta_function::unary_minus, PickOverload<>(&Vec3f::operator-));
     vec3f.set_function(sol::meta_function::addition, sol::overload(PickOverload<const Vec3f&>(&Vec3f::operator+),
@@ -102,8 +102,8 @@ void LuaWrapper::registerVectorTypes() {
     vec4f["computeSquaredLength"] = &Vec4f::computeSquaredLength<>;
     vec4f["computeLength"]        = &Vec4f::computeLength<>;
     vec4f["normalize"]            = &Vec4f::normalize<>;
-    vec4f["lerp"]                 = &Vec4f::lerp;
-    vec4f["nlerp"]                = &Vec4f::nlerp;
+    vec4f["lerp"]                 = &Vec4f::lerp<>;
+    vec4f["nlerp"]                = &Vec4f::nlerp<>;
     vec4f["strictlyEquals"]       = &Vec4f::strictlyEquals;
     vec4f.set_function(sol::meta_function::unary_minus, PickOverload<>(&Vec4f::operator-));
     vec4f.set_function(sol::meta_function::addition, sol::overload(PickOverload<const Vec4f&>(&Vec4f::operator+),

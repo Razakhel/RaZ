@@ -108,15 +108,22 @@ public:
   template <typename NormedT = std::conditional_t<std::is_integral_v<T>, float, T>>
   constexpr Vector<NormedT, Size> normalize() const noexcept;
   /// Computes the linear interpolation between vectors, according to a coefficient.
+  /// \tparam LerpT Type of the interpolated vector's values. By default, it is the same as the current vector's.
+  /// \tparam CoeffT Type of the coefficient. For vectors of an integral type, it is defined to float; otherwise, it is the same as the original vectors'.
   /// \param vec Vector to be interpolated with.
   /// \param coeff Coefficient between 0 (returns the current vector) and 1 (returns the given vector).
   /// \return Linearly interpolated vector.
-  constexpr Vector lerp(const Vector& vec, float coeff) const noexcept;
+  template <typename LerpT = T, typename CoeffT = std::conditional_t<std::is_integral_v<T>, float, T>>
+  constexpr Vector<LerpT, Size> lerp(const Vector& vec, CoeffT coeff) const noexcept;
   /// Computes the normalized linear interpolation between vectors, according to a coefficient.
+  /// \tparam NormedT Type of the normalized interpolated vector's values. For vectors of an integral type, it is defined to float;
+  ///   otherwise, it is the same as the original vectors'.
+  /// \tparam CoeffT Type of the coefficient. For vectors of an integral type, it is defined to float; otherwise, it is the same as the original vectors'.
   /// \param vec Vector to be interpolated with.
   /// \param coeff Coefficient between 0 (returns the normalized current vector) and 1 (returns the normalized given vector).
   /// \return Normalized linearly interpolated vector.
-  constexpr Vector nlerp(const Vector& vec, float coeff) const noexcept { return lerp(vec, coeff).normalize(); }
+  template <typename NormedT = std::conditional_t<std::is_integral_v<T>, float, T>, typename CoeffT = std::conditional_t<std::is_integral_v<T>, float, T>>
+  constexpr Vector<NormedT, Size> nlerp(const Vector& vec, CoeffT coeff) const noexcept { return lerp<NormedT>(vec, coeff).normalize(); }
   /// Checks for strict equality between the current vector & the given one.
   /// \param vec Vector to be compared with.
   /// \return True if vectors are strictly equal to each other, false otherwise.

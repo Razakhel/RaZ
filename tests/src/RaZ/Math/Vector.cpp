@@ -211,6 +211,31 @@ TEST_CASE("Vector normalization") {
 }
 
 TEST_CASE("Vector interpolation") {
+  CHECK(vec3b1.lerp(vec3b2, 0.f) == vec3b1);
+  CHECK(vec3b1.lerp(vec3b2, 0.25f) == Raz::Vec3b(35, 69, 9)); // Results are truncated, not rounded
+  CHECK(vec3b1.lerp(vec3b2, 0.5f) == Raz::Vec3b(39, 131, 6));
+  CHECK(vec3b1.lerp(vec3b2, 0.75f) == Raz::Vec3b(43, 193, 3));
+  CHECK(vec3b1.lerp(vec3b2, 1.f) == vec3b2);
+
+  // The resulting interpolated vector's type can be manually chosen
+  CHECK(vec3b1.lerp<float>(vec3b2, 0.f) == Raz::Vec3f(vec3b1));
+  CHECK(vec3b1.lerp<float>(vec3b2, 0.25f) == Raz::Vec3f(35.25f, 69.75f, 9.f));
+  CHECK(vec3b1.lerp<float>(vec3b2, 0.5f) == Raz::Vec3f(39.5f, 131.5f, 6.f));
+  CHECK(vec3b1.lerp<float>(vec3b2, 0.75f) == Raz::Vec3f(43.75f, 193.25f, 3.f));
+  CHECK(vec3b1.lerp<float>(vec3b2, 1.f) == Raz::Vec3f(vec3b2));
+
+  // Computing the lerp as-is then normalizing the result truncates the values, as lerp()'s returned vector is of the original type by default
+  CHECK_THAT(vec3b1.lerp(vec3b2, 0.5f).normalize(), IsNearlyEqualToVector(Raz::Vec3f(0.285059f, 0.9575061f, 0.0438552f)));
+  // Computing the normalized linear interpolation does the lerp with the same result type as it uses itself; no truncation happens
+  CHECK_THAT(vec3b1.nlerp(vec3b2, 0.5f), IsNearlyEqualToVector(Raz::Vec3f(0.2874076f, 0.956813f, 0.0436569f)));
+
+  CHECK(vec3i1.lerp(vec3i2, 0.f) == vec3i1);
+  CHECK(vec3i1.lerp(vec3i2, 0.25f) == Raz::Vec3i(149, -264, 14061));
+  CHECK(vec3i1.lerp(vec3i2, 0.5f) == Raz::Vec3i(346, -529, 9380));
+  CHECK(vec3i1.lerp(vec3i2, 0.75f) == Raz::Vec3i(543, -793, 4699));
+  CHECK(vec3i1.lerp(vec3i2, 1.f) == vec3i2);
+  CHECK(vec3i1.nlerp(vec3i2, 0.5f) == Raz::Vec3f(0.0368035f, -0.056269f, 0.997737f));
+
   // lerp() doesn't normalize the resulting vector
   CHECK(vec3f1.lerp(vec3f2, 0.f) == vec3f1);
   CHECK(vec3f1.lerp(vec3f2, 0.25f) == Raz::Vec3f(137.73749f, 43.3125f, 2.23575f)); // (vec3f1 * 3 + vec3f2) / 4

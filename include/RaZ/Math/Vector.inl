@@ -106,15 +106,19 @@ constexpr Vector<NormedT, Size> Vector<T, Size>::normalize() const noexcept {
 }
 
 template <typename T, std::size_t Size>
-constexpr Vector<T, Size> Vector<T, Size>::lerp(const Vector& vec, float coeff) const noexcept {
+template <typename LerpT, typename CoeffT>
+constexpr Vector<LerpT, Size> Vector<T, Size>::lerp(const Vector& vec, CoeffT coeff) const noexcept {
+  static_assert(std::is_floating_point_v<CoeffT>, "Error: The linear interpolation's coefficient type must be floating-point.");
   assert("Error: The interpolation coefficient must be between 0 & 1." && (coeff >= 0 && coeff <= 1));
 
-  return *this + (vec - *this) * coeff;
+  const Vector<CoeffT, Size> convertedThis(*this);
+  const Vector<CoeffT, Size> lerpVec = convertedThis + (Vector<CoeffT, Size>(vec) - convertedThis) * coeff;
+  return Vector<LerpT, Size>(lerpVec);
 }
 
 template <typename T, std::size_t Size>
 constexpr bool Vector<T, Size>::strictlyEquals(const Vector& vec) const noexcept {
-  return std::equal(m_data.cbegin(), m_data.cend(), vec.getData().cbegin());
+  return std::equal(m_data.cbegin(), m_data.cend(), vec.m_data.cbegin());
 }
 
 template <typename T, std::size_t Size>
