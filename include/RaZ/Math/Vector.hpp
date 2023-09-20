@@ -102,8 +102,11 @@ public:
   constexpr LengthT computeLength() const noexcept { return std::sqrt(static_cast<LengthT>(computeSquaredLength())); }
   /// Computes the normalized vector.
   /// Normalizing a vector makes it of length 1.
+  /// \tparam NormedT Type of the normalized vector's values. For vectors of an integral type, it is defined to float;
+  ///   otherwise, it is the same as the original vector's.
   /// \return Normalized vector.
-  constexpr Vector normalize() const noexcept;
+  template <typename NormedT = std::conditional_t<std::is_integral_v<T>, float, T>>
+  constexpr Vector<NormedT, Size> normalize() const noexcept;
   /// Computes the linear interpolation between vectors, according to a coefficient.
   /// \param vec Vector to be interpolated with.
   /// \param coeff Coefficient between 0 (returns the current vector) and 1 (returns the given vector).

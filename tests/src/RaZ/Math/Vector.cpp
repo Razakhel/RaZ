@@ -195,6 +195,21 @@ TEST_CASE("Vector length") {
   CHECK_THAT(vec4f1.computeLength(), IsNearlyEqualTo(851.323364258f));
 }
 
+TEST_CASE("Vector normalization") {
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().normalize()), Raz::Vec3f>);
+  CHECK_THAT(vec3b1.normalize(), IsNearlyEqualToVector(Raz::Vec3f(0.9066808f, 0.2339821f, 0.3509732f)));
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3i>().normalize()), Raz::Vec3f>);
+  CHECK_THAT(vec3i1.normalize(), IsNearlyEqualToVector(Raz::Vec3f(-0.00256108f, 0.f, 0.9999967f)));
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3f>().normalize()), Raz::Vec3f>);
+  CHECK_THAT(vec3f1.normalize(), IsNearlyEqualToVector(Raz::Vec3f(0.0754819f, 0.9969313f, 0.0207457f)));
+  CHECK_THAT(vec4f1.normalize(), IsNearlyEqualToVector(Raz::Vec4f(0.0992219f, 0.0023492f, 0.0000011f, 0.9950625f)));
+
+  CHECK_THAT(vec4f1.normalize().computeSquaredLength(), IsNearlyEqualTo(1.f));
+  CHECK_THAT(vec3f1.normalize().computeLength(), IsNearlyEqualTo(1.f));
+}
+
 TEST_CASE("Vector interpolation") {
   // lerp() doesn't normalize the resulting vector
   CHECK(vec3f1.lerp(vec3f2, 0.f) == vec3f1);

@@ -32,7 +32,7 @@ void LuaWrapper::registerVectorTypes() {
     vec2f["reflect"]              = &Vec2f::reflect;
     vec2f["computeSquaredLength"] = &Vec2f::computeSquaredLength<>;
     vec2f["computeLength"]        = &Vec2f::computeLength<>;
-    vec2f["normalize"]            = &Vec2f::normalize;
+    vec2f["normalize"]            = &Vec2f::normalize<>;
     vec2f["lerp"]                 = &Vec2f::lerp;
     vec2f["nlerp"]                = &Vec2f::nlerp;
     vec2f["strictlyEquals"]       = &Vec2f::strictlyEquals;
@@ -64,7 +64,7 @@ void LuaWrapper::registerVectorTypes() {
     vec3f["reflect"]              = &Vec3f::reflect;
     vec3f["computeSquaredLength"] = &Vec3f::computeSquaredLength<>;
     vec3f["computeLength"]        = &Vec3f::computeLength<>;
-    vec3f["normalize"]            = &Vec3f::normalize;
+    vec3f["normalize"]            = &Vec3f::normalize<>;
     vec3f["lerp"]                 = &Vec3f::lerp;
     vec3f["nlerp"]                = &Vec3f::nlerp;
     vec3f["strictlyEquals"]       = &Vec3f::strictlyEquals;
@@ -101,7 +101,7 @@ void LuaWrapper::registerVectorTypes() {
     vec4f["reflect"]              = &Vec4f::reflect;
     vec4f["computeSquaredLength"] = &Vec4f::computeSquaredLength<>;
     vec4f["computeLength"]        = &Vec4f::computeLength<>;
-    vec4f["normalize"]            = &Vec4f::normalize;
+    vec4f["normalize"]            = &Vec4f::normalize<>;
     vec4f["lerp"]                 = &Vec4f::lerp;
     vec4f["nlerp"]                = &Vec4f::nlerp;
     vec4f["strictlyEquals"]       = &Vec4f::strictlyEquals;

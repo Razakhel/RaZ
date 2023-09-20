@@ -96,8 +96,11 @@ constexpr Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const noexce
 }
 
 template <typename T, std::size_t Size>
-constexpr Vector<T, Size> Vector<T, Size>::normalize() const noexcept {
-  Vector<T, Size> res = *this;
+template <typename NormedT>
+constexpr Vector<NormedT, Size> Vector<T, Size>::normalize() const noexcept {
+  static_assert(std::is_floating_point_v<NormedT>, "Error: The normalized vector's type must be floating-point.");
+
+  Vector<NormedT, Size> res(*this);
   res /= computeLength();
   return res;
 }
