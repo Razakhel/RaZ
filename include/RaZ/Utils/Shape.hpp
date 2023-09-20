@@ -155,14 +155,14 @@ public:
   /// \return Computed centroid.
   Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) * 0.5f; }
   AABB computeBoundingBox() const override;
-  /// Line length computation.
-  /// To be used if the actual length is needed; otherwise, prefer computeSquaredLength().
-  /// \return Line's length.
-  float computeLength() const { return (m_endPos - m_beginPos).computeLength(); }
   /// Line squared length computation.
   /// To be preferred over computeLength() for faster operations.
   /// \return Line's squared length.
   float computeSquaredLength() const { return (m_endPos - m_beginPos).computeSquaredLength(); }
+  /// Line length computation.
+  /// To be used if the actual length is needed; otherwise, prefer computeSquaredLength().
+  /// \return Line's length.
+  float computeLength() const { return (m_endPos - m_beginPos).computeLength(); }
 
   /// Checks if the current line is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.

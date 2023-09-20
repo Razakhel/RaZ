@@ -86,16 +86,20 @@ public:
   /// \param normal Direction to compute the reflection over.
   /// \return Vector's reflection.
   constexpr Vector reflect(const Vector& normal) const noexcept { return (*this - normal * dot(normal) * 2); }
-  /// Computes the length of the vector.
-  /// Calculating the actual length requires a square root operation to be involved, which is expensive.
-  /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredLength().
-  /// \return Vector's length.
-  constexpr float computeLength() const noexcept { return std::sqrt(computeSquaredLength()); }
   /// Computes the squared length of the vector.
   /// The squared length is equal to the dot product of the vector with itself.
   /// This calculation does not involve a square root; it is then to be preferred over computeLength() for faster operations.
+  /// \tparam SqLengthT Type of the squared length value. For vectors of an integral type, it is defined to a large unsigned integer type to avoid overflows.
   /// \return Vector's squared length.
-  constexpr float computeSquaredLength() const noexcept { return dot(*this); }
+  template <typename SqLengthT = std::conditional_t<std::is_integral_v<T>, uint64_t, T>>
+  constexpr SqLengthT computeSquaredLength() const noexcept { return dot(*this); }
+  /// Computes the length of the vector.
+  /// Calculating the actual length requires a square root operation to be involved, which is expensive.
+  /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredLength().
+  /// \tparam LengthT Type of the length value. For vectors of an integral type, it is defined to float; otherwise, it is the same as the original vector's.
+  /// \return Vector's length.
+  template <typename LengthT = std::conditional_t<std::is_integral_v<T>, float, T>>
+  constexpr LengthT computeLength() const noexcept { return std::sqrt(static_cast<LengthT>(computeSquaredLength())); }
   /// Computes the normalized vector.
   /// Normalizing a vector makes it of length 1.
   /// \return Normalized vector.

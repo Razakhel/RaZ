@@ -88,17 +88,17 @@ TEST_CASE("Line basic") {
   CHECK(line3.computeCentroid() == Raz::Vec3f(3.5f, 3.75f, 0.f));
   CHECK(line4.computeCentroid() == Raz::Vec3f(-2.f, -2.f, 0.f));
 
-  CHECK_THAT(line1.computeLength(), IsNearlyEqualTo(1.f));
   CHECK_THAT(line1.computeSquaredLength(), IsNearlyEqualTo(1.f));
+  CHECK_THAT(line1.computeLength(), IsNearlyEqualTo(1.f));
 
-  CHECK_THAT(line2.computeLength(), IsNearlyEqualTo(1.f));
   CHECK_THAT(line2.computeSquaredLength(), IsNearlyEqualTo(1.f));
+  CHECK_THAT(line2.computeLength(), IsNearlyEqualTo(1.f));
 
-  CHECK_THAT(line3.computeLength(), IsNearlyEqualTo(4.7169905f));
   CHECK_THAT(line3.computeSquaredLength(), IsNearlyEqualTo(22.25f));
+  CHECK_THAT(line3.computeLength(), IsNearlyEqualTo(4.7169905f));
 
-  CHECK_THAT(line4.computeLength(), IsNearlyEqualTo(22.6274166f));
   CHECK_THAT(line4.computeSquaredLength(), IsNearlyEqualTo(512.f));
+  CHECK_THAT(line4.computeLength(), IsNearlyEqualTo(22.6274166f));
 }
 
 TEST_CASE("Line point containment") {

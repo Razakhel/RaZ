@@ -27,8 +27,8 @@ void LuaWrapper::registerShapeTypes() {
                                                         sol::base_classes, sol::bases<Shape>());
     line["getBeginPos"]          = &Line::getBeginPos;
     line["getEndPos"]            = &Line::getEndPos;
-    line["computeLength"]        = &Line::computeLength;
     line["computeSquaredLength"] = &Line::computeSquaredLength;
+    line["computeLength"]        = &Line::computeLength;
   }
 
   {

@@ -175,6 +175,26 @@ TEST_CASE("Vector manipulations") {
   CHECK(vec3f1.reflect(vec3f2) == Raz::Vec3f(-4'019'108.859'878'28f, -350'714.439'453f, -46'922.543'011'268f));
 }
 
+TEST_CASE("Vector length") {
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().computeSquaredLength()), uint64_t>);
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().computeLength()), float>);
+  CHECK(vec3b1.computeSquaredLength() == 1169);
+  CHECK(vec3b1.computeLength() == 34.190643311f);
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3i>().computeSquaredLength()), uint64_t>);
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3i>().computeLength()), float>);
+  CHECK(vec3i1.computeSquaredLength() == 351264868);
+  CHECK(vec3i1.computeLength() == 18742.060546875f);
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3f>().computeSquaredLength()), float>);
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3f>().computeLength()), float>);
+  CHECK(vec3f1.computeSquaredLength() == 1774.876342773f);
+  CHECK(vec3f1.computeLength() == 42.12928009f);
+
+  CHECK_THAT(vec4f1.computeSquaredLength(), IsNearlyEqualTo(724751.5f));
+  CHECK_THAT(vec4f1.computeLength(), IsNearlyEqualTo(851.323364258f));
+}
+
 TEST_CASE("Vector interpolation") {
   // lerp() doesn't normalize the resulting vector
   CHECK(vec3f1.lerp(vec3f2, 0.f) == vec3f1);

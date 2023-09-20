@@ -100,8 +100,8 @@ TEST_CASE("LuaUtils Shape") {
     local line = Line.new(Vec3f.new(-1), Vec3f.new(1))
     assert(line:getBeginPos() == Vec3f.new(-1))
     assert(line:getEndPos() == Vec3f.new(1))
-    assert(FloatUtils.areNearlyEqual(line:computeLength(), 3.4641015529633))
     assert(line:computeSquaredLength() == 12)
+    assert(FloatUtils.areNearlyEqual(line:computeLength(), 3.4641015529633))
 
     local obb = OBB.new(Vec3f.new(-1), Vec3f.new(1))
     obb       = OBB.new(Vec3f.new(-1), Vec3f.new(1), Quaternionf.identity())

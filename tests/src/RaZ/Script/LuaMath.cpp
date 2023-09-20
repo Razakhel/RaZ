@@ -290,8 +290,8 @@ TEST_CASE("LuaMath Vector") {
     assert(vec2:x() == vec2[0])
     assert(vec2:y() == vec2[1])
 
-    assert(FloatUtils.areNearlyEqual(vec2:computeLength(), 2.236068))
     assert(vec2:computeSquaredLength() == vec2:dot(vec2))
+    assert(FloatUtils.areNearlyEqual(vec2:computeLength(), 2.236068))
     assert(FloatUtils.areNearlyEqual(vec2:normalize():computeSquaredLength(), 1))
 
     assert(vec2:reflect(Vec2f.new(0, 1)) == Vec2f.new(1, -2))
@@ -315,8 +315,8 @@ TEST_CASE("LuaMath Vector") {
     assert(vec3:y() == vec3[1])
     assert(vec3:z() == vec3[2])
 
-    assert(FloatUtils.areNearlyEqual(vec3:computeLength(), 3.7416574))
     assert(vec3:computeSquaredLength() == vec3:dot(vec3))
+    assert(FloatUtils.areNearlyEqual(vec3:computeLength(), 3.7416574))
     assert(FloatUtils.areNearlyEqual(vec3:normalize():computeSquaredLength(), 1))
 
     assert(vec3:cross(Vec3f.new(0, 1, 0)) == Vec3f.new(-3, 0, 1))
@@ -341,8 +341,8 @@ TEST_CASE("LuaMath Vector") {
     assert(vec4:z() == vec4[2])
     assert(vec4:w() == vec4[3])
 
-    assert(FloatUtils.areNearlyEqual(vec4:computeLength(), 5.4772257))
     assert(vec4:computeSquaredLength() == vec4:dot(vec4))
+    assert(FloatUtils.areNearlyEqual(vec4:computeLength(), 5.4772257))
     assert(FloatUtils.areNearlyEqual(vec4:normalize():computeSquaredLength(), 1))
 
     assert(vec4:reflect(Vec4f.new(0, 1, 0, 1)) == Vec4f.new(1, -10, 3, -8))
