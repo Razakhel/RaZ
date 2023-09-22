@@ -22,6 +22,9 @@ constexpr Raz::Vec3f vec3f2(541.41f, 47.25f, 6.321f);
 constexpr Raz::Vec4f vec4f1(84.47f, 2.f, 0.001f, 847.12f);
 constexpr Raz::Vec4f vec4f2(13.01f, 0.15f, 84.8f, 72.f);
 
+constexpr Raz::Vec3d vec3d1(-18.1, 4752.001, -842.0);
+constexpr Raz::Vec3d vec3d2(13.01, -0.00000001, 351.025465545);
+
 } // namespace
 
 TEST_CASE("Vector deduction guides") {
@@ -84,6 +87,9 @@ TEST_CASE("Vector dot") {
   CHECK(vec3f1.dot(vec3f2) == vec3f2.dot(vec3f1)); // A · B == B · A
 
   CHECK_THAT(vec4f1.dot(vec4f2), IsNearlyEqualTo(62091.98f));
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3d>().dot(std::declval<Raz::Vec3d>())), double>);
+  CHECK_THAT(vec3d1.dot(vec3d2), IsNearlyEqualTo(-295798.92303641));
 }
 
 TEST_CASE("Vector cross") {
@@ -93,8 +99,11 @@ TEST_CASE("Vector cross") {
   CHECK(vec3i1.cross(vec3i2) == Raz::Vec3i(19829036, 13869944, 50784));
 
   CHECK_THAT(vec3f1.cross(vec3f1), IsNearlyEqualToVector(Raz::Vec3f(0.f), 0.00001f)); // Clang in Release gives values above the default tolerance
-  CHECK(vec3f1.cross(vec3f2) == Raz::Vec3f(224.1855f, 453.09156f, -22588.965f));
+  CHECK_THAT(vec3f1.cross(vec3f2), IsNearlyEqualToVector(Raz::Vec3f(224.1855f, 453.09156f, -22588.965f)));
   CHECK(vec3f1.cross(vec3f2) == -vec3f2.cross(vec3f1)); // A x B == -(B x A)
+
+  CHECK_THAT(vec3d1.cross(vec3d1), IsNearlyEqualToVector(Raz::Vec3d(0.0), 0.00001f));
+  CHECK_THAT(vec3d1.cross(vec3d2), IsNearlyEqualToVector(Raz::Vec3d(1668073.3632868854, -4600.859073635499, -61823.533009819)));
 }
 
 TEST_CASE("Vector/scalar operations") {
@@ -126,6 +135,7 @@ TEST_CASE("Vector/scalar operations") {
   CHECK((vec4f2 / 7.32f) == Raz::Vec4f(1.777322404f, 0.0204918f, 11.58469945f, 9.83606557f));
 
   // If IEEE 754 is supported, check that division by 0 behaves as expected
+
   if constexpr (std::numeric_limits<float>::is_iec559) {
     const Raz::Vec3f vecInf = vec3f1 / 0.f;
     CHECK(vecInf[0] == std::numeric_limits<float>::infinity());
@@ -133,6 +143,18 @@ TEST_CASE("Vector/scalar operations") {
     CHECK(vecInf[2] == std::numeric_limits<float>::infinity());
 
     const Raz::Vec3f vecNaN = Raz::Vec3f(0.f) / 0.f;
+    CHECK(std::isnan(vecNaN[0]));
+    CHECK(std::isnan(vecNaN[1]));
+    CHECK(std::isnan(vecNaN[2]));
+  }
+
+  if constexpr (std::numeric_limits<double>::is_iec559) {
+    const Raz::Vec3d vecInf = vec3d1 / 0.0;
+    CHECK(vecInf[0] == -std::numeric_limits<double>::infinity());
+    CHECK(vecInf[1] == std::numeric_limits<double>::infinity());
+    CHECK(vecInf[2] == -std::numeric_limits<double>::infinity());
+
+    const Raz::Vec3d vecNaN = Raz::Vec3d(0.0) / 0.0;
     CHECK(std::isnan(vecNaN[0]));
     CHECK(std::isnan(vecNaN[1]));
     CHECK(std::isnan(vecNaN[2]));
@@ -151,14 +173,20 @@ TEST_CASE("Vector/vector operations") {
   CHECK((vec3i1 * vec3i2) == Raz::Vec3i(-35520, 0, 337356));
   CHECK((vec3i1 / vec3i2) == Raz::Vec3i(0, 0, 1041));
 
-  CHECK(-vec3f1 == Raz::Vec3f(-3.18f, -42.f, -0.874f));
-  CHECK((vec3f1 + vec3f1) == vec3f1 * 2);
-  CHECK((vec3f1 - vec3f1) == Raz::Vec3f(0.f));
-  CHECK((vec3f1 * vec3f2) == Raz::Vec3f(1721.6838f, 1984.5f, 5.524554f));
-  CHECK((vec3f1 / vec3f2) == Raz::Vec3f(0.00587355f, 0.888889f, 0.1382692f));
+  CHECK((-vec3f1).strictlyEquals(Raz::Vec3f(-3.18f, -42.f, -0.874f)));
+  CHECK_THAT(vec3f1 + vec3f1, IsNearlyEqualToVector(vec3f1 * 2));
+  CHECK_THAT(vec3f1 - vec3f1, IsNearlyEqualToVector(Raz::Vec3f(0.f)));
+  CHECK_THAT(vec3f1 * vec3f2, IsNearlyEqualToVector(Raz::Vec3f(1721.6838f, 1984.5f, 5.524554f)));
+  CHECK_THAT(vec3f1 / vec3f2, IsNearlyEqualToVector(Raz::Vec3f(0.00587355f, 0.888889f, 0.1382692f)));
 
-  CHECK_THAT((vec4f1 * vec4f2), IsNearlyEqualToVector(Raz::Vec4f(1098.9547f, 0.3, 0.0848, 60992.64)));
-  CHECK_THAT((vec4f1 / vec4f2), IsNearlyEqualToVector(Raz::Vec4f(6.4926977, 13.333333, 0.0000117, 11.765555)));
+  CHECK_THAT(vec4f1 * vec4f2, IsNearlyEqualToVector(Raz::Vec4f(1098.9547f, 0.3, 0.0848, 60992.64)));
+  CHECK_THAT(vec4f1 / vec4f2, IsNearlyEqualToVector(Raz::Vec4f(6.4926977, 13.333333, 0.0000117, 11.765555)));
+
+  CHECK((-vec3d1).strictlyEquals(Raz::Vec3d(18.1, -4752.001, 842.0)));
+  CHECK_THAT(vec3d1 + vec3d1, IsNearlyEqualToVector(vec3d1 * 2));
+  CHECK_THAT(vec3d1 - vec3d1, IsNearlyEqualToVector(Raz::Vec3d(0.0)));
+  CHECK_THAT(vec3d1 * vec3d2, IsNearlyEqualToVector(Raz::Vec3d(-235.481, -0.0000475200099999, -295563.44198889)));
+  CHECK_THAT(vec3d1 / vec3d2, IsNearlyEqualToVector(Raz::Vec3d(-1.391237509607994, -475200100000.0, -2.3986863707814358)));
 }
 
 TEST_CASE("Vector/matrix operations") {
@@ -188,8 +216,12 @@ TEST_CASE("Vector reflection") {
   // The reflected vector cannot be computed for unsigned types
 
   CHECK(Raz::Vec3f(1.f, -1.f, 0.f).reflect(Raz::Vec3f(0.f, 1.f, 0.f)) == Raz::Vec3f(1.f, 1.f, 0.f));
-  CHECK(vec3f1.reflect(Raz::Vec3f(0.f, 1.f, 0.f)) == Raz::Vec3f(3.18f, -42.f, 0.874f));
-  CHECK(vec3f1.reflect(vec3f2) == Raz::Vec3f(-4'019'108.859'878'28f, -350'714.439'453f, -46'922.543'011'268f));
+  CHECK_THAT(vec3f1.reflect(Raz::Vec3f(0.f, 1.f, 0.f)), IsNearlyEqualToVector(Raz::Vec3f(3.18f, -42.f, 0.874f)));
+  CHECK_THAT(vec3f1.reflect(vec3f2), IsNearlyEqualToVector(Raz::Vec3f(-4019108.85987828f, -350714.439453f, -46922.543011268f)));
+
+  CHECK(Raz::Vec3d(0.0, 1.0, 0.0).reflect(Raz::Vec3d(-1.0, -1.0, 0.0)) == Raz::Vec3d(-2.0, -1.0, 0.0));
+  CHECK_THAT(vec3d1.reflect(Raz::Vec3d(0.0, 1.0, 0.0)), IsNearlyEqualToVector(Raz::Vec3d(-18.1, -4752.001, -842.0)));
+  CHECK_THAT(vec3d1.reflect(vec3d2), IsNearlyEqualToVector(Raz::Vec3d(7696669.877407388, 4751.995084021539, 207665067.33313086)));
 }
 
 TEST_CASE("Vector length") {
@@ -210,6 +242,11 @@ TEST_CASE("Vector length") {
 
   CHECK_THAT(vec4f1.computeSquaredLength(), IsNearlyEqualTo(724751.5f));
   CHECK_THAT(vec4f1.computeLength(), IsNearlyEqualTo(851.323364258f));
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3d>().computeSquaredLength()), double>);
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3d>().computeLength()), double>);
+  CHECK(vec3d1.computeSquaredLength() == 23290805.114001002);
+  CHECK(vec3d1.computeLength() == 4826.054818793607);
 }
 
 TEST_CASE("Vector normalization") {
@@ -225,6 +262,9 @@ TEST_CASE("Vector normalization") {
 
   CHECK_THAT(vec4f1.normalize().computeSquaredLength(), IsNearlyEqualTo(1.f));
   CHECK_THAT(vec3f1.normalize().computeLength(), IsNearlyEqualTo(1.f));
+
+  CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3d>().normalize()), Raz::Vec3d>);
+  CHECK_THAT(vec3d1.normalize(), IsNearlyEqualToVector(Raz::Vec3d(-0.0037504754254997, 0.9846554128425506, -0.174469630291203)));
 }
 
 TEST_CASE("Vector interpolation") {
@@ -266,6 +306,12 @@ TEST_CASE("Vector interpolation") {
   CHECK(vec4f1.nlerp(vec4f2, 0.5f) == (vec4f1 + vec4f2).normalize());
   CHECK(vec4f1.nlerp(vec4f2, 0.75f) == Raz::Vec4f(0.11226334f, 0.00222709f, 0.23125429f, 0.966392f)); // (vec4f1 + vec4f2 * 3).normalize()
   CHECK(vec4f1.nlerp(vec4f2, 1.f) == vec4f2.normalize());
+
+  CHECK_THAT(vec3d1.lerp(vec3d2, 0.0), IsNearlyEqualToVector(vec3d1));
+  CHECK_THAT(vec3d1.lerp(vec3d2, 0.25), IsNearlyEqualToVector(Raz::Vec3d(-10.3225, 3564.0007499974999, -543.74363361375)));
+  CHECK_THAT(vec3d1.lerp(vec3d2, 0.5), IsNearlyEqualToVector((vec3d1 + vec3d2) / 2, 0.000000000000001));
+  CHECK_THAT(vec3d1.lerp(vec3d2, 0.75), IsNearlyEqualToVector(Raz::Vec3d(5.232499999999998, 1188.0002499925003, 52.76909915874989)));
+  CHECK_THAT(vec3d1.lerp(vec3d2, 1.0), IsNearlyEqualToVector(vec3d2, 0.000000000001));
 }
 
 TEST_CASE("Vector hash") {
@@ -280,6 +326,9 @@ TEST_CASE("Vector hash") {
 
   CHECK(vec4f1.hash() == vec4f1.hash());
   CHECK_FALSE(vec4f1.hash() == vec4f2.hash());
+
+  CHECK(vec3d1.hash() == vec3d1.hash());
+  CHECK_FALSE(vec3d1.hash() == vec3d2.hash());
 
   constexpr Raz::Vec3f vec3f1Swizzled(vec3f1[2], vec3f1[0], vec3f1[1]);
   CHECK_FALSE(vec3f1.hash() == vec3f1Swizzled.hash());
@@ -354,11 +403,16 @@ TEST_CASE("Vector strict equality") {
   CHECK_FALSE(vec3f1.strictlyEquals(vec3f1Epsilon)); // Strict-equality checks
   CHECK_FALSE(std::equal_to<Raz::Vec3f>()(vec3f1, vec3f1Epsilon));
 
+  constexpr Raz::Vec3d vec3d2Epsilon = vec3d2 + std::numeric_limits<double>::epsilon();
+  CHECK(vec3d2 == vec3d2Epsilon); // Near-equality check
+  CHECK_FALSE(vec3d2.strictlyEquals(vec3d2Epsilon)); // Strict-equality checks
+  CHECK_FALSE(std::equal_to<Raz::Vec3d>()(vec3d2, vec3d2Epsilon));
+
   constexpr std::array<Raz::Vec3f, 3> vectors = { vec3f1Swizzled, vec3f1Epsilon, vec3f1 };
 
   // When using a simple find(), which uses operator==, vec3f1Epsilon is found instead of vec3f1
   const auto foundIter = std::find(vectors.cbegin(), vectors.cend(), vec3f1);
-  CHECK_FALSE(std::distance(vectors.cbegin(), foundIter) == 2);
+  CHECK(std::distance(vectors.cbegin(), foundIter) == 1);
 
   // To search for a specific element, find_if() must be used with a strict equality check
   const auto foundIfIter = std::find_if(vectors.cbegin(), vectors.cend(), [&] (const Raz::Vec3f& compVec) { return vec3f1.strictlyEquals(compVec); });
@@ -391,6 +445,12 @@ TEST_CASE("Vector less-than") {
   CHECK_FALSE(std::less<Raz::Vec4f>()(vec4f1, vec4f1));
   CHECK(std::less<Raz::Vec4f>()(vec4f1, vec4f1 + std::numeric_limits<float>::epsilon()));
   CHECK_FALSE(std::less<Raz::Vec4f>()(vec4f1 + std::numeric_limits<float>::epsilon(), vec4f1));
+
+  CHECK(std::less<Raz::Vec3d>()(vec3d1, vec3d2));
+  CHECK_FALSE(std::less<Raz::Vec3d>()(vec3d2, vec3d1));
+  CHECK_FALSE(std::less<Raz::Vec3d>()(vec3d2, vec3d2));
+  CHECK(std::less<Raz::Vec3d>()(vec3d2, vec3d2 + std::numeric_limits<double>::epsilon()));
+  CHECK_FALSE(std::less<Raz::Vec3d>()(vec3d2 + std::numeric_limits<double>::epsilon(), vec3d2));
 }
 
 TEST_CASE("Vector conversion") {
@@ -400,6 +460,7 @@ TEST_CASE("Vector conversion") {
   CHECK(Raz::Vec4u(vec4f1) == Raz::Vec4u(84, 2, 0, 847));
   CHECK(Raz::Vec4d(vec4f2) == Raz::Vec4d(13.010000228881835, 0.1500000059604644, 84.8000030517578, 72.0));
   CHECK(Raz::Vec4f(vec4f2).strictlyEquals(vec4f2));
+  CHECK(Raz::Vec3i(vec3d1) == Raz::Vec3i(-18, 4752, -842));
 }
 
 TEST_CASE("Vector printing") {
@@ -423,4 +484,8 @@ TEST_CASE("Vector printing") {
   stream.str(std::string());
   stream << vec4f1;
   CHECK(stream.str() == "[ 84.47, 2, 0.001, 847.12 ]");
+
+  stream.str(std::string());
+  stream << vec3d2;
+  CHECK(stream.str() == "[ 13.01, -1e-08, 351.025 ]");
 }
