@@ -147,13 +147,13 @@ TEST_CASE("Quaternion/vector multiplication") {
 
   // Checking that the matrix multiplication behaves the same way
 
-  CHECK(quatRotX * pos == Raz::Mat3f(quatRotX.computeMatrix()) * pos);
-  CHECK(quatRotY * pos == Raz::Mat3f(quatRotY.computeMatrix()) * pos);
-  CHECK(quatRotZ * pos == Raz::Mat3f(quatRotZ.computeMatrix()) * pos);
+  CHECK_THAT(quatRotX * pos, IsNearlyEqualToVector(Raz::Mat3f(quatRotX.computeMatrix()) * pos, 0.000001f));
+  CHECK_THAT(quatRotY * pos, IsNearlyEqualToVector(Raz::Mat3f(quatRotY.computeMatrix()) * pos, 0.000001f));
+  CHECK_THAT(quatRotZ * pos, IsNearlyEqualToVector(Raz::Mat3f(quatRotZ.computeMatrix()) * pos, 0.000001f));
 
-  CHECK(pos * quatRotX == pos * Raz::Mat3f(quatRotX.computeMatrix()));
-  CHECK(pos * quatRotY == pos * Raz::Mat3f(quatRotY.computeMatrix()));
-  CHECK(pos * quatRotZ == pos * Raz::Mat3f(quatRotZ.computeMatrix()));
+  CHECK_THAT(pos * quatRotX, IsNearlyEqualToVector(pos * Raz::Mat3f(quatRotX.computeMatrix()), 0.000001f));
+  CHECK_THAT(pos * quatRotY, IsNearlyEqualToVector(pos * Raz::Mat3f(quatRotY.computeMatrix()), 0.000001f));
+  CHECK_THAT(pos * quatRotZ, IsNearlyEqualToVector(pos * Raz::Mat3f(quatRotZ.computeMatrix()), 0.000001f));
 }
 
 TEST_CASE("Quaternion/quaternion multiplication") {

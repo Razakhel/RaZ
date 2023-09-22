@@ -190,6 +190,7 @@ public:
   /// \param val Value to be set.
   void setFloatValue(std::size_t widthIndex, std::size_t heightIndex, uint8_t channelIndex, float val);
   /// Sets a pixel in the image.
+  /// \note This sets a single value, hence requires an image with a single channel.
   /// \tparam T Type of the pixel to be set.
   /// \param widthIndex Width index of the pixel to be set.
   /// \param heightIndex Height index of the pixel to be set.

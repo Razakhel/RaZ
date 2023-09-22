@@ -25,15 +25,17 @@ constexpr Raz::Vec4f vec4f2(13.01f, 0.15f, 84.8f, 72.f);
 } // namespace
 
 TEST_CASE("Vector deduction guides") {
-  constexpr Raz::Vector vec2i(1, 2);
   constexpr Raz::Vector vec3b(static_cast<uint8_t>(1), 2, 3);
-  constexpr Raz::Vector vec3f(1.f, 2.f, 3.f);
+  constexpr Raz::Vector vec2i(1, 2);
   constexpr Raz::Vector vec4u(1u, 2u, 3u, 4u);
+  constexpr Raz::Vector vec3f(1.f, 2.f, 3.f);
+  constexpr Raz::Vector vec5d(1.0, 2.0, 3.0, 4.0, 5.0);
 
-  CHECK(std::is_same_v<std::decay_t<decltype(vec2i)>, Raz::Vec2i>);
   CHECK(std::is_same_v<std::decay_t<decltype(vec3b)>, Raz::Vec3b>);
-  CHECK(std::is_same_v<std::decay_t<decltype(vec3f)>, Raz::Vec3f>);
+  CHECK(std::is_same_v<std::decay_t<decltype(vec2i)>, Raz::Vec2i>);
   CHECK(std::is_same_v<std::decay_t<decltype(vec4u)>, Raz::Vec4u>);
+  CHECK(std::is_same_v<std::decay_t<decltype(vec3f)>, Raz::Vec3f>);
+  CHECK(std::is_same_v<std::decay_t<decltype(vec5d)>, Raz::Vector<double, 5>>);
 }
 
 TEST_CASE("Vector indexing") {
@@ -96,6 +98,18 @@ TEST_CASE("Vector cross") {
 }
 
 TEST_CASE("Vector/scalar operations") {
+  CHECK((vec3b1 + 4) == Raz::Vec3b(35, 12, 16));
+  CHECK((vec3b2 - 8) == Raz::Vec3b(40, 247, 248)); // Underflowing from 0 to 248 (255 - 7)
+  CHECK((vec3b1 * 2) == Raz::Vec3b(62, 16, 24));
+  CHECK((vec3b2 / 3) == Raz::Vec3b(16, 85, 0));
+
+  CHECK((vec3i1 + 72) == Raz::Vec3i(24, 72, 18814));
+  CHECK((vec3i2 - 20) == Raz::Vec3i(720, -1078, -2));
+  CHECK((vec3i1 * 5) == Raz::Vec3i(-240, 0, 93710));
+  CHECK((vec3i2 / 10) == Raz::Vec3i(74, -105, 1));
+
+  // Floating-point vectors
+
   CHECK((vec3f1 + 3.5f) == Raz::Vec3f(6.68f, 45.5f, 4.374f));
   CHECK((vec3f2 - 74.42f) == Raz::Vec3f(466.99f, -27.17f, -68.099f));
   CHECK((vec3f1 + 8.2f) == (8.2f + vec3f1));
@@ -127,7 +141,15 @@ TEST_CASE("Vector/scalar operations") {
 
 TEST_CASE("Vector/vector operations") {
   CHECK((vec3b1 + vec3b2) == Raz::Vec3b(79, 7, 12)); // Values are overflowed
+  CHECK((vec3b1 - vec3b2) == Raz::Vec3b(239, 9, 12)); // Values are underflowed
+  CHECK((vec3b1 * vec3b2) == Raz::Vec3b(208, 248, 0)); // Values are overflowed
+  CHECK((vec3b1 / (vec3b2 + Raz::Vec3b(0, 0, 1))) == Raz::Vec3b(0, 0, 12)); // Adding 1 to Z to avoid dividing by 0
+
+  CHECK(-vec3i1 == Raz::Vec3i(48, 0, -18742));
+  CHECK((vec3i1 + vec3i2) == Raz::Vec3i(692, -1058, 18760));
   CHECK((vec3i1 - vec3i2) == Raz::Vec3i(-788, 1058, 18724));
+  CHECK((vec3i1 * vec3i2) == Raz::Vec3i(-35520, 0, 337356));
+  CHECK((vec3i1 / vec3i2) == Raz::Vec3i(0, 0, 1041));
 
   CHECK(-vec3f1 == Raz::Vec3f(-3.18f, -42.f, -0.874f));
   CHECK((vec3f1 + vec3f1) == vec3f1 * 2);
@@ -247,6 +269,12 @@ TEST_CASE("Vector interpolation") {
 }
 
 TEST_CASE("Vector hash") {
+  CHECK(vec3b1.hash() == vec3b1.hash());
+  CHECK_FALSE(vec3b1.hash() == vec3b2.hash());
+
+  CHECK(vec3i1.hash() == vec3i1.hash());
+  CHECK_FALSE(vec3i1.hash() == vec3i2.hash());
+
   CHECK(vec3f1.hash() == vec3f1.hash());
   CHECK_FALSE(vec3f1.hash() == vec3f2.hash());
 
@@ -278,6 +306,8 @@ TEST_CASE("Vector hash") {
 }
 
 TEST_CASE("Vector near-equality") {
+  // Near-equality applies only to vectors of floating-point values
+
   CHECK_FALSE(vec3f1 == vec3f2);
 
   constexpr Raz::Vec3f baseVec(1.f);
@@ -303,6 +333,12 @@ TEST_CASE("Vector near-equality") {
 }
 
 TEST_CASE("Vector strict equality") {
+  CHECK(vec3b1.strictlyEquals(vec3b1));
+  CHECK_FALSE(vec3b1.strictlyEquals(vec3b1 + Raz::Vec3b(1, 0, 0)));
+
+  CHECK(vec3i1.strictlyEquals(vec3i1));
+  CHECK_FALSE(vec3i1.strictlyEquals(vec3i1 + Raz::Vec3i(1, 0, 0)));
+
   CHECK(vec3f1.strictlyEquals(vec3f1));
   CHECK(vec4f1.strictlyEquals(vec4f1));
 
@@ -338,6 +374,12 @@ TEST_CASE("Vector strict equality") {
 }
 
 TEST_CASE("Vector less-than") {
+  CHECK(std::less<Raz::Vec3b>()(vec3b1, vec3b2));
+  CHECK_FALSE(std::less<Raz::Vec3b>()(vec3b2, vec3b1));
+
+  CHECK(std::less<Raz::Vec3i>()(vec3i1, vec3i2));
+  CHECK_FALSE(std::less<Raz::Vec3i>()(vec3i2, vec3i1));
+
   CHECK(std::less<Raz::Vec3f>()(vec3f1, vec3f2));
   CHECK_FALSE(std::less<Raz::Vec3f>()(vec3f2, vec3f1));
   CHECK_FALSE(std::less<Raz::Vec3f>()(vec3f1, vec3f1)); // Equal vectors are not strictly less than the other
