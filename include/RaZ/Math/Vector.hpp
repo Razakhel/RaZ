@@ -85,7 +85,7 @@ public:
   /// \image html vector_reflect.jpg "Incident vector reflection"
   /// \param normal Direction to compute the reflection over.
   /// \return Vector's reflection.
-  constexpr Vector reflect(const Vector& normal) const noexcept { return (*this - normal * dot(normal) * 2); }
+  constexpr Vector reflect(const Vector& normal) const noexcept;
   /// Computes the squared length of the vector.
   /// The squared length is equal to the dot product of the vector with itself.
   /// This calculation does not involve a square root; it is then to be preferred over computeLength() for faster operations.

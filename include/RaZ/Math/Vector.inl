@@ -96,6 +96,13 @@ constexpr Vector<T, Size> Vector<T, Size>::cross(const Vector& vec) const noexce
 }
 
 template <typename T, std::size_t Size>
+constexpr Vector<T, Size> Vector<T, Size>::reflect(const Vector& normal) const noexcept {
+  static_assert(std::is_signed_v<T>, "Error: The cross product can only be computed with vectors of a signed type.");
+
+  return (*this - normal * static_cast<T>(dot(normal)) * 2);
+}
+
+template <typename T, std::size_t Size>
 template <typename NormedT>
 constexpr Vector<NormedT, Size> Vector<T, Size>::normalize() const noexcept {
   static_assert(std::is_floating_point_v<NormedT>, "Error: The normalized vector's type must be floating-point.");

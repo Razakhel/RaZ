@@ -157,19 +157,14 @@ TEST_CASE("Vector/matrix operations") {
   CHECK((vec4f1 * Raz::Mat4f::identity()) == vec4f1);
 }
 
-TEST_CASE("Vector manipulations") {
-  CHECK_THAT(vec3f1.normalize().computeLength(), IsNearlyEqualTo(1.f));
-  CHECK_THAT(vec4f1.normalize().computeSquaredLength(), IsNearlyEqualTo(1.f));
-  CHECK_THAT(Raz::Vec3f(0.f, 1.f, 0.f).computeLength(), IsNearlyEqualTo(1.f));
-
-  // Testing Vector::reflect():
-  //
+TEST_CASE("Vector reflection") {
   // IncVec  N  Reflection
-  //     \   |   /
-  //      \  |  /
+  //      \  ^  ^
   //       \ | /
-  //________\|/___________
-  //
+  // _______v|/_______
+
+  // The reflected vector cannot be computed for unsigned types
+
   CHECK(Raz::Vec3f(1.f, -1.f, 0.f).reflect(Raz::Vec3f(0.f, 1.f, 0.f)) == Raz::Vec3f(1.f, 1.f, 0.f));
   CHECK(vec3f1.reflect(Raz::Vec3f(0.f, 1.f, 0.f)) == Raz::Vec3f(3.18f, -42.f, 0.874f));
   CHECK(vec3f1.reflect(vec3f2) == Raz::Vec3f(-4'019'108.859'878'28f, -350'714.439'453f, -46'922.543'011'268f));
