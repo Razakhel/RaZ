@@ -57,8 +57,10 @@ void LuaWrapper::registerCoreTypes() {
     sol::usertype<World> world = state.new_usertype<World>("World",
                                                            sol::constructors<World(),
                                                                              World(std::size_t)>());
+#if defined(RAZ_USE_AUDIO)
     world["addAudioSystem"]   = sol::overload(&World::addSystem<AudioSystem>,
                                               &World::addSystem<AudioSystem, const char*>);
+#endif
     world["addBvhSystem"]     = &World::addSystem<BvhSystem>;
     world["addPhysicsSystem"] = &World::addSystem<PhysicsSystem>;
     world["addRenderSystem"]  = sol::overload(&World::addSystem<RenderSystem>,

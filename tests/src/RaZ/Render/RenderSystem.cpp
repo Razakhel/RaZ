@@ -92,6 +92,7 @@ TEST_CASE("RenderSystem Cook-Torrance ball") {
   CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_cubemap_base.png", true)));
 }
 
+#if !defined(RAZ_NO_OVERLAY)
 TEST_CASE("RenderSystem overlay render") {
   Raz::World world(1);
 
@@ -156,3 +157,4 @@ TEST_CASE("RenderSystem overlay render") {
     overlay3.disable();
   }
 }
+#endif

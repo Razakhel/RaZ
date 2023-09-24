@@ -1,6 +1,8 @@
 #include "RaZ/Entity.hpp"
+#if defined(RAZ_USE_AUDIO)
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Audio/Sound.hpp"
+#endif
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Physics/Collider.hpp"
@@ -39,29 +41,41 @@ void LuaWrapper::registerEntityTypes() {
     entity["addComponent"]         = bindComponents<Camera,
                                                     Collider,
                                                     Light,
+#if defined(RAZ_USE_AUDIO)
                                                     Listener,
+#endif
                                                     Mesh,
                                                     MeshRenderer,
                                                     RigidBody,
+#if defined(RAZ_USE_AUDIO)
                                                     Sound,
+#endif
                                                     Transform>();
     entity["hasCamera"]            = &Entity::hasComponent<Camera>;
     entity["hasCollider"]          = &Entity::hasComponent<Collider>;
     entity["hasLight"]             = &Entity::hasComponent<Light>;
+#if defined(RAZ_USE_AUDIO)
     entity["hasListener"]          = &Entity::hasComponent<Listener>;
+#endif
     entity["hasMesh"]              = &Entity::hasComponent<Mesh>;
     entity["hasMeshRenderer"]      = &Entity::hasComponent<MeshRenderer>;
     entity["hasRigidBody"]         = &Entity::hasComponent<RigidBody>;
+#if defined(RAZ_USE_AUDIO)
     entity["hasSound"]             = &Entity::hasComponent<Sound>;
+#endif
     entity["hasTransform"]         = &Entity::hasComponent<Transform>;
     entity["getCamera"]            = [] (Entity& e) { return &e.getComponent<Camera>(); };
     entity["getCollider"]          = [] (Entity& e) { return &e.getComponent<Collider>(); };
     entity["getLight"]             = [] (Entity& e) { return &e.getComponent<Light>(); };
+#if defined(RAZ_USE_AUDIO)
     entity["getListener"]          = [] (Entity& e) { return &e.getComponent<Listener>(); };
+#endif
     entity["getMesh"]              = [] (Entity& e) { return &e.getComponent<Mesh>(); };
     entity["getMeshRenderer"]      = [] (Entity& e) { return &e.getComponent<MeshRenderer>(); };
     entity["getRigidBody"]         = [] (Entity& e) { return &e.getComponent<RigidBody>(); };
+#if defined(RAZ_USE_AUDIO)
     entity["getSound"]             = [] (Entity& e) { return &e.getComponent<Sound>(); };
+#endif
     entity["getTransform"]         = [] (Entity& e) { return &e.getComponent<Transform>(); };
   }
 }

@@ -11,7 +11,9 @@ namespace Raz {
 void LuaWrapper::registerTypes() {
   [[maybe_unused]] static const bool _ = [] () {
     registerAnimationTypes();
+#if defined(RAZ_USE_AUDIO)
     registerAudioTypes();
+#endif
     registerCoreTypes();
     registerDataTypes();
     registerEntityTypes();
@@ -20,7 +22,9 @@ void LuaWrapper::registerTypes() {
     registerMatrixTypes();
     registerMeshTypes();
     registerMeshRendererTypes();
+#if !defined(RAZ_NO_OVERLAY)
     registerOverlayTypes();
+#endif
     registerPhysicsTypes();
     registerRenderTypes();
     registerRenderGraphTypes();

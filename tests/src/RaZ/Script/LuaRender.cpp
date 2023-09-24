@@ -166,6 +166,7 @@ TEST_CASE("LuaRender MeshRenderer") {
   )"));
 }
 
+#if !defined(RAZ_NO_OVERLAY)
 TEST_CASE("LuaRender Overlay") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local overlay = Overlay.new()
@@ -344,6 +345,7 @@ TEST_CASE("LuaRender Overlay") {
     overlayTexture:setTexture(Texture2D.new(TextureColorspace.GRAY))
   )"));
 }
+#endif
 
 TEST_CASE("LuaRender RenderGraph") {
   CHECK(Raz::LuaWrapper::execute(R"(

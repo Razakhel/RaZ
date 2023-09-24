@@ -46,33 +46,42 @@ TEST_CASE("LuaCore Entity") {
     entity:addComponent(Camera.new())
     entity:addComponent(Collider.new())
     entity:addComponent(Light.new(LightType.POINT, 1))
-    entity:addComponent(Listener.new())
     entity:addComponent(Mesh.new())
     entity:addComponent(MeshRenderer.new())
     entity:addComponent(RigidBody.new(0, 0))
-    entity:addComponent(Sound.new())
     entity:addComponent(Transform.new())
 
     assert(entity:hasCamera())
     assert(entity:hasCollider())
     assert(entity:hasLight())
-    assert(entity:hasListener())
     assert(entity:hasMesh())
     assert(entity:hasMeshRenderer())
     assert(entity:hasRigidBody())
-    assert(entity:hasSound())
     assert(entity:hasTransform())
 
     assert(entity:getCamera() ~= nil)
     assert(entity:getCollider() ~= nil)
     assert(entity:getLight() ~= nil)
-    assert(entity:getListener() ~= nil)
     assert(entity:getMesh() ~= nil)
     assert(entity:getMeshRenderer() ~= nil)
     assert(entity:getRigidBody() ~= nil)
-    assert(entity:getSound() ~= nil)
     assert(entity:getTransform() ~= nil)
   )"));
+
+#if defined(RAZ_USE_AUDIO)
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local entity = Entity.new(0)
+
+    entity:addComponent(Listener.new())
+    entity:addComponent(Sound.new())
+
+    assert(entity:hasListener())
+    assert(entity:hasSound())
+
+    assert(entity:getListener() ~= nil)
+    assert(entity:getSound() ~= nil)
+  )"));
+#endif
 }
 
 TEST_CASE("LuaCore World") {
@@ -86,13 +95,19 @@ TEST_CASE("LuaCore World") {
     world:refresh()
     world:destroy()
 
-    world:addAudioSystem()
-    world:addAudioSystem("")
     world:addBvhSystem()
     world:addPhysicsSystem()
     world:addRenderSystem()
     world:addRenderSystem(1, 1)
   )"));
+
+#if defined(RAZ_USE_AUDIO)
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local world = World.new()
+    world:addAudioSystem()
+    world:addAudioSystem("")
+  )"));
+#endif
 
 #if !defined(RAZ_NO_WINDOW)
   CHECK(Raz::LuaWrapper::execute(R"(

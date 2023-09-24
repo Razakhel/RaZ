@@ -283,9 +283,9 @@ if (RAZ_PLATFORM_LINUX)
     endif ()
 endif ()
 
-################
-# RaZ - OpenAL #
-################
+######################
+# RaZ - Audio/OpenAL #
+######################
 
 find_package(OpenAL)
 
@@ -319,6 +319,8 @@ if (RAZ_USE_AUDIO)
         target_link_libraries(RaZ PRIVATE ${OPENAL_LIBRARY})
     endif ()
     target_compile_definitions(RaZ PUBLIC RAZ_USE_AUDIO)
+
+    message(STATUS "[RaZ] Audio ENABLED")
 else ()
     file(
         GLOB
@@ -326,12 +328,15 @@ else ()
 
         "${PROJECT_SOURCE_DIR}/src/RaZ/Audio/*"
         "${PROJECT_SOURCE_DIR}/src/RaZ/Data/WavLoad.cpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Data/WavSave.cpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaAudio.cpp"
 
         "${PROJECT_SOURCE_DIR}/include/RaZ/Audio/*"
         "${PROJECT_SOURCE_DIR}/include/RaZ/Data/WavFormat.hpp"
     )
-
     list(REMOVE_ITEM RAZ_FILES ${RAZ_AUDIO_FILES})
+
+    message(STATUS "[RaZ] Audio DISABLED")
 endif ()
 
 #########################
@@ -398,10 +403,6 @@ endif ()
 # Compiling & linking external libraries
 add_subdirectory(extern)
 
-if (RAZ_USE_LIBPNG)
-    target_link_libraries(RaZ PRIVATE libpng)
-endif ()
-
 if (RAZ_USE_GLEW)
     target_link_libraries(RaZ PRIVATE GLEW)
 endif ()
@@ -434,7 +435,11 @@ else ()
     target_compile_definitions(RaZ PUBLIC RAZ_NO_OVERLAY)
 endif ()
 
-if (RAZ_USE_SOL2)
+if (RAZ_USE_LIBPNG)
+    target_link_libraries(RaZ PRIVATE libpng)
+endif ()
+
+if (RAZ_USE_LUA)
     target_link_libraries(RaZ PRIVATE Sol2 Lua)
 else ()
     file(
@@ -444,7 +449,6 @@ else ()
         "${PROJECT_SOURCE_DIR}/src/RaZ/Script/*"
         "${PROJECT_SOURCE_DIR}/include/RaZ/Script/*"
     )
-
     list(REMOVE_ITEM RAZ_FILES ${RAZ_LUA_FILES})
 
     target_compile_definitions(RaZ PUBLIC RAZ_NO_LUA)

@@ -60,7 +60,7 @@ target_link_libraries(RaZ_MinDemo RaZ_Examples)
 add_executable(RaZ_PhysicsDemo physicsDemo.cpp)
 target_link_libraries(RaZ_PhysicsDemo RaZ_Examples)
 
-if (RAZ_USE_SOL2)
+if (RAZ_USE_LUA)
     add_executable(RaZ_ScriptDemo scriptDemo.cpp)
     target_link_libraries(RaZ_ScriptDemo RaZ_Examples)
 endif()
@@ -89,7 +89,7 @@ if (RAZ_USE_EMSCRIPTEN)
         set_target_properties(RaZ_AudioDemo PROPERTIES SUFFIX ".html")
     endif ()
 
-    if (RAZ_USE_SOL2)
+    if (RAZ_USE_LUA)
         set_target_properties(RaZ_ScriptDemo PROPERTIES SUFFIX ".html")
     endif()
 

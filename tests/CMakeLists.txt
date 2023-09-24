@@ -70,26 +70,39 @@ set(
     include/*.hpp
 )
 
+if (RAZ_USE_LUA)
+    list(APPEND RAZ_TESTS_SRC src/RaZ/Script/*.cpp)
+endif ()
+
+file(
+    GLOB
+    RAZ_TEST_FILES
+
+    ${RAZ_TESTS_SRC}
+)
+
+############################
+# RaZ Tests - Audio/OpenAL #
+############################
+
 if (RAZ_USE_AUDIO)
-    list(APPEND RAZ_TESTS_SRC src/RaZ/Audio/*.cpp)
+    file(
+        GLOB
+        RAZ_AUDIO_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Audio/*.cpp"
+    )
+    list(APPEND RAZ_TEST_FILES ${RAZ_AUDIO_TEST_FILES})
 
     if (WIN32)
         # Copying OpenAL's DLL to the tests folder
         file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/tests/OpenAL32.dll")
         file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/tests/libopenal-1.dll")
     endif ()
+else ()
+    list(REMOVE_ITEM RAZ_TEST_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Data/WavFormat.cpp")
+    list(REMOVE_ITEM RAZ_TEST_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaAudio.cpp")
 endif ()
-
-if (RAZ_USE_SOL2)
-    list(APPEND RAZ_TESTS_SRC src/RaZ/Script/*.cpp)
-endif ()
-
-file(
-    GLOB
-    RAZ_TESTS_FILES
-
-    ${RAZ_TESTS_SRC}
-)
 
 ###############################
 # RaZ Tests - FBX file format #
@@ -101,7 +114,7 @@ if (MSVC AND RAZ_USE_FBX)
 else ()
     list(
         REMOVE_ITEM
-        RAZ_TESTS_FILES
+        RAZ_TEST_FILES
 
         "${PROJECT_SOURCE_DIR}/src/RaZ/Data/FbxFormat.cpp"
     )
@@ -111,7 +124,7 @@ endif ()
 # RaZ Tests - Build #
 #####################
 
-target_sources(RaZ_Tests PRIVATE ${RAZ_TESTS_FILES})
+target_sources(RaZ_Tests PRIVATE ${RAZ_TEST_FILES})
 
 target_include_directories(
     RaZ_Tests

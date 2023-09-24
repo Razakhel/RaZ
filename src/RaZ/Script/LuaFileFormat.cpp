@@ -12,7 +12,9 @@
 #include "RaZ/Data/OffFormat.hpp"
 #include "RaZ/Data/PngFormat.hpp"
 #include "RaZ/Data/TgaFormat.hpp"
+#if defined(RAZ_USE_AUDIO)
 #include "RaZ/Data/WavFormat.hpp"
+#endif
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/FilePath.hpp"
@@ -81,11 +83,13 @@ void LuaWrapper::registerFileFormatTypes() {
                                          PickOverload<const FilePath&, bool>(&TgaFormat::load));
   }
 
+#if defined(RAZ_USE_AUDIO)
   {
     sol::table wavFormat = state["WavFormat"].get_or_create<sol::table>();
     wavFormat["load"]    = &WavFormat::load;
     wavFormat["save"]    = &WavFormat::save;
   }
+#endif
 }
 
 } // namespace Raz
