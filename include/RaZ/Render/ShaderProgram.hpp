@@ -68,7 +68,7 @@ public:
   /// Compiles all the shaders contained by the program.
   virtual void compileShaders() const = 0;
   /// Links the program to the graphics card.
-  /// \note Linking a program resets all its attributes' values and textures' bindings; you may want to call sendAttributes() & initTextures() afterwards.
+  /// \note Linking a program resets all its attributes' values and textures' bindings; you may want to call sendAttributes() & initTextures() afterward.
   void link();
   /// Checks if the program has been successfully linked.
   /// \return True if the program is linked, false otherwise.

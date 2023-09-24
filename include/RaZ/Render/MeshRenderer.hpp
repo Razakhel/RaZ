@@ -56,7 +56,7 @@ public:
   /// \return Reference to the newly added submesh renderer.
   template <typename... Args> SubmeshRenderer& addSubmeshRenderer(Args&&... args) { return m_submeshRenderers.emplace_back(std::forward<Args>(args)...); }
   /// Clones the mesh renderer.
-  /// \warning This doesn't load anything onto the GPU; to do so, call the load() function taking a Mesh afterwards.
+  /// \warning This doesn't load anything onto the GPU; to do so, call the load() function taking a Mesh afterward.
   /// \return Cloned mesh renderer.
   MeshRenderer clone() const;
   /// Loads a mesh onto the GPU.

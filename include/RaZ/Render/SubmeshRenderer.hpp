@@ -35,7 +35,7 @@ public:
   void setMaterialIndex(std::size_t materialIndex) { m_materialIndex = materialIndex; }
 
   /// Clones the submesh renderer.
-  /// \warning This doesn't load anything onto the graphics card; the load() function must be called afterwards with a Submesh for this.
+  /// \warning This doesn't load anything onto the graphics card; the load() function must be called afterward with a Submesh for this.
   /// \return Cloned submesh renderer.
   SubmeshRenderer clone() const;
   /// Loads the submesh's data (vertices & indices) onto the graphics card.
