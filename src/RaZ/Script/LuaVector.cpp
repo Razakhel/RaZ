@@ -21,6 +21,102 @@ void LuaWrapper::registerVectorTypes() {
   // Manually hashing a vector should not be useful on Lua's side anyway
 
   {
+    sol::usertype<Vec2b> vec2b = state.new_usertype<Vec2b>("Vec2b",
+                                                           sol::constructors<Vec2b(),
+                                                                             Vec2b(uint8_t),
+                                                                             Vec2b(uint8_t, uint8_t),
+                                                                             Vec2b(const Vec3b&)>());
+    vec2b["x"]                    = PickConstOverload<>(&Vec2b::x);
+    vec2b["y"]                    = PickConstOverload<>(&Vec2b::y);
+    vec2b["dot"]                  = &Vec2b::dot<>;
+    vec2b["computeSquaredLength"] = &Vec2b::computeSquaredLength<>;
+    vec2b["computeLength"]        = &Vec2b::computeLength<>;
+    vec2b["normalize"]            = &Vec2b::normalize<>;
+    vec2b["lerp"]                 = &Vec2b::lerp<>;
+    vec2b["lerpf"]                = &Vec2b::lerp<float>;
+    vec2b["nlerp"]                = &Vec2b::nlerp<>;
+    vec2b["strictlyEquals"]       = &Vec2b::strictlyEquals;
+    vec2b.set_function(sol::meta_function::unary_minus, PickOverload<>(&Vec2b::operator-));
+    vec2b.set_function(sol::meta_function::addition, sol::overload(PickOverload<const Vec2b&>(&Vec2b::operator+),
+                                                                   PickOverload<uint8_t>(&Vec2b::operator+)));
+    vec2b.set_function(sol::meta_function::subtraction, sol::overload(PickOverload<const Vec2b&>(&Vec2b::operator-),
+                                                                      PickOverload<uint8_t>(&Vec2b::operator-)));
+    vec2b.set_function(sol::meta_function::multiplication, sol::overload(PickOverload<const Vec2b&>(&Vec2b::operator*),
+                                                                         PickOverload<uint8_t>(&Vec2b::operator*),
+                                                                         PickOverload<const Vec2b&, const Mat2b&>(&::Raz::operator*<uint8_t, 2, 2>)));
+    vec2b.set_function(sol::meta_function::division, sol::overload(PickOverload<const Vec2b&>(&Vec2b::operator/),
+                                                                   PickOverload<uint8_t>(&Vec2b::operator/)));
+    vec2b.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec2b::operator[]));
+  }
+
+  {
+    sol::usertype<Vec3b> vec3b = state.new_usertype<Vec3b>("Vec3b",
+                                                           sol::constructors<Vec3b(),
+                                                                             Vec3b(uint8_t),
+                                                                             Vec3b(uint8_t, uint8_t, uint8_t),
+                                                                             Vec3b(const Vec2b&, uint8_t),
+                                                                             Vec3b(const Vec4b&)>());
+    vec3b["x"]                    = PickConstOverload<>(&Vec3b::x);
+    vec3b["y"]                    = PickConstOverload<>(&Vec3b::y);
+    vec3b["z"]                    = PickConstOverload<>(&Vec3b::z);
+    vec3b["dot"]                  = &Vec3b::dot<>;
+    vec3b["computeSquaredLength"] = &Vec3b::computeSquaredLength<>;
+    vec3b["computeLength"]        = &Vec3b::computeLength<>;
+    vec3b["normalize"]            = &Vec3b::normalize<>;
+    vec3b["lerp"]                 = &Vec3b::lerp<>;
+    vec3b["lerpf"]                = &Vec3b::lerp<float>;
+    vec3b["nlerp"]                = &Vec3b::nlerp<>;
+    vec3b["strictlyEquals"]       = &Vec3b::strictlyEquals;
+    vec3b.set_function(sol::meta_function::unary_minus, PickOverload<>(&Vec3b::operator-));
+    vec3b.set_function(sol::meta_function::addition, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator+),
+                                                                   PickOverload<uint8_t>(&Vec3b::operator+)));
+    vec3b.set_function(sol::meta_function::subtraction, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator-),
+                                                                      PickOverload<uint8_t>(&Vec3b::operator-)));
+    vec3b.set_function(sol::meta_function::multiplication, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator*),
+                                                                         PickOverload<uint8_t>(&Vec3b::operator*),
+                                                                         PickOverload<const Vec3b&, const Mat3b&>(&::Raz::operator*<uint8_t, 3, 3>)));
+    vec3b.set_function(sol::meta_function::division, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator/),
+                                                                   PickOverload<uint8_t>(&Vec3b::operator/)));
+    vec3b.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec3b::operator[]));
+
+    sol::table axis = state["Axis"].get_or_create<sol::table>();
+    axis["X"]       = Axis::X;
+    axis["Y"]       = Axis::Y;
+    axis["Z"]       = Axis::Z;
+  }
+
+  {
+    sol::usertype<Vec4b> vec4b = state.new_usertype<Vec4b>("Vec4b",
+                                                           sol::constructors<Vec4b(),
+                                                                             Vec4b(uint8_t),
+                                                                             Vec4b(uint8_t, uint8_t, uint8_t, uint8_t),
+                                                                             Vec4b(const Vec3b&, uint8_t)>());
+    vec4b["x"]                    = PickConstOverload<>(&Vec4b::x);
+    vec4b["y"]                    = PickConstOverload<>(&Vec4b::y);
+    vec4b["z"]                    = PickConstOverload<>(&Vec4b::z);
+    vec4b["w"]                    = PickConstOverload<>(&Vec4b::w);
+    vec4b["dot"]                  = &Vec4b::dot<>;
+    vec4b["computeSquaredLength"] = &Vec4b::computeSquaredLength<>;
+    vec4b["computeLength"]        = &Vec4b::computeLength<>;
+    vec4b["normalize"]            = &Vec4b::normalize<>;
+    vec4b["lerp"]                 = &Vec4b::lerp<>;
+    vec4b["lerpf"]                = &Vec4b::lerp<float>;
+    vec4b["nlerp"]                = &Vec4b::nlerp<>;
+    vec4b["strictlyEquals"]       = &Vec4b::strictlyEquals;
+    vec4b.set_function(sol::meta_function::unary_minus, PickOverload<>(&Vec4b::operator-));
+    vec4b.set_function(sol::meta_function::addition, sol::overload(PickOverload<const Vec4b&>(&Vec4b::operator+),
+                                                                   PickOverload<uint8_t>(&Vec4b::operator+)));
+    vec4b.set_function(sol::meta_function::subtraction, sol::overload(PickOverload<const Vec4b&>(&Vec4b::operator-),
+                                                                      PickOverload<uint8_t>(&Vec4b::operator-)));
+    vec4b.set_function(sol::meta_function::multiplication, sol::overload(PickOverload<const Vec4b&>(&Vec4b::operator*),
+                                                                         PickOverload<uint8_t>(&Vec4b::operator*),
+                                                                         PickOverload<const Vec4b&, const Mat4b&>(&::Raz::operator*<uint8_t, 4, 4>)));
+    vec4b.set_function(sol::meta_function::division, sol::overload(PickOverload<const Vec4b&>(&Vec4b::operator/),
+                                                                   PickOverload<uint8_t>(&Vec4b::operator/)));
+    vec4b.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec4b::operator[]));
+  }
+
+  {
     sol::usertype<Vec2f> vec2f = state.new_usertype<Vec2f>("Vec2f",
                                                            sol::constructors<Vec2f(),
                                                                              Vec2f(float),

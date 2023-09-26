@@ -280,7 +280,81 @@ TEST_CASE("LuaMath Transform") {
   )"));
 }
 
-TEST_CASE("LuaMath Vector") {
+TEST_CASE("LuaMath Vector byte") {
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local vec2 = Vec2b.new()
+    vec2       = Vec2b.new(1)
+    vec2       = Vec2b.new(1, 2)
+    vec2       = Vec2b.new(Vec3b.new(1, 2, 3))
+
+    assert(vec2:x() == vec2[0])
+    assert(vec2:y() == vec2[1])
+
+    assert(vec2:computeSquaredLength() == vec2:dot(vec2))
+    assert(FloatUtils.areNearlyEqual(vec2:computeLength(), 2.236068))
+    assert(FloatUtils.areNearlyEqual(vec2:normalize():computeSquaredLength(), 1))
+
+    assert(Vec2b.new(0, 1):lerp(Vec2b.new(1, 0), 0.5) == Vec2b.new(0)) -- Truncated from 0.5 to 0
+    assert(Vec2b.new(0, 1):lerpf(Vec2b.new(1, 0), 0.5) == Vec2f.new(0.5)) -- lerpf() is available to avoid truncating
+    assert(Vec2b.new(0, 1):nlerp(Vec2b.new(1, 0), 0.5) == Vec2f.new(0.7071067))
+
+    assert(-vec2 == Vec2b.new(255, 254)) -- This is technically doable, but probably never makes sense and may be removed in the future
+    assert(vec2 + Vec2b.new(1) == vec2 + 1)
+    assert(vec2 - Vec2b.new(1) == vec2 - 1)
+    assert(vec2 * Vec2b.new(2) == vec2 * 2)
+    assert(vec2 / Vec2b.new(2) == vec2 / 2)
+
+    local vec3 = Vec3b.new()
+    vec3       = Vec3b.new(1)
+    vec3       = Vec3b.new(1, 2, 3)
+    vec3       = Vec3b.new(vec2, 3)
+    vec3       = Vec3b.new(Vec4b.new(1, 2, 3, 4))
+
+    assert(vec3:x() == vec3[0])
+    assert(vec3:y() == vec3[1])
+    assert(vec3:z() == vec3[2])
+
+    assert(vec3:computeSquaredLength() == vec3:dot(vec3))
+    assert(FloatUtils.areNearlyEqual(vec3:computeLength(), 3.7416574))
+    assert(FloatUtils.areNearlyEqual(vec3:normalize():computeSquaredLength(), 1))
+
+    assert(Vec3b.new(0, 1, 0):lerp(Vec3b.new(1, 0, 1), 0.5) == Vec3b.new(0)) -- Truncated from 0.5 to 0
+    assert(Vec3b.new(0, 1, 0):lerpf(Vec3b.new(1, 0, 1), 0.5) == Vec3f.new(0.5))
+    assert(Vec3b.new(0, 1, 0):nlerp(Vec3b.new(1, 0, 1), 0.5) == Vec3f.new(0.5773502))
+
+    assert(-vec3 == Vec3b.new(255, 254, 253))
+    assert(vec3 + Vec3b.new(1) == vec3 + 1)
+    assert(vec3 - Vec3b.new(1) == vec3 - 1)
+    assert(vec3 * Vec3b.new(2) == vec3 * 2)
+    assert(vec3 / Vec3b.new(2) == vec3 / 2)
+
+    local vec4 = Vec4b.new()
+    vec4       = Vec4b.new(1)
+    vec4       = Vec4b.new(1, 2, 3, 4)
+    vec4       = Vec4b.new(vec3, 4)
+
+    assert(vec4:x() == vec4[0])
+    assert(vec4:y() == vec4[1])
+    assert(vec4:z() == vec4[2])
+    assert(vec4:w() == vec4[3])
+
+    assert(vec4:computeSquaredLength() == vec4:dot(vec4))
+    assert(FloatUtils.areNearlyEqual(vec4:computeLength(), 5.4772257))
+    assert(FloatUtils.areNearlyEqual(vec4:normalize():computeSquaredLength(), 1))
+
+    assert(Vec4b.new(0, 1, 0, 1):lerp(Vec4b.new(1, 0, 1, 1), 0.5) == Vec4b.new(0, 0, 0, 1)) -- Truncated from 0.5 to 0
+    assert(Vec4b.new(0, 1, 0, 1):lerpf(Vec4b.new(1, 0, 1, 1), 0.5) == Vec4f.new(0.5, 0.5, 0.5, 1))
+    assert(Vec4b.new(0, 1, 0, 1):nlerp(Vec4b.new(1, 0, 1, 1), 0.5) == Vec4f.new(0.3779644, 0.3779644, 0.3779644, 0.7559289))
+
+    assert(-vec4 == Vec4b.new(255, 254, 253, 252))
+    assert(vec4 + Vec4b.new(1) == vec4 + 1)
+    assert(vec4 - Vec4b.new(1) == vec4 - 1)
+    assert(vec4 * Vec4b.new(2) == vec4 * 2)
+    assert(vec4 / Vec4b.new(2) == vec4 / 2)
+  )"));
+}
+
+TEST_CASE("LuaMath Vector float") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local vec2 = Vec2f.new()
     vec2       = Vec2f.new(1)
