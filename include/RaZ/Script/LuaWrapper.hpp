@@ -32,6 +32,7 @@ private:
   static void registerDataTypes();
   static void registerEntityTypes();
   static void registerFileFormatTypes();
+  static void registerImageTypes();
   static void registerMathTypes();
   static void registerMatrixTypes();
   static void registerMeshTypes();
