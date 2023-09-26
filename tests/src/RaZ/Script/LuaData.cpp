@@ -89,11 +89,15 @@ TEST_CASE("LuaData Image") {
     assert(not img:isEmpty())
     img:setFloatValue(0, 0, 0, 3.0)
     assert(img:recoverFloatValue(0, 0, 0) == 3.0)
+    img:setVec4fPixel(0, 0, Vec4f.new(1, 2, 3, 4))
+    assert(img:recoverVec4fPixel(0, 0) == Vec4f.new(1, 2, 3, 4))
 
     img = Image.new(1, 1, ImageColorspace.SRGB, ImageDataType.BYTE)
     assert(img:getChannelCount() == 3)
     img:setByteValue(0, 0, 0, 127)
     assert(img:recoverByteValue(0, 0, 0) == 127)
+    img:setVec3bPixel(0, 0, Vec3b.new(1, 2, 3))
+    assert(img:recoverVec3bPixel(0, 0) == Vec3b.new(1, 2, 3))
 
     local pngPath = FilePath.new(RAZ_TESTS_ROOT .. "assets/images/dëfàùltTêst.png")
     local tgaPath = FilePath.new(RAZ_TESTS_ROOT .. "assets/images/dëfàùltTêst.tga")
