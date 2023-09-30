@@ -337,13 +337,44 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         # List of all -s options: https://github.com/emscripten-core/emscripten/blob/main/src/settings.js
 
         if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(
-                COMPILER_FLAGS
+            option(RAZ_EMSCRIPTEN_DEBUG_FAST_LINK "Allows to drastically speed up linking time in Debug; do not use this for an actual debug build" OFF)
 
-                ${COMPILER_FLAGS}
-                -O0 -g
-                #-fsanitize=address,undefined # Enable sanitizers
-            )
+            if (RAZ_EMSCRIPTEN_DEBUG_FAST_LINK)
+                # See https://emscripten.org/docs/optimizing/Optimizing-Code.html#link-times for details on improving link times
+
+                target_link_options(
+                    ${TARGET_NAME}
+
+                    ${SCOPE}
+
+                    "SHELL:-s ERROR_ON_WASM_CHANGES_AFTER_LINK" # Produces a linking error if the linker requires modifying the generated WASM
+                    "SHELL:-s WASM_BIGINT" # Enabling BigInt support
+                )
+            else ()
+                set(
+                    COMPILER_FLAGS
+
+                    ${COMPILER_FLAGS}
+                    -g
+                    #-fsanitize=address,undefined # Enable sanitizers
+                )
+
+                target_link_options(
+                    ${TARGET_NAME}
+
+                    ${SCOPE}
+
+                    #-fsanitize=address,undefined # Enable sanitizers
+                    "SHELL:-s ASSERTIONS=1" # Enable assertions
+                    "SHELL:-s GL_ASSERTIONS=1" # Enable OpenGL error checks
+                    #"SHELL:-s GL_TESTING=1" # Keep the drawing buffer alive to allow testing
+                    #"SHELL:-s INITIAL_MEMORY=300MB" # Expanding the initial memory pool; required for asan
+                    "SHELL:-s SAFE_HEAP=1" # Enable heap checks
+                    "SHELL:-s STACK_OVERFLOW_CHECK=2" # Enhance call stack precision
+                )
+            endif ()
+
+            set(COMPILER_FLAGS ${COMPILER_FLAGS} -O0)
 
             target_link_options(
                 ${TARGET_NAME}
@@ -354,13 +385,6 @@ function(add_compiler_flags TARGET_NAME SCOPE)
                 --cpuprofiler # Display a CPU profiler on the page
                 #--memoryprofiler # Display a memory profiler on the page (SAFE_HEAP needs to be disabled: "maximum call stack size exceeded")
                 #-gsource-map # Generate source map
-                "SHELL:-s ASSERTIONS=1" # Enable assertions
-                "SHELL:-s SAFE_HEAP=1" # Enable heap checks
-                "SHELL:-s STACK_OVERFLOW_CHECK=2" # Enhance call stack precision
-                "SHELL:-s GL_ASSERTIONS=1" # Enable OpenGL error checks
-                #"SHELL:-s GL_TESTING=1" # Keep the drawing buffer alive to allow testing
-                #-fsanitize=address,undefined # Enable sanitizers
-                #"SHELL:-s INITIAL_MEMORY=300MB" # Expanding the initial memory pool; required for asan
             )
         else ()
             target_compile_definitions(${TARGET_NAME} ${DEFINITIONS_SCOPE} NDEBUG)
@@ -385,13 +409,13 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             ${SCOPE}
 
             #-pthread # Enabling pthread
-            #"SHELL:-s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency" # Setting the initial thread pool size to the system's thread count
-            #"SHELL:-s PROXY_TO_PTHREAD" # Runs the whole program into a separate thread
-            "SHELL:-s USE_WEBGL2=1" # Force the use of WebGL2
+            "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed
+            "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
             "SHELL:-s OFFSCREEN_FRAMEBUFFER=1" # Enable rendering to offscreen targets
             "SHELL:-s OFFSCREENCANVAS_SUPPORT=1" # Allow creating multiple GL contexts on separate threads & swapping between them
-            "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
-            "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed
+            #"SHELL:-s PROXY_TO_PTHREAD" # Runs the whole program into a separate thread
+            #"SHELL:-s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency" # Setting the initial thread pool size to the system's thread count
+            "SHELL:-s USE_WEBGL2=1" # Force the use of WebGL2
         )
     endif ()
 
