@@ -40,12 +40,15 @@ elseif (RAZ_COMPILER_MSVC)
 
         PRIVATE
 
+        /wd4723 # Potential divide by 0
+
         # Warnings triggered by Catch
         /wd4388 # Signed/unsigned mismatch (equality comparison)
         /wd4583 # Destructor not implicitly called
         /wd4623 # Default constructor implicitly deleted
         /wd4868 # Evaluation order not guaranteed in braced initializing list
         /wd5219 # Implicit conversion, possible loss of data
+        /wd5267 # Assignment operator implicitly deleted
     )
 endif ()
 

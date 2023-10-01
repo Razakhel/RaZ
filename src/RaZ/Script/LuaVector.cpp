@@ -42,8 +42,7 @@ void LuaWrapper::registerVectorTypes() {
     vec2b.set_function(sol::meta_function::subtraction, sol::overload(PickOverload<const Vec2b&>(&Vec2b::operator-),
                                                                       PickOverload<uint8_t>(&Vec2b::operator-)));
     vec2b.set_function(sol::meta_function::multiplication, sol::overload(PickOverload<const Vec2b&>(&Vec2b::operator*),
-                                                                         PickOverload<uint8_t>(&Vec2b::operator*),
-                                                                         PickOverload<const Vec2b&, const Mat2b&>(&::Raz::operator*<uint8_t, 2, 2>)));
+                                                                         PickOverload<uint8_t>(&Vec2b::operator*)));
     vec2b.set_function(sol::meta_function::division, sol::overload(PickOverload<const Vec2b&>(&Vec2b::operator/),
                                                                    PickOverload<uint8_t>(&Vec2b::operator/)));
     vec2b.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec2b::operator[]));
@@ -73,8 +72,7 @@ void LuaWrapper::registerVectorTypes() {
     vec3b.set_function(sol::meta_function::subtraction, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator-),
                                                                       PickOverload<uint8_t>(&Vec3b::operator-)));
     vec3b.set_function(sol::meta_function::multiplication, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator*),
-                                                                         PickOverload<uint8_t>(&Vec3b::operator*),
-                                                                         PickOverload<const Vec3b&, const Mat3b&>(&::Raz::operator*<uint8_t, 3, 3>)));
+                                                                         PickOverload<uint8_t>(&Vec3b::operator*)));
     vec3b.set_function(sol::meta_function::division, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator/),
                                                                    PickOverload<uint8_t>(&Vec3b::operator/)));
     vec3b.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec3b::operator[]));
@@ -109,8 +107,7 @@ void LuaWrapper::registerVectorTypes() {
     vec4b.set_function(sol::meta_function::subtraction, sol::overload(PickOverload<const Vec4b&>(&Vec4b::operator-),
                                                                       PickOverload<uint8_t>(&Vec4b::operator-)));
     vec4b.set_function(sol::meta_function::multiplication, sol::overload(PickOverload<const Vec4b&>(&Vec4b::operator*),
-                                                                         PickOverload<uint8_t>(&Vec4b::operator*),
-                                                                         PickOverload<const Vec4b&, const Mat4b&>(&::Raz::operator*<uint8_t, 4, 4>)));
+                                                                         PickOverload<uint8_t>(&Vec4b::operator*)));
     vec4b.set_function(sol::meta_function::division, sol::overload(PickOverload<const Vec4b&>(&Vec4b::operator/),
                                                                    PickOverload<uint8_t>(&Vec4b::operator/)));
     vec4b.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec4b::operator[]));

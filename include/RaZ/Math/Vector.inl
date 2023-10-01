@@ -139,6 +139,14 @@ constexpr std::size_t Vector<T, Size>::hash(std::size_t seed) const noexcept {
 }
 
 template <typename T, std::size_t Size>
+constexpr Vector<T, Size> Vector<T, Size>::operator-() const noexcept {
+  Vector<T, Size> res;
+  for (std::size_t i = 0; i < Size; ++i)
+    res.m_data[i] = -m_data[i];
+  return res;
+}
+
+template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator+(const Vector& vec) const noexcept {
   Vector<T, Size> res = *this;
   res += vec;
@@ -239,6 +247,9 @@ constexpr Vector<T, Size>& Vector<T, Size>::operator*=(ValT val) noexcept {
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) noexcept {
+  if constexpr (std::is_integral_v<T>)
+    assert("Error: Integer vector division by 0 is undefined." && (std::find(vec.m_data.cbegin(), vec.m_data.cend(), 0) == vec.m_data.cend()));
+
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] /= vec[i];
   return *this;
@@ -246,6 +257,9 @@ constexpr Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) noexce
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size>& Vector<T, Size>::operator/=(T val) noexcept {
+  if constexpr (std::is_integral_v<T>)
+    assert("Error: Integer vector division by 0 is undefined." && (val != 0));
+
   for (T& elt : m_data)
     elt /= val;
   return *this;
