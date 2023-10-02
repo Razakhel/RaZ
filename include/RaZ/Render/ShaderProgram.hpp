@@ -25,6 +25,15 @@
 
 namespace Raz {
 
+enum class ImageAccess : unsigned int;
+enum class ImageInternalFormat : unsigned int;
+
+enum class ImageTextureUsage {
+  READ = 0,
+  WRITE,
+  READ_WRITE
+};
+
 /// ShaderProgram class, holding shaders & handling data transmission to the graphics card with uniforms.
 class ShaderProgram {
 public:
@@ -60,6 +69,19 @@ public:
   std::size_t getTextureCount() const noexcept { return m_textures.size(); }
   const Texture& getTexture(std::size_t index) const noexcept { return *m_textures[index].first; }
   const Texture& getTexture(const std::string& uniformName) const;
+#if !defined(USE_WEBGL)
+  /// Checks if there is an image texture entry with the given texture.
+  /// \param texture Texture to find.
+  /// \return True if an entry has been found, false otherwise.
+  bool hasImageTexture(const Texture& texture) const noexcept;
+  /// Checks if there is an image texture entry with the given uniform name.
+  /// \param uniformName Uniform name to find.
+  /// \return True if an entry has been found, false otherwise.
+  bool hasImageTexture(const std::string& uniformName) const noexcept;
+  std::size_t getImageTextureCount() const noexcept { return m_imageTextures.size(); }
+  const Texture& getImageTexture(std::size_t index) const noexcept { return *m_imageTextures[index].first; }
+  const Texture& getImageTexture(const std::string& uniformName) const;
+#endif
 
   /// Sets an attribute to be sent to the shaders. If the uniform name already exists, replaces the attribute's value.
   /// \tparam T Type of the attribute to set. Must be a type handled by ShaderProgram::sendUniform().
@@ -70,13 +92,22 @@ public:
   /// \param texture Texture to set.
   /// \param uniformName Uniform name to bind the texture to.
   void setTexture(TexturePtr texture, const std::string& uniformName);
+#if !defined(USE_WEBGL)
+  /// Sets an image texture to be bound to the shaders. If the uniform name already exists, replaces the texture.
+  /// \param texture Texture to set.
+  /// \param uniformName Uniform name to bind the texture to.
+  /// \param usage Usage made of the texture.
+  /// \see https://www.khronos.org/opengl/wiki/Image_Load_Store
+  void setImageTexture(TexturePtr texture, const std::string& uniformName, ImageTextureUsage usage = ImageTextureUsage::READ_WRITE);
+#endif
 
   /// Loads all the shaders contained by the program.
   virtual void loadShaders() const = 0;
   /// Compiles all the shaders contained by the program.
   virtual void compileShaders() const = 0;
   /// Links the program to the graphics card.
-  /// \note Linking a program resets all its attributes' values and textures' bindings; you may want to call sendAttributes() & initTextures() afterward.
+  /// \note Linking a program resets all its attributes' values and textures' bindings;
+  ///   you may want to call sendAttributes(), initTextures() & initImageTextures() afterward.
   void link();
   /// Checks if the program has been successfully linked.
   /// \return True if the program is linked, false otherwise.
@@ -98,14 +129,28 @@ public:
   void initTextures() const;
   /// Binds the program's textures.
   void bindTextures() const;
-  /// Removes all entries associated with the given texture.
+  /// Removes all textures associated with the given texture.
   /// \param texture Texture to remove the entries for.
   void removeTexture(const Texture& texture);
-  /// Removes the entry associated with the given uniform name.
+  /// Removes the texture associated with the given uniform name.
   /// \param uniformName Uniform name to remove the entry for.
   void removeTexture(const std::string& uniformName);
   /// Removes all textures associated to the program.
   void clearTextures() { m_textures.clear(); }
+#if !defined(USE_WEBGL)
+  /// Sets the program's image textures' binding points.
+  void initImageTextures() const;
+  /// Binds the program's image textures.
+  void bindImageTextures() const;
+  /// Removes all image textures associated with the given texture.
+  /// \param texture Texture to remove the entries for.
+  void removeImageTexture(const Texture& texture);
+  /// Removes the image texture associated with the given uniform name.
+  /// \param uniformName Uniform name to remove the entry for.
+  void removeImageTexture(const std::string& uniformName);
+  /// Removes all image textures associated to the program.
+  void clearImageTextures() { m_imageTextures.clear(); }
+#endif
   /// Gets the uniform's location (ID) corresponding to the given name.
   /// \note Location will be -1 if the name is incorrect or if the uniform isn't used in the shader(s) (will be optimized out).
   /// \param name Name of the uniform to recover the location from.
@@ -292,8 +337,6 @@ public:
   virtual ~ShaderProgram();
 
 protected:
-  OwnerValue<unsigned int> m_index {};
-
   struct Attribute {
     int location = -1;
     std::variant<int, unsigned int, float,
@@ -301,9 +344,20 @@ protected:
                  Mat2f, Mat3f, Mat4f,
                  std::vector<int>, std::vector<unsigned int>, std::vector<float>> value {};
   };
-  std::unordered_map<std::string, Attribute> m_attributes {};
 
+  struct ImageTextureAttachment {
+    std::string uniformName;
+    ImageAccess access {};
+    ImageInternalFormat format {};
+  };
+
+  OwnerValue<unsigned int> m_index {};
+
+  std::unordered_map<std::string, Attribute> m_attributes {};
   std::vector<std::pair<TexturePtr, std::string>> m_textures {};
+#if !defined(USE_WEBGL)
+  std::vector<std::pair<TexturePtr, ImageTextureAttachment>> m_imageTextures {};
+#endif
 
 private:
   /// Updates all attributes' uniform locations.

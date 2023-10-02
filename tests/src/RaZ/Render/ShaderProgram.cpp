@@ -273,6 +273,68 @@ TEST_CASE("ShaderProgram textures") {
   CHECK_FALSE(program.hasTexture("tex2D2"));
 }
 
+#if !defined(USE_WEBGL)
+TEST_CASE("ShaderProgram image textures") {
+  TestShaderProgram program;
+
+  CHECK(program.getImageTextureCount() == 0);
+
+  // Adding an image texture without a valid colorspace throws an exception
+  CHECK_THROWS(program.setImageTexture(Raz::Texture2D::create(), "noColorspace"));
+
+  const auto tex2D = Raz::Texture2D::create(Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  const auto tex3D = Raz::Texture3D::create(Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT16);
+
+  program.setImageTexture(tex2D, "tex2D", Raz::ImageTextureUsage::READ);
+  CHECK(program.getImageTextureCount() == 1);
+  REQUIRE(program.hasImageTexture("tex2D")); // An image texture's existence can be checked with either its uniform name...
+  CHECK(program.hasImageTexture(*tex2D)); // ... or the texture itself
+
+  CHECK(program.getImageTexture("tex2D").getIndex() == tex2D->getIndex()); // Image textures can be recovered with either their uniform name...
+  CHECK(program.getImageTexture(0).getIndex() == tex2D->getIndex()); // ... or their index in the list
+
+  // The same image texture can be paired with different uniform names
+  program.setImageTexture(tex2D, "tex2D2", Raz::ImageTextureUsage::WRITE);
+  CHECK(program.getImageTextureCount() == 2);
+  REQUIRE(program.hasImageTexture("tex2D"));
+  REQUIRE(program.hasImageTexture("tex2D2"));
+  CHECK(program.hasImageTexture(*tex2D));
+  // Getting an image texture with either of the uniform names returns the same
+  CHECK(program.getImageTexture("tex2D").getIndex() == program.getImageTexture("tex2D2").getIndex());
+
+  program.setImageTexture(tex3D, "tex3D", Raz::ImageTextureUsage::READ_WRITE);
+  CHECK(program.getImageTextureCount() == 3);
+  REQUIRE(program.hasImageTexture("tex3D"));
+  CHECK(program.hasImageTexture(program.getImageTexture("tex3D")));
+  CHECK(program.getImageTexture(2).getIndex() == program.getImageTexture("tex3D").getIndex());
+
+  program.setImageTexture(tex3D, "tex3D2");
+  CHECK(program.getImageTextureCount() == 4);
+  REQUIRE(program.hasImageTexture("tex3D2"));
+  CHECK(program.getImageTexture(2).getIndex() == program.getImageTexture(3).getIndex());
+
+  // Removing a specific image texture removes all entries corresponding to it
+  program.removeImageTexture(*tex3D);
+  CHECK(program.getImageTextureCount() == 2);
+  CHECK_FALSE(program.hasImageTexture("tex3D"));
+  CHECK_FALSE(program.hasImageTexture("tex3D2"));
+
+  program.setImageTexture(Raz::Texture2D::create(Raz::TextureColorspace::RG), "tex2D");
+  CHECK(program.getImageTextureCount() == 2); // The image texture already exists, none has been added
+  REQUIRE(program.hasImageTexture("tex2D"));
+  CHECK_FALSE(program.getImageTexture("tex2D").getIndex() == tex2D->getIndex()); // But its value has been reassigned
+
+  program.removeImageTexture("tex2D");
+  CHECK(program.getImageTextureCount() == 1);
+  CHECK_FALSE(program.hasImageTexture("tex2D"));
+  CHECK(program.hasImageTexture("tex2D2")); // The other entry remains
+
+  program.clearImageTextures();
+  CHECK(program.getImageTextureCount() == 0);
+  CHECK_FALSE(program.hasImageTexture("tex2D2"));
+}
+#endif
+
 TEST_CASE("RenderShaderProgram creation") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 

@@ -119,6 +119,9 @@ void RenderSystem::updateMaterials(const MeshRenderer& meshRenderer) const {
 
     materialProgram.sendAttributes();
     materialProgram.initTextures();
+#if !defined(USE_WEBGL)
+    materialProgram.initImageTextures();
+#endif
 
     m_cameraUbo.bindUniformBlock(materialProgram, "uboCameraInfo", 0);
     m_lightsUbo.bindUniformBlock(materialProgram, "uboLightsInfo", 1);

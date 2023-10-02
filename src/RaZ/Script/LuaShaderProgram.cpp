@@ -67,6 +67,11 @@ void LuaWrapper::registerShaderProgramTypes() {
   }
 
   {
+    sol::table imageTextureUsage    = state["ImageTextureUsage"].get_or_create<sol::table>();
+    imageTextureUsage["READ"]       = ImageTextureUsage::READ;
+    imageTextureUsage["WRITE"]      = ImageTextureUsage::WRITE;
+    imageTextureUsage["READ_WRITE"] = ImageTextureUsage::READ_WRITE;
+
     sol::usertype<ShaderProgram> shaderProgram = state.new_usertype<ShaderProgram>("ShaderProgram", sol::no_constructor);
     shaderProgram["hasAttribute"]           = [] (const ShaderProgram& p, const std::string& n) { return p.hasAttribute(n); };
     shaderProgram["getAttributeCount"]      = &ShaderProgram::getAttributeCount;
@@ -75,6 +80,13 @@ void LuaWrapper::registerShaderProgramTypes() {
     shaderProgram["getTextureCount"]        = &ShaderProgram::getTextureCount;
     shaderProgram["getTexture"]             = sol::overload([] (const ShaderProgram& p, std::size_t i) { return &p.getTexture(i); },
                                                             [] (const ShaderProgram& p, const std::string& n) { return &p.getTexture(n); });
+#if !defined(USE_WEBGL)
+    shaderProgram["hasImageTexture"]        = sol::overload(PickOverload<const Texture&>(&ShaderProgram::hasImageTexture),
+                                                            PickOverload<const std::string&>(&ShaderProgram::hasImageTexture));
+    shaderProgram["getImageTextureCount"]   = &ShaderProgram::getImageTextureCount;
+    shaderProgram["getImageTexture"]        = sol::overload([] (const ShaderProgram& p, std::size_t i) { return &p.getImageTexture(i); },
+                                                            [] (const ShaderProgram& p, const std::string& n) { return &p.getImageTexture(n); });
+#endif
     shaderProgram["setIntAttribute"]        = &ShaderProgram::setAttribute<int>;
     shaderProgram["setUintAttribute"]       = &ShaderProgram::setAttribute<unsigned int>;
     shaderProgram["setFloatAttribute"]      = &ShaderProgram::setAttribute<float>;
@@ -98,6 +110,23 @@ void LuaWrapper::registerShaderProgramTypes() {
 #endif
                                                             [] (ShaderProgram& p, Texture2DPtr t, const std::string& n) { p.setTexture(std::move(t), n); },
                                                             [] (ShaderProgram& p, Texture3DPtr t, const std::string& n) { p.setTexture(std::move(t), n); });
+#if !defined(USE_WEBGL)
+    shaderProgram["setImageTexture"]        = sol::overload(
+#if !defined(USE_OPENGL_ES)
+                                                            [] (ShaderProgram& p, Texture1DPtr t,
+                                                                const std::string& n) { p.setImageTexture(std::move(t), n, ImageTextureUsage::READ_WRITE); },
+                                                            [] (ShaderProgram& p, Texture1DPtr t, const std::string& n,
+                                                                ImageTextureUsage u) { p.setImageTexture(std::move(t), n, u); },
+#endif
+                                                            [] (ShaderProgram& p, Texture2DPtr t,
+                                                                const std::string& n) { p.setImageTexture(std::move(t), n, ImageTextureUsage::READ_WRITE); },
+                                                            [] (ShaderProgram& p, Texture2DPtr t, const std::string& n,
+                                                                ImageTextureUsage u) { p.setImageTexture(std::move(t), n, u); },
+                                                            [] (ShaderProgram& p, Texture3DPtr t,
+                                                                const std::string& n) { p.setImageTexture(std::move(t), n, ImageTextureUsage::READ_WRITE); },
+                                                            [] (ShaderProgram& p, Texture3DPtr t, const std::string& n,
+                                                                ImageTextureUsage u) { p.setImageTexture(std::move(t), n, u); });
+#endif
     shaderProgram["loadShaders"]            = &ShaderProgram::loadShaders;
     shaderProgram["compileShaders"]         = &ShaderProgram::compileShaders;
     shaderProgram["link"]                   = &ShaderProgram::link;
@@ -113,6 +142,13 @@ void LuaWrapper::registerShaderProgramTypes() {
     shaderProgram["removeTexture"]          = sol::overload(PickOverload<const Texture&>(&ShaderProgram::removeTexture),
                                                             PickOverload<const std::string&>(&ShaderProgram::removeTexture));
     shaderProgram["clearTextures"]          = &ShaderProgram::clearTextures;
+#if !defined(USE_WEBGL)
+    shaderProgram["initImageTextures"]      = &ShaderProgram::initImageTextures;
+    shaderProgram["bindImageTextures"]      = &ShaderProgram::bindImageTextures;
+    shaderProgram["removeImageTexture"]     = sol::overload(PickOverload<const Texture&>(&ShaderProgram::removeImageTexture),
+                                                            PickOverload<const std::string&>(&ShaderProgram::removeImageTexture));
+    shaderProgram["clearImageTextures"]     = &ShaderProgram::clearImageTextures;
+#endif
     shaderProgram["recoverUniformLocation"] = &ShaderProgram::recoverUniformLocation;
   }
 }

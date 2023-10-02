@@ -852,6 +852,30 @@ TEST_CASE("LuaRender ShaderProgram") {
     renderShaderProgram:clearTextures()
   )"));
 #endif
+
+#if !defined(USE_WEBGL)
+  if (Raz::Renderer::checkVersion(4, 2)) {
+    CHECK(Raz::LuaWrapper::execute(R"(
+      local renderShaderProgram = RenderShaderProgram.new()
+
+      local tex2D = Texture2D.create(1, 1, TextureColorspace.GRAY)
+      renderShaderProgram:setImageTexture(tex2D, "tex2D1", ImageTextureUsage.READ)
+      renderShaderProgram:setImageTexture(tex2D, "tex2D2", ImageTextureUsage.WRITE)
+      renderShaderProgram:setImageTexture(tex2D, "tex2D3", ImageTextureUsage.READ_WRITE)
+      assert(renderShaderProgram:getImageTextureCount() == 3)
+      assert(renderShaderProgram:hasImageTexture(tex2D))
+      assert(renderShaderProgram:hasImageTexture("tex2D1"))
+      assert(renderShaderProgram:getImageTexture(0) == renderShaderProgram:getImageTexture("tex2D1"))
+      renderShaderProgram:initImageTextures()
+      renderShaderProgram:bindImageTextures()
+      renderShaderProgram:removeImageTexture("tex2D1")
+      assert(not renderShaderProgram:hasImageTexture("tex2D1"))
+      renderShaderProgram:removeImageTexture(tex2D)
+      assert(renderShaderProgram:getImageTextureCount() == 0)
+      renderShaderProgram:clearImageTextures()
+    )"));
+  }
+#endif
 }
 
 TEST_CASE("LuaRender SubmeshRenderer") {

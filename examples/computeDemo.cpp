@@ -39,12 +39,15 @@ int main() {
     /////////////////////
 
     const auto texture = Raz::Texture3D::create(textureSize, textureSize, textureDepth, Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT16);
-    Raz::Renderer::bindImageTexture(0, texture->getIndex(), 0, true, 0, Raz::ImageAccess::WRITE, Raz::ImageInternalFormat::R16F);
 
     Raz::ComputeShaderProgram perlinNoise(Raz::ComputeShader(RAZ_ROOT "shaders/perlin_noise_3d.comp"));
+    perlinNoise.setImageTexture(texture, "uniNoiseMap", Raz::ImageTextureUsage::WRITE);
+    perlinNoise.initImageTextures();
     perlinNoise.execute(textureSize, textureSize, textureDepth);
 
     Raz::ComputeShaderProgram worleyNoise(Raz::ComputeShader(RAZ_ROOT "shaders/worley_noise_3d.comp"));
+    worleyNoise.setImageTexture(texture, "uniNoiseMap", Raz::ImageTextureUsage::WRITE);
+    worleyNoise.initImageTextures();
 
     Raz::Renderer::setLabel(Raz::RenderObjectType::TEXTURE, texture->getIndex(), "Noise texture");
     Raz::Renderer::setLabel(Raz::RenderObjectType::PROGRAM, perlinNoise.getIndex(), "Perlin noise shader program");

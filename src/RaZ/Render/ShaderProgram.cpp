@@ -13,6 +13,43 @@ inline void checkProgramUsed([[maybe_unused]] const ShaderProgram& program) {
 #endif
 }
 
+ImageInternalFormat recoverImageTextureFormat(const Texture& texture) {
+  const TextureColorspace colorspace = texture.getColorspace();
+  const TextureDataType dataType     = texture.getDataType();
+
+  switch (colorspace) {
+    case TextureColorspace::GRAY:
+      if (dataType == TextureDataType::FLOAT32)
+        return ImageInternalFormat::R32F;
+
+#if !defined(USE_OPENGL_ES)
+      return (dataType == TextureDataType::BYTE ? ImageInternalFormat::R8 : ImageInternalFormat::R16F);
+#else
+      break;
+#endif
+
+#if !defined(USE_OPENGL_ES)
+    case TextureColorspace::RG:
+      return (dataType == TextureDataType::BYTE    ? ImageInternalFormat::RG8
+           : (dataType == TextureDataType::FLOAT16 ? ImageInternalFormat::RG16F
+                                                   : ImageInternalFormat::RG32F));
+#endif
+
+    case TextureColorspace::RGB:
+    case TextureColorspace::RGBA:
+    case TextureColorspace::SRGB:
+    case TextureColorspace::SRGBA:
+      return (dataType == TextureDataType::BYTE    ? ImageInternalFormat::RGBA8
+           : (dataType == TextureDataType::FLOAT16 ? ImageInternalFormat::RGBA16F
+                                                   : ImageInternalFormat::RGBA32F));
+
+    default:
+      break;
+  }
+
+  throw std::invalid_argument("Error: The given image texture is not supported");
+}
+
 } // namespace
 
 ShaderProgram::ShaderProgram()
@@ -45,6 +82,31 @@ const Texture& ShaderProgram::getTexture(const std::string& uniformName) const {
   return *textureIt->first;
 }
 
+#if !defined(USE_WEBGL)
+bool ShaderProgram::hasImageTexture(const Texture& texture) const noexcept {
+  return std::any_of(m_imageTextures.cbegin(), m_imageTextures.cend(), [&texture] (const auto& element) {
+    return (element.first->getIndex() == texture.getIndex());
+  });
+}
+
+bool ShaderProgram::hasImageTexture(const std::string& uniformName) const noexcept {
+  return std::any_of(m_imageTextures.cbegin(), m_imageTextures.cend(), [&uniformName] (const auto& element) {
+    return (element.second.uniformName == uniformName);
+  });
+}
+
+const Texture& ShaderProgram::getImageTexture(const std::string& uniformName) const {
+  const auto textureIt = std::find_if(m_imageTextures.begin(), m_imageTextures.end(), [&uniformName] (const auto& element) {
+    return (element.second.uniformName == uniformName);
+  });
+
+  if (textureIt == m_imageTextures.cend())
+    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+
+  return *textureIt->first;
+}
+#endif
+
 void ShaderProgram::setTexture(TexturePtr texture, const std::string& uniformName) {
   const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
     return (element.second == uniformName);
@@ -55,6 +117,39 @@ void ShaderProgram::setTexture(TexturePtr texture, const std::string& uniformNam
   else
     m_textures.emplace_back(std::move(texture), uniformName);
 }
+
+#if !defined(USE_WEBGL)
+void ShaderProgram::setImageTexture(TexturePtr texture, const std::string& uniformName, ImageTextureUsage usage) {
+  if (
+#if !defined(USE_OPENGL_ES)
+    !Renderer::checkVersion(4, 2)
+#else
+    !Renderer::checkVersion(3, 1)
+#endif
+    ) {
+    throw std::runtime_error("Error: Using image textures requires OpenGL 4.2+ or OpenGL ES 3.1+");
+  }
+
+  if (texture->getColorspace() == Raz::TextureColorspace::INVALID || texture->getColorspace() == Raz::TextureColorspace::DEPTH)
+    throw std::invalid_argument("Error: The given image texture's colorspace is invalid");
+
+  auto imgTextureIt = std::find_if(m_imageTextures.begin(), m_imageTextures.end(), [&uniformName] (const auto& element) {
+    return (element.second.uniformName == uniformName);
+  });
+
+  if (imgTextureIt != m_imageTextures.end()) {
+    imgTextureIt->first = std::move(texture);
+  } else {
+    m_imageTextures.emplace_back(std::move(texture), ImageTextureAttachment{ uniformName });
+    imgTextureIt = m_imageTextures.end() - 1;
+  }
+
+  imgTextureIt->second.access = (usage == ImageTextureUsage::READ  ? ImageAccess::READ
+                              : (usage == ImageTextureUsage::WRITE ? ImageAccess::WRITE
+                                                                   : ImageAccess::READ_WRITE));
+  imgTextureIt->second.format = recoverImageTextureFormat(*imgTextureIt->first);
+}
+#endif
 
 void ShaderProgram::link() {
   Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
@@ -77,6 +172,9 @@ void ShaderProgram::updateShaders() {
   link();
   sendAttributes();
   initTextures();
+#if !defined(USE_WEBGL)
+  initImageTextures();
+#endif
 
   Logger::debug("[ShaderProgram] Updated shaders");
 }
@@ -151,6 +249,46 @@ void ShaderProgram::removeTexture(const std::string& uniformName) {
     return;
   }
 }
+
+#if !defined(USE_WEBGL)
+void ShaderProgram::initImageTextures() const {
+  if (m_imageTextures.empty())
+    return;
+
+  use();
+
+  // TODO: binding indices should be user-definable to allow the same texture to be bound to multiple uniforms
+  int bindingIndex = 0;
+
+  for (const auto& [texture, info] : m_imageTextures)
+    sendUniform(info.uniformName, bindingIndex++);
+}
+
+void ShaderProgram::bindImageTextures() const {
+  use();
+
+  unsigned int bindingIndex = 0;
+
+  for (const auto& [texture, info] : m_imageTextures)
+    Renderer::bindImageTexture(bindingIndex++, texture->getIndex(), 0, false, 0, info.access, info.format);
+}
+
+void ShaderProgram::removeImageTexture(const Texture& texture) {
+  m_imageTextures.erase(std::remove_if(m_imageTextures.begin(), m_imageTextures.end(), [&texture] (const auto& element) {
+    return (element.first->getIndex() == texture.getIndex());
+  }), m_imageTextures.end());
+}
+
+void ShaderProgram::removeImageTexture(const std::string& uniformName) {
+  for (auto imgTextureIt = m_imageTextures.begin(); imgTextureIt != m_imageTextures.end(); ++imgTextureIt) {
+    if (imgTextureIt->second.uniformName != uniformName)
+      continue;
+
+    m_imageTextures.erase(imgTextureIt);
+    return;
+  }
+}
+#endif
 
 int ShaderProgram::recoverUniformLocation(const std::string& uniformName) const {
   return Renderer::recoverUniformLocation(m_index, uniformName.c_str());
@@ -367,11 +505,17 @@ RenderShaderProgram RenderShaderProgram::clone() const {
 
   program.link();
 
-  program.m_attributes = m_attributes;
-  program.m_textures   = m_textures;
+  program.m_attributes    = m_attributes;
+  program.m_textures      = m_textures;
+#if !defined(USE_WEBGL)
+  program.m_imageTextures = m_imageTextures;
+#endif
 
   sendAttributes();
   initTextures();
+#if !defined(USE_WEBGL)
+  initImageTextures();
+#endif
 
   return program;
 }
@@ -457,11 +601,13 @@ ComputeShaderProgram ComputeShaderProgram::clone() const {
 
   program.setShader(m_compShader.clone());
 
-  program.m_attributes = m_attributes;
-  program.m_textures   = m_textures;
+  program.m_attributes    = m_attributes;
+  program.m_textures      = m_textures;
+  program.m_imageTextures = m_imageTextures;
 
   sendAttributes();
   initTextures();
+  initImageTextures();
 
   return program;
 }
@@ -479,7 +625,7 @@ void ComputeShaderProgram::compileShaders() const {
 }
 
 void ComputeShaderProgram::execute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) const {
-  use();
+  bindImageTextures();
   Renderer::dispatchCompute(groupCountX, groupCountY, groupCountZ);
   Renderer::setMemoryBarrier(BarrierType::ALL);
 }

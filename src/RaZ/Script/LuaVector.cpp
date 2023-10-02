@@ -76,11 +76,6 @@ void LuaWrapper::registerVectorTypes() {
     vec3b.set_function(sol::meta_function::division, sol::overload(PickOverload<const Vec3b&>(&Vec3b::operator/),
                                                                    PickOverload<uint8_t>(&Vec3b::operator/)));
     vec3b.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec3b::operator[]));
-
-    sol::table axis = state["Axis"].get_or_create<sol::table>();
-    axis["X"]       = Axis::X;
-    axis["Y"]       = Axis::Y;
-    axis["Z"]       = Axis::Z;
   }
 
   {

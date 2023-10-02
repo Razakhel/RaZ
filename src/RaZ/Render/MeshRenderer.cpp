@@ -15,6 +15,9 @@ Material& MeshRenderer::setMaterial(Material&& material) {
   Material& newMaterial = m_materials.emplace_back(std::move(material));
   newMaterial.getProgram().sendAttributes();
   newMaterial.getProgram().initTextures();
+#if !defined(USE_WEBGL)
+  newMaterial.getProgram().initImageTextures();
+#endif
 
   for (SubmeshRenderer& submeshRenderer : m_submeshRenderers)
     submeshRenderer.setMaterialIndex(0);
@@ -78,6 +81,9 @@ void MeshRenderer::loadMaterials() const {
   for (const Material& material : m_materials) {
     material.getProgram().sendAttributes();
     material.getProgram().initTextures();
+#if !defined(USE_WEBGL)
+    material.getProgram().initImageTextures();
+#endif
   }
 }
 
