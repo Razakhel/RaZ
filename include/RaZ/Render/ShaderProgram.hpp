@@ -15,6 +15,14 @@
 #include <variant>
 #include <vector>
 
+#if !defined(USE_WEBGL) && defined(EMSCRIPTEN)
+#define USE_WEBGL
+#endif
+
+#if !defined(USE_OPENGL_ES) && (defined(EMSCRIPTEN) || defined(USE_WEBGL))
+#define USE_OPENGL_ES
+#endif
+
 namespace Raz {
 
 /// ShaderProgram class, holding shaders & handling data transmission to the graphics card with uniforms.
@@ -356,6 +364,7 @@ private:
   FragmentShader m_fragShader {};
 };
 
+#if !defined(USE_WEBGL)
 class ComputeShaderProgram final : public ShaderProgram {
 public:
   ComputeShaderProgram() : ShaderProgram() {}
@@ -377,6 +386,7 @@ public:
 private:
   ComputeShader m_compShader {};
 };
+#endif
 
 } // namespace Raz
 

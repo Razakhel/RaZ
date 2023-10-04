@@ -101,6 +101,7 @@ public:
   FragmentShader clone() const;
 };
 
+#if !defined(USE_WEBGL)
 class ComputeShader final : public Shader {
 public:
   ComputeShader();
@@ -112,6 +113,7 @@ public:
 
   ComputeShader clone() const;
 };
+#endif
 
 } // namespace Raz
 

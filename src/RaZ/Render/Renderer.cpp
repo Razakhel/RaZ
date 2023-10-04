@@ -504,6 +504,7 @@ void Renderer::bindTexture(TextureType type, unsigned int index) {
   printConditionalErrors();
 }
 
+#if !defined(USE_WEBGL)
 void Renderer::bindImageTexture(unsigned int imageUnitIndex, unsigned int textureIndex, int textureLevel,
                                 bool isLayered, int layer,
                                 ImageAccess imgAccess, ImageInternalFormat imgFormat) {
@@ -518,6 +519,7 @@ void Renderer::bindImageTexture(unsigned int imageUnitIndex, unsigned int textur
 
   printConditionalErrors();
 }
+#endif
 
 void Renderer::activateTexture(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());

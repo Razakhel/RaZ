@@ -689,7 +689,7 @@ TEST_CASE("LuaRender Shader") {
 }
 
 TEST_CASE("LuaRender ShaderProgram") {
-#if !defined(USE_OPENGL_ES)
+#if !defined(USE_WEBGL)
   if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     CHECK(Raz::LuaWrapper::execute(R"(
       local computeShaderProgram = ComputeShaderProgram.new()

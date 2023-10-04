@@ -12,7 +12,7 @@ using namespace TypeUtils;
 void LuaWrapper::registerShaderProgramTypes() {
   sol::state& state = getState();
 
-#if !defined(USE_OPENGL_ES)
+#if !defined(USE_WEBGL)
   {
     sol::usertype<ComputeShaderProgram> computeShaderProgram = state.new_usertype<ComputeShaderProgram>("ComputeShaderProgram",
                                                                                                         sol::constructors<ComputeShaderProgram()>(),

@@ -162,6 +162,7 @@ TEST_CASE("ShaderProgram move") {
     }
   }
 
+#if !defined(USE_WEBGL)
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     Raz::ComputeShaderProgram programBase;
@@ -181,6 +182,7 @@ TEST_CASE("ShaderProgram move") {
     CHECK(programBase.getIndex() == programIndex);
     CHECK(programBase.getShader().getIndex() == compIndex);
   }
+#endif
 }
 
 TEST_CASE("ShaderProgram attributes") {
@@ -392,6 +394,7 @@ TEST_CASE("RenderShaderProgram uniforms") {
   checkUniformInfo(correspUniInfo, program);
 }
 
+#if !defined(USE_WEBGL)
 TEST_CASE("ComputeShaderProgram creation") {
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
@@ -461,3 +464,4 @@ TEST_CASE("ComputeShaderProgram uniforms") {
 
   checkUniformInfo(correspUniInfo, program);
 }
+#endif

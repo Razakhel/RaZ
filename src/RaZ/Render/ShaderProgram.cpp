@@ -437,6 +437,7 @@ void RenderShaderProgram::destroyFragmentShader() {
   m_fragShader.destroy();
 }
 
+#if !defined(USE_WEBGL)
 void ComputeShaderProgram::setShader(ComputeShader&& compShader) {
   Logger::debug("[ComputeShaderProgram] Setting shader (ID: " + std::to_string(compShader.getIndex()) + ", path: '" + compShader.getPath() + "')");
 
@@ -487,5 +488,6 @@ void ComputeShaderProgram::destroyShader() {
   Renderer::detachShader(m_index, m_compShader.getIndex());
   m_compShader.destroy();
 }
+#endif
 
 } // namespace Raz

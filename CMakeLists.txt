@@ -183,14 +183,13 @@ if (RAZ_COMPILER_GCC)
             RaZ
 
             PRIVATE
-
-            -g
-            -O0
-            -fno-inline
-            -fno-inline-small-functions
-            -fno-default-inline
-            -fprofile-arcs
-            -ftest-coverage
+                -g
+                -O0
+                -fno-inline
+                -fno-inline-small-functions
+                -fno-default-inline
+                -fprofile-arcs
+                -ftest-coverage
         )
 
         target_link_libraries(RaZ PRIVATE gcov)
@@ -208,9 +207,8 @@ if (RAZ_USE_EMSCRIPTEN)
         RaZ
 
         PUBLIC
-
-        "SHELL:-s USE_GLFW=3"
-        "SHELL:-s USE_LIBPNG=1"
+            "SHELL:-s USE_GLFW=3"
+            "SHELL:-s USE_LIBPNG=1"
     )
 
     set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} glfw)
@@ -267,10 +265,9 @@ if (RAZ_PLATFORM_LINUX)
             RaZ
 
             PRIVATE
-
-            -fsanitize=undefined
-            -fsanitize=address
-            -fsanitize=leak
+                -fsanitize=undefined
+                -fsanitize=address
+                -fsanitize=leak
         )
 
         set(

@@ -180,6 +180,7 @@ FragmentShader FragmentShader::clone() const {
   return res;
 }
 
+#if !defined(USE_WEBGL)
 ComputeShader::ComputeShader() {
   Logger::debug("[Shader] Creating compute shader...");
   m_index = Renderer::createShader(ShaderType::COMPUTE);
@@ -202,5 +203,6 @@ ComputeShader ComputeShader::clone() const {
 
   return res;
 }
+#endif
 
 } // namespace Raz

@@ -12,6 +12,7 @@ using namespace TypeUtils;
 void LuaWrapper::registerShaderTypes() {
   sol::state& state = getState();
 
+#if !defined(USE_WEBGL)
   {
     sol::usertype<ComputeShader> computeShader = state.new_usertype<ComputeShader>("ComputeShader",
                                                                                    sol::constructors<ComputeShader(),
@@ -21,6 +22,7 @@ void LuaWrapper::registerShaderTypes() {
                                                     PickOverload<const char*>(&ComputeShader::loadFromSource));
     computeShader["clone"]          = &ComputeShader::clone;
   }
+#endif
 
   {
     sol::usertype<FragmentShader> fragmentShader = state.new_usertype<FragmentShader>("FragmentShader",

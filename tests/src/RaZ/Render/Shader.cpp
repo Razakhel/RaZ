@@ -73,6 +73,7 @@ TEST_CASE("Shader validity") {
     CHECK_FALSE(fragShader.isValid());
   }
 
+#if !defined(USE_WEBGL)
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     Raz::ComputeShader compShader;
@@ -83,6 +84,7 @@ TEST_CASE("Shader validity") {
     CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK_FALSE(compShader.isValid());
   }
+#endif
 }
 
 TEST_CASE("Shader clone") {
@@ -140,6 +142,7 @@ TEST_CASE("Shader clone") {
     areShadersEqual(shaderFromSource, shaderFromSource.clone());
   }
 
+#if !defined(USE_WEBGL)
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     const Raz::ComputeShader shaderFromPath(shaderPath);
@@ -148,6 +151,7 @@ TEST_CASE("Shader clone") {
     const Raz::ComputeShader shaderFromSource = Raz::ComputeShader::loadFromSource(shaderSource);
     areShadersEqual(shaderFromSource, shaderFromSource.clone());
   }
+#endif
 }
 
 TEST_CASE("Vertex shader from source") {
@@ -230,6 +234,7 @@ TEST_CASE("Fragment shader from source") {
   checkShader(Raz::FragmentShader::loadFromSource("#version 330\n" + fragSource));
 }
 
+#if !defined(USE_WEBGL)
 TEST_CASE("Compute shader from source") {
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
@@ -253,6 +258,7 @@ TEST_CASE("Compute shader from source") {
   checkShader(Raz::ComputeShader::loadFromSource(compSource));
   checkShader(Raz::ComputeShader::loadFromSource("#version 420\n" + compSource)); // A minimum of OpenGL 4.2 is required for the extension to exist
 }
+#endif
 
 TEST_CASE("Vertex shader imported") {
   Raz::Renderer::recoverErrors(); // Flushing errors
@@ -298,6 +304,7 @@ TEST_CASE("Fragment shader imported") {
   checkShader(fragShader, fragShaderPath);
 }
 
+#if !defined(USE_WEBGL)
 TEST_CASE("Compute shader imported") {
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
@@ -310,3 +317,4 @@ TEST_CASE("Compute shader imported") {
   const Raz::ComputeShader compShader(compShaderPath);
   checkShader(compShader, compShaderPath);
 }
+#endif

@@ -12,6 +12,14 @@
 #include <unordered_set>
 #include <vector>
 
+#if !defined(USE_WEBGL) && defined(EMSCRIPTEN)
+#define USE_WEBGL
+#endif
+
+#if !defined(USE_OPENGL_ES) && (defined(EMSCRIPTEN) || defined(USE_WEBGL))
+#define USE_OPENGL_ES
+#endif
+
 namespace Raz {
 
 enum class Capability : unsigned int {
@@ -939,9 +947,11 @@ public:
   static void generateTexture(unsigned int& index) { generateTextures(1, &index); }
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
+#if !defined(USE_WEBGL)
   static void bindImageTexture(unsigned int imageUnitIndex, unsigned int textureIndex, int textureLevel,
                                bool isLayered, int layer,
                                ImageAccess imgAccess, ImageInternalFormat imgFormat);
+#endif
   static void activateTexture(unsigned int index);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.
