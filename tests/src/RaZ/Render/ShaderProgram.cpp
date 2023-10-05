@@ -117,49 +117,62 @@ void checkUniformInfo(const std::unordered_map<std::string, UniformInfo>& corres
 
 TEST_CASE("ShaderProgram move") {
   {
+    Raz::RenderShaderProgram programBase;
+
+    programBase.setShaders(Raz::VertexShader(), Raz::FragmentShader());
+
+#if !defined(USE_OPENGL_ES)
+    programBase.setGeometryShader(Raz::GeometryShader());
+
     // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
     const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0) || Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader");
 
-    Raz::RenderShaderProgram programBase;
-
-    programBase.setShaders(Raz::VertexShader(), Raz::GeometryShader(), Raz::FragmentShader());
     if (isTessellationSupported) {
       programBase.setTessellationControlShader(Raz::TessellationControlShader());
       programBase.setTessellationEvaluationShader(Raz::TessellationEvaluationShader());
     }
+#endif
 
     programBase.updateShaders();
 
     const unsigned int programIndex  = programBase.getIndex();
     const unsigned int vertIndex     = programBase.getVertexShader().getIndex();
+#if !defined(USE_OPENGL_ES)
     const unsigned int tessCtrlIndex = (isTessellationSupported ? programBase.getTessellationControlShader().getIndex() : 0);
     const unsigned int tessEvalIndex = (isTessellationSupported ? programBase.getTessellationEvaluationShader().getIndex() : 0);
     const unsigned int geomIndex     = programBase.getGeometryShader().getIndex();
+#endif
     const unsigned int fragIndex     = programBase.getFragmentShader().getIndex();
 
     // Constructor
     Raz::RenderShaderProgram programMoved = std::move(programBase);
     CHECK(programMoved.getIndex() == programIndex);
     CHECK(programMoved.getVertexShader().getIndex() == vertIndex);
-    CHECK(programMoved.getGeometryShader().getIndex() == geomIndex);
     CHECK(programMoved.getFragmentShader().getIndex() == fragIndex);
+
+#if !defined(USE_OPENGL_ES)
+    CHECK(programMoved.getGeometryShader().getIndex() == geomIndex);
 
     if (isTessellationSupported) {
       CHECK(programMoved.getTessellationControlShader().getIndex() == tessCtrlIndex);
       CHECK(programMoved.getTessellationEvaluationShader().getIndex() == tessEvalIndex);
     }
+#endif
 
     // Assignment operator
     programBase = std::move(programMoved);
     CHECK(programBase.getIndex() == programIndex);
     CHECK(programBase.getVertexShader().getIndex() == vertIndex);
-    CHECK(programBase.getGeometryShader().getIndex() == geomIndex);
     CHECK(programBase.getFragmentShader().getIndex() == fragIndex);
+
+#if !defined(USE_OPENGL_ES)
+    CHECK(programBase.getGeometryShader().getIndex() == geomIndex);
 
     if (isTessellationSupported) {
       CHECK(programBase.getTessellationControlShader().getIndex() == tessCtrlIndex);
       CHECK(programBase.getTessellationEvaluationShader().getIndex() == tessEvalIndex);
     }
+#endif
   }
 
 #if !defined(USE_WEBGL)
@@ -412,15 +425,18 @@ TEST_CASE("RenderShaderProgram creation") {
 TEST_CASE("RenderShaderProgram uniforms") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
+  Raz::RenderShaderProgram program(Raz::VertexShader::loadFromSource(vertSource), Raz::FragmentShader::loadFromSource(fragSource));
+
+#if !defined(USE_OPENGL_ES)
   // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
   const bool isTessellationSupported = Raz::Renderer::checkVersion(4, 0) || Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader");
 
-  Raz::RenderShaderProgram program(Raz::VertexShader::loadFromSource(vertSource), Raz::FragmentShader::loadFromSource(fragSource));
   if (isTessellationSupported) {
     program.setTessellationControlShader(Raz::TessellationControlShader::loadFromSource(tessCtrlSource));
     program.setTessellationEvaluationShader(Raz::TessellationEvaluationShader::loadFromSource(tessEvalSource));
     program.updateShaders();
   }
+#endif
 
   REQUIRE(program.isLinked());
 
@@ -429,12 +445,14 @@ TEST_CASE("RenderShaderProgram uniforms") {
   CHECK(program.recoverUniformLocation("uniVec3") != -1);
   CHECK(program.recoverUniformLocation("uniSampler2D") != -1);
 
+#if !defined(USE_OPENGL_ES)
   if (isTessellationSupported) {
     CHECK(program.recoverUniformLocation("uniInt") != -1);
     CHECK(program.recoverUniformLocation("uniBool") != -1);
     CHECK(program.recoverUniformLocation("uniUint") != -1);
     CHECK(program.recoverUniformLocation("uniFloat") != -1);
   }
+#endif
 
   // Any unused uniform will be optimized out, hence won't have a location
   CHECK(program.recoverUniformLocation("uniUnused") == -1);
@@ -446,12 +464,14 @@ TEST_CASE("RenderShaderProgram uniforms") {
     { "uniSampler2D", { Raz::UniformType::SAMPLER_2D, 1 } }
   };
 
+#if !defined(USE_OPENGL_ES)
   if (isTessellationSupported) {
     correspUniInfo.emplace("uniInt[0]", UniformInfo{ Raz::UniformType::INT, 2 });
     correspUniInfo.emplace("uniBool", UniformInfo{ Raz::UniformType::BOOL, 1 });
     correspUniInfo.emplace("uniUint[0]", UniformInfo{ Raz::UniformType::UINT, 3 });
     correspUniInfo.emplace("uniFloat", UniformInfo{ Raz::UniformType::FLOAT, 1 });
   }
+#endif
 
   checkUniformInfo(correspUniInfo, program);
 }

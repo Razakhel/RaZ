@@ -34,6 +34,7 @@ void LuaWrapper::registerShaderTypes() {
     fragmentShader["clone"]          = &FragmentShader::clone;
   }
 
+#if !defined(USE_OPENGL_ES)
   {
     sol::usertype<GeometryShader> geometryShader = state.new_usertype<GeometryShader>("GeometryShader",
                                                                                       sol::constructors<GeometryShader(),
@@ -43,6 +44,7 @@ void LuaWrapper::registerShaderTypes() {
                                                      PickOverload<const char*>(&GeometryShader::loadFromSource));
     geometryShader["clone"]          = &GeometryShader::clone;
   }
+#endif
 
   {
     sol::usertype<Shader> shader = state.new_usertype<Shader>("Shader", sol::no_constructor);
@@ -56,6 +58,7 @@ void LuaWrapper::registerShaderTypes() {
     shader["destroy"]    = &Shader::destroy;
   }
 
+#if !defined(USE_OPENGL_ES)
   {
     sol::usertype<TessellationControlShader> tessCtrlShader = state.new_usertype<TessellationControlShader>("TessellationControlShader",
                                                                                                             sol::constructors<
@@ -79,6 +82,7 @@ void LuaWrapper::registerShaderTypes() {
                                                      PickOverload<const char*>(&TessellationEvaluationShader::loadFromSource));
     tessEvalShader["clone"]          = &TessellationEvaluationShader::clone;
   }
+#endif
 
   {
     sol::usertype<VertexShader> vertexShader = state.new_usertype<VertexShader>("VertexShader",

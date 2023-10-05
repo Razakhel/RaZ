@@ -747,27 +747,29 @@ TEST_CASE("LuaRender ShaderProgram") {
   }
 #endif
 
-  if (!Raz::Renderer::checkVersion(4, 0) && !Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader")) {
+#if !defined(USE_OPENGL_ES)
+  if (Raz::Renderer::checkVersion(4, 0) || Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader")) {
     CHECK(Raz::LuaWrapper::execute(R"(
-    local renderShaderProgram = RenderShaderProgram.new()
+      local renderShaderProgram = RenderShaderProgram.new()
 
-    renderShaderProgram:setTessellationControlShader(TessellationControlShader.new())
-    renderShaderProgram:setTessellationEvaluationShader(TessellationEvaluationShader.new())
+      renderShaderProgram:setTessellationControlShader(TessellationControlShader.new())
+      renderShaderProgram:setTessellationEvaluationShader(TessellationEvaluationShader.new())
 
-    renderShaderProgram:setShaders(VertexShader.new(), TessellationEvaluationShader.new(), FragmentShader.new())
-    renderShaderProgram:setShaders(VertexShader.new(), TessellationControlShader.new(), TessellationEvaluationShader.new(), FragmentShader.new())
+      renderShaderProgram:setShaders(VertexShader.new(), TessellationEvaluationShader.new(), FragmentShader.new())
+      renderShaderProgram:setShaders(VertexShader.new(), TessellationControlShader.new(), TessellationEvaluationShader.new(), FragmentShader.new())
 
-    local renderShaderProgram2 = renderShaderProgram:clone()
+      local renderShaderProgram2 = renderShaderProgram:clone()
 
-    assert(renderShaderProgram2:hasTessellationControlShader())
-    assert(renderShaderProgram2:getTessellationControlShader() ~= nil)
-    assert(renderShaderProgram2:hasTessellationEvaluationShader())
-    assert(renderShaderProgram2:getTessellationEvaluationShader() ~= nil)
+      assert(renderShaderProgram2:hasTessellationControlShader())
+      assert(renderShaderProgram2:getTessellationControlShader() ~= nil)
+      assert(renderShaderProgram2:hasTessellationEvaluationShader())
+      assert(renderShaderProgram2:getTessellationEvaluationShader() ~= nil)
 
-    renderShaderProgram:destroyTessellationControlShader()
-    renderShaderProgram:destroyTessellationEvaluationShader()
+      renderShaderProgram:destroyTessellationControlShader()
+      renderShaderProgram:destroyTessellationEvaluationShader()
     )"));
   }
+#endif
 
   CHECK(Raz::LuaWrapper::execute(R"(
     local renderShaderProgram = RenderShaderProgram.new()

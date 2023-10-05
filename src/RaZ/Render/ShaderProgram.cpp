@@ -410,6 +410,7 @@ void RenderShaderProgram::setVertexShader(VertexShader&& vertShader) {
   Renderer::attachShader(m_index, m_vertShader.getIndex());
 }
 
+#if !defined(USE_OPENGL_ES)
 void RenderShaderProgram::setTessellationControlShader(TessellationControlShader&& tessCtrlShader) {
   Logger::debug("[RenderShaderProgram] Setting tessellation control shader (ID: "
                 + std::to_string(tessCtrlShader.getIndex()) + ", path: '" + tessCtrlShader.getPath() + "')");
@@ -447,6 +448,7 @@ void RenderShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
 
   Renderer::attachShader(m_index, m_geomShader->getIndex());
 }
+#endif
 
 void RenderShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
   Logger::debug("[RenderShaderProgram] Setting fragment shader (ID: " + std::to_string(fragShader.getIndex()) + ", path: '" + fragShader.getPath() + "')");
@@ -467,6 +469,7 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader, FragmentShader&&
   link();
 }
 
+#if !defined(USE_OPENGL_ES)
 void RenderShaderProgram::setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader) {
   setVertexShader(std::move(vertShader));
   setGeometryShader(std::move(geomShader));
@@ -482,6 +485,7 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader, TessellationEval
 
   link();
 }
+
 void RenderShaderProgram::setShaders(VertexShader&& vertShader,
                                      TessellationControlShader&& tessCtrlShader,
                                      TessellationEvaluationShader&& tessEvalShader,
@@ -493,14 +497,17 @@ void RenderShaderProgram::setShaders(VertexShader&& vertShader,
 
   link();
 }
+#endif
 
 RenderShaderProgram RenderShaderProgram::clone() const {
   RenderShaderProgram program;
 
   program.setVertexShader(m_vertShader.clone());
+#if !defined(USE_OPENGL_ES)
   if (m_tessCtrlShader) program.setTessellationControlShader(m_tessCtrlShader->clone());
   if (m_tessEvalShader) program.setTessellationEvaluationShader(m_tessEvalShader->clone());
   if (m_geomShader) program.setGeometryShader(m_geomShader->clone());
+#endif
   program.setFragmentShader(m_fragShader.clone());
 
   program.link();
@@ -524,9 +531,11 @@ void RenderShaderProgram::loadShaders() const {
   Logger::debug("[RenderShaderProgram] Loading shaders...");
 
   m_vertShader.load();
+#if !defined(USE_OPENGL_ES)
   if (m_tessCtrlShader) m_tessCtrlShader->load();
   if (m_tessEvalShader) m_tessEvalShader->load();
   if (m_geomShader) m_geomShader->load();
+#endif
   m_fragShader.load();
 
   Logger::debug("[RenderShaderProgram] Loaded shaders");
@@ -536,9 +545,11 @@ void RenderShaderProgram::compileShaders() const {
   Logger::debug("[RenderShaderProgram] Compiling shaders...");
 
   m_vertShader.compile();
+#if !defined(USE_OPENGL_ES)
   if (m_tessCtrlShader) m_tessCtrlShader->compile();
   if (m_tessEvalShader) m_tessEvalShader->compile();
   if (m_geomShader) m_geomShader->compile();
+#endif
   m_fragShader.compile();
 
   Logger::debug("[RenderShaderProgram] Compiled shaders");
@@ -549,6 +560,7 @@ void RenderShaderProgram::destroyVertexShader() {
   m_vertShader.destroy();
 }
 
+#if !defined(USE_OPENGL_ES)
 void RenderShaderProgram::destroyTessellationControlShader() {
   if (!m_tessCtrlShader)
     return;
@@ -575,6 +587,7 @@ void RenderShaderProgram::destroyGeometryShader() {
   m_geomShader->destroy();
   m_geomShader.reset();
 }
+#endif
 
 void RenderShaderProgram::destroyFragmentShader() {
   Renderer::detachShader(m_index, m_fragShader.getIndex());

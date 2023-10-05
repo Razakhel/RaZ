@@ -369,30 +369,38 @@ public:
   RenderShaderProgram() noexcept : ShaderProgram() {}
   RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader) noexcept
     : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
+#if !defined(USE_OPENGL_ES)
   RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader) noexcept
     : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(geomShader), std::move(fragShader)); }
+#endif
 
   const VertexShader& getVertexShader() const noexcept { return m_vertShader; }
+#if !defined(USE_OPENGL_ES)
   bool hasTessellationControlShader() const noexcept { return m_tessCtrlShader.has_value(); }
   const TessellationControlShader& getTessellationControlShader() const noexcept { assert(hasTessellationControlShader()); return *m_tessCtrlShader; }
   bool hasTessellationEvaluationShader() const noexcept { return m_tessEvalShader.has_value(); }
   const TessellationEvaluationShader& getTessellationEvaluationShader() const noexcept { assert(hasTessellationEvaluationShader()); return *m_tessEvalShader; }
   bool hasGeometryShader() const noexcept { return m_geomShader.has_value(); }
   const GeometryShader& getGeometryShader() const noexcept { assert(hasGeometryShader()); return *m_geomShader; }
+#endif
   const FragmentShader& getFragmentShader() const noexcept { return m_fragShader; }
 
   void setVertexShader(VertexShader&& vertShader);
+#if !defined(USE_OPENGL_ES)
   void setTessellationControlShader(TessellationControlShader&& tessCtrlShader);
   void setTessellationEvaluationShader(TessellationEvaluationShader&& tessEvalShader);
   void setGeometryShader(GeometryShader&& geomShader);
+#endif
   void setFragmentShader(FragmentShader&& fragShader);
   void setShaders(VertexShader&& vertShader, FragmentShader&& fragShader);
+#if !defined(USE_OPENGL_ES)
   void setShaders(VertexShader&& vertShader, GeometryShader&& geomShader, FragmentShader&& fragShader);
   void setShaders(VertexShader&& vertShader, TessellationEvaluationShader&& tessEvalShader, FragmentShader&& fragShader);
   void setShaders(VertexShader&& vertShader,
                   TessellationControlShader&& tessCtrlShader,
                   TessellationEvaluationShader&& tessEvalShader,
                   FragmentShader&& fragShader);
+#endif
 
   RenderShaderProgram clone() const;
   /// Loads all the shaders contained by the program.
@@ -401,20 +409,24 @@ public:
   void compileShaders() const override;
   /// Destroys the vertex shader, detaching it from the program & deleting it.
   void destroyVertexShader();
+#if !defined(USE_OPENGL_ES)
   /// Destroys the tessellation control shader (if any), detaching it from the program & deleting it.
   void destroyTessellationControlShader();
   /// Destroys the tessellation evaluation shader (if any), detaching it from the program & deleting it.
   void destroyTessellationEvaluationShader();
   /// Destroys the geometry shader (if any), detaching it from the program & deleting it.
   void destroyGeometryShader();
+#endif
   /// Destroys the fragment shader, detaching it from the program & deleting it.
   void destroyFragmentShader();
 
 private:
   VertexShader m_vertShader {};
+#if !defined(USE_OPENGL_ES)
   std::optional<TessellationControlShader> m_tessCtrlShader {};
   std::optional<TessellationEvaluationShader> m_tessEvalShader {};
   std::optional<GeometryShader> m_geomShader {};
+#endif
   FragmentShader m_fragShader {};
 };
 

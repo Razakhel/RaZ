@@ -32,22 +32,28 @@ void LuaWrapper::registerShaderProgramTypes() {
                                                                                                      sol::constructors<RenderShaderProgram()>(),
                                                                                                      sol::base_classes, sol::bases<ShaderProgram>());
     renderShaderProgram["getVertexShader"]                     = [] (const RenderShaderProgram& p) { return &p.getVertexShader(); };
+#if !defined(USE_OPENGL_ES)
     renderShaderProgram["hasTessellationControlShader"]        = &RenderShaderProgram::hasTessellationControlShader;
     renderShaderProgram["getTessellationControlShader"]        = [] (const RenderShaderProgram& p) { return &p.getTessellationControlShader(); };
     renderShaderProgram["hasTessellationEvaluationShader"]     = &RenderShaderProgram::hasTessellationEvaluationShader;
     renderShaderProgram["getTessellationEvaluationShader"]     = [] (const RenderShaderProgram& p) { return &p.getTessellationEvaluationShader(); };
     renderShaderProgram["hasGeometryShader"]                   = &RenderShaderProgram::hasGeometryShader;
     renderShaderProgram["getGeometryShader"]                   = [] (const RenderShaderProgram& p) { return &p.getGeometryShader(); };
+#endif
     renderShaderProgram["getFragmentShader"]                   = [] (const RenderShaderProgram& p) { return &p.getFragmentShader(); };
     renderShaderProgram["setVertexShader"]                     = [] (RenderShaderProgram& p, VertexShader& s) { p.setVertexShader(std::move(s)); };
+#if !defined(USE_OPENGL_ES)
     renderShaderProgram["setTessellationControlShader"]        = [] (RenderShaderProgram& p,
                                                                      TessellationControlShader& s) { p.setTessellationControlShader(std::move(s)); };
     renderShaderProgram["setTessellationEvaluationShader"]     = [] (RenderShaderProgram& p,
                                                                      TessellationEvaluationShader& s) { p.setTessellationEvaluationShader(std::move(s)); };
     renderShaderProgram["setGeometryShader"]                   = [] (RenderShaderProgram& p, GeometryShader& s) { p.setGeometryShader(std::move(s)); };
+#endif
     renderShaderProgram["setFragmentShader"]                   = [] (RenderShaderProgram& p, FragmentShader& s) { p.setFragmentShader(std::move(s)); };
     renderShaderProgram["setShaders"]                          = sol::overload([] (RenderShaderProgram& p, VertexShader& v,
-                                                                                   FragmentShader& f) { p.setShaders(std::move(v), std::move(f)); },
+                                                                                   FragmentShader& f) { p.setShaders(std::move(v), std::move(f)); }
+#if !defined(USE_OPENGL_ES)
+                                                                               ,
                                                                                [] (RenderShaderProgram& p, VertexShader& v, GeometryShader& g,
                                                                                    FragmentShader& f) { p.setShaders(std::move(v), std::move(g),
                                                                                                                      std::move(f)); },
@@ -57,12 +63,16 @@ void LuaWrapper::registerShaderProgramTypes() {
                                                                                [] (RenderShaderProgram& p, VertexShader& v, TessellationControlShader& tc,
                                                                                    TessellationEvaluationShader& te,
                                                                                    FragmentShader& f) { p.setShaders(std::move(v), std::move(tc),
-                                                                                                                     std::move(te), std::move(f)); });
+                                                                                                                     std::move(te), std::move(f)); }
+#endif
+                                                                               );
     renderShaderProgram["clone"]                               = &RenderShaderProgram::clone;
     renderShaderProgram["destroyVertexShader"]                 = &RenderShaderProgram::destroyVertexShader;
+#if !defined(USE_OPENGL_ES)
     renderShaderProgram["destroyTessellationControlShader"]    = &RenderShaderProgram::destroyTessellationControlShader;
     renderShaderProgram["destroyTessellationEvaluationShader"] = &RenderShaderProgram::destroyTessellationEvaluationShader;
     renderShaderProgram["destroyGeometryShader"]               = &RenderShaderProgram::destroyGeometryShader;
+#endif
     renderShaderProgram["destroyFragmentShader"]               = &RenderShaderProgram::destroyFragmentShader;
   }
 

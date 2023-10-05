@@ -88,6 +88,7 @@ VertexShader VertexShader::clone() const {
   return res;
 }
 
+#if !defined(USE_OPENGL_ES)
 TessellationControlShader::TessellationControlShader() {
   Logger::debug("[Shader] Creating tessellation control shader...");
   m_index = Renderer::createShader(ShaderType::TESSELLATION_CONTROL);
@@ -156,6 +157,7 @@ GeometryShader GeometryShader::clone() const {
 
   return res;
 }
+#endif
 
 FragmentShader::FragmentShader() {
   Logger::debug("[Shader] Creating fragment shader...");

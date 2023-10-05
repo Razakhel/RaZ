@@ -53,6 +53,7 @@ public:
   VertexShader clone() const;
 };
 
+#if !defined(USE_OPENGL_ES)
 class TessellationControlShader final : public Shader {
 public:
   TessellationControlShader();
@@ -88,6 +89,7 @@ public:
 
   GeometryShader clone() const;
 };
+#endif
 
 class FragmentShader final : public Shader {
 public:
