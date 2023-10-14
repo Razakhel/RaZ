@@ -289,6 +289,9 @@ TEST_CASE("Mesh UV sphere") {
 
     CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(sphere.getRadius())));
   }
+
+  CHECK_THROWS(Raz::Mesh(sphere, 0, Raz::SphereMeshType::UV)); // Creating a sphere with no subdivision throws an exception
+  CHECK_NOTHROW(Raz::Mesh(sphere, 1, Raz::SphereMeshType::UV)); // Although it doesn't make much sense, a subdivision as low as one is currently allowed
 }
 
 TEST_CASE("Mesh icosphere") {
@@ -363,6 +366,8 @@ TEST_CASE("Mesh icosphere") {
 //
 //    CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(sphere.getRadius())));
 //  }
+
+  CHECK_THROWS(Raz::Mesh(sphere, 0, Raz::SphereMeshType::ICO)); // Creating a sphere with no subdivision throws an exception
 }
 
 TEST_CASE("Mesh AABB") {

@@ -66,6 +66,9 @@ Mesh::Mesh(const Plane& plane, float width, float depth) {
 }
 
 Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
+  if (subdivCount < 1)
+    throw std::invalid_argument("Error: Cannot create a sphere mesh with no subdivision");
+
   switch (type) {
     case SphereMeshType::UV:
       createUvSphere(sphere, subdivCount, subdivCount);
