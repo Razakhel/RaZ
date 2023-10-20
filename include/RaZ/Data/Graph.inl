@@ -31,7 +31,8 @@ T& GraphNode<T>::getChild(std::size_t index) noexcept {
 template <typename T>
 template <typename... OtherNodesTs>
 void GraphNode<T>::addParents(GraphNode& node, OtherNodesTs&&... otherNodes) {
-  assert("Error: A graph node cannot have itself as a parent." && &node != this);
+  if (&node == this)
+    throw std::invalid_argument("Error: A graph node cannot be a parent of itself");
 
   if (std::find(m_parents.cbegin(), m_parents.cend(), &node) == m_parents.cend())
     m_parents.emplace_back(static_cast<T*>(&node));
@@ -58,7 +59,8 @@ void GraphNode<T>::removeParents(GraphNode& node, OtherNodesTs&&... otherNodes) 
 template <typename T>
 template <typename... OtherNodesTs>
 void GraphNode<T>::addChildren(GraphNode& node, OtherNodesTs&&... otherNodes) {
-  assert("Error: A graph node cannot be a child of itself." && &node != this);
+  if (&node == this)
+    throw std::invalid_argument("Error: A graph node cannot be a child of itself");
 
   if (std::find(m_children.cbegin(), m_children.cend(), &node) == m_children.cend())
     m_children.emplace_back(static_cast<T*>(&node));
@@ -84,7 +86,8 @@ void GraphNode<T>::removeChildren(GraphNode& node, OtherNodesTs&&... otherNodes)
 
 template <typename T>
 void GraphNode<T>::unlinkParent(const GraphNode& node) {
-  assert("Error: A graph node cannot be unlinked from itself." && &node != this);
+  if (&node == this)
+    throw std::invalid_argument("Error: A graph node cannot be unlinked from itself");
 
   const auto parentIt = std::find(m_parents.cbegin(), m_parents.cend(), &node);
   if (parentIt != m_parents.cend())
@@ -93,7 +96,8 @@ void GraphNode<T>::unlinkParent(const GraphNode& node) {
 
 template <typename T>
 void GraphNode<T>::unlinkChild(const GraphNode& node) {
-  assert("Error: A graph node cannot be unlinked from itself." && &node != this);
+  if (&node == this)
+    throw std::invalid_argument("Error: A graph node cannot be unlinked from itself");
 
   const auto childIt = std::find(m_children.cbegin(), m_children.cend(), &node);
   if (childIt != m_children.cend())

@@ -135,7 +135,15 @@ TEST_CASE("Graph linking test") {
   CHECK(&node2.getParent(0) == &root);
   CHECK(node2.getChildCount() == 0);
 
-  // Trying to remove a node which is not in the graph throws an exception
+  // Trying to add or remove the current node as child or parent throws
+  CHECK_THROWS(node2.addChildren(node11, node2, node12));
+  CHECK(&node2.getChild(0) == &node11); // The arguments given before the current node have been set, but not those after
+  CHECK_THROWS(node2.removeChildren(node11, node2));
+  CHECK_THROWS(node11.addParents(node2, node11, node12));
+  CHECK(&node11.getParent(0) == &node2);
+  CHECK_THROWS(node11.removeParents(node2, node11));
+
+  // Trying to remove a node which is not in the graph throws
   TestNode testNode;
   CHECK_THROWS(graph.removeNode(testNode));
 }
