@@ -14,14 +14,10 @@ constexpr Quaternion<T>::Quaternion(Radians<T> angle, const Vec3<T>& axis) noexc
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::normalize() const noexcept {
   Quaternion<T> res = *this;
-  const T sqNorm    = computeSquaredNorm();
 
-  if (sqNorm > 0) {
-    const T invSqNorm = 1 / std::sqrt(sqNorm);
-
-    res.m_real      *= invSqNorm;
-    res.m_complexes *= invSqNorm;
-  }
+  const T invNorm  = 1 / computeNorm();
+  res.m_real      *= invNorm;
+  res.m_complexes *= invNorm;
 
   return res;
 }

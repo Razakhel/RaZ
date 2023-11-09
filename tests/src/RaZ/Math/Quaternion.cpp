@@ -67,28 +67,28 @@ TEST_CASE("Quaternion interpolation") {
   CHECK_THAT(quat1.lerp(quat2, 0.75f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.77937877f, 0.552119f, -1.06066f, 2.6516504f)));
   CHECK(quat1.lerp(quat2, 1.f) == quat2);
 
-  const Raz::Quaternionf quat1Norm = quat1.normalize();
-  const Raz::Quaternionf quat2Norm = quat2.normalize();
+  const Raz::Quaternionf normedQuat1 = quat1.normalize();
+  const Raz::Quaternionf normedQuat2 = quat2.normalize();
 
   // Direct nlerp() (quaternions are not normalized beforehand)
-  CHECK(quat1.nlerp(quat2, 0.f) == quat1Norm);
+  CHECK(quat1.nlerp(quat2, 0.f) == normedQuat1);
   CHECK_THAT(quat1.nlerp(quat2, 0.25f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.68513638f, 0.179562f, -0.262178f, 0.65544516f)));
   CHECK_THAT(quat1.nlerp(quat2, 0.5f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.40111461f, 0.18704282f, -0.3330366f, 0.83259147f)));
   CHECK_THAT(quat1.nlerp(quat2, 0.75f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.25880963f, 0.183343f, -0.3522152f, 0.880538f)));
-  CHECK(quat1.nlerp(quat2, 1.f) == quat2Norm);
+  CHECK(quat1.nlerp(quat2, 1.f) == normedQuat2);
 
   // Pre-normalized nlerp() (almost strictly equivalent to nlerp(...).normalize() with non-normalized quaternions like above)
-  CHECK(quat1Norm.nlerp(quat2Norm, 0.f) == quat1Norm);
-  CHECK_THAT(quat1Norm.nlerp(quat2Norm, 0.25f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.94805622f, 0.13198756f, -0.10749099f, 0.26872748f)));
-  CHECK_THAT(quat1Norm.nlerp(quat2Norm, 0.5f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.76069689f, 0.17258403f, -0.23239529f, 0.58098823f)));
-  CHECK_THAT(quat1Norm.nlerp(quat2Norm, 0.75f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.45934007f, 0.18731718f, -0.32247299f, 0.8061825f)));
-  CHECK(quat1Norm.nlerp(quat2Norm, 1.f) == quat2Norm);
+  CHECK(normedQuat1.nlerp(normedQuat2, 0.f) == normedQuat1);
+  CHECK_THAT(normedQuat1.nlerp(normedQuat2, 0.25f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.94805622f, 0.13198756f, -0.10749099f, 0.26872748f)));
+  CHECK_THAT(normedQuat1.nlerp(normedQuat2, 0.5f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.76069689f, 0.17258403f, -0.23239529f, 0.58098823f)));
+  CHECK_THAT(normedQuat1.nlerp(normedQuat2, 0.75f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.45934007f, 0.18731718f, -0.32247299f, 0.8061825f)));
+  CHECK(normedQuat1.nlerp(normedQuat2, 1.f) == normedQuat2);
 
-  CHECK(quat1Norm.slerp(quat2Norm, 0.f) == quat1Norm);
-  CHECK_THAT(quat1Norm.slerp(quat2Norm, 0.25f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.93302816f, 0.13793936f, -0.12341759f, 0.30854398f)));
-  CHECK_THAT(quat1Norm.slerp(quat2Norm, 0.5f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.76069695f, 0.17258403f, -0.23239529f, 0.58098823f)));
-  CHECK_THAT(quat1Norm.slerp(quat2Norm, 0.75f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.49936396f, 0.18703631f, -0.31418267f, 0.78545672f)));
-  CHECK(quat1Norm.slerp(quat2Norm, 1.f) == quat2Norm);
+  CHECK(normedQuat1.slerp(normedQuat2, 0.f) == normedQuat1);
+  CHECK_THAT(normedQuat1.slerp(normedQuat2, 0.25f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.93302816f, 0.13793936f, -0.12341759f, 0.30854398f)));
+  CHECK_THAT(normedQuat1.slerp(normedQuat2, 0.5f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.76069695f, 0.17258403f, -0.23239529f, 0.58098823f)));
+  CHECK_THAT(normedQuat1.slerp(normedQuat2, 0.75f), IsNearlyEqualToQuaternion(Raz::Quaternionf(0.49936396f, 0.18703631f, -0.31418267f, 0.78545672f)));
+  CHECK(normedQuat1.slerp(normedQuat2, 1.f) == normedQuat2);
 }
 
 TEST_CASE("Quaternion matrix computation") {
