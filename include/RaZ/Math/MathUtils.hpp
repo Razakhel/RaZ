@@ -3,16 +3,13 @@
 #ifndef RAZ_MATHUTILS_HPP
 #define RAZ_MATHUTILS_HPP
 
+#include "RaZ/Math/Vector.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
 
-namespace Raz {
-
-template <typename T, std::size_t Size>
-class Vector;
-
-namespace MathUtils {
+namespace Raz::MathUtils {
 
 /// Computes the linear interpolation between two values, according to a coefficient.
 /// \tparam T Type to compute the interpolation with.
@@ -137,8 +134,34 @@ constexpr T smootherstep(T minThresh, T maxThresh, T value) noexcept {
   return smootherstep(clampedVal);
 }
 
-} // namespace MathUtils
+/// Computes an [orthonormal basis from a single vector](https://graphics.pixar.com/library/OrthonormalB/), according to the right hand rule.
+///
+/// Note that the example diagram below represents one possible solution; the vectors may not necessarily be in these directions relatively to the input.
+///
+///           axis3
+///            ^
+///            |
+///            +---> axis2
+///           /
+///          v
+///       input
+///
+/// \tparam T Type of the basis' vectors.
+/// \param input Base vector from which to compute the basis. Must be normalized.
+/// \param axis2 Second vector of the computed basis.
+/// \param axis3 Third vector of the computed basis.
+template <typename T>
+void computeOrthonormalBasis(const Vec3<T>& input, Vec3<T>& axis2, Vec3<T>& axis3) {
+  static_assert(std::is_floating_point_v<T>, "Error: Vectors must be of a floating-point type to compute an orthonormal basis from.");
 
-} // namespace Raz
+  const T sign = std::copysign(static_cast<T>(1), input.z());
+  const T a    = static_cast<T>(-1) / (sign + input.z());
+  const T b    = input.x() * input.y() * a;
+
+  axis2 = Vec3<T>(static_cast<T>(1) + sign * input.x() * input.x() * a, sign * b, -sign * input.x());
+  axis3 = Vec3<T>(b, sign + input.y() * input.y() * a, -input.y());
+}
+
+} // namespace Raz::MathUtils
 
 #endif // RAZ_MATHUTILS_HPP

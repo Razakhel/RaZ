@@ -118,3 +118,30 @@ TEST_CASE("MathUtils smootherstep range") {
   CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 5.f + std::numeric_limits<float>::epsilon()) == 1.f);
   CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 10.f) == 1.f);
 }
+
+TEST_CASE("MathUtils orthonormal basis") {
+  Raz::Vec3f axis2;
+  Raz::Vec3f axis3;
+
+  Raz::MathUtils::computeOrthonormalBasis(Raz::Axis::X, axis2, axis3);
+  CHECK(axis2 == -Raz::Axis::Z);
+  CHECK(axis3 == Raz::Axis::Y);
+
+  Raz::MathUtils::computeOrthonormalBasis(Raz::Axis::Y, axis2, axis3);
+  CHECK(axis2 == Raz::Axis::X);
+  CHECK(axis3 == -Raz::Axis::Z);
+
+  Raz::MathUtils::computeOrthonormalBasis(Raz::Axis::Z, axis2, axis3);
+  CHECK(axis2 == Raz::Axis::X);
+  CHECK(axis3 == Raz::Axis::Y);
+
+  Raz::MathUtils::computeOrthonormalBasis(Raz::Vec3f(1.f).normalize(), axis2, axis3);
+  CHECK(axis2 == Raz::Vec3f(0.788675f, -0.211324856f, -0.577350259f));
+  CHECK(axis3 == Raz::Vec3f(-0.211324856f, 0.788675f, -0.577350259f));
+  CHECK(axis2.dot(axis3) == 0.f);
+
+  Raz::MathUtils::computeOrthonormalBasis(Raz::Vec3f(-1.f).normalize(), axis2, axis3);
+  CHECK(axis2 == Raz::Vec3f(0.788675f, -0.211324856f, -0.577350259f));
+  CHECK(axis3 == Raz::Vec3f(0.211324856f, -0.788675f, 0.577350259f));
+  CHECK(axis2.dot(axis3) == 0.f);
+}
