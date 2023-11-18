@@ -152,10 +152,32 @@ void LuaWrapper::registerOverlayTypes() {
   }
 
   {
+    sol::usertype<OverlayTextArea> overlayTextArea = state.new_usertype<OverlayTextArea>("OverlayTextArea",
+                                                                                         sol::constructors<
+                                                                                           OverlayTextArea(std::string,
+                                                                                                           std::function<void(const std::string&)>),
+                                                                                           OverlayTextArea(std::string,
+                                                                                                           std::function<void(const std::string&)>,
+                                                                                                           std::string),
+                                                                                           OverlayTextArea(std::string,
+                                                                                                           std::function<void(const std::string&)>,
+                                                                                                           std::string,
+                                                                                                           float)
+                                                                                         >(),
+                                                                                         sol::base_classes, sol::bases<OverlayElement>());
+    overlayTextArea["text"]   = sol::property(&OverlayTextArea::getText, &OverlayTextArea::setText);
+    overlayTextArea["append"] = &OverlayTextArea::append;
+    overlayTextArea["clear"]  = &OverlayTextArea::clear;
+  }
+
+  {
     sol::usertype<OverlayTextbox> overlayTextbox = state.new_usertype<OverlayTextbox>("OverlayTextbox",
                                                                                       sol::constructors<
                                                                                         OverlayTextbox(std::string,
-                                                                                                       std::function<void(const std::string&)>)
+                                                                                                       std::function<void(const std::string&)>),
+                                                                                        OverlayTextbox(std::string,
+                                                                                                       std::function<void(const std::string&)>,
+                                                                                                       std::string)
                                                                                       >(),
                                                                                       sol::base_classes, sol::bases<OverlayElement>());
     overlayTextbox["text"]   = sol::property(&OverlayTextbox::getText, &OverlayTextbox::setText);
@@ -191,7 +213,17 @@ void LuaWrapper::registerOverlayTypes() {
     overlayWindow["addButton"]       = &OverlayWindow::addButton;
     overlayWindow["addCheckbox"]     = &OverlayWindow::addCheckbox;
     overlayWindow["addSlider"]       = &OverlayWindow::addSlider;
-    overlayWindow["addTextbox"]      = &OverlayWindow::addTextbox;
+    overlayWindow["addTextbox"]      = sol::overload([] (OverlayWindow& w, std::string l,
+                                                         std::function<void(const std::string&)> c) { return &w.addTextbox(std::move(l),
+                                                                                                                           std::move(c)); },
+                                                     PickOverload<std::string, std::function<void(const std::string&)>,
+                                                                  std::string>(&OverlayWindow::addTextbox));
+    overlayWindow["addTextArea"]     = sol::overload([] (OverlayWindow& w, std::string l,
+                                                         std::function<void(const std::string&)> c) { return &w.addTextArea(std::move(l), std::move(c)); },
+                                                     [] (OverlayWindow& w, std::string l, std::function<void(const std::string&)> c,
+                                                         std::string t) { return &w.addTextArea(std::move(l), std::move(c), std::move(t)); },
+                                                     PickOverload<std::string, std::function<void(const std::string&)>,
+                                                                  std::string, float>(&OverlayWindow::addTextArea));
     overlayWindow["addListBox"]      = sol::overload([] (OverlayWindow& w, std::string l, std::vector<std::string> e,
                                                          std::function<void(const std::string&, std::size_t)> c) { return &w.addListBox(std::move(l),
                                                                                                                                         std::move(e),
@@ -234,6 +266,7 @@ void LuaWrapper::registerOverlayTypes() {
     { "CHECKBOX",      OverlayElementType::CHECKBOX },
     { "SLIDER",        OverlayElementType::SLIDER },
     { "TEXTBOX",       OverlayElementType::TEXTBOX },
+    { "TEXT_AREA",     OverlayElementType::TEXT_AREA },
     { "LIST_BOX",      OverlayElementType::LIST_BOX },
     { "DROPDOWN",      OverlayElementType::DROPDOWN },
     { "TEXTURE",       OverlayElementType::TEXTURE },

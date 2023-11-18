@@ -107,6 +107,23 @@ void OverlayTextbox::clear() {
   m_callback(m_text);
 }
 
+void OverlayTextArea::setText(std::string text) {
+  m_text = std::move(text);
+  m_callback(m_text);
+}
+
+OverlayTextArea& OverlayTextArea::append(const std::string& text) {
+  m_text += text;
+  m_callback(m_text);
+
+  return *this;
+}
+
+void OverlayTextArea::clear() {
+  m_text.clear();
+  m_callback(m_text);
+}
+
 OverlayTexture::OverlayTexture(const Texture2D& texture)
   : OverlayTexture(texture, texture.getWidth(), texture.getHeight()) {}
 
@@ -155,10 +172,21 @@ OverlaySlider& OverlayWindow::addSlider(std::string label, std::function<void(fl
                                                                                               minValue, maxValue, initValue)));
 }
 
-OverlayTextbox& OverlayWindow::addTextbox(std::string label, std::function<void(const std::string&)> callback) {
-  auto& textbox = static_cast<OverlayTextbox&>(*m_elements.emplace_back(std::make_unique<OverlayTextbox>(std::move(label), std::move(callback))));
-  textbox.m_text.reserve(64);
+OverlayTextbox& OverlayWindow::addTextbox(std::string label, std::function<void(const std::string&)> callback, std::string initText) {
+  auto& textbox = static_cast<OverlayTextbox&>(*m_elements.emplace_back(std::make_unique<OverlayTextbox>(std::move(label),
+                                                                                                         std::move(callback),
+                                                                                                         std::move(initText))));
+  textbox.m_text.reserve(std::min(textbox.m_text.size(), static_cast<std::size_t>(64)));
   return textbox;
+}
+
+OverlayTextArea& OverlayWindow::addTextArea(std::string label, std::function<void(const std::string&)> callback, std::string initText, float maxHeight) {
+  auto& textArea = static_cast<OverlayTextArea&>(*m_elements.emplace_back(std::make_unique<OverlayTextArea>(std::move(label),
+                                                                                                            std::move(callback),
+                                                                                                            std::move(initText),
+                                                                                                            maxHeight)));
+  textArea.m_text.reserve(std::min(textArea.m_text.size(), static_cast<std::size_t>(2048)));
+  return textArea;
 }
 
 OverlayListBox& OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
@@ -290,6 +318,20 @@ void OverlayWindow::render() const {
 
         if (ImGui::InputText(textbox.m_label.c_str(), &textbox.m_text))
           textbox.m_callback(textbox.m_text);
+
+        break;
+      }
+
+      case OverlayElementType::TEXT_AREA:
+      {
+        auto& textArea = static_cast<OverlayTextArea&>(*element);
+
+        if (ImGui::InputTextMultiline(textArea.m_label.c_str(),
+                                      &textArea.m_text,
+                                      ImVec2(-1.f, textArea.m_maxHeight),
+                                      ImGuiInputTextFlags_AllowTabInput)) {
+          textArea.m_callback(textArea.m_text);
+        }
 
         break;
       }

@@ -111,7 +111,7 @@ TEST_CASE("RenderSystem overlay render") {
     overlay1.addButton("Button", [] () noexcept {});
     overlay1.addCheckbox("Checkbox on", [] () noexcept {}, [] () noexcept {}, true);
     overlay1.addCheckbox("Checkbox off", [] () noexcept {}, [] () noexcept {}, false);
-    overlay1.addTextbox("Textbox", [] (const std::string&) noexcept {});
+    overlay1.addTextbox("Textbox", [] (const std::string&) noexcept {}, "initial").append(" text");
 
     CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay1_base.png", true)));
 
@@ -155,6 +155,16 @@ TEST_CASE("RenderSystem overlay render") {
     CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay3_base.png", true)));
 
     overlay3.disable();
+  }
+
+  {
+    Raz::OverlayWindow& overlay4 = window.getOverlay().addWindow("RaZ - Overlay test 4", Raz::Vec2f(window.getWidth(), window.getHeight()));
+    overlay4.addTextArea("Text area", [] (const std::string&) noexcept {}, "initial text", 25.f) += "\nmultiline";
+
+    // The text area's vertical scrollbar seems to be only rendered from the 2d frame onward
+    CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay4_base.png", true)));
+
+    overlay4.disable();
   }
 }
 #endif

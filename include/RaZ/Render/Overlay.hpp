@@ -24,6 +24,7 @@ enum class OverlayElementType {
   CHECKBOX,
   SLIDER,
   TEXTBOX,
+  TEXT_AREA,
   LIST_BOX,
   DROPDOWN,
   TEXTURE,
@@ -184,7 +185,8 @@ class OverlayTextbox final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayTextbox(std::string label, std::function<void(const std::string&)> callback) : OverlayElement(std::move(label)), m_callback{ std::move(callback) } {}
+  OverlayTextbox(std::string label, std::function<void(const std::string&)> callback, std::string initText = {})
+    : OverlayElement(std::move(label)), m_text{ std::move(initText) }, m_callback{ std::move(callback) } {}
 
   OverlayElementType getType() const override { return OverlayElementType::TEXTBOX; }
   const std::string& getText() const noexcept { return m_text; }
@@ -199,6 +201,29 @@ public:
 private:
   std::string m_text {};
   std::function<void(const std::string&)> m_callback {};
+};
+
+class OverlayTextArea final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayTextArea(std::string label, std::function<void(const std::string&)> callback, std::string initText = {}, float maxHeight = -1.f)
+    : OverlayElement(std::move(label)), m_text{ std::move(initText) }, m_callback{ std::move(callback) }, m_maxHeight{ maxHeight } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::TEXT_AREA; }
+  const std::string& getText() const noexcept { return m_text; }
+
+  void setText(std::string text);
+
+  OverlayTextArea& append(const std::string& text);
+  void clear();
+
+  OverlayTextArea& operator+=(const std::string& text) { return append(text); }
+
+private:
+  std::string m_text {};
+  std::function<void(const std::string&)> m_callback {};
+  float m_maxHeight {};
 };
 
 class OverlayListBox final : public OverlayElement {
@@ -409,11 +434,19 @@ public:
   /// \param initValue Initial value.
   /// \return Reference to the newly added slider.
   OverlaySlider& addSlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue);
-  /// Adds a texbox on the overlay window.
-  /// \param label Text to be displayed beside the checkbox.
+  /// Adds a textbox on the overlay window.
+  /// \param label Text to be displayed beside the textbox.
   /// \param callback Function to be called every time the content is modified.
+  /// \param initText Initial text to be set.
   /// \return Reference to the newly added textbox.
-  OverlayTextbox& addTextbox(std::string label, std::function<void(const std::string&)> callback);
+  OverlayTextbox& addTextbox(std::string label, std::function<void(const std::string&)> callback, std::string initText = {});
+  /// Adds a text area on the overlay window.
+  /// \param label Text to be displayed beside the text area.
+  /// \param callback Function to be called every time the content is modified.
+  /// \param initText Initial text to be set.
+  /// \param maxHeight Maximum height. If strictly lower than 0, automatically resizes the widget to fit the window's content.
+  /// \return Reference to the newly added text area.
+  OverlayTextArea& addTextArea(std::string label, std::function<void(const std::string&)> callback, std::string initText = {}, float maxHeight = -1.f);
   /// Adds a list box on the overlay window.
   /// \param label Text to be displayed beside the list.
   /// \param entries Texts to fill the list with.
@@ -454,7 +487,7 @@ public:
   /// \param minYVal Minimum value on the Y (vertical) axis.
   /// \param maxYVal Maximum value on the Y (vertical) axis.
   /// \param lockYAxis Whether to allow panning & zooming on the Y (vertical) axis.
-  /// \param maxHeight Maximum height of the plot widget. If strictly lower than 0, automatically resizes the plot to fit the window's content.
+  /// \param maxHeight Maximum height. If strictly lower than 0, automatically resizes the widget to fit the window's content.
   /// \return Reference to the newly added plot.
   [[nodiscard]] OverlayPlot& addPlot(std::string label, std::size_t maxValCount,
                                      std::string xAxisLabel = {}, std::string yAxisLabel = {},
