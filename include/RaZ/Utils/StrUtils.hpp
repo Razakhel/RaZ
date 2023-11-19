@@ -3,6 +3,8 @@
 #ifndef RAZ_STRUTILS_HPP
 #define RAZ_STRUTILS_HPP
 
+#include "RaZ/Utils/CompilerUtils.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <codecvt>
@@ -369,7 +371,10 @@ inline std::vector<std::wstring> split(std::wstring text, wchar_t delimiter) {
 /// \param text Wide string to convert.
 /// \return Converted UTF-8 string.
 inline std::string toUtf8(const std::wstring& text) {
+  PUSH_WARNINGS_STATE
+  DISABLE_WARNING_CLANG(-Wdeprecated-declarations)
   return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().to_bytes(text);
+  POP_WARNINGS_STATE
 }
 
 /// Returns the current UTF-8 encoded string.
@@ -384,7 +389,10 @@ constexpr const std::string& toUtf8(const std::string& text) {
 /// \param text UTF-8 string to convert.
 /// \return Converted wide string.
 inline std::wstring toWide(const std::string& text) {
+  PUSH_WARNINGS_STATE
+  DISABLE_WARNING_CLANG(-Wdeprecated-declarations)
   return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(text);
+  POP_WARNINGS_STATE
 }
 
 /// Returns the current wide string.
