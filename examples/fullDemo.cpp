@@ -163,21 +163,22 @@ int main() {
     // Scripting //
     ///////////////
 
+    constexpr std::string_view luaScriptSource = R"(
+local rotAngle = Degreesf.new(20)
+
+function setup()
+    -- 'this' always represents the entity containing the script
+    this:getTransform().rotation = Quaternionf.new(-rotAngle, Axis.Y)
+end
+
+function update(timeInfo)
+    local angle = rotAngle * math.sin(timeInfo.globalTime) * timeInfo.deltaTime
+    this:getTransform():rotate(Quaternionf.new(angle, Axis.Y))
+end)";
+
     world.addSystem<Raz::ScriptSystem>();
 
-    auto& luaScript = mesh.addComponent<Raz::LuaScript>(R"(
-      local rotAngle = Degreesf.new(20)
-
-      function setup()
-        -- 'this' always represents the entity containing the script
-        this:getTransform().rotation = Quaternionf.new(-rotAngle, Axis.Y)
-      end
-
-      function update(timeInfo)
-        local angle = rotAngle * math.sin(timeInfo.globalTime) * timeInfo.deltaTime
-        this:getTransform():rotate(Quaternionf.new(angle, Axis.Y))
-      end
-    )");
+    auto& luaScript = mesh.addComponent<Raz::LuaScript>(luaScriptSource.data());
 
     ///////////
     // Audio //
@@ -214,6 +215,35 @@ int main() {
 
     DemoUtils::insertOverlayCullingOption(window, overlay);
     DemoUtils::insertOverlayVerticalSyncOption(window, overlay);
+
+    constexpr float overlayScriptWidth        = 600.f;
+    constexpr float overlayScriptSourceHeight = 225.f;
+    constexpr float overlayScriptHeight       = overlayScriptSourceHeight + 60.f;
+
+    Raz::OverlayWindow& overlayScript = window.getOverlay().addWindow("Edit script",
+                                                                      Raz::Vec2f(overlayScriptWidth, overlayScriptHeight),
+                                                                      Raz::Vec2f(static_cast<float>(window.getWidth()) - overlayScriptWidth, 0.f));
+    overlayScript.disable();
+
+    Raz::OverlayTextArea& scriptTextArea = overlayScript.addTextArea("Lua script",
+                                                                     [] (const std::string&) noexcept {},
+                                                                     luaScriptSource.data() + 1,
+                                                                     overlayScriptSourceHeight);
+
+    overlayScript.addButton("Apply", [&] () {
+      try {
+        // Running a dummy script, checking that it's syntactically correct
+        Raz::LuaScript testScript(scriptTextArea.getText());
+        testScript.registerEntity(mesh, "this");
+        testScript.update({});
+
+        luaScript.loadCode(scriptTextArea.getText());
+      } catch (const std::exception& ex) {
+        Raz::Logger::error("Failed to reload the Lua script:\n" + std::string(ex.what()));
+      }
+    });
+
+    overlay.addButton("Edit script", [&overlayScript] () noexcept { overlayScript.enable(!overlayScript.isEnabled()); });
 
     overlay.addSeparator();
 
