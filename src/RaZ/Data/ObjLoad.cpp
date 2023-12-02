@@ -49,7 +49,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
     std::string nextValue;
     file >> tag >> nextValue;
 
-    if (tag[0] == 'K') {                 // Standard properties
+    if (tag[0] == 'K') {                 // Standard properties [K*]
       std::string secondValue;
       std::string thirdValue;
       file >> secondValue >> thirdValue;
@@ -64,7 +64,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
         material.getProgram().setAttribute(values, MaterialAttribute::Ambient);
       else if (tag[1] == 's')            // Specular factor [Ks]
         material.getProgram().setAttribute(values, MaterialAttribute::Specular);
-    } else if (tag[0] == 'P') {          // PBR properties
+    } else if (tag[0] == 'P') {          // PBR properties [P*]
       const float factor = std::stof(nextValue);
 
       if (tag[1] == 'm')                 // Metallic factor [Pm]
@@ -73,13 +73,13 @@ inline void loadMtl(const FilePath& mtlFilePath,
         material.getProgram().setAttribute(factor, MaterialAttribute::Roughness);
 
       materialType = MaterialType::COOK_TORRANCE;
-    } else if (tag[0] == 'm') {          // Import texture
+    } else if (tag[0] == 'm') {          // Import texture [map_*]
       const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
 
       if (map == nullptr)
         continue;
 
-      if (tag[4] == 'K') {               // Standard maps
+      if (tag[4] == 'K') {               // Standard maps [map_K*]
         if (tag[5] == 'd')               // Diffuse/albedo map [map_Kd]
           material.getProgram().setTexture(map, MaterialTexture::BaseColor);
         else if (tag[5] == 'e')          // Emissive map [map_Ke]
@@ -88,7 +88,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
           material.getProgram().setTexture(map, MaterialTexture::Ambient);
         else if (tag[5] == 's')          // Specular map [map_Ks]
           material.getProgram().setTexture(map, MaterialTexture::Specular);
-      } else if (tag[4] == 'P') {       // PBR maps
+      } else if (tag[4] == 'P') {       // PBR maps [map_P*]
         if (tag[5] == 'm')               // Metallic map [map_Pm]
           material.getProgram().setTexture(map, MaterialTexture::Metallic);
         else if (tag[5] == 'r')          // Roughness map [map_Pr]
@@ -96,11 +96,12 @@ inline void loadMtl(const FilePath& mtlFilePath,
 
         materialType = MaterialType::COOK_TORRANCE;
       } else if (tag[4] == 'd') {        // Transparency map [map_d]
+        map->setFilter(TextureFilter::NEAREST, TextureFilter::NEAREST, TextureFilter::NEAREST);
         material.getProgram().setTexture(map, MaterialTexture::Transparency);
       } else if (tag[4] == 'b') {        // Bump map [map_bump]
         material.getProgram().setTexture(map, MaterialTexture::Bump);
       }
-    } else if (tag[0] == 'd') {          // Transparency factor
+    } else if (tag[0] == 'd') {          // Transparency factor [d]
       material.getProgram().setAttribute(std::stof(nextValue), MaterialAttribute::Transparency);
     } else if (tag[0] == 'T') {
       if (tag[1] == 'r')                 // Transparency factor (alias, 1 - d) [Tr]

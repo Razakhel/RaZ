@@ -79,8 +79,11 @@ void Material::loadType(MaterialType type) {
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Ambient);
       if (!m_program.hasTexture(MaterialTexture::Specular))
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Specular);
-      if (!m_program.hasTexture(MaterialTexture::Transparency))
-        m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Transparency);
+      if (!m_program.hasTexture(MaterialTexture::Transparency)) {
+        auto transparencyMap = Texture2D::create(ColorPreset::White);
+        transparencyMap->setFilter(TextureFilter::NEAREST, TextureFilter::NEAREST, TextureFilter::NEAREST);
+        m_program.setTexture(std::move(transparencyMap), MaterialTexture::Transparency);
+      }
       if (!m_program.hasTexture(MaterialTexture::Bump))
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Bump);
 

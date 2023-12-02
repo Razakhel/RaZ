@@ -1,5 +1,4 @@
 #include "RaZ/Render/SsrRenderProcess.hpp"
-#include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/Texture.hpp"
 

@@ -74,6 +74,9 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
   renderSystem.sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   renderSystem.sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
 
+  if (renderSystem.hasCubemap())
+    renderSystem.getCubemap().draw();
+
   renderSystem.m_modelUbo.bind();
 
   for (const Entity* entity : renderSystem.m_entities) {
@@ -88,9 +91,6 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
     renderSystem.m_modelUbo.sendData(entity->getComponent<Transform>().computeTransformMatrix(), 0);
     meshRenderer.draw();
   }
-
-  if (renderSystem.hasCubemap())
-    renderSystem.getCubemap().draw();
 
   geometryFramebuffer.unbind();
 

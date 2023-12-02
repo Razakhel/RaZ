@@ -304,6 +304,14 @@ void Renderer::setStencilMask(unsigned int mask, FaceOrientation orientation) {
   printConditionalErrors();
 }
 
+void Renderer::setBlendFunction(BlendFactor source, BlendFactor destination) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBlendFunc(static_cast<unsigned int>(source), static_cast<unsigned int>(destination));
+
+  printConditionalErrors();
+}
+
 void Renderer::setFaceCulling(FaceOrientation orientation) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 

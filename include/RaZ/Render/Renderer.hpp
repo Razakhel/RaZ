@@ -151,6 +151,30 @@ enum class FaceOrientation : unsigned int {
   FRONT_BACK = 1032 /* GL_FRONT_AND_BACK */  ///<
 };
 
+enum class BlendFactor : unsigned int {
+  ZERO                     = 0     /* GL_ZERO                     */, ///<
+  ONE                      = 1     /* GL_ONE                      */, ///<
+  SRC_COLOR                = 768   /* GL_SRC_COLOR                */, ///<
+  ONE_MINUS_SRC_COLOR      = 769   /* GL_ONE_MINUS_SRC_COLOR      */, ///<
+  SRC_ALPHA                = 770   /* GL_SRC_ALPHA                */, ///<
+  ONE_MINUS_SRC_ALPHA      = 771   /* GL_ONE_MINUS_SRC_ALPHA      */, ///<
+  DST_ALPHA                = 772   /* GL_DST_ALPHA                */, ///<
+  ONE_MINUS_DST_ALPHA      = 773   /* GL_ONE_MINUS_DST_ALPHA      */, ///<
+  DST_COLOR                = 774   /* GL_DST_COLOR                */, ///<
+  ONE_MINUS_DST_COLOR      = 775   /* GL_ONE_MINUS_DST_COLOR      */, ///<
+  SRC_ALPHA_SATURATE       = 776   /* GL_SRC_ALPHA_SATURATE       */, ///<
+  CONSTANT_COLOR           = 32769 /* GL_CONSTANT_COLOR           */, ///<
+  ONE_MINUS_CONSTANT_COLOR = 32770 /* GL_ONE_MINUS_CONSTANT_COLOR */, ///<
+  CONSTANT_ALPHA           = 32771 /* GL_CONSTANT_ALPHA           */, ///<
+  ONE_MINUS_CONSTANT_ALPHA = 32772 /* GL_ONE_MINUS_CONSTANT_ALPHA */, ///<
+#if !defined(USE_OPENGL_ES)
+  SRC1_COLOR               = 35065 /* GL_SRC1_COLOR               */, ///<
+  ONE_MINUS_SRC1_COLOR     = 35066 /* GL_ONE_MINUS_SRC1_COLOR     */, ///<
+  SRC1_ALPHA               = 34185 /* GL_SRC1_ALPHA               */, ///<
+  ONE_MINUS_SRC1_ALPHA     = 35067 /* GL_ONE_MINUS_SRC1_ALPHA     */  ///<
+#endif
+};
+
 enum class PolygonMode : unsigned int {
   POINT = 6912 /* GL_POINT */, ///<
   LINE  = 6913 /* GL_LINE  */, ///<
@@ -909,6 +933,7 @@ public:
   /// \param mask Bitmask defining which stencil bits can be written.
   /// \param orientation Face orientation for which to set the mask.
   static void setStencilMask(unsigned int mask, FaceOrientation orientation = FaceOrientation::FRONT_BACK);
+  static void setBlendFunction(BlendFactor source, BlendFactor destination);
   static void setFaceCulling(FaceOrientation orientation);
 #if !defined(USE_OPENGL_ES)
   static void setPolygonMode(FaceOrientation orientation, PolygonMode mode);

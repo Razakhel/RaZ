@@ -189,6 +189,7 @@ void RenderSystem::initialize() {
   //  As such, if reaching here, the Renderer is necessarily already functional. Ideally, this call below should be the only one in the whole program
   Renderer::initialize();
   Renderer::enable(Capability::CULL);
+  Renderer::enable(Capability::BLEND);
   Renderer::enable(Capability::DEPTH_TEST);
   Renderer::enable(Capability::STENCIL_TEST);
 #if !defined(USE_OPENGL_ES)
