@@ -10,6 +10,8 @@ namespace Raz {
 
 void LuaWrapper::registerTypes() {
   [[maybe_unused]] static const bool _ = [] () {
+    Logger::debug("[LuaWrapper] Registering types...");
+
     registerAnimationTypes();
 #if defined(RAZ_USE_AUDIO)
     registerAudioTypes();
@@ -39,6 +41,8 @@ void LuaWrapper::registerTypes() {
     registerVectorTypes();
     registerWindowTypes();
 
+    Logger::debug("[LuaWrapper] Registered types");
+
     return true;
   }();
 }
@@ -47,12 +51,16 @@ bool LuaWrapper::execute(const std::string& code) {
   if (code.empty())
     return false;
 
+  Logger::debug("[LuaWrapper] Executing code...");
+
   try {
     getState().script(code);
   } catch (const sol::error& err) {
-    Logger::error("[LuaWrapper] Error running code: '" + std::string(err.what()) + "'.");
+    Logger::error("[LuaWrapper] Error executing code: '" + std::string(err.what()) + "'.");
     return false;
   }
+
+  Logger::debug("[LuaWrapper] Executed code");
 
   return true;
 }
@@ -61,20 +69,28 @@ bool LuaWrapper::executeFromFile(const FilePath& filePath) {
   if (filePath.isEmpty())
     return false;
 
+  Logger::debug("[LuaWrapper] Executing code from file ('" + filePath + "')...");
+
   try {
     getState().script_file(filePath.toUtf8());
   } catch (const sol::error& err) {
-    Logger::error("[LuaWrapper] Error running file: '" + std::string(err.what()) + "'.");
+    Logger::error("[LuaWrapper] Error executing code from file: '" + std::string(err.what()) + "'.");
     return false;
   }
+
+  Logger::debug("[LuaWrapper] Executed code from file");
 
   return true;
 }
 
 sol::state& LuaWrapper::getState() {
   static sol::state state = [] () {
+    Logger::debug("[LuaWrapper] Initializing state...");
+
     sol::state luaState;
     luaState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+
+    Logger::debug("[LuaWrapper] Initialized state");
 
     return luaState;
   }();
