@@ -24,7 +24,8 @@ void LuaWrapper::registerTypes() {
     registerMeshTypes();
     registerMeshRendererTypes();
 #if !defined(RAZ_NO_OVERLAY)
-    registerOverlayTypes();
+    registerOverlayBaseTypes();
+    registerOverlayWidgetTypes();
 #endif
     registerPhysicsTypes();
     registerRenderTypes();
