@@ -23,7 +23,6 @@ file(
     glew/include/GL/*.h
 )
 
-# Building GLEW
 target_sources(GLEW PRIVATE ${GLEW_FILES})
 
 if (RAZ_PLATFORM_CYGWIN)

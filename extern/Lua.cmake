@@ -16,7 +16,6 @@ file(
     lua/*.h
 )
 
-# Building Lua
 target_sources(Lua PRIVATE ${LUA_FILES})
 
 target_include_directories(Lua SYSTEM PUBLIC lua)

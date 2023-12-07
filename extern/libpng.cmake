@@ -16,7 +16,6 @@ file(
     png/*.h
 )
 
-# Building libpng
 target_sources(libpng PRIVATE ${PNG_FILES})
 
 target_include_directories(libpng SYSTEM PUBLIC png)

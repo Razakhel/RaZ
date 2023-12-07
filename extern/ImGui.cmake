@@ -39,7 +39,6 @@ if (NOT RAZ_USE_GLFW AND NOT RAZ_USE_EMSCRIPTEN)
      )
 endif ()
 
-# Building ImGui
 target_sources(ImGui PRIVATE ${IMGUI_FILES})
 
 target_include_directories(

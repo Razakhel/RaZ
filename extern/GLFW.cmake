@@ -130,7 +130,6 @@ file(
     ${GLFW_PLATFORM_SRC}
 )
 
-# Building GLFW
 target_sources(GLFW PRIVATE ${GLFW_FILES})
 
 target_include_directories(
