@@ -30,3 +30,5 @@ option(RAZ_USE_LUA "Use Lua scripting (with Sol2)" ON)
 if (RAZ_USE_LUA)
     include(Sol2)
 endif ()
+
+include(fastgltf)
