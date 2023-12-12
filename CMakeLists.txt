@@ -451,6 +451,8 @@ else ()
     target_compile_definitions(RaZ PUBLIC RAZ_NO_LUA)
 endif ()
 
+target_link_libraries(RaZ PRIVATE fastgltf simdjson)
+
 # Compiling RaZ's sources
 target_sources(RaZ PRIVATE ${RAZ_FILES})
 

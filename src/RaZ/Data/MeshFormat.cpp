@@ -1,4 +1,5 @@
 #include "RaZ/Data/FbxFormat.hpp"
+#include "RaZ/Data/GltfFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/MeshFormat.hpp"
 #include "RaZ/Data/ObjFormat.hpp"
@@ -12,7 +13,9 @@ namespace Raz::MeshFormat {
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
-  if (fileExt == "obj") {
+  if (fileExt == "gltf" || fileExt == "glb") {
+    return GltfFormat::load(filePath);
+  } else if (fileExt == "obj") {
     return ObjFormat::load(filePath);
   } else if (fileExt == "off") {
     Mesh mesh = OffFormat::load(filePath);

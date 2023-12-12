@@ -380,7 +380,8 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
   Logger::debug("[ObjLoad] Loaded OBJ file (" + std::to_string(mesh.getSubmeshes().size()) + " submesh(es), "
                                               + std::to_string(mesh.recoverVertexCount()) + " vertices, "
-                                              + std::to_string(mesh.recoverTriangleCount()) + " triangles)");
+                                              + std::to_string(mesh.recoverTriangleCount()) + " triangles, "
+                                              + std::to_string(meshRenderer.getMaterials().size()) + " material(s))");
 
   return { std::move(mesh), std::move(meshRenderer) };
 }

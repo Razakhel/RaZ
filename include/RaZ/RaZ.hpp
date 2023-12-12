@@ -20,6 +20,7 @@
 #include "Data/BvhSystem.hpp"
 #include "Data/Color.hpp"
 #include "Data/FbxFormat.hpp"
+#include "Data/GltfFormat.hpp"
 #include "Data/Graph.hpp"
 #include "Data/Image.hpp"
 #include "Data/ImageFormat.hpp"

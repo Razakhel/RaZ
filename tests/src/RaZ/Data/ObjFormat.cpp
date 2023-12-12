@@ -147,7 +147,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
     const Raz::Image diffuseImg = diffuseMap.recoverImage();
     REQUIRE_FALSE(diffuseImg.isEmpty());
 
-    // RGBR image with alpha, flipped vertically: verifying that values are BRRG with 50% opacity
+    // RGBR image with alpha, flipped vertically: checking that values are BRRG with 50% opacity
 
     // ---------
     // | R | G |
@@ -396,7 +396,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
     const Raz::Image albedoImg = albedoMap.recoverImage();
     REQUIRE_FALSE(albedoImg.isEmpty());
 
-    // RGBR image with alpha, flipped vertically: verifying that values are BRRG with 50% opacity
+    // RGBR image with alpha, flipped vertically: checking that values are BRRG with 50% opacity
 
     // ---------
     // | R | G |

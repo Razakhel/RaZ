@@ -4,6 +4,7 @@
 #if defined(RAZ_USE_FBX)
 #include "RaZ/Data/FbxFormat.hpp"
 #endif
+#include "RaZ/Data/GltfFormat.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
@@ -41,6 +42,11 @@ void LuaWrapper::registerFileFormatTypes() {
     fbxFormat["load"]    = &FbxFormat::load;
   }
 #endif
+
+  {
+    sol::table gltfFormat = state["GltfFormat"].get_or_create<sol::table>();
+    gltfFormat["load"]    = &GltfFormat::load;
+  }
 
   {
     sol::table imageFormat = state["ImageFormat"].get_or_create<sol::table>();

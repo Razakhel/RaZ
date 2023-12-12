@@ -239,7 +239,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
         // TODO: small hack to avoid segfaulting when mesh count > material count, but clearly wrong; find another way
         submeshRenderer.setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
       else
-        Logger::error("[FBX] Materials can't be mapped to anything other than the whole submesh.");
+        Logger::error("[FbxLoad] Materials can't be mapped to anything other than the whole submesh.");
     }
 
     mesh.addSubmesh(std::move(submesh));

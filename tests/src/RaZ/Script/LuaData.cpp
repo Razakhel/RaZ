@@ -130,6 +130,9 @@ TEST_CASE("LuaData Mesh") {
     meshData, _ = ObjFormat.load(FilePath.new("téstÊxpørt.obj"))
     assert(meshData:recoverVertexCount() == 24)
     ObjFormat.save(FilePath.new("téstÊxpørt.obj"), meshData)
+
+    meshData, _ = GltfFormat.load(FilePath.new(RAZ_TESTS_ROOT .. "assets/meshes/çûbè.gltf"))
+    assert(meshData:recoverVertexCount() == 72)
   )"));
 
 #if defined(RAZ_USE_FBX)
