@@ -148,7 +148,7 @@ void main() {
   }
 
   vec3 ambient  = vec3(0.03) * albedo * ambOcc;
-  vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
+  vec3 emissive = pow(texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.emissive;
   vec3 color    = ambient + lightRadiance + emissive;
 
   // HDR tone mapping
