@@ -177,7 +177,7 @@ constexpr Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) noexcept {
   std::size_t widthStride = 0;
 
   for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
-    std::size_t resIndex = heightIndex * W;
+    const std::size_t resIndex = heightIndex * W;
 
     for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
       const std::size_t finalIndex = resIndex + widthIndex;
@@ -219,7 +219,7 @@ template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::identity() noexcept {
   static_assert(W == H, "Error: Matrix must be a square one.");
 
-  Matrix<T, W, H> res;
+  Matrix res;
 
   for (std::size_t diagIndex = 0; diagIndex < W; ++diagIndex)
     res[diagIndex * W + diagIndex] = 1.f;
@@ -228,22 +228,22 @@ constexpr Matrix<T, W, H> Matrix<T, W, H>::identity() noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-template <typename... Vecs>
-constexpr Matrix<T, W, H> Matrix<T, W, H>::fromRows(Vecs&&... vecs) noexcept {
-  static_assert(sizeof...(Vecs) == H, "Error: A Matrix can't be constructed with more or less vectors than it can hold.");
+template <typename... VecsTs>
+constexpr Matrix<T, W, H> Matrix<T, W, H>::fromRows(VecsTs&&... vecs) noexcept {
+  static_assert(sizeof...(VecsTs) == H, "Error: A Matrix can't be constructed with more or less vectors than it can hold.");
 
   Matrix res;
-  res.setRows(std::forward<Vecs>(vecs)...);
+  res.setRows(std::forward<VecsTs>(vecs)...);
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-template <typename... Vecs>
-constexpr Matrix<T, W, H> Matrix<T, W, H>::fromColumns(Vecs&&... vecs) noexcept {
-  static_assert(sizeof...(Vecs) == W, "Error: A Matrix can't be constructed with more or less vectors than it can hold.");
+template <typename... VecsTs>
+constexpr Matrix<T, W, H> Matrix<T, W, H>::fromColumns(VecsTs&&... vecs) noexcept {
+  static_assert(sizeof...(VecsTs) == W, "Error: A Matrix can't be constructed with more or less vectors than it can hold.");
 
   Matrix res;
-  res.setColumns(std::forward<Vecs>(vecs)...);
+  res.setColumns(std::forward<VecsTs>(vecs)...);
   return res;
 }
 
@@ -306,7 +306,7 @@ constexpr Vector<T, H> Matrix<T, W, H>::recoverColumn(std::size_t columnIndex) c
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr bool Matrix<T, W, H>::strictlyEquals(const Matrix<T, W, H>& mat) const noexcept {
+constexpr bool Matrix<T, W, H>::strictlyEquals(const Matrix& mat) const noexcept {
   return std::equal(m_data.cbegin(), m_data.cend(), mat.getData().cbegin());
 }
 
@@ -322,62 +322,62 @@ constexpr std::size_t Matrix<T, W, H>::hash(std::size_t seed) const noexcept {
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator+(const Matrix& mat) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res += mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator+(T val) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res += val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator-(const Matrix& mat) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res -= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator-(T val) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res -= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator%(const Matrix& mat) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res %= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator*(T val) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res *= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(const Matrix& mat) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res /= mat;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::operator/(T val) const noexcept {
-  Matrix<T, W, H> res = *this;
+  Matrix res = *this;
   res /= val;
   return res;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& mat) noexcept {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] += mat[i];
   return *this;
@@ -385,13 +385,13 @@ constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator+=(const Matrix<T, W, H>& ma
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator+=(T val) noexcept {
-  for (T& it : m_data)
-    it += val;
+  for (T& elt : m_data)
+    elt += val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator-=(const Matrix<T, W, H>& mat) noexcept {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator-=(const Matrix& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] -= mat[i];
   return *this;
@@ -399,13 +399,13 @@ constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator-=(const Matrix<T, W, H>& ma
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator-=(T val) noexcept {
-  for (T& it : m_data)
-    it -= val;
+  for (T& elt : m_data)
+    elt -= val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix<T, W, H>& mat) noexcept {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] *= mat[i];
   return *this;
@@ -413,13 +413,13 @@ constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator%=(const Matrix<T, W, H>& ma
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator*=(T val) noexcept {
-  for (T& it : m_data)
-    it *= val;
+  for (T& elt : m_data)
+    elt *= val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& mat) noexcept {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix& mat) noexcept {
   for (std::size_t i = 0; i < m_data.size(); ++i)
     m_data[i] /= mat[i];
   return *this;
@@ -427,19 +427,19 @@ constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(const Matrix<T, W, H>& ma
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator/=(T val) noexcept {
-  for (T& it : m_data)
-    it /= val;
+  for (T& elt : m_data)
+    elt /= val;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator*=(const Matrix<T, W, H>& mat) noexcept {
+constexpr Matrix<T, W, H>& Matrix<T, W, H>::operator*=(const Matrix& mat) noexcept {
   *this = *this * mat;
   return *this;
 }
 
 template <typename T, std::size_t W, std::size_t H>
-constexpr bool Matrix<T, W, H>::operator==(const Matrix<T, W, H>& mat) const noexcept {
+constexpr bool Matrix<T, W, H>::operator==(const Matrix& mat) const noexcept {
   if constexpr (std::is_floating_point_v<T>)
     return FloatUtils::areNearlyEqual(*this, mat);
   else
@@ -488,46 +488,46 @@ constexpr void Matrix<T, W, H>::setValues(T2&& val, Args&&... args) noexcept {
 }
 
 template <typename T, std::size_t W, std::size_t H>
-template <typename Vec, typename... Vecs>
-constexpr void Matrix<T, W, H>::setRows(Vec&& vec, Vecs&&... args) noexcept {
-  static_assert(std::is_same_v<std::decay_t<Vec>, Vector<T, W>>, "Error: Rows must all be vectors of the same type & size.");
+template <typename VecT, typename... VecsTs>
+constexpr void Matrix<T, W, H>::setRows(VecT&& vec, VecsTs&&... args) noexcept {
+  static_assert(std::is_same_v<std::decay_t<VecT>, Vector<T, W>>, "Error: Rows must all be vectors of the same type & size.");
 
   constexpr std::size_t firstIndex = H - sizeof...(args) - 1;
 
   for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex)
-    m_data[firstIndex + widthIndex * H] = vec[widthIndex];
+    m_data[firstIndex + widthIndex * H] = std::forward<VecT>(vec)[widthIndex];
 
   if constexpr (sizeof...(args) > 0)
-    setRows(std::forward<Vecs>(args)...);
+    setRows(std::forward<VecsTs>(args)...);
 }
 
 template <typename T, std::size_t W, std::size_t H>
-template <typename Vec, typename... Vecs>
-constexpr void Matrix<T, W, H>::setColumns(Vec&& vec, Vecs&&... args) noexcept {
-  static_assert(std::is_same_v<std::decay_t<Vec>, Vector<T, H>>, "Error: Columns must all be vectors of the same type & size.");
+template <typename VecT, typename... VecsTs>
+constexpr void Matrix<T, W, H>::setColumns(VecT&& vec, VecsTs&&... args) noexcept {
+  static_assert(std::is_same_v<std::decay_t<VecT>, Vector<T, H>>, "Error: Columns must all be vectors of the same type & size.");
 
   constexpr std::size_t firstIndex = H * (W - sizeof...(args) - 1);
 
   for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex)
-    m_data[firstIndex + heightIndex] = vec[heightIndex];
+    m_data[firstIndex + heightIndex] = std::forward<VecT>(vec)[heightIndex];
 
   if constexpr (sizeof...(args) > 0)
-    setColumns(std::forward<Vecs>(args)...);
+    setColumns(std::forward<VecsTs>(args)...);
 }
 
-template <typename T, std::size_t W, std::size_t H, std::size_t WI, std::size_t HI>
-constexpr Matrix<T, H, WI> operator*(const Matrix<T, W, H>& mat1, const Matrix<T, WI, HI>& mat2) noexcept {
-  static_assert(W == HI, "Error: The left-hand matrix's width must be equal to the right-hand matrix's height.");
+template <typename T, std::size_t WL, std::size_t HL, std::size_t WR, std::size_t HR>
+constexpr Matrix<T, HL, WR> operator*(const Matrix<T, WL, HL>& mat1, const Matrix<T, WR, HR>& mat2) noexcept {
+  static_assert(WL == HR, "Error: The left-hand side matrix's width must be equal to the right-hand side matrix's height.");
 
-  Matrix<T, H, WI> res;
+  Matrix<T, HL, WR> res;
 
-  for (std::size_t widthIndex = 0; widthIndex < WI; ++widthIndex) {
-    const std::size_t finalWidthIndex = widthIndex * H;
+  for (std::size_t widthIndex = 0; widthIndex < WR; ++widthIndex) {
+    const std::size_t finalWidthIndex = widthIndex * HL;
 
-    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex) {
+    for (std::size_t heightIndex = 0; heightIndex < HL; ++heightIndex) {
       T& val = res[finalWidthIndex + heightIndex];
 
-      for (std::size_t stride = 0; stride < W; ++stride)
+      for (std::size_t stride = 0; stride < WL; ++stride)
         val += mat1.getElement(stride, heightIndex) * mat2.getElement(widthIndex, stride);
     }
   }
@@ -545,6 +545,21 @@ constexpr Vector<T, H> operator*(const Matrix<T, W, H>& mat, const Vector<T, W>&
 
     for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex)
       res[heightIndex] += mat[finalWidthIndex + heightIndex] * vec[widthIndex];
+  }
+
+  return res;
+}
+
+template <typename T, std::size_t W, std::size_t H>
+constexpr Vector<T, W> operator*(const Vector<T, H>& vec, const Matrix<T, W, H>& mat) noexcept {
+  // This multiplication is made assuming the vector to be horizontal
+  Vector<T, W> res;
+
+  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
+    const std::size_t finalWidthIndex = widthIndex * H;
+
+    for (std::size_t heightIndex = 0; heightIndex < H; ++heightIndex)
+      res[widthIndex] += vec[heightIndex] * mat[finalWidthIndex + heightIndex];
   }
 
   return res;

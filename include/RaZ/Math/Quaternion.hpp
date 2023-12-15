@@ -45,7 +45,7 @@ public:
 
   /// Creates a quaternion representing an identity transformation.
   /// \return Identity quaternion.
-  static constexpr Quaternion identity() noexcept { return Quaternion<T>(1, 0, 0, 0); }
+  static constexpr Quaternion identity() noexcept { return Quaternion(1, 0, 0, 0); }
 
   /// Computes the dot product between quaternions.
   /// \param quat Quaternion to compute the dot product with.

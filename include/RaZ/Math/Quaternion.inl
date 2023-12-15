@@ -1,5 +1,3 @@
-#include "RaZ/Math/Constants.hpp"
-
 namespace Raz {
 
 template <typename T>
@@ -13,7 +11,7 @@ constexpr Quaternion<T>::Quaternion(Radians<T> angle, const Vec3<T>& axis) noexc
 
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::normalize() const noexcept {
-  Quaternion<T> res = *this;
+  Quaternion res = *this;
 
   const T invNorm  = 1 / computeNorm();
   res.m_real      *= invNorm;
@@ -73,16 +71,16 @@ constexpr Quaternion<T> Quaternion<T>::slerp(const Quaternion& quat, T coeff) co
 
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::conjugate() const noexcept {
-  Quaternion<T> res = *this;
-  res.m_complexes   = -m_complexes;
+  Quaternion res  = *this;
+  res.m_complexes = -m_complexes;
 
   return res;
 }
 
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::inverse() const noexcept {
-  Quaternion<T> res = *this;
-  const T sqNorm    = computeSquaredNorm();
+  Quaternion res = *this;
+  const T sqNorm = computeSquaredNorm();
 
   if (sqNorm > 0) {
     const T invSqNorm = 1 / sqNorm;
@@ -118,14 +116,14 @@ constexpr Mat4<T> Quaternion<T>::computeMatrix() const noexcept {
 
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::operator*(const Quaternion& quat) const noexcept {
-  Quaternion<T> res = *this;
+  Quaternion res = *this;
   res *= quat;
   return res;
 }
 
 template <typename T>
 constexpr Quaternion<T>& Quaternion<T>::operator*=(const Quaternion& quat) noexcept {
-  const Quaternion<T> copy = *this;
+  const Quaternion copy = *this;
 
   m_real = copy.m_real          * quat.m_real
          - copy.m_complexes.x() * quat.m_complexes.x()
@@ -163,10 +161,10 @@ std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quat) {
 
 template <typename T>
 constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T currCoeff, T otherCoeff) const noexcept {
-  return Quaternion<T>(m_real          * currCoeff + quat.m_real          * otherCoeff,
-                       m_complexes.x() * currCoeff + quat.m_complexes.x() * otherCoeff,
-                       m_complexes.y() * currCoeff + quat.m_complexes.y() * otherCoeff,
-                       m_complexes.z() * currCoeff + quat.m_complexes.z() * otherCoeff);
+  return Quaternion(m_real          * currCoeff + quat.m_real          * otherCoeff,
+                    m_complexes.x() * currCoeff + quat.m_complexes.x() * otherCoeff,
+                    m_complexes.y() * currCoeff + quat.m_complexes.y() * otherCoeff,
+                    m_complexes.z() * currCoeff + quat.m_complexes.z() * otherCoeff);
 }
 
 template <typename T>

@@ -9,11 +9,11 @@
 
 namespace Raz {
 
-template <typename T, std::size_t Size>
-class Vector;
-
 template <typename T, std::size_t W, std::size_t H>
 class Matrix;
+
+template <typename T, std::size_t Size>
+class Vector;
 
 template <typename T, std::size_t W, std::size_t H>
 std::ostream& operator<<(std::ostream& stream, const Matrix<T, W, H>& mat);
@@ -61,16 +61,16 @@ public:
   static constexpr Matrix identity() noexcept;
   /// Constructs a matrix from the given row vectors.
   /// \note All vectors must be of the same inner type as the matrix's, and must have a size equal to the matrix's width.
-  /// \tparam Vecs Types of the vectors to construct the matrix with.
+  /// \tparam VecsTs Types of the vectors to construct the matrix with.
   /// \param vecs Row vectors to construct the matrix with.
-  template <typename... Vecs>
-  static constexpr Matrix fromRows(Vecs&&... vecs) noexcept;
+  template <typename... VecsTs>
+  static constexpr Matrix fromRows(VecsTs&&... vecs) noexcept;
   /// Constructs a matrix from the given column vectors.
   /// \note All vectors must be of the same inner type as the matrix's, and must have a size equal to the matrix's height.
-  /// \tparam Vecs Types of the vectors to construct the matrix with.
+  /// \tparam VecsTs Types of the vectors to construct the matrix with.
   /// \param vecs Column vectors to construct the matrix with.
-  template <typename... Vecs>
-  static constexpr Matrix fromColumns(Vecs&&... vecs) noexcept;
+  template <typename... VecsTs>
+  static constexpr Matrix fromColumns(VecsTs&&... vecs) noexcept;
 
   /// Transposed matrix computation.
   /// \return Transposed matrix.
@@ -211,35 +211,46 @@ private:
   template <std::size_t WI, std::size_t HI, typename T2, typename... Args>
   constexpr void setValues(T2&& val, Args&&... args) noexcept;
 
-  template <typename Vec, typename... Vecs>
-  constexpr void setRows(Vec&& vec, Vecs&&... args) noexcept;
+  template <typename VecT, typename... VecsTs>
+  constexpr void setRows(VecT&& vec, VecsTs&&... args) noexcept;
 
-  template <typename Vec, typename... Vecs>
-  constexpr void setColumns(Vec&& vec, Vecs&&... args) noexcept;
+  template <typename VecT, typename... VecsTs>
+  constexpr void setColumns(VecT&& vec, VecsTs&&... args) noexcept;
 
   std::array<T, W * H> m_data {};
 };
 
 /// Matrix-matrix multiplication operator.
-/// \tparam W Width of the left-hand matrix.
-/// \tparam H Height of the left-hand matrix & width of the resulting one.
-/// \tparam WI Width of the right-hand matrix & height of the resulting one.
-/// \tparam HI Height of the right-hand matrix.
-/// \param mat1 Left-hand matrix.
-/// \param mat2 Right-hand matrix.
+/// \tparam T Type of the matrices' data.
+/// \tparam WL Width of the left-hand side matrix.
+/// \tparam HL Height of the left-hand side matrix & width of the resulting one.
+/// \tparam WR Width of the right-hand side matrix & height of the resulting one.
+/// \tparam HR Height of the right-hand side matrix.
+/// \param mat1 Left-hand side matrix.
+/// \param mat2 Right-hand side matrix.
 /// \return Result of the multiplied matrices.
-template <typename T, std::size_t W, std::size_t H, std::size_t WI, std::size_t HI>
-constexpr Matrix<T, H, WI> operator*(const Matrix<T, WI, H>& mat1, const Matrix<T, WI, HI>& mat2) noexcept;
+template <typename T, std::size_t WL, std::size_t HL, std::size_t WR, std::size_t HR>
+constexpr Matrix<T, HL, WR> operator*(const Matrix<T, WL, HL>& mat1, const Matrix<T, WR, HR>& mat2) noexcept;
 
 /// Matrix-vector multiplication operator (assumes the vector to be vertical).
 /// \tparam T Type of the matrix's & vector's data.
 /// \tparam W Width of the matrix & size of the input vector.
 /// \tparam H Height of the matrix & size of the resulting vector.
-/// \param mat Left-hand matrix.
-/// \param vec Right-hand vector.
+/// \param mat Left-hand side matrix.
+/// \param vec Right-hand side vector.
 /// \return Result of the matrix-vector multiplication.
 template <typename T, std::size_t W, std::size_t H>
 constexpr Vector<T, H> operator*(const Matrix<T, W, H>& mat, const Vector<T, W>& vec) noexcept;
+
+/// Vector-matrix multiplication operator (assumes the vector to be horizontal).
+/// \tparam T Type of the vector's & matrix's data.
+/// \tparam W Width of the matrix & size of the resulting vector.
+/// \tparam H Height of the matrix & size of the input vector.
+/// \param vec Left-hand side vector.
+/// \param mat Right-hand side matrix.
+/// \return Result of the vector-matrix multiplication.
+template <typename T, std::size_t W, std::size_t H>
+constexpr Vector<T, W> operator*(const Vector<T, H>& vec, const Matrix<T, W, H>& mat) noexcept;
 
 // Aliases
 

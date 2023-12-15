@@ -27,49 +27,45 @@ constexpr Vector<T, Size>::Vector(T val) noexcept {
 template <typename T, std::size_t Size>
 constexpr const T& Vector<T, Size>::x() const noexcept {
   static_assert(Size >= 1, "Error: Getting the X component requires the vector to be of size 1 or more.");
-
   return m_data[0];
 }
 
 template <typename T, std::size_t Size>
 constexpr T& Vector<T, Size>::x() noexcept {
-  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->x());
+  return const_cast<T&>(static_cast<const Vector*>(this)->x());
 }
 
 template <typename T, std::size_t Size>
 constexpr const T& Vector<T, Size>::y() const noexcept {
   static_assert(Size >= 2, "Error: Getting the Y component requires the vector to be of size 2 or more.");
-
   return m_data[1];
 }
 
 template <typename T, std::size_t Size>
 constexpr T& Vector<T, Size>::y() noexcept {
-  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->y());
+  return const_cast<T&>(static_cast<const Vector*>(this)->y());
 }
 
 template <typename T, std::size_t Size>
 constexpr const T& Vector<T, Size>::z() const noexcept {
   static_assert(Size >= 3, "Error: Getting the Z component requires the vector to be of size 3 or more.");
-
   return m_data[2];
 }
 
 template <typename T, std::size_t Size>
 constexpr T& Vector<T, Size>::z() noexcept {
-  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->z());
+  return const_cast<T&>(static_cast<const Vector*>(this)->z());
 }
 
 template <typename T, std::size_t Size>
 constexpr const T& Vector<T, Size>::w() const noexcept {
   static_assert(Size >= 4, "Error: Getting the W component requires the vector to be of size 4 or more.");
-
   return m_data[3];
 }
 
 template <typename T, std::size_t Size>
 constexpr T& Vector<T, Size>::w() noexcept {
-  return const_cast<T&>(static_cast<const Vector<T, Size>*>(this)->w());
+  return const_cast<T&>(static_cast<const Vector*>(this)->w());
 }
 
 template <typename T, std::size_t Size>
@@ -140,7 +136,7 @@ constexpr std::size_t Vector<T, Size>::hash(std::size_t seed) const noexcept {
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator-() const noexcept {
-  Vector<T, Size> res;
+  Vector res;
   for (std::size_t i = 0; i < Size; ++i)
     res.m_data[i] = -m_data[i];
   return res;
@@ -148,56 +144,56 @@ constexpr Vector<T, Size> Vector<T, Size>::operator-() const noexcept {
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator+(const Vector& vec) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res += vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator+(T val) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res += val;
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator-(const Vector& vec) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res -= vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator-(T val) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res -= val;
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator*(const Vector& vec) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res *= vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator*(T val) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res *= val;
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator/(const Vector& vec) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res /= vec;
   return res;
 }
 
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator/(T val) const noexcept {
-  Vector<T, Size> res = *this;
+  Vector res = *this;
   res /= val;
   return res;
 }
@@ -266,7 +262,7 @@ constexpr Vector<T, Size>& Vector<T, Size>::operator/=(T val) noexcept {
 }
 
 template <typename T, std::size_t Size>
-constexpr bool Vector<T, Size>::operator==(const Vector<T, Size>& vec) const noexcept {
+constexpr bool Vector<T, Size>::operator==(const Vector& vec) const noexcept {
   if constexpr (std::is_floating_point_v<T>)
     return FloatUtils::areNearlyEqual(*this, vec);
   else
@@ -294,21 +290,6 @@ std::ostream& operator<<(std::ostream& stream, const Vector<T, Size>& vec) {
   stream << " ]";
 
   return stream;
-}
-
-template <typename T, std::size_t Size, std::size_t W>
-constexpr Vector<T, W> operator*(const Vector<T, Size>& vec, const Matrix<T, W, Size>& mat) noexcept {
-  // This multiplication is made assuming the vector to be horizontal
-  Vector<T, W> res;
-
-  for (std::size_t widthIndex = 0; widthIndex < W; ++widthIndex) {
-    const std::size_t finalWidthIndex = widthIndex * Size;
-
-    for (std::size_t heightIndex = 0; heightIndex < Size; ++heightIndex)
-      res[widthIndex] += vec[heightIndex] * mat[finalWidthIndex + heightIndex];
-  }
-
-  return res;
 }
 
 } // namespace Raz

@@ -10,9 +10,6 @@
 
 namespace Raz {
 
-template <typename T, std::size_t W, std::size_t H>
-class Matrix;
-
 template <typename T, std::size_t Size>
 class Vector;
 
@@ -256,16 +253,6 @@ constexpr Vector<T, Size> operator+(T val, const Vector<T, Size>& vec) noexcept 
 /// \return Multiplied vector.
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> operator*(T val, const Vector<T, Size>& vec) noexcept { return vec * val; }
-
-/// Vector-matrix multiplication operator (assumes the vector to be horizontal).
-/// \tparam T Type of the vector's & matrix's data.
-/// \tparam Size Size of the input vector & height of the matrix.
-/// \tparam W Width of the matrix & size of the resulting vector.
-/// \param vec Left-hand vector.
-/// \param mat Right-hand matrix.
-/// \return Result of the vector-matrix multiplication.
-template <typename T, std::size_t Size, std::size_t W>
-constexpr Vector<T, W> operator*(const Vector<T, Size>& vec, const Matrix<T, W, Size>& mat) noexcept;
 
 // Deduction guides
 
