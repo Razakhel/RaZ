@@ -32,3 +32,4 @@ if (RAZ_USE_LUA)
 endif ()
 
 include(fastgltf)
+include(stb)
