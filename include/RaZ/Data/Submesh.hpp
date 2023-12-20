@@ -48,6 +48,8 @@ public:
   /// Computes & updates the submesh's bounding box.
   /// \return Submesh's bounding box.
   const AABB& computeBoundingBox();
+  /// Computes the tangents for each of the submesh's vertices.
+  void computeTangents();
 
   Submesh& operator=(const Submesh&) = delete;
   Submesh& operator=(Submesh&&) noexcept = default;

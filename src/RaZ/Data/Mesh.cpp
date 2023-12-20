@@ -6,25 +6,6 @@
 
 namespace Raz {
 
-namespace {
-
-constexpr Vec3f computeTangent(const Vertex& firstVert, const Vertex& secondVert, const Vertex& thirdVert) noexcept {
-  const Vec3f firstEdge  = secondVert.position - firstVert.position;
-  const Vec3f secondEdge = thirdVert.position - firstVert.position;
-
-  const Vec2f firstUvDiff  = secondVert.texcoords - firstVert.texcoords;
-  const Vec2f secondUvDiff = thirdVert.texcoords - firstVert.texcoords;
-
-  const float denominator = (firstUvDiff.x() * secondUvDiff.y() - secondUvDiff.x() * firstUvDiff.y());
-
-  if (denominator == 0.f)
-    return Vec3f(0.f);
-
-  return (firstEdge * secondUvDiff.y() - secondEdge * firstUvDiff.y()) / denominator;
-}
-
-} // namespace
-
 Mesh::Mesh(const Plane& plane, float width, float depth) {
   const float height = plane.computeCentroid().y();
 
@@ -257,32 +238,8 @@ void Mesh::computeTangents() {
     return;
 
   Threading::parallelize(m_submeshes, [] (const auto& range) noexcept {
-    for (Submesh& submesh : range) {
-      for (Vertex& vertex : submesh.getVertices())
-        vertex.tangent = Vec3f(0.f, 0.f, 0.f);
-
-      for (std::size_t i = 0; i < submesh.getTriangleIndexCount(); i += 3) {
-        Vertex& firstVert  = submesh.getVertices()[submesh.getTriangleIndices()[i    ]];
-        Vertex& secondVert = submesh.getVertices()[submesh.getTriangleIndices()[i + 1]];
-        Vertex& thirdVert  = submesh.getVertices()[submesh.getTriangleIndices()[i + 2]];
-
-        const Vec3f tangent = computeTangent(firstVert, secondVert, thirdVert);
-
-        // Adding the computed tangent to each vertex; they will be normalized later
-        firstVert.tangent  += tangent;
-        secondVert.tangent += tangent;
-        thirdVert.tangent  += tangent;
-      }
-
-      // Normalizing the accumulated tangents
-      for (Vertex& vert : submesh.getVertices()) {
-        // Avoiding NaNs by preventing normalization of a 0 vector
-        if (vert.tangent.strictlyEquals(Vec3f(0.f)))
-          continue;
-
-        vert.tangent = (vert.tangent - vert.normal * vert.tangent.dot(vert.normal)).normalize();
-      }
-    }
+    for (Submesh& submesh : range)
+      submesh.computeTangents();
   });
 }
 
