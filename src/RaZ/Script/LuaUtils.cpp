@@ -36,8 +36,10 @@ void LuaWrapper::registerUtilsTypes() {
   }
 
   {
-    sol::table fileUtils  = state["FileUtils"].get_or_create<sol::table>();
-    fileUtils["readFile"] = &FileUtils::readFile;
+    sol::table fileUtils          = state["FileUtils"].get_or_create<sol::table>();
+    fileUtils["isReadable"]       = &FileUtils::isReadable;
+    fileUtils["readFileToArray"]  = &FileUtils::readFileToArray;
+    fileUtils["readFileToString"] = &FileUtils::readFileToString;
   }
 
   {

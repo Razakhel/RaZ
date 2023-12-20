@@ -42,7 +42,7 @@ void LuaScript::loadCode(const std::string& code) {
 
 void LuaScript::loadCodeFromFile(const FilePath& filePath) {
   Logger::debug("[LuaScript] Loading code from file ('" + filePath + "')...");
-  loadCode(FileUtils::readFile(filePath));
+  loadCode(FileUtils::readFileToString(filePath));
   Logger::debug("[LuaScript] Loaded code from file");
 }
 

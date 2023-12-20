@@ -16,7 +16,7 @@ void Shader::load() const {
     return;
 
   Logger::debug("[Shader] Loading (ID: " + std::to_string(m_index) + ", path: '" + m_path + "')...");
-  loadSource(FileUtils::readFile(m_path));
+  loadSource(FileUtils::readFileToString(m_path));
   Logger::debug("[Shader] Loaded");
 }
 

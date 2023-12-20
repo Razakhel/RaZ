@@ -30,7 +30,9 @@ TEST_CASE("LuaUtils FilePath") {
 
 TEST_CASE("LuaUtils FileUtils") {
   CHECK(Raz::LuaWrapper::execute(R"(
-    assert(FileUtils.readFile(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")) == "НΣļlõ ωθяŁĐ!\n")
+    assert(FileUtils.isReadable(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")))
+    assert(FileUtils.readFileToArray(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")):size() == 22)
+    assert(FileUtils.readFileToString(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")) == "НΣļlõ ωθяŁĐ!\n")
   )"));
 }
 
