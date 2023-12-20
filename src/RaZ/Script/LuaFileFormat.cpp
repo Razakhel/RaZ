@@ -49,11 +49,15 @@ void LuaWrapper::registerFileFormatTypes() {
   }
 
   {
-    sol::table imageFormat = state["ImageFormat"].get_or_create<sol::table>();
-    imageFormat["load"]    = sol::overload([] (const FilePath& p) { return ImageFormat::load(p); },
-                                           PickOverload<const FilePath&, bool>(&ImageFormat::load));
-    imageFormat["save"]    = sol::overload([] (const FilePath& p, const Image& i) { ImageFormat::save(p, i); },
-                                           PickOverload<const FilePath&, const Image&, bool>(&ImageFormat::save));
+    sol::table imageFormat      = state["ImageFormat"].get_or_create<sol::table>();
+    imageFormat["load"]         = sol::overload([] (const FilePath& p) { return ImageFormat::load(p); },
+                                                PickOverload<const FilePath&, bool>(&ImageFormat::load));
+    imageFormat["loadFromData"] = sol::overload([] (const std::vector<unsigned char>& d) { return ImageFormat::loadFromData(d); },
+                                                PickOverload<const std::vector<unsigned char>&, bool>(&ImageFormat::loadFromData),
+                                                [] (const unsigned char* d, std::size_t s) { return ImageFormat::loadFromData(d, s); },
+                                                PickOverload<const unsigned char*, std::size_t, bool>(&ImageFormat::loadFromData));
+    imageFormat["save"]         = sol::overload([] (const FilePath& p, const Image& i) { ImageFormat::save(p, i); },
+                                                    PickOverload<const FilePath&, const Image&, bool>(&ImageFormat::save));
   }
 
   {

@@ -29,6 +29,19 @@ ImageColorspace recoverColorspace(int channelCount) {
   }
 }
 
+Image createImageFromData(int width, int height, int channelCount, bool isHdr, const std::unique_ptr<void, ImageDataDeleter>& data) {
+  const std::size_t valueCount = width * height * channelCount;
+
+  Image img(width, height, recoverColorspace(channelCount), (isHdr ? ImageDataType::FLOAT : ImageDataType::BYTE));
+
+  if (isHdr)
+    std::copy_n(static_cast<float*>(data.get()), valueCount, static_cast<float*>(img.getDataPtr()));
+  else
+    std::copy_n(static_cast<uint8_t*>(data.get()), valueCount, static_cast<uint8_t*>(img.getDataPtr()));
+
+  return img;
+}
+
 } // namespace
 
 Image load(const FilePath& filePath, bool flipVertically) {
@@ -52,16 +65,40 @@ Image load(const FilePath& filePath, bool flipVertically) {
   if (data == nullptr)
     throw std::invalid_argument("[ImageFormat] Cannot load image '" + filePath + "': " + stbi_failure_reason());
 
-  const std::size_t valueCount = width * height * channelCount;
-
-  Image img(width, height, recoverColorspace(channelCount), (isHdr ? ImageDataType::FLOAT : ImageDataType::BYTE));
-
-  if (isHdr)
-    std::copy_n(static_cast<float*>(data.get()), valueCount, static_cast<float*>(img.getDataPtr()));
-  else
-    std::copy_n(static_cast<uint8_t*>(data.get()), valueCount, static_cast<uint8_t*>(img.getDataPtr()));
+  Image img = createImageFromData(width, height, channelCount, isHdr, data);
 
   Logger::debug("[ImageFormat] Loaded image");
+
+  return img;
+}
+
+Image loadFromData(const std::vector<unsigned char>& imgData, bool flipVertically) {
+  return loadFromData(imgData.data(), imgData.size(), flipVertically);
+}
+
+Image loadFromData(const unsigned char* imgData, std::size_t dataSize, bool flipVertically) {
+  Logger::debug("[ImageFormat] Loading image from data...");
+
+  stbi_set_flip_vertically_on_load(flipVertically);
+
+  const bool isHdr = stbi_is_hdr_from_memory(imgData, static_cast<int>(dataSize));
+
+  int width {};
+  int height {};
+  int channelCount {};
+  std::unique_ptr<void, ImageDataDeleter> data;
+
+  if (isHdr)
+    data.reset(stbi_loadf_from_memory(imgData, static_cast<int>(dataSize), &width, &height, &channelCount, 0));
+  else
+    data.reset(stbi_load_from_memory(imgData, static_cast<int>(dataSize), &width, &height, &channelCount, 0));
+
+  if (data == nullptr)
+    throw std::invalid_argument("[ImageFormat] Cannot load image from data: " + std::string(stbi_failure_reason()));
+
+  Image img = createImageFromData(width, height, static_cast<uint8_t>(channelCount), isHdr, data);
+
+  Logger::debug("[ImageFormat] Loaded image from data");
 
   return img;
 }

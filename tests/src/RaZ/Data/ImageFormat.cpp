@@ -2,6 +2,7 @@
 
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
+#include "RaZ/Utils/FileUtils.hpp"
 
 #include <array>
 
@@ -63,6 +64,16 @@ void checkImage(const Raz::FilePath& filePath, uint8_t expectedChannelCount, con
                  expectedColorspace,
                  expectedValues);
   checkImageData(Raz::ImageFormat::load(filePath, true),
+                 expectedChannelCount,
+                 expectedColorspace,
+                 { expectedValues[2], expectedValues[3], expectedValues[0], expectedValues[1] });
+
+  const std::vector<unsigned char> fileContent = Raz::FileUtils::readFileToArray(filePath);
+  checkImageData(Raz::ImageFormat::loadFromData(fileContent),
+                 expectedChannelCount,
+                 expectedColorspace,
+                 expectedValues);
+  checkImageData(Raz::ImageFormat::loadFromData(fileContent, true),
                  expectedChannelCount,
                  expectedColorspace,
                  { expectedValues[2], expectedValues[3], expectedValues[0], expectedValues[1] });
