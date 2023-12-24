@@ -60,12 +60,23 @@ void loadVertices(const fastgltf::Primitive& primitive,
     vert.position = Vec3f(data[0], data[1], data[2]);
   });
 
-  // The tangent's input W component (data[3]) is either 1 or -1 and represents the handedness
-  // See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
   constexpr std::array<std::pair<std::string_view, void (*)(Vertex&, const float*)>, 3> attributes = {{
-    { "TEXCOORD_0", [] (Vertex& vert, const float* data) { vert.texcoords = Vec2f(data[0], data[1]); } },
-    { "NORMAL",     [] (Vertex& vert, const float* data) { vert.normal    = Vec3f(data[0], data[1], data[2]); } },
-    { "TANGENT",    [] (Vertex& vert, const float* data) { vert.tangent   = Vec3f(data[0], data[1], data[2]) * data[3]; } }
+    { "TEXCOORD_0", [] (Vertex& vert, const float* data) {
+      // The texcoords can be outside the [0; 1] range; they're normalized according to the REPEAT mode. This may be subject to change
+      //   See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#_wrapping
+      vert.texcoords = Vec2f(data[0], data[1]);
+
+      for (float& elt : vert.texcoords.getData()) {
+        if (elt < -1.f || elt > 1.f) elt = std::fmod(elt, 1.f);
+        if (elt < 0.f) elt += 1.f;
+      }
+    }},
+    { "NORMAL",  [] (Vertex& vert, const float* data) { vert.normal = Vec3f(data[0], data[1], data[2]); } },
+    { "TANGENT", [] (Vertex& vert, const float* data) {
+      // The tangent's input W component (data[3]) is either 1 or -1 and represents the handedness
+      //   See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
+      vert.tangent = Vec3f(data[0], data[1], data[2]) * data[3];
+    }}
   }};
 
   for (auto&& [attribName, callback] : attributes) {
