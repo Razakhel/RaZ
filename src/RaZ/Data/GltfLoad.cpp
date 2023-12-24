@@ -144,7 +144,7 @@ std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& mesh
                                          const std::vector<fastgltf::Buffer>& buffers,
                                          const std::vector<fastgltf::BufferView>& bufferViews,
                                          const std::vector<fastgltf::Accessor>& accessors) {
-  Logger::debug("[GltfLoad] Loading " + std::to_string(meshes.size()) + " meshes...");
+  Logger::debug("[GltfLoad] Loading " + std::to_string(meshes.size()) + " mesh(es)...");
 
   Mesh loadedMesh;
   MeshRenderer loadedMeshRenderer;
@@ -165,28 +165,48 @@ std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& mesh
     }
   }
 
-  Logger::debug("[GltfLoad] Loaded meshes");
+  Logger::debug("[GltfLoad] Loaded mesh(es)");
 
   return { std::move(loadedMesh), std::move(loadedMeshRenderer) };
 }
 
-std::vector<Image> loadImages(const std::vector<fastgltf::Image>& images, const FilePath& rootFilePath) {
-  Logger::debug("[GltfLoad] Loading " + std::to_string(images.size()) + " images...");
+std::vector<Image> loadImages(const std::vector<fastgltf::Image>& images,
+                              const std::vector<fastgltf::Buffer>& buffers,
+                              const std::vector<fastgltf::BufferView>& bufferViews,
+                              const FilePath& rootFilePath) {
+  Logger::debug("[GltfLoad] Loading " + std::to_string(images.size()) + " image(s)...");
 
   std::vector<Image> loadedImages;
   loadedImages.reserve(images.size());
 
-  for (const fastgltf::Image& img : images) {
-    if (!std::holds_alternative<fastgltf::sources::URI>(img.data)) {
-      Logger::error("[GltfLoad] Images can only be loaded from a file path for now.");
-      continue;
-    }
+  static constexpr auto loadFailure = [] (const auto&) {
+    Logger::error("[GltfLoad] Cannot find a suitable way of loading an image.");
+  };
 
-    const auto& imgPath = std::get<fastgltf::sources::URI>(img.data).uri.path();
-    loadedImages.emplace_back(ImageFormat::load(rootFilePath + imgPath));
+  for (const fastgltf::Image& img : images) {
+    std::visit(fastgltf::visitor {
+      [&loadedImages, &rootFilePath] (const fastgltf::sources::URI& imgPath) {
+        loadedImages.emplace_back(ImageFormat::load(rootFilePath + imgPath.uri.path()));
+      },
+      [&loadedImages] (const fastgltf::sources::Vector& imgData) {
+        loadedImages.emplace_back(ImageFormat::loadFromData(imgData.bytes));
+      },
+      [&bufferViews, &buffers, &loadedImages] (const fastgltf::sources::BufferView& bufferViewSource) {
+        const fastgltf::BufferView& imgView = bufferViews[bufferViewSource.bufferViewIndex];
+        const fastgltf::Buffer& imgBuffer   = buffers[imgView.bufferIndex];
+
+        std::visit(fastgltf::visitor {
+          [&loadedImages, &imgView] (const fastgltf::sources::Vector& imgData) {
+            loadedImages.emplace_back(ImageFormat::loadFromData(imgData.bytes.data() + imgView.byteOffset, imgView.byteLength));
+          },
+          loadFailure
+        }, imgBuffer.data);
+      },
+      loadFailure
+    }, img.data);
   }
 
-  Logger::debug("[GltfLoad] Loaded images");
+  Logger::debug("[GltfLoad] Loaded image(s)");
 
   return loadedImages;
 }
@@ -230,7 +250,7 @@ std::pair<Image, Image> extractMetalnessRoughnessImages(const Image& metalRoughI
 }
 
 void loadMaterials(const std::vector<fastgltf::Material>& materials, const std::vector<Image>& images, MeshRenderer& meshRenderer) {
-  Logger::debug("[GltfLoad] Loading " + std::to_string(materials.size()) + " materials...");
+  Logger::debug("[GltfLoad] Loading " + std::to_string(materials.size()) + " material(s)...");
 
   meshRenderer.getMaterials().clear();
 
@@ -270,7 +290,7 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials, const std::
     loadedMat.loadType(MaterialType::COOK_TORRANCE);
   }
 
-  Logger::debug("[GltfLoad] Loaded materials");
+  Logger::debug("[GltfLoad] Loaded material(s)");
 }
 
 } // namespace
@@ -309,7 +329,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
   auto [mesh, meshRenderer] = loadMeshes(asset->meshes, asset->buffers, asset->bufferViews, asset->accessors);
 
-  const std::vector<Image> images = loadImages(asset->images, parentPath);
+  const std::vector<Image> images = loadImages(asset->images, asset->buffers, asset->bufferViews, parentPath);
   loadMaterials(asset->materials, images, meshRenderer);
 
   Logger::debug("[GltfLoad] Loaded glTF file (" + std::to_string(mesh.getSubmeshes().size()) + " submesh(es), "

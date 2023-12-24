@@ -10,7 +10,7 @@ TEST_CASE("GltfFormat load glTF") {
   const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè.gltf");
 
   REQUIRE(mesh.getSubmeshes().size() == 2);
-  CHECK(mesh.getSubmeshes()[0].getVertexCount() == 36);
+  REQUIRE(mesh.getSubmeshes()[0].getVertexCount() == 36);
   CHECK(mesh.getSubmeshes()[1].getVertexCount() == 36);
   CHECK(mesh.recoverVertexCount() == 72);
   CHECK(mesh.getSubmeshes()[0].getTriangleIndexCount() == 36);
@@ -38,6 +38,8 @@ TEST_CASE("GltfFormat load glTF") {
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.25f);
 
   {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::BaseColor));
+
     const auto& baseColorMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::BaseColor));
 
     REQUIRE(baseColorMap.getWidth() == 2);
@@ -63,6 +65,8 @@ TEST_CASE("GltfFormat load glTF") {
   }
 
   {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::Emissive));
+
     const auto& emissiveMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Emissive));
 
     REQUIRE(emissiveMap.getWidth() == 2);
@@ -88,6 +92,8 @@ TEST_CASE("GltfFormat load glTF") {
   }
 
   {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::Normal));
+
     const auto& normalMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Normal));
 
     REQUIRE(normalMap.getWidth() == 2);
@@ -113,6 +119,8 @@ TEST_CASE("GltfFormat load glTF") {
   }
 
   {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::Metallic));
+
     const auto& metallicMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Metallic));
 
     REQUIRE(metallicMap.getWidth() == 2);
@@ -145,6 +153,8 @@ TEST_CASE("GltfFormat load glTF") {
   }
 
   {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::Roughness));
+
     const auto& roughnessMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Roughness));
 
     REQUIRE(roughnessMap.getWidth() == 2);
@@ -177,6 +187,8 @@ TEST_CASE("GltfFormat load glTF") {
   }
 
   {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::Ambient));
+
     const auto& ambientOcclusionMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Ambient));
 
     REQUIRE(ambientOcclusionMap.getWidth() == 2);
@@ -209,11 +221,11 @@ TEST_CASE("GltfFormat load glTF") {
   }
 }
 
-TEST_CASE("GltfFormat load GLB") {
+TEST_CASE("GltfFormat load GLB simple") {
   const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/ßøӾ.glb");
 
   REQUIRE(mesh.getSubmeshes().size() == 1);
-  CHECK(mesh.getSubmeshes()[0].getVertexCount() == 24);
+  REQUIRE(mesh.getSubmeshes()[0].getVertexCount() == 24);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.getSubmeshes()[0].getTriangleIndexCount() == 36);
   CHECK(mesh.recoverTriangleCount() == 12); // 36 / 3
@@ -235,4 +247,55 @@ TEST_CASE("GltfFormat load GLB") {
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.f));
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 1.f);
+}
+
+TEST_CASE("GltfFormat load GLB textured") {
+  const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/ßøӾTêxtùrëd.glb");
+
+  REQUIRE(mesh.getSubmeshes().size() == 1);
+  REQUIRE(mesh.getSubmeshes()[0].getVertexCount() == 24);
+  CHECK(mesh.recoverVertexCount() == 24);
+  CHECK(mesh.getSubmeshes()[0].getTriangleIndexCount() == 36);
+  CHECK(mesh.recoverTriangleCount() == 12); // 36 / 3
+
+  CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(-0.5f, -0.5f, 0.5f), Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(0.5f, -0.5f, 0.5f),  Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[12] == Raz::Vertex{ Raz::Vec3f(0.5f, -0.5f, 0.5f),  Raz::Vec2f(0.f, 0.f), -Raz::Axis::Y, Raz::Vec3f(0.f) });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[23] == Raz::Vertex{ Raz::Vec3f(0.5f, 0.5f, -0.5f),  Raz::Vec2f(1.f, 1.f), -Raz::Axis::Z, Raz::Vec3f(0.f) });
+
+  REQUIRE(meshRenderer.getSubmeshRenderers().size() == 1);
+  CHECK(meshRenderer.getSubmeshRenderers()[0].getRenderMode() == Raz::RenderMode::TRIANGLE);
+  CHECK(meshRenderer.getSubmeshRenderers()[0].getMaterialIndex() == 0);
+
+  REQUIRE(meshRenderer.getMaterials().size() == 1);
+
+  const Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials()[0].getProgram();
+
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::ColorPreset::White);
+  CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::ColorPreset::Black);
+  CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
+  CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 1.f);
+
+  {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::BaseColor));
+
+    const auto& baseColorMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::BaseColor));
+
+    REQUIRE(baseColorMap.getWidth() == 256);
+    REQUIRE(baseColorMap.getHeight() == 256);
+    REQUIRE(baseColorMap.getColorspace() == Raz::TextureColorspace::RGB);
+    REQUIRE(baseColorMap.getDataType() == Raz::TextureDataType::BYTE);
+
+#if !defined(USE_OPENGL_ES)
+    const Raz::Image baseColorImg = baseColorMap.recoverImage();
+    REQUIRE_FALSE(baseColorImg.isEmpty());
+
+    CHECK(baseColorImg.recoverPixel<uint8_t, 3>(0, 0) == Raz::Vec3b(220));
+    CHECK(baseColorImg.recoverPixel<uint8_t, 3>(64, 64) == Raz::Vec3b(108, 173, 223));
+    CHECK(baseColorImg.recoverPixel<uint8_t, 3>(127, 127) == Raz::Vec3b(255));
+    CHECK(baseColorImg.recoverPixel<uint8_t, 3>(167, 71) == Raz::Vec3b(255));
+    CHECK(baseColorImg.recoverPixel<uint8_t, 3>(192, 192) == Raz::Vec3b(92, 135, 39));
+    CHECK(baseColorImg.recoverPixel<uint8_t, 3>(255, 255) == Raz::Vec3b(220));
+#endif
+  }
 }
