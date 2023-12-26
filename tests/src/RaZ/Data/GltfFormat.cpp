@@ -261,7 +261,7 @@ TEST_CASE("GltfFormat load GLB textured") {
   CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(-0.5f, -0.5f, 0.5f), Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });
   CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(0.5f, -0.5f, 0.5f),  Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });
   CHECK(mesh.getSubmeshes()[0].getVertices()[12] == Raz::Vertex{ Raz::Vec3f(0.5f, -0.5f, 0.5f),  Raz::Vec2f(0.f, 0.f), -Raz::Axis::Y, Raz::Vec3f(0.f) });
-  CHECK(mesh.getSubmeshes()[0].getVertices()[23] == Raz::Vertex{ Raz::Vec3f(0.5f, 0.5f, -0.5f),  Raz::Vec2f(1.f, 1.f), -Raz::Axis::Z, Raz::Vec3f(0.f) });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[23] == Raz::Vertex{ Raz::Vec3f(0.5f, 0.5f, -0.5f),  Raz::Vec2f(1.f, 1.f), -Raz::Axis::Z, Raz::Axis::X });
 
   REQUIRE(meshRenderer.getSubmeshRenderers().size() == 1);
   CHECK(meshRenderer.getSubmeshRenderers()[0].getRenderMode() == Raz::RenderMode::TRIANGLE);

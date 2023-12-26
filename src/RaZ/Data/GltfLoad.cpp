@@ -41,7 +41,7 @@ void loadVertices(const fastgltf::Primitive& primitive,
                   const std::vector<fastgltf::Buffer>& buffers,
                   const std::vector<fastgltf::BufferView>& bufferViews,
                   const std::vector<fastgltf::Accessor>& accessors,
-                  std::vector<Vertex>& vertices) {
+                  Submesh& submesh) {
   Logger::debug("[GltfLoad] Loading vertices...");
 
   const auto positionIt = primitive.findAttribute("POSITION");
@@ -54,6 +54,7 @@ void loadVertices(const fastgltf::Primitive& primitive,
   if (!positionAccessor.bufferViewIndex.has_value())
     return;
 
+  std::vector<Vertex>& vertices = submesh.getVertices();
   vertices.resize(positionAccessor.count);
 
   loadVertexData<float>(positionAccessor, buffers, bufferViews, vertices, [] (Vertex& vert, const float* data) {
@@ -79,6 +80,8 @@ void loadVertices(const fastgltf::Primitive& primitive,
     }}
   }};
 
+  bool hasLoadedTangents = false;
+
   for (auto&& [attribName, callback] : attributes) {
     const auto attribIter = primitive.findAttribute(attribName);
 
@@ -87,9 +90,16 @@ void loadVertices(const fastgltf::Primitive& primitive,
 
     const fastgltf::Accessor& attribAccessor = accessors[attribIter->second];
 
-    if (attribAccessor.bufferViewIndex.has_value())
+    if (attribAccessor.bufferViewIndex.has_value()) {
       loadVertexData(attribAccessor, buffers, bufferViews, vertices, callback);
+
+      if (attribName == "TANGENT")
+        hasLoadedTangents = true;
+    }
   }
+
+  if (!hasLoadedTangents)
+    submesh.computeTangents();
 
   Logger::debug("[GltfLoad] Loaded vertices");
 }
@@ -117,19 +127,21 @@ void loadIndices(const fastgltf::Accessor& indicesAccessor,
   const std::size_t dataStride     = indicesView.byteStride.value_or(dataSize);
 
   for (std::size_t i = 0; i < indices.size(); ++i) {
+    const uint8_t* const indexData = indicesData + i * dataStride;
+
     // The indices must be of an unsigned integer type, but its size is unspecified
     // See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#_mesh_primitive_indices
     switch (dataSize) {
       case 1:
-        indices[i] = *reinterpret_cast<const uint8_t*>(indicesData + i * dataStride);
+        indices[i] = *indexData;
         break;
 
       case 2:
-        indices[i] = *reinterpret_cast<const uint16_t*>(indicesData + i * dataStride);
+        indices[i] = *reinterpret_cast<const uint16_t*>(indexData);
         break;
 
       case 4:
-        indices[i] = *reinterpret_cast<const uint32_t*>(indicesData + i * dataStride);
+        indices[i] = *reinterpret_cast<const uint32_t*>(indexData);
         break;
 
       default:
@@ -157,8 +169,9 @@ std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& mesh
       Submesh& submesh = loadedMesh.addSubmesh();
       SubmeshRenderer& submeshRenderer = loadedMeshRenderer.addSubmeshRenderer();
 
-      loadVertices(primitive, buffers, bufferViews, accessors, submesh.getVertices());
+      // Indices must be loaded first as they are needed to compute the tangents if necessary
       loadIndices(accessors[*primitive.indicesAccessor], buffers, bufferViews, submesh.getTriangleIndices());
+      loadVertices(primitive, buffers, bufferViews, accessors, submesh);
 
       submeshRenderer.load(submesh, (primitive.type == fastgltf::PrimitiveType::Triangles ? RenderMode::TRIANGLE : RenderMode::POINT));
       submeshRenderer.setMaterialIndex(primitive.materialIndex.value_or(0));
