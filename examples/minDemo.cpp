@@ -18,7 +18,7 @@ int main() {
     camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
     Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
-    mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
+    mesh.addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
 
     Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
     light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type

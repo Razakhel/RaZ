@@ -24,7 +24,7 @@ int main() {
     auto& physics = world.addSystem<Raz::PhysicsSystem>();
 
     {
-      const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj");
+      const auto [mesh, meshRenderer] = Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/ball.obj");
 
       Raz::Entity& ball1 = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(-3.f, 3.f, 0.f));
       ball1.addComponent<Raz::MeshRenderer>(meshRenderer.clone()).load(mesh);

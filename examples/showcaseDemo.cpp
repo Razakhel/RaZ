@@ -6,7 +6,7 @@ using namespace std::literals;
 
 inline void loadSponzaScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
   auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj").second;
+  meshRenderer       = Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj").second;
   render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
@@ -17,7 +17,7 @@ inline void loadSponzaScene(Raz::Entity& mesh, const Raz::RenderSystem& render) 
 
 inline void loadBallScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
   auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second;
+  meshRenderer       = Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second;
   render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
@@ -28,7 +28,7 @@ inline void loadBallScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
 
 inline void loadShieldScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
   auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj").second;
+  meshRenderer       = Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/shield.obj").second;
   render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();
@@ -39,7 +39,7 @@ inline void loadShieldScene(Raz::Entity& mesh, const Raz::RenderSystem& render) 
 
 inline void loadCerberusScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
   auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
-  meshRenderer       = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/cerberus.obj").second;
+  meshRenderer       = Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/cerberus.obj").second;
   render.updateMaterials(meshRenderer);
 
   auto& meshTrans = mesh.getComponent<Raz::Transform>();

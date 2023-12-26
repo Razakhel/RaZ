@@ -14,7 +14,7 @@ camera:addComponent(Camera.new(window:getWidth(), window:getHeight()))
 
 local shield      = world:addEntity()
 local shieldTrans = shield:addComponent(Transform.new(Vec3f.new(), Quaternionf.identity(), Vec3f.new(0.1)))
-local _, shieldRendererData = ObjFormat.load(FilePath.new(RAZ_ROOT .. "assets/meshes/shield.obj"))
+local _, shieldRendererData = MeshFormat.load(FilePath.new(RAZ_ROOT .. "assets/meshes/shield.obj"))
 shield:addComponent(shieldRendererData)
 
 local cube      = world:addEntity()

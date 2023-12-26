@@ -129,7 +129,7 @@ int main() {
 
     Raz::Entity& mesh = world.addEntity();
 
-    auto [meshData, meshRenderData] = Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj");
+    auto [meshData, meshRenderData] = Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/shield.obj");
     auto& meshComp       = mesh.addComponent<Raz::Mesh>(std::move(meshData)); // Useful if you need to keep the geometry
     auto& meshRenderComp = mesh.addComponent<Raz::MeshRenderer>(std::move(meshRenderData)); // Useful if you need to render the mesh
 

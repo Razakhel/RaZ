@@ -6,7 +6,7 @@
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
-#include "RaZ/Data/ObjFormat.hpp"
+#include "RaZ/Data/MeshFormat.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
@@ -62,7 +62,7 @@ TEST_CASE("RenderSystem Cook-Torrance ball") {
   auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f));
   auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
 
-  world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_TESTS_ROOT "../assets/meshes/ball.obj").second);
+  world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_TESTS_ROOT "../assets/meshes/ball.obj").second);
 
   world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 1.5f)).addComponent<Raz::Light>(Raz::LightType::POINT, 1.5f, Raz::ColorPreset::White);
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(5.f, 0.f, -1.f).normalize(),

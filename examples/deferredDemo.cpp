@@ -170,7 +170,7 @@ int main() {
     //////////
 
     Raz::Entity& mesh  = world.addEntity();
-    auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::ObjFormat::load(RAZ_ROOT "assets/meshes/shield.obj").second);
+    auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/shield.obj").second);
 
     Raz::RenderShaderProgram& shaderProgram = meshRenderer.getMaterials().front().getProgram();
     shaderProgram.setFragmentShader(Raz::FragmentShader::loadFromSource(geomFragSource));
