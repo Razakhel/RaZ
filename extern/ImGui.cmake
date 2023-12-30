@@ -6,8 +6,8 @@ project(ImGui)
 
 # If not compiling with Emscripten, GLEW and GLFW need to be enabled for ImGui to be available
 if (NOT RAZ_USE_EMSCRIPTEN)
-    if (NOT RAZ_USE_GLEW OR NOT RAZ_USE_GLFW)
-        message(FATAL_ERROR "[RaZ] ImGui can't be used with either GLEW or GLFW disabled; either reenable both or disable ImGui")
+    if (NOT RAZ_USE_GLEW OR NOT RAZ_USE_WINDOW)
+        message(FATAL_ERROR "[RaZ] ImGui can't be used with either GLEW or windowing disabled; either reenable both or disable ImGui")
     endif ()
 endif ()
 
@@ -29,7 +29,7 @@ file(
     implot/*.h
 )
 
-if (NOT RAZ_USE_GLFW AND NOT RAZ_USE_EMSCRIPTEN)
+if (NOT RAZ_USE_WINDOW AND NOT RAZ_USE_EMSCRIPTEN)
     list(
         REMOVE_ITEM
         IMGUI_FILES
@@ -63,6 +63,6 @@ endif ()
 
 target_link_libraries(ImGui PUBLIC GLEW)
 
-if (RAZ_USE_GLFW)
+if (RAZ_USE_WINDOW AND NOT RAZ_USE_EMSCRIPTEN)
     target_link_libraries(ImGui PUBLIC GLFW)
 endif ()

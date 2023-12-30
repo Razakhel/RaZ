@@ -404,22 +404,29 @@ if (RAZ_USE_GLEW)
     target_link_libraries(RaZ PRIVATE GLEW)
 endif ()
 
-if (RAZ_USE_GLFW)
-    target_link_libraries(RaZ PRIVATE GLFW)
-elseif (NOT RAZ_USE_EMSCRIPTEN) # Emscripten handles GLFW on its own, but still needs the Window to render into
-    list(
-        REMOVE_ITEM
-        RAZ_FILES
+if (NOT RAZ_USE_EMSCRIPTEN) # Emscripten handles GLFW on its own, but still needs the Window to render into
+    if (RAZ_USE_WINDOW)
+        target_link_libraries(RaZ PRIVATE GLFW)
+        message(STATUS "[RaZ] Windowing ENABLED")
+    else ()
+        list(
+            REMOVE_ITEM
+            RAZ_FILES
 
-        "${PROJECT_SOURCE_DIR}/src/RaZ/Render/Window.cpp"
-        "${PROJECT_SOURCE_DIR}/include/RaZ/Render/Window.hpp"
-    )
+            "${PROJECT_SOURCE_DIR}/src/RaZ/Render/Window.cpp"
+            "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaWindow.cpp"
+            "${PROJECT_SOURCE_DIR}/include/RaZ/Render/Window.hpp"
+        )
 
-    target_compile_definitions(RaZ PUBLIC RAZ_NO_WINDOW)
+        target_compile_definitions(RaZ PUBLIC RAZ_NO_WINDOW)
+
+        message(STATUS "[RaZ] Windowing DISABLED")
+    endif ()
 endif ()
 
 if (RAZ_USE_IMGUI)
     target_link_libraries(RaZ PRIVATE ImGui)
+    message(STATUS "[RaZ] Overlay ENABLED")
 else ()
     list(
         REMOVE_ITEM
@@ -430,6 +437,8 @@ else ()
     )
 
     target_compile_definitions(RaZ PUBLIC RAZ_NO_OVERLAY)
+
+    message(STATUS "[RaZ] Overlay DISABLED")
 endif ()
 
 if (RAZ_USE_LIBPNG)
@@ -438,6 +447,7 @@ endif ()
 
 if (RAZ_USE_LUA)
     target_link_libraries(RaZ PRIVATE Sol2 Lua)
+    message(STATUS "[RaZ] Lua scripting ENABLED")
 else ()
     file(
         GLOB
@@ -449,6 +459,8 @@ else ()
     list(REMOVE_ITEM RAZ_FILES ${RAZ_LUA_FILES})
 
     target_compile_definitions(RaZ PUBLIC RAZ_NO_LUA)
+
+    message(STATUS "[RaZ] Lua scripting DISABLED")
 endif ()
 
 target_link_libraries(RaZ PRIVATE fastgltf simdjson stb)

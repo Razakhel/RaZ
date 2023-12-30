@@ -22,12 +22,14 @@ int main(int argc, char* argv[]) {
   Raz::LuaWrapper::execute("RAZ_TESTS_ROOT = \"" RAZ_TESTS_ROOT "\""); // Adding the root path definition as a global variable
 #endif
 
+#if !defined(RAZ_NO_WINDOW)
   // Rendering tests require an OpenGL context to be created, which is done by the Window; the following instruction instantiates it
   TestUtils::getWindow();
 
   // Setting texture [un]pack alignment to 1, so that the elements are aligned on bytes. This allows direct comparison with raw data
   Raz::Renderer::setPixelStorage(Raz::PixelStorage::PACK_ALIGNMENT, 1);
   Raz::Renderer::setPixelStorage(Raz::PixelStorage::UNPACK_ALIGNMENT, 1);
+#endif
 
   return Catch::Session().run(argc, argv);
 }

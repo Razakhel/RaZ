@@ -8,7 +8,9 @@ jobs:
   #########
 
   linux:
-    name: Linux (${{ matrix.compiler.c }}, ${{ matrix.build_type }}${{ !matrix.use_audio && ', no audio' || '' }})
+    name: "Linux (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
+      ${{ !matrix.use_audio && ', no audio' || '' }}\
+      ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: ubuntu-latest
 
     strategy:
@@ -22,8 +24,11 @@ jobs:
           - Release
         use_audio:
           - true
+        use_window:
+          - true
         include:
-          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: false }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: false, use_window: true }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_window: false }
 
     steps:
     - uses: actions/checkout@v3
@@ -70,7 +75,10 @@ jobs:
         cmake -GNinja \
               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
               -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
-              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON \
+              -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_USE_WINDOW=${{ matrix.use_window && 'ON' || 'OFF' }} \
+              -DRAZ_USE_IMGUI=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON ${{ matrix.compiler.c == 'gcc' && '-DRAZ_ENABLE_COVERAGE=ON' || '' }} \
               -DSKIP_RENDERER_ERRORS=ON -DENABLE_DEBUG_INFO=ON \
               ${{ github.workspace }} &&
@@ -83,26 +91,27 @@ jobs:
         cmake --build . --config ${{ matrix.build_type }} &&
         pwd && find .
 
-    # Running the tests using gdb to catch potential segfaults
+    # Running the tests using GDB to catch potential segfaults; only done if windowing is enabled, as many tests depend on a graphical context
     - name: Test
+      if: matrix.use_window
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' \
         gdb --batch --return-child-result -x '${{ github.workspace }}/tests/assets/debug/gdb_commands.txt' ./tests/RaZ_Tests
 
-    # Preparing code coverage; only done with GCC in Debug with audio enabled
+    # Preparing code coverage; only done with GCC in Debug with all features enabled
     - name: Coverage setup
-      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio
+      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_window
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
         lcov -r coverage.info '/usr/*' -o coverage.info &&
         lcov -l coverage.info
 
-    # Processing code coverage; only done with GCC in Debug with audio enabled
+    # Processing code coverage; only done with GCC in Debug with all features enabled
     - name: Coverage processing
-      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio
+      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_window
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -115,7 +124,7 @@ jobs:
       run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      if: matrix.use_audio
+      if: matrix.use_audio && matrix.use_window
       uses: actions/upload-artifact@v3
       with:
         name: linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
@@ -128,8 +137,12 @@ jobs:
   ###########
 
   windows:
-    name: Windows (${{ matrix.compiler.c }}, ${{ matrix.build_type }}${{ !matrix.use_audio && ', no audio' || '' }})
+    name: "Windows (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
+      ${{ !matrix.use_audio && ', no audio' || '' }}\
+      ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: windows-2022
+    env:
+      OPENAL_VERSION: 1.23.1
 
     strategy:
       fail-fast: false
@@ -141,19 +154,36 @@ jobs:
           - Release
         use_audio:
           - true
+        use_window:
+          - true
         include:
-          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: false }
+          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: false, use_window: true }
+          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: true, use_window: false }
 
     steps:
     - uses: actions/checkout@v3
 
-      # Installing OpenAL-soft to handle the audio part
-    - name: Build setup
+    # Caching OpenAL-Soft's installation; this avoids reinstalling it on every build
+    - name: OpenAL-Soft caching
+      if: matrix.use_audio
+      uses: actions/cache@v3
+      id: openal-soft
+      with:
+        path: C:/OpenAL
+        key: openal-soft-${{ env.OPENAL_VERSION }}
+        restore-keys: |
+          openal-soft-${{ env.OPENAL_VERSION }}
+
+      # Downloading & installing OpenAL-Soft to handle the audio part; only done when failed to find its cached installation
+    - name: OpenAL-Soft setup
+      if: matrix.use_audio && steps.openal-soft.outputs.cache-hit != 'true'
       run: |
-        curl --silent --insecure https://www.openal-soft.org/openal-binaries/openal-soft-1.21.0-bin.zip -O &&
-        7z x openal-soft-1.21.0-bin.zip &&
-        mv openal-soft-1.21.0-bin C:/OpenAL;
-        cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+        curl -sSkLO https://github.com/kcat/openal-soft/releases/download/${{ env.OPENAL_VERSION }}/openal-soft-${{ env.OPENAL_VERSION }}-bin.zip &&
+        7z x openal-soft-${{ env.OPENAL_VERSION }}-bin.zip &&
+        mv openal-soft-${{ env.OPENAL_VERSION }}-bin C:/OpenAL
+
+    - name: Build setup
+      run: cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
 
     - name: Configuration
       shell: bash
@@ -161,7 +191,10 @@ jobs:
       run: |
         cmake -G"Visual Studio 17 2022" -A x64 \
               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF \
+              -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_USE_WINDOW=${{ matrix.use_window && 'ON' || 'OFF' }} \
+              -DRAZ_USE_IMGUI=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON \
               -DSKIP_RENDERER_ERRORS=ON -DENABLE_DEBUG_INFO=ON \
               $GITHUB_WORKSPACE &&
@@ -179,7 +212,7 @@ jobs:
       run: cmake --install . --prefix C:/RaZ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      if: matrix.use_audio
+      if: matrix.use_audio && matrix.use_window
       uses: actions/upload-artifact@v3
       with:
         name: windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
@@ -191,7 +224,9 @@ jobs:
   #########
 
   macos:
-    name: macOS (${{ matrix.compiler.c }}, ${{ matrix.build_type }}${{ !matrix.use_audio && ', no audio' || '' }})
+    name: "macOS (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
+      ${{ !matrix.use_audio && ', no audio' || '' }}\
+      ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: macos-latest
 
     strategy:
@@ -204,8 +239,11 @@ jobs:
           - Release
         use_audio:
           - true
+        use_window:
+          - true
         include:
-          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: false }
+          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: false, use_window: true }
+          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: true, use_window: false }
 
     steps:
     - uses: actions/checkout@v3
@@ -229,7 +267,10 @@ jobs:
         cmake -GNinja \
               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
               -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
-              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF \
+              -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_USE_WINDOW=${{ matrix.use_window && 'ON' || 'OFF' }} \
+              -DRAZ_USE_IMGUI=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON \
               -DSKIP_RENDERER_ERRORS=ON -DENABLE_DEBUG_INFO=ON \
               $GITHUB_WORKSPACE &&
@@ -248,7 +289,7 @@ jobs:
       run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      if: matrix.use_audio
+      if: matrix.use_audio && matrix.use_window
       uses: actions/upload-artifact@v3
       with:
         name: macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
@@ -261,21 +302,24 @@ jobs:
   ##############
 
   emscripten:
-    name: Emscripten (${{ matrix.compiler.c }}, ${{ matrix.build_type }}${{ !matrix.use_audio && ', no audio' || '' }})
+    name: "Emscripten (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
+      ${{ !matrix.use_audio && ', no audio' || '' }})"
     runs-on: ubuntu-latest
+    env:
+      EMSCRIPTEN_VERSION: 3.1.0 # The 'latest' version may fail to build
 
     strategy:
       fail-fast: false
       matrix:
         compiler:
-          - { c: emcc, cpp: em++, version: 3.1.0 } # The 'latest' version may fail to build
+          - { c: emcc, cpp: em++ }
         build_type:
           - Debug
           - Release
         use_audio:
           - true
         include:
-          - { compiler: { c: emcc, cpp: em++, version: 3.1.0 }, build_type: Debug, use_audio: false }
+          - { compiler: { c: emcc, cpp: em++ }, build_type: Debug, use_audio: false }
 
     steps:
       - uses: actions/checkout@v3
@@ -298,15 +342,15 @@ jobs:
       #    chmod +x ./fbx20190_fbxsdk_linux &&
       #    printf 'yes\nn' | ./fbx20190_fbxsdk_linux /usr
 
-      # Caching Emscripten's installation; this avoids installing it on every build
+      # Caching Emscripten's installation; this avoids reinstalling it on every build
       - name: Emscripten caching
         uses: actions/cache@v3
         id: emsdk
         with:
           path: ~/emsdk
-          key: emsdk-${{ matrix.compiler.version }}
+          key: emsdk-${{ env.EMSCRIPTEN_VERSION }}
           restore-keys: |
-            emsdk-${{ matrix.compiler.version }}
+            emsdk-${{ env.EMSCRIPTEN_VERSION }}
 
       # Downloading & installing Emscripten; only done when failed to find its cached installation
       - name: Emscripten setup
@@ -314,9 +358,8 @@ jobs:
         shell: bash
         run: |
           git clone --depth 1 https://github.com/emscripten-core/emsdk.git ~/emsdk &&
-          ~/emsdk/emsdk install ${{ matrix.compiler.version }} && ~/emsdk/emsdk activate ${{ matrix.compiler.version }}
+          ~/emsdk/emsdk install ${{ env.EMSCRIPTEN_VERSION }} && ~/emsdk/emsdk activate ${{ env.EMSCRIPTEN_VERSION }}
 
-      # Downloading & installing Emscripten, to build RaZ in WebAssembly
       - name: Build setup
         shell: bash
         run: cmake -E make_directory ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
@@ -328,7 +371,8 @@ jobs:
           source ~/emsdk/emsdk_env.sh &&
           emcmake cmake -GNinja \
                         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                        -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+                        -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF \
+                        -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
                         -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON ${{ matrix.build_type == 'Debug' && '-DRAZ_EMSCRIPTEN_DEBUG_FAST_LINK=ON' || '' }} \
                         -DSKIP_RENDERER_ERRORS=ON -DENABLE_DEBUG_INFO=ON \
                         $GITHUB_WORKSPACE &&

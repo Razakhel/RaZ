@@ -167,4 +167,4 @@ TEST_CASE("RenderSystem overlay render") {
     overlay4.disable();
   }
 }
-#endif
+#endif // RAZ_NO_OVERLAY

@@ -5,23 +5,23 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (NOT RAZ_USE_EMSCRIPTEN)
-    option(RAZ_USE_LIBPNG "Compile & use libpng" ON)
+    option(RAZ_USE_LIBPNG "Use libpng" ON)
     if (RAZ_USE_LIBPNG)
         include(libpng)
     endif ()
 
-    option(RAZ_USE_GLEW "Compile & use GLEW" ON)
+    option(RAZ_USE_GLEW "Use GLEW" ON)
     if (RAZ_USE_GLEW)
         include(GLEW)
     endif ()
 
-    option(RAZ_USE_GLFW "Compile & use GLFW" ON)
-    if (RAZ_USE_GLFW)
+    option(RAZ_USE_WINDOW "Use windowing & input capabilities (with GLFW)" ON)
+    if (RAZ_USE_WINDOW)
         include(GLFW)
     endif ()
 endif ()
 
-option(RAZ_USE_IMGUI "Compile & use ImGui" ON)
+option(RAZ_USE_IMGUI "Use ImGui" ON)
 if (RAZ_USE_IMGUI)
     include(ImGui)
 endif ()

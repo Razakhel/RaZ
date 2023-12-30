@@ -67,11 +67,14 @@ set(
     src/RaZ/Data/*.cpp
     src/RaZ/Math/*.cpp
     src/RaZ/Physics/*.cpp
-    src/RaZ/Render/*.cpp
     src/RaZ/Utils/*.cpp
 
     include/*.hpp
 )
+
+if (RAZ_USE_WINDOW OR RAZ_USE_EMSCRIPTEN)
+    list(APPEND RAZ_TESTS_SRC src/RaZ/Render/*.cpp)
+endif ()
 
 if (RAZ_USE_LUA)
     list(APPEND RAZ_TESTS_SRC src/RaZ/Script/*.cpp)
@@ -103,8 +106,13 @@ if (RAZ_USE_AUDIO)
         file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/tests/libopenal-1.dll")
     endif ()
 else ()
-    list(REMOVE_ITEM RAZ_TEST_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Data/WavFormat.cpp")
-    list(REMOVE_ITEM RAZ_TEST_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaAudio.cpp")
+    list(
+        REMOVE_ITEM
+        RAZ_TEST_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Data/WavFormat.cpp"
+        "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaAudio.cpp"
+    )
 endif ()
 
 ###############################

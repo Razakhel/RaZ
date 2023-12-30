@@ -10,6 +10,8 @@ target_compile_features(GLEW PRIVATE c_std_11)
 
 if (RAZ_PLATFORM_WINDOWS OR RAZ_PLATFORM_CYGWIN)
     set(GLEW_LINKER_FLAGS opengl32)
+elseif (RAZ_PLATFORM_LINUX)
+    set(GLEW_LINKER_FLAGS GL)
 elseif (RAZ_PLATFORM_MAC)
     find_package(OpenGL REQUIRED)
     set(GLEW_LINKER_FLAGS OpenGL::GL)

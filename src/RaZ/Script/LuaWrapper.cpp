@@ -39,7 +39,9 @@ void LuaWrapper::registerTypes() {
     registerTextureTypes();
     registerUtilsTypes();
     registerVectorTypes();
+#if !defined(RAZ_NO_WINDOW)
     registerWindowTypes();
+#endif
 
     Logger::debug("[LuaWrapper] Registered types");
 

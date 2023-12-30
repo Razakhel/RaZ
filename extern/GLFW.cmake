@@ -104,7 +104,6 @@ elseif (RAZ_PLATFORM_LINUX)
         GLFW_LINKER_FLAGS
 
         dl
-        GL
         pthread
         X11
         Xcursor
