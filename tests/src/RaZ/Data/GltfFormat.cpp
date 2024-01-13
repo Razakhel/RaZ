@@ -19,12 +19,10 @@ TEST_CASE("GltfFormat load glTF") {
 
   // Meshes are chained in the order 2 -> 1 -> 0, hence applying each of its parents' transforms before its own
 
-  // TODO: this first submesh is wrong, as it does not take the global transform (the root's, here the third submesh's) into account. See the
-  //   related comment in the glTF's transforms loading function
-  CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(10.15f, 10.15f, 9.85f), Raz::Vec2f(0.f, 0.f), -Raz::Axis::Z, -Raz::Axis::Y });
-  CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(10.05f, 10.05f, 9.85f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::Z, -Raz::Axis::Y });
-  CHECK(mesh.getSubmeshes()[0].getVertices()[17] == Raz::Vertex{ Raz::Vec3f(10.05f, 10.15f, 9.95f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::X, -Raz::Axis::Y });
-  CHECK(mesh.getSubmeshes()[0].getVertices()[35] == Raz::Vertex{ Raz::Vec3f(10.05f, 10.05f, 9.95f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::X, -Raz::Axis::Y });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(121.97f, 82.03f, 122.03f), Raz::Vec2f(0.f, 0.f), -Raz::Axis::X, -Raz::Axis::Z });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(121.97f, 82.01f, 122.01f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::X, -Raz::Axis::Z });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[17] == Raz::Vertex{ Raz::Vec3f(121.99f, 82.01f, 122.03f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::Y, -Raz::Axis::Z });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[35] == Raz::Vertex{ Raz::Vec3f(121.99f, 82.01f, 122.01f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::Y, -Raz::Axis::Z });
 
   CHECK(mesh.getSubmeshes()[1].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(120.2f, 80.2f, 119.8f), Raz::Vec2f(0.f, 0.f), -Raz::Axis::Z, -Raz::Axis::Y });
   CHECK(mesh.getSubmeshes()[1].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(119.8f, 79.8f, 119.8f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::Z, -Raz::Axis::Y });

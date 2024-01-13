@@ -26,58 +26,41 @@ Transform loadTransform(const fastgltf::Node& node) {
 
 }
 
-std::vector<std::optional<Transform>> loadTransforms(const std::vector<fastgltf::Node>& nodes, std::size_t meshNodeCount) {
-  std::vector<std::optional<Transform>> transforms;
-  transforms.resize(meshNodeCount);
+void computeNodeTransform(const fastgltf::Node& currentNode,
+                          const std::optional<Transform>& parentTransform,
+                          const std::vector<fastgltf::Node>& nodes,
+                          std::vector<std::optional<Transform>>& transforms) {
+  if (!currentNode.meshIndex.has_value())
+    return;
 
-  for (std::size_t transformIndex = 0; transformIndex < meshNodeCount; ++transformIndex) {
-    const fastgltf::Node& node = nodes[transformIndex];
+  const std::size_t currentMeshIndex = *currentNode.meshIndex;
 
-    if (!node.meshIndex.has_value())
-      continue;
-
-    const std::size_t nodeMeshIndex = *node.meshIndex;
-
-    if (nodeMeshIndex >= meshNodeCount) {
-      Logger::error("[GltfLoad] Unexpected node mesh index.");
-      continue;
-    }
-
-    std::optional<Transform>& nodeTransform = transforms[nodeMeshIndex];
-
-    if (!nodeTransform.has_value())
-      nodeTransform = loadTransform(node);
-
-    for (const std::size_t childIndex : node.children) {
-      const fastgltf::Node& childNode = nodes[childIndex];
-
-      if (!childNode.meshIndex.has_value())
-        continue;
-
-      const std::size_t childNodeMeshIndex = *childNode.meshIndex;
-
-      if (childNodeMeshIndex >= meshNodeCount) {
-        Logger::error("[GltfLoad] Unexpected child node mesh index.");
-        continue;
-      }
-
-      std::optional<Transform>& childTransform = transforms[childNodeMeshIndex];
-
-      if (!childTransform.has_value())
-        childTransform = loadTransform(childNode);
-
-      // TODO: this will not be enough for configurations (perhaps a bit esoteric) that have children nodes referenced before their parents
-      //   For example, take the following configuration, where the nodes are taken from the file in the order { A, B, C }:
-      //   B -> A -> C
-      //   We first load A's transform matrix which is relative to B's, its parent, then apply it to its children (here C), themselves in their
-      //     own local transform (that we load at this moment, although it's not relevant here). Then we load B, the root, apply its transform to
-      //     its *direct* children (here A), but *not recursively*. C ends up in a local space made up from its own transform and its *direct* parent's,
-      //     not from those all the way up to the root
-      childTransform->setPosition(nodeTransform->getPosition() + nodeTransform->getRotation() * (childTransform->getPosition() * nodeTransform->getScale()));
-      childTransform->setRotation(nodeTransform->getRotation() * childTransform->getRotation());
-      childTransform->scale(nodeTransform->getScale());
-    }
+  if (currentMeshIndex >= transforms.size()) {
+    Logger::error("[GltfLoad] Unexpected node mesh index.");
+    return;
   }
+
+  std::optional<Transform>& currentTransform = transforms[currentMeshIndex];
+
+  if (!currentTransform.has_value())
+    currentTransform = loadTransform(currentNode);
+
+  if (parentTransform.has_value()) {
+    currentTransform->setPosition(parentTransform->getPosition() + parentTransform->getRotation() * (currentTransform->getPosition() * parentTransform->getScale()));
+    currentTransform->setRotation((parentTransform->getRotation() * currentTransform->getRotation()).normalize());
+    currentTransform->scale(parentTransform->getScale());
+  }
+
+  for (const std::size_t childIndex : currentNode.children)
+    computeNodeTransform(nodes[childIndex], currentTransform, nodes, transforms);
+}
+
+std::vector<std::optional<Transform>> loadTransforms(const std::vector<fastgltf::Node>& nodes, std::size_t meshCount) {
+  std::vector<std::optional<Transform>> transforms;
+  transforms.resize(meshCount);
+
+  for (const fastgltf::Node& node : nodes)
+    computeNodeTransform(node, std::nullopt, nodes, transforms);
 
   return transforms;
 }
