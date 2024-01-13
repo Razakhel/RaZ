@@ -103,8 +103,12 @@ template <typename NormedT>
 constexpr Vector<NormedT, Size> Vector<T, Size>::normalize() const noexcept {
   static_assert(std::is_floating_point_v<NormedT>, "Error: The normalized vector's type must be floating-point.");
 
+  const NormedT sqLength = computeSquaredLength<NormedT>();
   Vector<NormedT, Size> res(*this);
-  res /= computeLength();
+
+  if (sqLength != static_cast<NormedT>(0))
+    res /= std::sqrt(sqLength);
+
   return res;
 }
 

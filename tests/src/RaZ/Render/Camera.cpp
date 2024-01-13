@@ -32,15 +32,11 @@ TEST_CASE("Camera look-at") {
 
   const Raz::Mat4f& viewMat = camera.computeLookAt(Raz::Vec3f(0.f));
 
-  // If target == position, creates a look-at matrix filled with NaNs:
-  // [ nan, nan, nan, nan ]
-  // [ nan, nan, nan, nan ]
-  // [ nan, nan, nan, nan ]
-  // [ 0,   0,   0,   1   ]
-  for (std::size_t widthIndex = 0; widthIndex < 4; ++widthIndex) {
-    for (std::size_t heightIndex = 0; heightIndex < 3; ++heightIndex)
-      CHECK(std::isnan(viewMat.getElement(widthIndex, heightIndex)));
-  }
+  // If target == position, creates a look-at matrix filled with 0s except for the last row
+  CHECK(viewMat.strictlyEquals(Raz::Mat4f(0.f, 0.f, 0.f, 0.f,
+                                          0.f, 0.f, 0.f, 0.f,
+                                          0.f, 0.f, 0.f, 0.f,
+                                          0.f, 0.f, 0.f, 1.f)));
 
   camera.setTarget(Raz::Vec3f(0.f, 0.f, -1.f));
   camera.computeLookAt(Raz::Vec3f(0.f));

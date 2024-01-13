@@ -265,6 +265,12 @@ TEST_CASE("Vector normalization") {
 
   CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3d>().normalize()), Raz::Vec3d>);
   CHECK_THAT(vec3d1.normalize(), IsNearlyEqualToVector(Raz::Vec3d(-0.0037504754254997, 0.9846554128425506, -0.174469630291203)));
+
+  // Normalizing a 0 vector returns it as is
+  CHECK(Raz::Vec3b(0).normalize() == Raz::Vec3f(0.f));
+  CHECK(Raz::Vec3i(0).normalize() == Raz::Vec3f(0.f));
+  CHECK(Raz::Vec3f(0.f).normalize() == Raz::Vec3f(0.f));
+  CHECK(Raz::Vec3d(0.0).normalize() == Raz::Vec3d(0.f));
 }
 
 TEST_CASE("Vector interpolation") {

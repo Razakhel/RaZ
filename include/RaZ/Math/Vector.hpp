@@ -89,10 +89,10 @@ public:
   /// \tparam SqLengthT Type of the squared length value. For vectors of an integral type, it is defined to a large unsigned integer type to avoid overflows.
   /// \return Vector's squared length.
   template <typename SqLengthT = std::conditional_t<std::is_integral_v<T>, uint64_t, T>>
-  constexpr SqLengthT computeSquaredLength() const noexcept { return dot(*this); }
+  constexpr SqLengthT computeSquaredLength() const noexcept { return static_cast<SqLengthT>(dot(*this)); }
   /// Computes the length of the vector.
   /// Calculating the actual length requires a square root operation to be involved, which is expensive.
-  /// As such, this function should be used if actual length is needed; otherwise, prefer computeSquaredLength().
+  /// As such, this function should be used only if the actual length is needed; otherwise, prefer computeSquaredLength().
   /// \tparam LengthT Type of the length value. For vectors of an integral type, it is defined to float; otherwise, it is the same as the original vector's.
   /// \return Vector's length.
   template <typename LengthT = std::conditional_t<std::is_integral_v<T>, float, T>>
