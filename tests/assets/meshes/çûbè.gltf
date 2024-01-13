@@ -137,40 +137,7 @@
   ],
   "materials": [
     {
-      "name": "Cube1",
-      "pbrMetallicRoughness": {
-        "baseColorFactor": [
-          0.99,
-          0.99,
-          0.99,
-          0.99
-        ],
-        "baseColorTexture": {
-          "index": 0
-        },
-        "metallicFactor": 0.5,
-        "roughnessFactor": 0.25,
-        "metallicRoughnessTexture": {
-          "index": 0
-        }
-      },
-      "normalTexture": {
-        "index": 2
-      },
-      "occlusionTexture": {
-        "index": 0
-      },
-      "emissiveFactor": [
-        0.75,
-        0.75,
-        0.75
-      ],
-      "emissiveTexture": {
-        "index": 1
-      }
-    },
-    {
-      "name": "Cube2",
+      "name": "Default",
       "pbrMetallicRoughness": {
         "baseColorFactor": [
           0.99,
@@ -205,7 +172,7 @@
   ],
   "meshes": [
     {
-      "name": "Cube1",
+      "name": "Child11",
       "primitives": [
         {
           "attributes": {
@@ -221,7 +188,7 @@
       ]
     },
     {
-      "name": "Cube2",
+      "name": "Child1",
       "primitives": [
         {
           "attributes": {
@@ -231,7 +198,23 @@
             "TEXCOORD_0": 4
           },
           "indices": 0,
-          "material": 1,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Root",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 2,
+            "POSITION": 1,
+            "TANGENT": 3,
+            "TEXCOORD_0": 4
+          },
+          "indices": 0,
+          "material": 0,
           "mode": 0
         }
       ]
@@ -240,11 +223,69 @@
   "nodes": [
     {
       "mesh": 0,
-      "name": "Cube1"
+      "name": "Child11",
+      "translation" : [
+          1.0,
+          1.0,
+          1.0
+      ],
+      "rotation" : [
+          0.0,
+          0.0,
+          0.7071068286895752,
+          0.7071068286895752
+      ],
+      "scale" : [
+          0.5,
+          0.5,
+          0.5
+      ]
     },
     {
+      "children" : [
+          0
+      ],
       "mesh": 1,
-      "name": "Cube2"
+      "name": "Child1",
+      "translation" : [
+          10.0,
+          10.0,
+          10.0
+      ],
+      "rotation" : [
+          0.0,
+          0.7071068286895752,
+          0.0,
+          0.7071068286895752
+      ],
+      "scale" : [
+          0.1,
+          0.1,
+          0.1
+      ]
+    },
+    {
+      "children" : [
+          1
+      ],
+      "mesh": 2,
+      "name": "Root",
+      "translation" : [
+          100.0,
+          100.0,
+          100.0
+      ],
+      "rotation" : [
+          0.7071068286895752,
+          0.0,
+          0.0,
+          0.7071068286895752
+      ],
+      "scale" : [
+          2.0,
+          2.0,
+          2.0
+      ]
     }
   ],
   "samplers": [
@@ -254,7 +295,7 @@
   "scenes": [
     {
       "nodes": [
-        0
+        2
       ]
     }
   ],
@@ -266,6 +307,10 @@
     {
       "sampler": 0,
       "source": 1
+    },
+    {
+      "sampler": 0,
+      "source": 2
     }
   ]
 }

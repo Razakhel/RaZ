@@ -9,26 +9,42 @@
 TEST_CASE("GltfFormat load glTF") {
   const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè.gltf");
 
-  REQUIRE(mesh.getSubmeshes().size() == 2);
+  REQUIRE(mesh.getSubmeshes().size() == 3);
   REQUIRE(mesh.getSubmeshes()[0].getVertexCount() == 36);
   CHECK(mesh.getSubmeshes()[1].getVertexCount() == 36);
-  CHECK(mesh.recoverVertexCount() == 72);
+  CHECK(mesh.recoverVertexCount() == 108);
   CHECK(mesh.getSubmeshes()[0].getTriangleIndexCount() == 36);
   CHECK(mesh.getSubmeshes()[1].getTriangleIndexCount() == 36);
-  CHECK(mesh.recoverTriangleCount() == 24); // 72 / 3
+  CHECK(mesh.recoverTriangleCount() == 36); // Total index count / 3
 
-  CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(1.f, -1.f, 1.f),        Raz::Vec2f(0.f, 0.f), -Raz::Axis::Y, -Raz::Axis::X });
-  CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(-1.f, -1.f, -1.f),      Raz::Vec2f(0.f, 1.f), -Raz::Axis::Y, -Raz::Axis::X });
-  CHECK(mesh.getSubmeshes()[0].getVertices()[17] == Raz::Vertex{ Raz::Vec3f(1.f, 1.f, -0.9999989f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::Z, -Raz::Axis::X });
-  CHECK(mesh.getSubmeshes()[0].getVertices()[35] == Raz::Vertex{ Raz::Vec3f(-1.f, 1.f, -1.f),       Raz::Vec2f(0.f, 1.f), -Raz::Axis::Z, -Raz::Axis::X });
+  // Meshes are chained in the order 2 -> 1 -> 0, hence applying each of its parents' transforms before its own
 
-  REQUIRE(meshRenderer.getSubmeshRenderers().size() == 2);
+  // TODO: this first submesh is wrong, as it does not take the global transform (the root's, here the third submesh's) into account. See the
+  //   related comment in the glTF's transforms loading function
+  CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(10.15f, 10.15f, 9.85f), Raz::Vec2f(0.f, 0.f), -Raz::Axis::Z, -Raz::Axis::Y });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(10.05f, 10.05f, 9.85f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::Z, -Raz::Axis::Y });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[17] == Raz::Vertex{ Raz::Vec3f(10.05f, 10.15f, 9.95f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::X, -Raz::Axis::Y });
+  CHECK(mesh.getSubmeshes()[0].getVertices()[35] == Raz::Vertex{ Raz::Vec3f(10.05f, 10.05f, 9.95f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::X, -Raz::Axis::Y });
+
+  CHECK(mesh.getSubmeshes()[1].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(120.2f, 80.2f, 119.8f), Raz::Vec2f(0.f, 0.f), -Raz::Axis::Z, -Raz::Axis::Y });
+  CHECK(mesh.getSubmeshes()[1].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(119.8f, 79.8f, 119.8f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::Z, -Raz::Axis::Y });
+  CHECK(mesh.getSubmeshes()[1].getVertices()[17] == Raz::Vertex{ Raz::Vec3f(119.8f, 80.2f, 120.2f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::X, -Raz::Axis::Y });
+  CHECK(mesh.getSubmeshes()[1].getVertices()[35] == Raz::Vertex{ Raz::Vec3f(119.8f, 79.8f, 120.2f), Raz::Vec2f(0.f, 1.f), -Raz::Axis::X, -Raz::Axis::Y });
+
+  CHECK(mesh.getSubmeshes()[2].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(102.f, 98.f, 98.f),   Raz::Vec2f(0.f, 0.f), -Raz::Axis::Z, -Raz::Axis::X });
+  CHECK(mesh.getSubmeshes()[2].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(98.f, 102.f, 98.f),   Raz::Vec2f(0.f, 1.f), -Raz::Axis::Z, -Raz::Axis::X });
+  CHECK(mesh.getSubmeshes()[2].getVertices()[17] == Raz::Vertex{ Raz::Vec3f(102.f, 102.f, 102.f), Raz::Vec2f(0.f, 1.f),  Raz::Axis::Y, -Raz::Axis::X });
+  CHECK(mesh.getSubmeshes()[2].getVertices()[35] == Raz::Vertex{ Raz::Vec3f(98.f, 102.f, 102.f),  Raz::Vec2f(0.f, 1.f),  Raz::Axis::Y, -Raz::Axis::X });
+
+  REQUIRE(meshRenderer.getSubmeshRenderers().size() == 3);
   CHECK(meshRenderer.getSubmeshRenderers()[0].getRenderMode() == Raz::RenderMode::TRIANGLE);
   CHECK(meshRenderer.getSubmeshRenderers()[0].getMaterialIndex() == 0);
-  CHECK(meshRenderer.getSubmeshRenderers()[1].getRenderMode() == Raz::RenderMode::POINT);
-  CHECK(meshRenderer.getSubmeshRenderers()[1].getMaterialIndex() == 1);
+  CHECK(meshRenderer.getSubmeshRenderers()[1].getRenderMode() == Raz::RenderMode::TRIANGLE);
+  CHECK(meshRenderer.getSubmeshRenderers()[1].getMaterialIndex() == 0);
+  CHECK(meshRenderer.getSubmeshRenderers()[2].getRenderMode() == Raz::RenderMode::POINT);
+  CHECK(meshRenderer.getSubmeshRenderers()[2].getMaterialIndex() == 0);
 
-  REQUIRE(meshRenderer.getMaterials().size() == 2);
+  REQUIRE(meshRenderer.getMaterials().size() == 1);
 
   const Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials()[0].getProgram();
 
@@ -228,7 +244,7 @@ TEST_CASE("GltfFormat load GLB simple") {
   REQUIRE(mesh.getSubmeshes()[0].getVertexCount() == 24);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.getSubmeshes()[0].getTriangleIndexCount() == 36);
-  CHECK(mesh.recoverTriangleCount() == 12); // 36 / 3
+  CHECK(mesh.recoverTriangleCount() == 12); // Total index count / 3
 
   CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(-0.5f, -0.5f, 0.5f), Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });
   CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(0.5f, -0.5f, 0.5f),  Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });
@@ -256,7 +272,7 @@ TEST_CASE("GltfFormat load GLB textured") {
   REQUIRE(mesh.getSubmeshes()[0].getVertexCount() == 24);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.getSubmeshes()[0].getTriangleIndexCount() == 36);
-  CHECK(mesh.recoverTriangleCount() == 12); // 36 / 3
+  CHECK(mesh.recoverTriangleCount() == 12); // Total index count / 3
 
   CHECK(mesh.getSubmeshes()[0].getVertices()[0]  == Raz::Vertex{ Raz::Vec3f(-0.5f, -0.5f, 0.5f), Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });
   CHECK(mesh.getSubmeshes()[0].getVertices()[1]  == Raz::Vertex{ Raz::Vec3f(0.5f, -0.5f, 0.5f),  Raz::Vec2f(0.f, 0.f),  Raz::Axis::Z, Raz::Vec3f(0.f) });

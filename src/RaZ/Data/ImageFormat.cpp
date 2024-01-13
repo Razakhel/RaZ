@@ -48,7 +48,7 @@ Image load(const FilePath& filePath, bool flipVertically) {
   Logger::debug("[ImageFormat] Loading image '" + filePath + "'...");
 
   const std::string fileStr = filePath.toUtf8();
-  const bool isHdr = stbi_is_hdr(fileStr.c_str());
+  const bool isHdr = (stbi_is_hdr(fileStr.c_str()) != 0);
 
   stbi_set_flip_vertically_on_load(flipVertically);
 
@@ -81,7 +81,7 @@ Image loadFromData(const unsigned char* imgData, std::size_t dataSize, bool flip
 
   stbi_set_flip_vertically_on_load(flipVertically);
 
-  const bool isHdr = stbi_is_hdr_from_memory(imgData, static_cast<int>(dataSize));
+  const bool isHdr = (stbi_is_hdr_from_memory(imgData, static_cast<int>(dataSize)) != 0);
 
   int width {};
   int height {};

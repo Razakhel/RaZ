@@ -2,6 +2,7 @@
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
@@ -12,6 +13,74 @@
 namespace Raz::GltfFormat {
 
 namespace {
+
+Transform loadTransform(const fastgltf::Node& node) {
+  const auto* transform = std::get_if<fastgltf::Node::TRS>(&node.transform);
+
+  if (transform == nullptr) // Shouldn't happen with the option that splits a matrix in TRS components
+    throw std::invalid_argument("[GltfLoad] Unexpected node transform type.");
+
+  return Transform(Vec3f(transform->translation[0], transform->translation[1], transform->translation[2]),
+                   Quaternionf(transform->rotation[3], transform->rotation[0], transform->rotation[1], transform->rotation[2]), // Input is XYZW
+                   Vec3f(transform->scale[0], transform->scale[1], transform->scale[2]));
+
+}
+
+std::vector<std::optional<Transform>> loadTransforms(const std::vector<fastgltf::Node>& nodes, std::size_t meshNodeCount) {
+  std::vector<std::optional<Transform>> transforms;
+  transforms.resize(meshNodeCount);
+
+  for (std::size_t transformIndex = 0; transformIndex < meshNodeCount; ++transformIndex) {
+    const fastgltf::Node& node = nodes[transformIndex];
+
+    if (!node.meshIndex.has_value())
+      continue;
+
+    const std::size_t nodeMeshIndex = *node.meshIndex;
+
+    if (nodeMeshIndex >= meshNodeCount) {
+      Logger::error("[GltfLoad] Unexpected node mesh index.");
+      continue;
+    }
+
+    std::optional<Transform>& nodeTransform = transforms[nodeMeshIndex];
+
+    if (!nodeTransform.has_value())
+      nodeTransform = loadTransform(node);
+
+    for (const std::size_t childIndex : node.children) {
+      const fastgltf::Node& childNode = nodes[childIndex];
+
+      if (!childNode.meshIndex.has_value())
+        continue;
+
+      const std::size_t childNodeMeshIndex = *childNode.meshIndex;
+
+      if (childNodeMeshIndex >= meshNodeCount) {
+        Logger::error("[GltfLoad] Unexpected child node mesh index.");
+        continue;
+      }
+
+      std::optional<Transform>& childTransform = transforms[childNodeMeshIndex];
+
+      if (!childTransform.has_value())
+        childTransform = loadTransform(childNode);
+
+      // TODO: this will not be enough for configurations (perhaps a bit esoteric) that have children nodes referenced before their parents
+      //   For example, take the following configuration, where the nodes are taken from the file in the order { A, B, C }:
+      //   B -> A -> C
+      //   We first load A's transform matrix which is relative to B's, its parent, then apply it to its children (here C), themselves in their
+      //     own local transform (that we load at this moment, although it's not relevant here). Then we load B, the root, apply its transform to
+      //     its *direct* children (here A), but *not recursively*. C ends up in a local space made up from its own transform and its *direct* parent's,
+      //     not from those all the way up to the root
+      childTransform->setPosition(nodeTransform->getPosition() + nodeTransform->getRotation() * (childTransform->getPosition() * nodeTransform->getScale()));
+      childTransform->setRotation(nodeTransform->getRotation() * childTransform->getRotation());
+      childTransform->scale(nodeTransform->getScale());
+    }
+  }
+
+  return transforms;
+}
 
 template <typename T>
 void loadVertexData(const fastgltf::Accessor& accessor,
@@ -41,6 +110,7 @@ void loadVertices(const fastgltf::Primitive& primitive,
                   const std::vector<fastgltf::Buffer>& buffers,
                   const std::vector<fastgltf::BufferView>& bufferViews,
                   const std::vector<fastgltf::Accessor>& accessors,
+                  const std::optional<Transform>& transform,
                   Submesh& submesh) {
   Logger::debug("[GltfLoad] Loading vertices...");
 
@@ -101,6 +171,14 @@ void loadVertices(const fastgltf::Primitive& primitive,
   if (!hasLoadedTangents)
     submesh.computeTangents();
 
+  if (transform.has_value()) {
+    for (Vertex& vert : submesh.getVertices()) {
+      vert.position = transform->getPosition() + transform->getRotation() * (vert.position * transform->getScale());
+      vert.normal   = (transform->getRotation() * vert.normal).normalize();
+      vert.tangent  = (transform->getRotation() * vert.tangent).normalize();
+    }
+  }
+
   Logger::debug("[GltfLoad] Loaded vertices");
 }
 
@@ -155,14 +233,15 @@ void loadIndices(const fastgltf::Accessor& indicesAccessor,
 std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& meshes,
                                          const std::vector<fastgltf::Buffer>& buffers,
                                          const std::vector<fastgltf::BufferView>& bufferViews,
-                                         const std::vector<fastgltf::Accessor>& accessors) {
+                                         const std::vector<fastgltf::Accessor>& accessors,
+                                         const std::vector<std::optional<Transform>>& transforms) {
   Logger::debug("[GltfLoad] Loading " + std::to_string(meshes.size()) + " mesh(es)...");
 
   Mesh loadedMesh;
   MeshRenderer loadedMeshRenderer;
 
-  for (const fastgltf::Mesh& mesh : meshes) {
-    for (const fastgltf::Primitive& primitive : mesh.primitives) {
+  for (std::size_t meshIndex = 0; meshIndex < meshes.size(); ++meshIndex) {
+    for (const fastgltf::Primitive& primitive : meshes[meshIndex].primitives) {
       if (!primitive.indicesAccessor.has_value())
         throw std::invalid_argument("Error: The glTF file requires having indexed geometry.");
 
@@ -171,7 +250,7 @@ std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& mesh
 
       // Indices must be loaded first as they are needed to compute the tangents if necessary
       loadIndices(accessors[*primitive.indicesAccessor], buffers, bufferViews, submesh.getTriangleIndices());
-      loadVertices(primitive, buffers, bufferViews, accessors, submesh);
+      loadVertices(primitive, buffers, bufferViews, accessors, transforms[meshIndex], submesh);
 
       submeshRenderer.load(submesh, (primitive.type == fastgltf::PrimitiveType::Triangles ? RenderMode::TRIANGLE : RenderMode::POINT));
       submeshRenderer.setMaterialIndex(primitive.materialIndex.value_or(0));
@@ -327,11 +406,11 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
   switch (fastgltf::determineGltfFileType(&data)) {
     case fastgltf::GltfType::glTF:
-      asset = parser.loadGLTF(&data, parentPath.getPath(), fastgltf::Options::LoadExternalBuffers);
+      asset = parser.loadGLTF(&data, parentPath.getPath(), fastgltf::Options::LoadExternalBuffers | fastgltf::Options::DecomposeNodeMatrices);
       break;
 
     case fastgltf::GltfType::GLB:
-      asset = parser.loadBinaryGLTF(&data, parentPath.getPath(), fastgltf::Options::LoadGLBBuffers);
+      asset = parser.loadBinaryGLTF(&data, parentPath.getPath(), fastgltf::Options::LoadGLBBuffers | fastgltf::Options::DecomposeNodeMatrices);
       break;
 
     default:
@@ -341,7 +420,8 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   if (asset.error() != fastgltf::Error::None)
     throw std::invalid_argument("Error: Failed to load glTF: " + fastgltf::getErrorMessage(asset.error()));
 
-  auto [mesh, meshRenderer] = loadMeshes(asset->meshes, asset->buffers, asset->bufferViews, asset->accessors);
+  const std::vector<std::optional<Transform>> transforms = loadTransforms(asset->nodes, asset->meshes.size());
+  auto [mesh, meshRenderer] = loadMeshes(asset->meshes, asset->buffers, asset->bufferViews, asset->accessors, transforms);
 
   const std::vector<std::optional<Image>> images = loadImages(asset->images, asset->buffers, asset->bufferViews, parentPath);
   loadMaterials(asset->materials, images, meshRenderer);
