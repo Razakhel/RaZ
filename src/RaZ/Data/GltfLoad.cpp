@@ -325,7 +325,28 @@ std::pair<Image, Image> extractMetalnessRoughnessImages(const Image& metalRoughI
   return { std::move(metalnessImg), std::move(roughnessImg) };
 }
 
-void loadMaterials(const std::vector<fastgltf::Material>& materials, const std::vector<std::optional<Image>>& images, MeshRenderer& meshRenderer) {
+template <template <typename> typename OptionalT, typename TextureInfoT, typename FuncT>
+void loadTexture(const OptionalT<TextureInfoT>& textureInfo,
+                 const std::vector<fastgltf::Texture>& textures,
+                 const std::vector<std::optional<Image>>& images,
+                 const FuncT& callback) {
+  static_assert(std::is_base_of_v<fastgltf::TextureInfo, TextureInfoT>);
+
+  if (!textureInfo.has_value())
+    return;
+
+  const fastgltf::Optional<std::size_t>& imgIndex = textures[textureInfo->textureIndex].imageIndex;
+
+  if (!imgIndex.has_value() || !images[*imgIndex].has_value())
+    return;
+
+  callback(*images[*imgIndex]);
+}
+
+void loadMaterials(const std::vector<fastgltf::Material>& materials,
+                   const std::vector<fastgltf::Texture>& textures,
+                   const std::vector<std::optional<Image>>& images,
+                   MeshRenderer& meshRenderer) {
   Logger::debug("[GltfLoad] Loading " + std::to_string(materials.size()) + " material(s)...");
 
   meshRenderer.getMaterials().clear();
@@ -343,25 +364,28 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials, const std::
     matProgram.setAttribute(mat.pbrData.metallicFactor, MaterialAttribute::Metallic);
     matProgram.setAttribute(mat.pbrData.roughnessFactor, MaterialAttribute::Roughness);
 
-    if (mat.pbrData.baseColorTexture && images[mat.pbrData.baseColorTexture->textureIndex])
-      matProgram.setTexture(Texture2D::create(*images[mat.pbrData.baseColorTexture->textureIndex]), MaterialTexture::BaseColor);
+    loadTexture(mat.pbrData.baseColorTexture, textures, images, [&matProgram] (const Image& img) {
+      matProgram.setTexture(Texture2D::create(img), MaterialTexture::BaseColor);
+    });
 
-    if (mat.emissiveTexture && images[mat.emissiveTexture->textureIndex])
-      matProgram.setTexture(Texture2D::create(*images[mat.emissiveTexture->textureIndex]), MaterialTexture::Emissive);
+    loadTexture(mat.emissiveTexture, textures, images, [&matProgram] (const Image& img) {
+      matProgram.setTexture(Texture2D::create(img), MaterialTexture::Emissive);
+    });
 
-    if (mat.occlusionTexture && images[mat.occlusionTexture->textureIndex]) { // Ambient occlusion
-      const Image ambientOcclusionImg = extractAmbientOcclusionImage(*images[mat.occlusionTexture->textureIndex]);
+    loadTexture(mat.occlusionTexture, textures, images, [&matProgram] (const Image& img) {
+      const Image ambientOcclusionImg = extractAmbientOcclusionImage(img);
       matProgram.setTexture(Texture2D::create(ambientOcclusionImg), MaterialTexture::Ambient);
-    }
+    });
 
-    if (mat.normalTexture && images[mat.normalTexture->textureIndex])
-      matProgram.setTexture(Texture2D::create(*images[mat.normalTexture->textureIndex]), MaterialTexture::Normal);
+    loadTexture(mat.normalTexture, textures, images, [&matProgram] (const Image& img) {
+      matProgram.setTexture(Texture2D::create(img), MaterialTexture::Normal);
+    });
 
-    if (mat.pbrData.metallicRoughnessTexture && images[mat.pbrData.metallicRoughnessTexture->textureIndex]) {
-      const auto [metalnessImg, roughnessImg] = extractMetalnessRoughnessImages(*images[mat.pbrData.metallicRoughnessTexture->textureIndex]);
+    loadTexture(mat.pbrData.metallicRoughnessTexture, textures, images, [&matProgram] (const Image& img) {
+      const auto [metalnessImg, roughnessImg] = extractMetalnessRoughnessImages(img);
       matProgram.setTexture(Texture2D::create(metalnessImg), MaterialTexture::Metallic);
       matProgram.setTexture(Texture2D::create(roughnessImg), MaterialTexture::Roughness);
-    }
+    });
 
     loadedMat.loadType(MaterialType::COOK_TORRANCE);
   }
@@ -407,7 +431,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   auto [mesh, meshRenderer] = loadMeshes(asset->meshes, asset->buffers, asset->bufferViews, asset->accessors, transforms);
 
   const std::vector<std::optional<Image>> images = loadImages(asset->images, asset->buffers, asset->bufferViews, parentPath);
-  loadMaterials(asset->materials, images, meshRenderer);
+  loadMaterials(asset->materials, asset->textures, images, meshRenderer);
 
   Logger::debug("[GltfLoad] Loaded glTF file (" + std::to_string(mesh.getSubmeshes().size()) + " submesh(es), "
                                                 + std::to_string(mesh.recoverVertexCount()) + " vertices, "

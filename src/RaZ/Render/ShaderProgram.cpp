@@ -130,7 +130,7 @@ void ShaderProgram::setImageTexture(TexturePtr texture, const std::string& unifo
     throw std::runtime_error("Error: Using image textures requires OpenGL 4.2+ or OpenGL ES 3.1+");
   }
 
-  if (texture->getColorspace() == Raz::TextureColorspace::INVALID || texture->getColorspace() == Raz::TextureColorspace::DEPTH)
+  if (texture->getColorspace() == TextureColorspace::INVALID || texture->getColorspace() == TextureColorspace::DEPTH)
     throw std::invalid_argument("Error: The given image texture's colorspace is invalid");
 
   auto imgTextureIt = std::find_if(m_imageTextures.begin(), m_imageTextures.end(), [&uniformName] (const auto& element) {

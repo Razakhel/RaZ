@@ -146,19 +146,19 @@
           0.99
         ],
         "baseColorTexture": {
-          "index": 0
+          "index": 2
         },
         "metallicFactor": 0.5,
         "roughnessFactor": 0.25,
         "metallicRoughnessTexture": {
-          "index": 0
+          "index": 2
         }
       },
       "normalTexture": {
-        "index": 2
+        "index": 1
       },
       "occlusionTexture": {
-        "index": 0
+        "index": 2
       },
       "emissiveFactor": [
         0.75,
@@ -166,7 +166,7 @@
         0.75
       ],
       "emissiveTexture": {
-        "index": 1
+        "index": 0
       }
     }
   ],
@@ -302,15 +302,15 @@
   "textures": [
     {
       "sampler": 0,
-      "source": 0
-    },
-    {
-      "sampler": 0,
       "source": 1
     },
     {
       "sampler": 0,
       "source": 2
+    },
+    {
+      "sampler": 0,
+      "source": 0
     }
   ]
 }
