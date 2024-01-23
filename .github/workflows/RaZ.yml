@@ -106,7 +106,7 @@ jobs:
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
-        lcov -r coverage.info '/usr/*' -o coverage.info &&
+        lcov -r coverage.info '/usr/*' '${{ github.workspace }}/extern/*' -o coverage.info &&
         lcov -l coverage.info
 
     # Processing code coverage; only done with GCC in Debug with all features enabled
@@ -115,7 +115,6 @@ jobs:
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        flag-name: github-actions-${{ github.run_id }}
         path-to-lcov: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/coverage.info
 
     # Installing RaZ in the build directory; default is /usr/local
@@ -127,7 +126,7 @@ jobs:
       if: matrix.use_audio && matrix.use_window
       uses: actions/upload-artifact@v3
       with:
-        name: linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
+        name: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
         path: |
           ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/include
           ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/lib
@@ -215,7 +214,7 @@ jobs:
       if: matrix.use_audio && matrix.use_window
       uses: actions/upload-artifact@v3
       with:
-        name: windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
+        name: RaZ-windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
         path: |
           C:/RaZ
 
@@ -292,7 +291,7 @@ jobs:
       if: matrix.use_audio && matrix.use_window
       uses: actions/upload-artifact@v3
       with:
-        name: macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.run_id }}
+        name: RaZ-macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
         path: |
           ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/include
           ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/lib
