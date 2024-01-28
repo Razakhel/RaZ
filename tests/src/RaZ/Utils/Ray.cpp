@@ -156,6 +156,8 @@ TEST_CASE("Ray-sphere intersection") {
 }
 
 TEST_CASE("Ray-triangle intersection") {
+  // See: https://www.geogebra.org/m/e8uqvjwh
+
   // These triangles are defined so that:
   //  - triangle1 is laying flat slightly above 0
   //  - triangle2 is standing, parallel to the Y/Z plane (facing the X direction)
@@ -168,12 +170,12 @@ TEST_CASE("Ray-triangle intersection") {
 
   CHECK(ray1.intersects(triangle1, &hit));
   CHECK(hit.position == Raz::Vec3f(0.f, 0.5f, 0.f));
-  CHECK(hit.normal   == -Raz::Axis::Y);
+  CHECK(hit.normal   == Raz::Axis::Y);
   CHECK(hit.distance == 0.5f);
 
   CHECK(ray2.intersects(triangle1, &hit));
   CHECK(hit.position == Raz::Vec3f(0.5f, 0.5f, 0.f));
-  CHECK(hit.normal   == -Raz::Axis::Y);
+  CHECK(hit.normal   == Raz::Axis::Y);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(2.1213205f));
 
   CHECK(ray3.intersects(triangle1, &hit));
@@ -185,7 +187,7 @@ TEST_CASE("Ray-triangle intersection") {
 
   CHECK(ray2.intersects(triangle2, &hit));
   CHECK(hit.position == Raz::Vec3f(0.5f, 0.5f, 0.f));
-  CHECK(hit.normal   == -Raz::Axis::X);
+  CHECK(hit.normal   == Raz::Axis::X);
   CHECK_THAT(hit.distance, IsNearlyEqualTo(2.1213202f));
 
   CHECK(ray3.intersects(triangle2, &hit));
@@ -200,7 +202,7 @@ TEST_CASE("Ray-triangle intersection") {
   CHECK(ray3.intersects(triangle3, &hit));
   // The second point is almost aligned with the ray; see https://www.geogebra.org/m/g4pumzwu
   CHECK_THAT(hit.position, IsNearlyEqualToVector(Raz::Vec3f(-1.5000002f, -1.5000002f, 0.f)));
-  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f(-0.077791f, 0.9334918f, -0.3500594f)));
+  CHECK_THAT(hit.normal, IsNearlyEqualToVector(Raz::Vec3f(0.077791f, -0.9334918f, 0.3500594f)));
   CHECK_THAT(hit.distance, IsNearlyEqualTo(3.5355341f));
 }
 

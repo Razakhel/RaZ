@@ -240,7 +240,7 @@ TEST_CASE("BvhSystem query") {
   CHECK(entity == &mesh1);
   CHECK(hit.position == Raz::Vec3f(0.f, 0.f, 0.25f));
   CHECK_THROWS(triangle1.contains(hit.position)); // TODO: wait for the triangle's point containment check to be available
-  CHECK(hit.normal == -triangle1.computeNormal());
+  CHECK(hit.normal == triangle1.computeNormal());
   CHECK(hit.distance == 1.414213538f);
 
   // Same as the above, but in the opposite direction
@@ -249,7 +249,7 @@ TEST_CASE("BvhSystem query") {
   CHECK(entity == &mesh2);
   CHECK(hit.position == Raz::Vec3f(0.f, 0.375f, 0.f));
   CHECK_THROWS(triangle2.contains(hit.position)); // TODO: wait for the triangle's point containment check to be available
-  CHECK(hit.normal == -triangle2.computeNormal());
+  CHECK(hit.normal == triangle2.computeNormal());
   CHECK(hit.distance == 1.414213538f);
 
   // If the ray hits nothing, a null pointer is returned

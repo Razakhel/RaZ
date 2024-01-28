@@ -139,13 +139,7 @@ bool Ray::intersects(const Triangle& triangle, RayHit* hit) const {
 
   if (hit) {
     hit->position = m_origin + m_direction * hitDist;
-
-    const Vec3f normal = firstEdge.cross(secondEdge).normalize();
-
-    // We want the normal facing the ray, not the opposite direction (no culling)
-    // This may not be the ideal behavior; this may change when a real use case will be available
-    hit->normal = (normal.dot(m_direction) > 0.f ? -normal : normal);
-
+    hit->normal   = firstEdge.cross(secondEdge).normalize(); // Directly computing the normal using the already calculated triangle's edges
     hit->distance = hitDist;
   }
 
