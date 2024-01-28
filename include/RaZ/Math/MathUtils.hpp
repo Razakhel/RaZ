@@ -3,11 +3,13 @@
 #ifndef RAZ_MATHUTILS_HPP
 #define RAZ_MATHUTILS_HPP
 
+#include "RaZ/Math/Constants.hpp"
 #include "RaZ/Math/Vector.hpp"
 
 #include <algorithm>
 #include <cassert>
 #include <type_traits>
+#include <vector>
 
 namespace Raz::MathUtils {
 
@@ -160,6 +162,23 @@ void computeOrthonormalBasis(const Vec3<T>& input, Vec3<T>& axis2, Vec3<T>& axis
 
   axis2 = Vec3<T>(static_cast<T>(1) + sign * input.x() * input.x() * a, sign * b, -sign * input.x());
   axis3 = Vec3<T>(b, sign + input.y() * input.y() * a, -input.y());
+}
+
+/// Computes points on the Fibonacci sphere, giving evenly distributed points around a unit sphere.
+/// \param pointCount Number of points to compute.
+/// \return Points on the Fibonacci sphere. All vectors are of length 1.
+inline std::vector<Vec3f> computeFibonacciSpherePoints(std::size_t pointCount) {
+  std::vector<Vec3f> fiboPoints(pointCount);
+
+  for (std::size_t i = 0; i < pointCount; ++i) {
+    const float theta  = 2.f * Pi<float> * static_cast<float>(i) / GoldenRatio<float>;
+    const float cosPhi = 1.f - 2.f * (static_cast<float>(i) + 0.5f) / static_cast<float>(pointCount);
+    const float sinPhi = std::sqrt(1.f - cosPhi * cosPhi);
+
+    fiboPoints[i] = Vec3f(std::cos(theta) * sinPhi, cosPhi, std::sin(theta) * sinPhi);
+  }
+
+  return fiboPoints;
 }
 
 } // namespace Raz::MathUtils

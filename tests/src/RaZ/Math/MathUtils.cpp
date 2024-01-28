@@ -145,3 +145,38 @@ TEST_CASE("MathUtils orthonormal basis") {
   CHECK(axis3 == Raz::Vec3f(0.211324856f, -0.788675f, 0.577350259f));
   CHECK(axis2.dot(axis3) == 0.f);
 }
+
+TEST_CASE("MathUtils Fibonacci sphere") {
+  std::vector<Raz::Vec3f> fiboPoints = Raz::MathUtils::computeFibonacciSpherePoints(0);
+  CHECK(fiboPoints.empty());
+
+  fiboPoints = Raz::MathUtils::computeFibonacciSpherePoints(1);
+  REQUIRE(fiboPoints.size() == 1);
+  CHECK_THAT(fiboPoints[0], IsNearlyEqualToVector(Raz::Vec3f(1.f, 0.f, 0.f)));
+
+  fiboPoints = Raz::MathUtils::computeFibonacciSpherePoints(2);
+  REQUIRE(fiboPoints.size() == 2);
+  CHECK_THAT(fiboPoints[0], IsNearlyEqualToVector(Raz::Vec3f(0.8660253f, 0.5f, 0.f)));
+  CHECK_THAT(fiboPoints[1], IsNearlyEqualToVector(Raz::Vec3f(-0.6385802f, -0.5, -0.5849917f)));
+
+  fiboPoints = Raz::MathUtils::computeFibonacciSpherePoints(3);
+  REQUIRE(fiboPoints.size() == 3);
+  CHECK_THAT(fiboPoints[0], IsNearlyEqualToVector(Raz::Vec3f(0.745356f, 0.6666666f, 0.f)));
+  CHECK_THAT(fiboPoints[1], IsNearlyEqualToVector(Raz::Vec3f(-0.7373688f, 0.f, -0.6754903f)));
+  CHECK_THAT(fiboPoints[2], IsNearlyEqualToVector(Raz::Vec3f(0.0651632f, -0.6666666f, 0.742502f)));
+
+  fiboPoints = Raz::MathUtils::computeFibonacciSpherePoints(4);
+  REQUIRE(fiboPoints.size() == 4);
+  CHECK_THAT(fiboPoints[0], IsNearlyEqualToVector(Raz::Vec3f(0.6614378f, 0.75f, 0.f)));
+  CHECK_THAT(fiboPoints[1], IsNearlyEqualToVector(Raz::Vec3f(-0.7139543f, 0.25f, -0.6540406f)));
+  CHECK_THAT(fiboPoints[2], IsNearlyEqualToVector(Raz::Vec3f(0.0846495f, -0.25f, 0.9645385f)));
+  CHECK_THAT(fiboPoints[3], IsNearlyEqualToVector(Raz::Vec3f(0.4024442f, -0.75f, -0.5249176f)));
+
+  fiboPoints = Raz::MathUtils::computeFibonacciSpherePoints(5);
+  REQUIRE(fiboPoints.size() == 5);
+  CHECK_THAT(fiboPoints[0], IsNearlyEqualToVector(Raz::Vec3f(0.6f, 0.8f, 0.f)));
+  CHECK_THAT(fiboPoints[1], IsNearlyEqualToVector(Raz::Vec3f(-0.6758097f, 0.3999999f, -0.619097f)));
+  CHECK_THAT(fiboPoints[2], IsNearlyEqualToVector(Raz::Vec3f(0.0874256f, 0.f, 0.996171f)));
+  CHECK_THAT(fiboPoints[3], IsNearlyEqualToVector(Raz::Vec3f(0.5576431f, -0.3999999f, -0.7273473f)));
+  CHECK_THAT(fiboPoints[4], IsNearlyEqualToVector(Raz::Vec3f(-0.5908281f, -0.7999999f, 0.104509f)));
+}
