@@ -1050,6 +1050,21 @@ public:
                               unsigned int width,
                               TextureFormat format,
                               PixelDataType dataType, const void* data);
+  /// Sends the image's sub-data corresponding to the currently bound 1D texture.
+  /// \note Unavailable with OpenGL ES; use a Nx1 2D texture instead.
+  /// \param type Type of the texture.
+  /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
+  /// \param offsetX Width offset.
+  /// \param width Image width.
+  /// \param format Image format.
+  /// \param dataType Type of the data to be sent.
+  /// \param data Data to be sent.
+  static void sendImageSubData1D(TextureType type,
+                                 unsigned int mipmapLevel,
+                                 unsigned int offsetX,
+                                 unsigned int width,
+                                 TextureFormat format,
+                                 PixelDataType dataType, const void* data);
 #endif
   /// Sends the image's data corresponding to the currently bound 2D texture.
   /// \param type Type of the texture.
@@ -1066,6 +1081,22 @@ public:
                               unsigned int width, unsigned int height,
                               TextureFormat format,
                               PixelDataType dataType, const void* data);
+  /// Sends the image's sub-data corresponding to the currently bound 2D texture.
+  /// \param type Type of the texture.
+  /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
+  /// \param offsetX Width offset.
+  /// \param offsetY Height offset.
+  /// \param width Image width.
+  /// \param height Image height.
+  /// \param format Image format.
+  /// \param dataType Type of the data to be sent.
+  /// \param data Data to be sent.
+  static void sendImageSubData2D(TextureType type,
+                                 unsigned int mipmapLevel,
+                                 unsigned int offsetX, unsigned int offsetY,
+                                 unsigned int width, unsigned int height,
+                                 TextureFormat format,
+                                 PixelDataType dataType, const void* data);
   /// Sends the image's data corresponding to the currently bound 3D texture.
   /// \param type Type of the texture.
   /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
@@ -1082,6 +1113,24 @@ public:
                               unsigned int width, unsigned int height, unsigned depth,
                               TextureFormat format,
                               PixelDataType dataType, const void* data);
+  /// Sends the image's sub-data corresponding to the currently bound 3D texture.
+  /// \param type Type of the texture.
+  /// \param mipmapLevel Mipmap (level of detail) of the texture. 0 is the most detailed.
+  /// \param offsetX Width offset.
+  /// \param offsetY Height offset.
+  /// \param offsetZ Depth offset.
+  /// \param width Image width.
+  /// \param height Image height.
+  /// \param depth Image depth.
+  /// \param format Image format.
+  /// \param dataType Type of the data to be sent.
+  /// \param data Data to be sent.
+  static void sendImageSubData3D(TextureType type,
+                                 unsigned int mipmapLevel,
+                                 unsigned int offsetX, unsigned int offsetY, unsigned int offsetZ,
+                                 unsigned int width, unsigned int height, unsigned depth,
+                                 TextureFormat format,
+                                 PixelDataType dataType, const void* data);
 #if !defined(USE_OPENGL_ES)
   static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, int* values);
   static void recoverTextureAttribute(TextureType type, unsigned int mipmapLevel, TextureAttribute attribute, float* values);

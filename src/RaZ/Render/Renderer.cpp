@@ -625,6 +625,25 @@ void Renderer::sendImageData1D(TextureType type,
 
   printConditionalErrors();
 }
+
+void Renderer::sendImageSubData1D(TextureType type,
+                                  unsigned int mipmapLevel,
+                                  unsigned int offsetX,
+                                  unsigned int width,
+                                  TextureFormat format,
+                                  PixelDataType dataType, const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexSubImage1D(static_cast<unsigned int>(type),
+                  static_cast<int>(mipmapLevel),
+                  static_cast<int>(offsetX),
+                  static_cast<int>(width),
+                  static_cast<unsigned int>(format),
+                  static_cast<unsigned int>(dataType),
+                  data);
+
+  printConditionalErrors();
+}
 #endif
 
 void Renderer::sendImageData2D(TextureType type,
@@ -648,6 +667,27 @@ void Renderer::sendImageData2D(TextureType type,
   printConditionalErrors();
 }
 
+void Renderer::sendImageSubData2D(TextureType type,
+                                  unsigned int mipmapLevel,
+                                  unsigned int offsetX, unsigned int offsetY,
+                                  unsigned int width, unsigned int height,
+                                  TextureFormat format,
+                                  PixelDataType dataType, const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexSubImage2D(static_cast<unsigned int>(type),
+                  static_cast<int>(mipmapLevel),
+                  static_cast<int>(offsetX),
+                  static_cast<int>(offsetY),
+                  static_cast<int>(width),
+                  static_cast<int>(height),
+                  static_cast<unsigned int>(format),
+                  static_cast<unsigned int>(dataType),
+                  data);
+
+  printConditionalErrors();
+}
+
 void Renderer::sendImageData3D(TextureType type,
                                unsigned int mipmapLevel,
                                TextureInternalFormat internalFormat,
@@ -666,6 +706,29 @@ void Renderer::sendImageData3D(TextureType type,
                static_cast<unsigned int>(format),
                static_cast<unsigned int>(dataType),
                data);
+
+  printConditionalErrors();
+}
+
+void Renderer::sendImageSubData3D(TextureType type,
+                                  unsigned int mipmapLevel,
+                                  unsigned int offsetX, unsigned int offsetY, unsigned int offsetZ,
+                                  unsigned int width, unsigned int height, unsigned int depth,
+                                  TextureFormat format,
+                                  PixelDataType dataType, const void* data) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glTexSubImage3D(static_cast<unsigned int>(type),
+                  static_cast<int>(mipmapLevel),
+                  static_cast<int>(offsetX),
+                  static_cast<int>(offsetY),
+                  static_cast<int>(offsetZ),
+                  static_cast<int>(width),
+                  static_cast<int>(height),
+                  static_cast<int>(depth),
+                  static_cast<unsigned int>(format),
+                  static_cast<unsigned int>(dataType),
+                  data);
 
   printConditionalErrors();
 }
