@@ -6,6 +6,7 @@
 #include "RaZ/Data/OwnerValue.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace Raz {
 
@@ -80,6 +81,11 @@ public:
 protected:
   explicit Texture(TextureType type);
 
+  /// Assigns default parameters after image loading. Must be called after having loaded the images' data in order to properly create the mipmaps.
+  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
+  void setLoadedParameters(bool createMipmaps) const;
+  /// Generates mipmaps for the current texture.
+  void generateMipmaps() const;
   virtual void load() const = 0;
 
   OwnerValue<unsigned int> m_index {};
@@ -175,6 +181,7 @@ public:
   Texture3D(TextureColorspace colorspace, TextureDataType dataType) : Texture3D() { setColorspace(colorspace, dataType); }
   Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace) : Texture3D(colorspace) { resize(width, height, depth); }
   Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace, TextureDataType dataType);
+  explicit Texture3D(const std::vector<Image>& imageSlices, bool createMipmaps = true) : Texture3D() { load(imageSlices, createMipmaps); }
   /// Constructs a plain colored texture.
   /// \param color Color to fill the texture with.
   /// \param width Width of the texture to create.
@@ -194,6 +201,11 @@ public:
   /// \param height New texture height.
   /// \param depth New texture depth.
   void resize(unsigned int width, unsigned int height, unsigned int depth);
+  /// Loads the images' data onto the graphics card.
+  /// \param imageSlices Images along the depth to load the data from. All of them must have the same attributes (width, height, colorspace, ...)
+  ///   and the number of images will become the texture's depth.
+  /// \param createMipmaps True to generate texture mipmaps, false otherwise.
+  void load(const std::vector<Image>& imageSlices, bool createMipmaps = true);
   /// Fills the texture with a single color.
   /// \param color Color to fill the texture with.
   void fill(const Color& color);

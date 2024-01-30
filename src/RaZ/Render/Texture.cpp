@@ -4,8 +4,6 @@
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <utility>
-
 namespace Raz {
 
 namespace {
@@ -176,6 +174,30 @@ Texture::Texture(TextureType type) : m_type{ type } {
   setWrapping(TextureWrapping::CLAMP);
 }
 
+void Texture::setLoadedParameters(bool createMipmaps) const {
+  if (m_colorspace == TextureColorspace::GRAY || m_colorspace == TextureColorspace::RG) {
+    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_R, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_G, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_B, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_A, (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1));
+  }
+
+  if (createMipmaps) {
+    generateMipmaps();
+    setFilter(TextureFilter::LINEAR, TextureFilter::LINEAR, TextureFilter::LINEAR);
+  } else {
+    setFilter(TextureFilter::LINEAR);
+  }
+
+  setWrapping(TextureWrapping::REPEAT);
+}
+
+void Texture::generateMipmaps() const {
+  bind();
+  Renderer::generateMipmap(m_type);
+  unbind();
+}
+
 #if !defined(USE_OPENGL_ES)
 Texture1D::Texture1D()
   : Texture(TextureType::TEXTURE_1D) {}
@@ -255,34 +277,19 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
     return;
   }
 
-#if defined(USE_OPENGL_ES)
-  if ((image.getWidth() & (image.getWidth() - 1)) != 0 || (image.getHeight() & (image.getHeight() - 1)) != 0) {
-    Logger::warn("[Texture] The given image's dimensions (" + std::to_string(image.getWidth()) + 'x' + std::to_string(image.getHeight())
-               + ") are not powers of two; this can give unexpected results.");
-  }
-#endif
-
   m_width      = image.getWidth();
   m_height     = image.getHeight();
   m_colorspace = static_cast<TextureColorspace>(image.getColorspace());
   m_dataType   = (image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
 
-  if (createMipmaps)
-    setFilter(TextureFilter::LINEAR, TextureFilter::LINEAR, TextureFilter::LINEAR);
-  else
-    setFilter(TextureFilter::LINEAR);
-
-  setWrapping(TextureWrapping::REPEAT);
+#if defined(USE_OPENGL_ES)
+  if ((m_width & (m_width - 1)) != 0 || (m_height & (m_height - 1)) != 0) {
+    Logger::warn("[Texture] The given image's dimensions (" + std::to_string(m_width) + 'x' + std::to_string(m_height)
+               + ") are not powers of two; this can give unexpected results.");
+  }
+#endif
 
   bind();
-
-  if (m_colorspace == TextureColorspace::GRAY || m_colorspace == TextureColorspace::RG) {
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_R, static_cast<int>(TextureFormat::RED));
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_G, static_cast<int>(TextureFormat::RED));
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_B, static_cast<int>(TextureFormat::RED));
-    Renderer::setTextureParameter(TextureType::TEXTURE_2D, TextureParam::SWIZZLE_A,
-                                  (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1));
-  }
 
   Renderer::sendImageData2D(TextureType::TEXTURE_2D,
                             0,
@@ -293,10 +300,7 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
                             (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                             image.getDataPtr());
 
-  if (createMipmaps)
-    Renderer::generateMipmap(TextureType::TEXTURE_2D);
-
-  unbind();
+  setLoadedParameters(createMipmaps);
 }
 
 void Texture2D::fill(const Color& color) {
@@ -369,6 +373,55 @@ void Texture3D::resize(unsigned int width, unsigned int height, unsigned int dep
   m_depth  = depth;
 
   load();
+}
+
+void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) {
+  if (imageSlices.empty() || imageSlices.front().isEmpty()) {
+    // Images not found, defaulting texture to pure white
+    fill(ColorPreset::White);
+    return;
+  }
+
+  m_width      = imageSlices.front().getWidth();
+  m_height     = imageSlices.front().getHeight();
+  m_depth      = static_cast<unsigned int>(imageSlices.size());
+  m_colorspace = static_cast<TextureColorspace>(imageSlices.front().getColorspace());
+  m_dataType   = (imageSlices.front().getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
+
+#if defined(USE_OPENGL_ES)
+  if ((m_width & (m_width - 1)) != 0 || (m_height & (m_height - 1)) != 0 || (m_depth & (m_depth - 1)) != 0) {
+    Logger::warn("[Texture] The given image's dimensions (" + std::to_string(m_width) + 'x' + std::to_string(m_height) + 'x' + std::to_string(m_depth)
+               + ") are not powers of two; this can give unexpected results.");
+  }
+#endif
+
+  load();
+
+  const TextureFormat format        = recoverFormat(m_colorspace);
+  const PixelDataType pixelDataType = (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT);
+
+  bind();
+
+  for (std::size_t imgIndex = 0; imgIndex < imageSlices.size(); ++imgIndex) {
+    const Image& img = imageSlices[imgIndex];
+
+    if (img.getWidth() != m_width || img.getHeight() != m_height || static_cast<TextureColorspace>(img.getColorspace()) != m_colorspace)
+      throw std::invalid_argument("[Texture3D] The given images have different attributes.");
+
+    Renderer::sendImageSubData3D(TextureType::TEXTURE_3D,
+                                 0,
+                                 0,
+                                 0,
+                                 static_cast<unsigned int>(imgIndex),
+                                 m_width,
+                                 m_height,
+                                 1,
+                                 format,
+                                 pixelDataType,
+                                 img.getDataPtr());
+  }
+
+  setLoadedParameters(createMipmaps);
 }
 
 void Texture3D::fill(const Color& color) {
