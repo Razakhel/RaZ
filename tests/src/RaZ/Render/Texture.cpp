@@ -1,6 +1,7 @@
 #include "Catch.hpp"
 
 #include "RaZ/Data/Color.hpp"
+#include "RaZ/Data/Image.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 
@@ -163,6 +164,57 @@ TEST_CASE("Texture move") {
 #endif
   CHECK(movedTexture2DCtor.getIndex() == movedTexture2DOpIndex);
   CHECK(movedTexture3DCtor.getIndex() == movedTexture3DOpIndex);
+}
+
+TEST_CASE("Texture2D load image") {
+  Raz::Image img(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
+  img.setPixel(0, 0, static_cast<uint8_t>(0));
+  img.setPixel(1, 0, static_cast<uint8_t>(1));
+  img.setPixel(0, 1, static_cast<uint8_t>(2));
+  img.setPixel(1, 1, static_cast<uint8_t>(3));
+
+  const Raz::Texture2D texture2D(img);
+
+  CHECK(texture2D.getWidth() == img.getWidth());
+  CHECK(texture2D.getHeight() == img.getHeight());
+  CHECK(texture2D.getColorspace() == Raz::TextureColorspace::GRAY);
+  CHECK(texture2D.getDataType() == Raz::TextureDataType::BYTE);
+
+#if !defined(USE_OPENGL_ES)
+  const Raz::Image textureImg = texture2D.recoverImage();
+  REQUIRE_FALSE(textureImg.isEmpty());
+  REQUIRE(textureImg.getWidth() == 2);
+  REQUIRE(textureImg.getHeight() == 2);
+  REQUIRE(textureImg.getColorspace() == Raz::ImageColorspace::GRAY);
+  REQUIRE(textureImg.getDataType() == Raz::ImageDataType::BYTE);
+  CHECK(textureImg.recoverPixel<uint8_t>(0, 0) == 0);
+  CHECK(textureImg.recoverPixel<uint8_t>(1, 0) == 1);
+  CHECK(textureImg.recoverPixel<uint8_t>(0, 1) == 2);
+  CHECK(textureImg.recoverPixel<uint8_t>(1, 1) == 3);
+#endif
+}
+
+TEST_CASE("Texture3D load image slices") {
+  std::vector<Raz::Image> imageSlices;
+  imageSlices.emplace_back(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT).setPixel(0, 0, 1.234f);
+  imageSlices.emplace_back(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT).setPixel(1, 1, 2.345f);
+
+  const Raz::Texture3D texture3D(imageSlices);
+
+  CHECK(texture3D.getWidth() == imageSlices.front().getWidth());
+  CHECK(texture3D.getHeight() == imageSlices.front().getHeight());
+  CHECK(texture3D.getDepth() == imageSlices.size());
+  CHECK(texture3D.getColorspace() == Raz::TextureColorspace::GRAY);
+  CHECK(texture3D.getDataType() == Raz::TextureDataType::FLOAT16);
+
+  CHECK_THROWS(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE),
+                                Raz::Image(2, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE) })); // Different widths
+  CHECK_THROWS(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE),
+                                Raz::Image(1, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE) })); // Different heights
+  CHECK_THROWS(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE),
+                                Raz::Image(1, 1, Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE) })); // Different colorspaces
+  CHECK_THROWS(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE),
+                                Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT) })); // Different data types
 }
 
 TEST_CASE("Texture fill") {

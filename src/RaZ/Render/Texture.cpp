@@ -382,11 +382,14 @@ void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) 
     return;
   }
 
+  const ImageColorspace firstImgColorspace = imageSlices.front().getColorspace();
+  const ImageDataType firstImgDataType     = imageSlices.front().getDataType();
+
   m_width      = imageSlices.front().getWidth();
   m_height     = imageSlices.front().getHeight();
   m_depth      = static_cast<unsigned int>(imageSlices.size());
-  m_colorspace = static_cast<TextureColorspace>(imageSlices.front().getColorspace());
-  m_dataType   = (imageSlices.front().getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
+  m_colorspace = static_cast<TextureColorspace>(firstImgColorspace);
+  m_dataType   = (firstImgDataType == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
 
 #if defined(USE_OPENGL_ES)
   if ((m_width & (m_width - 1)) != 0 || (m_height & (m_height - 1)) != 0 || (m_depth & (m_depth - 1)) != 0) {
@@ -397,7 +400,7 @@ void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) 
 
   load();
 
-  const TextureFormat format        = recoverFormat(m_colorspace);
+  const TextureFormat textureFormat = recoverFormat(m_colorspace);
   const PixelDataType pixelDataType = (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT);
 
   bind();
@@ -405,7 +408,7 @@ void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) 
   for (std::size_t imgIndex = 0; imgIndex < imageSlices.size(); ++imgIndex) {
     const Image& img = imageSlices[imgIndex];
 
-    if (img.getWidth() != m_width || img.getHeight() != m_height || static_cast<TextureColorspace>(img.getColorspace()) != m_colorspace)
+    if (img.getWidth() != m_width || img.getHeight() != m_height || img.getColorspace() != firstImgColorspace || img.getDataType() != firstImgDataType)
       throw std::invalid_argument("[Texture3D] The given images have different attributes.");
 
     Renderer::sendImageSubData3D(TextureType::TEXTURE_3D,
@@ -416,7 +419,7 @@ void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) 
                                  m_width,
                                  m_height,
                                  1,
-                                 format,
+                                 textureFormat,
                                  pixelDataType,
                                  img.getDataPtr());
   }
