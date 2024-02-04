@@ -124,9 +124,9 @@ int main() {
     blur.setOutputBuffer(blurredColorBuffer);
     blur.setStrength(16);
 
-    // SSR
+    // Screen space reflections
 
-    auto& ssr = renderGraph.addRenderProcess<Raz::SsrRenderProcess>();
+    auto& ssr = renderGraph.addRenderProcess<Raz::ScreenSpaceReflectionsRenderProcess>();
     ssr.addParent(blur);
     ssr.setInputDepthBuffer(depthBuffer);
     ssr.setInputColorBuffer(colorBuffer);

@@ -1,15 +1,15 @@
 #pragma once
 
-#ifndef RAZ_SSRRENDERPROCESS_HPP
-#define RAZ_SSRRENDERPROCESS_HPP
+#ifndef RAZ_SCREENSPACEREFLECTIONSRENDERPROCESS_HPP
+#define RAZ_SCREENSPACEREFLECTIONSRENDERPROCESS_HPP
 
 #include "RaZ/Render/MonoPassRenderProcess.hpp"
 
 namespace Raz {
 
-class SsrRenderProcess final : public MonoPassRenderProcess {
+class ScreenSpaceReflectionsRenderProcess final : public MonoPassRenderProcess {
 public:
-  explicit SsrRenderProcess(RenderGraph& renderGraph);
+  explicit ScreenSpaceReflectionsRenderProcess(RenderGraph& renderGraph);
 
   void setInputDepthBuffer(Texture2DPtr depthBuffer);
   void setInputColorBuffer(Texture2DPtr colorBuffer);
@@ -21,4 +21,4 @@ public:
 
 } // namespace Raz
 
-#endif // RAZ_SSRRENDERPROCESS_HPP
+#endif // RAZ_SCREENSPACEREFLECTIONSRENDERPROCESS_HPP

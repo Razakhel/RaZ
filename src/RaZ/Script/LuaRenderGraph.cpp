@@ -8,7 +8,7 @@
 #include "RaZ/Render/PixelizationRenderProcess.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
-#include "RaZ/Render/SsrRenderProcess.hpp"
+#include "RaZ/Render/ScreenSpaceReflectionsRenderProcess.hpp"
 #include "RaZ/Render/VignetteRenderProcess.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
@@ -34,20 +34,20 @@ void LuaWrapper::registerRenderGraphTypes() {
                                                 [] (RenderGraph& g, FragmentShader& s, std::string n) { g.addNode(std::move(s), std::move(n)); });
     renderGraph["removeNode"]   = &RenderGraph::removeNode;
 
-    renderGraph["isValid"]                             = &RenderGraph::isValid;
-    renderGraph["getGeometryPass"]                     = PickNonConstOverload<>(&RenderGraph::getGeometryPass);
-    renderGraph["addBloomRenderProcess"]               = &RenderGraph::addRenderProcess<BloomRenderProcess>;
-    renderGraph["addBoxBlurRenderProcess"]             = &RenderGraph::addRenderProcess<BoxBlurRenderProcess>;
-    renderGraph["addChromaticAberrationRenderProcess"] = &RenderGraph::addRenderProcess<ChromaticAberrationRenderProcess>;
-    renderGraph["addConvolutionRenderProcess"]         = sol::overload(&RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&>,
-                                                                       &RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&, std::string>);
-    renderGraph["addFilmGrainRenderProcess"]           = &RenderGraph::addRenderProcess<FilmGrainRenderProcess>;
-    renderGraph["addGaussianBlurRenderProcess"]        = &RenderGraph::addRenderProcess<GaussianBlurRenderProcess>;
-    renderGraph["addPixelizationRenderProcess"]        = &RenderGraph::addRenderProcess<PixelizationRenderProcess>;
-    renderGraph["addSsrRenderProcess"]                 = &RenderGraph::addRenderProcess<SsrRenderProcess>;
-    renderGraph["addVignetteRenderProcess"]            = &RenderGraph::addRenderProcess<VignetteRenderProcess>;
-    renderGraph["resizeViewport"]                      = &RenderGraph::resizeViewport;
-    renderGraph["updateShaders"]                       = &RenderGraph::updateShaders;
+    renderGraph["isValid"]                                = &RenderGraph::isValid;
+    renderGraph["getGeometryPass"]                        = PickNonConstOverload<>(&RenderGraph::getGeometryPass);
+    renderGraph["addBloomRenderProcess"]                  = &RenderGraph::addRenderProcess<BloomRenderProcess>;
+    renderGraph["addBoxBlurRenderProcess"]                = &RenderGraph::addRenderProcess<BoxBlurRenderProcess>;
+    renderGraph["addChromaticAberrationRenderProcess"]    = &RenderGraph::addRenderProcess<ChromaticAberrationRenderProcess>;
+    renderGraph["addConvolutionRenderProcess"]            = sol::overload(&RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&>,
+                                                                          &RenderGraph::addRenderProcess<ConvolutionRenderProcess, const Mat3f&, std::string>);
+    renderGraph["addFilmGrainRenderProcess"]              = &RenderGraph::addRenderProcess<FilmGrainRenderProcess>;
+    renderGraph["addGaussianBlurRenderProcess"]           = &RenderGraph::addRenderProcess<GaussianBlurRenderProcess>;
+    renderGraph["addPixelizationRenderProcess"]           = &RenderGraph::addRenderProcess<PixelizationRenderProcess>;
+    renderGraph["addScreenSpaceReflectionsRenderProcess"] = &RenderGraph::addRenderProcess<ScreenSpaceReflectionsRenderProcess>;
+    renderGraph["addVignetteRenderProcess"]               = &RenderGraph::addRenderProcess<VignetteRenderProcess>;
+    renderGraph["resizeViewport"]                         = &RenderGraph::resizeViewport;
+    renderGraph["updateShaders"]                          = &RenderGraph::updateShaders;
   }
 
   {
@@ -178,15 +178,15 @@ void LuaWrapper::registerRenderGraphTypes() {
     }
 
     {
-      auto ssrRenderProcess = state.new_usertype<SsrRenderProcess>("SsrRenderProcess",
-                                                                   sol::constructors<SsrRenderProcess(RenderGraph&)>(),
-                                                                   sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
-      ssrRenderProcess["setInputDepthBuffer"]        = &SsrRenderProcess::setInputDepthBuffer;
-      ssrRenderProcess["setInputColorBuffer"]        = &SsrRenderProcess::setInputColorBuffer;
-      ssrRenderProcess["setInputBlurredColorBuffer"] = &SsrRenderProcess::setInputBlurredColorBuffer;
-      ssrRenderProcess["setInputNormalBuffer"]       = &SsrRenderProcess::setInputNormalBuffer;
-      ssrRenderProcess["setInputSpecularBuffer"]     = &SsrRenderProcess::setInputSpecularBuffer;
-      ssrRenderProcess["setOutputBuffer"]            = &SsrRenderProcess::setOutputBuffer;
+      auto ssrRenderProcess = state.new_usertype<ScreenSpaceReflectionsRenderProcess>("ScreenSpaceReflectionsRenderProcess",
+                                                                                      sol::constructors<ScreenSpaceReflectionsRenderProcess(RenderGraph&)>(),
+                                                                                      sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+      ssrRenderProcess["setInputDepthBuffer"]        = &ScreenSpaceReflectionsRenderProcess::setInputDepthBuffer;
+      ssrRenderProcess["setInputColorBuffer"]        = &ScreenSpaceReflectionsRenderProcess::setInputColorBuffer;
+      ssrRenderProcess["setInputBlurredColorBuffer"] = &ScreenSpaceReflectionsRenderProcess::setInputBlurredColorBuffer;
+      ssrRenderProcess["setInputNormalBuffer"]       = &ScreenSpaceReflectionsRenderProcess::setInputNormalBuffer;
+      ssrRenderProcess["setInputSpecularBuffer"]     = &ScreenSpaceReflectionsRenderProcess::setInputSpecularBuffer;
+      ssrRenderProcess["setOutputBuffer"]            = &ScreenSpaceReflectionsRenderProcess::setOutputBuffer;
     }
 
     {
