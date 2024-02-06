@@ -24,8 +24,8 @@ TEST_CASE("PhysicsSystem accepted components", "[physics]") {
 
   auto& physics = world.addSystem<Raz::PhysicsSystem>();
 
-  Raz::Entity& rigidBody = world.addEntityWithComponent<Raz::RigidBody>(1.f, 1.f); // RenderSystem::update() needs a Camera with a Transform component
-  Raz::Entity& collider  = world.addEntityWithComponent<Raz::Collider>(Raz::Plane(0.f));
+  const Raz::Entity& rigidBody = world.addEntityWithComponent<Raz::RigidBody>(1.f, 1.f); // RenderSystem::update() needs a Camera with a Transform component
+  const Raz::Entity& collider  = world.addEntityWithComponent<Raz::Collider>(Raz::Plane(0.f));
 
   world.update({});
 

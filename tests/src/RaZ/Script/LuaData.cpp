@@ -32,17 +32,17 @@ TEST_CASE("LuaData Bitset", "[script][lua][data]") {
   )"));
 }
 
-TEST_CASE("LuaData BvhSystem", "[script][lua][data]") {
+TEST_CASE("LuaData BoundingVolumeHierarchy", "[script][lua][data]") {
   CHECK(Raz::LuaWrapper::execute(R"(
-    local bvhSystem = BvhSystem.new()
+    local bvh = BoundingVolumeHierarchy.new()
 
-    bvhSystem:build()
+    bvh:build({})
 
     local rayHit = RayHit.new()
-    assert(bvhSystem:query(Ray.new(Vec3f.new(), Axis.Z)) == nil)
-    assert(bvhSystem:query(Ray.new(Vec3f.new(), Axis.Z), rayHit) == nil)
+    assert(bvh:query(Ray.new(Vec3f.new(), Axis.Z)) == nil)
+    assert(bvh:query(Ray.new(Vec3f.new(), Axis.Z), rayHit) == nil)
 
-    local bvhRootNode = bvhSystem:getRootNode()
+    local bvhRootNode = bvh:getRootNode()
 
     assert(bvhRootNode:getBoundingBox() == AABB.new(Vec3f.new(), Vec3f.new()))
     assert(bvhRootNode:hasLeftChild() == bvhRootNode:hasRightChild())
@@ -53,6 +53,14 @@ TEST_CASE("LuaData BvhSystem", "[script][lua][data]") {
     assert(bvhRootNode:isLeaf())
     assert(bvhRootNode:query(Ray.new(Vec3f.new(), Axis.Z)) == nil)
     assert(bvhRootNode:query(Ray.new(Vec3f.new(), Axis.Z), rayHit) == nil)
+  )"));
+}
+
+TEST_CASE("LuaData BoundingVolumeHierarchySystem", "[script][lua][data]") {
+  CHECK(Raz::LuaWrapper::execute(R"(
+    local bvhSystem = BoundingVolumeHierarchySystem.new()
+
+    assert(bvhSystem:getBvh() ~= nil)
 
     assert(bvhSystem:getAcceptedComponents() ~= nil)
     assert(not bvhSystem:containsEntity(Entity.new(0)))

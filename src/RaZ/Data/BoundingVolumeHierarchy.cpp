@@ -1,4 +1,5 @@
-#include "RaZ/Data/BvhSystem.hpp"
+#include "RaZ/Entity.hpp"
+#include "RaZ/Data/BoundingVolumeHierarchy.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
@@ -15,7 +16,7 @@ enum CutAxis {
 
 } // namespace
 
-Entity* BvhNode::query(const Ray& ray, RayHit* hit) const {
+Entity* BoundingVolumeHierarchyNode::query(const Ray& ray, RayHit* hit) const {
   if (!ray.intersects(m_boundingBox, hit))
     return nullptr;
 
@@ -40,7 +41,7 @@ Entity* BvhNode::query(const Ray& ray, RayHit* hit) const {
   return (leftEntity != nullptr ? leftEntity : rightEntity);
 }
 
-void BvhNode::build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginIndex, std::size_t endIndex) {
+void BoundingVolumeHierarchyNode::build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginIndex, std::size_t endIndex) {
   m_boundingBox = trianglesInfo[beginIndex].triangle.computeBoundingBox();
 
   if (endIndex - beginIndex <= 1) {
@@ -79,35 +80,33 @@ void BvhNode::build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginI
   }
 
   // Reorganizing triangles by splitting them over the cut axis, according to their centroid
-  const float halfCutPos  = m_boundingBox.getMinPosition()[cutAxis] + (maxLength / 2.f);
-  const auto midShapeIter = std::partition(trianglesInfo.begin() + beginIndex, trianglesInfo.begin() + endIndex, [cutAxis, halfCutPos] (const TriangleInfo& triangleInfo) {
-    return triangleInfo.triangle.computeCentroid()[cutAxis] < halfCutPos;
-  });
+  const float halfCutPos  = m_boundingBox.getMinPosition()[cutAxis] + (maxLength * 0.5f);
+  const auto midShapeIter = std::partition(trianglesInfo.begin() + static_cast<std::ptrdiff_t>(beginIndex),
+                                           trianglesInfo.begin() + static_cast<std::ptrdiff_t>(endIndex),
+                                           [cutAxis, halfCutPos] (const TriangleInfo& triangleInfo) {
+                                             return (triangleInfo.triangle.computeCentroid()[cutAxis] < halfCutPos);
+                                           });
 
   auto midIndex = static_cast<std::size_t>(std::distance(trianglesInfo.begin(), midShapeIter));
   if (midIndex == beginIndex || midIndex == endIndex)
     midIndex = (beginIndex + endIndex) / 2;
 
-  m_leftChild = std::make_unique<BvhNode>();
+  m_leftChild = std::make_unique<BoundingVolumeHierarchyNode>();
   m_leftChild->build(trianglesInfo, beginIndex, midIndex);
 
-  m_rightChild = std::make_unique<BvhNode>();
+  m_rightChild = std::make_unique<BoundingVolumeHierarchyNode>();
   m_rightChild->build(trianglesInfo, midIndex, endIndex);
 }
 
-BvhSystem::BvhSystem() {
-  registerComponents<Mesh>();
-}
-
-void BvhSystem::build() {
-  m_rootNode = BvhNode();
+void BoundingVolumeHierarchy::build(const std::vector<Entity*>& entities) {
+  m_rootNode = BoundingVolumeHierarchyNode();
 
   // Storing all triangles in a list to build the BVH from
 
   std::size_t totalTriangleCount = 0;
 
-  for (const Entity* entity : m_entities) {
-    if (!entity->isEnabled())
+  for (const Entity* entity : entities) {
+    if (!entity->isEnabled() || !entity->hasComponent<Mesh>())
       continue;
 
     totalTriangleCount += entity->getComponent<Mesh>().recoverTriangleCount();
@@ -116,11 +115,11 @@ void BvhSystem::build() {
   if (totalTriangleCount == 0)
     return; // No triangle to build the BVH from
 
-  std::vector<BvhNode::TriangleInfo> triangles;
+  std::vector<BoundingVolumeHierarchyNode::TriangleInfo> triangles;
   triangles.reserve(totalTriangleCount);
 
-  for (Entity* entity : m_entities) {
-    if (!entity->isEnabled())
+  for (Entity* entity : entities) {
+    if (!entity->isEnabled() || !entity->hasComponent<Mesh>())
       continue;
 
     const bool hasTransform    = entity->hasComponent<Transform>();
@@ -138,22 +137,12 @@ void BvhSystem::build() {
                               Vec3f(transformation * Vec4f(triangle.getThirdPos(), 1.f)));
         }
 
-        triangles.emplace_back(BvhNode::TriangleInfo{ triangle, entity });
+        triangles.emplace_back(BoundingVolumeHierarchyNode::TriangleInfo{ triangle, entity });
       }
     }
   }
 
   m_rootNode.build(triangles, 0, totalTriangleCount);
-}
-
-void BvhSystem::linkEntity(const EntityPtr& entity) {
-  System::linkEntity(entity);
-  build(); // TODO: if N entities are linked one after the other, the BVH will be rebuilt as many times
-}
-
-void BvhSystem::unlinkEntity(const EntityPtr& entity) {
-  System::unlinkEntity(entity);
-  build(); // TODO: if N entities are unlinked one after the other, the BVH will be rebuilt as many times
 }
 
 } // namespace Raz

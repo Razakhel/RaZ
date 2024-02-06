@@ -95,7 +95,7 @@ TEST_CASE("LuaCore World", "[script][lua][core]") {
     world:refresh()
     world:destroy()
 
-    world:addBvhSystem()
+    world:addBoundingVolumeHierarchySystem()
     world:addPhysicsSystem()
     world:addRenderSystem()
     world:addRenderSystem(1, 1)

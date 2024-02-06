@@ -1,29 +1,16 @@
-#include "RaZ/Application.hpp"
-#include "RaZ/World.hpp"
-#include "RaZ/Data/BvhSystem.hpp"
+#include "RaZ/Entity.hpp"
+#include "RaZ/Data/BoundingVolumeHierarchy.hpp"
 #include "RaZ/Data/Mesh.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("BvhSystem accepted components", "[data]") {
-  Raz::World world(1);
-
-  auto& bvh = world.addSystem<Raz::BvhSystem>();
-
-  Raz::Entity& mesh = world.addEntityWithComponent<Raz::Mesh>();
-
-  world.update({});
-
-  CHECK(bvh.containsEntity(mesh));
-}
-
-TEST_CASE("BvhSystem basic", "[data]") {
-  Raz::BvhSystem bvh;
+TEST_CASE("BoundingVolumeHierarchy basic", "[data]") {
+  Raz::BoundingVolumeHierarchy bvh;
   CHECK(bvh.getRootNode().isLeaf());
   CHECK(bvh.getRootNode().getBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
   CHECK(bvh.getRootNode().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
 
-  bvh.build();
+  bvh.build({}); // Nothing to build from
   CHECK(bvh.getRootNode().isLeaf());
   CHECK(bvh.getRootNode().getBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
   CHECK(bvh.getRootNode().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
@@ -31,33 +18,40 @@ TEST_CASE("BvhSystem basic", "[data]") {
   CHECK_FALSE(bvh.query(Raz::Ray(Raz::Vec3f(0.f), Raz::Axis::Z)));
 }
 
-TEST_CASE("BvhSystem build", "[data]") {
-  Raz::World world(4);
+TEST_CASE("BoundingVolumeHierarchy build", "[data]") {
+  Raz::BoundingVolumeHierarchy bvh;
 
-  auto& bvh = world.addSystem<Raz::BvhSystem>();
-
-  const Raz::Triangle triangle1(Raz::Vec3f(-1.f), Raz::Vec3f(1.f, 1.5f, -1.f), Raz::Vec3f(-1.5f, 1.f, 1.f));
+  const Raz::Triangle triangle1(Raz::Vec3f(-1.f, -1.f, -1.f), Raz::Vec3f(1.f, 1.5f, -1.f), Raz::Vec3f(-1.5f, 1.f, 1.f));
   const Raz::Triangle triangle2(Raz::Vec3f(-1.f, 1.f, -1.5f), Raz::Vec3f(1.5f, -1.f, -1.f), Raz::Vec3f(1.f, 1.f, 1.5f));
 
+  Raz::Entity entity1(0);
+  Raz::Entity entity2(1);
+
+  // Entities don't have a Mesh component, they will be ignored
+  bvh.build({ &entity1, &entity2 });
+  CHECK(bvh.getRootNode().isLeaf());
+  CHECK(bvh.getRootNode().getBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
+  CHECK(bvh.getRootNode().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
+
   {
-    Raz::Submesh& submesh = world.addEntity().addComponent<Raz::Mesh>().addSubmesh();
+    Raz::Submesh& submesh = entity1.addComponent<Raz::Mesh>().addSubmesh();
     submesh.getVertices() = { { triangle1.getFirstPos() }, { triangle1.getSecondPos() }, { triangle1.getThirdPos() } };
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
   {
-    Raz::Submesh& submesh = world.addEntity().addComponent<Raz::Mesh>().addSubmesh();
+    Raz::Submesh& submesh = entity2.addComponent<Raz::Mesh>().addSubmesh();
     submesh.getVertices() = { { triangle2.getFirstPos() }, { triangle2.getSecondPos() }, { triangle2.getThirdPos() } };
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update({});
+  bvh.build({ &entity1, &entity2 });
 
   //           root
   //          /    \
   // triangle1      triangle2
 
-  CHECK_FALSE(bvh.getRootNode().isLeaf());
+  REQUIRE_FALSE(bvh.getRootNode().isLeaf());
   CHECK(bvh.getRootNode().getBoundingBox() == Raz::AABB(Raz::Vec3f(-1.5f, -1.f, -1.5f), Raz::Vec3f(1.5f, 1.5f, 1.5f)));
   CHECK(bvh.getRootNode().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
 
@@ -77,13 +71,15 @@ TEST_CASE("BvhSystem build", "[data]") {
 
   const Raz::Triangle triangle3(Raz::Vec3f(2.f, -2.5f, 1.f), Raz::Vec3f(2.5f, -2.5f, 2.f), Raz::Vec3f(2.5f, 0.f, 0.5f));
 
+  Raz::Entity entity3(2);
+
   {
-    Raz::Submesh& submesh = world.addEntity().addComponent<Raz::Mesh>().addSubmesh();
+    Raz::Submesh& submesh = entity3.addComponent<Raz::Mesh>().addSubmesh();
     submesh.getVertices() = { { triangle3.getFirstPos() }, { triangle3.getSecondPos() }, { triangle3.getThirdPos() } };
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update({});
+  bvh.build({ &entity1, &entity2, &entity3 });
 
   //           root
   //          /    \
@@ -91,7 +87,7 @@ TEST_CASE("BvhSystem build", "[data]") {
   //              /   \
   //     triangle2     triangle3
 
-  CHECK_FALSE(bvh.getRootNode().isLeaf());
+  REQUIRE_FALSE(bvh.getRootNode().isLeaf());
   CHECK(bvh.getRootNode().getBoundingBox() == Raz::AABB(Raz::Vec3f(-1.5f, -2.5f, -1.5f), Raz::Vec3f(2.5f, 1.5f, 2.f)));
   CHECK(bvh.getRootNode().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
 
@@ -102,7 +98,7 @@ TEST_CASE("BvhSystem build", "[data]") {
   }
 
   {
-    CHECK_FALSE(bvh.getRootNode().getRightChild().isLeaf());
+    REQUIRE_FALSE(bvh.getRootNode().getRightChild().isLeaf());
     CHECK(bvh.getRootNode().getRightChild().getBoundingBox() == Raz::AABB(Raz::Vec3f(-1.f, -2.5f, -1.5f), Raz::Vec3f(2.5f, 1.f, 2.f)));
     CHECK(bvh.getRootNode().getRightChild().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
 
@@ -121,13 +117,15 @@ TEST_CASE("BvhSystem build", "[data]") {
 
   const Raz::Triangle triangle4(Raz::Vec3f(-2.f, 2.f, 2.5f), Raz::Vec3f(3.f, 1.5f, 2.5f), Raz::Vec3f(-1.f, 0.5f, -2.f));
 
+  Raz::Entity entity4(3);
+
   {
-    Raz::Submesh& submesh = world.addEntity().addComponent<Raz::Mesh>().addSubmesh();
+    Raz::Submesh& submesh = entity4.addComponent<Raz::Mesh>().addSubmesh();
     submesh.getVertices() = { { triangle4.getFirstPos() }, { triangle4.getSecondPos() }, { triangle4.getThirdPos() } };
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update({});
+  bvh.build({ &entity1, &entity2, &entity3, &entity4 });
 
   //          ----- root -----
   //          |              |
@@ -136,12 +134,12 @@ TEST_CASE("BvhSystem build", "[data]") {
   //       |       | triangle2   triangle3
   // triangle1   triangle4
 
-  CHECK_FALSE(bvh.getRootNode().isLeaf());
+  REQUIRE_FALSE(bvh.getRootNode().isLeaf());
   CHECK(bvh.getRootNode().getBoundingBox() == Raz::AABB(Raz::Vec3f(-2.f, -2.5f, -2.f), Raz::Vec3f(3.f, 2.f, 2.5f)));
   CHECK(bvh.getRootNode().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
 
   {
-    CHECK_FALSE(bvh.getRootNode().getLeftChild().isLeaf());
+    REQUIRE_FALSE(bvh.getRootNode().getLeftChild().isLeaf());
     CHECK(bvh.getRootNode().getLeftChild().getBoundingBox() == Raz::AABB(Raz::Vec3f(-2.f, -1.f, -2.f), Raz::Vec3f(3.f, 2.f, 2.5f)));
     CHECK(bvh.getRootNode().getLeftChild().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
 
@@ -157,7 +155,7 @@ TEST_CASE("BvhSystem build", "[data]") {
   }
 
   {
-    CHECK_FALSE(bvh.getRootNode().getRightChild().isLeaf());
+    REQUIRE_FALSE(bvh.getRootNode().getRightChild().isLeaf());
     CHECK(bvh.getRootNode().getRightChild().getBoundingBox() == Raz::AABB(Raz::Vec3f(-1.f, -2.5f, -1.5f), Raz::Vec3f(2.5f, 1.f, 2.f)));
     CHECK(bvh.getRootNode().getRightChild().getTriangle() == Raz::Triangle(Raz::Vec3f(0.f), Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
 
@@ -173,46 +171,44 @@ TEST_CASE("BvhSystem build", "[data]") {
   }
 }
 
-TEST_CASE("BvhSystem query", "[data]") {
+TEST_CASE("BoundingVolumeHierarchy query", "[data]") {
   // See: https://www.geogebra.org/m/tabbfjfd
 
-  Raz::World world(3);
-
-  auto& bvh = world.addSystem<Raz::BvhSystem>();
+  Raz::BoundingVolumeHierarchy bvh;
 
   const Raz::Triangle triangle1(Raz::Vec3f(-1.f, 0.f, 1.f), Raz::Vec3f(1.f, 0.f, 1.f), Raz::Vec3f(0.f, 0.f, -1.f));
   const Raz::Triangle triangle2(Raz::Vec3f(-1.f, -1.f, 0.f), Raz::Vec3f(1.f, -1.f, 0.f), Raz::Vec3f(0.f, 1.f, 0.f));
   const Raz::Triangle triangle3(Raz::Vec3f(-3.f, -1.f, 0.f), Raz::Vec3f(-1.f, -1.f, 0.f), Raz::Vec3f(-2.f, 1.f, 0.f));
 
-  Raz::Entity& mesh1 = world.addEntity();
-  Raz::Entity& mesh2 = world.addEntity();
-  Raz::Entity& mesh3 = world.addEntity();
+  Raz::Entity entity1(0);
+  Raz::Entity entity2(1);
+  Raz::Entity entity3(2);
 
   {
-    Raz::Submesh& submesh = mesh1.addComponent<Raz::Mesh>().addSubmesh();
+    Raz::Submesh& submesh = entity1.addComponent<Raz::Mesh>().addSubmesh();
     submesh.getVertices() = { { triangle1.getFirstPos() }, { triangle1.getSecondPos() }, { triangle1.getThirdPos() } };
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
   {
-    Raz::Submesh& submesh = mesh2.addComponent<Raz::Mesh>().addSubmesh();
+    Raz::Submesh& submesh = entity2.addComponent<Raz::Mesh>().addSubmesh();
     submesh.getVertices() = { { triangle2.getFirstPos() }, { triangle2.getSecondPos() }, { triangle2.getThirdPos() } };
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
   {
-    Raz::Submesh& submesh = mesh3.addComponent<Raz::Mesh>().addSubmesh();
+    Raz::Submesh& submesh = entity3.addComponent<Raz::Mesh>().addSubmesh();
     submesh.getVertices() = { { triangle3.getFirstPos() }, { triangle3.getSecondPos() }, { triangle3.getThirdPos() } };
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update({});
+  bvh.build({ &entity1, &entity2, &entity3 });
 
   Raz::RayHit hit;
 
   const Raz::Entity* entity = bvh.query(Raz::Ray(Raz::Vec3f(0.f, 1.f, 0.5f), -Raz::Axis::Y), &hit);
 
-  CHECK(entity == &mesh1);
+  CHECK(entity == &entity1);
   CHECK(hit.position == Raz::Vec3f(0.f, 0.f, 0.5f));
   CHECK_THROWS(triangle1.contains(hit.position)); // TODO: wait for the triangle's point containment check to be available
   CHECK(hit.normal == triangle1.computeNormal());
@@ -220,7 +216,7 @@ TEST_CASE("BvhSystem query", "[data]") {
 
   entity = bvh.query(Raz::Ray(Raz::Vec3f(0.f, 0.5f, 1.f), -Raz::Axis::Z), &hit);
 
-  CHECK(entity == &mesh2);
+  CHECK(entity == &entity2);
   CHECK(hit.position == Raz::Vec3f(0.f, 0.5f, 0.f));
   CHECK_THROWS(triangle2.contains(hit.position)); // TODO: wait for the triangle's point containment check to be available
   CHECK(hit.normal == triangle2.computeNormal());
@@ -228,7 +224,7 @@ TEST_CASE("BvhSystem query", "[data]") {
 
   entity = bvh.query(Raz::Ray(Raz::Vec3f(-2.f, 0.f, 1.f), -Raz::Axis::Z), &hit);
 
-  CHECK(entity == &mesh3);
+  CHECK(entity == &entity3);
   CHECK(hit.position == Raz::Vec3f(-2.f, 0.f, 0.f));
   CHECK_THROWS(triangle3.contains(hit.position)); // TODO: wait for the triangle's point containment check to be available
   CHECK(hit.normal == triangle3.computeNormal());
@@ -237,7 +233,7 @@ TEST_CASE("BvhSystem query", "[data]") {
   // When hitting two triangles (here, in order, triangles 1 & 2), the one closest to the ray must be returned
   entity = bvh.query(Raz::Ray(Raz::Vec3f(0.f, -1.f, 1.25f), Raz::Vec3f(0.f, 1.f, -1.f).normalize()), &hit);
 
-  CHECK(entity == &mesh1);
+  CHECK(entity == &entity1);
   CHECK(hit.position == Raz::Vec3f(0.f, 0.f, 0.25f));
   CHECK_THROWS(triangle1.contains(hit.position)); // TODO: wait for the triangle's point containment check to be available
   CHECK(hit.normal == triangle1.computeNormal());
@@ -246,7 +242,7 @@ TEST_CASE("BvhSystem query", "[data]") {
   // Same as the above, but in the opposite direction
   entity = bvh.query(Raz::Ray(Raz::Vec3f(0.f, 1.375f, -1.f), Raz::Vec3f(0.f, -1.f, 1.f).normalize()), &hit);
 
-  CHECK(entity == &mesh2);
+  CHECK(entity == &entity2);
   CHECK(hit.position == Raz::Vec3f(0.f, 0.375f, 0.f));
   CHECK_THROWS(triangle2.contains(hit.position)); // TODO: wait for the triangle's point containment check to be available
   CHECK(hit.normal == triangle2.computeNormal());

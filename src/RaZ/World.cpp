@@ -15,7 +15,7 @@ void World::removeEntity(const Entity& entity) {
   if (iter == m_entities.end())
     throw std::invalid_argument("Error: The entity isn't owned by this world");
 
-  for (SystemPtr& system : m_systems)
+  for (const SystemPtr& system : m_systems)
     system->unlinkEntity(*iter);
 
   m_entities.erase(iter);

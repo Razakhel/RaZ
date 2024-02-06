@@ -1,5 +1,6 @@
 #include "RaZ/Data/Bitset.hpp"
-#include "RaZ/Data/BvhSystem.hpp"
+#include "RaZ/Data/BoundingVolumeHierarchy.hpp"
+#include "RaZ/Data/BoundingVolumeHierarchySystem.hpp"
 #include "RaZ/Data/Color.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
@@ -39,27 +40,36 @@ void LuaWrapper::registerDataTypes() {
 
   {
     {
-      sol::usertype<BvhNode> bvhNode = state.new_usertype<BvhNode>("BvhNode",
-                                                                   sol::constructors<BvhNode()>());
-      bvhNode["getBoundingBox"] = &BvhNode::getBoundingBox;
-      bvhNode["hasLeftChild"]   = &BvhNode::hasLeftChild;
-      bvhNode["getLeftChild"]   = [] (const BvhNode& n) { return &n.getLeftChild(); };
-      bvhNode["hasRightChild"]  = &BvhNode::hasRightChild;
-      bvhNode["getRightChild"]  = [] (const BvhNode& n) { return &n.getRightChild(); };
-      bvhNode["getTriangle"]    = &BvhNode::getTriangle;
-      bvhNode["isLeaf"]         = &BvhNode::isLeaf;
-      bvhNode["query"]          = sol::overload([] (const BvhNode& n, const Ray& r) { return n.query(r); },
-                                                PickOverload<const Ray&, RayHit*>(&BvhNode::query));
+      sol::usertype<BoundingVolumeHierarchyNode> bvhNode = state.new_usertype<BoundingVolumeHierarchyNode>("BoundingVolumeHierarchyNode",
+                                                                                                           sol::constructors<BoundingVolumeHierarchyNode()>());
+      bvhNode["getBoundingBox"] = &BoundingVolumeHierarchyNode::getBoundingBox;
+      bvhNode["hasLeftChild"]   = &BoundingVolumeHierarchyNode::hasLeftChild;
+      bvhNode["getLeftChild"]   = [] (const BoundingVolumeHierarchyNode& n) { return &n.getLeftChild(); };
+      bvhNode["hasRightChild"]  = &BoundingVolumeHierarchyNode::hasRightChild;
+      bvhNode["getRightChild"]  = [] (const BoundingVolumeHierarchyNode& n) { return &n.getRightChild(); };
+      bvhNode["getTriangle"]    = &BoundingVolumeHierarchyNode::getTriangle;
+      bvhNode["isLeaf"]         = &BoundingVolumeHierarchyNode::isLeaf;
+      bvhNode["query"]          = sol::overload([] (const BoundingVolumeHierarchyNode& n, const Ray& r) { return n.query(r); },
+                                                PickOverload<const Ray&, RayHit*>(&BoundingVolumeHierarchyNode::query));
     }
 
     {
-      sol::usertype<BvhSystem> bvhSystem = state.new_usertype<BvhSystem>("BvhSystem",
-                                                                         sol::constructors<BvhSystem()>(),
-                                                                         sol::base_classes, sol::bases<System>());
-      bvhSystem["getRootNode"] = [] (const BvhSystem& s) { return &s.getRootNode(); };
-      bvhSystem["build"]       = &BvhSystem::build;
-      bvhSystem["query"]       = sol::overload([] (const BvhSystem& s, const Ray& r) { return s.query(r); },
-                                               PickOverload<const Ray&, RayHit*>(&BvhSystem::query));
+      sol::usertype<BoundingVolumeHierarchy> bvh = state.new_usertype<BoundingVolumeHierarchy>("BoundingVolumeHierarchy",
+                                                                                               sol::constructors<BoundingVolumeHierarchy()>());
+      bvh["getRootNode"] = [] (const BoundingVolumeHierarchy& b) { return &b.getRootNode(); };
+      // Sol doesn't seem to be able to bind a constant reference to std::vector; leaving a copy here as it is "cheap"
+      bvh["build"]       = [] (BoundingVolumeHierarchy& b, std::vector<Entity*> e) { b.build(e); };
+      bvh["query"]       = sol::overload([] (const BoundingVolumeHierarchy& b, const Ray& r) { return b.query(r); },
+                                         PickOverload<const Ray&, RayHit*>(&BoundingVolumeHierarchy::query));
+    }
+
+    {
+      sol::usertype<BoundingVolumeHierarchySystem> bvhSystem = state.new_usertype<BoundingVolumeHierarchySystem>("BoundingVolumeHierarchySystem",
+                                                                                                                 sol::constructors<
+                                                                                                                   BoundingVolumeHierarchySystem()
+                                                                                                                 >(),
+                                                                                                                 sol::base_classes, sol::bases<System>());
+      bvhSystem["getBvh"] = [] (BoundingVolumeHierarchySystem& s) { return &s.getBvh(); };
     }
   }
 
