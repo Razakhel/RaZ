@@ -1,25 +1,26 @@
 #include "RaZ/Entity.hpp"
-#include "RaZ/Data/Mesh.hpp"
-#include "RaZ/Math/Transform.hpp"
-#include "RaZ/Render/Light.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 namespace {
 
-// Declaring entities to be tested
-Raz::Entity entity0(0);
-Raz::Entity entity1(1);
-Raz::Entity entity2(2);
+struct FirstTestComponent : public Raz::Component {};
+struct SecondTestComponent : public Raz::Component {};
 
 } // namespace
 
 TEST_CASE("Entity basic", "[core]") {
+  Raz::Entity entity0(0);
+  const Raz::Entity entity1(1);
+  const Raz::Entity entity2(2, false);
+
   CHECK(entity0.getId() == 0);
   CHECK(entity1.getId() == 1);
   CHECK(entity2.getId() == 2);
 
   CHECK(entity0.isEnabled());
+  CHECK(entity1.isEnabled());
+  CHECK_FALSE(entity2.isEnabled());
 
   entity0.disable();
   CHECK_FALSE(entity0.isEnabled());
@@ -28,46 +29,51 @@ TEST_CASE("Entity basic", "[core]") {
   CHECK(entity0.isEnabled());
 }
 
-TEST_CASE("Entity-component manipulations", "[core]") {
-  CHECK(entity0.getComponents().empty());
+TEST_CASE("Entity-component manipulation", "[core]") {
+  Raz::Entity entity(0);
 
-  CHECK_FALSE(entity0.hasComponent<Raz::Mesh>());
-  CHECK_FALSE(entity0.hasComponent<Raz::Transform>());
+  CHECK(entity.getComponents().empty());
+  CHECK_FALSE(entity.hasComponent<FirstTestComponent>());
+  CHECK_FALSE(entity.hasComponent<SecondTestComponent>());
 
-  entity0.addComponent<Raz::Transform>();
-  CHECK(entity0.hasComponent<Raz::Transform>());
-  CHECK_FALSE(entity0.hasComponent<Raz::Mesh>());
+  entity.addComponent<FirstTestComponent>();
+  CHECK(entity.hasComponent<FirstTestComponent>());
+  CHECK_NOTHROW(entity.getComponent<FirstTestComponent>());
+  CHECK_FALSE(entity.hasComponent<SecondTestComponent>());
+  CHECK_THROWS(entity.getComponent<SecondTestComponent>());
 
-  CHECK(std::is_same_v<decltype(entity0.getComponent<Raz::Transform>()), Raz::Transform&>);
-  CHECK_THROWS(entity0.getComponent<Raz::Mesh>());
+  CHECK(std::is_same_v<decltype(entity.getComponent<FirstTestComponent>()), FirstTestComponent&>);
 
-  entity0.removeComponent<Raz::Transform>();
-  CHECK_FALSE(entity0.hasComponent<Raz::Transform>());
-  CHECK_THROWS(entity0.getComponent<Raz::Transform>());
+  entity.removeComponent<FirstTestComponent>();
+  CHECK_FALSE(entity.hasComponent<FirstTestComponent>());
+  CHECK_THROWS(entity.getComponent<FirstTestComponent>());
 }
 
 TEST_CASE("Entity bitset", "[core]") {
+  Raz::Entity entity0(0);
+  Raz::Entity entity1(1);
+
+  CHECK(entity0.getEnabledComponents().isEmpty());
+  entity0.addComponent<FirstTestComponent>();
+  CHECK_FALSE(entity0.getEnabledComponents().isEmpty());
+
+  CHECK(entity0.getEnabledComponents().getEnabledBitCount() == 1);
+  CHECK(entity0.getEnabledComponents()[Raz::Component::getId<FirstTestComponent>()]);
+  CHECK(entity0.getEnabledComponents().getSize() == Raz::Component::getId<FirstTestComponent>() + 1);
+
   CHECK(entity1.getEnabledComponents().isEmpty());
-  entity1.addComponent<Raz::Transform>();
+  entity1.addComponent<SecondTestComponent>();
   CHECK_FALSE(entity1.getEnabledComponents().isEmpty());
 
   CHECK(entity1.getEnabledComponents().getEnabledBitCount() == 1);
-  CHECK(entity1.getEnabledComponents()[Raz::Component::getId<Raz::Transform>()]);
-  CHECK(entity1.getEnabledComponents().getSize() == Raz::Component::getId<Raz::Transform>() + 1);
-
-  CHECK(entity2.getEnabledComponents().isEmpty());
-  entity2.addComponent<Raz::Light>(Raz::LightType::POINT, 10.f);
-  CHECK_FALSE(entity2.getEnabledComponents().isEmpty());
-
-  CHECK(entity2.getEnabledComponents().getEnabledBitCount() == 1);
-  CHECK(entity2.getEnabledComponents()[Raz::Component::getId<Raz::Light>()]);
-  CHECK(entity2.getEnabledComponents().getSize() == Raz::Component::getId<Raz::Light>() + 1);
+  CHECK(entity1.getEnabledComponents()[Raz::Component::getId<SecondTestComponent>()]);
+  CHECK(entity1.getEnabledComponents().getSize() == Raz::Component::getId<SecondTestComponent>() + 1);
 
   //  Match test
   //     ---
-  //    0 0 1     -> Transform
-  // &  0 1 0     -> Light
+  //    0 0 1     -> FirstTestComponent
+  // &  0 1 0     -> SecondTestComponent
   //   _______
   // =  0 0 0
-  CHECK((entity1.getEnabledComponents() & entity2.getEnabledComponents()) == Raz::Bitset(entity1.getEnabledComponents().getSize()));
+  CHECK((entity0.getEnabledComponents() & entity1.getEnabledComponents()) == Raz::Bitset(entity1.getEnabledComponents().getSize(), false));
 }

@@ -80,12 +80,10 @@ TEST_CASE("RenderSystem Cook-Torrance ball", "[render]") {
 
   // Setting a cubemap & moving the camera to look the ball from below, in order to see the left, top & back faces of the cubemap
 
-  renderSystem.setCubemap(Raz::Cubemap(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png"),
-                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png"),
-                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ĜƓGǦ.png"),
-                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ĜƓGǦ.png"),
-                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png"),
-                                       Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png")));
+  const Raz::Image redImg   = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png");
+  const Raz::Image greenImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ĜƓGǦ.png");
+  const Raz::Image blueImg  = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/BƁḂɃ.png");
+  renderSystem.setCubemap(Raz::Cubemap(redImg, redImg, greenImg, greenImg, blueImg, blueImg));
 
   cameraTrans.translate(Raz::Vec3f(3.f, -3.f, 0.f));
   cameraComp.setCameraType(Raz::CameraType::LOOK_AT);

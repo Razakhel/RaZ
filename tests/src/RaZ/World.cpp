@@ -82,7 +82,7 @@ TEST_CASE("World refresh", "[core]") {
 
   Raz::Entity& entity0 = world.addEntity(true);
   Raz::Entity& entity1 = world.addEntity(true);
-  Raz::Entity& entity2 = world.addEntity(true);
+  const Raz::Entity& entity2 = world.addEntity(true);
 
   CHECK(entity0.getId() == 0);
   CHECK(entity1.getId() == 1);
