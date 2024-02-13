@@ -26,6 +26,7 @@
 #include "Data/Image.hpp"
 #include "Data/ImageFormat.hpp"
 #include "Data/Mesh.hpp"
+#include "Data/MeshDistanceField.hpp"
 #include "Data/MeshFormat.hpp"
 #include "Data/ObjFormat.hpp"
 #include "Data/OffFormat.hpp"

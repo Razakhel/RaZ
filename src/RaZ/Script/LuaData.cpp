@@ -2,6 +2,8 @@
 #include "RaZ/Data/BoundingVolumeHierarchy.hpp"
 #include "RaZ/Data/BoundingVolumeHierarchySystem.hpp"
 #include "RaZ/Data/Color.hpp"
+#include "RaZ/Data/Image.hpp"
+#include "RaZ/Data/MeshDistanceField.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
 
@@ -98,6 +100,17 @@ void LuaWrapper::registerDataTypes() {
     colorPreset["Magenta"]     = ColorPreset::Magenta;
     colorPreset["Yellow"]      = ColorPreset::Yellow;
     colorPreset["White"]       = ColorPreset::White;
+  }
+
+  {
+    sol::usertype<MeshDistanceField> mdf = state.new_usertype<MeshDistanceField>("MeshDistanceField",
+                                                                                 sol::constructors<
+                                                                                   MeshDistanceField(const Raz::AABB&, unsigned int, unsigned int, unsigned int)
+                                                                                 >());
+    mdf["getDistance"]   = &MeshDistanceField::getDistance;
+    mdf["setBvh"]        = &MeshDistanceField::setBvh;
+    mdf["compute"]       = &MeshDistanceField::compute;
+    mdf["recoverSlices"] = &MeshDistanceField::recoverSlices;
   }
 }
 
