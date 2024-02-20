@@ -20,7 +20,7 @@ namespace {
 Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath = {}) {
   Raz::Window& window = TestUtils::getWindow();
 
-  // Rendering a frame of the scene by updating the World's RenderSystem & running the Window
+  // Rendering a frame of the scene by updating the World's RenderSystem, and running the Window to render its overlay
   world.update({});
   window.run(0.f);
 

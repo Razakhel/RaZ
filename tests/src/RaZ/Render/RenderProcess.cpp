@@ -20,11 +20,10 @@
 namespace {
 
 Raz::Image renderFrame(Raz::World& world, const Raz::Texture2DPtr& output, const Raz::FilePath& renderedImgPath = {}) {
-  Raz::Window& window = TestUtils::getWindow();
-
-  // Rendering a frame of the scene by updating the World's RenderSystem & running the Window
+  // Rendering a frame of the scene by updating the World's RenderSystem
+  // Running the window shouldn't be useful as we render to a texture, and more importantly can make this file's tests
+  //  fail under Linux (as the second rendered frame of each test might be empty)
   world.update({});
-  window.run(0.f);
 
 #if !defined(USE_OPENGL_ES)
   Raz::Image renderedImg = output->recoverImage();
@@ -39,8 +38,8 @@ Raz::Image renderFrame(Raz::World& world, const Raz::Texture2DPtr& output, const
                                          Raz::TextureType::TEXTURE_2D,
                                          Raz::FramebufferType::READ_FRAMEBUFFER);
 
-  Raz::Image renderedImg(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
-  Raz::Renderer::recoverFrame(window.getWidth(), window.getHeight(), Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, renderedImg.getDataPtr());
+  Raz::Image renderedImg(output->getWidth(), output->getHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
+  Raz::Renderer::recoverFrame(output->getWidth(), output->getHeight(), Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, renderedImg.getDataPtr());
 
   Raz::Renderer::unbindFramebuffer(Raz::FramebufferType::READ_FRAMEBUFFER);
 #endif
@@ -71,6 +70,7 @@ TEST_CASE("ChromaticAberrationRenderProcess execution", "[render]") {
   const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& chromaticAberration = render.getRenderGraph().addRenderProcess<Raz::ChromaticAberrationRenderProcess>();
+  chromaticAberration.addParent(render.getGeometryPass());
   chromaticAberration.setInputBuffer(std::move(input));
   chromaticAberration.setOutputBuffer(output);
 
@@ -116,6 +116,7 @@ TEST_CASE("ConvolutionRenderProcess execution", "[render]") {
   auto& convolution = render.getRenderGraph().addRenderProcess<Raz::ConvolutionRenderProcess>(Raz::Mat3f(0.f, 0.f, 0.f,
                                                                                                          0.f, 1.f, 0.f,
                                                                                                          0.f, 0.f, 0.f));
+  convolution.addParent(render.getGeometryPass());
   convolution.setInputBuffer(std::move(input));
   convolution.setOutputBuffer(output);
 
@@ -141,6 +142,7 @@ TEST_CASE("FilmGrainRenderProcess execution", "[render][!mayfail]") { // May fai
   const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& filmGrain = render.getRenderGraph().addRenderProcess<Raz::FilmGrainRenderProcess>();
+  filmGrain.addParent(render.getGeometryPass());
   filmGrain.setInputBuffer(std::move(input));
   filmGrain.setOutputBuffer(output);
 
@@ -168,6 +170,7 @@ TEST_CASE("PixelizationRenderProcess execution", "[render][!mayfail]") { // May 
   const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& pixelization = render.getRenderGraph().addRenderProcess<Raz::PixelizationRenderProcess>();
+  pixelization.addParent(render.getGeometryPass());
   pixelization.setInputBuffer(std::move(input));
   pixelization.setOutputBuffer(output);
 
@@ -191,6 +194,7 @@ TEST_CASE("VignetteRenderProcess execution", "[render]") {
   const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& vignette = render.getRenderGraph().addRenderProcess<Raz::VignetteRenderProcess>();
+  vignette.addParent(render.getGeometryPass());
   vignette.setInputBuffer(std::move(input));
   vignette.setOutputBuffer(output);
 
