@@ -91,14 +91,24 @@ jobs:
         cmake --build . --config ${{ matrix.build_type }} &&
         pwd && find .
 
-    # Running the tests using GDB to catch potential segfaults; only done if windowing is enabled, as many tests depend on a graphical context
+    # Running all tests but rendering ones, using GDB to catch potential segfaults
+    # TODO: they are only run if windowing is enabled, as mesh loading functions notably depend on it to create mesh renderers, but they should not
     - name: Test
       if: matrix.use_window
       shell: bash
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' \
-        gdb --batch --return-child-result -x '${{ github.workspace }}/tests/assets/debug/gdb_commands.txt' ./tests/RaZ_Tests
+        gdb --batch --return-child-result -x '${{ github.workspace }}/tests/assets/debug/gdb_commands.txt' --args ./tests/RaZ_Tests ~[render]
+
+    # Running only rendering tests, using GDB to catch potential segfaults; only done if windowing is enabled, as rendering tests depend on a graphical context
+    - name: Test (rendering)
+      if: matrix.use_window
+      shell: bash
+      working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
+      run: |
+        ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' \
+        gdb --batch --return-child-result -x '${{ github.workspace }}/tests/assets/debug/gdb_commands.txt' --args ./tests/RaZ_Tests [render]
 
     # Preparing code coverage; only done with GCC in Debug with all features enabled
     - name: Coverage setup
