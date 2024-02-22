@@ -2,7 +2,7 @@
 
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaUtils FilePath") {
+TEST_CASE("LuaUtils FilePath", "[script][lua][utils]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local pathStr = "../test/file.txt"
 
@@ -28,7 +28,7 @@ TEST_CASE("LuaUtils FilePath") {
   )"));
 }
 
-TEST_CASE("LuaUtils FileUtils") {
+TEST_CASE("LuaUtils FileUtils", "[script][lua][utils]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     assert(FileUtils.isReadable(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")))
     assert(FileUtils.readFileToArray(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")):size() == 22)
@@ -36,7 +36,7 @@ TEST_CASE("LuaUtils FileUtils") {
   )"));
 }
 
-TEST_CASE("LuaUtils Logger") {
+TEST_CASE("LuaUtils Logger", "[script][lua][utils]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     Logger.setLoggingLevel(LoggingLevel.ERROR)
     Logger.setLoggingLevel(LoggingLevel.WARNING)
@@ -55,7 +55,7 @@ TEST_CASE("LuaUtils Logger") {
   )"));
 }
 
-TEST_CASE("LuaUtils Ray") {
+TEST_CASE("LuaUtils Ray", "[script][lua][utils]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local rayHit = RayHit.new()
 
@@ -92,7 +92,7 @@ TEST_CASE("LuaUtils Ray") {
   )"));
 }
 
-TEST_CASE("LuaUtils Shape") {
+TEST_CASE("LuaUtils Shape", "[script][lua][utils]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local aabb = AABB.new(Vec3f.new(-1), Vec3f.new(1))
     assert(aabb:getMinPosition() == Vec3f.new(-1))
@@ -169,7 +169,7 @@ TEST_CASE("LuaUtils Shape") {
   )"));
 }
 
-TEST_CASE("LuaUtils StrUtils") {
+TEST_CASE("LuaUtils StrUtils", "[script][lua][utils]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     assert(StrUtils.startsWith("test", "te"))
     assert(StrUtils.endsWith("test", "st"))

@@ -3,7 +3,7 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaRender Camera") {
+TEST_CASE("LuaRender Camera", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local camera = Camera.new()
     camera       = Camera.new(1, 1)
@@ -37,7 +37,7 @@ TEST_CASE("LuaRender Camera") {
   )"));
 }
 
-TEST_CASE("LuaRender Cubemap") {
+TEST_CASE("LuaRender Cubemap", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local cubemap = Cubemap.new()
     cubemap       = Cubemap.new(Image.new(1, 1, ImageColorspace.GRAY), Image.new(1, 1, ImageColorspace.GRAY_ALPHA),
@@ -57,7 +57,7 @@ TEST_CASE("LuaRender Cubemap") {
   )"));
 }
 
-TEST_CASE("LuaRender Framebuffer") {
+TEST_CASE("LuaRender Framebuffer", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local framebuffer = Framebuffer.new()
 
@@ -82,7 +82,7 @@ TEST_CASE("LuaRender Framebuffer") {
   )"));
 }
 
-TEST_CASE("LuaRender GraphicObjects") {
+TEST_CASE("LuaRender GraphicObjects", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local indexBuffer = IndexBuffer.new()
     assert(indexBuffer:getIndex() ~= 0)
@@ -104,7 +104,7 @@ TEST_CASE("LuaRender GraphicObjects") {
   )"));
 }
 
-TEST_CASE("LuaRender Light") {
+TEST_CASE("LuaRender Light", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local light = Light.new(LightType.POINT, 1)
     light       = Light.new(LightType.POINT, 1, ColorPreset.White)
@@ -126,7 +126,7 @@ TEST_CASE("LuaRender Light") {
   )"));
 }
 
-TEST_CASE("LuaRender Material") {
+TEST_CASE("LuaRender Material", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local material = Material.new()
     material       = Material.new(MaterialType.BLINN_PHONG)
@@ -138,7 +138,7 @@ TEST_CASE("LuaRender Material") {
   )"));
 }
 
-TEST_CASE("LuaRender MeshRenderer") {
+TEST_CASE("LuaRender MeshRenderer", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local meshRenderer = MeshRenderer.new()
     meshRenderer       = MeshRenderer.new(Mesh.new())
@@ -167,7 +167,7 @@ TEST_CASE("LuaRender MeshRenderer") {
 }
 
 #if !defined(RAZ_NO_OVERLAY)
-TEST_CASE("LuaRender Overlay") {
+TEST_CASE("LuaRender Overlay", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local overlay = Overlay.new()
     overlay:addWindow("Test")
@@ -365,7 +365,7 @@ TEST_CASE("LuaRender Overlay") {
 }
 #endif
 
-TEST_CASE("LuaRender RenderGraph") {
+TEST_CASE("LuaRender RenderGraph", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local renderGraph = RenderGraph.new()
 
@@ -392,7 +392,7 @@ TEST_CASE("LuaRender RenderGraph") {
   )"));
 }
 
-TEST_CASE("LuaRender RenderPass") {
+TEST_CASE("LuaRender RenderPass", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local renderPass  = RenderPass.new()
     local renderPass2 = RenderPass.new()
@@ -445,7 +445,7 @@ TEST_CASE("LuaRender RenderPass") {
 #endif
 }
 
-TEST_CASE("LuaRender RenderProcess") {
+TEST_CASE("LuaRender RenderProcess", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local renderGraph = RenderGraph.new()
     local renderPass  = RenderPass.new()
@@ -573,7 +573,7 @@ TEST_CASE("LuaRender RenderProcess") {
   )"));
 }
 
-TEST_CASE("LuaRender RenderSystem") {
+TEST_CASE("LuaRender RenderSystem", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local renderSystem = RenderSystem.new()
     renderSystem       = RenderSystem.new(1, 1)
@@ -616,7 +616,7 @@ TEST_CASE("LuaRender RenderSystem") {
 #endif
 }
 
-TEST_CASE("LuaRender Shader") {
+TEST_CASE("LuaRender Shader", "[script][lua][render]") {
   if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     CHECK(Raz::LuaWrapper::execute(R"(
       local computeShader = ComputeShader.new()
@@ -706,7 +706,7 @@ TEST_CASE("LuaRender Shader") {
   )"));
 }
 
-TEST_CASE("LuaRender ShaderProgram") {
+TEST_CASE("LuaRender ShaderProgram", "[script][lua][render]") {
 #if !defined(USE_WEBGL)
   if (Raz::Renderer::checkVersion(4, 3) || Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader")) {
     CHECK(Raz::LuaWrapper::execute(R"(
@@ -898,7 +898,7 @@ TEST_CASE("LuaRender ShaderProgram") {
 #endif
 }
 
-TEST_CASE("LuaRender SubmeshRenderer") {
+TEST_CASE("LuaRender SubmeshRenderer", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local submeshRenderer = SubmeshRenderer.new()
     submeshRenderer       = SubmeshRenderer.new(Submesh.new())
@@ -915,7 +915,7 @@ TEST_CASE("LuaRender SubmeshRenderer") {
   )"));
 }
 
-TEST_CASE("LuaRender Texture") {
+TEST_CASE("LuaRender Texture", "[script][lua][render]") {
 #if !defined(USE_OPENGL_ES)
   CHECK(Raz::LuaWrapper::execute(R"(
     local tex1D = Texture1D.new(TextureColorspace.INVALID)
@@ -1028,7 +1028,7 @@ TEST_CASE("LuaRender Texture") {
   )"));
 }
 
-TEST_CASE("LuaRender UniformBuffer") {
+TEST_CASE("LuaRender UniformBuffer", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local uniformBuffer = UniformBuffer.new(1)
     uniformBuffer       = UniformBuffer.new(1, UniformBufferUsage.DYNAMIC)
@@ -1052,7 +1052,7 @@ TEST_CASE("LuaRender UniformBuffer") {
   )"));
 }
 
-TEST_CASE("LuaRender Window") {
+TEST_CASE("LuaRender Window", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local renderSystem = RenderSystem.new() -- A RenderSystem is needed to use a Window
 

@@ -115,7 +115,7 @@ void checkUniformInfo(const std::unordered_map<std::string, UniformInfo>& corres
 
 } // namespace
 
-TEST_CASE("ShaderProgram move") {
+TEST_CASE("ShaderProgram move", "[render]") {
   {
     Raz::RenderShaderProgram programBase;
 
@@ -198,7 +198,7 @@ TEST_CASE("ShaderProgram move") {
 #endif
 }
 
-TEST_CASE("ShaderProgram attributes") {
+TEST_CASE("ShaderProgram attributes", "[render]") {
   TestShaderProgram program;
 
   CHECK(program.getAttributeCount() == 0);
@@ -229,7 +229,7 @@ TEST_CASE("ShaderProgram attributes") {
   CHECK_FALSE(program.hasAttribute("attrib2"));
 }
 
-TEST_CASE("ShaderProgram textures") {
+TEST_CASE("ShaderProgram textures", "[render]") {
   TestShaderProgram program;
 
   CHECK(program.getTextureCount() == 0);
@@ -287,7 +287,7 @@ TEST_CASE("ShaderProgram textures") {
 }
 
 #if !defined(USE_WEBGL)
-TEST_CASE("ShaderProgram image textures") {
+TEST_CASE("ShaderProgram image textures", "[render]") {
   TestShaderProgram program;
 
   CHECK(program.getImageTextureCount() == 0);
@@ -348,7 +348,7 @@ TEST_CASE("ShaderProgram image textures") {
 }
 #endif
 
-TEST_CASE("RenderShaderProgram creation") {
+TEST_CASE("RenderShaderProgram creation", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   {
@@ -422,7 +422,7 @@ TEST_CASE("RenderShaderProgram creation") {
   }
 }
 
-TEST_CASE("RenderShaderProgram uniforms") {
+TEST_CASE("RenderShaderProgram uniforms", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   Raz::RenderShaderProgram program(Raz::VertexShader::loadFromSource(vertSource), Raz::FragmentShader::loadFromSource(fragSource));
@@ -477,7 +477,7 @@ TEST_CASE("RenderShaderProgram uniforms") {
 }
 
 #if !defined(USE_WEBGL)
-TEST_CASE("ComputeShaderProgram creation") {
+TEST_CASE("ComputeShaderProgram creation", "[render]") {
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;
@@ -514,7 +514,7 @@ TEST_CASE("ComputeShaderProgram creation") {
   }
 }
 
-TEST_CASE("ComputeShaderProgram uniforms") {
+TEST_CASE("ComputeShaderProgram uniforms", "[render]") {
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;

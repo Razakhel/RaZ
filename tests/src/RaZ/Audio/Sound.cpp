@@ -6,14 +6,14 @@
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Threading.hpp"
 
-TEST_CASE("Sound initialization") {
+TEST_CASE("Sound initialization", "[audio]") {
   const Raz::AudioSystem audio; // Initializing the audio device & context, needed before all audio action
 
   const Raz::Sound sound;
   CHECK(sound.getBufferIndex() != std::numeric_limits<unsigned int>::max());
 }
 
-TEST_CASE("Sound move") {
+TEST_CASE("Sound move", "[audio]") {
   const Raz::AudioSystem audio;
 
   Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
@@ -86,7 +86,7 @@ TEST_CASE("Sound move") {
   CHECK(movedSoundCtor.recoverVelocity() == movedSoundOpVelocity);
 }
 
-TEST_CASE("Sound operations") {
+TEST_CASE("Sound operations", "[audio]") {
   const Raz::AudioSystem audio;
 
   const Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");

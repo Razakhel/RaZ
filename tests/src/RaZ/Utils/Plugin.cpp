@@ -3,7 +3,7 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Plugin.hpp"
 
-TEST_CASE("Plugin load") {
+TEST_CASE("Plugin load", "[utils]") {
 #if defined(RAZ_PLATFORM_WINDOWS)
   Raz::Plugin plugin(RAZ_TESTS_ROOT "assets/misc/PlûgïnTést.dll");
 #else

@@ -6,7 +6,7 @@
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 
-TEST_CASE("GltfFormat load glTF") {
+TEST_CASE("GltfFormat load glTF", "[data]") {
   const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè.gltf");
 
   REQUIRE(mesh.getSubmeshes().size() == 3);
@@ -235,7 +235,7 @@ TEST_CASE("GltfFormat load glTF") {
   }
 }
 
-TEST_CASE("GltfFormat load GLB simple") {
+TEST_CASE("GltfFormat load GLB simple", "[data]") {
   const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/ßøӾ.glb");
 
   REQUIRE(mesh.getSubmeshes().size() == 1);
@@ -263,7 +263,7 @@ TEST_CASE("GltfFormat load GLB simple") {
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 1.f);
 }
 
-TEST_CASE("GltfFormat load GLB textured") {
+TEST_CASE("GltfFormat load GLB textured", "[data]") {
   const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/ßøӾTêxtùrëd.glb");
 
   REQUIRE(mesh.getSubmeshes().size() == 1);

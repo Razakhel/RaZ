@@ -2,7 +2,7 @@
 
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaCore Application") {
+TEST_CASE("LuaCore Application", "[script][lua][core]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local frameTimeInfo = FrameTimeInfo.new()
 
@@ -31,7 +31,7 @@ TEST_CASE("LuaCore Application") {
   )"));
 }
 
-TEST_CASE("LuaCore Entity") {
+TEST_CASE("LuaCore Entity", "[script][lua][core]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local entity = Entity.new(0)
     entity       = Entity.new(0, true)
@@ -84,7 +84,7 @@ TEST_CASE("LuaCore Entity") {
 #endif
 }
 
-TEST_CASE("LuaCore World") {
+TEST_CASE("LuaCore World", "[script][lua][core]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local world = World.new()
     world       = World.new(0)

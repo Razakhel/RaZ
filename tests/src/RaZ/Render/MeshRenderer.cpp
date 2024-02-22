@@ -4,7 +4,7 @@
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/Shape.hpp"
 
-TEST_CASE("MeshRenderer materials") {
+TEST_CASE("MeshRenderer materials", "[render]") {
   Raz::MeshRenderer meshRenderer;
 
   CHECK(meshRenderer.getSubmeshRenderers().empty());
@@ -54,7 +54,7 @@ TEST_CASE("MeshRenderer materials") {
   CHECK(meshRenderer.getSubmeshRenderers()[2].getMaterialIndex() == std::numeric_limits<std::size_t>::max());
 }
 
-TEST_CASE("MeshRenderer clone") {
+TEST_CASE("MeshRenderer clone", "[render]") {
   Raz::MeshRenderer meshRenderer;
 
   meshRenderer.addSubmeshRenderer().setMaterialIndex(42);
@@ -74,7 +74,7 @@ TEST_CASE("MeshRenderer clone") {
   CHECK(clonedMeshRenderer.getMaterials()[1].getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.5f));
 }
 
-TEST_CASE("MeshRenderer loading") {
+TEST_CASE("MeshRenderer loading", "[render]") {
   Raz::MeshRenderer meshRenderer(Raz::Mesh(Raz::Sphere(Raz::Vec3f(0.f), 1.f), 1, Raz::SphereMeshType::UV));
 
   CHECK(meshRenderer.getSubmeshRenderers().size() == 1);

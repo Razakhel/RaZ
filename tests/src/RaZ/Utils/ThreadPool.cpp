@@ -5,7 +5,7 @@
 
 #ifdef RAZ_THREADS_AVAILABLE
 
-TEST_CASE("ThreadPool basic") {
+TEST_CASE("ThreadPool basic", "[utils]") {
   Raz::ThreadPool pool;
   std::atomic<int> i = 0;
 

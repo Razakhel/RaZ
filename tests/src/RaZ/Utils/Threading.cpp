@@ -37,7 +37,7 @@ void iteratorParallelIncrementation(std::vector<int>& values) {
 
 } // namespace
 
-TEST_CASE("Threading async basic") {
+TEST_CASE("Threading async basic", "[utils]") {
   std::future<int> res = Raz::Threading::launchAsync([] () noexcept {
     return 42;
   });
@@ -47,14 +47,14 @@ TEST_CASE("Threading async basic") {
   CHECK(res.get() == 42);
 }
 
-TEST_CASE("Threading simple parallelization") {
+TEST_CASE("Threading simple parallelization", "[utils]") {
   std::atomic<int> i = 0;
   Raz::Threading::parallelize([&i] () noexcept { ++i; }, 10);
 
   CHECK(i == 10);
 }
 
-TEST_CASE("Threading multi parallelization") {
+TEST_CASE("Threading multi parallelization", "[utils]") {
   std::atomic<int> i = 0;
   Raz::Threading::parallelize({
     [&i] () noexcept { ++i; },
@@ -67,7 +67,7 @@ TEST_CASE("Threading multi parallelization") {
   CHECK(i == 5);
 }
 
-TEST_CASE("Threading index parallelization - divisible size") {
+TEST_CASE("Threading index parallelization - divisible size", "[utils]") {
   std::vector<int> values(2048); // Choosing a size that can be easily divided
   fillRandom(values);
 
@@ -78,7 +78,7 @@ TEST_CASE("Threading index parallelization - divisible size") {
   CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
-TEST_CASE("Threading index parallelization - indivisible size") {
+TEST_CASE("Threading index parallelization - indivisible size", "[utils]") {
   std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be divided
   fillRandom(values);
 
@@ -89,7 +89,7 @@ TEST_CASE("Threading index parallelization - indivisible size") {
   CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
-TEST_CASE("Threading iterator parallelization - divisible size") {
+TEST_CASE("Threading iterator parallelization - divisible size", "[utils]") {
   std::vector<int> values(2048); // Choosing a size that can be easily divided
   fillRandom(values);
 
@@ -100,7 +100,7 @@ TEST_CASE("Threading iterator parallelization - divisible size") {
   CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
-TEST_CASE("Threading iterator parallelization - indivisible size") {
+TEST_CASE("Threading iterator parallelization - indivisible size", "[utils]") {
   std::vector<int> values(2083); // Choosing a prime number as size, so that it can't be divided
   fillRandom(values);
 
@@ -111,7 +111,7 @@ TEST_CASE("Threading iterator parallelization - indivisible size") {
   CHECK(sumBeforeIncrement + values.size() == sumAfterIncrement);
 }
 
-TEST_CASE("Threading parallelization empty input") {
+TEST_CASE("Threading parallelization empty input", "[utils]") {
   CHECK_NOTHROW(Raz::Threading::parallelize(std::initializer_list<std::function<void()>>()));
 
   CHECK_THROWS(Raz::Threading::parallelize(0, 0, [] (const Raz::Threading::IndexRange&) noexcept {}));

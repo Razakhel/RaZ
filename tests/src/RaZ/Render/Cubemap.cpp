@@ -4,9 +4,8 @@
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Renderer.hpp"
-#include "RaZ/Utils/FilePath.hpp"
 
-TEST_CASE("Cubemap move") {
+TEST_CASE("Cubemap move", "[render]") {
   Raz::Cubemap cubemap;
 
   const unsigned int cubemapIndex = cubemap.getIndex();
@@ -36,7 +35,7 @@ TEST_CASE("Cubemap move") {
   CHECK(movedCubemapCtor.getIndex() == movedCubemapOpIndex);
 }
 
-TEST_CASE("Cubemap textures") {
+TEST_CASE("Cubemap textures", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const Raz::Image refImgPosX = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/₀₀₀₀.png");

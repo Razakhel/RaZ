@@ -3,7 +3,7 @@
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/PngFormat.hpp"
 
-TEST_CASE("PngFormat load") {
+TEST_CASE("PngFormat load", "[data]") {
   const Raz::Image img = Raz::PngFormat::load(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.png");
 
   CHECK(img.getWidth() == 2);
@@ -58,7 +58,7 @@ TEST_CASE("PngFormat load") {
   CHECK(imgFlipped.recoverByteValue(1, 1, 3) == 255);
 }
 
-TEST_CASE("PngFormat save") {
+TEST_CASE("PngFormat save", "[data]") {
   Raz::Image img(3, 3, Raz::ImageColorspace::RGBA);
 
   // Creating a 3x3 image, configured as such (x are white pixels):

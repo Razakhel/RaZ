@@ -81,30 +81,30 @@ void checkImage(const Raz::FilePath& filePath, uint8_t expectedChannelCount, con
 
 } // namespace
 
-TEST_CASE("ImageFormat load BMP") {
+TEST_CASE("ImageFormat load BMP", "[data]") {
   checkImage(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.bmp", 4, rawValues);
 }
 
-TEST_CASE("ImageFormat load GIF") {
+TEST_CASE("ImageFormat load GIF", "[data]") {
   checkImage(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.gif", 4, rawValues);
 }
 
-TEST_CASE("ImageFormat load JPEG") {
+TEST_CASE("ImageFormat load JPEG", "[data]") {
   checkImage(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.jpg", 3, jpegValues);
 }
 
-TEST_CASE("ImageFormat load PGM") {
+TEST_CASE("ImageFormat load PGM", "[data]") {
   checkImage(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.pgm", 1, rawValues);
 }
 
-TEST_CASE("ImageFormat load PNG") {
+TEST_CASE("ImageFormat load PNG", "[data]") {
   checkImage(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.png", 4, rawValues);
 }
 
-TEST_CASE("ImageFormat load PPM") {
+TEST_CASE("ImageFormat load PPM", "[data]") {
   checkImage(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.ppm", 3, rawValues);
 }
 
-TEST_CASE("ImageFormat load TGA") {
+TEST_CASE("ImageFormat load TGA", "[data]") {
   checkImage(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.tga", 3, rawValues);
 }

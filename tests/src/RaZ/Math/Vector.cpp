@@ -27,7 +27,7 @@ constexpr Raz::Vec3d vec3d2(13.01, -0.00000001, 351.025465545);
 
 } // namespace
 
-TEST_CASE("Vector deduction guides") {
+TEST_CASE("Vector deduction guides", "[math]") {
   constexpr Raz::Vector vec3b(static_cast<uint8_t>(1), 2, 3);
   constexpr Raz::Vector vec2i(1, 2);
   constexpr Raz::Vector vec4u(1u, 2u, 3u, 4u);
@@ -41,7 +41,7 @@ TEST_CASE("Vector deduction guides") {
   CHECK(std::is_same_v<std::decay_t<decltype(vec5d)>, Raz::Vector<double, 5>>);
 }
 
-TEST_CASE("Vector indexing") {
+TEST_CASE("Vector indexing", "[math]") {
   CHECK(vec3f1[0] == 3.18f);
   CHECK(vec3f1[1] == 42.f);
   CHECK(vec3f1[2] == 0.874f);
@@ -73,7 +73,7 @@ TEST_CASE("Vector indexing") {
   CHECK(vecCopy.w() == vec4f1.w() + 2.f);
 }
 
-TEST_CASE("Vector dot") {
+TEST_CASE("Vector dot", "[math]") {
   CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().dot(std::declval<Raz::Vec3b>())), uint64_t>);
   CHECK(vec3b1.dot(vec3b2) == 3528);
 
@@ -92,7 +92,7 @@ TEST_CASE("Vector dot") {
   CHECK_THAT(vec3d1.dot(vec3d2), IsNearlyEqualTo(-295798.92303641));
 }
 
-TEST_CASE("Vector cross") {
+TEST_CASE("Vector cross", "[math]") {
   // The cross product cannot be computed for unsigned types or sizes other than 3
 
   CHECK(vec3i1.cross(vec3i1) == Raz::Vec3i(0));
@@ -106,7 +106,7 @@ TEST_CASE("Vector cross") {
   CHECK_THAT(vec3d1.cross(vec3d2), IsNearlyEqualToVector(Raz::Vec3d(1668073.3632868854, -4600.859073635499, -61823.533009819)));
 }
 
-TEST_CASE("Vector/scalar operations") {
+TEST_CASE("Vector/scalar operations", "[math]") {
   CHECK((vec3b1 + 4) == Raz::Vec3b(35, 12, 16));
   CHECK((vec3b2 - 8) == Raz::Vec3b(40, 247, 248)); // Underflowing from 0 to 248 (255 - 7)
   CHECK((vec3b1 * 2) == Raz::Vec3b(62, 16, 24));
@@ -161,7 +161,7 @@ TEST_CASE("Vector/scalar operations") {
   }
 }
 
-TEST_CASE("Vector/vector operations") {
+TEST_CASE("Vector/vector operations", "[math]") {
   CHECK((vec3b1 + vec3b2) == Raz::Vec3b(79, 7, 12)); // Values are overflowed
   CHECK((vec3b1 - vec3b2) == Raz::Vec3b(239, 9, 12)); // Values are underflowed
   CHECK((vec3b1 * vec3b2) == Raz::Vec3b(208, 248, 0)); // Values are overflowed
@@ -189,7 +189,7 @@ TEST_CASE("Vector/vector operations") {
   CHECK_THAT(vec3d1 / vec3d2, IsNearlyEqualToVector(Raz::Vec3d(-1.391237509607994, -475200100000.0, -2.3986863707814358)));
 }
 
-TEST_CASE("Vector/matrix operations") {
+TEST_CASE("Vector/matrix operations", "[math]") {
   const Raz::Mat3f mat3( 4.12f,  25.1f,  30.7842f,
                          3.04f,  5.f,   -64.5f,
                         -1.f,   -7.54f,  8.41f);
@@ -207,7 +207,7 @@ TEST_CASE("Vector/matrix operations") {
   CHECK((vec4f1 * Raz::Mat4f::identity()) == vec4f1);
 }
 
-TEST_CASE("Vector reflection") {
+TEST_CASE("Vector reflection", "[math]") {
   // IncVec  N  Reflection
   //      \  ^  ^
   //       \ | /
@@ -224,7 +224,7 @@ TEST_CASE("Vector reflection") {
   CHECK_THAT(vec3d1.reflect(vec3d2), IsNearlyEqualToVector(Raz::Vec3d(7696669.877407388, 4751.995084021539, 207665067.33313086)));
 }
 
-TEST_CASE("Vector length") {
+TEST_CASE("Vector length", "[math]") {
   CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().computeSquaredLength()), uint64_t>);
   CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().computeLength()), float>);
   CHECK(vec3b1.computeSquaredLength() == 1169);
@@ -249,7 +249,7 @@ TEST_CASE("Vector length") {
   CHECK(vec3d1.computeLength() == 4826.054818793607);
 }
 
-TEST_CASE("Vector normalization") {
+TEST_CASE("Vector normalization", "[math]") {
   CHECK(std::is_same_v<decltype(std::declval<Raz::Vec3b>().normalize()), Raz::Vec3f>);
   CHECK_THAT(vec3b1.normalize(), IsNearlyEqualToVector(Raz::Vec3f(0.9066808f, 0.2339821f, 0.3509732f)));
 
@@ -273,7 +273,7 @@ TEST_CASE("Vector normalization") {
   CHECK(Raz::Vec3d(0.0).normalize() == Raz::Vec3d(0.f));
 }
 
-TEST_CASE("Vector interpolation") {
+TEST_CASE("Vector interpolation", "[math]") {
   CHECK(vec3b1.lerp(vec3b2, 0.f) == vec3b1);
   CHECK(vec3b1.lerp(vec3b2, 0.25f) == Raz::Vec3b(35, 69, 9)); // Results are truncated, not rounded
   CHECK(vec3b1.lerp(vec3b2, 0.5f) == Raz::Vec3b(39, 131, 6));
@@ -320,7 +320,7 @@ TEST_CASE("Vector interpolation") {
   CHECK_THAT(vec3d1.lerp(vec3d2, 1.0), IsNearlyEqualToVector(vec3d2, 0.000000000001));
 }
 
-TEST_CASE("Vector hash") {
+TEST_CASE("Vector hash", "[math]") {
   CHECK(vec3b1.hash() == vec3b1.hash());
   CHECK_FALSE(vec3b1.hash() == vec3b2.hash());
 
@@ -360,7 +360,7 @@ TEST_CASE("Vector hash") {
   CHECK(map.find(vec3f1Epsilon) == map.cend());
 }
 
-TEST_CASE("Vector near-equality") {
+TEST_CASE("Vector near-equality", "[math]") {
   // Near-equality applies only to vectors of floating-point values
 
   CHECK_FALSE(vec3f1 == vec3f2);
@@ -387,7 +387,7 @@ TEST_CASE("Vector near-equality") {
   CHECK(baseVec == compVec); // Vector::operator== does a near-equality check on floating point types
 }
 
-TEST_CASE("Vector strict equality") {
+TEST_CASE("Vector strict equality", "[math]") {
   CHECK(vec3b1.strictlyEquals(vec3b1));
   CHECK_FALSE(vec3b1.strictlyEquals(vec3b1 + Raz::Vec3b(1, 0, 0)));
 
@@ -433,7 +433,7 @@ TEST_CASE("Vector strict equality") {
   CHECK_FALSE(std::equal(vectors.cbegin(), vectors.cend(), swappedVectors.cbegin(), std::equal_to<Raz::Vec3f>()));
 }
 
-TEST_CASE("Vector less-than") {
+TEST_CASE("Vector less-than", "[math]") {
   CHECK(std::less<Raz::Vec3b>()(vec3b1, vec3b2));
   CHECK_FALSE(std::less<Raz::Vec3b>()(vec3b2, vec3b1));
 
@@ -459,7 +459,7 @@ TEST_CASE("Vector less-than") {
   CHECK_FALSE(std::less<Raz::Vec3d>()(vec3d2 + std::numeric_limits<double>::epsilon(), vec3d2));
 }
 
-TEST_CASE("Vector conversion") {
+TEST_CASE("Vector conversion", "[math]") {
   CHECK(Raz::Vec3f(vec3b1) == Raz::Vec3f(31.f, 8.f, 12.f));
   CHECK(Raz::Vec3b(vec3i1) == Raz::Vec3b(208, 0, 54)); // Values are underflowed & overflowed
   CHECK(Raz::Vec3i(vec3f1) == Raz::Vec3i(3, 42, 0)); // Results are truncated, not rounded
@@ -469,7 +469,7 @@ TEST_CASE("Vector conversion") {
   CHECK(Raz::Vec3i(vec3d1) == Raz::Vec3i(-18, 4752, -842));
 }
 
-TEST_CASE("Vector printing") {
+TEST_CASE("Vector printing", "[math]") {
   std::stringstream stream;
 
   stream << vec3b1;

@@ -80,7 +80,7 @@ const Raz::AABB aabb3(Raz::Vec3f(-10.f, -10.f, -5.f), Raz::Vec3f(-6.f, -5.f, 5.f
 
 } // namespace
 
-TEST_CASE("Line basic") {
+TEST_CASE("Line basic", "[utils]") {
   // See: https://www.geogebra.org/m/fbq8scce
 
   CHECK(line1.computeCentroid() == Raz::Vec3f(0.5f, 0.f, 0.f));
@@ -101,7 +101,7 @@ TEST_CASE("Line basic") {
   CHECK_THAT(line4.computeLength(), IsNearlyEqualTo(22.6274166f));
 }
 
-TEST_CASE("Line point containment") {
+TEST_CASE("Line point containment", "[utils]") {
   CHECK(line1.contains(line1.getBeginPos()));
   CHECK(line1.contains(line1.getEndPos()));
   CHECK(line1.contains(line1.computeCentroid()));
@@ -115,7 +115,7 @@ TEST_CASE("Line point containment") {
   CHECK(line4.contains(line4.computeCentroid()));
 }
 
-TEST_CASE("Line-plane intersection") {
+TEST_CASE("Line-plane intersection", "[utils]") {
   CHECK_FALSE(line1.intersects(plane1));
   CHECK(line1.intersects(plane2));
   CHECK_FALSE(line1.intersects(plane3));
@@ -141,7 +141,7 @@ TEST_CASE("Line-plane intersection") {
   CHECK(reverseTestLine.intersects(testPlane));
 }
 
-TEST_CASE("Line-AABB intersection") {
+TEST_CASE("Line-AABB intersection", "[utils]") {
   // See: https://www.geogebra.org/m/fru9r3r6
 
   CHECK(line1.intersects(aabb1));
@@ -161,7 +161,7 @@ TEST_CASE("Line-AABB intersection") {
   CHECK(line4.intersects(aabb3));
 }
 
-TEST_CASE("Line translation") {
+TEST_CASE("Line translation", "[utils]") {
   Raz::Line line1Copy = line1;
 
   line1Copy.translate(Raz::Vec3f(1.f));
@@ -173,7 +173,7 @@ TEST_CASE("Line translation") {
   CHECK(line1Copy.getEndPos() == line1.getEndPos());
 }
 
-TEST_CASE("Line point projection") {
+TEST_CASE("Line point projection", "[utils]") {
   CHECK(line1.computeProjection(line1.getBeginPos()) == line1.getBeginPos());
   CHECK(line1.computeProjection(line1.getEndPos()) == line1.getEndPos());
   const Raz::Vec3f centroid1 = line1.computeCentroid();
@@ -202,14 +202,14 @@ TEST_CASE("Line point projection") {
   CHECK(line4.computeProjection(furtherBegin) == Raz::Vec3f(-9.5f, -9.5f, 0.f));
 }
 
-TEST_CASE("Line bounding box") {
+TEST_CASE("Line bounding box", "[utils]") {
   CHECK(line1.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(1.f, 0.f, 0.f)));
   CHECK(line2.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f, 1.f, 0.f)));
   CHECK(line3.computeBoundingBox() == Raz::AABB(Raz::Vec3f(1.5f, 2.5f, 0.f), Raz::Vec3f(5.5f, 5.f, 0.f)));
   CHECK(line4.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-10.f, -10.f, 0.f), Raz::Vec3f(6.f, 6.f, 0.f)));
 }
 
-TEST_CASE("Line equality") {
+TEST_CASE("Line equality", "[utils]") {
   CHECK(line1 == line1);
   CHECK(line2 == line2);
 
@@ -221,7 +221,7 @@ TEST_CASE("Line equality") {
   CHECK(line1Copy == line1);
 }
 
-TEST_CASE("Plane basic") {
+TEST_CASE("Plane basic", "[utils]") {
   const Raz::Plane testPlane1(1.f, Raz::Axis::Y);
   CHECK(testPlane1.getDistance() == 1.f);
 
@@ -239,7 +239,7 @@ TEST_CASE("Plane basic") {
   CHECK(testPlane2.getNormal() == testPlane3.getNormal());
 }
 
-TEST_CASE("Plane-plane intersection") {
+TEST_CASE("Plane-plane intersection", "[utils]") {
   const Raz::Plane testPlane(2.f, -Raz::Axis::Y);
 
   CHECK_FALSE(plane1.intersects(testPlane));
@@ -256,7 +256,7 @@ TEST_CASE("Plane-plane intersection") {
   CHECK_FALSE(plane3.intersects(plane3));
 }
 
-TEST_CASE("Plane-sphere intersection") {
+TEST_CASE("Plane-sphere intersection", "[utils]") {
   // See: https://www.geogebra.org/m/r3brvcsn
 
   CHECK(plane1.intersects(sphere1));
@@ -272,7 +272,7 @@ TEST_CASE("Plane-sphere intersection") {
   CHECK(plane3.intersects(sphere3));
 }
 
-TEST_CASE("Plane translation") {
+TEST_CASE("Plane translation", "[utils]") {
   {
     Raz::Plane plane1Copy = plane1;
 
@@ -310,7 +310,7 @@ TEST_CASE("Plane translation") {
   }
 }
 
-TEST_CASE("Plane equality") {
+TEST_CASE("Plane equality", "[utils]") {
   CHECK(plane1 == plane1);
   CHECK(plane2 == plane2);
 
@@ -322,7 +322,7 @@ TEST_CASE("Plane equality") {
   CHECK(plane1Copy == plane1);
 }
 
-TEST_CASE("Sphere point containment") {
+TEST_CASE("Sphere point containment", "[utils]") {
   CHECK(sphere1.contains(sphere1.getCenter()));
   CHECK(sphere1.contains(Raz::Vec3f(0.f, 1.f, 0.f))); // Right on the sphere's border
   CHECK_FALSE(sphere1.contains(Raz::Vec3f(0.f, 1.f + std::numeric_limits<float>::epsilon(), 0.f)));
@@ -336,7 +336,7 @@ TEST_CASE("Sphere point containment") {
   CHECK_FALSE(sphere3.contains(Raz::Vec3f(sphere3.getCenter().x(), sphere3.getCenter().y(), sphere3.getRadius() + std::numeric_limits<float>::epsilon())));
 }
 
-TEST_CASE("Sphere-sphere intersection") {
+TEST_CASE("Sphere-sphere intersection", "[utils]") {
   // See: https://www.geogebra.org/m/tsfueyp5
 
   const Raz::Sphere testSphere(Raz::Vec3f(0.f), 13.15f); // This sphere intersects all the test ones
@@ -356,7 +356,7 @@ TEST_CASE("Sphere-sphere intersection") {
   CHECK(testSphere.intersects(sphere3));
 }
 
-TEST_CASE("Sphere translation") {
+TEST_CASE("Sphere translation", "[utils]") {
   Raz::Sphere sphere1Copy = sphere1;
 
   sphere1Copy.translate(Raz::Vec3f(1.f));
@@ -368,13 +368,13 @@ TEST_CASE("Sphere translation") {
   CHECK(sphere1Copy.getRadius() == sphere1.getRadius());
 }
 
-TEST_CASE("Sphere bounding box") {
+TEST_CASE("Sphere bounding box", "[utils]") {
   CHECK(sphere1.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-1.f), Raz::Vec3f(1.f)));
   CHECK(sphere2.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.f, 5.f, -5.f), Raz::Vec3f(10.f, 15.f, 5.f)));
   CHECK(sphere3.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-11.f, -11.f, -1.f), Raz::Vec3f(-9.f, -9.f, 1.f)));
 }
 
-TEST_CASE("Sphere equality") {
+TEST_CASE("Sphere equality", "[utils]") {
   CHECK(sphere1 == sphere1);
   CHECK(sphere2 == sphere2);
 
@@ -386,7 +386,7 @@ TEST_CASE("Sphere equality") {
   CHECK(sphere1Copy == sphere1);
 }
 
-TEST_CASE("Triangle basic") {
+TEST_CASE("Triangle basic", "[utils]") {
   // See: https://www.geogebra.org/m/gszsn33d
 
   CHECK(triangle1.computeCentroid() == Raz::Vec3f(0.f, 0.5f, 0.f));
@@ -399,7 +399,7 @@ TEST_CASE("Triangle basic") {
   CHECK_THAT(triangle3.computeNormal(), IsNearlyEqualToVector(Raz::Vec3f(0.077791f, -0.93349177f, 0.35005942f)));
 }
 
-TEST_CASE("Triangle translation") {
+TEST_CASE("Triangle translation", "[utils]") {
   Raz::Triangle triangle1Copy = triangle1;
 
   triangle1Copy.translate(Raz::Vec3f(1.f));
@@ -413,13 +413,13 @@ TEST_CASE("Triangle translation") {
   CHECK(triangle1Copy.getThirdPos() == triangle1.getThirdPos());
 }
 
-TEST_CASE("Triangle bounding box") {
+TEST_CASE("Triangle bounding box", "[utils]") {
   CHECK(triangle1.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-3.f, 0.5f, -6.f), Raz::Vec3f(3.f, 0.5f, 3.f)));
   CHECK(triangle2.computeBoundingBox() == Raz::AABB(Raz::Vec3f(0.5f, -0.5f, -3.f), Raz::Vec3f(0.5f, 3.f, 3.f)));
   CHECK(triangle3.computeBoundingBox() == Raz::AABB(Raz::Vec3f(-1.5f, -1.75f, -1.f), Raz::Vec3f(0.f, -1.f, 1.f)));
 }
 
-TEST_CASE("Triangle clockwiseness") {
+TEST_CASE("Triangle clockwiseness", "[utils]") {
   CHECK(triangle1.isCounterClockwise(Raz::Axis::Y));
   CHECK(triangle2.isCounterClockwise(Raz::Axis::X));
   CHECK(triangle3.isCounterClockwise(-Raz::Axis::Y)); // Pointing roughly towards -Y
@@ -438,7 +438,7 @@ TEST_CASE("Triangle clockwiseness") {
   CHECK(testTriangle2.isCounterClockwise(Raz::Axis::Z));
 }
 
-TEST_CASE("Triangle equality") {
+TEST_CASE("Triangle equality", "[utils]") {
   CHECK(triangle1 == triangle1);
   CHECK(triangle2 == triangle2);
 
@@ -450,7 +450,7 @@ TEST_CASE("Triangle equality") {
   CHECK(triangle1Copy == triangle1);
 }
 
-TEST_CASE("AABB basic") {
+TEST_CASE("AABB basic", "[utils]") {
   CHECK(aabb1.computeCentroid() == Raz::Vec3f(0.f));
   CHECK(aabb2.computeCentroid() == Raz::Vec3f(3.5f, 4.f, 0.f));
   CHECK(aabb3.computeCentroid() == Raz::Vec3f(-8.f, -7.5f, 0.f));
@@ -460,7 +460,7 @@ TEST_CASE("AABB basic") {
   CHECK(aabb3.computeHalfExtents() == Raz::Vec3f(2.f, 2.5f, 5.f));
 }
 
-TEST_CASE("AABB point containment") {
+TEST_CASE("AABB point containment", "[utils]") {
   // See: https://www.geogebra.org/m/kwkkt9ry
 
   CHECK(aabb1.contains(aabb1.computeCentroid()));
@@ -494,7 +494,7 @@ TEST_CASE("AABB point containment") {
   CHECK_FALSE(aabb3.contains(point5));
 }
 
-TEST_CASE("AABB-AABB intersection") {
+TEST_CASE("AABB-AABB intersection", "[utils]") {
   CHECK(aabb1.intersects(aabb1)); // A box always intersects itself
   CHECK(aabb2.intersects(aabb2));
   CHECK(aabb3.intersects(aabb3));
@@ -531,7 +531,7 @@ TEST_CASE("AABB-AABB intersection") {
   }
 }
 
-TEST_CASE("AABB translation") {
+TEST_CASE("AABB translation", "[utils]") {
   Raz::AABB aabb1Copy = aabb1;
 
   aabb1Copy.translate(Raz::Vec3f(1.f));
@@ -543,13 +543,13 @@ TEST_CASE("AABB translation") {
   CHECK(aabb1Copy.getMaxPosition() == aabb1.getMaxPosition());
 }
 
-TEST_CASE("AABB bounding box") {
+TEST_CASE("AABB bounding box", "[utils]") {
   CHECK(aabb1.computeBoundingBox() == aabb1);
   CHECK(aabb2.computeBoundingBox() == aabb2);
   CHECK(aabb3.computeBoundingBox() == aabb3);
 }
 
-TEST_CASE("AABB equality") {
+TEST_CASE("AABB equality", "[utils]") {
   CHECK(aabb1 == aabb1);
   CHECK(aabb2 == aabb2);
 

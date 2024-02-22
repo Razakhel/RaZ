@@ -6,7 +6,7 @@
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
 
-TEST_CASE("Components IDs") {
+TEST_CASE("Components IDs", "[core]") {
   // With the CRTP, every component gets a different constant ID with the first call
   // The ID is incremented with every distinct component call
   // No matter how many times one component is checked, it will always have the same ID

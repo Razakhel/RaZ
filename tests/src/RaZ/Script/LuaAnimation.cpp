@@ -2,7 +2,7 @@
 
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaAnimation Skeleton") {
+TEST_CASE("LuaAnimation Skeleton", "[script][lua][animation]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local skeleton = Skeleton.new()
     skeleton       = Skeleton.new(0)

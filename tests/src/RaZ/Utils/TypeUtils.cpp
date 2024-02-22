@@ -32,7 +32,7 @@ enum class EnumTest {
   AGAIN
 };
 
-TEST_CASE("TypeUtils type str") {
+TEST_CASE("TypeUtils type str", "[utils]") {
   int testInt {};
   const int& testIntRef = testInt;
 
@@ -61,7 +61,7 @@ TEST_CASE("TypeUtils type str") {
 #endif
 }
 
-TEST_CASE("TypeUtils enum str") {
+TEST_CASE("TypeUtils enum str", "[utils]") {
 #if defined(RAZ_COMPILER_GCC) && __GNUC__ < 9
   // Prior to version 9, GCC prints enum values as (Type)value
   CHECK_NOFAIL(Raz::TypeUtils::getEnumStr<EnumTest::VALUE>() == "(EnumTest)0");
@@ -76,7 +76,7 @@ TEST_CASE("TypeUtils enum str") {
 
 #if !defined(RAZ_COMPILER_MSVC)
 
-TEST_CASE("TypeUtils has attribute") {
+TEST_CASE("TypeUtils has attribute", "[utils]") {
   CHECK(Raz::TypeUtils::hasDefaultConstructor<AttributeTest>());
   CHECK(Raz::TypeUtils::hasCopyConstructor<AttributeTest>());
   CHECK_FALSE(Raz::TypeUtils::hasMoveConstructor<AttributeTest>()); // Deleted

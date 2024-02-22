@@ -5,7 +5,7 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 
-TEST_CASE("Texture creation") {
+TEST_CASE("Texture creation", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
 #if !defined(USE_OPENGL_ES) // 1D textures are unavailable with OpenGL ES
@@ -44,7 +44,7 @@ TEST_CASE("Texture creation") {
   CHECK(texture3D.getDataType() == Raz::TextureDataType::BYTE);
 }
 
-TEST_CASE("Texture move") {
+TEST_CASE("Texture move", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
 #if !defined(USE_OPENGL_ES) // 1D textures are unavailable with OpenGL ES
@@ -217,7 +217,7 @@ TEST_CASE("Texture3D load image slices") {
                                 Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT) })); // Different data types
 }
 
-TEST_CASE("Texture fill") {
+TEST_CASE("Texture fill", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
 #if !defined(USE_OPENGL_ES)

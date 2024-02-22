@@ -3,13 +3,13 @@
 #include "RaZ/Application.hpp"
 #include "RaZ/Script/LuaScript.hpp"
 
-TEST_CASE("LuaScript validity") {
-  CHECK_THROWS(Raz::LuaScript({})); // Empty script
+TEST_CASE("LuaScript validity", "[script][lua]") {
+  CHECK_THROWS(Raz::LuaScript("")); // Empty script
   CHECK_THROWS(Raz::LuaScript("local a = 3")); // No update() function
   CHECK_NOTHROW(Raz::LuaScript("function update () end"));
 }
 
-TEST_CASE("LuaScript code") {
+TEST_CASE("LuaScript code", "[script][lua]") {
   Raz::LuaScript script(R"(
     tests_script_var = 0
     function tests_script_func () end
@@ -28,7 +28,7 @@ TEST_CASE("LuaScript code") {
   CHECK(script.getEnvironment().exists("update"));
 }
 
-TEST_CASE("LuaScript register") {
+TEST_CASE("LuaScript register", "[script][lua]") {
   Raz::LuaScript script("function update () return entity1 == entity2 end");
   const Raz::Entity entity(0);
 
@@ -49,7 +49,7 @@ TEST_CASE("LuaScript register") {
   CHECK_FALSE(script.getEnvironment().exists("entity2"));
 }
 
-TEST_CASE("LuaScript execution") {
+TEST_CASE("LuaScript execution", "[script][lua]") {
   Raz::LuaScript script("function update() end");
   CHECK(script.update({})); // update() does not return anything, which is the same as returning true
 

@@ -3,7 +3,7 @@
 #include "RaZ/Math/MathUtils.hpp"
 #include "RaZ/Math/Vector.hpp"
 
-TEST_CASE("MathUtils lerp arithmetic types") {
+TEST_CASE("MathUtils lerp arithmetic types", "[math]") {
   CHECK(Raz::MathUtils::lerp(0.f, 1.f, 0.f) == 0.f);
   CHECK(Raz::MathUtils::lerp(0.f, 1.f, 0.25f) == 0.25f);
   CHECK(Raz::MathUtils::lerp(0.f, 1.f, 0.5f) == 0.5f);
@@ -29,7 +29,7 @@ TEST_CASE("MathUtils lerp arithmetic types") {
   CHECK(Raz::MathUtils::lerp(457, 5324, 1.f) == 5324);
 }
 
-TEST_CASE("MathUtils lerp vector") {
+TEST_CASE("MathUtils lerp vector", "[math]") {
   CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 0.f) == Raz::Vec3f(0.f));
   CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 0.25f) == Raz::Vec3f(0.25f));
   CHECK(Raz::MathUtils::lerp(Raz::Vec3f(0.f), Raz::Vec3f(1.f), 0.5f) == Raz::Vec3f(0.5f));
@@ -55,7 +55,7 @@ TEST_CASE("MathUtils lerp vector") {
   CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 1.f) == Raz::Vec3b(75, 241, 173));
 }
 
-TEST_CASE("MathUtils smoothstep value") {
+TEST_CASE("MathUtils smoothstep value", "[math]") {
   CHECK(Raz::MathUtils::smoothstep(0.f) == 0.f);
   CHECK(Raz::MathUtils::smoothstep(0.25f) == 0.15625f);
   CHECK(Raz::MathUtils::smoothstep(0.5f) == 0.5f);
@@ -63,7 +63,7 @@ TEST_CASE("MathUtils smoothstep value") {
   CHECK(Raz::MathUtils::smoothstep(1.f) == 1.f);
 }
 
-TEST_CASE("MathUtils smoothstep range") {
+TEST_CASE("MathUtils smoothstep range", "[math]") {
   CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, -1.f) == 0.f); // If value < minThresh, returns 0
   CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 0.f) == 0.f);
   CHECK(Raz::MathUtils::smoothstep(0.f, 1.f, 0.25f) == 0.15625f);
@@ -87,7 +87,7 @@ TEST_CASE("MathUtils smoothstep range") {
   CHECK(Raz::MathUtils::smoothstep(-5.f, 5.f, 10.f) == 1.f);
 }
 
-TEST_CASE("MathUtils smootherstep value") {
+TEST_CASE("MathUtils smootherstep value", "[math]") {
   CHECK(Raz::MathUtils::smootherstep(0.f) == 0.f);
   CHECK(Raz::MathUtils::smootherstep(0.25f) == 0.103515625f);
   CHECK(Raz::MathUtils::smootherstep(0.5f) == 0.5f);
@@ -95,7 +95,7 @@ TEST_CASE("MathUtils smootherstep value") {
   CHECK(Raz::MathUtils::smootherstep(1.f) == 1.f);
 }
 
-TEST_CASE("MathUtils smootherstep range") {
+TEST_CASE("MathUtils smootherstep range", "[math]") {
   CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, -1.f) == 0.f); // If value < minThresh, returns 0
   CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 0.f) == 0.f);
   CHECK(Raz::MathUtils::smootherstep(0.f, 1.f, 0.25f) == 0.103515625f);
@@ -119,7 +119,7 @@ TEST_CASE("MathUtils smootherstep range") {
   CHECK(Raz::MathUtils::smootherstep(-5.f, 5.f, 10.f) == 1.f);
 }
 
-TEST_CASE("MathUtils orthonormal basis") {
+TEST_CASE("MathUtils orthonormal basis", "[math]") {
   Raz::Vec3f axis2;
   Raz::Vec3f axis3;
 
@@ -146,7 +146,7 @@ TEST_CASE("MathUtils orthonormal basis") {
   CHECK(axis2.dot(axis3) == 0.f);
 }
 
-TEST_CASE("MathUtils Fibonacci sphere") {
+TEST_CASE("MathUtils Fibonacci sphere", "[math]") {
   std::vector<Raz::Vec3f> fiboPoints = Raz::MathUtils::computeFibonacciSpherePoints(0);
   CHECK(fiboPoints.empty());
 

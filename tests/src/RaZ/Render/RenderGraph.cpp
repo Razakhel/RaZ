@@ -2,7 +2,7 @@
 
 #include "RaZ/Render/RenderGraph.hpp"
 
-TEST_CASE("RenderGraph validity") {
+TEST_CASE("RenderGraph validity", "[render]") {
   Raz::RenderGraph graph;
   CHECK(graph.isValid());
 

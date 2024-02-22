@@ -5,7 +5,7 @@
 #include "RaZ/Data/BvhSystem.hpp"
 #include "RaZ/Data/Mesh.hpp"
 
-TEST_CASE("BvhSystem accepted components") {
+TEST_CASE("BvhSystem accepted components", "[data]") {
   Raz::World world(1);
 
   auto& bvh = world.addSystem<Raz::BvhSystem>();
@@ -17,7 +17,7 @@ TEST_CASE("BvhSystem accepted components") {
   CHECK(bvh.containsEntity(mesh));
 }
 
-TEST_CASE("BvhSystem basic") {
+TEST_CASE("BvhSystem basic", "[data]") {
   Raz::BvhSystem bvh;
   CHECK(bvh.getRootNode().isLeaf());
   CHECK(bvh.getRootNode().getBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
@@ -31,7 +31,7 @@ TEST_CASE("BvhSystem basic") {
   CHECK_FALSE(bvh.query(Raz::Ray(Raz::Vec3f(0.f), Raz::Axis::Z)));
 }
 
-TEST_CASE("BvhSystem build") {
+TEST_CASE("BvhSystem build", "[data]") {
   Raz::World world(4);
 
   auto& bvh = world.addSystem<Raz::BvhSystem>();
@@ -173,7 +173,7 @@ TEST_CASE("BvhSystem build") {
   }
 }
 
-TEST_CASE("BvhSystem query") {
+TEST_CASE("BvhSystem query", "[data]") {
   // See: https://www.geogebra.org/m/tabbfjfd
 
   Raz::World world(3);

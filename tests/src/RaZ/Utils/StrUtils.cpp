@@ -2,7 +2,7 @@
 
 #include "RaZ/Utils/StrUtils.hpp"
 
-TEST_CASE("String starts/ends with") {
+TEST_CASE("String starts/ends with", "[utils]") {
   // Standard strings
   {
     const std::string str = "this is a test";
@@ -34,7 +34,7 @@ TEST_CASE("String starts/ends with") {
   }
 }
 
-TEST_CASE("String case change") {
+TEST_CASE("String case change", "[utils]") {
   // Standard strings
   {
     const std::string lowerSimpleStr  = "this is a test";
@@ -82,7 +82,7 @@ TEST_CASE("String case change") {
   }
 }
 
-TEST_CASE("String trimming") {
+TEST_CASE("String trimming", "[utils]") {
   // Standard strings
   {
     const std::string baseStr         = "   ͳhîs ís  ä    †èsτ     ";
@@ -120,7 +120,7 @@ TEST_CASE("String trimming") {
   }
 }
 
-TEST_CASE("String splitting") {
+TEST_CASE("String splitting", "[utils]") {
   // Standard strings
   {
     const std::string baseStr = "ͳhîs'†èsτ  (ís ä)     gøθd/†èsτ   /   ";

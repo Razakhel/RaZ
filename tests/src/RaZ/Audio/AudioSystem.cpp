@@ -11,7 +11,7 @@
 
 using namespace Raz::Literals;
 
-TEST_CASE("AudioSystem accepted components") {
+TEST_CASE("AudioSystem accepted components", "[audio]") {
   Raz::World world(2);
 
   auto& audio = world.addSystem<Raz::AudioSystem>();
@@ -25,7 +25,7 @@ TEST_CASE("AudioSystem accepted components") {
   CHECK(audio.containsEntity(listener));
 }
 
-TEST_CASE("AudioSystem initialization") {
+TEST_CASE("AudioSystem initialization", "[audio]") {
   {
     const Raz::AudioSystem audio;
     CHECK_FALSE(audio.recoverCurrentDevice().empty()); // If it is actually empty, audio features won't be available on this platform
@@ -37,7 +37,7 @@ TEST_CASE("AudioSystem initialization") {
   }
 }
 
-TEST_CASE("AudioSystem devices recovery") {
+TEST_CASE("AudioSystem devices recovery", "[audio]") {
   const std::vector<std::string> devices = Raz::AudioSystem::recoverDevices();
 
   const Raz::AudioSystem audio;
@@ -46,7 +46,7 @@ TEST_CASE("AudioSystem devices recovery") {
   CHECK(std::find(devices.cbegin(), devices.cend(), currentDevice) != devices.cend());
 }
 
-TEST_CASE("AudioSystem attributes update") {
+TEST_CASE("AudioSystem attributes update", "[audio]") {
   Raz::World world;
 
   world.addSystem<Raz::AudioSystem>();

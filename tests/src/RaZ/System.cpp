@@ -15,7 +15,7 @@ public:
   bool update(const Raz::FrameTimeInfo&) override { return true; }
 };
 
-TEST_CASE("System basic") {
+TEST_CASE("System basic", "[core]") {
   TestSystem testSystem {};
 
   Raz::EntityPtr mesh = Raz::Entity::create(0);

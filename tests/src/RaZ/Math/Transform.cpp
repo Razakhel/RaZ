@@ -6,7 +6,7 @@
 
 using namespace Raz::Literals;
 
-TEST_CASE("Transform position") {
+TEST_CASE("Transform position", "[math]") {
   Raz::Transform transform;
   CHECK(transform.getPosition() == Raz::Vec3f(0.f, 0.f, 0.f));
   CHECK(transform.hasUpdated()); // By default, a transform always has an updated status
@@ -45,7 +45,7 @@ TEST_CASE("Transform position") {
   CHECK_FALSE(transform.hasUpdated());
 }
 
-TEST_CASE("Transform rotation") {
+TEST_CASE("Transform rotation", "[math]") {
   Raz::Transform transform;
   CHECK(transform.getRotation() == Raz::Quaternionf::identity());
   CHECK(transform.hasUpdated()); // By default, a transform always has an updated status
@@ -76,7 +76,7 @@ TEST_CASE("Transform rotation") {
   //CHECK(transform.hasUpdated());
 }
 
-TEST_CASE("Transform scale") {
+TEST_CASE("Transform scale", "[math]") {
   Raz::Transform transform;
   CHECK(transform.getScale() == Raz::Vec3f(1.f, 1.f, 1.f));
   CHECK(transform.hasUpdated()); // By default, a transform always has an updated status
@@ -97,7 +97,7 @@ TEST_CASE("Transform scale") {
   CHECK(transform.hasUpdated());
 }
 
-TEST_CASE("Transform operations") {
+TEST_CASE("Transform operations", "[math]") {
   Raz::Transform transform(Raz::Vec3f(1.f, 0.f, 1.f), Raz::Quaternionf(90_deg, Raz::Axis::Y), Raz::Vec3f(2.f));
 
   CHECK(transform.getPosition() == Raz::Vec3f(1.f, 0.f, 1.f));

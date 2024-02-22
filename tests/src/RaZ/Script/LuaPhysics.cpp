@@ -2,7 +2,7 @@
 
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaPhysics Collider") {
+TEST_CASE("LuaPhysics Collider", "[script][lua][physics]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local collider = Collider.new()
 
@@ -20,7 +20,7 @@ TEST_CASE("LuaPhysics Collider") {
   )"));
 }
 
-TEST_CASE("LuaPhysics PhysicsSystem") {
+TEST_CASE("LuaPhysics PhysicsSystem", "[script][lua][physics]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local physicsSystem = PhysicsSystem.new()
 
@@ -36,7 +36,7 @@ TEST_CASE("LuaPhysics PhysicsSystem") {
   )"));
 }
 
-TEST_CASE("LuaPhysics RigidBody") {
+TEST_CASE("LuaPhysics RigidBody", "[script][lua][physics]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local rigidBody = RigidBody.new(0, 0)
 

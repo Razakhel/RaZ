@@ -2,7 +2,7 @@
 
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaMath Angle") {
+TEST_CASE("LuaMath Angle", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local deg = Degreesf.new(180)
     assert(-deg == Degreesf.new(-180))
@@ -22,7 +22,7 @@ TEST_CASE("LuaMath Angle") {
   )"));
 }
 
-TEST_CASE("LuaMath MathUtils") {
+TEST_CASE("LuaMath MathUtils", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     assert(MathUtils.lerp(1, 2, 0.25) == 1.25)
     assert(MathUtils.lerp(Vec3f.new(1), Vec3f.new(2), 0.25) == Vec3f.new(1.25))
@@ -35,7 +35,7 @@ TEST_CASE("LuaMath MathUtils") {
   )"));
 }
 
-TEST_CASE("LuaMath Matrix") {
+TEST_CASE("LuaMath Matrix", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local mat2 = Mat2f.new()
     mat2       = Mat2f.new(Mat3f.identity())
@@ -182,7 +182,7 @@ TEST_CASE("LuaMath Matrix") {
   )"));
 }
 
-TEST_CASE("LuaMath PerlinNoise") {
+TEST_CASE("LuaMath PerlinNoise", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     assert(FloatUtils.areNearlyEqual(PerlinNoise.compute1D(0.1), -0.106848))
     assert(FloatUtils.areNearlyEqual(PerlinNoise.compute1D(0.1, 2), -0.224224))
@@ -198,7 +198,7 @@ TEST_CASE("LuaMath PerlinNoise") {
   )"));
 }
 
-TEST_CASE("LuaMath Quaternion") {
+TEST_CASE("LuaMath Quaternion", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local quat = Quaternionf.new(1, 0, 0, 0)
     quat       = Quaternionf.identity()
@@ -233,7 +233,7 @@ TEST_CASE("LuaMath Quaternion") {
   )"));
 }
 
-TEST_CASE("LuaMath Transform") {
+TEST_CASE("LuaMath Transform", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local trans = Transform.new()
     trans       = Transform.new(Vec3f.new())
@@ -280,7 +280,7 @@ TEST_CASE("LuaMath Transform") {
   )"));
 }
 
-TEST_CASE("LuaMath Vector byte") {
+TEST_CASE("LuaMath Vector byte", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local vec2 = Vec2b.new()
     vec2       = Vec2b.new(1)
@@ -354,7 +354,7 @@ TEST_CASE("LuaMath Vector byte") {
   )"));
 }
 
-TEST_CASE("LuaMath Vector float") {
+TEST_CASE("LuaMath Vector float", "[script][lua][math]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local vec2 = Vec2f.new()
     vec2       = Vec2f.new(1)

@@ -2,7 +2,7 @@
 
 #include "RaZ/Data/Mesh.hpp"
 
-TEST_CASE("Mesh basic") {
+TEST_CASE("Mesh basic", "[data]") {
   Raz::Mesh mesh;
   CHECK(mesh.getSubmeshes().empty());
   CHECK(mesh.getBoundingBox() == Raz::AABB(Raz::Vec3f(0.f), Raz::Vec3f(0.f)));
@@ -30,7 +30,7 @@ TEST_CASE("Mesh basic") {
   CHECK(boundingBox == mesh.getBoundingBox());
 }
 
-TEST_CASE("Mesh tangents") {
+TEST_CASE("Mesh tangents", "[data]") {
   Raz::Mesh mesh;
 
   CHECK_NOTHROW(mesh.computeTangents()); // Attempting to compute tangents on an empty mesh does nothing
@@ -80,7 +80,7 @@ TEST_CASE("Mesh tangents") {
   CHECK(submesh.getVertices()[3].tangent == triangle2Tangent);
 }
 
-TEST_CASE("Mesh plane") {
+TEST_CASE("Mesh plane", "[data]") {
   const Raz::Plane plane(1.5f, Raz::Axis::Y);
 
   constexpr float width = 1.f;
@@ -133,7 +133,7 @@ TEST_CASE("Mesh plane") {
   CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
-TEST_CASE("Mesh triangle") {
+TEST_CASE("Mesh triangle", "[data]") {
   const Raz::Triangle triangle(Raz::Vec3f(-1.f, 0.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 1.f, 0.f));
   CHECK(triangle.computeNormal() == Raz::Axis::Z);
   CHECK(triangle.isCounterClockwise(Raz::Axis::Z));
@@ -175,7 +175,7 @@ TEST_CASE("Mesh triangle") {
   CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
-TEST_CASE("Mesh quad") {
+TEST_CASE("Mesh quad", "[data]") {
   const Raz::Quad quad(Raz::Vec3f(0.f, 2.f, 0.f), Raz::Vec3f(1.f, 2.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 0.f, 0.f));
 
   Raz::Mesh mesh(quad);
@@ -211,7 +211,7 @@ TEST_CASE("Mesh quad") {
   CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
-TEST_CASE("Mesh UV sphere") {
+TEST_CASE("Mesh UV sphere", "[data]") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
   auto checkWindingOrder = [&sphere] (const Raz::Mesh& mesh) {
@@ -294,7 +294,7 @@ TEST_CASE("Mesh UV sphere") {
   CHECK_NOTHROW(Raz::Mesh(sphere, 1, Raz::SphereMeshType::UV)); // Although it doesn't make much sense, a subdivision as low as one is currently allowed
 }
 
-TEST_CASE("Mesh icosphere") {
+TEST_CASE("Mesh icosphere", "[data]") {
   const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
   auto checkWindingOrder = [&sphere] (const Raz::Mesh& mesh) {
@@ -370,7 +370,7 @@ TEST_CASE("Mesh icosphere") {
   CHECK_THROWS(Raz::Mesh(sphere, 0, Raz::SphereMeshType::ICO)); // Creating a sphere with no subdivision throws an exception
 }
 
-TEST_CASE("Mesh AABB") {
+TEST_CASE("Mesh AABB", "[data]") {
   const Raz::AABB box(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
 
   Raz::Mesh mesh(box);

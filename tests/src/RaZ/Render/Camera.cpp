@@ -5,7 +5,7 @@
 
 using namespace Raz::Literals;
 
-TEST_CASE("Camera view") {
+TEST_CASE("Camera view", "[render]") {
   Raz::Camera camera;
 
   const Raz::Quaternionf rotation(45_deg, Raz::Axis::Y);
@@ -27,7 +27,7 @@ TEST_CASE("Camera view") {
   CHECK(viewMat == Raz::Mat4f::identity());
 }
 
-TEST_CASE("Camera look-at") {
+TEST_CASE("Camera look-at", "[render]") {
   Raz::Camera camera;
 
   const Raz::Mat4f& viewMat = camera.computeLookAt(Raz::Vec3f(0.f));
@@ -61,7 +61,7 @@ TEST_CASE("Camera look-at") {
                                                         0.f,           0.f,           0.f,           1.f)));
 }
 
-TEST_CASE("Camera perspective projection") {
+TEST_CASE("Camera perspective projection", "[render]") {
   Raz::Camera camera(800, 400, 45_deg, 0.1f, 1000.f, Raz::ProjectionType::PERSPECTIVE);
 
   CHECK(camera.computeProjectionMatrix().strictlyEquals(camera.computePerspectiveMatrix())); // Checking that the camera is a perspective one
@@ -79,7 +79,7 @@ TEST_CASE("Camera perspective projection") {
                                                                             0.f,     0.f, -1.f,         0.f)));
 }
 
-TEST_CASE("Camera orthographic projection") {
+TEST_CASE("Camera orthographic projection", "[render]") {
   Raz::Camera camera(800, 400, 45_deg, 0.1f, 1000.f, Raz::ProjectionType::ORTHOGRAPHIC);
 
   CHECK(camera.computeProjectionMatrix().strictlyEquals(camera.computeOrthographicMatrix())); // Checking that the camera is an orthographic one
@@ -97,7 +97,7 @@ TEST_CASE("Camera orthographic projection") {
                                                                             0.f,     0.f,   0.f,    1.f)));
 }
 
-TEST_CASE("Camera point unprojection") {
+TEST_CASE("Camera point unprojection", "[render]") {
   Raz::Camera camera(320, 180);
 
   Raz::Transform camTrans(Raz::Vec3f(5.f));

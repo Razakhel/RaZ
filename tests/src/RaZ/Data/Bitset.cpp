@@ -15,7 +15,7 @@ const Raz::Bitset alternated2({ false, true, false, true, false, true }); // 0 1
 
 } // namespace
 
-TEST_CASE("Bitset basic") {
+TEST_CASE("Bitset basic", "[data]") {
   CHECK(fullZeros.isEmpty());
   CHECK_FALSE(fullOnes.isEmpty());
 
@@ -41,7 +41,7 @@ TEST_CASE("Bitset basic") {
   CHECK(copy.isEmpty());
 }
 
-TEST_CASE("Bitset manipulations") {
+TEST_CASE("Bitset manipulations", "[data]") {
   CHECK((alternated1 & alternated1) == alternated1);
   CHECK((alternated2 & alternated2) == alternated2);
 
@@ -81,7 +81,7 @@ TEST_CASE("Bitset manipulations") {
   CHECK(~alternated2 == alternated1);
 }
 
-TEST_CASE("Bitset shifts") {
+TEST_CASE("Bitset shifts", "[data]") {
   CHECK((alternated1 << 1) == Raz::Bitset({ true, false, true, false, true, false, false })); // 1 0 1 0 1 0 0
   CHECK((alternated1 >> 1) == Raz::Bitset({ true, false, true, false, true })); // 1 0 1 0 1
 
@@ -94,7 +94,7 @@ TEST_CASE("Bitset shifts") {
   CHECK(shiftTest == alternated1);
 }
 
-TEST_CASE("Bitset printing") {
+TEST_CASE("Bitset printing", "[data]") {
   std::stringstream stream;
 
   stream << fullOnes;

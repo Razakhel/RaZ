@@ -3,7 +3,7 @@
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/TgaFormat.hpp"
 
-TEST_CASE("TgaFormat load") {
+TEST_CASE("TgaFormat load", "[data]") {
   const Raz::Image img = Raz::TgaFormat::load(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.tga");
 
   CHECK(img.getWidth() == 2);

@@ -2,7 +2,7 @@
 
 #include "RaZ/Physics/RigidBody.hpp"
 
-TEST_CASE("RigidBody basic") {
+TEST_CASE("RigidBody basic", "[physics]") {
   Raz::RigidBody rigidBody(1.1f, 0.25f);
   CHECK(rigidBody.getMass() == 1.1f);
   CHECK(rigidBody.getInvMass() == 0.909090877f);

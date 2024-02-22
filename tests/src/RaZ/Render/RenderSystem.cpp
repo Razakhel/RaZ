@@ -34,7 +34,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath =
 
 } // namespace
 
-TEST_CASE("RenderSystem accepted components") {
+TEST_CASE("RenderSystem accepted components", "[render]") {
   Raz::World world(3);
 
   auto& renderSystem = world.addSystem<Raz::RenderSystem>(0, 0);
@@ -51,7 +51,7 @@ TEST_CASE("RenderSystem accepted components") {
   CHECK(renderSystem.containsEntity(light));
 }
 
-TEST_CASE("RenderSystem Cook-Torrance ball") {
+TEST_CASE("RenderSystem Cook-Torrance ball", "[render]") {
   Raz::World world(7);
 
   const Raz::Window& window = TestUtils::getWindow();
@@ -93,7 +93,7 @@ TEST_CASE("RenderSystem Cook-Torrance ball") {
 }
 
 #if !defined(RAZ_NO_OVERLAY)
-TEST_CASE("RenderSystem overlay render") {
+TEST_CASE("RenderSystem overlay render", "[render]") {
   Raz::World world(1);
 
   Raz::Window& window = TestUtils::getWindow();

@@ -8,7 +8,7 @@ class TestNode final : public Raz::GraphNode<TestNode> {};
 
 } // namespace
 
-TEST_CASE("Graph linking test") {
+TEST_CASE("Graph linking test", "[data]") {
   Raz::Graph<TestNode> graph(5);
 
   TestNode& root   = graph.addNode();
@@ -148,7 +148,7 @@ TEST_CASE("Graph linking test") {
   CHECK_THROWS(graph.removeNode(testNode));
 }
 
-TEST_CASE("Graph extremities test") {
+TEST_CASE("Graph extremities test", "[data]") {
   Raz::Graph<TestNode> graph(5);
 
   TestNode& root  = graph.addNode();

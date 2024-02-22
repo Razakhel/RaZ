@@ -5,7 +5,7 @@
 
 #include <numeric>
 
-TEST_CASE("Image colorspace/data type creation") {
+TEST_CASE("Image colorspace/data type creation", "[data]") {
   const Raz::Image imgByte(Raz::ImageColorspace::RGBA);
   CHECK(imgByte.getWidth() == 0);
   CHECK(imgByte.getHeight() == 0);
@@ -23,7 +23,7 @@ TEST_CASE("Image colorspace/data type creation") {
   CHECK(imgFloat.isEmpty());
 }
 
-TEST_CASE("Image dimensions creation") {
+TEST_CASE("Image dimensions creation", "[data]") {
   const Raz::Image imgEmpty(0, 0, Raz::ImageColorspace::RGBA);
   CHECK(imgEmpty.getWidth() == 0);
   CHECK(imgEmpty.getHeight() == 0);
@@ -41,7 +41,7 @@ TEST_CASE("Image dimensions creation") {
   CHECK_FALSE(imgSmall.isEmpty());
 }
 
-TEST_CASE("Image value access") {
+TEST_CASE("Image value access", "[data]") {
   {
     Raz::Image imgByte(1, 1, Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
     REQUIRE(imgByte.getChannelCount() == 3);
@@ -100,7 +100,7 @@ TEST_CASE("Image value access") {
   }
 }
 
-TEST_CASE("Image equality") {
+TEST_CASE("Image equality", "[data]") {
   const Raz::Image imgB1(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
   const Raz::Image imgB2(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
   const Raz::Image imgB3(2, 2, Raz::ImageColorspace::GRAY_ALPHA, Raz::ImageDataType::BYTE);
@@ -147,7 +147,7 @@ TEST_CASE("Image equality") {
   }
 }
 
-TEST_CASE("Image copy/move") {
+TEST_CASE("Image copy/move", "[data]") {
   Raz::Image imgBase(3, 3, Raz::ImageColorspace::RGB);
 
   auto* imgData = static_cast<uint8_t*>(imgBase.getDataPtr());

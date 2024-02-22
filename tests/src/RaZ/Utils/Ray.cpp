@@ -20,7 +20,7 @@ constexpr Raz::Ray ray3(Raz::Vec3f(1.f, 1.f, 0.f), Raz::Vec3f(-0.707106769f, -0.
 
 } // namespace
 
-TEST_CASE("Ray-point intersection") {
+TEST_CASE("Ray-point intersection", "[utils]") {
   Raz::RayHit hit;
 
   CHECK(ray1.intersects(ray1.getOrigin(), &hit));
@@ -73,7 +73,7 @@ TEST_CASE("Ray-point intersection") {
   CHECK_FALSE(ray3.intersects(topRightPoint));
 }
 
-TEST_CASE("Ray-plane intersection") {
+TEST_CASE("Ray-plane intersection", "[utils]") {
   //       Plane 1      |      Plane 2      |      Plane 3      |      Plane 4
   //                    |                   |                   |
   //   \      normal    |    \              |              /    |
@@ -107,7 +107,7 @@ TEST_CASE("Ray-plane intersection") {
   CHECK(ray3.intersects(plane4));
 }
 
-TEST_CASE("Ray-sphere intersection") {
+TEST_CASE("Ray-sphere intersection", "[utils]") {
   // See: https://www.geogebra.org/m/sn7ajcj2
 
   const Raz::Sphere sphere1(Raz::Vec3f(0.f), 1.f);
@@ -155,7 +155,7 @@ TEST_CASE("Ray-sphere intersection") {
   CHECK_THAT(hit.distance, IsNearlyEqualTo(14.5563498f));
 }
 
-TEST_CASE("Ray-triangle intersection") {
+TEST_CASE("Ray-triangle intersection", "[utils]") {
   // See: https://www.geogebra.org/m/e8uqvjwh
 
   // These triangles are defined so that:
@@ -206,7 +206,7 @@ TEST_CASE("Ray-triangle intersection") {
   CHECK_THAT(hit.distance, IsNearlyEqualTo(3.5355341f));
 }
 
-TEST_CASE("Ray-AABB intersection") {
+TEST_CASE("Ray-AABB intersection", "[utils]") {
   //         _______________________
   //        /|                    /|
   //       / |                   / | / 1 -> [ 0.5; 0.5; 0.5 ]
@@ -266,9 +266,9 @@ TEST_CASE("Ray-AABB intersection") {
   CHECK_THAT(hit.distance, IsNearlyEqualTo(9.8994951f));
 
   // TODO:
-  // A check must be made with a ray's origin lying precisely on a slab
-  // When this happens, with a naive implementation, only NaNs are returned; however, this ray must be considered intersecting the box properly
-  // See: https://tavianator.com/fast-branchless-raybounding-box-intersections-part-2-nans/
+  //  A check must be made with a ray's origin lying precisely on a slab
+  //  When this happens, with a naive implementation, only NaNs are returned; however, this ray must be considered intersecting the box properly
+  //  See: https://tavianator.com/fast-branchless-raybounding-box-intersections-part-2-nans/
 
   //const Raz::Ray slabRay(Raz::Vec3f(-0.5f, -0.5f, 0.f), Raz::Axis::Y);
   //CHECK(slabRay.intersects(aabb1, &hit));
@@ -277,7 +277,7 @@ TEST_CASE("Ray-AABB intersection") {
   //CHECK(hit.distance == 0.f);
 }
 
-TEST_CASE("Point projection") {
+TEST_CASE("Point projection", "[utils]") {
   const Raz::Vec3f topPoint(0.f, 2.f, 0.f);
   const Raz::Vec3f topRightPoint(2.f, 2.f, 0.f);
 

@@ -12,7 +12,7 @@ enum class EnumTest : unsigned int {
 
 MAKE_ENUM_FLAG(EnumTest)
 
-TEST_CASE("EnumUtils make enum flag") {
+TEST_CASE("EnumUtils make enum flag", "[utils]") {
   constexpr EnumTest zero   = EnumTest::ONE & EnumTest::TWO;
   constexpr EnumTest three  = EnumTest::ONE | EnumTest::TWO;
   constexpr EnumTest one    = three & EnumTest::ONE;

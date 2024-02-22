@@ -11,7 +11,7 @@ const Raz::FilePath filePath(RAZ_TESTS_ROOT "assets/misc/" + fileName);
 
 } // namespace
 
-TEST_CASE("FilePath constructors") {
+TEST_CASE("FilePath constructors", "[utils]") {
   const Raz::FilePath pathChar("spêçïàl/fílè/paτh");
   const Raz::FilePath pathString(std::string("spêçïàl/fílè/paτh"));
   const Raz::FilePath pathStringView(std::string_view("spêçïàl/fílè/paτh"));
@@ -20,7 +20,7 @@ TEST_CASE("FilePath constructors") {
   CHECK(pathString == pathStringView);
 }
 
-TEST_CASE("FilePath open special chars") {
+TEST_CASE("FilePath open special chars", "[utils]") {
   std::ifstream file(filePath.getPathStr());
 
   REQUIRE(file.is_open());
@@ -32,7 +32,7 @@ TEST_CASE("FilePath open special chars") {
   CHECK(fileContent == "НΣļlõ ωθяŁĐ!");
 }
 
-TEST_CASE("FilePath save special chars") {
+TEST_CASE("FilePath save special chars", "[utils]") {
   const Raz::FilePath path(fileName);
 
   {
@@ -50,7 +50,7 @@ TEST_CASE("FilePath save special chars") {
   CHECK(fileContent == "НΣļlõ ωθяŁĐ!");
 }
 
-TEST_CASE("FilePath concatenation") {
+TEST_CASE("FilePath concatenation", "[utils]") {
   const Raz::FilePath testPath = "tèstPâth";
 
   // operator+(char)
@@ -120,7 +120,7 @@ TEST_CASE("FilePath concatenation") {
   }
 }
 
-TEST_CASE("FilePath utilities") {
+TEST_CASE("FilePath utilities", "[utils]") {
   CHECK(filePath.recoverPathToFile() == (RAZ_TESTS_ROOT "assets/misc/"));
   CHECK(filePath.recoverFileName(/* true */) == "ͳεs†_fílè_测试.τxt");
   CHECK(filePath.recoverFileName(false) == "ͳεs†_fílè_测试");
@@ -157,7 +157,7 @@ TEST_CASE("FilePath utilities") {
   CHECK(Raz::FilePath::recoverExtension(mixedSeparatorsTestPath) == "êxt");
 }
 
-TEST_CASE("FilePath printing") {
+TEST_CASE("FilePath printing", "[utils]") {
   const Raz::FilePath testPath = "tèstPâth";
 
   // operator<<(std::ostream)

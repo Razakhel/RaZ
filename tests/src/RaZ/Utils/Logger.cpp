@@ -2,7 +2,7 @@
 
 #include "RaZ/Utils/Logger.hpp"
 
-TEST_CASE("Logger custom function") {
+TEST_CASE("Logger custom function", "[utils]") {
   Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
 
   std::string str;
@@ -56,7 +56,7 @@ TEST_CASE("Logger custom function") {
   Raz::Logger::setLoggingLevel(Raz::LoggingLevel::NONE);
 }
 
-TEST_CASE("Logger levels") {
+TEST_CASE("Logger levels", "[utils]") {
   std::string str;
 
   Raz::Logger::setLoggingFunction([&str] (Raz::LoggingLevel, const std::string&) { str = 'a'; });

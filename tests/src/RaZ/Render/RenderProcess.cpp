@@ -51,7 +51,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::Texture2DPtr& output, const
 
 } // namespace
 
-TEST_CASE("ChromaticAberrationRenderProcess execution") {
+TEST_CASE("ChromaticAberrationRenderProcess execution", "[render]") {
   Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();
@@ -93,7 +93,7 @@ TEST_CASE("ChromaticAberrationRenderProcess execution") {
              IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_chromatic_aberration.png", true)));
 }
 
-TEST_CASE("ConvolutionRenderProcess execution") {
+TEST_CASE("ConvolutionRenderProcess execution", "[render]") {
   Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();
@@ -125,7 +125,7 @@ TEST_CASE("ConvolutionRenderProcess execution") {
   CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_convolved.png", true)));
 }
 
-TEST_CASE("FilmGrainRenderProcess execution") {
+TEST_CASE("FilmGrainRenderProcess execution", "[render]") {
   Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();
@@ -148,7 +148,7 @@ TEST_CASE("FilmGrainRenderProcess execution") {
   CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/film_grain_strong.png", true), 0.062f));
 }
 
-TEST_CASE("PixelizationRenderProcess execution") {
+TEST_CASE("PixelizationRenderProcess execution", "[render]") {
   Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();
@@ -175,7 +175,7 @@ TEST_CASE("PixelizationRenderProcess execution") {
   CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_pixelated.png", true)));
 }
 
-TEST_CASE("VignetteRenderProcess execution") {
+TEST_CASE("VignetteRenderProcess execution", "[render]") {
   Raz::World world;
 
   const Raz::Window& window = TestUtils::getWindow();

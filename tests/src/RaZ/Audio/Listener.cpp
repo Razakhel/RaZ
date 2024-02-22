@@ -4,7 +4,7 @@
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Math/Vector.hpp"
 
-TEST_CASE("Listener data") {
+TEST_CASE("Listener data", "[audio]") {
   const Raz::AudioSystem audio; // Initializing the audio device & context, needed before all audio action
 
   Raz::Listener listener;

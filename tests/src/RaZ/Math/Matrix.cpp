@@ -26,7 +26,7 @@ constexpr Raz::Mat4f mat42( 5.5f,    98.14f, -8.24f,  42.f,
 
 } // namespace
 
-TEST_CASE("Matrix resize") {
+TEST_CASE("Matrix resize", "[math]") {
   constexpr Raz::Mat3f truncatedMat(mat41);
   constexpr Raz::Mat4f expandedMat(truncatedMat);
 
@@ -49,7 +49,7 @@ TEST_CASE("Matrix resize") {
                                                      0.f,     0.f,     0.f,    1.f));
 }
 
-TEST_CASE("Matrix from vectors") {
+TEST_CASE("Matrix from vectors", "[math]") {
   constexpr auto testMatRows = Raz::Matrix<float, 3, 4>::fromRows(Raz::Vec3f( 1.f,  2.f,  3.f),
                                                                   Raz::Vec3f( 4.f,  5.f,  6.f),
                                                                   Raz::Vec3f( 7.f,  8.f,  9.f),
@@ -71,7 +71,7 @@ TEST_CASE("Matrix from vectors") {
   CHECK(testMat41 == mat41);
 }
 
-TEST_CASE("Matrix elements fetching") {
+TEST_CASE("Matrix elements fetching", "[math]") {
   {
     constexpr Raz::Mat3i testMat(0, 3, 6,
                                  1, 4, 7,
@@ -175,7 +175,7 @@ TEST_CASE("Matrix elements fetching") {
   CHECK(testMatTrans.recoverColumn(0) == Raz::Vector<float, 8>(1.f, 2.f, 3.f, 4.f, 5.f, 6.f, 7.f, 8.f));
 }
 
-TEST_CASE("Matrix transposition") {
+TEST_CASE("Matrix transposition", "[math]") {
   CHECK(mat31.transpose() == Raz::Mat3f(4.12f,     3.04f, -1.f,
                                         25.1f,     5.f,   -7.54f,
                                         30.7842f, -64.5f,  8.41f));
@@ -197,7 +197,7 @@ TEST_CASE("Matrix transposition") {
   CHECK(mat3x2.transpose() == mat2x3);
 }
 
-TEST_CASE("Matrix inversion") {
+TEST_CASE("Matrix inversion", "[math]") {
   // Results taken from Wolfram Alpha: https://tinyurl.com/dve4wvbs
   CHECK(Raz::FloatUtils::areNearlyEqual(mat31.computeDeterminant(), -1404.90235872f));
   CHECK(mat31.inverse() == Raz::Mat3f( 0.3162355f,     0.315469503f,    1.26191771f,
@@ -215,7 +215,7 @@ TEST_CASE("Matrix inversion") {
   CHECK(Raz::Mat3f::identity().inverse() == Raz::Mat3f::identity());
 }
 
-TEST_CASE("Matrix/scalar operations") {
+TEST_CASE("Matrix/scalar operations", "[math]") {
   CHECK(mat31 * 3.f == Raz::Mat3f( 12.36f,  75.3f,   92.3526f,
                                    9.12f,   15.f,   -193.5f,
                                   -3.f,    -22.62f,  25.23f));
@@ -237,7 +237,7 @@ TEST_CASE("Matrix/scalar operations") {
                                   0.f, 0.f, 0.f, 0.f));
 }
 
-TEST_CASE("Matrix/matrix operations") {
+TEST_CASE("Matrix/matrix operations", "[math]") {
   CHECK(mat31 - mat31 == Raz::Mat3f(0.f, 0.f, 0.f,
                                     0.f, 0.f, 0.f,
                                     0.f, 0.f, 0.f));
@@ -285,7 +285,7 @@ TEST_CASE("Matrix/matrix operations") {
                                       49.f, 64.f));
 }
 
-TEST_CASE("Matrix/vector multiplication") {
+TEST_CASE("Matrix/vector multiplication", "[math]") {
   const Raz::Mat3f matRotX(1.f,         0.f,          0.f,
                            0.f, 0.70710677f, -0.70710677f,
                            0.f, 0.70710677f,  0.70710677f);
@@ -367,7 +367,7 @@ TEST_CASE("Matrix/vector multiplication") {
   CHECK(mat2x4 * vec2 == Raz::Vec4f(10.2f, 30.4f, 50.6f, 70.8f)); // https://tinyurl.com/3k5p9uyk
 }
 
-TEST_CASE("Matrix hash") {
+TEST_CASE("Matrix hash", "[math]") {
   CHECK(mat31.hash() == mat31.hash());
   CHECK_FALSE(mat31.hash() == mat32.hash());
 
@@ -398,7 +398,7 @@ TEST_CASE("Matrix hash") {
   CHECK(map.find(mat31Epsilon) == map.cend());
 }
 
-TEST_CASE("Matrix near-equality") {
+TEST_CASE("Matrix near-equality", "[math]") {
   CHECK_FALSE(mat31 == mat32);
 
   const Raz::Mat2f baseMat = Raz::Mat2f::identity();
@@ -426,7 +426,7 @@ TEST_CASE("Matrix near-equality") {
   CHECK(baseMat == compMat); // Matrix::operator== does a near-equality check on floating point types
 }
 
-TEST_CASE("Matrix strict equality") {
+TEST_CASE("Matrix strict equality", "[math]") {
   CHECK(mat31.strictlyEquals(mat31));
   CHECK(mat41.strictlyEquals(mat41));
 
@@ -461,7 +461,7 @@ TEST_CASE("Matrix strict equality") {
   CHECK_FALSE(std::equal(matrices.cbegin(), matrices.cend(), swappedMatrices.cbegin(), std::equal_to<Raz::Mat3f>()));
 }
 
-TEST_CASE("Matrix less-than") {
+TEST_CASE("Matrix less-than", "[math]") {
   CHECK(std::less<Raz::Mat3f>()(mat31, mat32));
   CHECK_FALSE(std::less<Raz::Mat3f>()(mat32, mat31));
   CHECK_FALSE(std::less<Raz::Mat3f>()(mat31, mat31)); // Equal matrices are not strictly less than the other
@@ -475,7 +475,7 @@ TEST_CASE("Matrix less-than") {
   CHECK_FALSE(std::less<Raz::Mat4f>()(mat41 + std::numeric_limits<float>::epsilon(), mat41));
 }
 
-TEST_CASE("Matrix printing") {
+TEST_CASE("Matrix printing", "[math]") {
   std::stringstream stream;
 
   stream << mat31;

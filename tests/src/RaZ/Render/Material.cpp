@@ -2,7 +2,7 @@
 
 #include "RaZ/Render/Material.hpp"
 
-TEST_CASE("Material predefined types") {
+TEST_CASE("Material predefined types", "[render]") {
   Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
 
   CHECK(material.getProgram().getAttributeCount() == 4);

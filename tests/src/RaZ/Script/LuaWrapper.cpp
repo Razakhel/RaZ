@@ -2,7 +2,7 @@
 
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaWrapper code execution") {
+TEST_CASE("LuaWrapper code execution", "[script][lua]") {
   CHECK_FALSE(Raz::LuaWrapper::execute(""));
   CHECK_FALSE(Raz::LuaWrapper::execute("this code is invalid"));
   CHECK(Raz::LuaWrapper::execute(R"(
@@ -12,7 +12,7 @@ TEST_CASE("LuaWrapper code execution") {
   )"));
 }
 
-TEST_CASE("LuaWrapper file execution") {
+TEST_CASE("LuaWrapper file execution", "[script][lua]") {
   CHECK_FALSE(Raz::LuaWrapper::executeFromFile(""));
   CHECK_FALSE(Raz::LuaWrapper::executeFromFile(RAZ_TESTS_ROOT "assets/scripts/invalid.lua"));
   CHECK(Raz::LuaWrapper::executeFromFile(RAZ_TESTS_ROOT "assets/scripts/basic.lua"));

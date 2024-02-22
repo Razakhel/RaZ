@@ -6,7 +6,7 @@
 #include "RaZ/Script/LuaScript.hpp"
 #include "RaZ/Script/ScriptSystem.hpp"
 
-TEST_CASE("ScriptSystem accepted components") {
+TEST_CASE("ScriptSystem accepted components", "[script][lua]") {
   Raz::World world;
 
   auto& scriptSystem = world.addSystem<Raz::ScriptSystem>();
@@ -18,7 +18,7 @@ TEST_CASE("ScriptSystem accepted components") {
   CHECK(scriptSystem.containsEntity(luaScript));
 }
 
-TEST_CASE("ScriptSystem registration") {
+TEST_CASE("ScriptSystem registration", "[script][lua]") {
   Raz::World world;
 
   world.addSystem<Raz::ScriptSystem>();
@@ -42,7 +42,7 @@ TEST_CASE("ScriptSystem registration") {
   CHECK(luaScript.update({}));
 }
 
-TEST_CASE("ScriptSystem setup") {
+TEST_CASE("ScriptSystem setup", "[script][lua]") {
   Raz::World world;
 
   world.addSystem<Raz::ScriptSystem>();
@@ -65,7 +65,7 @@ TEST_CASE("ScriptSystem setup") {
   CHECK(entityTrans.getPosition() == Raz::Vec3f(2.f)); // Updating the world again does not execute the setup
 }
 
-TEST_CASE("ScriptSystem update") {
+TEST_CASE("ScriptSystem update", "[script][lua]") {
   Raz::World world;
 
   world.addSystem<Raz::ScriptSystem>();

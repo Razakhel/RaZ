@@ -3,7 +3,7 @@
 #include "RaZ/Script/LuaEnvironment.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaEnvironment exists") {
+TEST_CASE("LuaEnvironment exists", "[script][lua]") {
   Raz::LuaWrapper::execute(R"(
     tests_env_var = 0
     tests_env_func = function () end

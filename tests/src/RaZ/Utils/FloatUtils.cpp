@@ -2,7 +2,7 @@
 
 #include "RaZ/Utils/FloatUtils.hpp"
 
-TEST_CASE("Near-equality absolute") {
+TEST_CASE("Near-equality absolute", "[utils]") {
   constexpr float floatEpsilon            = std::numeric_limits<float>::epsilon();
   constexpr double doubleEpsilon          = std::numeric_limits<double>::epsilon();
   constexpr long double longDoubleEpsilon = std::numeric_limits<long double>::epsilon();

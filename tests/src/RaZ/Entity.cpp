@@ -14,7 +14,7 @@ Raz::Entity entity2(2);
 
 } // namespace
 
-TEST_CASE("Entity basic") {
+TEST_CASE("Entity basic", "[core]") {
   CHECK(entity0.getId() == 0);
   CHECK(entity1.getId() == 1);
   CHECK(entity2.getId() == 2);
@@ -28,7 +28,7 @@ TEST_CASE("Entity basic") {
   CHECK(entity0.isEnabled());
 }
 
-TEST_CASE("Entity-component manipulations") {
+TEST_CASE("Entity-component manipulations", "[core]") {
   CHECK(entity0.getComponents().empty());
 
   CHECK_FALSE(entity0.hasComponent<Raz::Mesh>());
@@ -46,7 +46,7 @@ TEST_CASE("Entity-component manipulations") {
   CHECK_THROWS(entity0.getComponent<Raz::Transform>());
 }
 
-TEST_CASE("Entity bitset") {
+TEST_CASE("Entity bitset", "[core]") {
   CHECK(entity1.getEnabledComponents().isEmpty());
   entity1.addComponent<Raz::Transform>();
   CHECK_FALSE(entity1.getEnabledComponents().isEmpty());

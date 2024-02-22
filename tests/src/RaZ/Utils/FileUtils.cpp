@@ -12,13 +12,13 @@ const Raz::FilePath asciiFilePath(RAZ_TESTS_ROOT "assets/misc/Test_file.txt");
 
 } // namespace
 
-TEST_CASE("FileUtils is readable") {
+TEST_CASE("FileUtils is readable", "[utils]") {
   CHECK(Raz::FileUtils::isReadable(encodedFilePath));
   CHECK(Raz::FileUtils::isReadable(asciiFilePath));
   CHECK_FALSE(Raz::FileUtils::isReadable("this_file_does_not_exist.txt"));
 }
 
-TEST_CASE("FileUtils read file to array") {
+TEST_CASE("FileUtils read file to array", "[utils]") {
   {
     const std::vector<unsigned char> fileContent = Raz::FileUtils::readFileToArray(encodedFilePath);
     CHECK(fileContent.size() == 22);
@@ -37,7 +37,7 @@ TEST_CASE("FileUtils read file to array") {
   }
 }
 
-TEST_CASE("FileUtils read file to string") {
+TEST_CASE("FileUtils read file to string", "[utils]") {
   {
     const std::string fileContent = Raz::FileUtils::readFileToString(encodedFilePath);
     CHECK(fileContent.size() == 22); // This doesn't represent the actual character count due to the encoding

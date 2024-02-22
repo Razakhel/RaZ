@@ -2,7 +2,7 @@
 
 #include "RaZ/Script/LuaWrapper.hpp"
 
-TEST_CASE("LuaData Bitset") {
+TEST_CASE("LuaData Bitset", "[script][lua][data]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local bitset = Bitset.new()
     bitset       = Bitset.new(1)
@@ -32,7 +32,7 @@ TEST_CASE("LuaData Bitset") {
   )"));
 }
 
-TEST_CASE("LuaData BvhSystem") {
+TEST_CASE("LuaData BvhSystem", "[script][lua][data]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local bvhSystem = BvhSystem.new()
 
@@ -61,7 +61,7 @@ TEST_CASE("LuaData BvhSystem") {
   )"));
 }
 
-TEST_CASE("LuaData Color") {
+TEST_CASE("LuaData Color", "[script][lua][data]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     assert(Color.new() == ColorPreset.Black)
     assert(Color.new(Vec3f.new(1, 0, 0)) == ColorPreset.Red)
@@ -74,7 +74,7 @@ TEST_CASE("LuaData Color") {
   )"));
 }
 
-TEST_CASE("LuaData Image") {
+TEST_CASE("LuaData Image", "[script][lua][data]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local img = Image.new()
     img       = Image.new(ImageColorspace.GRAY)
@@ -106,7 +106,7 @@ TEST_CASE("LuaData Image") {
   )"));
 }
 
-TEST_CASE("LuaData Mesh") {
+TEST_CASE("LuaData Mesh", "[script][lua][data]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local mesh = Mesh.new()
     mesh       = Mesh.new(Plane.new(0), 0, 0)
@@ -148,7 +148,7 @@ TEST_CASE("LuaData Mesh") {
 #endif
 }
 
-TEST_CASE("LuaData Submesh") {
+TEST_CASE("LuaData Submesh", "[script][lua][data]") {
   CHECK(Raz::LuaWrapper::execute(R"(
     local submesh = Submesh.new()
 

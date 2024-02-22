@@ -2,7 +2,7 @@
 
 #include "RaZ/World.hpp"
 
-TEST_CASE("World entities manipulation") {
+TEST_CASE("World entities manipulation", "[core]") {
   Raz::World world(3);
 
   // The constructor argument simply reserves the size for entities
@@ -40,7 +40,7 @@ TEST_CASE("World entities manipulation") {
   CHECK_THROWS(world.removeEntity(extEntity));
 }
 
-TEST_CASE("World get entities with components") {
+TEST_CASE("World get entities with components", "[core]") {
   struct TestComp1 : public Raz::Component {};
   struct TestComp2 : public Raz::Component {};
 
@@ -77,7 +77,7 @@ TEST_CASE("World get entities with components") {
   CHECK(world.recoverEntitiesWithComponents<TestComp1>().front() == &entity1); // Still has the first component
 }
 
-TEST_CASE("World refresh") {
+TEST_CASE("World refresh", "[core]") {
   Raz::World world(3);
 
   Raz::Entity& entity0 = world.addEntity(true);

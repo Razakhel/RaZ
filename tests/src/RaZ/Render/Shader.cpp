@@ -17,7 +17,7 @@ inline void checkShader(const Raz::Shader& shader, const Raz::FilePath& path = {
 
 } // namespace
 
-TEST_CASE("Shader validity") {
+TEST_CASE("Shader validity", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   {
@@ -89,7 +89,7 @@ TEST_CASE("Shader validity") {
 #endif
 }
 
-TEST_CASE("Shader clone") {
+TEST_CASE("Shader clone", "[render]") {
   // The content of the shaders does not need to be valid for this test
   const Raz::FilePath shaderPath = RAZ_TESTS_ROOT "assets/shaders/basic.comp";
   constexpr std::string_view shaderSource = "Shader source test";
@@ -158,7 +158,7 @@ TEST_CASE("Shader clone") {
 #endif
 }
 
-TEST_CASE("Vertex shader from source") {
+TEST_CASE("Vertex shader from source", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string vertSource = R"(
@@ -173,7 +173,7 @@ TEST_CASE("Vertex shader from source") {
 }
 
 #if !defined(USE_OPENGL_ES)
-TEST_CASE("Tessellation control shader from source") {
+TEST_CASE("Tessellation control shader from source", "[render]") {
   // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
   if (!Raz::Renderer::checkVersion(4, 0) && !Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader"))
     return;
@@ -201,7 +201,7 @@ TEST_CASE("Tessellation control shader from source") {
   checkShader(Raz::TessellationControlShader::loadFromSource("#version 400\n" + tessCtrlSource));
 }
 
-TEST_CASE("Tessellation evaluation shader from source") {
+TEST_CASE("Tessellation evaluation shader from source", "[render]") {
   // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
   if (!Raz::Renderer::checkVersion(4, 0) && !Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader"))
     return;
@@ -224,7 +224,7 @@ TEST_CASE("Tessellation evaluation shader from source") {
 }
 #endif
 
-TEST_CASE("Fragment shader from source") {
+TEST_CASE("Fragment shader from source", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const std::string fragSource = R"(
@@ -241,7 +241,7 @@ TEST_CASE("Fragment shader from source") {
 }
 
 #if !defined(USE_WEBGL)
-TEST_CASE("Compute shader from source") {
+TEST_CASE("Compute shader from source", "[render]") {
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;
@@ -266,7 +266,7 @@ TEST_CASE("Compute shader from source") {
 }
 #endif
 
-TEST_CASE("Vertex shader imported") {
+TEST_CASE("Vertex shader imported", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const Raz::FilePath vertShaderPath = RAZ_TESTS_ROOT "../shaders/common.vert";
@@ -276,7 +276,7 @@ TEST_CASE("Vertex shader imported") {
 }
 
 #if !defined(USE_OPENGL_ES)
-TEST_CASE("Tessellation control shader imported") {
+TEST_CASE("Tessellation control shader imported", "[render]") {
   // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
   if (!Raz::Renderer::checkVersion(4, 0) && !Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader"))
     return;
@@ -289,7 +289,7 @@ TEST_CASE("Tessellation control shader imported") {
   checkShader(tessCtrlShader, tessCtrlShaderPath);
 }
 
-TEST_CASE("Tessellation evaluation shader imported") {
+TEST_CASE("Tessellation evaluation shader imported", "[render]") {
   // Tessellation shaders are only available in OpenGL 4.0+ or with the 'GL_ARB_tessellation_shader' extension
   if (!Raz::Renderer::checkVersion(4, 0) && !Raz::Renderer::isExtensionSupported("GL_ARB_tessellation_shader"))
     return;
@@ -303,7 +303,7 @@ TEST_CASE("Tessellation evaluation shader imported") {
 }
 #endif
 
-TEST_CASE("Fragment shader imported") {
+TEST_CASE("Fragment shader imported", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors
 
   const Raz::FilePath fragShaderPath = RAZ_TESTS_ROOT "../shaders/lambert.frag";
@@ -313,7 +313,7 @@ TEST_CASE("Fragment shader imported") {
 }
 
 #if !defined(USE_WEBGL)
-TEST_CASE("Compute shader imported") {
+TEST_CASE("Compute shader imported", "[render]") {
   // Compute shaders are only available in OpenGL 4.3+ or with the relevant extension
   if (!Raz::Renderer::checkVersion(4, 3) && !Raz::Renderer::isExtensionSupported("GL_ARB_compute_shader"))
     return;

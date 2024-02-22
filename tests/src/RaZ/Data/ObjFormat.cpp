@@ -69,7 +69,7 @@ Raz::MeshRenderer createMeshRenderer() {
 
 } // namespace
 
-TEST_CASE("ObjFormat load quad faces") {
+TEST_CASE("ObjFormat load quad faces", "[data]") {
   const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT "../assets/meshes/ballQuads.obj");
 
   CHECK(mesh.getSubmeshes().size() == 1);
@@ -81,7 +81,7 @@ TEST_CASE("ObjFormat load quad faces") {
   CHECK(meshRenderer.getMaterials().size() == 1);
 }
 
-TEST_CASE("ObjFormat load Blinn-Phong") {
+TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
   const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè_BP.obj");
 
   CHECK(mesh.getSubmeshes().size() == 1);
@@ -330,7 +330,7 @@ TEST_CASE("ObjFormat load Blinn-Phong") {
   }
 }
 
-TEST_CASE("ObjFormat load Cook-Torrance") {
+TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
   const auto [mesh, meshRenderer] = Raz::ObjFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè_CT.obj");
 
   CHECK(mesh.getSubmeshes().size() == 1);
@@ -579,7 +579,7 @@ TEST_CASE("ObjFormat load Cook-Torrance") {
   }
 }
 
-TEST_CASE("ObjFormat save") {
+TEST_CASE("ObjFormat save", "[data]") {
   const auto checkMeshData = [] (const Raz::Mesh& mesh) {
     CHECK(mesh.getSubmeshes().size() == 2);
 

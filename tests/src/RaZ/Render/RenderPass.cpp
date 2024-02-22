@@ -3,7 +3,7 @@
 #include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Render/Texture.hpp"
 
-TEST_CASE("RenderPass validity") {
+TEST_CASE("RenderPass validity", "[render]") {
   Raz::RenderPass initialPass;
   CHECK(initialPass.isValid()); // The pass has no buffer, thus is valid
 
@@ -40,7 +40,7 @@ TEST_CASE("RenderPass validity") {
   CHECK(nextPass.isValid()); // The color buffer is only set as read, the pass is valid again
 }
 
-TEST_CASE("RenderPass textures") {
+TEST_CASE("RenderPass textures", "[render]") {
   Raz::RenderPass initialPass;
   CHECK(initialPass.getReadTextureCount() == 0);
   CHECK_FALSE(initialPass.getFramebuffer().hasDepthBuffer());

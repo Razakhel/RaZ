@@ -7,7 +7,7 @@
 
 using namespace Raz::Literals;
 
-TEST_CASE("Skeleton rotation chain") {
+TEST_CASE("Skeleton rotation chain", "[animation]") {
   // Creating a skeleton so that the following configuration is reproduced:
   //
   //             / child11

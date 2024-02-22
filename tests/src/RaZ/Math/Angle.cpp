@@ -2,7 +2,7 @@
 
 #include "RaZ/Math/Angle.hpp"
 
-TEST_CASE("Degrees to Radians") {
+TEST_CASE("Degrees to Radians", "[math]") {
   constexpr Raz::Degreesf deg45(45.f);
   constexpr Raz::Degreesf deg90(90.f);
   constexpr Raz::Degreesf deg180(180.f);
@@ -14,7 +14,7 @@ TEST_CASE("Degrees to Radians") {
   CHECK_THAT(Raz::Radiansf(deg360).value, IsNearlyEqualTo(Raz::Pi<float> * 2));
 }
 
-TEST_CASE("Radians to Degrees") {
+TEST_CASE("Radians to Degrees", "[math]") {
   constexpr Raz::Radiansf radFourthPi(Raz::Pi<float> / 4);
   constexpr Raz::Radiansf radHalfPi(Raz::Pi<float> / 2);
   constexpr Raz::Radiansf radPi(Raz::Pi<float>);
@@ -26,7 +26,7 @@ TEST_CASE("Radians to Degrees") {
   CHECK_THAT(Raz::Degreesf(radDoublePi).value, IsNearlyEqualTo(360.f));
 }
 
-TEST_CASE("Angle operators") {
+TEST_CASE("Angle operators", "[math]") {
   // Literal operators
   using namespace Raz::Literals;
 

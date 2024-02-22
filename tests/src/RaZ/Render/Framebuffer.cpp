@@ -3,7 +3,7 @@
 #include "RaZ/Render/Framebuffer.hpp"
 #include "RaZ/Render/Texture.hpp"
 
-TEST_CASE("Framebuffer buffers") {
+TEST_CASE("Framebuffer buffers", "[render]") {
   Raz::Framebuffer framebuffer;
   CHECK_FALSE(framebuffer.hasDepthBuffer());
   CHECK(framebuffer.getColorBufferCount() == 0);
@@ -57,7 +57,7 @@ TEST_CASE("Framebuffer buffers") {
   CHECK(framebuffer.isEmpty()); // Both depth & color buffers have been removed
 }
 
-TEST_CASE("Framebuffer move") {
+TEST_CASE("Framebuffer move", "[render]") {
   Raz::Framebuffer framebuffer;
 
   const unsigned int framebufferIndex = framebuffer.getIndex();

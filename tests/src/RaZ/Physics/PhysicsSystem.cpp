@@ -8,7 +8,7 @@
 #include "RaZ/Physics/RigidBody.hpp"
 #include "RaZ/Utils/Shape.hpp"
 
-TEST_CASE("PhysicsSystem basic") {
+TEST_CASE("PhysicsSystem basic", "[physics]") {
   Raz::PhysicsSystem physics;
   CHECK(physics.getGravity() == Raz::Vec3f(0.f, -9.80665f, 0.f));
   CHECK(physics.getFriction() == 0.95f);
@@ -19,7 +19,7 @@ TEST_CASE("PhysicsSystem basic") {
   CHECK(physics.getFriction() == 0.25f);
 }
 
-TEST_CASE("PhysicsSystem accepted components") {
+TEST_CASE("PhysicsSystem accepted components", "[physics]") {
   Raz::World world(2);
 
   auto& physics = world.addSystem<Raz::PhysicsSystem>();
@@ -33,7 +33,7 @@ TEST_CASE("PhysicsSystem accepted components") {
   CHECK(physics.containsEntity(collider));
 }
 
-TEST_CASE("PhysicsSystem rigid bodies collision") {
+TEST_CASE("PhysicsSystem rigid bodies collision", "[physics]") {
   Raz::World world(4);
 
   float remainingTime {};

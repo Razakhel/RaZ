@@ -2,10 +2,9 @@
 
 #include "RaZ/Animation/Skeleton.hpp"
 #include "RaZ/Data/BvhFormat.hpp"
-#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
-TEST_CASE("BvhFormat load") {
+TEST_CASE("BvhFormat load", "[data]") {
   const Raz::Skeleton skeleton = Raz::BvhFormat::load(RAZ_TESTS_ROOT "assets/animation/ànîm.bvh");
 
   //                child1 (10, 10, 10)

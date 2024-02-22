@@ -2,7 +2,7 @@
 
 #include "RaZ/Data/Submesh.hpp"
 
-TEST_CASE("Vertex basic") {
+TEST_CASE("Vertex basic", "[data]") {
   constexpr Raz::Vertex vertex1{ Raz::Vec3f(0.f), Raz::Vec2f(1.f), Raz::Axis::Z, Raz::Axis::X };
   CHECK(vertex1.position == Raz::Vec3f(0.f));
   CHECK(vertex1.texcoords == Raz::Vec2f(1.f));
@@ -21,7 +21,7 @@ TEST_CASE("Vertex basic") {
   CHECK_FALSE(std::hash<Raz::Vertex>()(vertex1) == std::hash<Raz::Vertex>()(vertex2));
 }
 
-TEST_CASE("Submesh basic") {
+TEST_CASE("Submesh basic", "[data]") {
   Raz::Submesh submesh;
   CHECK(submesh.getVertexCount() == 0);
   CHECK(submesh.getLineIndexCount() == 0);

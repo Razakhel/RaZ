@@ -5,7 +5,7 @@
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
-TEST_CASE("FbxFormat load basic") {
+TEST_CASE("FbxFormat load basic", "[data]") {
   const auto [mesh, meshRenderer] = Raz::FbxFormat::load(RAZ_TESTS_ROOT "../assets/meshes/shaderBall.fbx");
 
   CHECK(mesh.getSubmeshes().size() == 7);

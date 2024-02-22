@@ -4,7 +4,7 @@
 
 #include <limits>
 
-TEST_CASE("OwnerValue move") {
+TEST_CASE("OwnerValue move", "[data]") {
   Raz::OwnerValue<int, std::numeric_limits<int>::max()> valLimit;
   CHECK(valLimit == std::numeric_limits<int>::max());
   CHECK_FALSE(valLimit.isValid()); // If an initial value is unspecified, the invalid one is assigned

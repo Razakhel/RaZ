@@ -14,7 +14,7 @@ const Raz::Quaternionf quat3(180_deg, 1.f, -2.f, 5.f);
 
 } // namespace
 
-TEST_CASE("Quaternion deduction guides") {
+TEST_CASE("Quaternion deduction guides", "[math]") {
   const Raz::Quaternion quatfVal(1.f, 1.f, 1.f, 1.f);
   const Raz::Quaternion quatfDeg(Raz::Degrees(0.f), Raz::Axis::X);
   const Raz::Quaternion quatdRad(Raz::Radians(0.0), 1.0, 0.0, 0.0);
@@ -24,7 +24,7 @@ TEST_CASE("Quaternion deduction guides") {
   CHECK(std::is_same_v<std::decay_t<decltype(quatdRad)>, Raz::Quaterniond>);
 }
 
-TEST_CASE("Quaternion dot product") {
+TEST_CASE("Quaternion dot product", "[math]") {
   const Raz::Quaternionf normedQuat1 = quat1.normalize();
   const Raz::Quaternionf normedQuat2 = quat2.normalize();
   const Raz::Quaternionf normedQuat3 = quat3.normalize();
@@ -47,7 +47,7 @@ TEST_CASE("Quaternion dot product") {
   CHECK(quat3.dot(quat1) == quat1.dot(quat3));
 }
 
-TEST_CASE("Quaternion norm computation") {
+TEST_CASE("Quaternion norm computation", "[math]") {
   CHECK_THAT(quat1.computeSquaredNorm(), IsNearlyEqualTo(1.f));
   CHECK_THAT(quat1.computeNorm(), IsNearlyEqualTo(1.f));
 
@@ -58,7 +58,7 @@ TEST_CASE("Quaternion norm computation") {
   CHECK_THAT(quat3.computeNorm(), IsNearlyEqualTo(5.47722578f));
 }
 
-TEST_CASE("Quaternion interpolation") {
+TEST_CASE("Quaternion interpolation", "[math]") {
   // Results taken from Rust's nalgebra crate: https://play.rust-lang.org/?version=stable&mode=release&edition=2018&gist=fb93e96b13f3708b3b54aacef65365c2
 
   CHECK(quat1.lerp(quat2, 0.f) == quat1);
@@ -91,7 +91,7 @@ TEST_CASE("Quaternion interpolation") {
   CHECK(normedQuat1.slerp(normedQuat2, 1.f) == normedQuat2);
 }
 
-TEST_CASE("Quaternion matrix computation") {
+TEST_CASE("Quaternion matrix computation", "[math]") {
   const Raz::Mat4f quat1Mat = quat1.computeMatrix();
   const Raz::Mat4f quat2Mat = quat2.computeMatrix();
   const Raz::Mat4f quat3Mat = quat3.computeMatrix();
@@ -117,7 +117,7 @@ TEST_CASE("Quaternion matrix computation") {
                                                                       0.f,           0.f,           0.f,          1.f)));
 }
 
-TEST_CASE("Quaternion/vector multiplication") {
+TEST_CASE("Quaternion/vector multiplication", "[math]") {
   // See: https://www.geogebra.org/m/aderzasm
 
   const Raz::Quaternionf quatRotX(45_deg, Raz::Axis::X);
@@ -156,7 +156,7 @@ TEST_CASE("Quaternion/vector multiplication") {
   CHECK_THAT(pos * quatRotZ, IsNearlyEqualToVector(pos * Raz::Mat3f(quatRotZ.computeMatrix()), 0.000001f));
 }
 
-TEST_CASE("Quaternion/quaternion multiplication") {
+TEST_CASE("Quaternion/quaternion multiplication", "[math]") {
   constexpr Raz::Quaternionf unitQuat = Raz::Quaternionf::identity();
   constexpr Raz::Mat4f unitQuatMat    = unitQuat.computeMatrix();
   CHECK(unitQuatMat == Raz::Mat4f::identity());
@@ -203,7 +203,7 @@ TEST_CASE("Quaternion/quaternion multiplication") {
                                                                        0.f,           0.f,           0.f,          1.f)));
 }
 
-TEST_CASE("Quaternion near-equality") {
+TEST_CASE("Quaternion near-equality", "[math]") {
   CHECK_FALSE(quat1 == quat2);
 
   constexpr Raz::Quaternionf baseQuat(1.f, 1.f, 1.f, 1.f);
@@ -234,7 +234,7 @@ TEST_CASE("Quaternion near-equality") {
   CHECK(baseQuat == compQuat); // Quaternion::operator== does a near-equality check
 }
 
-TEST_CASE("Quaternion printing") {
+TEST_CASE("Quaternion printing", "[math]") {
   std::stringstream stream;
 
   stream << quat1;
