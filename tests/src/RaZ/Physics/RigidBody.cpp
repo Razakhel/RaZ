@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Physics/RigidBody.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("RigidBody basic", "[physics]") {
   Raz::RigidBody rigidBody(1.1f, 0.25f);

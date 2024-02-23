@@ -1,7 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaRender Camera", "[script][lua][render]") {
   CHECK(Raz::LuaWrapper::execute(R"(

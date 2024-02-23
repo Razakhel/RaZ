@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Submesh.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Vertex basic", "[data]") {
   constexpr Raz::Vertex vertex1{ Raz::Vec3f(0.f), Raz::Vec2f(1.f), Raz::Axis::Z, Raz::Axis::X };

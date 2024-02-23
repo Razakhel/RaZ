@@ -1,6 +1,3 @@
-#include "Catch.hpp"
-#include "TestUtils.hpp"
-
 #include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Data/Image.hpp"
@@ -12,6 +9,11 @@
 #include "RaZ/Render/Light.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
+
+#include "CatchCustomMatchers.hpp"
+#include "TestUtils.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace {
 

@@ -1,6 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Script/LuaWrapper.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaWrapper code execution", "[script][lua]") {
   CHECK_FALSE(Raz::LuaWrapper::execute(""));

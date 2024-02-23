@@ -1,10 +1,10 @@
-#include "Catch.hpp"
-
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Data/WavFormat.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Threading.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Sound initialization", "[audio]") {
   const Raz::AudioSystem audio; // Initializing the audio device & context, needed before all audio action

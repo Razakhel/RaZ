@@ -1,10 +1,10 @@
-#include "Catch.hpp"
-
 #include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Script/LuaScript.hpp"
 #include "RaZ/Script/ScriptSystem.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("ScriptSystem accepted components", "[script][lua]") {
   Raz::World world;

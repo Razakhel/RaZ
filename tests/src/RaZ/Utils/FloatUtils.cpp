@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/FloatUtils.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Near-equality absolute", "[utils]") {
   constexpr float floatEpsilon            = std::numeric_limits<float>::epsilon();

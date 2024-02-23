@@ -1,7 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 using namespace std::literals;
 

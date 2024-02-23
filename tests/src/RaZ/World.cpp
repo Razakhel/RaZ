@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/World.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("World entities manipulation", "[core]") {
   Raz::World world(3);

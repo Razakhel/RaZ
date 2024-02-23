@@ -1,12 +1,12 @@
 #pragma once
 
-#ifndef RAZ_CATCH_HPP
-#define RAZ_CATCH_HPP
+#ifndef RAZ_CATCHCUSTOMMATCHERS_HPP
+#define RAZ_CATCHCUSTOMMATCHERS_HPP
 
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/FloatUtils.hpp"
 
-#include <catch/catch.hpp>
+#include <catch2/matchers/catch_matchers.hpp>
 
 #include <iomanip>
 #include <sstream>
@@ -17,7 +17,7 @@ namespace Raz { class Image; }
 /// \tparam T Type of the value to be compared to.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, typename TolT = T>
-class IsNearlyEqualTo final : public Catch::MatcherBase<T> {
+class IsNearlyEqualTo final : public Catch::Matchers::MatcherBase<T> {
   static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualTo's value type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualTo's tolerance type must be floating point.");
 
@@ -58,7 +58,7 @@ IsNearlyEqualTo(T, TolT) -> IsNearlyEqualTo<T, TolT>;
 /// \tparam Size Size of the vectors to be compared.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, std::size_t Size, typename TolT = T>
-class IsNearlyEqualToVector final : public Catch::MatcherBase<Raz::Vector<T, Size>> {
+class IsNearlyEqualToVector final : public Catch::Matchers::MatcherBase<Raz::Vector<T, Size>> {
   static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualToVector's value type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualToVector's tolerance type must be floating point.");
 
@@ -107,7 +107,7 @@ IsNearlyEqualToVector(Raz::Vector<T, Size>, TolT) -> IsNearlyEqualToVector<T, Si
 /// \tparam H Height of the matrices to be compared.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, std::size_t W, std::size_t H, typename TolT = T>
-class IsNearlyEqualToMatrix final : public Catch::MatcherBase<Raz::Matrix<T, W, H>> {
+class IsNearlyEqualToMatrix final : public Catch::Matchers::MatcherBase<Raz::Matrix<T, W, H>> {
   static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualToMatrix's value type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualToMatrix's tolerance type must be floating point.");
 
@@ -160,7 +160,7 @@ IsNearlyEqualToMatrix(Raz::Matrix<T, W, H>, TolT) -> IsNearlyEqualToMatrix<T, W,
 /// \tparam T Type of the quaternion to be compared to.
 /// \tparam TolT Tolerance type, which may differ from the value type.
 template <typename T, typename TolT = T>
-class IsNearlyEqualToQuaternion final : public Catch::MatcherBase<Raz::Quaternion<T>> {
+class IsNearlyEqualToQuaternion final : public Catch::Matchers::MatcherBase<Raz::Quaternion<T>> {
   static_assert(std::is_floating_point_v<T>, "Error: IsNearlyEqualToQuaternion's value type must be floating point.");
   static_assert(std::is_floating_point_v<TolT>, "Error: IsNearlyEqualToQuaternion's tolerance type must be floating point.");
 
@@ -211,7 +211,7 @@ template <typename T, typename TolT>
 IsNearlyEqualToQuaternion(Raz::Quaternion<T>, TolT) -> IsNearlyEqualToQuaternion<T, TolT>;
 
 /// Custom Catch matcher, which checks for near-equality between images.
-class IsNearlyEqualToImage final : public Catch::MatcherBase<Raz::Image> {
+class IsNearlyEqualToImage final : public Catch::Matchers::MatcherBase<Raz::Image> {
 public:
   /// Creates an instance of a near-equality image check custom matcher.
   /// \param comparison Image to be compared with.
@@ -242,4 +242,4 @@ private:
   Raz::FilePath m_diffImgPath {};
 };
 
-#endif // RAZ_CATCH_HPP
+#endif // RAZ_CATCHCUSTOMMATCHERS_HPP

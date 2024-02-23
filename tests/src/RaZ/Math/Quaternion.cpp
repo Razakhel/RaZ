@@ -1,8 +1,10 @@
-#include "Catch.hpp"
-
 #include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Quaternion.hpp"
+
+#include "CatchCustomMatchers.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 using namespace Raz::Literals;
 

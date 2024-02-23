@@ -1,7 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Shader.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace {
 

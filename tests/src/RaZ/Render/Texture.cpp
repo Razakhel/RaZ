@@ -1,9 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Texture creation", "[render]") {
   Raz::Renderer::recoverErrors(); // Flushing errors

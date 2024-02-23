@@ -1,8 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Data/WavFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("WavFormat load/save", "[data]") {
   const Raz::Sound origSound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");

@@ -1,7 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Physics/Collider.hpp"
 #include "RaZ/Utils/Shape.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Collider basic", "[physics]") {
   Raz::Collider collider(Raz::Plane(1.5f));

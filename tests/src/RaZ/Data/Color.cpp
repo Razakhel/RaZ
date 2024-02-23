@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Color.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Color components", "[data]") {
   Raz::Color color;

@@ -1,8 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/Shape.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("MeshRenderer materials", "[render]") {
   Raz::MeshRenderer meshRenderer;

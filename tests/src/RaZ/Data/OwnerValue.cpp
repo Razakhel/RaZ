@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/OwnerValue.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 #include <limits>
 

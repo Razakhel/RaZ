@@ -1,9 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/ObjFormat.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace {
 

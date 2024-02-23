@@ -1,10 +1,10 @@
-#include "Catch.hpp"
-
 #include "RaZ/Component.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/Light.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Components IDs", "[core]") {
   // With the CRTP, every component gets a different constant ID with the first call

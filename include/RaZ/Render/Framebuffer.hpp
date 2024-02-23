@@ -6,6 +6,7 @@
 #include "RaZ/Data/OwnerValue.hpp"
 
 #include <cassert>
+#include <memory>
 #include <vector>
 
 namespace Raz {

@@ -1,5 +1,3 @@
-#include "Catch.hpp"
-
 #include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Math/Transform.hpp"
@@ -7,6 +5,8 @@
 #include "RaZ/Physics/PhysicsSystem.hpp"
 #include "RaZ/Physics/RigidBody.hpp"
 #include "RaZ/Utils/Shape.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("PhysicsSystem basic", "[physics]") {
   Raz::PhysicsSystem physics;

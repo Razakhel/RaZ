@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/Threading.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 #include <numeric>
 #include <random>

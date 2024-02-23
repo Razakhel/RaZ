@@ -1,10 +1,11 @@
-#define CATCH_CONFIG_RUNNER // Telling Catch we will define a main on our own
-#include "Catch.hpp"
-#include "TestUtils.hpp"
-
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/Logger.hpp"
+
+#include "TestUtils.hpp"
+
+#include <catch2/catch_session.hpp>
+#include <catch2/catch_tostring.hpp>
 
 int main(int argc, char* argv[]) {
   // Increasing precision output for floating-point values

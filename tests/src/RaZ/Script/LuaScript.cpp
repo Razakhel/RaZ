@@ -1,7 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Application.hpp"
 #include "RaZ/Script/LuaScript.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaScript validity", "[script][lua]") {
   CHECK_THROWS(Raz::LuaScript("")); // Empty script

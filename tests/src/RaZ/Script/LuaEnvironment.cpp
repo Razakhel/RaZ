@@ -1,7 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Script/LuaEnvironment.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaEnvironment exists", "[script][lua]") {
   Raz::LuaWrapper::execute(R"(

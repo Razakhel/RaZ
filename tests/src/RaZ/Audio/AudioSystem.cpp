@@ -1,5 +1,3 @@
-#include "Catch.hpp"
-
 #include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Audio/AudioSystem.hpp"
@@ -8,6 +6,8 @@
 #include "RaZ/Math/Angle.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Physics/RigidBody.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 using namespace Raz::Literals;
 

@@ -1,7 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/TgaFormat.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("TgaFormat load", "[data]") {
   const Raz::Image img = Raz::TgaFormat::load(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.tga");

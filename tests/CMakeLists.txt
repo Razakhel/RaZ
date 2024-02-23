@@ -137,17 +137,17 @@ endif ()
 
 target_sources(RaZ_Tests PRIVATE ${RAZ_TEST_FILES})
 
-target_include_directories(
-    RaZ_Tests
-
-    PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/include"
-        "${CMAKE_HOME_DIRECTORY}/extern"
-)
+target_include_directories(RaZ_Tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # Adding a definition for the tests root path, so that it can be used in tests instead of full relative paths
 target_compile_definitions(RaZ_Tests PRIVATE RAZ_TESTS_ROOT="${CMAKE_CURRENT_SOURCE_DIR}/")
 
-target_link_libraries(RaZ_Tests PUBLIC RaZ)
+target_link_libraries(
+    RaZ_Tests
+
+    PRIVATE
+        RaZ
+        Catch2
+)
 
 add_test(RaZ_Tests RaZ_Tests)

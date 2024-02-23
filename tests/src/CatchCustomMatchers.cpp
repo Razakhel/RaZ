@@ -1,8 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+
+#include "CatchCustomMatchers.hpp"
 
 bool IsNearlyEqualToImage::match(const Raz::Image& base) const {
   if (base.getWidth() != m_comparison.getWidth() || base.getHeight() != m_comparison.getHeight())

@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Script/LuaWrapper.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaAnimation Skeleton", "[script][lua][animation]") {
   CHECK(Raz::LuaWrapper::execute(R"(

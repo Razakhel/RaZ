@@ -1,9 +1,10 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Render/Cubemap.hpp"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Cubemap move", "[render]") {
   Raz::Cubemap cubemap;

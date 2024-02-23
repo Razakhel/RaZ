@@ -1,7 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/Threading.hpp"
 #include "RaZ/Utils/ThreadPool.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 #ifdef RAZ_THREADS_AVAILABLE
 

@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Render/RenderGraph.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("RenderGraph validity", "[render]") {
   Raz::RenderGraph graph;

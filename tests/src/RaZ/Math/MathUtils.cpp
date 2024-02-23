@@ -1,7 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Math/MathUtils.hpp"
 #include "RaZ/Math/Vector.hpp"
+
+#include "CatchCustomMatchers.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("MathUtils lerp arithmetic types", "[math]") {
   CHECK(Raz::MathUtils::lerp(0.f, 1.f, 0.f) == 0.f);

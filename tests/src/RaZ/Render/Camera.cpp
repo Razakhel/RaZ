@@ -1,7 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
+
+#include "CatchCustomMatchers.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 using namespace Raz::Literals;
 

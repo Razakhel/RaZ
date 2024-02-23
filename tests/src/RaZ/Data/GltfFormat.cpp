@@ -1,10 +1,10 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/GltfFormat.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("GltfFormat load glTF", "[data]") {
   const auto [mesh, meshRenderer] = Raz::GltfFormat::load(RAZ_TESTS_ROOT "assets/meshes/çûbè.gltf");

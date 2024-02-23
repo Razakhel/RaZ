@@ -1,7 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/Ray.hpp"
 #include "RaZ/Utils/Shape.hpp"
+
+#include "CatchCustomMatchers.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace {
 

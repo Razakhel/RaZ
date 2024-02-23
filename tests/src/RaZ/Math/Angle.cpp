@@ -1,6 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Math/Angle.hpp"
+
+#include "CatchCustomMatchers.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Degrees to Radians", "[math]") {
   constexpr Raz::Degreesf deg45(45.f);

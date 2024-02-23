@@ -1,9 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Entity.hpp"
 #include "RaZ/System.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Math/Transform.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 class TestSystem : public Raz::System {
 public:

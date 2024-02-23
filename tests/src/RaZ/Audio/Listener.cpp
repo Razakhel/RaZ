@@ -1,13 +1,13 @@
-#include "Catch.hpp"
-
 #include "RaZ/Audio/AudioSystem.hpp"
 #include "RaZ/Audio/Listener.hpp"
 #include "RaZ/Math/Vector.hpp"
 
+#include <catch2/catch_test_macros.hpp>
+
 TEST_CASE("Listener data", "[audio]") {
   const Raz::AudioSystem audio; // Initializing the audio device & context, needed before all audio action
 
-  Raz::Listener listener;
+  const Raz::Listener listener;
 
   CHECK(listener.recoverGain() == 1.f);
   CHECK(listener.recoverPosition() == Raz::Vec3f(0.f));

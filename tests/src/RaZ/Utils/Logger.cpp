@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/Logger.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Logger custom function", "[utils]") {
   Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);

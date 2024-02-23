@@ -1,9 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/FbxFormat.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("FbxFormat load basic", "[data]") {
   const auto [mesh, meshRenderer] = Raz::FbxFormat::load(RAZ_TESTS_ROOT "../assets/meshes/shaderBall.fbx");

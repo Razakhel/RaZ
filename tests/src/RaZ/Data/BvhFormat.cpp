@@ -1,8 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Animation/Skeleton.hpp"
 #include "RaZ/Data/BvhFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("BvhFormat load", "[data]") {
   const Raz::Skeleton skeleton = Raz::BvhFormat::load(RAZ_TESTS_ROOT "assets/animation/ànîm.bvh");

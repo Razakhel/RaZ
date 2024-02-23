@@ -1,7 +1,7 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Plugin.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Plugin load", "[utils]") {
 #if defined(RAZ_PLATFORM_WINDOWS)

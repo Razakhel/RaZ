@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Math/PerlinNoise.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Perlin noise 1D") {
   // Whole coordinates always give 0

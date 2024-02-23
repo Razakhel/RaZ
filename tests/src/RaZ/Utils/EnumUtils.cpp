@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Utils/EnumUtils.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 enum class EnumTest : unsigned int {
   ONE   = 1,

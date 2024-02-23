@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Script/LuaWrapper.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaAudio AudioSystem", "[script][lua][audio]") {
   CHECK(Raz::LuaWrapper::execute(R"(

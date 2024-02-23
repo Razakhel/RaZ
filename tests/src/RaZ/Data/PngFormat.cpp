@@ -1,7 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/PngFormat.hpp"
+#include "RaZ/Utils/FilePath.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("PngFormat load", "[data]") {
   const Raz::Image img = Raz::PngFormat::load(RAZ_TESTS_ROOT "assets/images/dëfàùltTêst.png");

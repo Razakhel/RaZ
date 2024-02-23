@@ -1,6 +1,8 @@
-#include "Catch.hpp"
-
 #include "RaZ/Data/Mesh.hpp"
+
+#include "CatchCustomMatchers.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Mesh basic", "[data]") {
   Raz::Mesh mesh;

@@ -1,9 +1,9 @@
-#include "Catch.hpp"
-
 #include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 #include "RaZ/Data/BvhSystem.hpp"
 #include "RaZ/Data/Mesh.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("BvhSystem accepted components", "[data]") {
   Raz::World world(1);

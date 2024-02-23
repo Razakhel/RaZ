@@ -1,6 +1,6 @@
-#include "Catch.hpp"
-
 #include "RaZ/Render/Material.hpp"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Material predefined types", "[render]") {
   Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
