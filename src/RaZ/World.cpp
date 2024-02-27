@@ -46,14 +46,19 @@ void World::refresh() {
   for (std::size_t entityIndex = 0; entityIndex < m_activeEntityCount; ++entityIndex) {
     const EntityPtr& entity = m_entities[entityIndex];
 
-    for (const SystemPtr& system : m_systems) {
-      if (system == nullptr)
+    if (!entity->isEnabled())
+      continue;
+
+    for (std::size_t systemIndex = 0; systemIndex < m_systems.size(); ++systemIndex) {
+      const SystemPtr& system = m_systems[systemIndex];
+
+      if (system == nullptr || !m_activeSystems[systemIndex])
         continue;
 
       const Bitset matchingComponents = system->getAcceptedComponents() & entity->getEnabledComponents();
 
-      // If the system doesn't contain the entity, check if it should (possesses the accepted components); if yes, link it
-      // Else, if the system contains the entity but shouldn't, unlink it
+      // If the system does not contain the entity, check if it should (if it possesses the accepted components); if yes, link it
+      // Else, if the system contains the entity but should not, unlink it
       if (!system->containsEntity(*entity)) {
         if (!matchingComponents.isEmpty())
           system->linkEntity(entity);

@@ -24,47 +24,47 @@ public:
   const std::vector<EntityPtr>& getEntities() const { return m_entities; }
 
   /// Adds a given system to the world.
-  /// \tparam Sys Type of the system to be added.
+  /// \tparam SysT Type of the system to be added.
   /// \tparam Args Types of the arguments to be forwarded to the given system.
   /// \param args Arguments to be forwarded to the given system.
   /// \return Reference to the newly added system.
-  template <typename Sys, typename... Args> Sys& addSystem(Args&&... args);
+  template <typename SysT, typename... Args> SysT& addSystem(Args&&... args);
   /// Tells if a given system exists within the world.
-  /// \tparam Sys Type of the system to be checked.
+  /// \tparam SysT Type of the system to be checked.
   /// \return True if the given system is present, false otherwise.
-  template <typename Sys> bool hasSystem() const;
+  template <typename SysT> bool hasSystem() const;
   /// Gets a given system contained by the world.
   /// This system must be present within the world. If not, an exception is thrown.
-  /// \tparam Sys Type of the system to be fetched.
+  /// \tparam SysT Type of the system to be fetched.
   /// \return Constant reference to the found system.
-  template <typename Sys> const Sys& getSystem() const;
+  template <typename SysT> const SysT& getSystem() const;
   /// Gets a given system contained by the world.
   /// This system must be present within the world. If not, an exception is thrown.
-  /// \tparam Sys Type of the system to be fetched.
+  /// \tparam SysT Type of the system to be fetched.
   /// \return Reference to the found system.
-  template <typename Sys> Sys& getSystem() { return const_cast<Sys&>(static_cast<const World*>(this)->getSystem<Sys>()); }
+  template <typename SysT> SysT& getSystem() { return const_cast<SysT&>(static_cast<const World*>(this)->getSystem<SysT>()); }
   /// Removes the given system from the world.
-  /// \tparam Sys Type of the system to be removed.
-  template <typename Sys> void removeSystem();
+  /// \tparam SysT Type of the system to be removed.
+  template <typename SysT> void removeSystem();
   /// Adds an entity into the world.
   /// \param enabled True if the entity should be active immediately, false otherwise.
   /// \return Reference to the newly created entity.
   Entity& addEntity(bool enabled = true);
   /// Adds an entity into the world with a given component. This entity will be automatically enabled.
-  /// \tparam Comp Type of the component to be added into the entity.
+  /// \tparam CompT Type of the component to be added into the entity.
   /// \tparam Args Types of the arguments to be forwarded to the given component.
   /// \param args Arguments to be forwarded to the given component.
   /// \return Reference to the newly added entity.
-  template <typename Comp, typename... Args> Entity& addEntityWithComponent(Args&&... args);
+  template <typename CompT, typename... Args> Entity& addEntityWithComponent(Args&&... args);
   /// Adds an entity into the world with several components at once.
-  /// \tparam Comps Types of the components to be added into the entity.
+  /// \tparam CompsTs Types of the components to be added into the entity.
   /// \param enabled True if the entity should be active immediately, false otherwise.
   /// \return Reference to the newly added entity.
-  template <typename... Comps> Entity& addEntityWithComponents(bool enabled = true);
+  template <typename... CompsTs> Entity& addEntityWithComponents(bool enabled = true);
   /// Fetches entities which contain specific component(s).
-  /// \tparam Comps Types of the components to query.
+  /// \tparam CompsTs Types of the components to query.
   /// \return List of entities containing all given components.
-  template <typename... Comps> std::vector<Entity*> recoverEntitiesWithComponents();
+  template <typename... CompsTs> std::vector<Entity*> recoverEntitiesWithComponents();
   /// Removes an entity from the world. It *must* be an entity created by this world.
   /// \param entity Entity to be removed.
   void removeEntity(const Entity& entity);

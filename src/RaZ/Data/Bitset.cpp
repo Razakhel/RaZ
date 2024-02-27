@@ -4,17 +4,17 @@
 
 namespace Raz {
 
-void Bitset::setBit(std::size_t position, bool value) {
-  if (position >= m_bits.size())
-    m_bits.resize(position + 1);
+void Bitset::setBit(std::size_t index, bool value) {
+  if (index >= m_bits.size())
+    m_bits.resize(index + 1);
 
-  m_bits[position] = value;
+  m_bits[index] = value;
 }
 
 Bitset Bitset::operator~() const noexcept {
   Bitset res = *this;
 
-  for (auto bit : res.getBits())
+  for (auto bit : res.m_bits)
     bit = !bit;
 
   return res;
@@ -22,7 +22,7 @@ Bitset Bitset::operator~() const noexcept {
 
 Bitset Bitset::operator&(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.getBits().begin());
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.m_bits.begin());
 
   res &= bitset;
   return res;
@@ -30,7 +30,7 @@ Bitset Bitset::operator&(const Bitset& bitset) const noexcept {
 
 Bitset Bitset::operator|(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.getBits().begin());
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.m_bits.begin());
 
   res |= bitset;
   return res;
@@ -38,7 +38,7 @@ Bitset Bitset::operator|(const Bitset& bitset) const noexcept {
 
 Bitset Bitset::operator^(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.getBits().begin());
+  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.m_bits.begin());
 
   res ^= bitset;
   return res;

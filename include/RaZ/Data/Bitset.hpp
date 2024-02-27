@@ -16,14 +16,12 @@ public:
   explicit Bitset(std::size_t bitCount, bool initVal = false) : m_bits(bitCount, initVal) {}
   Bitset(std::initializer_list<bool> values) : m_bits(values) {}
 
-  const std::vector<bool>& getBits() const noexcept { return m_bits; }
-  std::vector<bool>& getBits() noexcept { return m_bits; }
   std::size_t getSize() const noexcept { return m_bits.size(); }
 
   bool isEmpty() const noexcept { return (std::find(m_bits.cbegin(), m_bits.cend(), true) == m_bits.cend()); }
   std::size_t getEnabledBitCount() const noexcept { return static_cast<std::size_t>(std::count(m_bits.cbegin(), m_bits.cend(), true)); }
-  std::size_t getDisabledBitCount() const noexcept { return m_bits.size() - getEnabledBitCount(); }
-  void setBit(std::size_t position, bool value = true);
+  std::size_t getDisabledBitCount() const noexcept { return (m_bits.size() - getEnabledBitCount()); }
+  void setBit(std::size_t index, bool value = true);
   void resize(std::size_t newSize) { m_bits.resize(newSize); }
   void reset() { std::fill(m_bits.begin(), m_bits.end(), false); }
   void clear() noexcept { m_bits.clear(); }
@@ -40,7 +38,7 @@ public:
   Bitset& operator<<=(std::size_t shift);
   Bitset& operator>>=(std::size_t shift);
   bool operator[](std::size_t index) const noexcept { return m_bits[index]; }
-  bool operator==(const Bitset& bitset) const noexcept { return std::equal(m_bits.cbegin(), m_bits.cend(), bitset.getBits().cbegin()); }
+  bool operator==(const Bitset& bitset) const noexcept { return std::equal(m_bits.cbegin(), m_bits.cend(), bitset.m_bits.cbegin()); }
   bool operator!=(const Bitset& bitset) const noexcept { return !(*this == bitset); }
   friend std::ostream& operator<<(std::ostream& stream, const Bitset& bitset);
 

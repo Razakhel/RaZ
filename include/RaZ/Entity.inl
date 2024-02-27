@@ -2,59 +2,59 @@
 
 namespace Raz {
 
-template <typename Comp, typename... Args>
-Comp& Entity::addComponent(Args&&... args) {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: The added component must be derived from Component.");
+template <typename CompT, typename... Args>
+CompT& Entity::addComponent(Args&&... args) {
+  static_assert(std::is_base_of_v<Component, CompT>, "Error: The added component must be derived from Component.");
 
-  const std::size_t compId = Component::getId<Comp>();
+  const std::size_t compId = Component::getId<CompT>();
 
   if (compId >= m_components.size())
     m_components.resize(compId + 1);
 
-  m_components[compId] = std::make_unique<Comp>(std::forward<Args>(args)...);
+  m_components[compId] = std::make_unique<CompT>(std::forward<Args>(args)...);
   m_enabledComponents.setBit(compId);
 
-  return static_cast<Comp&>(*m_components[compId]);
+  return static_cast<CompT&>(*m_components[compId]);
 }
 
-template <typename Comp>
-std::tuple<Comp&> Entity::addComponents() {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: The added component must be derived from Component.");
+template <typename CompT>
+std::tuple<CompT&> Entity::addComponents() {
+  static_assert(std::is_base_of_v<Component, CompT>, "Error: The added component must be derived from Component.");
 
-  return std::forward_as_tuple(addComponent<Comp>());
+  return std::forward_as_tuple(addComponent<CompT>());
 }
 
-template <typename Comp1, typename Comp2, typename... C>
-std::tuple<Comp1&, Comp2&, C...> Entity::addComponents() {
-  static_assert(std::is_base_of_v<Component, Comp1>, "Error: The added component must be derived from Component.");
+template <typename CompT1, typename CompT2, typename... C>
+std::tuple<CompT1&, CompT2&, C...> Entity::addComponents() {
+  static_assert(std::is_base_of_v<Component, CompT1>, "Error: The added component must be derived from Component.");
 
-  return std::tuple_cat(std::forward_as_tuple(addComponent<Comp1>()), addComponents<Comp2, C...>());
+  return std::tuple_cat(std::forward_as_tuple(addComponent<CompT1>()), addComponents<CompT2, C...>());
 }
 
-template <typename Comp>
+template <typename CompT>
 bool Entity::hasComponent() const {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: The checked component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, CompT>, "Error: The checked component must be derived from Component.");
 
-  const std::size_t compId = Component::getId<Comp>();
+  const std::size_t compId = Component::getId<CompT>();
   return ((compId < m_components.size()) && m_enabledComponents[compId]);
 }
 
-template <typename Comp>
-const Comp& Entity::getComponent() const {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: The fetched component must be derived from Component.");
+template <typename CompT>
+const CompT& Entity::getComponent() const {
+  static_assert(std::is_base_of_v<Component, CompT>, "Error: The fetched component must be derived from Component.");
 
-  if (hasComponent<Comp>())
-    return static_cast<const Comp&>(*m_components[Component::getId<Comp>()]);
+  if (hasComponent<CompT>())
+    return static_cast<const CompT&>(*m_components[Component::getId<CompT>()]);
 
   throw std::runtime_error("Error: No component available of specified type");
 }
 
-template <typename Comp>
+template <typename CompT>
 void Entity::removeComponent() {
-  static_assert(std::is_base_of_v<Component, Comp>, "Error: The removed component must be derived from Component.");
+  static_assert(std::is_base_of_v<Component, CompT>, "Error: The removed component must be derived from Component.");
 
-  if (hasComponent<Comp>()) {
-    const std::size_t compId = Component::getId<Comp>();
+  if (hasComponent<CompT>()) {
+    const std::size_t compId = Component::getId<CompT>();
 
     m_components[compId].reset();
     m_enabledComponents.setBit(compId, false);

@@ -8,35 +8,35 @@ TEST_CASE("World entities manipulation", "[core]") {
   // The constructor argument simply reserves the size for entities
   CHECK(world.getEntities().empty());
 
-  Raz::Entity& entity0 = world.addEntity();
-  Raz::Entity& entity1 = world.addEntity();
-  Raz::Entity& entity2 = world.addEntity();
+  const Raz::Entity& entity0 = world.addEntity();
+  const Raz::Entity& entity1 = world.addEntity();
+  const Raz::Entity& entity2 = world.addEntity();
 
   CHECK(entity0.getId() == 0);
   CHECK(entity1.getId() == 1);
   CHECK(entity2.getId() == 2);
 
   CHECK(world.getEntities().size() == 3);
+  CHECK(world.getEntities()[0]->getId() == 0);
+  CHECK(world.getEntities()[1]->getId() == 1);
+  CHECK(world.getEntities()[2]->getId() == 2);
 
   world.removeEntity(entity0);
-
   CHECK(world.getEntities().size() == 2);
   CHECK(world.getEntities()[0]->getId() == 1);
   CHECK(world.getEntities()[1]->getId() == 2);
 
   world.removeEntity(entity2);
-
   CHECK(world.getEntities().size() == 1);
   CHECK(world.getEntities()[0]->getId() == 1);
 
-  [[maybe_unused]] Raz::Entity& entity4 = world.addEntity();
-
+  world.addEntity();
   CHECK(world.getEntities().size() == 2);
   CHECK(world.getEntities()[0]->getId() == 1);
   CHECK(world.getEntities()[1]->getId() == 3); // The entity indices are always growing
 
   // The entity removal is made by checking the pointers; if it isn't owned by this world, it throws an exception
-  Raz::Entity extEntity(0);
+  const Raz::Entity extEntity(0);
   CHECK_THROWS(world.removeEntity(extEntity));
 }
 

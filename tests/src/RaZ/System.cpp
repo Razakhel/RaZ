@@ -1,56 +1,88 @@
+#include "RaZ/Application.hpp"
 #include "RaZ/Entity.hpp"
 #include "RaZ/System.hpp"
-#include "RaZ/Data/Mesh.hpp"
-#include "RaZ/Math/Transform.hpp"
+#include "RaZ/World.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
+namespace {
+
+struct FirstTestComponent : public Raz::Component {};
+struct SecondTestComponent : public Raz::Component {};
+
+} // namespace
+
 class TestSystem : public Raz::System {
 public:
-  TestSystem() { registerComponents<Raz::Transform>(); } // [ 0 1 ]
+  TestSystem() { registerComponents<SecondTestComponent>(); }
 
-  void linkEntity(const Raz::EntityPtr& entity) override { System::linkEntity(entity); }
-  void unlinkEntity(const Raz::EntityPtr& entity) override { System::unlinkEntity(entity); }
+  void linkEntity(const Raz::EntityPtr& entity) override {
+    ++linkedEntityCount;
+    System::linkEntity(entity);
+  }
+  void unlinkEntity(const Raz::EntityPtr& entity) override {
+    --linkedEntityCount;
+    System::unlinkEntity(entity);
+  }
 
-  bool update(const Raz::FrameTimeInfo&) override { return true; }
+  bool update(const Raz::FrameTimeInfo&) override {
+    ++updateCount;
+    return (updateCount != 4);
+  }
+
+  std::size_t linkedEntityCount = 0;
+  std::size_t updateCount = 0;
 };
 
 TEST_CASE("System basic", "[core]") {
-  TestSystem testSystem {};
+  Raz::World world(3);
 
-  Raz::EntityPtr mesh = Raz::Entity::create(0);
-  mesh->addComponent<Raz::Mesh>();
+  auto& testSystem = world.addSystem<TestSystem>();
+  CHECK(testSystem.getAcceptedComponents().getEnabledBitCount() == 1);
+  // A system's accepted components bitset gets a value at the component's index, thus is resized accordingly
+  CHECK(testSystem.getAcceptedComponents().getSize() == Raz::Component::getId<SecondTestComponent>() + 1);
+  CHECK(testSystem.getAcceptedComponents()[Raz::Component::getId<SecondTestComponent>()]);
 
-  // If the system is supposed to contain the entity, link it
-  // This operation is normally made into a World
-  if (!(mesh->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
-    testSystem.linkEntity(mesh);
+  Raz::Entity& firstEntity = world.addEntity();
+  firstEntity.addComponent<FirstTestComponent>();
 
-  CHECK_FALSE(testSystem.containsEntity(*mesh));
+  // As the entity doesn't contain any of the accepted components, it won't be linked
+  // The world's update returns true while there are still active systems
+  CHECK(world.update({}));
+  CHECK_FALSE(testSystem.containsEntity(firstEntity));
+  CHECK(testSystem.linkedEntityCount == 0);
+  CHECK(testSystem.updateCount == 1);
 
-  Raz::EntityPtr transform = Raz::Entity::create(1);
-  transform->addComponent<Raz::Transform>();
+  Raz::Entity& secondEntity = world.addEntity();
+  secondEntity.addComponent<SecondTestComponent>();
 
-  if (!(transform->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
-    testSystem.linkEntity(transform);
+  CHECK(world.update({})); // The entity is linked to the system as it has at least one of the accepted components
+  CHECK(testSystem.containsEntity(secondEntity));
+  CHECK(testSystem.linkedEntityCount == 1);
+  CHECK(testSystem.updateCount == 2);
 
-  CHECK(testSystem.containsEntity(*transform));
+  // Removing the component, the entity shouldn't be processed by the system anymore
+  secondEntity.removeComponent<SecondTestComponent>();
 
-  // Removing our Transform component, the entity shouldn't be processed by the system anymore
-  transform->removeComponent<Raz::Transform>();
-
-  // Unlink the entity if none of the components match
-  if ((transform->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
-    testSystem.unlinkEntity(transform);
-
-  CHECK_FALSE(testSystem.containsEntity(*transform));
+  CHECK(world.update({})); // The entity is unlinked from the system
+  CHECK_FALSE(testSystem.containsEntity(secondEntity));
+  CHECK(testSystem.linkedEntityCount == 0);
+  CHECK(testSystem.updateCount == 3);
 
   // Creating an entity without components
-  const Raz::EntityPtr emptyEntity = Raz::Entity::create(2);
+  const Raz::Entity& emptyEntity = world.addEntity();
 
   // The entity will not be linked since there's no component to be matched
-  if (!(emptyEntity->getEnabledComponents() & testSystem.getAcceptedComponents()).isEmpty())
-    testSystem.linkEntity(emptyEntity);
+  // As the only existing system has returned false on update there are no active system anymore, thus the world update also returns false
+  CHECK_FALSE(world.update({}));
+  CHECK_FALSE(testSystem.containsEntity(emptyEntity));
+  CHECK(testSystem.linkedEntityCount == 0);
+  CHECK(testSystem.updateCount == 4);
 
-  CHECK_FALSE(testSystem.containsEntity(*emptyEntity));
+  // The latest system update made it return false; this system should not be updated ever again and should ignore all entities, even compatible ones
+  secondEntity.addComponent<SecondTestComponent>();
+  CHECK_FALSE(world.update({}));
+  CHECK_FALSE(testSystem.containsEntity(secondEntity));
+  CHECK(testSystem.linkedEntityCount == 0);
+  CHECK(testSystem.updateCount == 4);
 }
