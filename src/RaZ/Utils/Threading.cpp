@@ -10,7 +10,8 @@ ThreadPool& getDefaultThreadPool() {
 }
 
 void parallelize(const std::function<void()>& action, unsigned int threadCount) {
-  assert("Error: The number of threads can't be 0." && threadCount != 0);
+  if (threadCount == 0)
+    throw std::invalid_argument("[Threading] The number of threads cannot be 0.");
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();

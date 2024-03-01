@@ -91,7 +91,7 @@ void parallelize(std::initializer_list<std::function<void()>> actions);
 /// \param action Action to be performed by each thread, taking an index range as boundaries.
 /// \param threadCount Amount of threads to start an instance on.
 template <typename BegIndexT, typename EndIndexT, typename FuncT, typename = std::enable_if_t<std::is_integral_v<BegIndexT> && std::is_integral_v<EndIndexT>>>
-void parallelize(BegIndexT beginIndex, EndIndexT endIndex, FuncT&& action, unsigned int threadCount = getSystemThreadCount());
+void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int threadCount = getSystemThreadCount());
 
 /// Calls a function in parallel over an iterator range.
 /// The iterators are automatically split, giving a separate start/past-the-end iterator range to each thread.
@@ -103,7 +103,7 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, FuncT&& action, unsig
 /// \param action Action to be performed by each thread, taking an iterator range as boundaries.
 /// \param threadCount Amount of threads to start an instance on.
 template <typename IterT, typename FuncT, typename = typename std::iterator_traits<IterT>::iterator_category>
-void parallelize(IterT begin, IterT end, FuncT&& action, unsigned int threadCount = getSystemThreadCount());
+void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int threadCount = getSystemThreadCount());
 
 /// Calls a function in parallel over a collection.
 /// The collection is automatically split, giving a separate start/past-the-end iterator range to each thread.
