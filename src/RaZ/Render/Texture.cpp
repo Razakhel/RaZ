@@ -1,5 +1,8 @@
 #include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/Image.hpp"
+#if defined(USE_OPENGL_ES)
+#include "RaZ/Render/Framebuffer.hpp"
+#endif
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
@@ -321,21 +324,30 @@ void Texture2D::fill(const Color& color) {
   unbind();
 }
 
-#if !defined(USE_OPENGL_ES) // Renderer::recoverTextureData() is unavailable with OpenGL ES
 Image Texture2D::recoverImage() const {
   Image img(m_width, m_height, static_cast<ImageColorspace>(m_colorspace), (m_dataType == TextureDataType::BYTE ? ImageDataType::BYTE : ImageDataType::FLOAT));
 
+  const PixelDataType pixelDataType = (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT);
+
+#if !defined(USE_OPENGL_ES)
   bind();
-  Renderer::recoverTextureData(TextureType::TEXTURE_2D,
-                               0,
-                               recoverFormat(m_colorspace),
-                               (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
-                               img.getDataPtr());
+  Renderer::recoverTextureData(TextureType::TEXTURE_2D, 0, recoverFormat(m_colorspace), pixelDataType, img.getDataPtr());
   unbind();
+#else
+  // Recovering an image directly from a texture (glGetTexImage()) is not possible with OpenGL ES; a framebuffer must be used to read the texture from instead
+  // See: https://stackoverflow.com/a/53993894/3292304
+
+  const Framebuffer dummyFramebuffer;
+  Renderer::bindFramebuffer(dummyFramebuffer.getIndex(), FramebufferType::READ_FRAMEBUFFER);
+
+  Renderer::setFramebufferTexture2D(FramebufferAttachment::COLOR0, m_index, 0, TextureType::TEXTURE_2D, FramebufferType::READ_FRAMEBUFFER);
+  Renderer::recoverFrame(m_width, m_height, recoverFormat(m_colorspace), pixelDataType, img.getDataPtr());
+
+  Renderer::unbindFramebuffer(FramebufferType::READ_FRAMEBUFFER);
+#endif
 
   return img;
 }
-#endif
 
 void Texture2D::load() const {
   if (m_colorspace == TextureColorspace::INVALID)

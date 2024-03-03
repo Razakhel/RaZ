@@ -25,24 +25,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::Texture2DPtr& output, const
   //  fail under Linux (as the second rendered frame of each test might be empty)
   world.update({});
 
-#if !defined(USE_OPENGL_ES)
   Raz::Image renderedImg = output->recoverImage();
-#else
-  // Recovering an image directly from a texture (glReadPixels()) is not possible with OpenGL ES; a framebuffer must be used to read the texture from instead
-  // See: https://stackoverflow.com/a/53993894/3292304
-  const Raz::Framebuffer intermFramebuffer;
-  Raz::Renderer::bindFramebuffer(intermFramebuffer.getIndex(), Raz::FramebufferType::READ_FRAMEBUFFER);
-  Raz::Renderer::setFramebufferTexture2D(Raz::FramebufferAttachment::COLOR0,
-                                         output->getIndex(),
-                                         0,
-                                         Raz::TextureType::TEXTURE_2D,
-                                         Raz::FramebufferType::READ_FRAMEBUFFER);
-
-  Raz::Image renderedImg(output->getWidth(), output->getHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
-  Raz::Renderer::recoverFrame(output->getWidth(), output->getHeight(), Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, renderedImg.getDataPtr());
-
-  Raz::Renderer::unbindFramebuffer(Raz::FramebufferType::READ_FRAMEBUFFER);
-#endif
 
   if (!renderedImgPath.isEmpty())
     Raz::ImageFormat::save(renderedImgPath, renderedImg, true);

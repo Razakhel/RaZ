@@ -158,14 +158,12 @@ public:
   /// Fills the texture with a single color.
   /// \param color Color to fill the texture with.
   void fill(const Color& color);
-#if !defined(USE_OPENGL_ES)
   /// Retrieves the texture's data from the GPU.
   /// \warning The pixel storage pack & unpack alignments should be set to 1 in order to recover actual pixels.
   /// \see Renderer::setPixelStorage()
   /// \warning Retrieving an image from the GPU is slow; use this function with caution.
   /// \return Recovered image.
   Image recoverImage() const;
-#endif
 
 private:
   void load() const override;
