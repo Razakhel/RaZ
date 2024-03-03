@@ -1,5 +1,4 @@
 #include "RaZ/Application.hpp"
-#include "RaZ/World.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
@@ -28,29 +27,27 @@ void Application::run() {
 
 bool Application::runOnce() {
   const auto currentTime = std::chrono::system_clock::now();
-  m_deltaTime            = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
+  m_timeInfo.deltaTime   = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
+  m_timeInfo.globalTime += m_timeInfo.deltaTime;
   m_lastFrameTime        = currentTime;
-  m_globalTime          += m_deltaTime;
 
-  int substepCount = 0;
-  m_remainingTime += m_deltaTime;
+  m_timeInfo.substepCount = 0;
+  m_remainingTime        += m_timeInfo.deltaTime;
 
-  while (m_remainingTime >= m_fixedTimeStep) {
-    ++substepCount;
-    m_remainingTime -= m_fixedTimeStep;
+  while (m_remainingTime >= m_timeInfo.substepTime) {
+    ++m_timeInfo.substepCount;
+    m_remainingTime -= m_timeInfo.substepTime;
   }
-
-  const FrameTimeInfo timeInfo{ m_deltaTime, m_globalTime, substepCount, m_fixedTimeStep };
 
   for (std::size_t worldIndex = 0; worldIndex < m_worlds.size(); ++worldIndex) {
     if (!m_activeWorlds[worldIndex])
       continue;
 
-    if (!m_worlds[worldIndex]->update(timeInfo))
+    if (!m_worlds[worldIndex]->update(m_timeInfo))
       m_activeWorlds.setBit(worldIndex, false);
   }
 
-  return m_isRunning && !m_activeWorlds.isEmpty();
+  return (m_isRunning && !m_activeWorlds.isEmpty());
 }
 
 } // namespace Raz

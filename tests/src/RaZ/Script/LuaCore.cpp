@@ -20,13 +20,11 @@ TEST_CASE("LuaCore Application", "[script][lua][core]") {
 
     application:addWorld()
     assert(#application:getWorlds() == 1)
-    application.fixedTimeStep = 0.5
-    assert(application.fixedTimeStep == 0.5)
+    application:setFixedTimeStep(0.5)
+    assert(application:getTimeInfo().substepTime == 0.5)
     application:run()
     application:run(function () end)
     assert(not application:runOnce())
-    assert(application:getDeltaTime() >= 0)
-    assert(application:getGlobalTime() >= 0)
     application:quit()
   )"));
 }

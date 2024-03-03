@@ -301,7 +301,7 @@ end)";
     //////////////////////////
 
 #if !defined(USE_OPENGL_ES)
-    app.run([&] (float) {
+    app.run([&] (const Raz::FrameTimeInfo&) {
       geomPlot.push(geometryPass.recoverElapsedTime());
       chromAberrPlot.push(chromaticAberration.recoverElapsedTime());
       blurPlot.push(boxBlur.recoverElapsedTime());

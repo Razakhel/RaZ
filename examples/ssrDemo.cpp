@@ -177,16 +177,12 @@ int main() {
     // Starting application //
     //////////////////////////
 
-    app.run([&] (float deltaTime) {
-      static float totalTime = 0.f;
+    app.run([&] (const Raz::FrameTimeInfo& timeInfo) {
+      const float sinTime = std::sin(timeInfo.globalTime);
 
-      const float sinTime = std::sin(totalTime);
-
-      redBoxTrans.rotate(Raz::Quaternionf(90_deg * deltaTime, Raz::Vec3f(0.f, 0.707106769f, 0.707106769f)));
+      redBoxTrans.rotate(Raz::Quaternionf(90_deg * timeInfo.deltaTime, Raz::Vec3f(0.f, 0.707106769f, 0.707106769f)));
       greenBallTrans.setPosition(0.f, 2.f + sinTime, 0.f);
       blueBallTrans.setPosition(2.f - sinTime, 1.f, 0.f);
-
-      totalTime += deltaTime;
     });
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occurred: "s + exception.what());

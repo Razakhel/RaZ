@@ -192,8 +192,8 @@ int main() {
     // Starting application //
     //////////////////////////
 
-    app.run([&] (float deltaTime) {
-      meshTrans.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
+    app.run([&] (const Raz::FrameTimeInfo& timeInfo) {
+      meshTrans.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Y);
 
 #if !defined(USE_OPENGL_ES)
       geomPlot.push(geometryPass.recoverElapsedTime());

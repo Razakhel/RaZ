@@ -218,8 +218,8 @@ int main() {
 
     loadBallScene(mesh, render);
 
-    app.run([&] (float deltaTime) {
-      meshTrans.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
+    app.run([&] (const Raz::FrameTimeInfo& timeInfo) {
+      meshTrans.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Y);
     });
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occurred: "s + exception.what());

@@ -30,15 +30,14 @@ void LuaWrapper::registerCoreTypes() {
     sol::usertype<Application> application = state.new_usertype<Application>("Application",
                                                                              sol::constructors<Application(),
                                                                                                Application(std::size_t)>());
-    application["getWorlds"]     = PickNonConstOverload<>(&Application::getWorlds);
-    application["getDeltaTime"]  = &Application::getDeltaTime;
-    application["getGlobalTime"] = &Application::getGlobalTime;
-    application["fixedTimeStep"] = sol::property(&Application::getFixedTimeStep, &Application::setFixedTimeStep);
-    application["addWorld"]      = &Application::addWorld<>;
-    application["run"]           = sol::overload([] (Application& app) { app.run(); },
-                                                 [] (Application& app, const std::function<void(float)>& func) { app.run(func); });
-    application["runOnce"]       = &Application::runOnce;
-    application["quit"]          = &Application::quit;
+    application["getWorlds"]        = PickNonConstOverload<>(&Application::getWorlds);
+    application["getTimeInfo"]      = &Application::getTimeInfo;
+    application["setFixedTimeStep"] = &Application::setFixedTimeStep;
+    application["addWorld"]         = &Application::addWorld<>;
+    application["run"]              = sol::overload([] (Application& app) { app.run(); },
+                                                    [] (Application& app, const std::function<void(const FrameTimeInfo&)>& func) { app.run(func); });
+    application["runOnce"]          = &Application::runOnce;
+    application["quit"]             = &Application::quit;
   }
 
   {

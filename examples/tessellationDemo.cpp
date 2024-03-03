@@ -242,8 +242,8 @@ int main() {
       Raz::Renderer::setPolygonMode(Raz::FaceOrientation::FRONT_BACK, Raz::PolygonMode::FILL);
     }, true);
 
-    app.run([&] (float deltaTime) {
-      transform.rotate(-45.0_deg * deltaTime, Raz::Axis::Y);
+    app.run([&] (const Raz::FrameTimeInfo& timeInfo) {
+      transform.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Y);
     });
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occurred: "s + exception.what());

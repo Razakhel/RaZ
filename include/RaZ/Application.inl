@@ -17,7 +17,7 @@ void Application::run(FuncT&& callback) {
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
   static auto emCallback = [this, callback = std::forward<FuncT>(callback)] () {
     runOnce();
-    callback(m_deltaTime);
+    callback(m_timeInfo);
   };
 
   emscripten_set_main_loop_arg([] (void* lambda) {
@@ -25,7 +25,7 @@ void Application::run(FuncT&& callback) {
   }, &emCallback, 0, 1);
 #else
   while (runOnce())
-    callback(m_deltaTime);
+    callback(m_timeInfo);
 #endif
 }
 
