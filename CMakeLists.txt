@@ -463,6 +463,17 @@ else ()
     message(STATUS "[RaZ] Lua scripting DISABLED")
 endif ()
 
+# The target is always linked, as the include files & their macros should be unconditionally available for ease of use; Tracy macros do something only
+#  if the expected definition is available, which only is if the related CMake option is set
+# It also always compiles the implementation file, but making it conditional would be much more of a hassle. This may change in the future
+target_link_libraries(RaZ PUBLIC Tracy)
+
+if (RAZ_USE_PROFILING)
+    message(STATUS "[RaZ] Profiling ENABLED")
+else ()
+    message(STATUS "[RaZ] Profiling DISABLED")
+endif ()
+
 target_link_libraries(RaZ PRIVATE fastgltf simdjson stb)
 
 # Compiling RaZ's sources

@@ -12,8 +12,6 @@ target_sources(Tracy PRIVATE tracy/TracyClient.cpp)
 
 target_include_directories(Tracy SYSTEM PUBLIC tracy)
 
-target_compile_definitions(Tracy PUBLIC TRACY_ENABLE)
-
 # Disabling all compilers warnings
 if (RAZ_COMPILER_MSVC)
     target_compile_options(Tracy PRIVATE /w)
