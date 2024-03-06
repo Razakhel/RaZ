@@ -6,6 +6,8 @@
 #include "RaZ/Physics/RigidBody.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <AL/al.h>
 #include <AL/alc.h>
 
@@ -37,6 +39,8 @@ inline void checkError(void* device, const std::string& errorMsg) {
 } // namespace
 
 AudioSystem::AudioSystem(const std::string& deviceName) {
+  ZoneScopedN("AudioSystem::AudioSystem");
+
   registerComponents<Sound, Listener>();
   openDevice(deviceName);
 
@@ -63,6 +67,8 @@ std::vector<std::string> AudioSystem::recoverDevices() {
 }
 
 void AudioSystem::openDevice(const std::string& deviceName) {
+  ZoneScopedN("AudioSystem::openDevice");
+
   Logger::debug("[AudioSystem] Opening " + (!deviceName.empty() ? + "device '" + deviceName + '\'' : "default device") + "...");
 
   destroy();
@@ -95,6 +101,8 @@ std::string AudioSystem::recoverCurrentDevice() const {
 }
 
 bool AudioSystem::update(const FrameTimeInfo&) {
+  ZoneScopedN("AudioSystem::update");
+
 #if defined(RAZ_CONFIG_DEBUG)
   // Checking that only one Listener exists
   bool hasOneListener = false;
@@ -147,6 +155,8 @@ bool AudioSystem::update(const FrameTimeInfo&) {
 }
 
 void AudioSystem::destroy() {
+  ZoneScopedN("AudioSystem::destroy");
+
   if (m_context == nullptr && m_device == nullptr)
     return;
 

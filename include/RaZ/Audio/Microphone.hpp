@@ -17,8 +17,7 @@ public:
   /// \param duration Amount of time to record, in seconds. This is a minimum; the actual available duration may exceed this value.
   /// \param deviceName Name of the audio capture device to open; if empty, will use the default one.
   /// \see Microphone::recoverDevices()
-  Microphone(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName = {}) { openDevice(format, frequency,
-                                                                                                                          duration, deviceName); }
+  Microphone(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName = {});
   Microphone(const Microphone&) = delete;
   Microphone(Microphone&&) = delete;
 

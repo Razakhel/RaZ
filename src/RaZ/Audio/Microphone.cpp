@@ -2,6 +2,8 @@
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <AL/al.h>
 #include <AL/alc.h>
 
@@ -83,6 +85,11 @@ constexpr int recoverFrameSize(AudioFormat format) {
 
 } // namespace
 
+Microphone::Microphone(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName) {
+  ZoneScopedN("Microphone::Microphone");
+  openDevice(format, frequency, duration, deviceName);
+}
+
 std::vector<std::string> Microphone::recoverDevices() {
   if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty vector
     return {};
@@ -102,6 +109,8 @@ std::vector<std::string> Microphone::recoverDevices() {
 }
 
 void Microphone::openDevice(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName) {
+  ZoneScopedN("Microphone::openDevice");
+
   Logger::debug("[Microphone] Opening capture " + (!deviceName.empty() ? + "device '" + deviceName + '\'' : "default device") + "...");
 
   destroy();
@@ -169,6 +178,8 @@ std::vector<uint8_t> Microphone::recoverData(float maxDuration) const {
 }
 
 void Microphone::recoverData(std::vector<uint8_t>& data, float maxDuration) const {
+  ZoneScopedN("Microphone::recoverData");
+
   data.clear();
 
   if (maxDuration == 0.f)
@@ -189,6 +200,8 @@ void Microphone::recoverData(std::vector<uint8_t>& data, float maxDuration) cons
 }
 
 Sound Microphone::recoverSound(float maxDuration) const {
+  ZoneScopedN("Microphone::recoverSound");
+
   Sound sound;
 
   sound.m_format    = m_format;
@@ -200,6 +213,8 @@ Sound Microphone::recoverSound(float maxDuration) const {
 }
 
 void Microphone::destroy() {
+  ZoneScopedN("Microphone::destroy");
+
   if (m_device == nullptr)
     return;
 

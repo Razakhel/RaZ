@@ -2,6 +2,8 @@
 #include "RaZ/Utils/CompilerUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <AL/efx.h>
 #include <AL/efx-presets.h>
 
@@ -65,6 +67,8 @@ inline bool loadFunctions() noexcept {
 } // namespace
 
 void SoundEffect::init() {
+  ZoneScopedN("SoundEffect::init");
+
   if (!alcIsExtensionPresent(alcGetContextsDevice(alcGetCurrentContext()), "ALC_EXT_EFX")) {
     Logger::error("[SoundEffect] Sound effects are unavailable.");
     return;
@@ -200,6 +204,8 @@ void SoundEffect::reset() {
 }
 
 void SoundEffect::destroy() {
+  ZoneScopedN("SoundEffect::destroy");
+
   if (!m_index.isValid())
     return;
 

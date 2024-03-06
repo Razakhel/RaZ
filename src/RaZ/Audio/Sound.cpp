@@ -3,6 +3,8 @@
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <AL/al.h>
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <AL/efx.h>
@@ -34,6 +36,8 @@ inline void checkError(const std::string& errorMsg) {
 } // namespace
 
 void Sound::init() {
+  ZoneScopedN("Sound::init");
+
   Logger::debug("[Sound] Initializing...");
 
   alGetError(); // Flushing errors
@@ -54,6 +58,8 @@ void Sound::init() {
 }
 
 void Sound::load() {
+  ZoneScopedN("Sound::load");
+
   stop(); // Making sure the sound isn't paused or currently playing
   alSourcei(m_source, AL_BUFFER, 0); // Detaching the previous buffer (if any) from the source
 
@@ -197,6 +203,8 @@ float Sound::recoverElapsedTime() const noexcept {
 }
 
 void Sound::destroy() {
+  ZoneScopedN("Sound::destroy");
+
   if (!m_source.isValid() && !m_buffer.isValid())
     return;
 

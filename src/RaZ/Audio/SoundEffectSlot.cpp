@@ -3,6 +3,8 @@
 #include "RaZ/Utils/CompilerUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <AL/al.h>
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <AL/efx.h>
@@ -68,6 +70,8 @@ inline bool loadFunctions() noexcept {
 } // namespace
 
 void SoundEffectSlot::init() {
+  ZoneScopedN("SoundEffectSlot::init");
+
   if (!alcIsExtensionPresent(alcGetContextsDevice(alcGetCurrentContext()), "ALC_EXT_EFX")) {
     Logger::error("[SoundEffectSlot] Sound effects are unavailable.");
     return;
@@ -88,11 +92,15 @@ void SoundEffectSlot::init() {
 }
 
 void SoundEffectSlot::loadEffect(const SoundEffect& effect) const noexcept {
+  ZoneScopedN("SoundEffectSlot::loadEffect");
+
   alAuxiliaryEffectSloti(m_index, AL_EFFECTSLOT_EFFECT, static_cast<int>(effect.getIndex()));
   checkError("Failed to load the sound effect");
 }
 
 void SoundEffectSlot::destroy() {
+  ZoneScopedN("SoundEffectSlot::destroy");
+
   if (!m_index.isValid())
     return;
 
