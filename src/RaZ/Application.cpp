@@ -1,6 +1,8 @@
 #include "RaZ/Application.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten.h>
 #endif
@@ -26,6 +28,8 @@ void Application::run() {
 }
 
 bool Application::runOnce() {
+  ZoneScopedN("Application::runOnce");
+
   const auto currentTime = std::chrono::system_clock::now();
   m_timeInfo.deltaTime   = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
   m_timeInfo.globalTime += m_timeInfo.deltaTime;
@@ -46,6 +50,12 @@ bool Application::runOnce() {
     if (!m_worlds[worldIndex]->update(m_timeInfo))
       m_activeWorlds.setBit(worldIndex, false);
   }
+
+  // Adding a frame mark registers the past frame
+  // TODO: the application setup (everything up until Application::run() is called, hence including the main function) is merged with the very first frame
+  //  A "fix" would be to add another FrameMark at the top of the run function, but the currently templated callback overload being in a header,
+  //  including Tracy to be used in there wouldn't be a good idea
+  FrameMark;
 
   return (m_isRunning && !m_activeWorlds.isEmpty());
 }

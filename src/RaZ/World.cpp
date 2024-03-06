@@ -1,5 +1,7 @@
 #include "RaZ/World.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 Entity& World::addEntity(bool enabled) {
@@ -22,6 +24,8 @@ void World::removeEntity(const Entity& entity) {
 }
 
 bool World::update(const FrameTimeInfo& timeInfo) {
+  ZoneScopedN("World::update");
+
   refresh();
 
   for (std::size_t systemIndex = 0; systemIndex < m_systems.size(); ++systemIndex) {
@@ -38,6 +42,8 @@ bool World::update(const FrameTimeInfo& timeInfo) {
 }
 
 void World::refresh() {
+  ZoneScopedN("World::refresh");
+
   if (m_entities.empty())
     return;
 
@@ -71,6 +77,8 @@ void World::refresh() {
 }
 
 void World::destroy() {
+  ZoneScopedN("World::destroy");
+
   // Entities must be released before the systems, since their destruction may depend on those
   m_entities.clear();
   m_activeEntityCount = 0;
@@ -88,6 +96,8 @@ void World::destroy() {
 }
 
 void World::sortEntities() {
+  ZoneScopedN("World::sortEntities");
+
   // Reorganizing the entites, swapping enabled & disabled ones so that the enabled ones are in front
   auto firstEntity = m_entities.begin();
   auto lastEntity  = m_entities.end() - 1;
