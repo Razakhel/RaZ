@@ -8,6 +8,8 @@
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <fstream>
 #include <map>
 #include <sstream>
@@ -17,6 +19,8 @@ namespace Raz::ObjFormat {
 namespace {
 
 inline Texture2DPtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
+  ZoneScopedN("[ObjLoad]::loadTexture");
+
   const FilePath fullTexturePath = mtlFilePath.recoverPathToFile() + textureFilePath;
 
   if (!FileUtils::isReadable(fullTexturePath)) {
@@ -31,6 +35,8 @@ inline Texture2DPtr loadTexture(const FilePath& mtlFilePath, const FilePath& tex
 inline void loadMtl(const FilePath& mtlFilePath,
                     std::vector<Material>& materials,
                     std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
+  ZoneScopedN("[ObjLoad]::loadMtl");
+
   Logger::debug("[ObjLoad] Loading MTL file ('" + mtlFilePath + "')...");
 
   std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
@@ -143,6 +149,8 @@ inline void loadMtl(const FilePath& mtlFilePath,
 } // namespace
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
+  ZoneScopedN("ObjFormat::load");
+
   Logger::debug("[ObjLoad] Loading OBJ file ('" + filePath + "')...");
 
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);

@@ -10,6 +10,8 @@
 #define STBI_WINDOWS_UTF8
 #include "stb_image.h"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz::ImageFormat {
 
 namespace {
@@ -45,6 +47,8 @@ Image createImageFromData(int width, int height, int channelCount, bool isHdr, c
 } // namespace
 
 Image load(const FilePath& filePath, bool flipVertically) {
+  ZoneScopedN("ImageFormat::load");
+
   Logger::debug("[ImageFormat] Loading image '" + filePath + "'...");
 
   const std::string fileStr = filePath.toUtf8();
@@ -77,6 +81,8 @@ Image loadFromData(const std::vector<unsigned char>& imgData, bool flipVerticall
 }
 
 Image loadFromData(const unsigned char* imgData, std::size_t dataSize, bool flipVertically) {
+  ZoneScopedN("ImageFormat::loadFromData");
+
   Logger::debug("[ImageFormat] Loading image from data...");
 
   stbi_set_flip_vertically_on_load(flipVertically);
@@ -104,6 +110,8 @@ Image loadFromData(const unsigned char* imgData, std::size_t dataSize, bool flip
 }
 
 void save(const FilePath& filePath, const Image& image, bool flipVertically) {
+  ZoneScopedN("ImageFormat::save");
+
   Logger::debug("[ImageFormat] Saving image to '" + filePath + "'...");
 
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());

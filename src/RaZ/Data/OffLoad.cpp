@@ -3,11 +3,15 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <fstream>
 
 namespace Raz::OffFormat {
 
 Mesh load(const FilePath& filePath) {
+  ZoneScopedN("OffFormat::load");
+
   Logger::debug("[OffLoad] Loading OFF file ('" + filePath + "')...");
 
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);

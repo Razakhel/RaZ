@@ -4,6 +4,8 @@
 #include "RaZ/Math/Matrix.hpp"
 #include "RaZ/Math/Transform.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 namespace {
@@ -17,6 +19,9 @@ enum CutAxis {
 } // namespace
 
 Entity* BoundingVolumeHierarchyNode::query(const Ray& ray, RayHit* hit) const {
+  // The following call can produce way too many zones, *drastically* increasing the profiling time & memory consumption
+  //ZoneScopedN("BoundingVolumeHierarchyNode::query");
+
   if (!ray.intersects(m_boundingBox, hit))
     return nullptr;
 
@@ -42,6 +47,9 @@ Entity* BoundingVolumeHierarchyNode::query(const Ray& ray, RayHit* hit) const {
 }
 
 void BoundingVolumeHierarchyNode::build(std::vector<TriangleInfo>& trianglesInfo, std::size_t beginIndex, std::size_t endIndex) {
+  // The following call can produce way too many zones, *drastically* increasing the profiling time & memory consumption
+  //ZoneScopedN("BoundingVolumeHierarchyNode::build");
+
   m_boundingBox = trianglesInfo[beginIndex].triangle.computeBoundingBox();
 
   if (endIndex - beginIndex <= 1) {
@@ -99,6 +107,8 @@ void BoundingVolumeHierarchyNode::build(std::vector<TriangleInfo>& trianglesInfo
 }
 
 void BoundingVolumeHierarchy::build(const std::vector<Entity*>& entities) {
+  ZoneScopedN("BoundingVolumeHierarchy::build");
+
   m_rootNode = BoundingVolumeHierarchyNode();
 
   // Storing all triangles in a list to build the BVH from

@@ -1,5 +1,7 @@
 #include "RaZ/Data/Submesh.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 namespace {
@@ -22,6 +24,8 @@ constexpr Vec3f computeTangent(const Vertex& firstVert, const Vertex& secondVert
 } // namespace
 
 const AABB& Submesh::computeBoundingBox() {
+  ZoneScopedN("Submesh::computeBoundingBox");
+
   Vec3f minPos(std::numeric_limits<float>::max());
   Vec3f maxPos(std::numeric_limits<float>::lowest());
 
@@ -40,6 +44,8 @@ const AABB& Submesh::computeBoundingBox() {
 }
 
 void Submesh::computeTangents() {
+  ZoneScopedN("Submesh::computeTangents");
+
   for (Vertex& vert : m_vertices)
     vert.tangent = Vec3f(0.f, 0.f, 0.f);
 

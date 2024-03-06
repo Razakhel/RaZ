@@ -3,6 +3,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <array>
 #include <fstream>
 #include <string>
@@ -148,6 +150,8 @@ inline WavInfo validateWav(std::ifstream& file) {
 } // namespace
 
 Sound load(const FilePath& filePath) {
+  ZoneScopedN("WavFormat::load");
+
   Logger::debug("[WavLoad] Loading WAV file ('" + filePath + "')...");
 
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);

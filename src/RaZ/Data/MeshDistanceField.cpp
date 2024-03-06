@@ -5,6 +5,8 @@
 #include "RaZ/Utils/Ray.hpp"
 #include "RaZ/Utils/Threading.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 MeshDistanceField::MeshDistanceField(const AABB& area, unsigned int width, unsigned int height, unsigned int depth)
@@ -18,6 +20,8 @@ float MeshDistanceField::getDistance(std::size_t widthIndex, std::size_t heightI
 }
 
 void MeshDistanceField::compute(std::size_t sampleCount) {
+  ZoneScopedN("MeshDistanceField::compute");
+
   if (m_bvh == nullptr)
     throw std::runtime_error("[MeshDistanceField] Computing a mesh distance field requires having given a BVH.");
 
@@ -29,6 +33,8 @@ void MeshDistanceField::compute(std::size_t sampleCount) {
   const float depthStep   = areaExtents.z() / static_cast<float>(m_depth - 1);
 
   Threading::parallelize(0, m_depth, [this, widthStep, heightStep, depthStep, sampleCount] (const Threading::IndexRange& range) {
+    ZoneScopedN("MeshDistanceField::compute");
+
     for (std::size_t depthIndex = range.beginIndex; depthIndex < range.endIndex; ++depthIndex) {
       for (std::size_t heightIndex = 0; heightIndex < m_height; ++heightIndex) {
         for (std::size_t widthIndex = 0; widthIndex < m_width; ++widthIndex) {
@@ -56,6 +62,8 @@ void MeshDistanceField::compute(std::size_t sampleCount) {
 }
 
 std::vector<Image> MeshDistanceField::recoverSlices() const {
+  ZoneScopedN("MeshDistanceField::recoverSlices");
+
   std::vector<Image> slices;
   slices.reserve(m_depth);
 

@@ -2,11 +2,15 @@
 #include "RaZ/Math/Constants.hpp"
 #include "RaZ/Utils/Threading.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <unordered_map>
 
 namespace Raz {
 
 Mesh::Mesh(const Plane& plane, float width, float depth) {
+  ZoneScopedN("Mesh::Mesh(Plane)");
+
   const float height = plane.computeCentroid().y();
 
   // TODO: creating a Mesh from a Plane doesn't take the normal into account for the vertices' position
@@ -47,6 +51,8 @@ Mesh::Mesh(const Plane& plane, float width, float depth) {
 }
 
 Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
+  ZoneScopedN("Mesh::Mesh(Sphere)");
+
   if (subdivCount < 1)
     throw std::invalid_argument("Error: Cannot create a sphere mesh with no subdivision");
 
@@ -64,6 +70,8 @@ Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
 }
 
 Mesh::Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords) {
+  ZoneScopedN("Mesh::Mesh(Triangle)");
+
   const Vec3f& firstPos  = triangle.getFirstPos();
   const Vec3f& secondPos = triangle.getSecondPos();
   const Vec3f& thirdPos  = triangle.getThirdPos();
@@ -93,6 +101,8 @@ Mesh::Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& s
 }
 
 Mesh::Mesh(const Quad& quad) {
+  ZoneScopedN("Mesh::Mesh(Quad)");
+
   const Vec3f& leftTopPos     = quad.getLeftTopPos();
   const Vec3f& rightTopPos    = quad.getRightTopPos();
   const Vec3f& rightBottomPos = quad.getRightBottomPos();
@@ -132,6 +142,8 @@ Mesh::Mesh(const Quad& quad) {
 }
 
 Mesh::Mesh(const AABB& box) {
+  ZoneScopedN("Mesh::Mesh(AABB)");
+
   const auto [minX, minY, minZ] = box.getMinPosition().getData();
   const auto [maxX, maxY, maxZ] = box.getMaxPosition().getData();
 
@@ -214,6 +226,8 @@ std::size_t Mesh::recoverTriangleCount() const {
 }
 
 const AABB& Mesh::computeBoundingBox() {
+  ZoneScopedN("Mesh::computeBoundingBox");
+
   Vec3f minPos(std::numeric_limits<float>::max());
   Vec3f maxPos(std::numeric_limits<float>::lowest());
 
@@ -234,6 +248,8 @@ const AABB& Mesh::computeBoundingBox() {
 }
 
 void Mesh::computeTangents() {
+  ZoneScopedN("Mesh::computeTangents");
+
   if (m_submeshes.empty())
     return;
 
@@ -245,6 +261,8 @@ void Mesh::computeTangents() {
 
 void Mesh::createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount) {
   // Algorithm based on the standard/UV sphere presented here: http://www.songho.ca/opengl/gl_sphere.html#sphere
+
+  ZoneScopedN("Mesh::createUvSphere");
 
   Submesh& submesh = m_submeshes.emplace_back();
 
@@ -321,6 +339,8 @@ void Mesh::createIcosphere(const Sphere& sphere, uint32_t /* subdivCount */) {
   // Algorithm based on the icosphere presented here:
   // - http://www.songho.ca/opengl/gl_sphere.html#icosphere
   // - https://gist.github.com/warmwaffles/402b9c04318d6ee6dfa4
+
+  ZoneScopedN("Mesh::createIcosphere");
 
   const float radius       = sphere.getRadius();
   const float goldenRadius = radius * GoldenRatio<float>;

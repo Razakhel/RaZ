@@ -8,7 +8,9 @@
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <fastgltf/parser.hpp>
+#include "fastgltf/parser.hpp"
+
+#include "tracy/Tracy.hpp"
 
 namespace Raz::GltfFormat {
 
@@ -30,6 +32,8 @@ void computeNodeTransform(const fastgltf::Node& currentNode,
                           const std::optional<Transform>& parentTransform,
                           const std::vector<fastgltf::Node>& nodes,
                           std::vector<std::optional<Transform>>& transforms) {
+  ZoneScopedN("[GltfLoad]::computeNodeTransform");
+
   if (!currentNode.meshIndex.has_value())
     return;
 
@@ -56,6 +60,8 @@ void computeNodeTransform(const fastgltf::Node& currentNode,
 }
 
 std::vector<std::optional<Transform>> loadTransforms(const std::vector<fastgltf::Node>& nodes, std::size_t meshCount) {
+  ZoneScopedN("[GltfLoad]::loadTransforms");
+
   std::vector<std::optional<Transform>> transforms;
   transforms.resize(meshCount);
 
@@ -71,6 +77,8 @@ void loadVertexData(const fastgltf::Accessor& accessor,
                     const std::vector<fastgltf::BufferView>& bufferViews,
                     std::vector<Vertex>& vertices,
                     void (*callback)(Vertex&, const T*)) {
+  ZoneScopedN("[GltfLoad]::loadVertexData");
+
   assert("Error: Loading vertex data requires the accessor to reference a buffer view." && accessor.bufferViewIndex.has_value());
 
   const fastgltf::BufferView& bufferView = bufferViews[*accessor.bufferViewIndex];
@@ -95,6 +103,8 @@ void loadVertices(const fastgltf::Primitive& primitive,
                   const std::vector<fastgltf::Accessor>& accessors,
                   const std::optional<Transform>& transform,
                   Submesh& submesh) {
+  ZoneScopedN("[GltfLoad]::loadVertices");
+
   Logger::debug("[GltfLoad] Loading vertices...");
 
   const auto positionIt = primitive.findAttribute("POSITION");
@@ -169,6 +179,8 @@ void loadIndices(const fastgltf::Accessor& indicesAccessor,
                  const std::vector<fastgltf::Buffer>& buffers,
                  const std::vector<fastgltf::BufferView>& bufferViews,
                  std::vector<unsigned int>& indices) {
+  ZoneScopedN("[GltfLoad]::loadIndices");
+
   Logger::debug("[GltfLoad] Loading indices...");
 
   if (!indicesAccessor.bufferViewIndex.has_value())
@@ -218,6 +230,8 @@ std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& mesh
                                          const std::vector<fastgltf::BufferView>& bufferViews,
                                          const std::vector<fastgltf::Accessor>& accessors,
                                          const std::vector<std::optional<Transform>>& transforms) {
+  ZoneScopedN("[GltfLoad]::loadMeshes");
+
   Logger::debug("[GltfLoad] Loading " + std::to_string(meshes.size()) + " mesh(es)...");
 
   Mesh loadedMesh;
@@ -249,6 +263,8 @@ std::vector<std::optional<Image>> loadImages(const std::vector<fastgltf::Image>&
                                              const std::vector<fastgltf::Buffer>& buffers,
                                              const std::vector<fastgltf::BufferView>& bufferViews,
                                              const FilePath& rootFilePath) {
+  ZoneScopedN("[GltfLoad]::loadImages");
+
   Logger::debug("[GltfLoad] Loading " + std::to_string(images.size()) + " image(s)...");
 
   std::vector<std::optional<Image>> loadedImages;
@@ -332,6 +348,8 @@ void loadTexture(const OptionalT<TextureInfoT>& textureInfo,
                  const FuncT& callback) {
   static_assert(std::is_base_of_v<fastgltf::TextureInfo, TextureInfoT>);
 
+  ZoneScopedN("[GltfLoad]::loadTexture");
+
   if (!textureInfo.has_value())
     return;
 
@@ -347,6 +365,8 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials,
                    const std::vector<fastgltf::Texture>& textures,
                    const std::vector<std::optional<Image>>& images,
                    MeshRenderer& meshRenderer) {
+  ZoneScopedN("[GltfLoad]::loadMaterials");
+
   Logger::debug("[GltfLoad] Loading " + std::to_string(materials.size()) + " material(s)...");
 
   meshRenderer.getMaterials().clear();
@@ -396,6 +416,8 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials,
 } // namespace
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
+  ZoneScopedN("GltfFormat::load");
+
   Logger::debug("[GltfLoad] Loading glTF file ('" + filePath + "')...");
 
   if (!FileUtils::isReadable(filePath))

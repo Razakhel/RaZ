@@ -3,8 +3,10 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include <png.h>
-#include <zlib.h>
+#include "png.h"
+#include "zlib.h"
+
+#include "tracy/Tracy.hpp"
 
 #include <array>
 #include <fstream>
@@ -25,6 +27,8 @@ inline bool validatePng(std::istream& file) {
 } // namespace
 
 Image load(const FilePath& filePath, bool flipVertically) {
+  ZoneScopedN("PngFormat::load");
+
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)
@@ -119,6 +123,8 @@ Image load(const FilePath& filePath, bool flipVertically) {
 }
 
 void save(const FilePath& filePath, const Image& image, bool flipVertically) {
+  ZoneScopedN("PngFormat::save");
+
   if (image.isEmpty()) {
     Logger::error("[PngSave] Cannot save empty image to '" + filePath + "'.");
     return;

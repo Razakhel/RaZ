@@ -6,6 +6,8 @@
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <fstream>
 #include <map>
 
@@ -33,6 +35,8 @@ inline void writeAttribute(std::ofstream& file, std::string_view tag, const Rend
 #if !defined(USE_OPENGL_ES) // Texture::recoverImage() is unavailable with OpenGL ES
 inline void writeTexture(std::ofstream& file, std::string_view tag, const std::string& materialName, std::string_view suffix,
                          const RenderShaderProgram& program, std::string_view uniformName) {
+  ZoneScopedN("[ObjSave]::writeTexture");
+
   if (!program.hasTexture(uniformName.data()))
     return;
 
@@ -49,6 +53,8 @@ inline void writeTexture(std::ofstream& file, std::string_view tag, const std::s
 #endif
 
 void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials) {
+  ZoneScopedN("[ObjSave]::saveMtl");
+
   std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
 
   mtlFile << "# MTL file created with RaZ - https://github.com/Razakhel/RaZ\n";
@@ -86,6 +92,8 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
 } // namespace
 
 void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRenderer) {
+  ZoneScopedN("ObjFormat::save");
+
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
   if (!file)

@@ -3,6 +3,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <array>
 #include <fstream>
 #include <sstream>
@@ -10,6 +12,8 @@
 namespace Raz::TgaFormat {
 
 Image load(const FilePath& filePath, bool flipVertically) {
+  ZoneScopedN("TgaFormat::load");
+
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)

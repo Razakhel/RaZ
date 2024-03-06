@@ -3,6 +3,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <fstream>
 #include <unordered_map>
 
@@ -11,6 +13,8 @@ namespace Raz::BvhFormat {
 namespace {
 
 void loadJoint(std::ifstream& file, std::unordered_map<std::string, SkeletonJoint&>& joints, Skeleton& skeleton, SkeletonJoint& parentJoint) {
+  ZoneScopedN("[BvhFormat]::loadJoint");
+
   std::string token;
   file >> token;
 
@@ -88,6 +92,8 @@ void loadJoint(std::ifstream& file, std::unordered_map<std::string, SkeletonJoin
 } // namespace
 
 Skeleton load(const FilePath& filePath) {
+  ZoneScopedN("BvhFormat::load");
+
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)

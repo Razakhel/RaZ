@@ -8,9 +8,13 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz::MeshFormat {
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
+  ZoneScopedN("MeshFormat::load");
+
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
   if (fileExt == "gltf" || fileExt == "glb") {
@@ -33,6 +37,8 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 }
 
 void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRenderer) {
+  ZoneScopedN("MeshFormat::save");
+
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
   if (fileExt == "obj")

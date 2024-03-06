@@ -7,6 +7,8 @@
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <fbxsdk.h>
 
 namespace Raz::FbxFormat {
@@ -14,6 +16,8 @@ namespace Raz::FbxFormat {
 namespace {
 
 inline Texture2DPtr loadTexture(const FilePath& textureFilePath) {
+  ZoneScopedN("[FbxLoad]::loadTexture");
+
   if (!FileUtils::isReadable(textureFilePath)) {
     Logger::warn("[FbxLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
     return nullptr;
@@ -24,6 +28,8 @@ inline Texture2DPtr loadTexture(const FilePath& textureFilePath) {
 }
 
 void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, const FilePath& filePath) {
+  ZoneScopedN("[FbxLoad]::loadMaterials");
+
   for (int matIndex = 0; matIndex < scene->GetMaterialCount(); ++matIndex) {
     const fbxsdk::FbxSurfaceMaterial* fbxMaterial = scene->GetMaterial(matIndex);
     Material material;
@@ -121,6 +127,8 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
 } // namespace
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
+  ZoneScopedN("FbxFormat::load");
+
   fbxsdk::FbxManager* manager = fbxsdk::FbxManager::Create();
   manager->SetIOSettings(fbxsdk::FbxIOSettings::Create(manager, IOSROOT));
 
