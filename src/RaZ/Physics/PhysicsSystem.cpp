@@ -5,6 +5,8 @@
 #include "RaZ/Physics/PhysicsSystem.hpp"
 #include "RaZ/Utils/Shape.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 PhysicsSystem::PhysicsSystem() {
@@ -12,6 +14,8 @@ PhysicsSystem::PhysicsSystem() {
 }
 
 bool PhysicsSystem::update(const FrameTimeInfo& timeInfo) {
+  ZoneScopedN("PhysicsSystem::update");
+
   const float relativeFriction = std::pow(m_friction, timeInfo.substepTime);
 
   for (int i = 0; i < timeInfo.substepCount; ++i) {
@@ -48,6 +52,8 @@ bool PhysicsSystem::update(const FrameTimeInfo& timeInfo) {
 }
 
 void PhysicsSystem::solveConstraints() {
+  ZoneScopedN("PhysicsSystem::solveConstraints");
+
   for (Entity* entity : m_entities) {
     if (!entity->isEnabled() || !entity->hasComponent<RigidBody>())
       continue;
