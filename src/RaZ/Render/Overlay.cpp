@@ -3,12 +3,13 @@
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include "GLFW/glfw3.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "implot.h"
+
+#include "tracy/Tracy.hpp"
 
 namespace Raz {
 
@@ -25,6 +26,8 @@ bool Overlay::hasMouseFocus() const {
 }
 
 void Overlay::render() const {
+  ZoneScopedN("Overlay::render");
+
 #if !defined(USE_OPENGL_ES) && defined(RAZ_CONFIG_DEBUG)
   if (Renderer::checkVersion(4, 3))
     Renderer::pushDebugGroup("Overlay pass");
@@ -47,6 +50,8 @@ void Overlay::render() const {
 }
 
 void Overlay::initialize(GLFWwindow* windowHandle) {
+  ZoneScopedN("Overlay::initialize");
+
   if (ImGui::GetCurrentContext() != nullptr)
     return; // The overlay has already been initialized
 
@@ -71,6 +76,8 @@ void Overlay::initialize(GLFWwindow* windowHandle) {
 }
 
 void Overlay::destroy() {
+  ZoneScopedN("Overlay::destroy");
+
   if (ImGui::GetCurrentContext() == nullptr)
     return; // The overlay has already been destroyed
 
@@ -244,6 +251,8 @@ OverlayFpsCounter& OverlayWindow::addFpsCounter(std::string formattedLabel) {
 }
 
 void OverlayWindow::render() const {
+  ZoneScopedN("OverlayWindow::render");
+
   if (!m_enabled)
     return;
 

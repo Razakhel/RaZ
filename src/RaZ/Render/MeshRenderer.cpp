@@ -2,6 +2,8 @@
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 void MeshRenderer::setRenderMode(RenderMode renderMode, const Mesh& mesh) {
@@ -10,6 +12,8 @@ void MeshRenderer::setRenderMode(RenderMode renderMode, const Mesh& mesh) {
 }
 
 Material& MeshRenderer::setMaterial(Material&& material) {
+  ZoneScopedN("MeshRenderer::setMaterial");
+
   m_materials.clear();
 
   Material& newMaterial = m_materials.emplace_back(std::move(material));
@@ -26,7 +30,7 @@ Material& MeshRenderer::setMaterial(Material&& material) {
 }
 
 void MeshRenderer::removeMaterial(std::size_t materialIndex) {
-  assert("Error: Cannot remove a material that doesn't exist." && materialIndex < m_materials.size());
+  assert("Error: Cannot remove a material that does not exist." && materialIndex < m_materials.size());
 
   m_materials.erase(m_materials.begin() + static_cast<std::ptrdiff_t>(materialIndex));
 
@@ -58,6 +62,8 @@ MeshRenderer MeshRenderer::clone() const {
 }
 
 void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
+  ZoneScopedN("MeshRenderer::load");
+
   if (mesh.getSubmeshes().empty()) {
     Logger::error("[MeshRenderer] Cannot load an empty mesh.");
     return;
@@ -78,6 +84,8 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
 }
 
 void MeshRenderer::loadMaterials() const {
+  ZoneScopedN("MeshRenderer::loadMaterials");
+
   for (const Material& material : m_materials) {
     material.getProgram().sendAttributes();
     material.getProgram().initTextures();
@@ -88,6 +96,8 @@ void MeshRenderer::loadMaterials() const {
 }
 
 void MeshRenderer::draw() const {
+  ZoneScopedN("MeshRenderer::draw");
+
   for (const SubmeshRenderer& submeshRenderer : m_submeshRenderers) {
     if (submeshRenderer.getMaterialIndex() != std::numeric_limits<std::size_t>::max()) {
       assert("Error: The material index does not reference any existing material." && (submeshRenderer.getMaterialIndex() < m_materials.size()));

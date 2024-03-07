@@ -7,6 +7,8 @@
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 namespace {
@@ -118,6 +120,8 @@ void Texture::unbind() const {
 }
 
 void Texture::setFilter(TextureFilter minify, TextureFilter magnify) const {
+  ZoneScopedN("Texture::setFilter");
+
   bind();
   Renderer::setTextureParameter(m_type, TextureParam::MINIFY_FILTER, recoverParam(minify));
   Renderer::setTextureParameter(m_type, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
@@ -125,6 +129,8 @@ void Texture::setFilter(TextureFilter minify, TextureFilter magnify) const {
 }
 
 void Texture::setFilter(TextureFilter minify, TextureFilter mipmapMinify, TextureFilter magnify) const {
+  ZoneScopedN("Texture::setFilter");
+
   bind();
   Renderer::setTextureParameter(m_type, TextureParam::MINIFY_FILTER, recoverParam(minify, mipmapMinify));
   Renderer::setTextureParameter(m_type, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
@@ -132,6 +138,8 @@ void Texture::setFilter(TextureFilter minify, TextureFilter mipmapMinify, Textur
 }
 
 void Texture::setWrapping(TextureWrapping wrapping) const {
+  ZoneScopedN("Texture::setWrapping");
+
   const TextureParamValue value = recoverParam(wrapping);
 
   bind();
@@ -150,6 +158,8 @@ void Texture::setColorspace(TextureColorspace colorspace, TextureDataType dataTy
       && (colorspace != TextureColorspace::DEPTH || dataType == TextureDataType::FLOAT32));
   assert("Error: A depth texture cannot be three-dimensional." && (colorspace != TextureColorspace::DEPTH || m_type != TextureType::TEXTURE_3D));
 
+  ZoneScopedN("Texture::setColorspace");
+
   m_colorspace = colorspace;
   m_dataType   = dataType;
 
@@ -160,6 +170,8 @@ void Texture::setColorspace(TextureColorspace colorspace, TextureDataType dataTy
 }
 
 Texture::~Texture() {
+  ZoneScopedN("Texture::~Texture");
+
   if (!m_index.isValid())
     return;
 
@@ -169,6 +181,8 @@ Texture::~Texture() {
 }
 
 Texture::Texture(TextureType type) : m_type{ type } {
+  ZoneScopedN("Texture::Texture");
+
   Logger::debug("[Texture] Creating...");
   Renderer::generateTexture(m_index);
   Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
@@ -178,6 +192,8 @@ Texture::Texture(TextureType type) : m_type{ type } {
 }
 
 void Texture::setLoadedParameters(bool createMipmaps) const {
+  ZoneScopedN("Texture::setLoadedParameters");
+
   if (m_colorspace == TextureColorspace::GRAY || m_colorspace == TextureColorspace::RG) {
     Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_R, static_cast<int>(TextureFormat::RED));
     Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_G, static_cast<int>(TextureFormat::RED));
@@ -196,6 +212,8 @@ void Texture::setLoadedParameters(bool createMipmaps) const {
 }
 
 void Texture::generateMipmaps() const {
+  ZoneScopedN("Texture::generateMipmaps");
+
   bind();
   Renderer::generateMipmap(m_type);
   unbind();
@@ -221,6 +239,8 @@ void Texture1D::resize(unsigned int width) {
 }
 
 void Texture1D::fill(const Color& color) {
+  ZoneScopedN("Texture1D::fill");
+
   m_colorspace = TextureColorspace::RGB;
   m_dataType   = TextureDataType::BYTE;
 
@@ -238,6 +258,8 @@ void Texture1D::fill(const Color& color) {
 }
 
 void Texture1D::load() const {
+  ZoneScopedN("Texture1D::load");
+
   if (m_colorspace == TextureColorspace::INVALID)
     return; // No colorspace has been set yet, the texture can't be loaded
 
@@ -274,6 +296,8 @@ void Texture2D::resize(unsigned int width, unsigned int height) {
 }
 
 void Texture2D::load(const Image& image, bool createMipmaps) {
+  ZoneScopedN("Texture2D::load(Image)");
+
   if (image.isEmpty()) {
     // Image not found, defaulting texture to pure white
     fill(ColorPreset::White);
@@ -307,6 +331,8 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
 }
 
 void Texture2D::fill(const Color& color) {
+  ZoneScopedN("Texture2D::fill");
+
   m_colorspace = TextureColorspace::RGB;
   m_dataType   = TextureDataType::BYTE;
 
@@ -325,6 +351,8 @@ void Texture2D::fill(const Color& color) {
 }
 
 Image Texture2D::recoverImage() const {
+  ZoneScopedN("Texture2D::recoverImage");
+
   Image img(m_width, m_height, static_cast<ImageColorspace>(m_colorspace), (m_dataType == TextureDataType::BYTE ? ImageDataType::BYTE : ImageDataType::FLOAT));
 
   const PixelDataType pixelDataType = (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT);
@@ -350,6 +378,8 @@ Image Texture2D::recoverImage() const {
 }
 
 void Texture2D::load() const {
+  ZoneScopedN("Texture2D::load");
+
   if (m_colorspace == TextureColorspace::INVALID)
     return; // No colorspace has been set yet, the texture can't be loaded
 
@@ -388,6 +418,8 @@ void Texture3D::resize(unsigned int width, unsigned int height, unsigned int dep
 }
 
 void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) {
+  ZoneScopedN("Texture3D::load(std::vector<Image>)");
+
   if (imageSlices.empty() || imageSlices.front().isEmpty()) {
     // Images not found, defaulting texture to pure white
     fill(ColorPreset::White);
@@ -440,6 +472,8 @@ void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) 
 }
 
 void Texture3D::fill(const Color& color) {
+  ZoneScopedN("Texture3D::fill");
+
   m_colorspace = TextureColorspace::RGB;
   m_dataType   = TextureDataType::BYTE;
 
@@ -459,6 +493,8 @@ void Texture3D::fill(const Color& color) {
 }
 
 void Texture3D::load() const {
+  ZoneScopedN("Texture3D::load");
+
   if (m_colorspace == TextureColorspace::INVALID)
     return; // No colorspace has been set yet, the texture can't be loaded
 

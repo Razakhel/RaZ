@@ -4,6 +4,8 @@
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 bool RenderGraph::isValid() const {
@@ -16,16 +18,20 @@ bool RenderGraph::isValid() const {
 }
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {
+  ZoneScopedN("RenderGraph::resizeViewport");
+
   m_geometryPass.resizeWriteBuffers(width, height);
 
-  for (std::unique_ptr<RenderPass>& renderPass : m_nodes)
+  for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->resizeWriteBuffers(width, height); // TODO: resizing all write buffers will only work if they have all been created with equal dimensions
 
-  for (std::unique_ptr<RenderProcess>& renderProcess : m_renderProcesses)
+  for (const std::unique_ptr<RenderProcess>& renderProcess : m_renderProcesses)
     renderProcess->resizeBuffers(width, height);
 }
 
 void RenderGraph::updateShaders() const {
+  ZoneScopedN("RenderGraph::updateShaders");
+
   for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
     renderPass->getProgram().updateShaders();
 }
@@ -34,9 +40,26 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
   assert("Error: The render system needs a camera for the render graph to be executed." && (renderSystem.m_cameraEntity != nullptr));
   assert("Error: The camera referenced by the render system needs a transform component." && renderSystem.m_cameraEntity->hasComponent<Transform>());
 
-  Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
+  ZoneScopedN("RenderGraph::execute");
 
-  const Framebuffer& geometryFramebuffer = m_geometryPass.m_writeFramebuffer;
+  {
+    ZoneScopedN("Renderer::clear");
+    Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
+  }
+
+  executeGeometryPass(renderSystem);
+
+  m_executedPasses.reserve(m_nodes.size() + 1);
+  m_executedPasses.emplace(&m_geometryPass);
+
+  for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
+    executePass(*renderPass);
+
+  m_executedPasses.clear();
+}
+
+void RenderGraph::executeGeometryPass(RenderSystem& renderSystem) const {
+  ZoneScopedN("RenderGraph::executeGeometryPass");
 
 #if !defined(USE_OPENGL_ES)
   m_geometryPass.m_timer.start();
@@ -46,6 +69,8 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
     Renderer::pushDebugGroup("Geometry pass");
 #endif
 #endif
+
+  const Framebuffer& geometryFramebuffer = m_geometryPass.m_writeFramebuffer;
 
   if (!geometryFramebuffer.isEmpty())
     geometryFramebuffer.bind();
@@ -102,22 +127,14 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
     Renderer::popDebugGroup();
 #endif
 #endif
-
-  m_executedPasses.reserve(m_nodes.size() + 1);
-  m_executedPasses.emplace(&m_geometryPass);
-
-  for (const std::unique_ptr<RenderPass>& renderPass : m_nodes)
-    execute(*renderPass);
-
-  m_executedPasses.clear();
 }
 
-void RenderGraph::execute(const RenderPass& renderPass) {
+void RenderGraph::executePass(const RenderPass& renderPass) {
   if (m_executedPasses.find(&renderPass) != m_executedPasses.cend())
     return;
 
   for (const RenderPass* parentPass : renderPass.m_parents)
-    execute(*parentPass);
+    executePass(*parentPass);
 
   renderPass.execute();
 

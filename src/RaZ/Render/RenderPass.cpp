@@ -2,6 +2,8 @@
 #include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Render/Texture.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 bool RenderPass::isValid() const {
@@ -35,6 +37,8 @@ void RenderPass::addReadTexture(TexturePtr texture, const std::string& uniformNa
 }
 
 void RenderPass::execute() const {
+  ZoneScopedN("RenderPass::execute");
+
   if (!m_enabled)
     return;
 

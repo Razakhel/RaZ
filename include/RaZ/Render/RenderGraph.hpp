@@ -42,9 +42,12 @@ private:
   /// Executes the render graph, executing all passes starting with the geometry's.
   /// \param renderSystem Render system executing the render graph.
   void execute(RenderSystem& renderSystem);
+  /// Executes the geometry pass.
+  /// \param renderSystem Render system executing the render graph.
+  void executeGeometryPass(RenderSystem& renderSystem) const;
   /// Executes a render pass, which in turn recursively executes its parents if they have not already been in the current frame.
   /// \param renderPass Render pass to be executed.
-  void execute(const RenderPass& renderPass);
+  void executePass(const RenderPass& renderPass);
 
   RenderPass m_geometryPass {};
   std::vector<std::unique_ptr<RenderProcess>> m_renderProcesses {};

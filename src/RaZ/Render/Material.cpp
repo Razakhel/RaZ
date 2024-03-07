@@ -2,6 +2,8 @@
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/Renderer.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 namespace {
@@ -29,6 +31,8 @@ constexpr std::string_view singleTexture3DShaderSource = {
 } // namespace
 
 void Material::loadType(MaterialType type) {
+  ZoneScopedN("Material::loadType");
+
   switch (type) {
     case MaterialType::COOK_TORRANCE:
       m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(cookTorranceShaderSource));

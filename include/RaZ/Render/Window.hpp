@@ -174,6 +174,10 @@ public:
   ~Window() { close(); }
 
 private:
+  /// Processes actions corresponding to keyboard & mouse inputs.
+  /// \param deltaTime Amount of time elapsed since the last frame.
+  void processInputs(float deltaTime);
+
   static inline int s_refCounter = 0;
 
   OwnerValue<GLFWwindow*, nullptr> m_windowHandle {};

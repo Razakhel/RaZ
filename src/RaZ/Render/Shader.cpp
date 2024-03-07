@@ -4,6 +4,8 @@
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 void Shader::import(FilePath filePath) {
@@ -31,6 +33,8 @@ bool Shader::isCompiled() const noexcept {
 }
 
 void Shader::loadSource(const std::string& source) const {
+  ZoneScopedN("Shader::loadSource");
+
   Logger::debug("[Shader] Loading source (ID: " + std::to_string(m_index) + ")...");
 
   // Removing spaces in front so that we can directly check the header tags
@@ -56,6 +60,8 @@ void Shader::loadSource(const std::string& source) const {
 }
 
 void Shader::destroy() {
+  ZoneScopedN("Shader::destroy");
+
   if (!m_index.isValid())
     return;
 

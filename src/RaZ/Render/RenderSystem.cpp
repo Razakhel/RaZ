@@ -8,6 +8,8 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 void RenderSystem::setCubemap(Cubemap&& cubemap) {
@@ -16,6 +18,8 @@ void RenderSystem::setCubemap(Cubemap&& cubemap) {
 }
 
 void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
+  ZoneScopedN("RenderSystem::resizeViewport");
+
   m_sceneWidth  = width;
   m_sceneHeight = height;
 
@@ -28,6 +32,8 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
 }
 
 bool RenderSystem::update(const FrameTimeInfo& timeInfo) {
+  ZoneScopedN("RenderSystem::update");
+
   m_cameraUbo.bindBase(0);
   m_lightsUbo.bindBase(1);
   m_timeUbo.bindBase(2);
@@ -75,6 +81,8 @@ void RenderSystem::sendCameraMatrices() const {
 }
 
 void RenderSystem::updateLights() const {
+  ZoneScopedN("RenderSystem::updateLights");
+
   unsigned int lightCount = 0;
 
   m_lightsUbo.bind();
@@ -91,6 +99,8 @@ void RenderSystem::updateLights() const {
 }
 
 void RenderSystem::updateShaders() const {
+  ZoneScopedN("RenderSystem::updateShaders");
+
   m_renderGraph.updateShaders();
 
   for (std::size_t i = 0; i < m_renderGraph.getNodeCount(); ++i) {
@@ -114,6 +124,8 @@ void RenderSystem::updateShaders() const {
 }
 
 void RenderSystem::updateMaterials(const MeshRenderer& meshRenderer) const {
+  ZoneScopedN("RenderSystem::updateMaterials(MeshRenderer)");
+
   for (const Material& material : meshRenderer.getMaterials()) {
     const RenderShaderProgram& materialProgram = material.getProgram();
 
@@ -131,6 +143,8 @@ void RenderSystem::updateMaterials(const MeshRenderer& meshRenderer) const {
 }
 
 void RenderSystem::updateMaterials() const {
+  ZoneScopedN("RenderSystem::updateMaterials");
+
   for (const Entity* entity : m_entities) {
     if (entity->hasComponent<MeshRenderer>())
       updateMaterials(entity->getComponent<MeshRenderer>());
@@ -138,6 +152,8 @@ void RenderSystem::updateMaterials() const {
 }
 
 void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format, PixelDataType dataType) const {
+  ZoneScopedN("RenderSystem::saveToImage");
+
   ImageColorspace colorspace = ImageColorspace::RGB;
 
   switch (format) {
@@ -169,6 +185,8 @@ void RenderSystem::destroy() {
 }
 
 void RenderSystem::linkEntity(const EntityPtr& entity) {
+  ZoneScopedN("RenderSystem::linkEntity");
+
   System::linkEntity(entity);
 
   if (entity->hasComponent<Camera>())
@@ -182,6 +200,8 @@ void RenderSystem::linkEntity(const EntityPtr& entity) {
 }
 
 void RenderSystem::initialize() {
+  ZoneScopedN("RenderSystem::initialize");
+
   registerComponents<Camera, Light, MeshRenderer>();
 
   // TODO: this Renderer initialization is technically useless; the RenderSystem needs to have it initialized before construction

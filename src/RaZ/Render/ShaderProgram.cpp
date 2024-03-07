@@ -2,6 +2,8 @@
 #include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 namespace {
@@ -152,6 +154,8 @@ void ShaderProgram::setImageTexture(TexturePtr texture, const std::string& unifo
 #endif
 
 void ShaderProgram::link() {
+  ZoneScopedN("ShaderProgram::link");
+
   Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
 
   Renderer::linkProgram(m_index);
@@ -165,6 +169,8 @@ bool ShaderProgram::isLinked() const {
 }
 
 void ShaderProgram::updateShaders() {
+  ZoneScopedN("ShaderProgram::updateShaders");
+
   Logger::debug("[ShaderProgram] Updating shaders...");
 
   loadShaders();
@@ -188,6 +194,8 @@ bool ShaderProgram::isUsed() const {
 }
 
 void ShaderProgram::sendAttributes() const {
+  ZoneScopedN("ShaderProgram::sendAttributes");
+
   if (m_attributes.empty())
     return;
 
@@ -211,6 +219,8 @@ void ShaderProgram::removeAttribute(const std::string& uniformName) {
 }
 
 void ShaderProgram::initTextures() const {
+  ZoneScopedN("ShaderProgram::initTextures");
+
   if (m_textures.empty())
     return;
 
@@ -224,6 +234,8 @@ void ShaderProgram::initTextures() const {
 }
 
 void ShaderProgram::bindTextures() const {
+  ZoneScopedN("ShaderProgram::bindTextures");
+
   use();
 
   unsigned int textureIndex = 0;
@@ -252,6 +264,8 @@ void ShaderProgram::removeTexture(const std::string& uniformName) {
 
 #if !defined(USE_WEBGL)
 void ShaderProgram::initImageTextures() const {
+  ZoneScopedN("ShaderProgram::initImageTextures");
+
   if (m_imageTextures.empty())
     return;
 
@@ -265,6 +279,8 @@ void ShaderProgram::initImageTextures() const {
 }
 
 void ShaderProgram::bindImageTextures() const {
+  ZoneScopedN("ShaderProgram::bindImageTextures");
+
   use();
 
   unsigned int bindingIndex = 0;
@@ -385,6 +401,8 @@ void ShaderProgram::sendUniform(int index, const Mat4f& mat) const {
 }
 
 ShaderProgram::~ShaderProgram() {
+  ZoneScopedN("ShaderProgram::~ShaderProgram");
+
   if (!m_index.isValid())
     return;
 
@@ -394,6 +412,8 @@ ShaderProgram::~ShaderProgram() {
 }
 
 void ShaderProgram::updateAttributesLocations() {
+  ZoneScopedN("ShaderProgram::updateAttributesLocations");
+
   for (auto& [name, attrib] : m_attributes)
     attrib.location = recoverUniformLocation(name);
 }
@@ -528,6 +548,8 @@ RenderShaderProgram RenderShaderProgram::clone() const {
 }
 
 void RenderShaderProgram::loadShaders() const {
+  ZoneScopedN("RenderShaderProgram::loadShaders");
+
   Logger::debug("[RenderShaderProgram] Loading shaders...");
 
   m_vertShader.load();
@@ -542,6 +564,8 @@ void RenderShaderProgram::loadShaders() const {
 }
 
 void RenderShaderProgram::compileShaders() const {
+  ZoneScopedN("RenderShaderProgram::compileShaders");
+
   Logger::debug("[RenderShaderProgram] Compiling shaders...");
 
   m_vertShader.compile();
@@ -556,12 +580,16 @@ void RenderShaderProgram::compileShaders() const {
 }
 
 void RenderShaderProgram::destroyVertexShader() {
+  ZoneScopedN("RenderShaderProgram::destroyVertexShader");
+
   Renderer::detachShader(m_index, m_vertShader.getIndex());
   m_vertShader.destroy();
 }
 
 #if !defined(USE_OPENGL_ES)
 void RenderShaderProgram::destroyTessellationControlShader() {
+  ZoneScopedN("RenderShaderProgram::destroyTessellationControlShader");
+
   if (!m_tessCtrlShader)
     return;
 
@@ -571,6 +599,8 @@ void RenderShaderProgram::destroyTessellationControlShader() {
 }
 
 void RenderShaderProgram::destroyTessellationEvaluationShader() {
+  ZoneScopedN("RenderShaderProgram::destroyTessellationEvaluationShader");
+
   if (!m_tessEvalShader)
     return;
 
@@ -580,6 +610,8 @@ void RenderShaderProgram::destroyTessellationEvaluationShader() {
 }
 
 void RenderShaderProgram::destroyGeometryShader() {
+  ZoneScopedN("RenderShaderProgram::destroyGeometryShader");
+
   if (!m_geomShader)
     return;
 
@@ -590,6 +622,8 @@ void RenderShaderProgram::destroyGeometryShader() {
 #endif
 
 void RenderShaderProgram::destroyFragmentShader() {
+  ZoneScopedN("RenderShaderProgram::destroyFragmentShader");
+
   Renderer::detachShader(m_index, m_fragShader.getIndex());
   m_fragShader.destroy();
 }
@@ -626,24 +660,32 @@ ComputeShaderProgram ComputeShaderProgram::clone() const {
 }
 
 void ComputeShaderProgram::loadShaders() const {
+  ZoneScopedN("ComputeShaderProgram::loadShaders");
+
   Logger::debug("[ComputeShaderProgram] Loading shader...");
   m_compShader.load();
   Logger::debug("[ComputeShaderProgram] Loaded shader");
 }
 
 void ComputeShaderProgram::compileShaders() const {
+  ZoneScopedN("ComputeShaderProgram::compileShaders");
+
   Logger::debug("[ComputeShaderProgram] Compiling shader...");
   m_compShader.compile();
   Logger::debug("[ComputeShaderProgram] Compiled shader");
 }
 
 void ComputeShaderProgram::execute(unsigned int groupCountX, unsigned int groupCountY, unsigned int groupCountZ) const {
+  ZoneScopedN("ComputeShaderProgram::execute");
+
   bindImageTextures();
   Renderer::dispatchCompute(groupCountX, groupCountY, groupCountZ);
   Renderer::setMemoryBarrier(BarrierType::ALL);
 }
 
 void ComputeShaderProgram::destroyShader() {
+  ZoneScopedN("ComputeShaderProgram::destroyShader");
+
   Renderer::detachShader(m_index, m_compShader.getIndex());
   m_compShader.destroy();
 }

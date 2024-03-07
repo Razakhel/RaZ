@@ -2,9 +2,13 @@
 #include "RaZ/Render/SubmeshRenderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 void SubmeshRenderer::setRenderMode(RenderMode renderMode, const Submesh& submesh) {
+  ZoneScopedN("SubmeshRenderer::setRenderMode");
+
   m_renderMode = renderMode;
 
   switch (m_renderMode) {
@@ -52,11 +56,15 @@ SubmeshRenderer SubmeshRenderer::clone() const {
 }
 
 void SubmeshRenderer::load(const Submesh& submesh, RenderMode renderMode) {
+  ZoneScopedN("SubmeshRenderer::load");
+
   loadVertices(submesh);
   setRenderMode(renderMode, submesh);
 }
 
 void SubmeshRenderer::draw() const {
+  ZoneScopedN("SubmeshRenderer::draw");
+
   m_vao.bind();
   m_ibo.bind();
 
@@ -64,6 +72,8 @@ void SubmeshRenderer::draw() const {
 }
 
 void SubmeshRenderer::loadVertices(const Submesh& submesh) {
+  ZoneScopedN("SubmeshRenderer::loadVertices");
+
   Logger::debug("[SubmeshRenderer] Loading submesh vertices...");
 
   m_vao.bind();
@@ -114,6 +124,8 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
 }
 
 void SubmeshRenderer::loadIndices(const Submesh& submesh) {
+  ZoneScopedN("SubmeshRenderer::loadIndices");
+
   Logger::debug("[SubmeshRenderer] Loading submesh indices...");
 
   m_vao.bind();

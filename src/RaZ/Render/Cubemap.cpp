@@ -5,6 +5,8 @@
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 namespace {
@@ -145,6 +147,8 @@ TextureInternalFormat recoverInternalFormat(ImageColorspace colorspace, ImageDat
 } // namespace
 
 Cubemap::Cubemap() {
+  ZoneScopedN("Cubemap::Cubemap");
+
   Logger::debug("[Cubemap] Creating...");
   Renderer::generateTexture(m_index);
   Logger::debug("[Cubemap] Created (ID: " + std::to_string(m_index) + ')');
@@ -155,6 +159,8 @@ const RenderShaderProgram& Cubemap::getProgram() const {
 }
 
 void Cubemap::load(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back) const {
+  ZoneScopedN("Cubemap::load");
+
   bind();
 
   constexpr auto mapImage = [] (const Image& img, TextureType type) {
@@ -220,6 +226,8 @@ void Cubemap::unbind() const {
 }
 
 void Cubemap::draw() const {
+  ZoneScopedN("Cubemap::draw");
+
   Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);
 
   const MeshRenderer& displayCube = getDisplayCube();
@@ -235,6 +243,8 @@ void Cubemap::draw() const {
 }
 
 Cubemap::~Cubemap() {
+  ZoneScopedN("Cubemap::~Cubemap");
+
   if (!m_index.isValid())
     return;
 

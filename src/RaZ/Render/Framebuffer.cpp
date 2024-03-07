@@ -6,11 +6,15 @@
 #include "RaZ/Render/Texture.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 namespace {
 
 inline void drawDisplaySurface() {
+  ZoneScopedN("[Framebuffer]::drawDisplaySurface");
+
   // Creating a triangle large enough to cover the whole render frame:
   //
   //   3 | \                                3 | \
@@ -54,6 +58,8 @@ inline void drawDisplaySurface() {
 } // namespace
 
 Framebuffer::Framebuffer() {
+  ZoneScopedN("Framebuffer::Framebuffer");
+
   Logger::debug("[Framebuffer] Creating...");
   Renderer::generateFramebuffer(m_index);
   Logger::debug("[Framebuffer] Created (ID: " + std::to_string(m_index) + ')');
@@ -118,6 +124,8 @@ void Framebuffer::clearTextureBuffers() {
 }
 
 void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
+  ZoneScopedN("Framebuffer::resizeBuffers");
+
   if (m_depthBuffer)
     m_depthBuffer->resize(width, height);
 
@@ -126,6 +134,8 @@ void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
 }
 
 void Framebuffer::mapBuffers() const {
+  ZoneScopedN("Framebuffer::mapBuffers");
+
   Logger::debug("[Framebuffer] Mapping buffers (ID: " + std::to_string(m_index) + ")...");
 
   Renderer::bindFramebuffer(m_index);
@@ -168,11 +178,15 @@ void Framebuffer::unbind() const {
 }
 
 void Framebuffer::display() const {
+  ZoneScopedN("Framebuffer::display");
+
   Renderer::clear(MaskType::COLOR);
   drawDisplaySurface();
 }
 
 Framebuffer::~Framebuffer() {
+  ZoneScopedN("Framebuffer::~Framebuffer");
+
   if (!m_index.isValid())
     return;
 

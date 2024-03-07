@@ -19,6 +19,8 @@
 #include "imgui_impl_glfw.h"
 #endif
 
+#include "tracy/Tracy.hpp"
+
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten/html5.h>
 #endif
@@ -30,6 +32,8 @@ Window::Window(RenderSystem& renderSystem,
                const std::string& title,
                WindowSetting settings,
                uint8_t antiAliasingSampleCount) : m_renderSystem{ &renderSystem }, m_width{ static_cast<int>(width) }, m_height{ static_cast<int>(height) } {
+  ZoneScopedN("Window::Window");
+
   Logger::debug("[Window] Initializing...");
 
   glfwSetErrorCallback([] (int errorCode, const char* description) {
@@ -184,6 +188,8 @@ void Window::enableFaceCulling(bool value) const {
 }
 
 bool Window::recoverVerticalSyncState() const {
+  ZoneScopedN("Window::recoverVerticalSyncState");
+
 #if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT())
     return static_cast<bool>(wglGetSwapIntervalEXT());
@@ -207,6 +213,8 @@ bool Window::recoverVerticalSyncState() const {
 }
 
 void Window::enableVerticalSync([[maybe_unused]] bool value) const {
+  ZoneScopedN("Window::enableVerticalSync");
+
 #if defined(RAZ_PLATFORM_WINDOWS)
   if (wglGetExtensionsStringEXT()) {
     wglSwapIntervalEXT(static_cast<int>(value));
@@ -262,6 +270,8 @@ void Window::setCloseCallback(std::function<void()> func) {
 }
 
 void Window::updateCallbacks() const {
+  ZoneScopedN("Window::updateCallbacks");
+
 #if !defined(RAZ_NO_OVERLAY)
   // Monitor events
   glfwSetMonitorCallback([] (GLFWmonitor* monitorHandle, int event) {
@@ -391,37 +401,22 @@ void Window::updateCallbacks() const {
 }
 
 bool Window::run(float deltaTime) {
+  ZoneScopedN("Window::run");
+
   if (glfwWindowShouldClose(m_windowHandle))
     return false;
 
-  glfwPollEvents();
-
-  // Process actions belonging to pressed keys & mouse buttons
-  auto& actions   = std::get<4>(m_callbacks);
-  auto actionIter = actions.cbegin();
-
-  while (actionIter != actions.cend()) {
-    const auto& action = actionIter->second;
-
-    // An action consists of two parts:
-    //   - a callback associated to the triggered key or button
-    //   - a value indicating if it should be executed only once or every frame
-
-    action.first(deltaTime);
-
-    // Removing the current action if ONCE is given, or simply increment the iterator
-    if (action.second == Input::ONCE)
-      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
-    else
-      ++actionIter;
-  }
+  processInputs(deltaTime);
 
 #if !defined(RAZ_NO_OVERLAY)
   if (m_isOverlayEnabled && !m_overlay.isEmpty())
     m_overlay.render();
 #endif
 
-  glfwSwapBuffers(m_windowHandle);
+  {
+    ZoneScopedN("glfwSwapBuffers");
+    glfwSwapBuffers(m_windowHandle);
+  }
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_webgl_commit_frame();
@@ -443,6 +438,8 @@ void Window::setShouldClose() const {
 }
 
 void Window::close() {
+  ZoneScopedN("Window::close");
+
   if (!m_windowHandle.isValid())
     return;
 
@@ -455,11 +452,42 @@ void Window::close() {
     Overlay::destroy();
 #endif
 
-    glfwTerminate();
+    {
+      ZoneScopedN("glfwTerminate");
+      glfwTerminate();
+    }
     m_windowHandle = nullptr;
   }
 
   Logger::debug("[Window] Closed");
+}
+
+void Window::processInputs(float deltaTime) {
+  ZoneScopedN("Window::processInputs");
+
+  {
+    ZoneScopedN("glfwPollEvents");
+    glfwPollEvents();
+  }
+
+  auto& actions   = std::get<InputActions>(m_callbacks);
+  auto actionIter = actions.cbegin();
+
+  while (actionIter != actions.cend()) {
+    const auto& action = actionIter->second;
+
+    // An action consists of two parts:
+    // - A callback associated to the triggered key or button
+    // - A value indicating if it should be executed only once or every frame
+
+    action.first(deltaTime);
+
+    // Removing the current action if ONCE is given, or simply increment the iterator
+    if (action.second == Input::ONCE)
+      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
+    else
+      ++actionIter;
+  }
 }
 
 } // namespace Raz
