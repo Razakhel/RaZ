@@ -1,6 +1,8 @@
 #include "RaZ/Script/LuaScript.hpp"
 #include "RaZ/Script/ScriptSystem.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 ScriptSystem::ScriptSystem() {
@@ -8,6 +10,8 @@ ScriptSystem::ScriptSystem() {
 }
 
 bool ScriptSystem::update(const FrameTimeInfo& timeInfo) {
+  ZoneScopedN("ScriptSystem::update");
+
   bool res = true;
 
   for (const Entity* entity : m_entities) {

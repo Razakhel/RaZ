@@ -6,10 +6,14 @@
 #define SOL_PRINT_ERRORS 0
 #include "sol/sol.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 void LuaWrapper::registerTypes() {
   [[maybe_unused]] static const bool _ = [] () {
+    ZoneScopedN("LuaWrapper::registerTypes");
+
     Logger::debug("[LuaWrapper] Registering types...");
 
     registerAnimationTypes();
@@ -50,6 +54,8 @@ void LuaWrapper::registerTypes() {
 }
 
 bool LuaWrapper::execute(const std::string& code) {
+  ZoneScopedN("LuaWrapper::execute");
+
   if (code.empty())
     return false;
 
@@ -68,6 +74,8 @@ bool LuaWrapper::execute(const std::string& code) {
 }
 
 bool LuaWrapper::executeFromFile(const FilePath& filePath) {
+  ZoneScopedN("LuaWrapper::executeFromFile");
+
   if (filePath.isEmpty())
     return false;
 

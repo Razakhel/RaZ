@@ -8,12 +8,16 @@
 #define SOL_PRINT_ERRORS 0
 #include "sol/sol.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 LuaEnvironment::LuaEnvironment()
   : m_environment{ std::make_unique<sol::environment>(LuaWrapper::getState(), sol::create, LuaWrapper::getState().globals()) } {}
 
 bool LuaEnvironment::execute(const std::string& code) const {
+  ZoneScopedN("LuaEnvironment::execute");
+
   if (code.empty())
     return false;
 
@@ -32,6 +36,8 @@ bool LuaEnvironment::execute(const std::string& code) const {
 }
 
 bool LuaEnvironment::executeFromFile(const FilePath& filePath) const {
+  ZoneScopedN("LuaEnvironment::executeFromFile");
+
   if (filePath.isEmpty())
     return false;
 

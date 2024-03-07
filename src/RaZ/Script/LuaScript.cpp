@@ -8,6 +8,8 @@
 #define SOL_SAFE_GETTER 0 // Allowing implicit conversion to bool
 #include "sol/sol.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 LuaScript::LuaScript(const std::string& code) {
@@ -20,6 +22,8 @@ LuaScript::LuaScript(const std::string& code) {
 }
 
 void LuaScript::loadCode(const std::string& code) {
+  ZoneScopedN("LuaScript::loadCode");
+
   Logger::debug("[LuaScript] Loading code...");
 
   const sol::object owningEntity = m_environment.get("this");
@@ -41,18 +45,24 @@ void LuaScript::loadCode(const std::string& code) {
 }
 
 void LuaScript::loadCodeFromFile(const FilePath& filePath) {
+  ZoneScopedN("LuaScript::loadCodeFromFile");
+
   Logger::debug("[LuaScript] Loading code from file ('" + filePath + "')...");
   loadCode(FileUtils::readFileToString(filePath));
   Logger::debug("[LuaScript] Loaded code from file");
 }
 
 bool LuaScript::update(const FrameTimeInfo& timeInfo) const {
+  ZoneScopedN("LuaScript::update");
+
   const sol::unsafe_function updateFunc = m_environment.get("update");
   const sol::unsafe_function_result updateRes = updateFunc(timeInfo);
   return (updateRes.get_type() == sol::type::none || updateRes);
 }
 
 void LuaScript::setup() const {
+  ZoneScopedN("LuaScript::setup");
+
   if (!m_environment.exists("setup"))
     return;
 
