@@ -1,6 +1,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/FileUtils.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <fstream>
 
 namespace Raz::FileUtils {
@@ -9,6 +11,8 @@ namespace {
 
 template <typename T>
 T readFile(const FilePath& filePath) {
+  ZoneScopedN("[FileUtils]::readFile");
+
   std::ifstream file(filePath, std::ios::binary | std::ios::ate);
 
   if (!file)
@@ -39,10 +43,12 @@ bool isReadable(const FilePath& filePath) {
 }
 
 std::vector<unsigned char> readFileToArray(const FilePath& filePath) {
+  ZoneScopedN("FileUtils::readFileToArray");
   return readFile<std::vector<unsigned char>>(filePath);
 }
 
 std::string readFileToString(const FilePath& filePath) {
+  ZoneScopedN("FileUtils::readFileToString");
   return readFile<std::string>(filePath);
 }
 

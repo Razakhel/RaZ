@@ -2,11 +2,15 @@
 #include "RaZ/Utils/Threading.hpp"
 #include "RaZ/Utils/ThreadPool.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 ThreadPool::ThreadPool() : ThreadPool(Threading::getSystemThreadCount()) {}
 
 ThreadPool::ThreadPool(unsigned int threadCount) {
+  ZoneScopedN("ThreadPool::ThreadPool");
+
   Logger::debug("[ThreadPool] Initializing (with " + std::to_string(threadCount) + " thread(s))...");
 
   m_threads.reserve(threadCount);
@@ -45,6 +49,8 @@ void ThreadPool::addAction(std::function<void()> action) {
 }
 
 ThreadPool::~ThreadPool() {
+  ZoneScopedN("ThreadPool::~ThreadPool");
+
   Logger::debug("[ThreadPool] Destroying...");
 
   {
