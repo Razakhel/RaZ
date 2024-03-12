@@ -62,7 +62,6 @@ public:
 #endif
   void resizeViewport(unsigned int width, unsigned int height);
   bool update(const FrameTimeInfo& timeInfo) override;
-  void sendCameraMatrices() const;
   /// Updates all lights referenced by the RenderSystem, sending their data to the GPU.
   void updateLights() const;
   void updateShaders() const;
@@ -82,6 +81,7 @@ protected:
 private:
   void initialize();
   void initialize(unsigned int sceneWidth, unsigned int sceneHeight);
+  void sendCameraInfo() const;
   void sendViewMatrix(const Mat4f& viewMat) const { m_cameraUbo.sendData(viewMat, 0); }
   void sendInverseViewMatrix(const Mat4f& invViewMat) const { m_cameraUbo.sendData(invViewMat, sizeof(Mat4f)); }
   void sendProjectionMatrix(const Mat4f& projMat) const { m_cameraUbo.sendData(projMat, sizeof(Mat4f) * 2); }

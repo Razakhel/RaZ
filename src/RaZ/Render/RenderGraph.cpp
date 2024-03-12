@@ -75,30 +75,6 @@ void RenderGraph::executeGeometryPass(RenderSystem& renderSystem) const {
   if (!geometryFramebuffer.isEmpty())
     geometryFramebuffer.bind();
 
-  auto& camera       = renderSystem.m_cameraEntity->getComponent<Camera>();
-  auto& camTransform = renderSystem.m_cameraEntity->getComponent<Transform>();
-
-  renderSystem.m_cameraUbo.bind();
-
-  if (camTransform.hasUpdated()) {
-    if (camera.getCameraType() == CameraType::LOOK_AT)
-      camera.computeLookAt(camTransform.getPosition());
-    else
-      camera.computeViewMatrix(camTransform);
-
-    camera.computeInverseViewMatrix();
-
-    renderSystem.sendViewMatrix(camera.getViewMatrix());
-    renderSystem.sendInverseViewMatrix(camera.getInverseViewMatrix());
-    renderSystem.sendCameraPosition(camTransform.getPosition());
-
-    camTransform.setUpdated(false);
-  }
-
-  renderSystem.sendProjectionMatrix(camera.getProjectionMatrix());
-  renderSystem.sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
-  renderSystem.sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
-
   if (renderSystem.hasCubemap())
     renderSystem.getCubemap().draw();
 

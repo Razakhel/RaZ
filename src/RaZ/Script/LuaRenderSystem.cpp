@@ -45,7 +45,6 @@ void LuaWrapper::registerRenderSystemTypes() {
                                                                     uint8_t>(&RenderSystem::createWindow));
 #endif
     renderSystem["resizeViewport"]     = &RenderSystem::resizeViewport;
-    renderSystem["sendCameraMatrices"] = &RenderSystem::sendCameraMatrices;
     renderSystem["updateLights"]       = &RenderSystem::updateLights;
     renderSystem["updateShaders"]      = &RenderSystem::updateShaders;
     renderSystem["updateMaterials"]    = sol::overload([] (const RenderSystem& r) { r.updateMaterials(); },

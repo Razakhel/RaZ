@@ -52,6 +52,8 @@ bool RenderSystem::update(const FrameTimeInfo& timeInfo) {
   m_timeUbo.sendData(timeInfo.deltaTime, 0);
   m_timeUbo.sendData(timeInfo.globalTime, sizeof(float));
 
+  sendCameraInfo();
+
   m_renderGraph.execute(*this);
 
 #if defined(RAZ_CONFIG_DEBUG) && !defined(SKIP_RENDERER_ERRORS)
@@ -64,20 +66,6 @@ bool RenderSystem::update(const FrameTimeInfo& timeInfo) {
 #endif
 
   return true;
-}
-
-void RenderSystem::sendCameraMatrices() const {
-  assert("Error: A camera must be given to a RenderSystem to send its matrices." && (m_cameraEntity != nullptr));
-
-  const auto& camera = m_cameraEntity->getComponent<Camera>();
-
-  m_cameraUbo.bind();
-  sendViewMatrix(camera.getViewMatrix());
-  sendInverseViewMatrix(camera.getInverseViewMatrix());
-  sendProjectionMatrix(camera.getProjectionMatrix());
-  sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
-  sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
-  sendCameraPosition(m_cameraEntity->getComponent<Transform>().getPosition());
 }
 
 void RenderSystem::updateLights() const {
@@ -250,6 +238,36 @@ void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) co
   m_lightsUbo.sendData(light.getColor(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 2));
   m_lightsUbo.sendData(light.getEnergy(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3));
   m_lightsUbo.sendData(light.getAngle().value, static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3 + sizeof(float)));
+}
+
+void RenderSystem::sendCameraInfo() const {
+  assert("Error: A camera must be given to a RenderSystem to send its info." && (m_cameraEntity != nullptr));
+
+  ZoneScopedN("RenderSystem::sendCameraInfo");
+
+  auto& camera       = m_cameraEntity->getComponent<Camera>();
+  auto& camTransform = m_cameraEntity->getComponent<Transform>();
+
+  m_cameraUbo.bind();
+
+  if (camTransform.hasUpdated()) {
+    if (camera.getCameraType() == CameraType::LOOK_AT)
+      camera.computeLookAt(camTransform.getPosition());
+    else
+      camera.computeViewMatrix(camTransform);
+
+    camera.computeInverseViewMatrix();
+
+    sendViewMatrix(camera.getViewMatrix());
+    sendInverseViewMatrix(camera.getInverseViewMatrix());
+    sendCameraPosition(camTransform.getPosition());
+
+    camTransform.setUpdated(false);
+  }
+
+  sendProjectionMatrix(camera.getProjectionMatrix());
+  sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
+  sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
 }
 
 } // namespace Raz
