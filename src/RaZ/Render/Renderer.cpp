@@ -3,6 +3,9 @@
 
 #include "GL/glew.h"
 
+#include "tracy/Tracy.hpp"
+#include "tracy/TracyOpenGL.hpp"
+
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -81,6 +84,8 @@ inline constexpr const char* recoverGlErrorStr(unsigned int errorCode) {
 } // namespace
 
 void Renderer::initialize() {
+  ZoneScopedN("Renderer::initialize");
+
   if (s_isInitialized)
     return;
 
@@ -94,6 +99,8 @@ void Renderer::initialize() {
   }
 
   s_isInitialized = true;
+
+  TracyGpuContext
 
   getParameter(StateParameter::MAJOR_VERSION, &s_majorVersion);
   getParameter(StateParameter::MINOR_VERSION, &s_minorVersion);
@@ -264,6 +271,8 @@ void Renderer::clearColor(float red, float green, float blue, float alpha) {
 void Renderer::clear(MaskType mask) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::clear")
+
   glClear(static_cast<unsigned int>(mask));
 
   printConditionalErrors();
@@ -271,6 +280,8 @@ void Renderer::clear(MaskType mask) {
 
 void Renderer::setDepthFunction(DepthStencilFunction func) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::setDepthFunction")
 
   glDepthFunc(static_cast<unsigned int>(func));
 
@@ -376,6 +387,8 @@ void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
 
 void Renderer::recoverFrame(unsigned int width, unsigned int height, TextureFormat format, PixelDataType dataType, void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::recoverFrame")
 
   glReadPixels(0, 0, static_cast<int>(width), static_cast<int>(height), static_cast<unsigned int>(format), static_cast<unsigned int>(dataType), data);
 
@@ -614,6 +627,8 @@ void Renderer::sendImageData1D(TextureType type,
                                PixelDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::sendImageData1D")
+
   glTexImage1D(static_cast<unsigned int>(type),
                static_cast<int>(mipmapLevel),
                static_cast<int>(internalFormat),
@@ -634,6 +649,8 @@ void Renderer::sendImageSubData1D(TextureType type,
                                   PixelDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::sendImageSubData1D")
+
   glTexSubImage1D(static_cast<unsigned int>(type),
                   static_cast<int>(mipmapLevel),
                   static_cast<int>(offsetX),
@@ -653,6 +670,8 @@ void Renderer::sendImageData2D(TextureType type,
                                TextureFormat format,
                                PixelDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::sendImageData2D")
 
   glTexImage2D(static_cast<unsigned int>(type),
                static_cast<int>(mipmapLevel),
@@ -675,6 +694,8 @@ void Renderer::sendImageSubData2D(TextureType type,
                                   PixelDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::sendImageSubData2D")
+
   glTexSubImage2D(static_cast<unsigned int>(type),
                   static_cast<int>(mipmapLevel),
                   static_cast<int>(offsetX),
@@ -695,6 +716,8 @@ void Renderer::sendImageData3D(TextureType type,
                                TextureFormat format,
                                PixelDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::sendImageData3D")
 
   glTexImage3D(static_cast<unsigned int>(type),
                static_cast<int>(mipmapLevel),
@@ -717,6 +740,8 @@ void Renderer::sendImageSubData3D(TextureType type,
                                   TextureFormat format,
                                   PixelDataType dataType, const void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::sendImageSubData3D")
 
   glTexSubImage3D(static_cast<unsigned int>(type),
                   static_cast<int>(mipmapLevel),
@@ -781,6 +806,8 @@ TextureInternalFormat Renderer::recoverTextureInternalFormat(TextureType type, u
 void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, TextureFormat format, PixelDataType dataType, void* data) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::recoverTextureData")
+
   glGetTexImage(static_cast<unsigned int>(type),
                 static_cast<int>(mipmapLevel),
                 static_cast<unsigned int>(format),
@@ -794,6 +821,8 @@ void Renderer::recoverTextureData(TextureType type, unsigned int mipmapLevel, Te
 void Renderer::generateMipmap(TextureType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::generateMipmap")
+
   glGenerateMipmap(static_cast<unsigned int>(type));
 
   printConditionalErrors();
@@ -803,6 +832,8 @@ void Renderer::generateMipmap(TextureType type) {
 void Renderer::generateMipmap(unsigned int textureIndex) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: OpenGL 4.5+ is needed to generate mipmap with a texture index." && checkVersion(4, 5));
+
+  TracyGpuZone("Renderer::generateMipmap")
 
   glGenerateTextureMipmap(textureIndex);
 
@@ -883,6 +914,8 @@ std::vector<unsigned int> Renderer::recoverAttachedShaders(unsigned int programI
 void Renderer::linkProgram(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::linkProgram")
+
   glLinkProgram(index);
 
   if (!isProgramLinked(index)) {
@@ -897,6 +930,8 @@ void Renderer::linkProgram(unsigned int index) {
 
 void Renderer::useProgram(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::useProgram")
 
   glUseProgram(index);
 
@@ -964,12 +999,16 @@ int Renderer::recoverShaderInfo(unsigned int index, ShaderInfo info) {
 void Renderer::sendShaderSource(unsigned int index, const char* source, int length) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::sendShaderSource")
+
   glShaderSource(index, 1, &source, &length);
 
   printConditionalErrors();
 }
 
 std::string Renderer::recoverShaderSource(unsigned int index) {
+  TracyGpuZone("Renderer::recoverShaderSource")
+
   const int sourceLength = recoverShaderInfo(index, ShaderInfo::SOURCE_LENGTH);
 
   if (sourceLength == 0)
@@ -987,6 +1026,8 @@ std::string Renderer::recoverShaderSource(unsigned int index) {
 
 void Renderer::compileShader(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::compileShader")
 
   glCompileShader(index);
 
@@ -1338,6 +1379,8 @@ void Renderer::setFramebufferTexture(FramebufferAttachment attachment,
                                      FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::setFramebufferTexture")
+
   glFramebufferTexture(static_cast<unsigned int>(type),
                        static_cast<unsigned int>(attachment),
                        textureIndex,
@@ -1350,6 +1393,8 @@ void Renderer::setFramebufferTexture1D(FramebufferAttachment attachment,
                                        unsigned int textureIndex, unsigned int mipmapLevel,
                                        FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::setFramebufferTexture1D")
 
   glFramebufferTexture1D(static_cast<unsigned int>(type),
                          static_cast<unsigned int>(attachment),
@@ -1367,6 +1412,8 @@ void Renderer::setFramebufferTexture2D(FramebufferAttachment attachment,
                                        FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::setFramebufferTexture2D")
+
   glFramebufferTexture2D(static_cast<unsigned int>(type),
                          static_cast<unsigned int>(attachment),
                          static_cast<unsigned int>(textureType),
@@ -1381,6 +1428,8 @@ void Renderer::setFramebufferTexture3D(FramebufferAttachment attachment,
                                        unsigned int textureIndex, unsigned int mipmapLevel, unsigned int layer,
                                        FramebufferType type) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::setFramebufferTexture3D")
 
   glFramebufferTexture3D(static_cast<unsigned int>(type),
                          static_cast<unsigned int>(attachment),
@@ -1414,6 +1463,8 @@ void Renderer::blitFramebuffer(int readMinX, int readMinY, int readMaxX, int rea
                                MaskType mask, BlitFilter filter) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::blitFramebuffer")
+
   glBlitFramebuffer(readMinX, readMinY, readMaxX, readMaxY,
                     writeMinX, writeMinY, writeMaxX, writeMaxY,
                     static_cast<unsigned int>(mask), static_cast<unsigned int>(filter));
@@ -1432,6 +1483,8 @@ void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
 void Renderer::drawArrays(PrimitiveType type, unsigned int first, unsigned int count) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::drawArrays")
+
   glDrawArrays(static_cast<unsigned int>(type), static_cast<int>(first), static_cast<int>(count));
 
   printConditionalErrors();
@@ -1440,6 +1493,8 @@ void Renderer::drawArrays(PrimitiveType type, unsigned int first, unsigned int c
 void Renderer::drawArraysInstanced(PrimitiveType type, unsigned int first, unsigned int primitiveCount, unsigned int instanceCount) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
+  TracyGpuZone("Renderer::drawArraysInstanced")
+
   glDrawArraysInstanced(static_cast<unsigned int>(type), static_cast<int>(first), static_cast<int>(primitiveCount), static_cast<int>(instanceCount));
 
   printConditionalErrors();
@@ -1447,6 +1502,8 @@ void Renderer::drawArraysInstanced(PrimitiveType type, unsigned int first, unsig
 
 void Renderer::drawElements(PrimitiveType type, unsigned int count, ElementDataType dataType, const void* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::drawElements")
 
   glDrawElements(static_cast<unsigned int>(type), static_cast<int>(count), static_cast<unsigned int>(dataType), indices);
 
@@ -1457,6 +1514,8 @@ void Renderer::drawElementsInstanced(PrimitiveType type, unsigned int primitiveC
                                      ElementDataType dataType, const void* indices,
                                      unsigned int instanceCount) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  TracyGpuZone("Renderer::drawElementsInstanced")
 
   glDrawElementsInstanced(static_cast<unsigned int>(type), static_cast<int>(primitiveCount),
                           static_cast<unsigned int>(dataType), indices,
@@ -1475,6 +1534,8 @@ void Renderer::dispatchCompute(unsigned int groupCountX, unsigned int groupCount
       && (checkVersion(3, 1) || isExtensionSupported("GL_ARB_compute_shader")));
 #endif
 
+  TracyGpuZone("Renderer::dispatchCompute")
+
   glDispatchCompute(groupCountX, groupCountY, groupCountZ);
 
   printConditionalErrors();
@@ -1488,6 +1549,8 @@ void Renderer::setMemoryBarrier(BarrierType type) {
   assert("Error: Setting a memory barrier requires OpenGL ES 3.1+." && checkVersion(3, 1));
 #endif
 
+  TracyGpuZone("Renderer::setMemoryBarrier")
+
   glMemoryBarrier(static_cast<unsigned int>(type));
 
   printConditionalErrors();
@@ -1500,6 +1563,8 @@ void Renderer::setMemoryBarrierByRegion(RegionBarrierType type) {
 #else
   assert("Error: Setting a memory barrier by region requires OpenGL ES 3.1+." && checkVersion(3, 1));
 #endif
+
+  TracyGpuZone("Renderer::setMemoryBarrierByRegion")
 
   glMemoryBarrierByRegion(static_cast<unsigned int>(type));
 

@@ -20,6 +20,7 @@
 #endif
 
 #include "tracy/Tracy.hpp"
+#include "tracy/TracyOpenGL.hpp"
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
 #include <emscripten/html5.h>
@@ -415,12 +416,18 @@ bool Window::run(float deltaTime) {
 
   {
     ZoneScopedN("glfwSwapBuffers");
+    TracyGpuZone("SwapBuffers")
     glfwSwapBuffers(m_windowHandle);
   }
 
 #if defined(RAZ_PLATFORM_EMSCRIPTEN)
   emscripten_webgl_commit_frame();
 #endif
+
+  {
+    TracyGpuZone("TracyGpuCollect")
+    TracyGpuCollect
+  }
 
   return true;
 }
