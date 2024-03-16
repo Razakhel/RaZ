@@ -3,6 +3,8 @@
 #include "RaZ/Utils/Logger.hpp"
 
 #include "tracy/Tracy.hpp"
+#include "GL/glew.h" // Needed by TracyOpenGL.hpp
+#include "tracy/TracyOpenGL.hpp"
 
 namespace Raz {
 
@@ -97,6 +99,7 @@ void MeshRenderer::loadMaterials() const {
 
 void MeshRenderer::draw() const {
   ZoneScopedN("MeshRenderer::draw");
+  TracyGpuZone("MeshRenderer::draw")
 
   for (const SubmeshRenderer& submeshRenderer : m_submeshRenderers) {
     if (submeshRenderer.getMaterialIndex() != std::numeric_limits<std::size_t>::max()) {

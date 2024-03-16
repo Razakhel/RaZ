@@ -6,6 +6,8 @@
 #include "RaZ/Utils/Logger.hpp"
 
 #include "tracy/Tracy.hpp"
+#include "GL/glew.h" // Needed by TracyOpenGL.hpp
+#include "tracy/TracyOpenGL.hpp"
 
 namespace Raz {
 
@@ -227,6 +229,7 @@ void Cubemap::unbind() const {
 
 void Cubemap::draw() const {
   ZoneScopedN("Cubemap::draw");
+  TracyGpuZone("Cubemap::draw")
 
   Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);
 

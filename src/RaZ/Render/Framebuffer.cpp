@@ -7,6 +7,8 @@
 #include "RaZ/Utils/Logger.hpp"
 
 #include "tracy/Tracy.hpp"
+#include "GL/glew.h" // Needed by TracyOpenGL.hpp
+#include "tracy/TracyOpenGL.hpp"
 
 namespace Raz {
 
@@ -179,6 +181,7 @@ void Framebuffer::unbind() const {
 
 void Framebuffer::display() const {
   ZoneScopedN("Framebuffer::display");
+  TracyGpuZone("Framebuffer::display")
 
   Renderer::clear(MaskType::COLOR);
   drawDisplaySurface();

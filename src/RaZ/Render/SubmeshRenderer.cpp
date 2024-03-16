@@ -3,6 +3,8 @@
 #include "RaZ/Utils/Logger.hpp"
 
 #include "tracy/Tracy.hpp"
+#include "GL/glew.h" // Needed by TracyOpenGL.hpp
+#include "tracy/TracyOpenGL.hpp"
 
 namespace Raz {
 
@@ -64,6 +66,7 @@ void SubmeshRenderer::load(const Submesh& submesh, RenderMode renderMode) {
 
 void SubmeshRenderer::draw() const {
   ZoneScopedN("SubmeshRenderer::draw");
+  TracyGpuZone("SubmeshRenderer::draw")
 
   m_vao.bind();
   m_ibo.bind();

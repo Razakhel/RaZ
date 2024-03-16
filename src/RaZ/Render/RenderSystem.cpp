@@ -9,6 +9,8 @@
 #include "RaZ/Render/RenderSystem.hpp"
 
 #include "tracy/Tracy.hpp"
+#include "GL/glew.h" // Needed by TracyOpenGL.hpp
+#include "tracy/TracyOpenGL.hpp"
 
 namespace Raz {
 
@@ -33,6 +35,7 @@ void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
 
 bool RenderSystem::update(const FrameTimeInfo& timeInfo) {
   ZoneScopedN("RenderSystem::update");
+  TracyGpuZone("RenderSystem::update")
 
   m_cameraUbo.bindBase(0);
   m_lightsUbo.bindBase(1);
