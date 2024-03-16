@@ -15,8 +15,11 @@ ThreadPool::ThreadPool(unsigned int threadCount) {
 
   m_threads.reserve(threadCount);
 
-  for (unsigned int i = 0; i < threadCount; ++i) {
-    m_threads.emplace_back([this] () {
+  for (unsigned int threadIndex = 0; threadIndex < threadCount; ++threadIndex) {
+    m_threads.emplace_back([this, threadIndex] () {
+      const std::string threadName = "Thread pool - #" + std::to_string(threadIndex + 1);
+      tracy::SetThreadName(threadName.c_str());
+
       std::function<void()> action;
 
       while (true) {
