@@ -3,6 +3,8 @@
 #include "RaZ/Render/Texture.hpp"
 
 #include "tracy/Tracy.hpp"
+#include "GL/glew.h" // Needed by TracyOpenGL.hpp
+#include "tracy/TracyOpenGL.hpp"
 
 namespace Raz {
 
@@ -42,13 +44,15 @@ void RenderPass::execute() const {
   if (!m_enabled)
     return;
 
-#if !defined(USE_OPENGL_ES)
-  m_timer.start();
+  TracyGpuZoneTransient(_, (m_name.empty() ? "[Unnamed pass]" : m_name.c_str()), true)
 
+#if !defined(USE_OPENGL_ES)
 #if defined(RAZ_CONFIG_DEBUG)
   if (Renderer::checkVersion(4, 3) && !m_name.empty())
     Renderer::pushDebugGroup(m_name);
 #endif
+
+  m_timer.start();
 #endif
 
   // Binding the program's textures marks it as used

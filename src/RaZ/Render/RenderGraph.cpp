@@ -5,6 +5,8 @@
 #include "RaZ/Render/RenderSystem.hpp"
 
 #include "tracy/Tracy.hpp"
+#include "GL/glew.h" // Needed by TracyOpenGL.hpp
+#include "tracy/TracyOpenGL.hpp"
 
 namespace Raz {
 
@@ -60,6 +62,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
 
 void RenderGraph::executeGeometryPass(RenderSystem& renderSystem) const {
   ZoneScopedN("RenderGraph::executeGeometryPass");
+  TracyGpuZone("Geometry pass")
 
 #if !defined(USE_OPENGL_ES)
   m_geometryPass.m_timer.start();
