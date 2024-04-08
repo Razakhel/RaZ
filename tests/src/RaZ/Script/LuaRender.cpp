@@ -946,9 +946,6 @@ TEST_CASE("LuaRender Texture", "[script][lua][render]") {
     tex1D:resize(2)
     tex1D:fill(ColorPreset.Red)
     assert(tex1D:getWidth() == 2)
-
-    local tex2D = Texture2D.new(1, 1, TextureColorspace.RGB)
-    assert(tex2D:recoverImage():getChannelCount() == 3)
   )"));
 #endif
 
@@ -990,6 +987,7 @@ TEST_CASE("LuaRender Texture", "[script][lua][render]") {
     tex2D:fill(ColorPreset.Green)
     assert(tex2D:getWidth() == 2)
     assert(tex2D:getHeight() == 2)
+    assert(tex2D:recoverImage():getChannelCount() == 3)
 
     local tex3D = Texture3D.new(TextureColorspace.INVALID)
     tex3D       = Texture3D.new(TextureColorspace.RGBA, TextureDataType.BYTE)

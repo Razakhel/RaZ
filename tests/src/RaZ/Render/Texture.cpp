@@ -180,7 +180,6 @@ TEST_CASE("Texture2D load image") {
   CHECK(texture2D.getColorspace() == Raz::TextureColorspace::GRAY);
   CHECK(texture2D.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
   const Raz::Image textureImg = texture2D.recoverImage();
   REQUIRE_FALSE(textureImg.isEmpty());
   REQUIRE(textureImg.getWidth() == 2);
@@ -191,7 +190,6 @@ TEST_CASE("Texture2D load image") {
   CHECK(textureImg.recoverPixel<uint8_t>(1, 0) == 1);
   CHECK(textureImg.recoverPixel<uint8_t>(0, 1) == 2);
   CHECK(textureImg.recoverPixel<uint8_t>(1, 1) == 3);
-#endif
 }
 
 TEST_CASE("Texture3D load image slices") {

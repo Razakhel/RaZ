@@ -79,9 +79,7 @@ void LuaWrapper::registerTextureTypes() {
     texture2D["load"]         = sol::overload([] (Texture2D& t, const Image& img) { t.load(img); },
                                               PickOverload<const Image&, bool>(&Texture2D::load));
     texture2D["fill"]         = &Texture2D::fill;
-#if !defined(USE_OPENGL_ES)
     texture2D["recoverImage"] = &Texture2D::recoverImage;
-#endif
   }
 
   {

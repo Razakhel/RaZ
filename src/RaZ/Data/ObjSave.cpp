@@ -32,7 +32,6 @@ inline void writeAttribute(std::ofstream& file, std::string_view tag, const Rend
   file << '\n';
 }
 
-#if !defined(USE_OPENGL_ES) // Texture::recoverImage() is unavailable with OpenGL ES
 inline void writeTexture(std::ofstream& file, std::string_view tag, const std::string& materialName, std::string_view suffix,
                          const RenderShaderProgram& program, std::string_view uniformName) {
   ZoneScopedN("[ObjSave]::writeTexture");
@@ -50,7 +49,6 @@ inline void writeTexture(std::ofstream& file, std::string_view tag, const std::s
   file << '\t' << tag << ' ' << texturePath << '\n';
   ImageFormat::save(texturePath, texture->recoverImage(), true);
 }
-#endif
 
 void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials) {
   ZoneScopedN("[ObjSave]::saveMtl");

@@ -61,7 +61,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     REQUIRE(baseColorMap.getColorspace() == Raz::TextureColorspace::RGBA);
     REQUIRE(baseColorMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image baseColorImg = baseColorMap.recoverImage();
     REQUIRE_FALSE(baseColorImg.isEmpty());
 
@@ -75,7 +74,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     CHECK(baseColorImg.recoverPixel<uint8_t, 4>(1, 0) == Raz::Vec4b(Raz::Vec3b(Raz::ColorPreset::Green), 127));
     CHECK(baseColorImg.recoverPixel<uint8_t, 4>(0, 1) == Raz::Vec4b(Raz::Vec3b(Raz::ColorPreset::Blue), 127));
     CHECK(baseColorImg.recoverPixel<uint8_t, 4>(1, 1) == Raz::Vec4b(Raz::Vec3b(Raz::ColorPreset::Red), 127));
-#endif
   }
 
   {
@@ -88,7 +86,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     REQUIRE(emissiveMap.getColorspace() == Raz::TextureColorspace::RGB);
     REQUIRE(emissiveMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image emissiveImg = emissiveMap.recoverImage();
     REQUIRE_FALSE(emissiveImg.isEmpty());
 
@@ -102,7 +99,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     CHECK(emissiveImg.recoverPixel<uint8_t, 3>(1, 0) == Raz::Vec3b(Raz::ColorPreset::Red));
     CHECK(emissiveImg.recoverPixel<uint8_t, 3>(0, 1) == Raz::Vec3b(Raz::ColorPreset::Red));
     CHECK(emissiveImg.recoverPixel<uint8_t, 3>(1, 1) == Raz::Vec3b(Raz::ColorPreset::Red));
-#endif
   }
 
   {
@@ -115,7 +111,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     REQUIRE(normalMap.getColorspace() == Raz::TextureColorspace::RGB);
     REQUIRE(normalMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image normalImg = normalMap.recoverImage();
     REQUIRE_FALSE(normalImg.isEmpty());
 
@@ -129,7 +124,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     CHECK(normalImg.recoverPixel<uint8_t, 3>(1, 0) == Raz::Vec3b(Raz::ColorPreset::Green));
     CHECK(normalImg.recoverPixel<uint8_t, 3>(0, 1) == Raz::Vec3b(Raz::ColorPreset::Green));
     CHECK(normalImg.recoverPixel<uint8_t, 3>(1, 1) == Raz::Vec3b(Raz::ColorPreset::Green));
-#endif
   }
 
   {
@@ -142,7 +136,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     REQUIRE(metallicMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(metallicMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image metallicImg = metallicMap.recoverImage();
     REQUIRE_FALSE(metallicImg.isEmpty());
 
@@ -163,7 +156,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     CHECK(metallicImg.recoverPixel<uint8_t>(1, 0) == 0);
     CHECK(metallicImg.recoverPixel<uint8_t>(0, 1) == 255);
     CHECK(metallicImg.recoverPixel<uint8_t>(1, 1) == 0);
-#endif
   }
 
   {
@@ -176,7 +168,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     REQUIRE(roughnessMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(roughnessMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image roughnessImg = roughnessMap.recoverImage();
     REQUIRE_FALSE(roughnessImg.isEmpty());
 
@@ -197,7 +188,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     CHECK(roughnessImg.recoverPixel<uint8_t>(1, 0) == 255);
     CHECK(roughnessImg.recoverPixel<uint8_t>(0, 1) == 0);
     CHECK(roughnessImg.recoverPixel<uint8_t>(1, 1) == 0);
-#endif
   }
 
   {
@@ -210,7 +200,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     REQUIRE(ambientOcclusionMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(ambientOcclusionMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image ambientOcclusionImg = ambientOcclusionMap.recoverImage();
     REQUIRE_FALSE(ambientOcclusionImg.isEmpty());
 
@@ -231,7 +220,6 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     CHECK(ambientOcclusionImg.recoverPixel<uint8_t>(1, 0) == 0);
     CHECK(ambientOcclusionImg.recoverPixel<uint8_t>(0, 1) == 0);
     CHECK(ambientOcclusionImg.recoverPixel<uint8_t>(1, 1) == 255);
-#endif
   }
 }
 
@@ -300,7 +288,6 @@ TEST_CASE("GltfFormat load GLB textured", "[data]") {
     REQUIRE(baseColorMap.getColorspace() == Raz::TextureColorspace::RGB);
     REQUIRE(baseColorMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image baseColorImg = baseColorMap.recoverImage();
     REQUIRE_FALSE(baseColorImg.isEmpty());
 
@@ -310,6 +297,5 @@ TEST_CASE("GltfFormat load GLB textured", "[data]") {
     CHECK(baseColorImg.recoverPixel<uint8_t, 3>(167, 71) == Raz::Vec3b(255));
     CHECK(baseColorImg.recoverPixel<uint8_t, 3>(192, 192) == Raz::Vec3b(92, 135, 39));
     CHECK(baseColorImg.recoverPixel<uint8_t, 3>(255, 255) == Raz::Vec3b(220));
-#endif
   }
 }

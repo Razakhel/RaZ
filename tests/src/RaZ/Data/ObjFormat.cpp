@@ -143,7 +143,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(diffuseMap.getColorspace() == Raz::TextureColorspace::RGBA);
     REQUIRE(diffuseMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image diffuseImg = diffuseMap.recoverImage();
     REQUIRE_FALSE(diffuseImg.isEmpty());
 
@@ -174,7 +173,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(diffuseImg.recoverByteValue(1, 1, 1) == 255);
     CHECK(diffuseImg.recoverByteValue(1, 1, 2) == 0);
     CHECK(diffuseImg.recoverByteValue(1, 1, 3) == 127);
-#endif
   }
 
   // Emissive map
@@ -186,7 +184,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(emissiveMap.getColorspace() == Raz::TextureColorspace::RGB);
     REQUIRE(emissiveMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image emissiveImg = emissiveMap.recoverImage();
     REQUIRE_FALSE(emissiveImg.isEmpty());
 
@@ -211,7 +208,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(emissiveImg.recoverByteValue(1, 1, 0) == 255);
     CHECK(emissiveImg.recoverByteValue(1, 1, 1) == 0);
     CHECK(emissiveImg.recoverByteValue(1, 1, 2) == 0);
-#endif
   }
 
   // Ambient map
@@ -223,7 +219,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(ambientMap.getColorspace() == Raz::TextureColorspace::RGB);
     REQUIRE(ambientMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image ambientImg = ambientMap.recoverImage();
     REQUIRE_FALSE(ambientImg.isEmpty());
 
@@ -248,7 +243,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(ambientImg.recoverByteValue(1, 1, 0) == 0);
     CHECK(ambientImg.recoverByteValue(1, 1, 1) == 0);
     CHECK(ambientImg.recoverByteValue(1, 1, 2) == 255);
-#endif
   }
 
   // Specular map
@@ -260,7 +254,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(specularMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(specularMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image specularImg = specularMap.recoverImage();
     REQUIRE_FALSE(specularImg.isEmpty());
 
@@ -274,7 +267,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(specularImg.recoverByteValue(1, 0, 0) == 255);
     CHECK(specularImg.recoverByteValue(0, 1, 0) == 255);
     CHECK(specularImg.recoverByteValue(1, 1, 0) == 0);
-#endif
   }
 
   // Transparency map
@@ -286,7 +278,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(transparencyMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(transparencyMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image transparencyImg = transparencyMap.recoverImage();
     REQUIRE_FALSE(transparencyImg.isEmpty());
 
@@ -300,7 +291,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(transparencyImg.recoverByteValue(1, 0, 0) == 255);
     CHECK(transparencyImg.recoverByteValue(0, 1, 0) == 255);
     CHECK(transparencyImg.recoverByteValue(1, 1, 0) == 255);
-#endif
   }
 
   // Bump map
@@ -312,7 +302,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(bumpMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(bumpMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image bumpImg = bumpMap.recoverImage();
     REQUIRE_FALSE(bumpImg.isEmpty());
 
@@ -326,7 +315,6 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(bumpImg.recoverByteValue(1, 0, 0) == 0);
     CHECK(bumpImg.recoverByteValue(0, 1, 0) == 0);
     CHECK(bumpImg.recoverByteValue(1, 1, 0) == 0);
-#endif
   }
 }
 
@@ -392,7 +380,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(albedoMap.getColorspace() == Raz::TextureColorspace::RGBA);
     REQUIRE(albedoMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image albedoImg = albedoMap.recoverImage();
     REQUIRE_FALSE(albedoImg.isEmpty());
 
@@ -423,7 +410,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(albedoImg.recoverByteValue(1, 1, 1) == 255);
     CHECK(albedoImg.recoverByteValue(1, 1, 2) == 0);
     CHECK(albedoImg.recoverByteValue(1, 1, 3) == 127);
-#endif
   }
 
   // Emissive map
@@ -435,7 +421,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(emissiveMap.getColorspace() == Raz::TextureColorspace::RGB);
     REQUIRE(emissiveMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image emissiveImg = emissiveMap.recoverImage();
     REQUIRE_FALSE(emissiveImg.isEmpty());
 
@@ -460,7 +445,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(emissiveImg.recoverByteValue(1, 1, 0) == 255);
     CHECK(emissiveImg.recoverByteValue(1, 1, 1) == 0);
     CHECK(emissiveImg.recoverByteValue(1, 1, 2) == 0);
-#endif
   }
 
   // Normal map
@@ -472,7 +456,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(normalMap.getColorspace() == Raz::TextureColorspace::RGB);
     REQUIRE(normalMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image normalImg = normalMap.recoverImage();
     REQUIRE_FALSE(normalImg.isEmpty());
 
@@ -497,7 +480,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(normalImg.recoverByteValue(1, 1, 0) == 0);
     CHECK(normalImg.recoverByteValue(1, 1, 1) == 0);
     CHECK(normalImg.recoverByteValue(1, 1, 2) == 255);
-#endif
   }
 
   // Metallic map
@@ -509,7 +491,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(metallicMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(metallicMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image metallicImg = metallicMap.recoverImage();
     REQUIRE_FALSE(metallicImg.isEmpty());
 
@@ -523,7 +504,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(metallicImg.recoverByteValue(1, 0, 0) == 255);
     CHECK(metallicImg.recoverByteValue(0, 1, 0) == 255);
     CHECK(metallicImg.recoverByteValue(1, 1, 0) == 255);
-#endif
   }
 
   // Roughness map
@@ -535,7 +515,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(roughnessMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(roughnessMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image roughnessImg = roughnessMap.recoverImage();
     REQUIRE_FALSE(roughnessImg.isEmpty());
 
@@ -549,7 +528,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(roughnessImg.recoverByteValue(1, 0, 0) == 0);
     CHECK(roughnessImg.recoverByteValue(0, 1, 0) == 0);
     CHECK(roughnessImg.recoverByteValue(1, 1, 0) == 0);
-#endif
   }
 
   // Ambient occlusion map
@@ -561,7 +539,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(ambientOcclusionMap.getColorspace() == Raz::TextureColorspace::GRAY);
     REQUIRE(ambientOcclusionMap.getDataType() == Raz::TextureDataType::BYTE);
 
-#if !defined(USE_OPENGL_ES)
     const Raz::Image ambientOcclusionImg = ambientOcclusionMap.recoverImage();
     REQUIRE_FALSE(ambientOcclusionImg.isEmpty());
 
@@ -575,7 +552,6 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(ambientOcclusionImg.recoverByteValue(1, 0, 0) == 255);
     CHECK(ambientOcclusionImg.recoverByteValue(0, 1, 0) == 255);
     CHECK(ambientOcclusionImg.recoverByteValue(1, 1, 0) == 0);
-#endif
   }
 }
 
