@@ -113,7 +113,29 @@ enum class StateParameter : unsigned int {
   POINT_SIZE                 = static_cast<unsigned int>(Capability::POINT_SIZE) /* GL_POINT_SIZE                 */, ///< Point size.
 #endif
   COMPRESSED_TEXTURE_FORMATS = 34467                                             /* GL_COMPRESSED_TEXTURE_FORMATS */, ///<
-  ARRAY_BUFFER_BINDING       = 34964                                             /* GL_ARRAY_BUFFER_BINDING       */  ///<
+  ARRAY_BUFFER_BINDING       = 34964                                             /* GL_ARRAY_BUFFER_BINDING       */, ///<
+
+#if !defined(USE_OPENGL_ES)
+  UNPACK_SWAP_BYTES   = 3312  /* GL_UNPACK_SWAP_BYTES  */, ///<
+  UNPACK_LSB_FIRST    = 3313  /* GL_UNPACK_LSB_FIRST   */, ///<
+#endif
+  UNPACK_ROW_LENGTH   = 3314  /* GL_UNPACK_ROW_LENGTH  */, ///<
+  UNPACK_SKIP_ROWS    = 3315  /* GL_UNPACK_SKIP_ROWS   */, ///<
+  UNPACK_SKIP_PIXELS  = 3316  /* GL_UNPACK_SKIP_PIXELS */, ///<
+  UNPACK_SKIP_IMAGES  = 32877 /* GL_PACK_SKIP_IMAGES   */, ///<
+  UNPACK_IMAGE_HEIGHT = 32878 /* GL_PACK_IMAGE_HEIGHT  */, ///<
+  UNPACK_ALIGNMENT    = 3317  /* GL_UNPACK_ALIGNMENT   */, ///<
+
+#if !defined(USE_OPENGL_ES)
+  PACK_SWAP_BYTES     = 3328  /* GL_PACK_SWAP_BYTES   */, ///<
+  PACK_LSB_FIRST      = 3329  /* GL_PACK_LSB_FIRST    */, ///<
+#endif
+  PACK_ROW_LENGTH     = 3330  /* GL_PACK_ROW_LENGTH   */, ///<
+  PACK_SKIP_ROWS      = 3331  /* GL_PACK_SKIP_ROWS    */, ///<
+  PACK_SKIP_PIXELS    = 3332  /* GL_PACK_SKIP_PIXELS  */, ///<
+  PACK_SKIP_IMAGES    = 32875 /* GL_PACK_SKIP_IMAGES  */, ///<
+  PACK_IMAGE_HEIGHT   = 32876 /* GL_PACK_IMAGE_HEIGHT */, ///<
+  PACK_ALIGNMENT      = 3333  /* GL_PACK_ALIGNMENT    */, ///<
 };
 
 enum class MaskType : unsigned int {
@@ -197,23 +219,27 @@ enum class PatchParameter : unsigned int {
 };
 
 enum class PixelStorage : unsigned int {
-  UNPACK_SWAP_BYTES   = 3312  /* GL_UNPACK_SWAP_BYTES  */, ///<
-  UNPACK_LSB_FIRST    = 3313  /* GL_UNPACK_LSB_FIRST   */, ///<
-  UNPACK_ROW_LENGTH   = 3314  /* GL_UNPACK_ROW_LENGTH  */, ///<
-  UNPACK_SKIP_ROWS    = 3315  /* GL_UNPACK_SKIP_ROWS   */, ///<
-  UNPACK_SKIP_PIXELS  = 3316  /* GL_UNPACK_SKIP_PIXELS */, ///<
-  UNPACK_SKIP_IMAGES  = 32877 /* GL_PACK_SKIP_IMAGES   */, ///<
-  UNPACK_IMAGE_HEIGHT = 32878 /* GL_PACK_IMAGE_HEIGHT  */, ///<
-  UNPACK_ALIGNMENT    = 3317  /* GL_UNPACK_ALIGNMENT   */, ///<
+#if !defined(USE_OPENGL_ES)
+  UNPACK_SWAP_BYTES   = static_cast<unsigned int>(StateParameter::UNPACK_SWAP_BYTES),   ///<
+  UNPACK_LSB_FIRST    = static_cast<unsigned int>(StateParameter::UNPACK_LSB_FIRST),    ///<
+#endif
+  UNPACK_ROW_LENGTH   = static_cast<unsigned int>(StateParameter::UNPACK_ROW_LENGTH),   ///<
+  UNPACK_SKIP_ROWS    = static_cast<unsigned int>(StateParameter::UNPACK_SKIP_ROWS),    ///<
+  UNPACK_SKIP_PIXELS  = static_cast<unsigned int>(StateParameter::UNPACK_SKIP_PIXELS),  ///<
+  UNPACK_SKIP_IMAGES  = static_cast<unsigned int>(StateParameter::UNPACK_SKIP_IMAGES),  ///<
+  UNPACK_IMAGE_HEIGHT = static_cast<unsigned int>(StateParameter::UNPACK_IMAGE_HEIGHT), ///<
+  UNPACK_ALIGNMENT    = static_cast<unsigned int>(StateParameter::UNPACK_ALIGNMENT),    ///<
 
-  PACK_SWAP_BYTES     = 3328  /* GL_PACK_SWAP_BYTES   */, ///<
-  PACK_LSB_FIRST      = 3329  /* GL_PACK_LSB_FIRST    */, ///<
-  PACK_ROW_LENGTH     = 3330  /* GL_PACK_ROW_LENGTH   */, ///<
-  PACK_SKIP_ROWS      = 3331  /* GL_PACK_SKIP_ROWS    */, ///<
-  PACK_SKIP_PIXELS    = 3332  /* GL_PACK_SKIP_PIXELS  */, ///<
-  PACK_SKIP_IMAGES    = 32875 /* GL_PACK_SKIP_IMAGES  */, ///<
-  PACK_IMAGE_HEIGHT   = 32876 /* GL_PACK_IMAGE_HEIGHT */, ///<
-  PACK_ALIGNMENT      = 3333  /* GL_PACK_ALIGNMENT    */  ///<
+#if !defined(USE_OPENGL_ES)
+  PACK_SWAP_BYTES     = static_cast<unsigned int>(StateParameter::PACK_SWAP_BYTES),   ///<
+  PACK_LSB_FIRST      = static_cast<unsigned int>(StateParameter::PACK_LSB_FIRST),    ///<
+#endif
+  PACK_ROW_LENGTH     = static_cast<unsigned int>(StateParameter::PACK_ROW_LENGTH),   ///<
+  PACK_SKIP_ROWS      = static_cast<unsigned int>(StateParameter::PACK_SKIP_ROWS),    ///<
+  PACK_SKIP_PIXELS    = static_cast<unsigned int>(StateParameter::PACK_SKIP_PIXELS),  ///<
+  PACK_SKIP_IMAGES    = static_cast<unsigned int>(StateParameter::PACK_SKIP_IMAGES),  ///<
+  PACK_IMAGE_HEIGHT   = static_cast<unsigned int>(StateParameter::PACK_IMAGE_HEIGHT), ///<
+  PACK_ALIGNMENT      = static_cast<unsigned int>(StateParameter::PACK_ALIGNMENT)     ///<
 };
 
 enum class AttribDataType : unsigned int {
@@ -1422,4 +1448,4 @@ private:
 
 } // namespace Raz
 
-#endif //RAZ_RENDERER_HPP
+#endif // RAZ_RENDERER_HPP
