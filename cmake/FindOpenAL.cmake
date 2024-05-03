@@ -77,6 +77,7 @@ elseif (APPLE)
         "~/Library/Frameworks/openal*"
         "/Library/Frameworks/openal*"
         "/opt/openal*"
+        "/opt/homebrew/opt/openal*"
         "/usr/local/opt/openal*"
     )
 else () # Linux
