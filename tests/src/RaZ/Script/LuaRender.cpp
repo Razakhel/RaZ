@@ -591,8 +591,8 @@ TEST_CASE("LuaRender RenderSystem", "[script][lua][render]") {
     renderSystem:updateLights()
     renderSystem:updateShaders()
     renderSystem:updateMaterials()
-    renderSystem:saveToImage(FilePath.new("téstÊxpørt.png"))
-    renderSystem:saveToImage(FilePath.new("téstÊxpørt.png"), TextureFormat.DEPTH)
+    renderSystem:saveToImage(FilePath.new("téstÊxpørt.jpg"))
+    renderSystem:saveToImage(FilePath.new("téstÊxpørt.hdr"), TextureFormat.DEPTH)
     renderSystem:saveToImage(FilePath.new("téstÊxpørt.png"), TextureFormat.RGBA, PixelDataType.UBYTE)
 
     assert(renderSystem:getAcceptedComponents() ~= nil)

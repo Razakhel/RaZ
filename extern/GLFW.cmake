@@ -137,7 +137,6 @@ target_include_directories(
 
     PUBLIC
         glfw/include
-        glfw/deps
 )
 
 target_compile_definitions(GLFW PUBLIC ${GLFW_DEFINITIONS})

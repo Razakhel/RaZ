@@ -1,6 +1,5 @@
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
-#include "RaZ/Data/PngFormat.hpp"
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
@@ -10,11 +9,24 @@
 #define STBI_WINDOWS_UTF8
 #include "stb_image.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#define STBIW_WINDOWS_UTF8
+#include "stb_image_write.h"
+
 #include "tracy/Tracy.hpp"
 
 namespace Raz::ImageFormat {
 
 namespace {
+
+enum class FileFormat {
+  UNKNOWN,
+  BMP,
+  PNG,
+  JPG,
+  TGA,
+  HDR
+};
 
 struct ImageDataDeleter {
   void operator()(void* data) noexcept { stbi_image_free(data); }
@@ -29,6 +41,21 @@ ImageColorspace recoverColorspace(int channelCount) {
     default:
       throw std::invalid_argument("Error: Unsupported number of channels.");
   }
+}
+
+FileFormat recoverFileFormat(const std::string& fileExt) {
+  if (fileExt == "bmp")
+    return FileFormat::BMP;
+  if (fileExt == "hdr")
+    return FileFormat::HDR;
+  if (fileExt == "jpg" || fileExt == "jpeg")
+    return FileFormat::JPG;
+  if (fileExt == "png")
+    return FileFormat::PNG;
+  if (fileExt == "tga")
+    return FileFormat::TGA;
+
+  return FileFormat::UNKNOWN;
 }
 
 Image createImageFromData(int width, int height, int channelCount, bool isHdr, const std::unique_ptr<void, ImageDataDeleter>& data) {
@@ -114,12 +141,66 @@ void save(const FilePath& filePath, const Image& image, bool flipVertically) {
 
   Logger::debug("[ImageFormat] Saving image to '" + filePath + "'...");
 
+  const std::string fileStr = filePath.toUtf8();
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
-  if (fileExt == "png")
-    PngFormat::save(filePath, image, flipVertically);
-  else
-    throw std::invalid_argument("[ImageFormat] Unsupported image file extension '" + fileExt + "' for saving.");
+  stbi_flip_vertically_on_write(flipVertically);
+
+  const auto imgWidth        = static_cast<int>(image.getWidth());
+  const auto imgHeight       = static_cast<int>(image.getHeight());
+  const auto imgChannelCount = static_cast<int>(image.getChannelCount());
+
+  const FileFormat format = recoverFileFormat(fileExt);
+
+  switch (format) {
+    case FileFormat::BMP:
+    case FileFormat::JPG:
+    case FileFormat::PNG:
+    case FileFormat::TGA:
+      if (image.getDataType() != ImageDataType::BYTE)
+        throw std::invalid_argument("[ImageFormat] Saving a non-HDR image requires a byte data type.");
+      break;
+
+    case FileFormat::HDR:
+      if (image.getDataType() != ImageDataType::FLOAT)
+        throw std::invalid_argument("[ImageFormat] Saving an HDR image requires a floating-point data type.");
+      break;
+
+    case FileFormat::UNKNOWN:
+    default:
+      break;
+  }
+
+  int result {};
+
+  switch (format) {
+    case FileFormat::BMP:
+      result = stbi_write_bmp(fileStr.c_str(), imgWidth, imgHeight, imgChannelCount, image.getDataPtr());
+      break;
+
+    case FileFormat::HDR:
+      result = stbi_write_hdr(fileStr.c_str(), imgWidth, imgHeight, imgChannelCount, static_cast<const float*>(image.getDataPtr()));
+      break;
+
+    case FileFormat::JPG:
+      result = stbi_write_jpg(fileStr.c_str(), imgWidth, imgHeight, imgChannelCount, image.getDataPtr(), 90);
+      break;
+
+    case FileFormat::PNG:
+      result = stbi_write_png(fileStr.c_str(), imgWidth, imgHeight, imgChannelCount, image.getDataPtr(), imgWidth * imgChannelCount);
+      break;
+
+    case FileFormat::TGA:
+      result = stbi_write_tga(fileStr.c_str(), imgWidth, imgHeight, imgChannelCount, image.getDataPtr());
+      break;
+
+    case FileFormat::UNKNOWN:
+    default:
+      throw std::invalid_argument("[ImageFormat] Unsupported image file extension '" + fileExt + "' for saving.");
+  }
+
+  if (result == 0)
+    throw std::invalid_argument("[ImageFormat] Failed to save image.");
 
   Logger::debug("[ImageFormat] Saved image");
 }
