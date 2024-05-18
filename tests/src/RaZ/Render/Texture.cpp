@@ -167,6 +167,9 @@ TEST_CASE("Texture move", "[render]") {
 }
 
 TEST_CASE("Texture2D load image") {
+  // Resetting the unpack alignment to the default value, in order to check that loading an image handles it properly
+  Raz::Renderer::setPixelStorage(Raz::PixelStorage::UNPACK_ALIGNMENT, 4);
+
   Raz::Image img(2, 2, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE);
   img.setPixel(0, 0, static_cast<uint8_t>(0));
   img.setPixel(1, 0, static_cast<uint8_t>(1));
@@ -190,6 +193,8 @@ TEST_CASE("Texture2D load image") {
   CHECK(textureImg.recoverPixel<uint8_t>(1, 0) == 1);
   CHECK(textureImg.recoverPixel<uint8_t>(0, 1) == 2);
   CHECK(textureImg.recoverPixel<uint8_t>(1, 1) == 3);
+
+  Raz::Renderer::setPixelStorage(Raz::PixelStorage::UNPACK_ALIGNMENT, 1);
 }
 
 TEST_CASE("Texture3D load image slices") {

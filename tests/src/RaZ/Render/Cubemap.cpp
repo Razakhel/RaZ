@@ -52,7 +52,7 @@ TEST_CASE("Cubemap textures", "[render]") {
   CHECK_FALSE(Raz::Renderer::hasErrors());
 
 #if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() functions are unavailable with OpenGL ES
-  std::vector<uint8_t> textureData {};
+  std::vector<uint8_t> textureData;
 
   cubemap.bind();
 

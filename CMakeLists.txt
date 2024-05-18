@@ -349,6 +349,8 @@ if (RAZ_COMPILER_MSVC OR (RAZ_COMPILER_GCC AND NOT MINGW)) # FBX SDK unavailable
         endif ()
 
         message(STATUS "[RaZ] FBX support ENABLED")
+    else ()
+        message(STATUS "[RaZ] FBX support DISABLED")
     endif ()
 endif ()
 
@@ -361,8 +363,6 @@ if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
         "${PROJECT_SOURCE_DIR}/src/RaZ/Data/FbxLoad.cpp"
         "${PROJECT_SOURCE_DIR}/include/RaZ/Data/FbxFormat.hpp"
     )
-
-    message(STATUS "[RaZ] FBX support DISABLED")
 endif ()
 
 #########################

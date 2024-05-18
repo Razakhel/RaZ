@@ -316,6 +316,13 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
   }
 #endif
 
+  int unpackAlignment = 4;
+
+  if (image.getChannelCount() == 1) {
+    Renderer::getParameter(StateParameter::UNPACK_ALIGNMENT, &unpackAlignment);
+    Renderer::setPixelStorage(PixelStorage::UNPACK_ALIGNMENT, 1);
+  }
+
   bind();
 
   Renderer::sendImageData2D(TextureType::TEXTURE_2D,
@@ -326,6 +333,9 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
                             recoverFormat(m_colorspace),
                             (m_dataType == TextureDataType::BYTE ? PixelDataType::UBYTE : PixelDataType::FLOAT),
                             image.getDataPtr());
+
+  if (image.getChannelCount() == 1)
+    Renderer::setPixelStorage(PixelStorage::UNPACK_ALIGNMENT, unpackAlignment);
 
   setLoadedParameters(createMipmaps);
 }
