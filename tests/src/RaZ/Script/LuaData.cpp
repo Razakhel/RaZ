@@ -109,7 +109,7 @@ TEST_CASE("LuaData Image", "[script][lua][data]") {
 
     local pngPath = FilePath.new(RAZ_TESTS_ROOT .. "assets/images/dëfàùltTêst.png")
     local tgaPath = FilePath.new(RAZ_TESTS_ROOT .. "assets/images/dëfàùltTêst.tga")
-    assert(ImageFormat.load(pngPath) == PngFormat.load(pngPath))
+    assert(ImageFormat.loadFromData(FileUtils.readFileToArray(pngPath)) ~= ImageFormat.load(pngPath, true))
     assert(ImageFormat.loadFromData(FileUtils.readFileToArray(tgaPath), true) == TgaFormat.load(tgaPath, true))
   )"));
 }

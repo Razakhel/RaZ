@@ -11,7 +11,6 @@
 #include "RaZ/Data/MeshFormat.hpp"
 #include "RaZ/Data/ObjFormat.hpp"
 #include "RaZ/Data/OffFormat.hpp"
-#include "RaZ/Data/PngFormat.hpp"
 #include "RaZ/Data/TgaFormat.hpp"
 #if defined(RAZ_USE_AUDIO)
 #include "RaZ/Data/WavFormat.hpp"
@@ -77,14 +76,6 @@ void LuaWrapper::registerFileFormatTypes() {
   {
     sol::table offFormat = state["OffFormat"].get_or_create<sol::table>();
     offFormat["load"]    = &OffFormat::load;
-  }
-
-  {
-    sol::table pngFormat = state["PngFormat"].get_or_create<sol::table>();
-    pngFormat["load"]    = sol::overload([] (const FilePath& p) { return PngFormat::load(p); },
-                                         PickOverload<const FilePath&, bool>(&PngFormat::load));
-    pngFormat["save"]    = sol::overload([] (const FilePath& p, const Image& i) { PngFormat::save(p, i); },
-                                         PickOverload<const FilePath&, const Image&, bool>(&PngFormat::save));
   }
 
   {

@@ -5,11 +5,6 @@
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if (NOT RAZ_USE_EMSCRIPTEN)
-    option(RAZ_USE_LIBPNG "Use libpng" ON)
-    if (RAZ_USE_LIBPNG)
-        include(libpng)
-    endif ()
-
     option(RAZ_USE_GLEW "Use GLEW" ON)
     if (RAZ_USE_GLEW)
         include(GLEW)

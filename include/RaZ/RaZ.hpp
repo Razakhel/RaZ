@@ -30,7 +30,6 @@
 #include "Data/MeshFormat.hpp"
 #include "Data/ObjFormat.hpp"
 #include "Data/OffFormat.hpp"
-#include "Data/PngFormat.hpp"
 #include "Data/Submesh.hpp"
 #include "Data/TgaFormat.hpp"
 #include "Data/WavFormat.hpp"

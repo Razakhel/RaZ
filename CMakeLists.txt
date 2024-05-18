@@ -201,16 +201,7 @@ if (RAZ_PLATFORM_LINUX)
 endif ()
 
 if (RAZ_USE_EMSCRIPTEN)
-    target_compile_options(RaZ PRIVATE "SHELL:-s USE_LIBPNG=1")
-
-    target_link_options(
-        RaZ
-
-        PUBLIC
-            "SHELL:-s USE_GLFW=3"
-            "SHELL:-s USE_LIBPNG=1"
-    )
-
+    target_link_options(RaZ PUBLIC "SHELL:-s USE_GLFW=3")
     set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} glfw)
 endif ()
 
@@ -352,6 +343,12 @@ if (RAZ_COMPILER_MSVC OR (RAZ_COMPILER_GCC AND NOT MINGW)) # FBX SDK unavailable
         target_include_directories(RaZ SYSTEM PRIVATE ${FBX_INCLUDE_DIR})
         target_link_libraries(RaZ PRIVATE ${FBX_LIBRARY})
         target_compile_definitions(RaZ PUBLIC RAZ_USE_FBX ${FBX_DEFINITIONS})
+
+        if (UNIX)
+            target_link_libraries(RaZ PRIVATE z) # Linking zlib
+        endif ()
+
+        message(STATUS "[RaZ] FBX support ENABLED")
     endif ()
 endif ()
 
@@ -364,6 +361,8 @@ if (NOT RAZ_USE_FBX OR NOT FBX_FOUND)
         "${PROJECT_SOURCE_DIR}/src/RaZ/Data/FbxLoad.cpp"
         "${PROJECT_SOURCE_DIR}/include/RaZ/Data/FbxFormat.hpp"
     )
+
+    message(STATUS "[RaZ] FBX support DISABLED")
 endif ()
 
 #########################
@@ -439,10 +438,6 @@ else ()
     target_compile_definitions(RaZ PUBLIC RAZ_NO_OVERLAY)
 
     message(STATUS "[RaZ] Overlay DISABLED")
-endif ()
-
-if (RAZ_USE_LIBPNG)
-    target_link_libraries(RaZ PRIVATE libpng)
 endif ()
 
 if (RAZ_USE_LUA)
