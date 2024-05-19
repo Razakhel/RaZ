@@ -58,7 +58,7 @@ void MeshDistanceField::compute(std::size_t sampleCount) {
         }
       }
     }
-  });
+  }, Threading::getSystemThreadCount() * 2);
 }
 
 std::vector<Image> MeshDistanceField::recoverSlices() const {
