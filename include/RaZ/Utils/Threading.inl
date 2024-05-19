@@ -17,11 +17,11 @@ std::future<ResultT> launchAsync(FuncT&& action, Args&&... args) {
 }
 
 template <typename BegIndexT, typename EndIndexT, typename FuncT, typename>
-void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int threadCount) {
+void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int taskCount) {
   static_assert(std::is_invocable_v<FuncT, IndexRange>, "Error: The given action must take an IndexRange as parameter");
 
-  if (threadCount == 0)
-    throw std::invalid_argument("[Threading] The number of threads cannot be 0.");
+  if (taskCount == 0)
+    throw std::invalid_argument("[Threading] The number of tasks cannot be 0.");
 
   if (static_cast<std::ptrdiff_t>(beginIndex) >= static_cast<std::ptrdiff_t>(endIndex))
     throw std::invalid_argument("[Threading] The given index range is invalid.");
@@ -29,45 +29,45 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
 
-  const auto totalRangeCount       = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
-  const std::size_t maxThreadCount = std::min(static_cast<std::size_t>(threadCount), totalRangeCount);
+  const auto totalRangeCount     = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
+  const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), totalRangeCount);
 
-  const std::size_t perThreadRangeCount = totalRangeCount / maxThreadCount;
-  std::size_t remainderElementCount     = totalRangeCount % maxThreadCount;
-  std::size_t threadBeginIndex          = 0;
+  const std::size_t perTaskRangeCount = totalRangeCount / maxTaskCount;
+  std::size_t remainderElementCount   = totalRangeCount % maxTaskCount;
+  std::size_t taskBeginIndex          = 0;
 
   std::vector<std::promise<void>> promises;
-  promises.resize(maxThreadCount);
+  promises.resize(maxTaskCount);
 
-  for (std::size_t threadIndex = 0; threadIndex < maxThreadCount; ++threadIndex) {
-    const std::size_t threadEndIndex = threadBeginIndex + perThreadRangeCount + (remainderElementCount > 0 ? 1 : 0);
+  for (std::size_t taskIndex = 0; taskIndex < maxTaskCount; ++taskIndex) {
+    const std::size_t taskEndIndex = taskBeginIndex + perTaskRangeCount + (remainderElementCount > 0 ? 1 : 0);
 
-    threadPool.addAction([&action, &promises, threadBeginIndex, threadEndIndex, threadIndex] () noexcept(std::is_nothrow_invocable_v<FuncT, IndexRange>) {
-      action(IndexRange{ threadBeginIndex, threadEndIndex });
-      promises[threadIndex].set_value();
+    threadPool.addTask([&action, &promises, taskBeginIndex, taskEndIndex, taskIndex] () noexcept(std::is_nothrow_invocable_v<FuncT, IndexRange>) {
+      action(IndexRange{ taskBeginIndex, taskEndIndex });
+      promises[taskIndex].set_value();
     });
 
-    threadBeginIndex = threadEndIndex;
+    taskBeginIndex = taskEndIndex;
 
     if (remainderElementCount > 0)
       --remainderElementCount;
   }
 
-  // Blocking here to wait for all threads to finish their action
+  // Blocking here waiting for all tasks to be finished
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
 #else
-  static_cast<void>(threadCount);
+  static_cast<void>(taskCount);
   action(IndexRange{ static_cast<std::size_t>(beginIndex), static_cast<std::size_t>(endIndex) });
 #endif
 }
 
 template <typename IterT, typename FuncT, typename>
-void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int threadCount) {
+void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskCount) {
   static_assert(std::is_invocable_v<FuncT, IterRange<IterT>>, "Error: The given action must take an IterRange as parameter");
 
-  if (threadCount == 0)
-    throw std::invalid_argument("[Threading] The number of threads cannot be 0.");
+  if (taskCount == 0)
+    throw std::invalid_argument("[Threading] The number of tasks cannot be 0.");
 
   const auto totalRangeCount = std::distance(begin, end);
 
@@ -77,34 +77,34 @@ void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int threa
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
 
-  const std::size_t maxThreadCount = std::min(static_cast<std::size_t>(threadCount), static_cast<std::size_t>(totalRangeCount));
+  const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), static_cast<std::size_t>(totalRangeCount));
 
-  const std::size_t perThreadRangeCount = static_cast<std::size_t>(totalRangeCount) / maxThreadCount;
-  std::size_t remainderElementCount     = static_cast<std::size_t>(totalRangeCount) % maxThreadCount;
-  IterT threadBeginIter                 = begin;
+  const std::size_t perTaskRangeCount = static_cast<std::size_t>(totalRangeCount) / maxTaskCount;
+  std::size_t remainderElementCount   = static_cast<std::size_t>(totalRangeCount) % maxTaskCount;
+  IterT taskBeginIter                 = begin;
 
   std::vector<std::promise<void>> promises;
-  promises.resize(maxThreadCount);
+  promises.resize(maxTaskCount);
 
-  for (std::size_t threadIndex = 0; threadIndex < maxThreadCount; ++threadIndex) {
-    const IterT threadEndIter = std::next(threadBeginIter, static_cast<std::ptrdiff_t>(perThreadRangeCount + (remainderElementCount > 0 ? 1 : 0)));
+  for (std::size_t taskIndex = 0; taskIndex < maxTaskCount; ++taskIndex) {
+    const IterT taskEndIter = std::next(taskBeginIter, static_cast<std::ptrdiff_t>(perTaskRangeCount + (remainderElementCount > 0 ? 1 : 0)));
 
-    threadPool.addAction([&action, &promises, threadBeginIter, threadEndIter, threadIndex] () noexcept(std::is_nothrow_invocable_v<FuncT, IterRange<IterT>>) {
-      action(IterRange<IterT>(threadBeginIter, threadEndIter));
-      promises[threadIndex].set_value();
+    threadPool.addTask([&action, &promises, taskBeginIter, taskEndIter, taskIndex] () noexcept(std::is_nothrow_invocable_v<FuncT, IterRange<IterT>>) {
+      action(IterRange<IterT>(taskBeginIter, taskEndIter));
+      promises[taskIndex].set_value();
     });
 
-    threadBeginIter = threadEndIter;
+    taskBeginIter = taskEndIter;
 
     if (remainderElementCount > 0)
       --remainderElementCount;
   }
 
-  // Blocking here to wait for all threads to finish their action
+  // Blocking here waiting for all tasks to be finished
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
 #else
-  static_cast<void>(threadCount);
+  static_cast<void>(taskCount);
   action(IterRange<IterT>(begin, end));
 #endif
 }

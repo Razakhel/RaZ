@@ -71,52 +71,52 @@ template <typename FuncT, typename... Args, typename ResultT = std::invoke_resul
 
 /// Calls a function in parallel.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
-/// \param action Action to be performed by each thread.
-/// \param threadCount Amount of threads to start an instance on.
-void parallelize(const std::function<void()>& action, unsigned int threadCount = getSystemThreadCount());
+/// \param action Action to be performed in parallel.
+/// \param taskCount Amount of tasks to start.
+void parallelize(const std::function<void()>& action, unsigned int taskCount = getSystemThreadCount());
 
-/// Calls the given functions in parallel, each on its own thread.
+/// Calls the given functions in parallel.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \param actions Actions to be performed in parallel.
 void parallelize(std::initializer_list<std::function<void()>> actions);
 
 /// Calls a function in parallel over an index range.
-/// The indices are automatically split, giving a separate start/past-the-end index range to each thread.
+/// The given index range is automatically split, providing a separate start/past-the-end index sub-range to each task.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam BegIndexT Type of the begin index.
 /// \tparam EndIndexT Type of the end index.
 /// \tparam FuncT Type of the action to be executed.
 /// \param beginIndex Starting index of the whole range. Must be lower than the end index.
 /// \param endIndex Past-the-last index of the whole range. Must be greater than the begin index.
-/// \param action Action to be performed by each thread, taking an index range as boundaries.
-/// \param threadCount Amount of threads to start an instance on.
+/// \param action Action to be performed in parallel, taking an index range as boundaries.
+/// \param taskCount Amount of tasks to start.
 template <typename BegIndexT, typename EndIndexT, typename FuncT, typename = std::enable_if_t<std::is_integral_v<BegIndexT> && std::is_integral_v<EndIndexT>>>
-void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int threadCount = getSystemThreadCount());
+void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int taskCount = getSystemThreadCount());
 
 /// Calls a function in parallel over an iterator range.
-/// The iterators are automatically split, giving a separate start/past-the-end iterator range to each thread.
+/// The given iterator range is automatically split, providing a separate start/past-the-end iterator sub-range to each task.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam IterT Type of the iterators.
 /// \tparam FuncT Type of the action to be executed.
 /// \param begin Begin iterator of the whole range. Must be lower than the end iterator.
 /// \param end End iterator of the whole range. Must be greater than the begin iterator.
-/// \param action Action to be performed by each thread, taking an iterator range as boundaries.
-/// \param threadCount Amount of threads to start an instance on.
+/// \param action Action to be performed in parallel, taking an iterator range as boundaries.
+/// \param taskCount Amount of tasks to start.
 template <typename IterT, typename FuncT, typename = typename std::iterator_traits<IterT>::iterator_category>
-void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int threadCount = getSystemThreadCount());
+void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskCount = getSystemThreadCount());
 
 /// Calls a function in parallel over a collection.
-/// The collection is automatically split, giving a separate start/past-the-end iterator range to each thread.
+/// The given collection is automatically split, providing a separate start/past-the-end iterator sub-range to each task.
 /// \note The container must either be a constant-size C array, or have public begin() & end() functions.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam ContainerT Type of the collection to iterate over.
 /// \tparam FuncT Type of the action to be executed.
-/// \param collection Collection to iterate over on multiple threads.
-/// \param action Action to be performed by each thread, taking an iterator range as boundaries.
-/// \param threadCount Amount of threads to start an instance on.
+/// \param collection Collection to iterate over in parallel.
+/// \param action Action to be performed in parallel, taking an iterator range as boundaries.
+/// \param taskCount Amount of tasks to start.
 template <typename ContainerT, typename FuncT, typename = decltype(std::begin(std::declval<ContainerT>()))>
-void parallelize(ContainerT&& collection, FuncT&& action, unsigned int threadCount = getSystemThreadCount()) {
-  parallelize(std::begin(collection), std::end(collection), std::forward<FuncT>(action), threadCount);
+void parallelize(ContainerT&& collection, FuncT&& action, unsigned int taskCount = getSystemThreadCount()) {
+  parallelize(std::begin(collection), std::end(collection), std::forward<FuncT>(action), taskCount);
 }
 
 } // namespace Threading

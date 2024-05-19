@@ -9,28 +9,28 @@ ThreadPool& getDefaultThreadPool() {
   return threadPool;
 }
 
-void parallelize(const std::function<void()>& action, unsigned int threadCount) {
-  if (threadCount == 0)
-    throw std::invalid_argument("[Threading] The number of threads cannot be 0.");
+void parallelize(const std::function<void()>& action, unsigned int taskCount) {
+  if (taskCount == 0)
+    throw std::invalid_argument("[Threading] The number of tasks cannot be 0.");
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   std::vector<std::promise<void>> promises;
-  promises.resize(threadCount);
+  promises.resize(taskCount);
 
-  for (unsigned int i = 0; i < threadCount; ++i) {
-    threadPool.addAction([&action, &promises, i] () {
+  for (unsigned int taskIndex = 0; taskIndex < taskCount; ++taskIndex) {
+    threadPool.addTask([&action, &promises, taskIndex] () {
       action();
-      promises[i].set_value();
+      promises[taskIndex].set_value();
     });
   }
 
-  // Blocking here to wait for all threads to finish their action
+  // Blocking here waiting for all tasks to be finished
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
 #else
-  for (unsigned int i = 0; i < threadCount; ++i)
+  for (unsigned int i = 0; i < taskCount; ++i)
     action();
 #endif
 }
@@ -42,15 +42,15 @@ void parallelize(std::initializer_list<std::function<void()>> actions) {
   std::vector<std::promise<void>> promises;
   promises.resize(actions.size());
 
-  for (unsigned int i = 0; i < actions.size(); ++i) {
-    threadPool.addAction([&actions, &promises, i] () {
-      const std::function<void()>& action = *(actions.begin() + i);
+  for (unsigned int taskIndex = 0; taskIndex < actions.size(); ++taskIndex) {
+    threadPool.addTask([&actions, &promises, taskIndex] () {
+      const std::function<void()>& action = *(actions.begin() + taskIndex);
       action();
-      promises[i].set_value();
+      promises[taskIndex].set_value();
     });
   }
 
-  // Blocking here to wait for all threads to finish their action
+  // Blocking here waiting for all tasks to be finished
   for (std::promise<void>& promise : promises)
     promise.get_future().wait();
 #else

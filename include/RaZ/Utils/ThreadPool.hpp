@@ -27,7 +27,7 @@ public:
   ThreadPool();
   explicit ThreadPool(unsigned int threadCount);
 
-  void addAction(std::function<void()> action);
+  void addTask(std::function<void()> task);
 
   ~ThreadPool();
 
@@ -35,9 +35,9 @@ private:
   std::vector<std::thread> m_threads {};
   bool m_shouldStop = false;
 
-  std::mutex m_actionsMutex {};
+  std::mutex m_tasksMutex {};
   std::condition_variable m_condVar {};
-  std::queue<std::function<void()>> m_actions {};
+  std::queue<std::function<void()>> m_tasks {};
 };
 
 } // namespace Raz

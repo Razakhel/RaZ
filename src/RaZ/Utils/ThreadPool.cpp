@@ -20,21 +20,21 @@ ThreadPool::ThreadPool(unsigned int threadCount) {
       const std::string threadName = "Thread pool - #" + std::to_string(threadIndex + 1);
       tracy::SetThreadName(threadName.c_str());
 
-      std::function<void()> action;
+      std::function<void()> task;
 
       while (true) {
         {
-          std::unique_lock<std::mutex> lock(m_actionsMutex);
-          m_condVar.wait(lock, [this] () { return (!m_actions.empty() || m_shouldStop); });
+          std::unique_lock<std::mutex> lock(m_tasksMutex);
+          m_condVar.wait(lock, [this] () { return (!m_tasks.empty() || m_shouldStop); });
 
           if (m_shouldStop)
             return;
 
-          action = std::move(m_actions.front());
-          m_actions.pop();
+          task = std::move(m_tasks.front());
+          m_tasks.pop();
         }
 
-        action();
+        task();
       }
     });
   }
@@ -42,10 +42,10 @@ ThreadPool::ThreadPool(unsigned int threadCount) {
   Logger::debug("[ThreadPool] Initialized");
 }
 
-void ThreadPool::addAction(std::function<void()> action) {
+void ThreadPool::addTask(std::function<void()> task) {
   {
-    std::lock_guard<std::mutex> lock(m_actionsMutex);
-    m_actions.push(std::move(action));
+    const std::lock_guard<std::mutex> lock(m_tasksMutex);
+    m_tasks.push(std::move(task));
   }
 
   m_condVar.notify_one();
@@ -57,7 +57,7 @@ ThreadPool::~ThreadPool() {
   Logger::debug("[ThreadPool] Destroying...");
 
   {
-    std::lock_guard<std::mutex> lock(m_actionsMutex);
+    const std::lock_guard<std::mutex> lock(m_tasksMutex);
     m_shouldStop = true;
   }
 
