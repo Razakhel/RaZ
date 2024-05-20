@@ -28,6 +28,16 @@ struct Vertex {
   constexpr bool operator!=(const Vertex& vert) const noexcept { return !(*this == vert); }
 };
 
+inline std::ostream& operator<<(std::ostream& stream, const Vertex& vert) {
+  stream << "{\n"
+         << "  " << vert.position << '\n'
+         << "  " << vert.texcoords << '\n'
+         << "  " << vert.normal << '\n'
+         << "  " << vert.tangent << '\n'
+         << '}';
+  return stream;
+}
+
 class Submesh {
 public:
   Submesh() noexcept = default;

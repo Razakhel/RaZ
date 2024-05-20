@@ -2,6 +2,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <sstream>
+
 TEST_CASE("Vertex basic", "[data]") {
   constexpr Raz::Vertex vertex1{ Raz::Vec3f(0.f), Raz::Vec2f(1.f), Raz::Axis::Z, Raz::Axis::X };
   CHECK(vertex1.position == Raz::Vec3f(0.f));
@@ -19,6 +21,26 @@ TEST_CASE("Vertex basic", "[data]") {
   CHECK_FALSE(vertex1 != vertex2); // Likewise for vertex inequality
   CHECK_FALSE(vertex1.strictlyEquals(vertex2));
   CHECK_FALSE(std::hash<Raz::Vertex>()(vertex1) == std::hash<Raz::Vertex>()(vertex2));
+}
+
+TEST_CASE("Vertex printing", "[data]") {
+  constexpr Raz::Vertex vertex{
+    Raz::Vec3f(1.f, 2.f, 3.f),
+    Raz::Vec2f(0.123456789f, 0.987654321f),
+    Raz::Vec3f(4.f, 5.f, 6.f),
+    Raz::Vec3f(7.f, 8.f, 9.f),
+  };
+
+  std::stringstream stream;
+
+  stream << vertex;
+  CHECK(stream.str() ==
+    "{\n"
+    "  [ 1, 2, 3 ]\n"
+    "  [ 0.123457, 0.987654 ]\n"
+    "  [ 4, 5, 6 ]\n"
+    "  [ 7, 8, 9 ]\n"
+    "}");
 }
 
 TEST_CASE("Submesh basic", "[data]") {
