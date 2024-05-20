@@ -13,13 +13,13 @@ struct Material {
   vec3 emissive;
   vec3 ambient;
   vec3 specular;
-  float transparency;
+  float opacity;
 
   sampler2D baseColorMap;
   sampler2D emissiveMap;
   sampler2D ambientMap;
   sampler2D specularMap;
-  sampler2D transparencyMap;
+  sampler2D opacityMap;
   sampler2D bumpMap;
 };
 

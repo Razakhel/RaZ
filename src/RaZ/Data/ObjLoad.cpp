@@ -101,17 +101,17 @@ inline void loadMtl(const FilePath& mtlFilePath,
           material.getProgram().setTexture(map, MaterialTexture::Roughness);
 
         materialType = MaterialType::COOK_TORRANCE;
-      } else if (tag[4] == 'd') {        // Transparency map [map_d]
+      } else if (tag[4] == 'd') {        // Opacity (dissolve) map [map_d]
         map->setFilter(TextureFilter::NEAREST, TextureFilter::NEAREST, TextureFilter::NEAREST);
-        material.getProgram().setTexture(map, MaterialTexture::Transparency);
+        material.getProgram().setTexture(map, MaterialTexture::Opacity);
       } else if (tag[4] == 'b') {        // Bump map [map_bump]
         material.getProgram().setTexture(map, MaterialTexture::Bump);
       }
-    } else if (tag[0] == 'd') {          // Transparency factor [d]
-      material.getProgram().setAttribute(std::stof(nextValue), MaterialAttribute::Transparency);
+    } else if (tag[0] == 'd') {          // Opacity (dissolve) factor [d]
+      material.getProgram().setAttribute(std::stof(nextValue), MaterialAttribute::Opacity);
     } else if (tag[0] == 'T') {
       if (tag[1] == 'r')                 // Transparency factor (alias, 1 - d) [Tr]
-        material.getProgram().setAttribute(1.f - std::stof(nextValue), MaterialAttribute::Transparency);
+        material.getProgram().setAttribute(1.f - std::stof(nextValue), MaterialAttribute::Opacity);
     } else if (tag[0] == 'b') {         // Bump map (alias) [bump]
       const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
 

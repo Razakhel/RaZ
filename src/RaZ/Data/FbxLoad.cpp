@@ -66,7 +66,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
 
     const fbxsdk::FbxPropertyT<fbxsdk::FbxDouble>& transparency = fbxMaterial->FindProperty(fbxsdk::FbxSurfaceMaterial::sTransparencyFactor);
     if (transparency.IsValid())
-      material.getProgram().setAttribute(static_cast<float>(transparency.Get()), MaterialAttribute::Transparency);
+      material.getProgram().setAttribute(1.f - static_cast<float>(transparency.Get()), MaterialAttribute::Opacity);
 
     // Recovering textures
 

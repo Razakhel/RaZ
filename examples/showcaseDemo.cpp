@@ -136,7 +136,9 @@ int main() {
 
     std::vector<std::string> scenes = { "Sponza", "Ball", "Shield", "Cerberus" };
 #if defined(RAZ_USE_FBX)
-    scenes.emplace_back("Shader ball");
+    // TODO: the shader ball has a transparency of 1 (opacity of 0), meaning that it is totally invisible
+    //  Maybe there is a way to recover something like the blending mode, but it is left disabled for now
+    //scenes.emplace_back("Shader ball");
 #endif
 
     overlay.addDropdown("Scene", std::move(scenes), [&mesh, &render] (const std::string&, std::size_t index) {
@@ -146,7 +148,7 @@ int main() {
         case 2: loadShieldScene(mesh, render); break;
         case 3: loadCerberusScene(mesh, render); break;
 #if defined(RAZ_USE_FBX)
-        case 4: loadShaderBallScene(mesh, render); break;
+        //case 4: loadShaderBallScene(mesh, render); break;
 #endif
         default: break;
       }
@@ -177,7 +179,7 @@ int main() {
     window.addKeyCallback(Raz::Keyboard::S, [&mesh, &render] (float /* deltaTime */) { loadShieldScene(mesh, render); }, Raz::Input::ONCE);
     window.addKeyCallback(Raz::Keyboard::C, [&mesh, &render] (float /* deltaTime */) { loadCerberusScene(mesh, render); }, Raz::Input::ONCE);
 #if defined(RAZ_USE_FBX)
-    window.addKeyCallback(Raz::Keyboard::D, [&mesh, &render] (float /* deltaTime */) { loadShaderBallScene(mesh, render); });
+    //window.addKeyCallback(Raz::Keyboard::D, [&mesh, &render] (float /* deltaTime */) { loadShaderBallScene(mesh, render); });
 #endif
 
     window.addKeyCallback(Raz::Keyboard::R, [&render] (float /* deltaTime */) noexcept { render.removeCubemap(); }, Raz::Input::ONCE);
@@ -202,7 +204,7 @@ int main() {
     std::cout << "\tS: Load Shield scene\n";
     std::cout << "\tC: Load Cerberus scene\n";
 #if defined(RAZ_USE_FBX)
-    std::cout << "\tD: Load ShaderBall scene\n";
+    //std::cout << "\tD: Load ShaderBall scene\n";
 #endif
     std::cout << '\n';
 

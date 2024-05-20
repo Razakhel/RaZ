@@ -26,9 +26,9 @@ static constexpr const char* Metallic  = "uniMaterial.metallicFactor";  ///< Met
 static constexpr const char* Roughness = "uniMaterial.roughnessFactor"; ///< Roughness factor.
 
 // Legacy attributes
-static constexpr const char* Ambient      = "uniMaterial.ambient";      ///< Ambient factor.
-static constexpr const char* Specular     = "uniMaterial.specular";     ///< Specular factor.
-static constexpr const char* Transparency = "uniMaterial.transparency"; ///< Transparency factor.
+static constexpr const char* Ambient  = "uniMaterial.ambient";  ///< Ambient factor.
+static constexpr const char* Specular = "uniMaterial.specular"; ///< Specular factor.
+static constexpr const char* Opacity  = "uniMaterial.opacity";  ///< Opacity factor.
 
 }
 
@@ -46,9 +46,9 @@ static constexpr const char* Metallic  = "uniMaterial.metallicMap";  ///< Metaln
 static constexpr const char* Roughness = "uniMaterial.roughnessMap"; ///< Roughness map.
 
 // Legacy textures
-static constexpr const char* Specular     = "uniMaterial.specularMap";     ///< Specular map
-static constexpr const char* Transparency = "uniMaterial.transparencyMap"; ///< Transparency map.
-static constexpr const char* Bump         = "uniMaterial.bumpMap";         ///< Bump map.
+static constexpr const char* Specular = "uniMaterial.specularMap"; ///< Specular map
+static constexpr const char* Opacity  = "uniMaterial.opacityMap";  ///< Opacity map.
+static constexpr const char* Bump     = "uniMaterial.bumpMap";     ///< Bump map.
 
 }
 

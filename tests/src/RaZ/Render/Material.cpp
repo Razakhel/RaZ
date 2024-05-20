@@ -36,15 +36,15 @@ TEST_CASE("Material predefined types", "[render]") {
   CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient) == Raz::Vec3f(1.f));
   REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular));
   CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular) == Raz::Vec3f(1.f));
-  REQUIRE(material.getProgram().hasAttribute<float>(Raz::MaterialAttribute::Transparency));
-  CHECK(material.getProgram().getAttribute<float>(Raz::MaterialAttribute::Transparency) == 1.f);
+  REQUIRE(material.getProgram().hasAttribute<float>(Raz::MaterialAttribute::Opacity));
+  CHECK(material.getProgram().getAttribute<float>(Raz::MaterialAttribute::Opacity) == 1.f);
 
   CHECK(material.getProgram().getTextureCount() == 6);
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::BaseColor));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Emissive));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Ambient));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Specular));
-  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Transparency));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Opacity));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Bump));
 
   material.getProgram().clearAttributes();

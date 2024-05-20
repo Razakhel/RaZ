@@ -159,25 +159,25 @@ void LuaWrapper::registerRenderTypes() {
     material["loadType"]   = &Material::loadType;
 
     state.new_enum<std::string>("MaterialAttribute", {
-      { "BaseColor",    MaterialAttribute::BaseColor },
-      { "Emissive",     MaterialAttribute::Emissive },
-      { "Metallic",     MaterialAttribute::Metallic },
-      { "Roughness",    MaterialAttribute::Roughness },
-      { "Ambient",      MaterialAttribute::Ambient },
-      { "Specular",     MaterialAttribute::Specular },
-      { "Transparency", MaterialAttribute::Transparency }
+      { "BaseColor", MaterialAttribute::BaseColor },
+      { "Emissive",  MaterialAttribute::Emissive },
+      { "Metallic",  MaterialAttribute::Metallic },
+      { "Roughness", MaterialAttribute::Roughness },
+      { "Ambient",   MaterialAttribute::Ambient },
+      { "Specular",  MaterialAttribute::Specular },
+      { "Opacity",   MaterialAttribute::Opacity }
     });
 
     state.new_enum<std::string>("MaterialTexture", {
-      { "BaseColor",    MaterialTexture::BaseColor },
-      { "Emissive",     MaterialTexture::Emissive },
-      { "Ambient",      MaterialTexture::Ambient },
-      { "Normal",       MaterialTexture::Normal },
-      { "Metallic",     MaterialTexture::Metallic },
-      { "Roughness",    MaterialTexture::Roughness },
-      { "Specular",     MaterialTexture::Specular },
-      { "Transparency", MaterialTexture::Transparency },
-      { "Bump",         MaterialTexture::Bump }
+      { "BaseColor", MaterialTexture::BaseColor },
+      { "Emissive",  MaterialTexture::Emissive },
+      { "Ambient",   MaterialTexture::Ambient },
+      { "Normal",    MaterialTexture::Normal },
+      { "Metallic",  MaterialTexture::Metallic },
+      { "Roughness", MaterialTexture::Roughness },
+      { "Specular",  MaterialTexture::Specular },
+      { "Opacity",   MaterialTexture::Opacity },
+      { "Bump",      MaterialTexture::Bump }
     });
 
     state.new_enum<MaterialType>("MaterialType", {

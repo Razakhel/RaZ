@@ -61,7 +61,7 @@ Raz::MeshRenderer createMeshRenderer() {
     matProgram.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), Raz::MaterialAttribute::Emissive);
     matProgram.setAttribute(Raz::Vec3f(0.f, 0.f, 1.f), Raz::MaterialAttribute::Ambient);
     matProgram.setAttribute(Raz::Vec3f(1.f, 0.f, 1.f), Raz::MaterialAttribute::Specular);
-    matProgram.setAttribute(0.5f, Raz::MaterialAttribute::Transparency);
+    matProgram.setAttribute(0.5f, Raz::MaterialAttribute::Opacity);
   }
 
   return meshRenderer;
@@ -269,17 +269,17 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     CHECK(specularImg.recoverByteValue(1, 1, 0) == 0);
   }
 
-  // Transparency map
+  // Opacity map
   {
-    const auto& transparencyMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Transparency));
+    const auto& opacityMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Opacity));
 
-    CHECK(transparencyMap.getWidth() == 2);
-    CHECK(transparencyMap.getHeight() == 2);
-    CHECK(transparencyMap.getColorspace() == Raz::TextureColorspace::GRAY);
-    REQUIRE(transparencyMap.getDataType() == Raz::TextureDataType::BYTE);
+    CHECK(opacityMap.getWidth() == 2);
+    CHECK(opacityMap.getHeight() == 2);
+    CHECK(opacityMap.getColorspace() == Raz::TextureColorspace::GRAY);
+    REQUIRE(opacityMap.getDataType() == Raz::TextureDataType::BYTE);
 
-    const Raz::Image transparencyImg = transparencyMap.recoverImage();
-    REQUIRE_FALSE(transparencyImg.isEmpty());
+    const Raz::Image opacityImg = opacityMap.recoverImage();
+    REQUIRE_FALSE(opacityImg.isEmpty());
 
     // ---------
     // | X | X |
@@ -287,10 +287,10 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
     // | X | X |
     // ---------
 
-    CHECK(transparencyImg.recoverByteValue(0, 0, 0) == 255);
-    CHECK(transparencyImg.recoverByteValue(1, 0, 0) == 255);
-    CHECK(transparencyImg.recoverByteValue(0, 1, 0) == 255);
-    CHECK(transparencyImg.recoverByteValue(1, 1, 0) == 255);
+    CHECK(opacityImg.recoverByteValue(0, 0, 0) == 255);
+    CHECK(opacityImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(opacityImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(opacityImg.recoverByteValue(1, 1, 0) == 255);
   }
 
   // Bump map
@@ -644,7 +644,7 @@ TEST_CASE("ObjFormat save", "[data]") {
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient).strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular).strictlyEquals(Raz::Vec3f(1.f, 0.f, 1.f)));
-      CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Transparency) == 0.5f);
+      CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Opacity) == 0.5f);
     }
   }
 }

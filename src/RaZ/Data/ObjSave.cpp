@@ -69,20 +69,20 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
     writeAttribute<float, 3>(mtlFile, "Ke", matProgram, MaterialAttribute::Emissive);
     writeAttribute<float, 3>(mtlFile, "Ka", matProgram, MaterialAttribute::Ambient);
     writeAttribute<float, 3>(mtlFile, "Ks", matProgram, MaterialAttribute::Specular);
-    writeAttribute<float, 1>(mtlFile, "d",  matProgram, MaterialAttribute::Transparency);
+    writeAttribute<float, 1>(mtlFile, "d",  matProgram, MaterialAttribute::Opacity);
     writeAttribute<float, 1>(mtlFile, "Pm", matProgram, MaterialAttribute::Metallic);
     writeAttribute<float, 1>(mtlFile, "Pr", matProgram, MaterialAttribute::Roughness);
 
 #if !defined(USE_OPENGL_ES)
-    writeTexture(mtlFile, "map_Kd",   materialName, "baseColor",    matProgram, MaterialTexture::BaseColor);
-    writeTexture(mtlFile, "map_Ke",   materialName, "emissive",     matProgram, MaterialTexture::Emissive);
-    writeTexture(mtlFile, "map_Ka",   materialName, "ambient",      matProgram, MaterialTexture::Ambient);
-    writeTexture(mtlFile, "map_Ks",   materialName, "specular",     matProgram, MaterialTexture::Specular);
-    writeTexture(mtlFile, "map_d",    materialName, "transparency", matProgram, MaterialTexture::Transparency);
-    writeTexture(mtlFile, "map_bump", materialName, "bump",         matProgram, MaterialTexture::Bump);
-    writeTexture(mtlFile, "norm",     materialName, "normal",       matProgram, MaterialTexture::Normal);
-    writeTexture(mtlFile, "map_Pm",   materialName, "metallic",     matProgram, MaterialTexture::Metallic);
-    writeTexture(mtlFile, "map_Pr",   materialName, "roughness",    matProgram, MaterialTexture::Roughness);
+    writeTexture(mtlFile, "map_Kd",   materialName, "baseColor", matProgram, MaterialTexture::BaseColor);
+    writeTexture(mtlFile, "map_Ke",   materialName, "emissive",  matProgram, MaterialTexture::Emissive);
+    writeTexture(mtlFile, "map_Ka",   materialName, "ambient",   matProgram, MaterialTexture::Ambient);
+    writeTexture(mtlFile, "map_Ks",   materialName, "specular",  matProgram, MaterialTexture::Specular);
+    writeTexture(mtlFile, "map_d",    materialName, "opacity",   matProgram, MaterialTexture::Opacity);
+    writeTexture(mtlFile, "map_bump", materialName, "bump",      matProgram, MaterialTexture::Bump);
+    writeTexture(mtlFile, "norm",     materialName, "normal",    matProgram, MaterialTexture::Normal);
+    writeTexture(mtlFile, "map_Pm",   materialName, "metallic",  matProgram, MaterialTexture::Metallic);
+    writeTexture(mtlFile, "map_Pr",   materialName, "roughness", matProgram, MaterialTexture::Roughness);
 #endif
   }
 }

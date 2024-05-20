@@ -72,8 +72,8 @@ void Material::loadType(MaterialType type) {
         m_program.setAttribute(Vec3f(1.f), MaterialAttribute::Ambient);
       if (!m_program.hasAttribute(MaterialAttribute::Specular))
         m_program.setAttribute(Vec3f(1.f), MaterialAttribute::Specular);
-      if (!m_program.hasAttribute(MaterialAttribute::Transparency))
-        m_program.setAttribute(1.f, MaterialAttribute::Transparency);
+      if (!m_program.hasAttribute(MaterialAttribute::Opacity))
+        m_program.setAttribute(1.f, MaterialAttribute::Opacity);
 
       if (!m_program.hasTexture(MaterialTexture::BaseColor))
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::BaseColor);
@@ -83,10 +83,10 @@ void Material::loadType(MaterialType type) {
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Ambient);
       if (!m_program.hasTexture(MaterialTexture::Specular))
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Specular);
-      if (!m_program.hasTexture(MaterialTexture::Transparency)) {
-        auto transparencyMap = Texture2D::create(ColorPreset::White);
-        transparencyMap->setFilter(TextureFilter::NEAREST, TextureFilter::NEAREST, TextureFilter::NEAREST);
-        m_program.setTexture(std::move(transparencyMap), MaterialTexture::Transparency);
+      if (!m_program.hasTexture(MaterialTexture::Opacity)) {
+        Texture2DPtr opacityMap = Texture2D::create(ColorPreset::White);
+        opacityMap->setFilter(TextureFilter::NEAREST, TextureFilter::NEAREST, TextureFilter::NEAREST);
+        m_program.setTexture(std::move(opacityMap), MaterialTexture::Opacity);
       }
       if (!m_program.hasTexture(MaterialTexture::Bump))
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Bump);
