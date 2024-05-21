@@ -50,7 +50,14 @@ layout(location = 1) out vec3 fragNormal;
 layout(location = 2) out vec4 fragSpecular;
 
 void main() {
-  vec3 color      = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.baseColor;
+  vec4 baseColor = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgba;
+  float opacity  = texture(uniMaterial.opacityMap, vertMeshInfo.vertTexcoords).r;
+  float alpha    = min(baseColor.a, opacity) * uniMaterial.opacity;
+
+  if (alpha < 0.1)
+      discard;
+
+  vec3 color      = baseColor.rgb * uniMaterial.baseColor;
   vec3 specFactor = texture(uniMaterial.specularMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.specular;
   vec3 normal     = vertMeshInfo.vertTBNMatrix[2];
   vec3 viewDir    = normalize(uniCameraPos - vertMeshInfo.vertPosition);
@@ -87,7 +94,7 @@ void main() {
   vec3 ambient  = color * 0.05;
   vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
 
-  fragColor    = vec4(ambient + diffuse + specular + emissive, 1.0);
+  fragColor    = vec4(ambient + diffuse + specular + emissive, alpha);
   fragNormal   = normal * 0.5 + 0.5;
   fragSpecular = vec4(specFactor, 1.0 - max(specFactor.x, max(specFactor.y, specFactor.z)));
 }

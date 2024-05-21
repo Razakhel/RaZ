@@ -91,8 +91,12 @@ float computeGeometry(vec3 normal, vec3 viewDir, vec3 lightDir, float roughness)
 }
 
 void main() {
-  // Gamma correction for albedo (sRGB presumed)
-  vec3 albedo     = pow(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+  vec4 baseColor = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgba;
+
+  if (baseColor.a < 0.1)
+    discard;
+
+  vec3 albedo     = pow(baseColor.rgb, vec3(2.2)) * uniMaterial.baseColor;
   float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
   float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
   float ambOcc    = texture(uniMaterial.ambientMap, vertMeshInfo.vertTexcoords).r;
@@ -156,7 +160,7 @@ void main() {
   // Gamma correction
   color = pow(color, vec3(1.0 / 2.2));
 
-  fragColor    = vec4(color, 1.0);
+  fragColor    = vec4(color, baseColor.a);
   fragNormal   = normal * 0.5 + 0.5;
   fragSpecular = vec4(baseReflectivity, roughness);
 }

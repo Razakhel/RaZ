@@ -49,6 +49,13 @@ layout(location = 0) out vec4 fragColor;
 layout(location = 1) out vec3 fragNormal;
 
 void main() {
+  vec4 baseColor = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgba;
+  float opacity  = texture(uniMaterial.opacityMap, vertMeshInfo.vertTexcoords).r;
+  float alpha    = min(baseColor.a, opacity) * uniMaterial.opacity;
+
+  if (alpha < 0.1)
+    discard;
+
   vec3 normal = vertMeshInfo.vertTBNMatrix[2];
 
   float lightHitAngle = 0.0;
@@ -65,9 +72,9 @@ void main() {
     lightHitAngle = max(lightHitAngle, clamp(dot(lightDir, normal), 0.0, 1.0));
   }
 
-  vec3 diffuse  = lightHitAngle * texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.baseColor;
+  vec3 diffuse  = lightHitAngle * baseColor.rgb * uniMaterial.baseColor;
   vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
 
-  fragColor  = vec4(diffuse + emissive, 1.0);
+  fragColor  = vec4(diffuse + emissive, alpha);
   fragNormal = normal;
 }
