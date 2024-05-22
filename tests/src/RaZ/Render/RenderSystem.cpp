@@ -15,6 +15,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+using namespace Raz::Literals;
+
 namespace {
 
 Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath = {}) {
@@ -90,6 +92,37 @@ TEST_CASE("RenderSystem Cook-Torrance ball", "[render]") {
   cameraComp.setTarget(Raz::Vec3f(0.f));
 
   CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_cubemap_base.png", true)));
+}
+
+TEST_CASE("RenderSystem Cook-Torrance alpha mask", "[render]") {
+  Raz::World world(2);
+
+  const Raz::Window& window = TestUtils::getWindow();
+
+  world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f));
+  camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+
+  Raz::Entity& plane = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f), Raz::Quaternionf(90_deg, Raz::Axis::X));
+  auto& meshRenderer = plane.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Plane(0.f), 1.f, 1.f));
+  Raz::RenderShaderProgram& planeProgram = meshRenderer.getMaterials().front().getProgram();
+
+  // Setting alpha values as follows:
+  // 0 1
+  // 1 0
+  Raz::Image baseColorMap(2, 2, Raz::ImageColorspace::RGBA);
+  baseColorMap.setPixel(0, 0, Raz::Vec4b(Raz::Vec3b(255), 0));
+  baseColorMap.setPixel(0, 1, Raz::Vec4b(Raz::Vec3b(255), 255));
+  baseColorMap.setPixel(1, 0, Raz::Vec4b(Raz::Vec3b(255), 255));
+  baseColorMap.setPixel(1, 1, Raz::Vec4b(Raz::Vec3b(255), 0));
+
+  planeProgram.setTexture(Raz::Texture2D::create(baseColorMap), Raz::MaterialTexture::BaseColor);
+
+  // Due to the default nearest filter, default repeat wrapping mode, and very low texture definition, the plane has just two small holes in a diagonal
+  // This would not happen in a real-world case, where the texture definition would be much higher
+  CHECK_THAT(renderFrame(world),
+             IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_plane_alpha_mask.png", true)));
 }
 
 #if !defined(RAZ_NO_OVERLAY)
