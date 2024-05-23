@@ -31,7 +31,7 @@ jobs:
           - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_window: false }
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # Installing the needed packages:
     #   - Ninja to build the project
@@ -122,10 +122,10 @@ jobs:
     # Processing code coverage; only done with GCC in Debug with all features enabled
     - name: Coverage processing
       if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_window
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/coverage.info
+        file: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/coverage.info
 
     # Installing RaZ in the build directory; default is /usr/local
     - name: Install
@@ -134,7 +134,7 @@ jobs:
 
     - name: Upload build
       if: matrix.use_audio && matrix.use_window
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
         path: |
@@ -170,12 +170,12 @@ jobs:
           - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: true, use_window: false }
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # Caching OpenAL-Soft's installation; this avoids reinstalling it on every build
     - name: OpenAL-Soft caching
       if: matrix.use_audio
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: openal-soft
       with:
         path: C:/OpenAL
@@ -222,7 +222,7 @@ jobs:
 
     - name: Upload build
       if: matrix.use_audio && matrix.use_window
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: RaZ-windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
         path: |
@@ -255,7 +255,7 @@ jobs:
           - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: true, use_window: false }
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     # Installing the needed packages:
     #   - Ninja to build the project
@@ -299,7 +299,7 @@ jobs:
 
     - name: Upload build
       if: matrix.use_audio && matrix.use_window
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: RaZ-macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
         path: |
@@ -331,7 +331,7 @@ jobs:
           - { compiler: { c: emcc, cpp: em++ }, build_type: Debug, use_audio: false }
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # Installing the needed packages:
       #   - Ninja to build the project
@@ -353,7 +353,7 @@ jobs:
 
       # Caching Emscripten's installation; this avoids reinstalling it on every build
       - name: Emscripten caching
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: emsdk
         with:
           path: ~/emsdk
