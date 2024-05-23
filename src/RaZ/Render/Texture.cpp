@@ -109,6 +109,19 @@ inline TextureParamValue recoverParam(TextureWrapping wrapping) {
   throw std::invalid_argument("Error: Invalid texture wrapping");
 }
 
+inline TextureColorspace recoverColorspace(ImageColorspace imgColorspace, bool shouldUseSrgb) {
+  auto texColorspace = static_cast<TextureColorspace>(imgColorspace);
+
+  if (shouldUseSrgb) {
+    if (texColorspace == TextureColorspace::RGB)
+      texColorspace = TextureColorspace::SRGB;
+    else if (texColorspace == TextureColorspace::RGBA)
+      texColorspace = TextureColorspace::SRGBA;
+  }
+
+  return texColorspace;
+}
+
 } // namespace
 
 void Texture::bind() const {
@@ -295,7 +308,7 @@ void Texture2D::resize(unsigned int width, unsigned int height) {
   load();
 }
 
-void Texture2D::load(const Image& image, bool createMipmaps) {
+void Texture2D::load(const Image& image, bool createMipmaps, bool shouldUseSrgb) {
   ZoneScopedN("Texture2D::load(Image)");
 
   if (image.isEmpty()) {
@@ -306,7 +319,7 @@ void Texture2D::load(const Image& image, bool createMipmaps) {
 
   m_width      = image.getWidth();
   m_height     = image.getHeight();
-  m_colorspace = static_cast<TextureColorspace>(image.getColorspace());
+  m_colorspace = recoverColorspace(image.getColorspace(), shouldUseSrgb);
   m_dataType   = (image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
 
 #if defined(USE_OPENGL_ES)
@@ -427,7 +440,7 @@ void Texture3D::resize(unsigned int width, unsigned int height, unsigned int dep
   load();
 }
 
-void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) {
+void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps, bool shouldUseSrgb) {
   ZoneScopedN("Texture3D::load(std::vector<Image>)");
 
   if (imageSlices.empty() || imageSlices.front().isEmpty()) {
@@ -442,7 +455,7 @@ void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps) 
   m_width      = imageSlices.front().getWidth();
   m_height     = imageSlices.front().getHeight();
   m_depth      = static_cast<unsigned int>(imageSlices.size());
-  m_colorspace = static_cast<TextureColorspace>(firstImgColorspace);
+  m_colorspace = recoverColorspace(firstImgColorspace, shouldUseSrgb);
   m_dataType   = (firstImgDataType == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
 
 #if defined(USE_OPENGL_ES)

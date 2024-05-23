@@ -195,6 +195,12 @@ TEST_CASE("Texture2D load image") {
   CHECK(textureImg.recoverPixel<uint8_t>(1, 1) == 3);
 
   Raz::Renderer::setPixelStorage(Raz::PixelStorage::UNPACK_ALIGNMENT, 1);
+
+  // Setting the sRGB parameter to true applies an sRGB(A) colorspace if the given image has an RGB(A) one
+  CHECK(Raz::Texture2D(Raz::Image(1, 1, Raz::ImageColorspace::RGB), false, false).getColorspace() == Raz::TextureColorspace::RGB);
+  CHECK(Raz::Texture2D(Raz::Image(1, 1, Raz::ImageColorspace::RGB), false, true).getColorspace() == Raz::TextureColorspace::SRGB);
+  CHECK(Raz::Texture2D(Raz::Image(1, 1, Raz::ImageColorspace::RGBA), false, false).getColorspace() == Raz::TextureColorspace::RGBA);
+  CHECK(Raz::Texture2D(Raz::Image(1, 1, Raz::ImageColorspace::RGBA), false, true).getColorspace() == Raz::TextureColorspace::SRGBA);
 }
 
 TEST_CASE("Texture3D load image slices") {
@@ -218,6 +224,12 @@ TEST_CASE("Texture3D load image slices") {
                                 Raz::Image(1, 1, Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE) })); // Different colorspaces
   CHECK_THROWS(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::BYTE),
                                 Raz::Image(1, 1, Raz::ImageColorspace::GRAY, Raz::ImageDataType::FLOAT) })); // Different data types
+
+  // Setting the sRGB parameter to true applies an sRGB(A) colorspace if the given images have an RGB(A) one
+  CHECK(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::RGB) }, false, false).getColorspace() == Raz::TextureColorspace::RGB);
+  CHECK(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::RGB) }, false, true).getColorspace() == Raz::TextureColorspace::SRGB);
+  CHECK(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::RGBA) }, false, false).getColorspace() == Raz::TextureColorspace::RGBA);
+  CHECK(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::RGBA) }, false, true).getColorspace() == Raz::TextureColorspace::SRGBA);
 }
 
 TEST_CASE("Texture fill", "[render]") {

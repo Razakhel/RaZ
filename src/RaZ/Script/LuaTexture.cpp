@@ -60,6 +60,7 @@ void LuaWrapper::registerTextureTypes() {
                                                                                                    TextureDataType),
                                                                                          Texture2D(const Image&),
                                                                                          Texture2D(const Image&, bool),
+                                                                                         Texture2D(const Image&, bool, bool),
                                                                                          Texture2D(const Color&),
                                                                                          Texture2D(const Color&, unsigned int),
                                                                                          Texture2D(const Color&, unsigned int, unsigned int)>(),
@@ -72,12 +73,14 @@ void LuaWrapper::registerTextureTypes() {
                                               &Texture2D::create<unsigned int, unsigned int, TextureColorspace, TextureDataType>,
                                               &Texture2D::create<const Image&>,
                                               &Texture2D::create<const Image&, bool>,
+                                              &Texture2D::create<const Image&, bool, bool>,
                                               &Texture2D::create<const Color&>,
                                               &Texture2D::create<const Color&, unsigned int>,
                                               &Texture2D::create<const Color&, unsigned int, unsigned int>);
     texture2D["resize"]       = &Texture2D::resize;
     texture2D["load"]         = sol::overload([] (Texture2D& t, const Image& img) { t.load(img); },
-                                              PickOverload<const Image&, bool>(&Texture2D::load));
+                                              [] (Texture2D& t, const Image& img, bool mips) { t.load(img, mips); },
+                                              PickOverload<const Image&, bool, bool>(&Texture2D::load));
     texture2D["fill"]         = &Texture2D::fill;
     texture2D["recoverImage"] = &Texture2D::recoverImage;
   }
@@ -89,6 +92,11 @@ void LuaWrapper::registerTextureTypes() {
                                                                                          Texture3D(unsigned int, unsigned int, unsigned int, TextureColorspace),
                                                                                          Texture3D(unsigned int, unsigned int, unsigned int, TextureColorspace,
                                                                                                    TextureDataType),
+                                                                                         // Constant references on vectors cannot be bound, and declaring
+                                                                                         //  constructors requires the exact prototype
+                                                                                         //Texture3D(const std::vector<Image>&),
+                                                                                         //Texture3D(const std::vector<Image>&, bool),
+                                                                                         //Texture3D(const std::vector<Image>&, bool, bool),
                                                                                          Texture3D(const Color&),
                                                                                          Texture3D(const Color&, unsigned int),
                                                                                          Texture3D(const Color&, unsigned int, unsigned int),
@@ -101,11 +109,17 @@ void LuaWrapper::registerTextureTypes() {
                                            &Texture3D::create<TextureColorspace, TextureDataType>,
                                            &Texture3D::create<unsigned int, unsigned int, unsigned int, TextureColorspace>,
                                            &Texture3D::create<unsigned int, unsigned int, unsigned int, TextureColorspace, TextureDataType>,
+                                           [] (std::vector<Image> imgs) { return Texture3D::create(imgs); },
+                                           [] (std::vector<Image> imgs, bool mips) { return Texture3D::create(imgs, mips); },
+                                           [] (std::vector<Image> imgs, bool mips, bool srgb) { return Texture3D::create(imgs, mips, srgb); },
                                            &Texture3D::create<const Color&>,
                                            &Texture3D::create<const Color&, unsigned int>,
                                            &Texture3D::create<const Color&, unsigned int, unsigned int>,
                                            &Texture3D::create<const Color&, unsigned int, unsigned int, unsigned int>);
     texture3D["resize"]    = &Texture3D::resize;
+    texture3D["load"]      = sol::overload([] (Texture3D& t, std::vector<Image> imgs) { t.load(imgs); },
+                                           [] (Texture3D& t, std::vector<Image> imgs, bool mips) { t.load(imgs, mips); },
+                                           [] (Texture3D& t, std::vector<Image> imgs, bool mips, bool srgb) { t.load(imgs, mips, srgb); });
     texture3D["fill"]      = &Texture3D::fill;
   }
 

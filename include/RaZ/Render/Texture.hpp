@@ -134,7 +134,7 @@ public:
   Texture2D(TextureColorspace colorspace, TextureDataType dataType) : Texture2D() { setColorspace(colorspace, dataType); }
   Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace) : Texture2D(colorspace) { resize(width, height); }
   Texture2D(unsigned int width, unsigned int height, TextureColorspace colorspace, TextureDataType dataType);
-  explicit Texture2D(const Image& image, bool createMipmaps = true) : Texture2D() { load(image, createMipmaps); }
+  explicit Texture2D(const Image& image, bool createMipmaps = true, bool shouldUseSrgb = false) : Texture2D() { load(image, createMipmaps, shouldUseSrgb); }
   /// Constructs a plain colored texture.
   /// \param color Color to fill the texture with.
   /// \param width Width of the texture to create.
@@ -154,7 +154,8 @@ public:
   /// Loads the image's data onto the graphics card.
   /// \param image Image to load the data from.
   /// \param createMipmaps True to generate texture mipmaps, false otherwise.
-  void load(const Image& image, bool createMipmaps = true);
+  /// \param shouldUseSrgb True to set an sRGB(A) colorspace if the image has an RGB(A) one, false to keep it as is.
+  void load(const Image& image, bool createMipmaps = true, bool shouldUseSrgb = false);
   /// Fills the texture with a single color.
   /// \param color Color to fill the texture with.
   void fill(const Color& color);
@@ -179,7 +180,8 @@ public:
   Texture3D(TextureColorspace colorspace, TextureDataType dataType) : Texture3D() { setColorspace(colorspace, dataType); }
   Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace) : Texture3D(colorspace) { resize(width, height, depth); }
   Texture3D(unsigned int width, unsigned int height, unsigned int depth, TextureColorspace colorspace, TextureDataType dataType);
-  explicit Texture3D(const std::vector<Image>& imageSlices, bool createMipmaps = true) : Texture3D() { load(imageSlices, createMipmaps); }
+  explicit Texture3D(const std::vector<Image>& imageSlices, bool createMipmaps = true, bool shouldUseSrgb = false)
+    : Texture3D() { load(imageSlices, createMipmaps, shouldUseSrgb); }
   /// Constructs a plain colored texture.
   /// \param color Color to fill the texture with.
   /// \param width Width of the texture to create.
@@ -203,7 +205,8 @@ public:
   /// \param imageSlices Images along the depth to load the data from. All of them must have the same attributes (width, height, colorspace, ...)
   ///   and the number of images will become the texture's depth.
   /// \param createMipmaps True to generate texture mipmaps, false otherwise.
-  void load(const std::vector<Image>& imageSlices, bool createMipmaps = true);
+  /// \param shouldUseSrgb True to set an sRGB(A) colorspace if the images have an RGB(A) one, false to keep it as is.
+  void load(const std::vector<Image>& imageSlices, bool createMipmaps = true, bool shouldUseSrgb = false);
   /// Fills the texture with a single color.
   /// \param color Color to fill the texture with.
   void fill(const Color& color);
