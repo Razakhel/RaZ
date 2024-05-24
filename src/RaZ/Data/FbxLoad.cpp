@@ -1,3 +1,4 @@
+#include "RaZ/Data/Color.hpp"
 #include "RaZ/Data/FbxFormat.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/ImageFormat.hpp"
@@ -15,16 +16,16 @@ namespace Raz::FbxFormat {
 
 namespace {
 
-inline Texture2DPtr loadTexture(const FilePath& textureFilePath) {
+inline Texture2DPtr loadTexture(const FilePath& textureFilePath, const Color& defaultColor, bool shouldUseSrgb = false) {
   ZoneScopedN("[FbxLoad]::loadTexture");
 
   if (!FileUtils::isReadable(textureFilePath)) {
     Logger::warn("[FbxLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
-    return nullptr;
+    return Texture2D::create(defaultColor);
   }
 
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-  return Texture2D::create(ImageFormat::load(textureFilePath, true), true);
+  return Texture2D::create(ImageFormat::load(textureFilePath, true), true, shouldUseSrgb);
 }
 
 void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, const FilePath& filePath) {
@@ -74,34 +75,26 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
 
     const auto* diffuseTexture = static_cast<fbxsdk::FbxFileTexture*>(diffuse.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (diffuseTexture) {
-      Texture2DPtr diffuseMap = loadTexture(texturePath + diffuseTexture->GetRelativeFileName());
-
-      if (diffuseMap)
-        material.getProgram().setTexture(std::move(diffuseMap), MaterialTexture::BaseColor);
+      Texture2DPtr diffuseMap = loadTexture(texturePath + diffuseTexture->GetRelativeFileName(), ColorPreset::White, true);
+      material.getProgram().setTexture(std::move(diffuseMap), MaterialTexture::BaseColor);
     }
 
     const auto* emissiveTexture = static_cast<fbxsdk::FbxFileTexture*>(emissive.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (emissiveTexture) {
-      Texture2DPtr emissiveMap = loadTexture(texturePath + emissiveTexture->GetRelativeFileName());
-
-      if (emissiveMap)
-        material.getProgram().setTexture(std::move(emissiveMap), MaterialTexture::Emissive);
+      Texture2DPtr emissiveMap = loadTexture(texturePath + emissiveTexture->GetRelativeFileName(), ColorPreset::White, true);
+      material.getProgram().setTexture(std::move(emissiveMap), MaterialTexture::Emissive);
     }
 
     const auto* ambientTexture = static_cast<fbxsdk::FbxFileTexture*>(ambient.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (ambientTexture) {
-      Texture2DPtr ambientMap = loadTexture(texturePath + ambientTexture->GetRelativeFileName());
-
-      if (ambientMap)
-        material.getProgram().setTexture(std::move(ambientMap), MaterialTexture::Ambient);
+      Texture2DPtr ambientMap = loadTexture(texturePath + ambientTexture->GetRelativeFileName(), ColorPreset::White, true);
+      material.getProgram().setTexture(std::move(ambientMap), MaterialTexture::Ambient);
     }
 
     const auto* specularTexture = static_cast<fbxsdk::FbxFileTexture*>(specular.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
     if (specularTexture) {
-      Texture2DPtr specularMap = loadTexture(texturePath + specularTexture->GetRelativeFileName());
-
-      if (specularMap)
-        material.getProgram().setTexture(std::move(specularMap), MaterialTexture::Specular);
+      Texture2DPtr specularMap = loadTexture(texturePath + specularTexture->GetRelativeFileName(), ColorPreset::White, true);
+      material.getProgram().setTexture(std::move(specularMap), MaterialTexture::Specular);
     }
 
     // Normal map not yet handled for standard materials
@@ -111,10 +104,8 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
       const auto* normalTexture = static_cast<fbxsdk::FbxFileTexture*>(normalMapProp.GetSrcObject(fbxsdk::FbxCriteria::ObjectType(fbxsdk::FbxFileTexture::ClassId)));
 
       if (normalTexture) {
-        Texture2DPtr normalMap = loadTexture(texturePath + normalTexture->GetRelativeFileName());
-
-        if (normalMap)
-          material.getProgram().setTexture(std::move(normalMap), MaterialTexture::Normal);
+        Texture2DPtr normalMap = loadTexture(texturePath + normalTexture->GetRelativeFileName(), ColorPreset::MediumBlue);
+        material.getProgram().setTexture(std::move(normalMap), MaterialTexture::Normal);
       }
     }
     */

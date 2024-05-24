@@ -58,7 +58,7 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
 
     REQUIRE(baseColorMap.getWidth() == 2);
     REQUIRE(baseColorMap.getHeight() == 2);
-    REQUIRE(baseColorMap.getColorspace() == Raz::TextureColorspace::RGBA);
+    REQUIRE(baseColorMap.getColorspace() == Raz::TextureColorspace::SRGBA);
     REQUIRE(baseColorMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image baseColorImg = baseColorMap.recoverImage();
@@ -83,7 +83,7 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
 
     REQUIRE(emissiveMap.getWidth() == 2);
     REQUIRE(emissiveMap.getHeight() == 2);
-    REQUIRE(emissiveMap.getColorspace() == Raz::TextureColorspace::RGB);
+    REQUIRE(emissiveMap.getColorspace() == Raz::TextureColorspace::SRGB);
     REQUIRE(emissiveMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image emissiveImg = emissiveMap.recoverImage();
@@ -285,7 +285,7 @@ TEST_CASE("GltfFormat load GLB textured", "[data]") {
 
     REQUIRE(baseColorMap.getWidth() == 256);
     REQUIRE(baseColorMap.getHeight() == 256);
-    REQUIRE(baseColorMap.getColorspace() == Raz::TextureColorspace::RGB);
+    REQUIRE(baseColorMap.getColorspace() == Raz::TextureColorspace::SRGB);
     REQUIRE(baseColorMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image baseColorImg = baseColorMap.recoverImage();

@@ -18,18 +18,16 @@ namespace Raz::ObjFormat {
 
 namespace {
 
-inline Texture2DPtr loadTexture(const FilePath& mtlFilePath, const FilePath& textureFilePath) {
+inline Texture2DPtr loadTexture(const FilePath& textureFilePath, const Color& defaultColor, bool shouldUseSrgb = false) {
   ZoneScopedN("[ObjLoad]::loadTexture");
 
-  const FilePath fullTexturePath = mtlFilePath.recoverPathToFile() + textureFilePath;
-
-  if (!FileUtils::isReadable(fullTexturePath)) {
-    Logger::warn("[ObjLoad] Cannot load texture '" + fullTexturePath + "'; either the file does not exist or it cannot be opened.");
-    return nullptr;
+  if (!FileUtils::isReadable(textureFilePath)) {
+    Logger::warn("[ObjLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
+    return Texture2D::create(defaultColor);
   }
 
   // Always apply a vertical flip to imported textures, since OpenGL maps them upside down
-  return Texture2D::create(ImageFormat::load(fullTexturePath, true), true);
+  return Texture2D::create(ImageFormat::load(textureFilePath, true), true, shouldUseSrgb);
 }
 
 inline void loadMtl(const FilePath& mtlFilePath,
@@ -80,49 +78,41 @@ inline void loadMtl(const FilePath& mtlFilePath,
 
       materialType = MaterialType::COOK_TORRANCE;
     } else if (tag[0] == 'm') {          // Import texture [map_*]
-      const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
-
-      if (map == nullptr)
-        continue;
+      const FilePath textureFilePath = mtlFilePath.recoverPathToFile() + nextValue;
 
       if (tag[4] == 'K') {               // Standard maps [map_K*]
         if (tag[5] == 'd')               // Diffuse/albedo map [map_Kd]
-          material.getProgram().setTexture(map, MaterialTexture::BaseColor);
+          material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::White, true), MaterialTexture::BaseColor);
         else if (tag[5] == 'e')          // Emissive map [map_Ke]
-          material.getProgram().setTexture(map, MaterialTexture::Emissive);
+          material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::White, true), MaterialTexture::Emissive);
         else if (tag[5] == 'a')          // Ambient/ambient occlusion map [map_Ka]
-          material.getProgram().setTexture(map, MaterialTexture::Ambient);
+          material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::White, true), MaterialTexture::Ambient);
         else if (tag[5] == 's')          // Specular map [map_Ks]
-          material.getProgram().setTexture(map, MaterialTexture::Specular);
-      } else if (tag[4] == 'P') {       // PBR maps [map_P*]
+          material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::White, true), MaterialTexture::Specular);
+      } else if (tag[4] == 'P') {        // PBR maps [map_P*]
         if (tag[5] == 'm')               // Metallic map [map_Pm]
-          material.getProgram().setTexture(map, MaterialTexture::Metallic);
+          material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::Red), MaterialTexture::Metallic);
         else if (tag[5] == 'r')          // Roughness map [map_Pr]
-          material.getProgram().setTexture(map, MaterialTexture::Roughness);
+          material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::Red), MaterialTexture::Roughness);
 
         materialType = MaterialType::COOK_TORRANCE;
       } else if (tag[4] == 'd') {        // Opacity (dissolve) map [map_d]
+        Texture2DPtr map = loadTexture(textureFilePath, ColorPreset::White);
         map->setFilter(TextureFilter::NEAREST, TextureFilter::NEAREST, TextureFilter::NEAREST);
-        material.getProgram().setTexture(map, MaterialTexture::Opacity);
+        material.getProgram().setTexture(std::move(map), MaterialTexture::Opacity);
       } else if (tag[4] == 'b') {        // Bump map [map_bump]
-        material.getProgram().setTexture(map, MaterialTexture::Bump);
+        material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::White), MaterialTexture::Bump);
       }
     } else if (tag[0] == 'd') {          // Opacity (dissolve) factor [d]
       material.getProgram().setAttribute(std::stof(nextValue), MaterialAttribute::Opacity);
     } else if (tag[0] == 'T') {
       if (tag[1] == 'r')                 // Transparency factor (alias, 1 - d) [Tr]
         material.getProgram().setAttribute(1.f - std::stof(nextValue), MaterialAttribute::Opacity);
-    } else if (tag[0] == 'b') {         // Bump map (alias) [bump]
-      const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
-
-      if (map)
-        material.getProgram().setTexture(map, MaterialTexture::Bump);
+    } else if (tag[0] == 'b') {          // Bump map (alias) [bump]
+      material.getProgram().setTexture(loadTexture(mtlFilePath.recoverPathToFile() + nextValue, ColorPreset::White), MaterialTexture::Bump);
     } else if (tag[0] == 'n') {
       if (tag[1] == 'o') {               // Normal map [norm]
-        const Texture2DPtr map = loadTexture(mtlFilePath, nextValue);
-
-        if (map)
-          material.getProgram().setTexture(map, MaterialTexture::Normal);
+        material.getProgram().setTexture(loadTexture(mtlFilePath.recoverPathToFile() + nextValue, ColorPreset::MediumBlue), MaterialTexture::Normal);
       } else if (tag[1] == 'e') {        // New material [newmtl]
         materialCorrespIndices.emplace(nextValue, materialCorrespIndices.size());
 

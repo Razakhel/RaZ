@@ -140,7 +140,7 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
 
     CHECK(diffuseMap.getWidth() == 2);
     CHECK(diffuseMap.getHeight() == 2);
-    CHECK(diffuseMap.getColorspace() == Raz::TextureColorspace::RGBA);
+    CHECK(diffuseMap.getColorspace() == Raz::TextureColorspace::SRGBA);
     REQUIRE(diffuseMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image diffuseImg = diffuseMap.recoverImage();
@@ -181,7 +181,7 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
 
     CHECK(emissiveMap.getWidth() == 2);
     CHECK(emissiveMap.getHeight() == 2);
-    CHECK(emissiveMap.getColorspace() == Raz::TextureColorspace::RGB);
+    CHECK(emissiveMap.getColorspace() == Raz::TextureColorspace::SRGB);
     REQUIRE(emissiveMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image emissiveImg = emissiveMap.recoverImage();
@@ -216,7 +216,7 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
 
     CHECK(ambientMap.getWidth() == 2);
     CHECK(ambientMap.getHeight() == 2);
-    CHECK(ambientMap.getColorspace() == Raz::TextureColorspace::RGB);
+    CHECK(ambientMap.getColorspace() == Raz::TextureColorspace::SRGB);
     REQUIRE(ambientMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image ambientImg = ambientMap.recoverImage();
@@ -377,7 +377,7 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
 
     CHECK(albedoMap.getWidth() == 2);
     CHECK(albedoMap.getHeight() == 2);
-    CHECK(albedoMap.getColorspace() == Raz::TextureColorspace::RGBA);
+    CHECK(albedoMap.getColorspace() == Raz::TextureColorspace::SRGBA);
     REQUIRE(albedoMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image albedoImg = albedoMap.recoverImage();
@@ -418,7 +418,7 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
 
     CHECK(emissiveMap.getWidth() == 2);
     CHECK(emissiveMap.getHeight() == 2);
-    CHECK(emissiveMap.getColorspace() == Raz::TextureColorspace::RGB);
+    CHECK(emissiveMap.getColorspace() == Raz::TextureColorspace::SRGB);
     REQUIRE(emissiveMap.getDataType() == Raz::TextureDataType::BYTE);
 
     const Raz::Image emissiveImg = emissiveMap.recoverImage();

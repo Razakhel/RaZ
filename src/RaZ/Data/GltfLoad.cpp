@@ -385,11 +385,11 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials,
     matProgram.setAttribute(mat.pbrData.roughnessFactor, MaterialAttribute::Roughness);
 
     loadTexture(mat.pbrData.baseColorTexture, textures, images, [&matProgram] (const Image& img) {
-      matProgram.setTexture(Texture2D::create(img), MaterialTexture::BaseColor);
+      matProgram.setTexture(Texture2D::create(img, true, true), MaterialTexture::BaseColor);
     });
 
     loadTexture(mat.emissiveTexture, textures, images, [&matProgram] (const Image& img) {
-      matProgram.setTexture(Texture2D::create(img), MaterialTexture::Emissive);
+      matProgram.setTexture(Texture2D::create(img, true, true), MaterialTexture::Emissive);
     });
 
     loadTexture(mat.occlusionTexture, textures, images, [&matProgram] (const Image& img) {
