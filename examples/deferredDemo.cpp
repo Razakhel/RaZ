@@ -43,7 +43,7 @@ constexpr std::string_view geomFragSource = R"(
   layout(location = 1) out vec4 fragNormal;
 
   void main() {
-    vec3 albedo     = pow(texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.baseColor;
+    vec3 albedo     = texture(uniMaterial.baseColorMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.baseColor;
     vec3 emissive   = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
     float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
     float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;

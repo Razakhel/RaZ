@@ -91,10 +91,14 @@ void main() {
     specular       += specFactor * pow(halfAngle, 32.0) * radiance;
   }
 
-  vec3 ambient  = color * 0.05;
-  vec3 emissive = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
+  vec3 ambient    = color * 0.05;
+  vec3 emissive   = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
+  vec3 finalColor = ambient + diffuse + specular + emissive;
 
-  fragColor    = vec4(ambient + diffuse + specular + emissive, alpha);
+  // Gamma correction; this is temporary and will be removed later
+  finalColor = pow(finalColor, vec3(1.0 / 2.2));
+
+  fragColor    = vec4(finalColor, alpha);
   fragNormal   = normal * 0.5 + 0.5;
   fragSpecular = vec4(specFactor, 1.0 - max(specFactor.x, max(specFactor.y, specFactor.z)));
 }

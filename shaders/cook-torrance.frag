@@ -96,7 +96,7 @@ void main() {
   if (baseColor.a < 0.1)
     discard;
 
-  vec3 albedo     = pow(baseColor.rgb, vec3(2.2)) * uniMaterial.baseColor;
+  vec3 albedo     = baseColor.rgb * uniMaterial.baseColor;
   float metallic  = texture(uniMaterial.metallicMap, vertMeshInfo.vertTexcoords).r * uniMaterial.metallicFactor;
   float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
   float ambOcc    = texture(uniMaterial.ambientMap, vertMeshInfo.vertTexcoords).r;
@@ -151,16 +151,16 @@ void main() {
     lightRadiance += (diffuse * albedoFactor + specular) * radiance * lightAngle;
   }
 
-  vec3 ambient  = vec3(0.03) * albedo * ambOcc;
-  vec3 emissive = pow(texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb, vec3(2.2)) * uniMaterial.emissive;
-  vec3 color    = ambient + lightRadiance + emissive;
+  vec3 ambient    = vec3(0.03) * albedo * ambOcc;
+  vec3 emissive   = texture(uniMaterial.emissiveMap, vertMeshInfo.vertTexcoords).rgb * uniMaterial.emissive;
+  vec3 finalColor = ambient + lightRadiance + emissive;
 
-  // HDR tone mapping
-  color = color / (color + vec3(1.0));
-  // Gamma correction
-  color = pow(color, vec3(1.0 / 2.2));
+  // Reinhard tone mapping; this is temporary and will be removed later
+  finalColor = finalColor / (finalColor + vec3(1.0));
+  // Gamma correction; this is temporary and will be removed later
+  finalColor = pow(finalColor, vec3(1.0 / 2.2));
 
-  fragColor    = vec4(color, baseColor.a);
+  fragColor    = vec4(finalColor, baseColor.a);
   fragNormal   = normal * 0.5 + 0.5;
   fragSpecular = vec4(baseReflectivity, roughness);
 }
