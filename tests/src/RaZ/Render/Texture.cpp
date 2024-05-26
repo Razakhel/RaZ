@@ -201,6 +201,26 @@ TEST_CASE("Texture2D load image") {
   CHECK(Raz::Texture2D(Raz::Image(1, 1, Raz::ImageColorspace::RGB), false, true).getColorspace() == Raz::TextureColorspace::SRGB);
   CHECK(Raz::Texture2D(Raz::Image(1, 1, Raz::ImageColorspace::RGBA), false, false).getColorspace() == Raz::TextureColorspace::RGBA);
   CHECK(Raz::Texture2D(Raz::Image(1, 1, Raz::ImageColorspace::RGBA), false, true).getColorspace() == Raz::TextureColorspace::SRGBA);
+
+  // However, images with an sRGB(A) colorspace and a floating-point data type are internally used as floating-point RGB(A)
+
+  {
+    const Raz::Texture2D texture(Raz::Image(1, 1, Raz::ImageColorspace::RGB, Raz::ImageDataType::FLOAT), false, true);
+    CHECK(texture.getColorspace() == Raz::TextureColorspace::SRGB);
+#if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() functions are unavailable with OpenGL ES
+    texture.bind();
+    CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_2D) == Raz::TextureInternalFormat::RGB16F);
+#endif
+  }
+
+  {
+    const Raz::Texture2D texture(Raz::Image(1, 1, Raz::ImageColorspace::RGBA, Raz::ImageDataType::FLOAT), false, true);
+    CHECK(texture.getColorspace() == Raz::TextureColorspace::SRGBA);
+#if !defined(USE_OPENGL_ES)
+    texture.bind();
+    CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_2D) == Raz::TextureInternalFormat::RGBA16F);
+#endif
+  }
 }
 
 TEST_CASE("Texture3D load image slices") {
@@ -230,6 +250,26 @@ TEST_CASE("Texture3D load image slices") {
   CHECK(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::RGB) }, false, true).getColorspace() == Raz::TextureColorspace::SRGB);
   CHECK(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::RGBA) }, false, false).getColorspace() == Raz::TextureColorspace::RGBA);
   CHECK(Raz::Texture3D({ Raz::Image(1, 1, Raz::ImageColorspace::RGBA) }, false, true).getColorspace() == Raz::TextureColorspace::SRGBA);
+
+  // However, images with an sRGB(A) colorspace and a floating-point data type are internally used as floating-point RGB(A)
+
+  {
+    const Raz::Texture3D texture({ Raz::Image(1, 1, Raz::ImageColorspace::RGB, Raz::ImageDataType::FLOAT) }, false, true);
+    CHECK(texture.getColorspace() == Raz::TextureColorspace::SRGB);
+#if !defined(USE_OPENGL_ES) // Renderer::recoverTexture*() functions are unavailable with OpenGL ES
+    texture.bind();
+    CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_3D) == Raz::TextureInternalFormat::RGB16F);
+#endif
+  }
+
+  {
+    const Raz::Texture3D texture({ Raz::Image(1, 1, Raz::ImageColorspace::RGBA, Raz::ImageDataType::FLOAT) }, false, true);
+    CHECK(texture.getColorspace() == Raz::TextureColorspace::SRGBA);
+#if !defined(USE_OPENGL_ES)
+    texture.bind();
+    CHECK(Raz::Renderer::recoverTextureInternalFormat(Raz::TextureType::TEXTURE_3D) == Raz::TextureInternalFormat::RGBA16F);
+#endif
+  }
 }
 
 TEST_CASE("Texture fill", "[render]") {

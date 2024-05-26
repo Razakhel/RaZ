@@ -16,6 +16,7 @@ namespace {
 inline TextureFormat recoverFormat(TextureColorspace colorspace) {
   switch (colorspace) {
     case TextureColorspace::INVALID:
+    default:
       break;
 
     case TextureColorspace::GRAY:
@@ -40,12 +41,21 @@ inline TextureFormat recoverFormat(TextureColorspace colorspace) {
 }
 
 inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace, TextureDataType dataType) {
-  // If the texture is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
-  if (dataType == TextureDataType::BYTE && colorspace != TextureColorspace::SRGB && colorspace != TextureColorspace::SRGBA)
-    return static_cast<TextureInternalFormat>(recoverFormat(colorspace));
+  if (dataType == TextureDataType::BYTE) {
+    if (colorspace == TextureColorspace::SRGB)
+      return TextureInternalFormat::SRGB8;
 
+    if (colorspace == TextureColorspace::SRGBA)
+      return TextureInternalFormat::SRGBA8;
+
+    // If the texture is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
+    return static_cast<TextureInternalFormat>(recoverFormat(colorspace));
+  }
+
+  // Floating-point sRGB(A) textures are not treated as sRGB, which is necessarily an integer format; they are therefore interpreted as floating-point RGB(A)
   switch (colorspace) {
     case TextureColorspace::INVALID:
+    default:
       break;
 
     case TextureColorspace::GRAY:
@@ -55,16 +65,12 @@ inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace,
       return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RG16F : TextureInternalFormat::RG32F);
 
     case TextureColorspace::RGB:
+    case TextureColorspace::SRGB:
       return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGB16F : TextureInternalFormat::RGB32F);
 
     case TextureColorspace::RGBA:
-      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGBA16F : TextureInternalFormat::RGBA32F);
-
-    case TextureColorspace::SRGB:
-      return TextureInternalFormat::SRGB8;
-
     case TextureColorspace::SRGBA:
-      return TextureInternalFormat::SRGBA8;
+      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGBA16F : TextureInternalFormat::RGBA32F);
 
     case TextureColorspace::DEPTH:
       return TextureInternalFormat::DEPTH32F;

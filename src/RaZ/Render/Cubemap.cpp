@@ -113,16 +113,29 @@ TextureFormat recoverFormat(ImageColorspace colorspace) {
     case ImageColorspace::RGBA:
     case ImageColorspace::SRGBA:
       return TextureFormat::RGBA;
+
+    default:
+      break;
   }
 
   throw std::invalid_argument("Error: Invalid image colorspace");
 }
 
 TextureInternalFormat recoverInternalFormat(ImageColorspace colorspace, ImageDataType dataType) {
-  // If the image is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
-  if (dataType == ImageDataType::BYTE && colorspace != ImageColorspace::SRGB && colorspace != ImageColorspace::SRGBA)
-    return static_cast<TextureInternalFormat>(recoverFormat(colorspace));
+  if (dataType == ImageDataType::BYTE) {
+    // RGB(A) images are supposed to be treated as sRGB(A) textures; this will be the case in the future
 
+    if (/*colorspace == ImageColorspace::RGB || */colorspace == ImageColorspace::SRGB)
+      return TextureInternalFormat::SRGB8;
+
+    if (/*colorspace == ImageColorspace::RGBA || */colorspace == ImageColorspace::SRGBA)
+      return TextureInternalFormat::SRGBA8;
+
+    // If the image is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
+    return static_cast<TextureInternalFormat>(recoverFormat(colorspace));
+  }
+
+  // Floating-point sRGB(A) images are not treated as sRGB, which is necessarily an integer format; they are therefore interpreted as floating-point RGB(A)
   switch (colorspace) {
     case ImageColorspace::GRAY:
       return TextureInternalFormat::R16F;
@@ -131,16 +144,15 @@ TextureInternalFormat recoverInternalFormat(ImageColorspace colorspace, ImageDat
       return TextureInternalFormat::RG16F;
 
     case ImageColorspace::RGB:
+    case ImageColorspace::SRGB:
       return TextureInternalFormat::RGB16F;
 
     case ImageColorspace::RGBA:
+    case ImageColorspace::SRGBA:
       return TextureInternalFormat::RGBA16F;
 
-    case ImageColorspace::SRGB:
-      return TextureInternalFormat::SRGB8;
-
-    case ImageColorspace::SRGBA:
-      return TextureInternalFormat::SRGBA8;
+    default:
+      break;
   }
 
   throw std::invalid_argument("Error: Invalid image colorspace");
