@@ -11,12 +11,9 @@
 namespace Raz {
 
 bool RenderGraph::isValid() const {
-  for (const std::unique_ptr<RenderPass>& renderPass : m_nodes) {
-    if (!renderPass->isValid())
-      return false;
-  }
-
-  return true;
+  return std::all_of(m_nodes.cbegin(), m_nodes.cend(), [] (const std::unique_ptr<RenderPass>& renderPass) {
+    return renderPass->isValid();
+  });
 }
 
 void RenderGraph::resizeViewport(unsigned int width, unsigned int height) {

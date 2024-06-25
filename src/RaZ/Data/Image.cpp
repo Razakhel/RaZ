@@ -27,7 +27,7 @@ bool ImageDataF::operator==(const ImageData& imgData) const {
 }
 
 Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{ colorspace }, m_dataType{ dataType } {
-  assert("Error: An sRGB[A] image must have a byte data type."
+  assert("Error: An sRGB(A) image must have a byte data type."
       && (m_colorspace != ImageColorspace::SRGB || m_colorspace != ImageColorspace::SRGBA || m_dataType == ImageDataType::BYTE));
 
   switch (colorspace) {

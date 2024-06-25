@@ -293,7 +293,11 @@ TEST_CASE("ShaderProgram image textures", "[render]") {
   CHECK(program.getImageTextureCount() == 0);
 
   // Adding an image texture without a valid colorspace throws an exception
-  CHECK_THROWS(program.setImageTexture(Raz::Texture2D::create(), "noColorspace"));
+  CHECK_THROWS(program.setImageTexture(Raz::Texture2D::create(), {}));
+  CHECK_THROWS(program.setImageTexture(Raz::Texture2D::create(Raz::TextureColorspace::DEPTH), {}));
+  // Textures with an sRGB(A) colorspace aren't valid as image textures
+  CHECK_THROWS(program.setImageTexture(Raz::Texture2D::create(Raz::TextureColorspace::SRGB), {}));
+  CHECK_THROWS(program.setImageTexture(Raz::Texture3D::create(Raz::TextureColorspace::SRGBA), {}));
 
   const auto tex2D = Raz::Texture2D::create(Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
   const auto tex3D = Raz::Texture3D::create(Raz::TextureColorspace::GRAY, Raz::TextureDataType::FLOAT16);

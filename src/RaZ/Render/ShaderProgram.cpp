@@ -49,7 +49,7 @@ ImageInternalFormat recoverImageTextureFormat(const Texture& texture) {
       break;
   }
 
-  throw std::invalid_argument("Error: The given image texture is not supported");
+  throw std::invalid_argument("[ShaderProgram] The given image texture is not supported");
 }
 
 } // namespace
@@ -79,7 +79,7 @@ const Texture& ShaderProgram::getTexture(const std::string& uniformName) const {
   });
 
   if (textureIt == m_textures.cend())
-    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+    throw std::invalid_argument("[ShaderProgram] The given attribute uniform name does not exist");
 
   return *textureIt->first;
 }
@@ -103,7 +103,7 @@ const Texture& ShaderProgram::getImageTexture(const std::string& uniformName) co
   });
 
   if (textureIt == m_imageTextures.cend())
-    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+    throw std::invalid_argument("[ShaderProgram] The given attribute uniform name does not exist");
 
   return *textureIt->first;
 }
@@ -129,11 +129,16 @@ void ShaderProgram::setImageTexture(TexturePtr texture, const std::string& unifo
     !Renderer::checkVersion(3, 1)
 #endif
     ) {
-    throw std::runtime_error("Error: Using image textures requires OpenGL 4.2+ or OpenGL ES 3.1+");
+    throw std::runtime_error("[ShaderProgram] Using image textures requires OpenGL 4.2+ or OpenGL ES 3.1+");
   }
 
   if (texture->getColorspace() == TextureColorspace::INVALID || texture->getColorspace() == TextureColorspace::DEPTH)
-    throw std::invalid_argument("Error: The given image texture's colorspace is invalid");
+    throw std::invalid_argument("[ShaderProgram] The given image texture's colorspace is invalid");
+
+  if (texture->getColorspace() == TextureColorspace::SRGB || texture->getColorspace() == TextureColorspace::SRGBA) {
+    // See: https://www.khronos.org/opengl/wiki/Image_Load_Store#Format_compatibility
+    throw std::invalid_argument("[ShaderProgram] Textures with an sRGB(A) colorspace cannot be used as image textures");
+  }
 
   auto imgTextureIt = std::find_if(m_imageTextures.begin(), m_imageTextures.end(), [&uniformName] (const auto& element) {
     return (element.second.uniformName == uniformName);
@@ -213,7 +218,7 @@ void ShaderProgram::removeAttribute(const std::string& uniformName) {
   const auto attribIt = m_attributes.find(uniformName);
 
   if (attribIt == m_attributes.end())
-    throw std::invalid_argument("Error: The given attribute uniform name does not exist");
+    throw std::invalid_argument("[ShaderProgram] The given attribute uniform name does not exist");
 
   m_attributes.erase(attribIt);
 }
