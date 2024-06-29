@@ -34,7 +34,7 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, 
 
   const std::size_t perTaskRangeCount = totalRangeCount / maxTaskCount;
   std::size_t remainderElementCount   = totalRangeCount % maxTaskCount;
-  std::size_t taskBeginIndex          = 0;
+  auto taskBeginIndex                 = static_cast<std::size_t>(beginIndex);
 
   std::vector<std::promise<void>> promises;
   promises.resize(maxTaskCount);

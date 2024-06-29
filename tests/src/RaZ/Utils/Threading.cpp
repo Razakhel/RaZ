@@ -62,11 +62,19 @@ TEST_CASE("Threading multi parallelization", "[utils]") {
 
 TEST_CASE("Threading index parallelization", "[utils]") {
   Raz::Threading::parallelize(0, 9, [] (const Raz::Threading::IndexRange& range) {
-    CHECK(((range.beginIndex == 0 && range.endIndex == 3)
-        || (range.beginIndex == 3 && range.endIndex == 5)
-        || (range.beginIndex == 5 && range.endIndex == 7)
-        || (range.beginIndex == 7 && range.endIndex == 9)));
+    CHECK(((range.beginIndex == 0 && range.endIndex == 3)    // 3 elements (0, 1, 2)
+        || (range.beginIndex == 3 && range.endIndex == 5)    // 2 elements (3, 4)
+        || (range.beginIndex == 5 && range.endIndex == 7)    // 2 elements (5, 6)
+        || (range.beginIndex == 7 && range.endIndex == 9))); // 2 elements (7, 8)
   }, 4);
+  // Testing with a non-zero begin index
+  Raz::Threading::parallelize(2, 9, [] (const Raz::Threading::IndexRange& range) {
+    CHECK(((range.beginIndex == 2 && range.endIndex == 4)    // 2 elements (2, 4)
+        || (range.beginIndex == 4 && range.endIndex == 6)    // 2 elements (4, 5)
+        || (range.beginIndex == 6 && range.endIndex == 8)    // 2 elements (6, 7)
+        || (range.beginIndex == 8 && range.endIndex == 9))); // 1 element (8)
+  }, 4);
+
   CHECK_THROWS(Raz::Threading::parallelize(0, 1, [] (const auto&) noexcept {}, 0)); // Given 0 as thread count
   CHECK_THROWS(Raz::Threading::parallelize(0, 0, [] (const auto&) noexcept {}, 1)); // Invalid range
 
@@ -82,11 +90,19 @@ TEST_CASE("Threading iterator parallelization", "[utils]") {
   {
     static constexpr std::array<int, 9> dummy {};
     Raz::Threading::parallelize(dummy.begin(), dummy.end(), [] (const Raz::Threading::IterRange<std::array<int, 9>::const_iterator>& range) {
-      CHECK(((range.begin() == dummy.begin() + 0 && range.end() == dummy.begin() + 3)
-          || (range.begin() == dummy.begin() + 3 && range.end() == dummy.begin() + 5)
-          || (range.begin() == dummy.begin() + 5 && range.end() == dummy.begin() + 7)
-          || (range.begin() == dummy.begin() + 7 && range.end() == dummy.begin() + 9)));
+      CHECK(((range.begin() == dummy.begin() + 0 && range.end() == dummy.begin() + 3)    // 3 elements (0, 1, 2)
+          || (range.begin() == dummy.begin() + 3 && range.end() == dummy.begin() + 5)    // 2 elements (3, 4)
+          || (range.begin() == dummy.begin() + 5 && range.end() == dummy.begin() + 7)    // 2 elements (5, 6)
+          || (range.begin() == dummy.begin() + 7 && range.end() == dummy.begin() + 9))); // 2 elements (7, 8)
     }, 4);
+    // Testing with a subset of the whole range
+    Raz::Threading::parallelize(dummy.begin() + 1, dummy.end() - 1, [] (const Raz::Threading::IterRange<std::array<int, 9>::const_iterator>& range) {
+      CHECK(((range.begin() == dummy.begin() + 1 && range.end() == dummy.begin() + 3)    // 2 elements (1, 2)
+          || (range.begin() == dummy.begin() + 3 && range.end() == dummy.begin() + 5)    // 2 elements (3, 4)
+          || (range.begin() == dummy.begin() + 5 && range.end() == dummy.begin() + 7)    // 2 elements (5, 6)
+          || (range.begin() == dummy.begin() + 7 && range.end() == dummy.begin() + 8))); // 1 element (7)
+    }, 4);
+
     CHECK_THROWS(Raz::Threading::parallelize(dummy.begin(), dummy.end(), [](const auto&) noexcept {}, 0)); // Given 0 as thread count
     CHECK_THROWS(Raz::Threading::parallelize(dummy.begin(), dummy.begin(), [](const auto&) noexcept {}, 1)); // Invalid range
   }
