@@ -73,8 +73,8 @@ public:
   Overlay& getOverlay() noexcept { return m_overlay; }
 #endif
 
-  void setClearColor(const Vec4f& clearColor) const;
-  void setClearColor(float red, float green, float blue, float alpha = 1.f) const { setClearColor(Vec4f(red, green, blue, alpha)); }
+  void setClearColor(const Color& color, float alpha = 1.f) const;
+  void setClearColor(float red, float green, float blue, float alpha = 1.f) const { setClearColor(Color(red, green, blue), alpha); }
   void setTitle(const std::string& title) const;
   /// Sets an image as window icon.
   /// \param img Image to be set as the window's icon. Must have an RGBA colorspace & a byte data type.

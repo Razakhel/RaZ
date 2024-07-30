@@ -1069,7 +1069,8 @@ TEST_CASE("LuaRender Window", "[script][lua][render]") {
 
     assert(window:getWidth() == window:getHeight())
 
-    window:setClearColor(Vec4f.new(1))
+    window:setClearColor(ColorPreset.Black)
+    window:setClearColor(ColorPreset.White, 1)
     window:setClearColor(1, 0, 0)
     window:setClearColor(0, 1, 0, 1)
     window:setTitle("Test")

@@ -27,7 +27,8 @@ void LuaWrapper::registerWindowTypes() {
 #if !defined(RAZ_NO_OVERLAY)
     window["getOverlay"]               = &Window::getOverlay;
 #endif
-    window["setClearColor"]            = sol::overload(PickOverload<const Vec4f&>(&Window::setClearColor),
+    window["setClearColor"]            = sol::overload([] (const Window& w, const Color& c) { w.setClearColor(c); },
+                                                       PickOverload<const Color&, float>(&Window::setClearColor),
                                                        [] (const Window& w, float r, float g, float b) { w.setClearColor(r, g, b); },
                                                        PickOverload<float, float, float, float>(&Window::setClearColor));
     window["setTitle"]                 = &Window::setTitle;

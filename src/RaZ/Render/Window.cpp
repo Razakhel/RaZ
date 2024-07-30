@@ -130,8 +130,8 @@ Window::Window(RenderSystem& renderSystem,
   Logger::debug("[Window] Initialized");
 }
 
-void Window::setClearColor(const Vec4f& clearColor) const {
-  Renderer::clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+void Window::setClearColor(const Color& color, float alpha) const {
+  Renderer::clearColor(color.red(), color.green(), color.blue(), alpha);
 }
 
 void Window::setTitle(const std::string& title) const {
