@@ -9,6 +9,7 @@
 #include "RaZ/Render/PixelizationRenderProcess.hpp"
 #include "RaZ/Render/RenderProcess.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
+#include "RaZ/Render/SobelFilterRenderProcess.hpp"
 #include "RaZ/Render/VignetteRenderProcess.hpp"
 #include "RaZ/Render/Window.hpp"
 
@@ -19,13 +20,8 @@
 
 namespace {
 
-Raz::Image renderFrame(Raz::World& world, const Raz::Texture2DPtr& output, const Raz::FilePath& renderedImgPath = {}) {
-  // Rendering a frame of the scene by updating the World's RenderSystem
-  // Running the window shouldn't be useful as we render to a texture, and more importantly can make this file's tests
-  //  fail under Linux (as the second rendered frame of each test might be empty)
-  world.update({});
-
-  Raz::Image renderedImg = output->recoverImage();
+Raz::Image recoverImage(const Raz::Texture2DPtr& outputTexture, const Raz::FilePath& renderedImgPath = {}) {
+  Raz::Image renderedImg = outputTexture->recoverImage();
 
   if (!renderedImgPath.isEmpty())
     Raz::ImageFormat::save(renderedImgPath, renderedImg, true);
@@ -57,7 +53,8 @@ TEST_CASE("ChromaticAberrationRenderProcess execution", "[render]") {
   chromaticAberration.setInputBuffer(std::move(input));
   chromaticAberration.setOutputBuffer(output);
 
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(baseImg));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(baseImg));
 
   // 1
   // 0
@@ -74,7 +71,9 @@ TEST_CASE("ChromaticAberrationRenderProcess execution", "[render]") {
   chromaticAberration.setStrength(5.f);
   chromaticAberration.setDirection(Raz::Vec2f(1.f, 1.f));
   chromaticAberration.setMaskTexture(std::move(texture));
-  CHECK_THAT(renderFrame(world, output),
+
+  world.update({});
+  CHECK_THAT(recoverImage(output),
              IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_chromatic_aberration.png", true)));
 }
 
@@ -103,12 +102,14 @@ TEST_CASE("ConvolutionRenderProcess execution", "[render]") {
   convolution.setInputBuffer(std::move(input));
   convolution.setOutputBuffer(output);
 
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(baseImg));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(baseImg));
 
   convolution.setKernel(Raz::Mat3f(-1.f, -1.f, -1.f,
                                    -1.f,  8.f, -1.f,
                                    -1.f, -1.f, -1.f));
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_convolved.png", true)));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_convolved.png", true)));
 }
 
 TEST_CASE("FilmGrainRenderProcess execution", "[render][!mayfail]") { // May fail under Linux for yet unknown reasons (second frame is empty)
@@ -129,10 +130,12 @@ TEST_CASE("FilmGrainRenderProcess execution", "[render][!mayfail]") { // May fai
   filmGrain.setInputBuffer(std::move(input));
   filmGrain.setOutputBuffer(output);
 
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/film_grain_weak.png", true)));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/film_grain_weak.png", true)));
 
   filmGrain.setStrength(0.5f);
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/film_grain_strong.png", true), 0.062f));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/film_grain_strong.png", true), 0.062f));
 }
 
 TEST_CASE("PixelizationRenderProcess execution", "[render][!mayfail]") { // May fail under Linux for yet unknown reasons (second frame is empty)
@@ -157,10 +160,43 @@ TEST_CASE("PixelizationRenderProcess execution", "[render][!mayfail]") { // May 
   pixelization.setInputBuffer(std::move(input));
   pixelization.setOutputBuffer(output);
 
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(baseImg));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(baseImg));
 
   pixelization.setStrength(0.75f);
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_pixelated.png", true)));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_pixelated.png", true)));
+}
+
+TEST_CASE("SobelFilterRenderProcess execution", "[render]") {
+  Raz::World world;
+
+  const Raz::Window& window = TestUtils::getWindow();
+
+  auto& render = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  // RenderSystem::update() needs a Camera with a Transform component
+  world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
+
+  const Raz::Image baseImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true);
+  REQUIRE(baseImg.getWidth() == window.getWidth());
+  REQUIRE(baseImg.getHeight() == window.getHeight());
+
+  Raz::Texture2DPtr input = Raz::Texture2D::create(baseImg);
+  const Raz::Texture2DPtr outputGrad    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  const Raz::Texture2DPtr outputGradDir = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+
+  auto& sobel = render.getRenderGraph().addRenderProcess<Raz::SobelFilterRenderProcess>();
+  sobel.addParent(render.getGeometryPass());
+  sobel.setInputBuffer(std::move(input));
+  sobel.setOutputGradientBuffer(outputGrad);
+  sobel.setOutputGradientDirectionBuffer(outputGradDir);
+
+  world.update({});
+  CHECK_THAT(recoverImage(outputGrad),
+             IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_sobel_grad.png", true)));
+  CHECK_THAT(recoverImage(outputGradDir),
+             IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_sobel_grad_dir.png", true), 0.06f));
 }
 
 TEST_CASE("VignetteRenderProcess execution", "[render]") {
@@ -181,10 +217,12 @@ TEST_CASE("VignetteRenderProcess execution", "[render]") {
   vignette.setInputBuffer(std::move(input));
   vignette.setOutputBuffer(output);
 
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/vignette_weak_black.png", true)));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/vignette_weak_black.png", true)));
 
   vignette.setStrength(1.f);
   vignette.setOpacity(0.5f);
   vignette.setColor(Raz::ColorPreset::Red);
-  CHECK_THAT(renderFrame(world, output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/vignette_strong_red.png", true)));
+  world.update({});
+  CHECK_THAT(recoverImage(output), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/vignette_strong_red.png", true)));
 }

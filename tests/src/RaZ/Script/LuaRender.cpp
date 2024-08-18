@@ -386,6 +386,7 @@ TEST_CASE("LuaRender RenderGraph", "[script][lua][render]") {
     assert(renderGraph:addGaussianBlurRenderProcess() ~= nil)
     assert(renderGraph:addPixelizationRenderProcess() ~= nil)
     assert(renderGraph:addScreenSpaceReflectionsRenderProcess() ~= nil)
+    assert(renderGraph:addSobelFilterRenderProcess() ~= nil)
     assert(renderGraph:addVignetteRenderProcess() ~= nil)
     renderGraph:resizeViewport(1, 1)
     renderGraph:updateShaders()

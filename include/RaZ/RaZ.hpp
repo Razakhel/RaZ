@@ -68,6 +68,7 @@
 #include "Render/ScreenSpaceReflectionsRenderProcess.hpp"
 #include "Render/Shader.hpp"
 #include "Render/ShaderProgram.hpp"
+#include "Render/SobelFilterRenderProcess.hpp"
 #include "Render/SubmeshRenderer.hpp"
 #include "Render/Texture.hpp"
 #include "Render/UniformBuffer.hpp"

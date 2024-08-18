@@ -9,6 +9,7 @@
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Render/ScreenSpaceReflectionsRenderProcess.hpp"
+#include "RaZ/Render/SobelFilterRenderProcess.hpp"
 #include "RaZ/Render/VignetteRenderProcess.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
@@ -45,6 +46,7 @@ void LuaWrapper::registerRenderGraphTypes() {
     renderGraph["addGaussianBlurRenderProcess"]           = &RenderGraph::addRenderProcess<GaussianBlurRenderProcess>;
     renderGraph["addPixelizationRenderProcess"]           = &RenderGraph::addRenderProcess<PixelizationRenderProcess>;
     renderGraph["addScreenSpaceReflectionsRenderProcess"] = &RenderGraph::addRenderProcess<ScreenSpaceReflectionsRenderProcess>;
+    renderGraph["addSobelFilterRenderProcess"]            = &RenderGraph::addRenderProcess<SobelFilterRenderProcess>;
     renderGraph["addVignetteRenderProcess"]               = &RenderGraph::addRenderProcess<VignetteRenderProcess>;
     renderGraph["resizeViewport"]                         = &RenderGraph::resizeViewport;
     renderGraph["updateShaders"]                          = &RenderGraph::updateShaders;
@@ -187,6 +189,15 @@ void LuaWrapper::registerRenderGraphTypes() {
       ssrRenderProcess["setInputNormalBuffer"]       = &ScreenSpaceReflectionsRenderProcess::setInputNormalBuffer;
       ssrRenderProcess["setInputSpecularBuffer"]     = &ScreenSpaceReflectionsRenderProcess::setInputSpecularBuffer;
       ssrRenderProcess["setOutputBuffer"]            = &ScreenSpaceReflectionsRenderProcess::setOutputBuffer;
+    }
+
+    {
+      auto sobelRenderProcess = state.new_usertype<SobelFilterRenderProcess>("SobelFilterRenderProcess",
+                                                                             sol::constructors<SobelFilterRenderProcess(RenderGraph&)>(),
+                                                                             sol::base_classes, sol::bases<MonoPassRenderProcess, RenderProcess>());
+      sobelRenderProcess["setInputBuffer"]                   = &SobelFilterRenderProcess::setInputBuffer;
+      sobelRenderProcess["setOutputGradientBuffer"]          = &SobelFilterRenderProcess::setOutputGradientBuffer;
+      sobelRenderProcess["setOutputGradientDirectionBuffer"] = &SobelFilterRenderProcess::setOutputGradientDirectionBuffer;
     }
 
     {
