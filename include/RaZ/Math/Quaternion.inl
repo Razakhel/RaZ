@@ -169,24 +169,20 @@ constexpr Quaternion<T> Quaternion<T>::lerp(const Quaternion& quat, T currCoeff,
 
 template <typename T>
 constexpr Vec3<T> operator*(const Quaternion<T>& quat, const Vec3<T>& vec) noexcept {
-  // Quaternion/vector multiplications are supposed to be made with unit quaternions only, hence the conjugation instead of the inversion
-  // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
-  // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
+  // Adapted from https://fgiesen.wordpress.com/2019/02/09/rotating-a-single-vector-using-a-quaternion/
 
-  Quaternion<T> vecQuat(0.f, vec.x(), vec.y(), vec.z());
-  vecQuat = quat * vecQuat * quat.conjugate();
-  return Vec3<T>(vecQuat.x(), vecQuat.y(), vecQuat.z());
+  const Vec3<T> quatVec(quat.x(), quat.y(), quat.z());
+  const Vec3<T> doubleQuatVecCross = static_cast<T>(2) * quatVec.cross(vec);
+  return vec + quat.w() * doubleQuatVecCross + quatVec.cross(doubleQuatVecCross);
 }
 
 template <typename T>
 constexpr Vec3<T> operator*(const Vec3<T>& vec, const Quaternion<T>& quat) noexcept {
-  // Quaternion/vector multiplications are supposed to be made with unit quaternions only, hence the conjugation instead of the inversion
-  // Most likely because of the error accumulation due to floating-point numbers, the norm of a supposedly unit quaternion is almost never very close to 1
-  // That norm is thus not checked here; it may require changing to an actual inversion in the future to avoid further approximation errors
+  // Adapted from https://fgiesen.wordpress.com/2019/02/09/rotating-a-single-vector-using-a-quaternion/
 
-  Quaternion<T> vecQuat(0.f, vec.x(), vec.y(), vec.z());
-  vecQuat = quat.conjugate() * vecQuat * quat;
-  return Vec3<T>(vecQuat.x(), vecQuat.y(), vecQuat.z());
+  const Vec3<T> quatVec(quat.x(), quat.y(), quat.z());
+  const Vec3<T> doubleQuatVecCross = static_cast<T>(2) * vec.cross(quatVec);
+  return vec + quat.w() * doubleQuatVecCross + doubleQuatVecCross.cross(quatVec);
 }
 
 } // namespace Raz

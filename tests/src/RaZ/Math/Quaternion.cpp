@@ -143,9 +143,9 @@ TEST_CASE("Quaternion/vector multiplication", "[math]") {
   CHECK(quatRotY * pos == Raz::Vec3f(5.44976425f, pos.y(), 5.27581501f));
   CHECK(quatRotZ * pos == Raz::Vec3f(-10.1741714f, 10.3481178f, pos.z()));
 
-  CHECK(pos * quatRotX == Raz::Vec3f(pos.x(), 15.6239338f, -4.89835596f));
-  CHECK(pos * quatRotY == Raz::Vec3f(-5.27581596f, pos.y(), 5.4497633f));
-  CHECK(pos * quatRotZ == Raz::Vec3f(10.3481188f, 10.1741686f, pos.z()));
+  CHECK_THAT(pos * quatRotX, IsNearlyEqualToVector(Raz::Vec3f(pos.x(), 15.6239338f, -4.89835596f), 0.000001f));
+  CHECK_THAT(pos * quatRotY, IsNearlyEqualToVector(Raz::Vec3f(-5.27581596f, pos.y(), 5.4497633f)));
+  CHECK_THAT(pos * quatRotZ, IsNearlyEqualToVector(Raz::Vec3f(10.3481188f, 10.1741686f, pos.z())));
 
   // Checking that the matrix multiplication behaves the same way
 
