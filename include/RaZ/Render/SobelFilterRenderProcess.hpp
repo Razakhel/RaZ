@@ -7,17 +7,17 @@
 
 namespace Raz {
 
-/// [Sobel filter](https://en.wikipedia.org/wiki/Sobel_operator) render process.
+/// [Sobel filter/operator](https://en.wikipedia.org/wiki/Sobel_operator) render process.
 class SobelFilterRenderProcess final : public MonoPassRenderProcess {
 public:
   explicit SobelFilterRenderProcess(RenderGraph& renderGraph);
 
   void resizeBuffers(unsigned int width, unsigned int height) override;
   void setInputBuffer(Texture2DPtr colorBuffer);
-  /// Sets the output buffer which will contain the gradient's value.
-  /// \param gradientBuffer Gradient's values buffer.
+  /// Sets the output buffer which will contain the gradient values.
+  /// \param gradientBuffer Gradient buffer.
   void setOutputGradientBuffer(Texture2DPtr gradientBuffer);
-  /// Sets the output buffer which will contain the gradient's direction.
+  /// Sets the output buffer which will contain the gradient direction values.
   ///
   ///           /--0.75--\
   ///         /            \
@@ -27,10 +27,10 @@ public:
   ///         \            /
   ///           \--0.25--/
   ///
-  /// \note The direction's values are just like those of [atan2](https://en.wikipedia.org/wiki/Atan2) (see image below), but remapped between [0; 1].
+  /// \note The direction values are just like those of [atan2](https://en.wikipedia.org/wiki/Atan2) (see image below), but remapped between [0; 1].
   /// \imageSize{https://upload.cppreference.com/mwiki/images/9/91/math-atan2.png, height: 20%; width: 20%;}
   /// \image html https://upload.cppreference.com/mwiki/images/9/91/math-atan2.png
-  /// \param gradDirBuffer Gradient's direction buffer.
+  /// \param gradDirBuffer Gradient direction buffer.
   void setOutputGradientDirectionBuffer(Texture2DPtr gradDirBuffer);
 };
 

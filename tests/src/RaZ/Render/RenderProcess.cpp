@@ -3,6 +3,7 @@
 #include "RaZ/Data/ImageFormat.hpp"
 #include "RaZ/Math/Transform.hpp"
 #include "RaZ/Render/Camera.hpp"
+#include "RaZ/Render/CannyFilterRenderProcess.hpp"
 #include "RaZ/Render/ChromaticAberrationRenderProcess.hpp"
 #include "RaZ/Render/ConvolutionRenderProcess.hpp"
 #include "RaZ/Render/FilmGrainRenderProcess.hpp"
@@ -30,6 +31,45 @@ Raz::Image recoverImage(const Raz::Texture2DPtr& outputTexture, const Raz::FileP
 }
 
 } // namespace
+
+TEST_CASE("CannyFilterRenderProcess execution", "[render]") {
+  Raz::World world;
+
+  const Raz::Window& window = TestUtils::getWindow();
+
+  auto& render = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  // RenderSystem::update() needs a Camera with a Transform component
+  world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
+
+  const Raz::Image gradientImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_sobel_grad.png", true);
+  REQUIRE(gradientImg.getWidth() == window.getWidth());
+  REQUIRE(gradientImg.getHeight() == window.getHeight());
+  const Raz::Image gradDirImg  = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_sobel_grad_dir.png", true);
+  REQUIRE(gradDirImg.getWidth() == window.getWidth());
+  REQUIRE(gradDirImg.getHeight() == window.getHeight());
+
+  Raz::Texture2DPtr gradientInput = Raz::Texture2D::create(gradientImg);
+  Raz::Texture2DPtr gradDirInput  = Raz::Texture2D::create(gradDirImg);
+  const Raz::Texture2DPtr output  = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::GRAY, Raz::TextureDataType::BYTE);
+
+  auto& canny = render.getRenderGraph().addRenderProcess<Raz::CannyFilterRenderProcess>();
+  canny.addParent(render.getGeometryPass());
+  canny.setInputGradientBuffer(std::move(gradientInput));
+  canny.setInputGradientDirectionBuffer(std::move(gradDirInput));
+  canny.setOutputBuffer(output);
+
+  world.update({});
+  CHECK_THAT(recoverImage(output),
+             IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_canny_default.png", true)));
+
+  canny.setLowerBound(0.f);
+  canny.setUpperBound(0.1f);
+
+  world.update({});
+  CHECK_THAT(recoverImage(output),
+             IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_canny_detailed.png", true)));
+}
 
 TEST_CASE("ChromaticAberrationRenderProcess execution", "[render]") {
   Raz::World world;
