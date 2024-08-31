@@ -39,6 +39,12 @@ void LuaWrapper::registerOverlayWidgetTypes() {
   }
 
   {
+    state.new_usertype<OverlayColorPicker>("OverlayColorPicker",
+                                           sol::constructors<OverlayColorPicker(std::string, std::function<void(const Color&)>, const Color&)>(),
+                                           sol::base_classes, sol::bases<OverlayElement>());
+  }
+
+  {
     state.new_usertype<OverlayDropdown>("OverlayDropdown",
                                         sol::constructors<OverlayDropdown(std::string, std::vector<std::string>,
                                                                           std::function<void(const std::string&, std::size_t)>),
@@ -193,6 +199,7 @@ void LuaWrapper::registerOverlayWidgetTypes() {
     { "TEXT_AREA",     OverlayElementType::TEXT_AREA },
     { "LIST_BOX",      OverlayElementType::LIST_BOX },
     { "DROPDOWN",      OverlayElementType::DROPDOWN },
+    { "COLOR_PICKER",  OverlayElementType::COLOR_PICKER },
     { "TEXTURE",       OverlayElementType::TEXTURE },
     { "PROGRESS_BAR",  OverlayElementType::PROGRESS_BAR },
     { "PLOT",          OverlayElementType::PLOT },

@@ -220,6 +220,14 @@ TEST_CASE("LuaRender Overlay", "[script][lua][render]") {
     assert(overlayColoredLabel.color == ColorPreset.Gray)
     assert(overlayColoredLabel.alpha == 0)
 
+    local overlayColorPicker = OverlayColorPicker.new("", function () end, ColorPreset.Blue)
+    overlayColorPicker       = overlayWindow:addColorPicker("", function () end, ColorPreset.Red)
+    assert(overlayColorPicker:getType() == OverlayElementType.COLOR_PICKER)
+    overlayColorPicker:enable()
+    overlayColorPicker:enable(true)
+    overlayColorPicker:disable()
+    assert(not overlayColorPicker:isEnabled())
+
     local overlayDropdown = OverlayDropdown.new("", { "1", "2", "3" }, function () end)
     overlayDropdown       = OverlayDropdown.new("", { "1", "2", "3" }, function () end, 0)
     overlayDropdown       = overlayWindow:addDropdown("", { "1", "2", "3" }, function () end)

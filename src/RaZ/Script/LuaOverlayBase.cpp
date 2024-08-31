@@ -66,6 +66,7 @@ void LuaWrapper::registerOverlayBaseTypes() {
                                                                                                                                          std::move(c)); },
                                                      PickOverload<std::string, std::vector<std::string>, std::function<void(const std::string&, std::size_t)>,
                                                                   std::size_t>(&OverlayWindow::addDropdown));
+    overlayWindow["addColorPicker"]  = &OverlayWindow::addColorPicker;
     overlayWindow["addTexture"]      = sol::overload(PickOverload<const Texture2D&, unsigned int, unsigned int>(&OverlayWindow::addTexture),
                                                      PickOverload<const Texture2D&>(&OverlayWindow::addTexture));
     overlayWindow["addProgressBar"]  = sol::overload([] (OverlayWindow& w, int min, int max) { return &w.addProgressBar(min, max); },

@@ -27,6 +27,7 @@ enum class OverlayElementType {
   TEXT_AREA,
   LIST_BOX,
   DROPDOWN,
+  COLOR_PICKER,
   TEXTURE,
   PROGRESS_BAR,
   PLOT,
@@ -232,8 +233,7 @@ class OverlayListBox final : public OverlayElement {
 public:
   OverlayListBox(std::string label, std::vector<std::string> entries,
                  std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-    : OverlayElement(std::move(label)),
-      m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
+    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {}
 
   OverlayElementType getType() const override { return OverlayElementType::LIST_BOX; }
 
@@ -241,7 +241,6 @@ private:
   std::vector<std::string> m_entries {};
   std::function<void(const std::string&, std::size_t)> m_actionChanged {};
   std::size_t m_currentId {};
-  const char* m_currentVal {};
 };
 
 class OverlayDropdown final : public OverlayElement {
@@ -250,8 +249,7 @@ class OverlayDropdown final : public OverlayElement {
 public:
   OverlayDropdown(std::string label, std::vector<std::string> entries,
                   std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-    : OverlayElement(std::move(label)),
-      m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId }, m_currentVal{ m_entries[initId].c_str() } {}
+    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {}
 
   OverlayElementType getType() const override { return OverlayElementType::DROPDOWN; }
 
@@ -259,7 +257,20 @@ private:
   std::vector<std::string> m_entries {};
   std::function<void(const std::string&, std::size_t)> m_actionChanged {};
   std::size_t m_currentId {};
-  const char* m_currentVal {};
+};
+
+class OverlayColorPicker final : public OverlayElement {
+  friend OverlayWindow;
+
+public:
+  OverlayColorPicker(std::string label, std::function<void(const Color&)> actionChanged, const Color& initColor)
+    : OverlayElement(std::move(label)), m_actionChanged{ std::move(actionChanged) }, m_currentColor{ initColor.red(), initColor.green(), initColor.blue() } {}
+
+  OverlayElementType getType() const override { return OverlayElementType::COLOR_PICKER; }
+
+private:
+  std::function<void(const Color&)> m_actionChanged {};
+  std::array<float, 3> m_currentColor {};
 };
 
 class OverlayTexture final : public OverlayElement {
@@ -463,6 +474,12 @@ public:
   /// \return Reference to the newly added dropdown list.
   OverlayDropdown& addDropdown(std::string label, std::vector<std::string> entries,
                                std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
+  /// Adds a color picker on the overlay window.
+  /// \param label Text to be displayed beside the color picker.
+  /// \param actionChanged Action to be executed when a color is selected.
+  /// \param initColor Initial color.
+  /// \return Reference to the newly added color picker.
+  OverlayColorPicker& addColorPicker(std::string label, std::function<void(const Color&)> actionChanged, const Color& initColor);
   /// Adds a texture on the overlay window.
   /// \param texture Texture to be displayed.
   /// \param maxWidth Maximum texture's width.

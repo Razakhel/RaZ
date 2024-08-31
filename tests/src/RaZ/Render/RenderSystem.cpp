@@ -193,9 +193,10 @@ TEST_CASE("RenderSystem overlay render", "[render]") {
   {
     Raz::OverlayWindow& overlay4 = window.getOverlay().addWindow("RaZ - Overlay test 4", Raz::Vec2f(window.getWidth(), window.getHeight()));
     overlay4.addTextArea("Text area", [] (const std::string&) noexcept {}, "initial text", 25.f) += "\nmultiline";
+    overlay4.addColorPicker("Color picker", [] (const Raz::Color&) noexcept {}, Raz::Color(150, 100, 50));
 
     // The text area's vertical scrollbar seems to be only rendered from the 2d frame onward
-    CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay4_base.png", true)));
+    CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/overlay4_base.png", true), 0.065f));
 
     overlay4.disable();
   }

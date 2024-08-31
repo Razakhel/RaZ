@@ -216,6 +216,12 @@ OverlayDropdown& OverlayWindow::addDropdown(std::string label, std::vector<std::
                                                                                                   std::move(actionChanged), initId)));
 }
 
+OverlayColorPicker& OverlayWindow::addColorPicker(std::string label, std::function<void(const Color&)> actionChanged, const Color& initColor) {
+  return static_cast<OverlayColorPicker&>(*m_elements.emplace_back(std::make_unique<OverlayColorPicker>(std::move(label),
+                                                                                                        std::move(actionChanged),
+                                                                                                        initColor)));
+}
+
 OverlayTexture& OverlayWindow::addTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) {
   return static_cast<OverlayTexture&>(*m_elements.emplace_back(std::make_unique<OverlayTexture>(texture, maxWidth, maxHeight)));
 }
@@ -396,6 +402,16 @@ void OverlayWindow::render() const {
 
           ImGui::EndCombo();
         }
+
+        break;
+      }
+
+      case OverlayElementType::COLOR_PICKER:
+      {
+        auto& colorPicker = static_cast<OverlayColorPicker&>(*element);
+
+        if (ImGui::ColorEdit3(colorPicker.m_label.c_str(), colorPicker.m_currentColor.data()))
+          colorPicker.m_actionChanged(Color(colorPicker.m_currentColor[0], colorPicker.m_currentColor[1], colorPicker.m_currentColor[2]));
 
         break;
       }
