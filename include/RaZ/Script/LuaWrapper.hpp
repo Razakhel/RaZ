@@ -24,6 +24,8 @@ public:
   /// \param filePath Path to the script to be executed. Must be valid ASCII; special characters are not handled.
   /// \return True if the script has been executed without errors, false otherwise.
   static bool executeFromFile(const FilePath& filePath);
+  /// Runs the garbage collector, releasing all unreferenced variables.
+  static void collectGarbage();
 
 private:
   static void registerAnimationTypes();

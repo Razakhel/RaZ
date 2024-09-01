@@ -93,6 +93,10 @@ bool LuaWrapper::executeFromFile(const FilePath& filePath) {
   return true;
 }
 
+void LuaWrapper::collectGarbage() {
+  getState().collect_garbage();
+}
+
 sol::state& LuaWrapper::getState() {
   static sol::state state = [] () {
     Logger::debug("[LuaWrapper] Initializing state...");
