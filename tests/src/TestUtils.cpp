@@ -5,6 +5,10 @@
 #include "RaZ/Render/Window.hpp"
 #endif // RAZ_NO_WINDOW
 
+#if !defined(RAZ_NO_LUA)
+#include "RaZ/Script/LuaWrapper.hpp"
+#endif // RAZ_NO_LUA
+
 namespace TestUtils {
 
 #if !defined(RAZ_NO_WINDOW)
@@ -14,5 +18,13 @@ Raz::Window& getWindow() {
   return renderSystem.getWindow();
 }
 #endif // RAZ_NO_WINDOW
+
+#if !defined(RAZ_NO_LUA)
+bool executeLuaScript(const std::string& code) {
+  const bool res = Raz::LuaWrapper::execute(code);
+  Raz::LuaWrapper::collectGarbage();
+  return res;
+}
+#endif // RAZ_NO_LUA
 
 } //namespace TestUtils
