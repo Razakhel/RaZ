@@ -1,9 +1,9 @@
-#include "RaZ/Script/LuaWrapper.hpp"
+#include "TestUtils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaData Bitset", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local bitset = Bitset.new()
     bitset       = Bitset.new(1)
     bitset       = Bitset.new(1, false)
@@ -33,7 +33,7 @@ TEST_CASE("LuaData Bitset", "[script][lua][data]") {
 }
 
 TEST_CASE("LuaData BoundingVolumeHierarchy", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local bvh = BoundingVolumeHierarchy.new()
 
     bvh:build({})
@@ -57,7 +57,7 @@ TEST_CASE("LuaData BoundingVolumeHierarchy", "[script][lua][data]") {
 }
 
 TEST_CASE("LuaData BoundingVolumeHierarchySystem", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local bvhSystem = BoundingVolumeHierarchySystem.new()
 
     assert(bvhSystem:getBvh() ~= nil)
@@ -70,7 +70,7 @@ TEST_CASE("LuaData BoundingVolumeHierarchySystem", "[script][lua][data]") {
 }
 
 TEST_CASE("LuaData Color", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     assert(Color.new() == ColorPreset.Black)
     assert(Color.new(Vec3f.new(1, 0, 0)) == ColorPreset.Red)
     assert(Color.new(0, 1, 0) == ColorPreset.Green)
@@ -83,7 +83,7 @@ TEST_CASE("LuaData Color", "[script][lua][data]") {
 }
 
 TEST_CASE("LuaData Image", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local img = Image.new()
     img       = Image.new(ImageColorspace.GRAY)
     img       = Image.new(ImageColorspace.GRAY_ALPHA, ImageDataType.BYTE)
@@ -115,7 +115,7 @@ TEST_CASE("LuaData Image", "[script][lua][data]") {
 }
 
 TEST_CASE("LuaData Mesh", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local mesh = Mesh.new()
     mesh       = Mesh.new(Plane.new(0), 0, 0)
     mesh       = Mesh.new(Sphere.new(Vec3f.new(), 1), 1, SphereMeshType.UV)
@@ -144,7 +144,7 @@ TEST_CASE("LuaData Mesh", "[script][lua][data]") {
   )"));
 
 #if defined(RAZ_USE_FBX)
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local fbxPath = FilePath.new(RAZ_TESTS_ROOT .. "../assets/meshes/shaderBall.fbx")
 
     local meshData, _ = MeshFormat.load(fbxPath)
@@ -157,7 +157,7 @@ TEST_CASE("LuaData Mesh", "[script][lua][data]") {
 }
 
 TEST_CASE("LuaData MeshDistanceField", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local mdf = MeshDistanceField.new(AABB.new(Vec3f.new(), Vec3f.new()), 2, 2, 2)
 
     assert(mdf:getDistance(0, 0, 0) ~= 0)
@@ -168,7 +168,7 @@ TEST_CASE("LuaData MeshDistanceField", "[script][lua][data]") {
 }
 
 TEST_CASE("LuaData Submesh", "[script][lua][data]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local submesh = Submesh.new()
 
     assert(submesh:getVertices():empty())

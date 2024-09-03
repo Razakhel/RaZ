@@ -1,9 +1,9 @@
-#include "RaZ/Script/LuaWrapper.hpp"
+#include "TestUtils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaCore Application", "[script][lua][core]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local frameTimeInfo = FrameTimeInfo.new()
 
     frameTimeInfo.deltaTime    = 0
@@ -30,7 +30,7 @@ TEST_CASE("LuaCore Application", "[script][lua][core]") {
 }
 
 TEST_CASE("LuaCore Entity", "[script][lua][core]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local entity = Entity.new(0)
     entity       = Entity.new(0, true)
 
@@ -67,7 +67,7 @@ TEST_CASE("LuaCore Entity", "[script][lua][core]") {
   )"));
 
 #if defined(RAZ_USE_AUDIO)
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local entity = Entity.new(0)
 
     entity:addComponent(Listener.new())
@@ -83,7 +83,7 @@ TEST_CASE("LuaCore Entity", "[script][lua][core]") {
 }
 
 TEST_CASE("LuaCore World", "[script][lua][core]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local world = World.new()
     world       = World.new(0)
 
@@ -100,7 +100,7 @@ TEST_CASE("LuaCore World", "[script][lua][core]") {
   )"));
 
 #if defined(RAZ_USE_AUDIO)
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local world = World.new()
     world:addAudioSystem()
     world:addAudioSystem("")
@@ -108,7 +108,7 @@ TEST_CASE("LuaCore World", "[script][lua][core]") {
 #endif
 
 #if !defined(RAZ_NO_WINDOW)
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local world = World.new()
     -- The constructors with less arguments are not tested to avoid spawning multiple windows
     world:addRenderSystem(1, 1, "", WindowSetting.INVISIBLE)

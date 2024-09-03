@@ -1,9 +1,9 @@
-#include "RaZ/Script/LuaWrapper.hpp"
+#include "TestUtils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaPhysics Collider", "[script][lua][physics]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local collider = Collider.new()
 
     assert(not collider:hasShape())
@@ -21,7 +21,7 @@ TEST_CASE("LuaPhysics Collider", "[script][lua][physics]") {
 }
 
 TEST_CASE("LuaPhysics PhysicsSystem", "[script][lua][physics]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local physicsSystem = PhysicsSystem.new()
 
     physicsSystem.gravity  = Axis.Y
@@ -37,7 +37,7 @@ TEST_CASE("LuaPhysics PhysicsSystem", "[script][lua][physics]") {
 }
 
 TEST_CASE("LuaPhysics RigidBody", "[script][lua][physics]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local rigidBody = RigidBody.new(0, 0)
 
     rigidBody.mass       = 10

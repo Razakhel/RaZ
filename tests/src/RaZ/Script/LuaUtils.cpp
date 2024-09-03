@@ -1,9 +1,9 @@
-#include "RaZ/Script/LuaWrapper.hpp"
+#include "TestUtils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaUtils FilePath", "[script][lua][utils]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local pathStr = "../test/file.txt"
 
     local filePath = FilePath.new()
@@ -29,7 +29,7 @@ TEST_CASE("LuaUtils FilePath", "[script][lua][utils]") {
 }
 
 TEST_CASE("LuaUtils FileUtils", "[script][lua][utils]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     assert(FileUtils.isReadable(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")))
     assert(FileUtils.readFileToArray(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")):size() == 22)
     assert(FileUtils.readFileToString(FilePath.new(RAZ_TESTS_ROOT .. "assets/misc/ͳεs†_fílè_测试.τxt")) == "НΣļlõ ωθяŁĐ!\n")
@@ -37,7 +37,7 @@ TEST_CASE("LuaUtils FileUtils", "[script][lua][utils]") {
 }
 
 TEST_CASE("LuaUtils Logger", "[script][lua][utils]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     Logger.setLoggingLevel(LoggingLevel.ERROR)
     Logger.setLoggingLevel(LoggingLevel.WARNING)
     Logger.setLoggingLevel(LoggingLevel.INFO)
@@ -56,7 +56,7 @@ TEST_CASE("LuaUtils Logger", "[script][lua][utils]") {
 }
 
 TEST_CASE("LuaUtils Ray", "[script][lua][utils]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local rayHit = RayHit.new()
 
     rayHit.position = Vec3f.new(1, 2, 3)
@@ -93,7 +93,7 @@ TEST_CASE("LuaUtils Ray", "[script][lua][utils]") {
 }
 
 TEST_CASE("LuaUtils Shape", "[script][lua][utils]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local aabb = AABB.new(Vec3f.new(-1), Vec3f.new(1))
     assert(aabb:getMinPosition() == Vec3f.new(-1))
     assert(aabb:getMaxPosition() == Vec3f.new(1))
@@ -170,7 +170,7 @@ TEST_CASE("LuaUtils Shape", "[script][lua][utils]") {
 }
 
 TEST_CASE("LuaUtils StrUtils", "[script][lua][utils]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     assert(StrUtils.startsWith("test", "te"))
     assert(StrUtils.endsWith("test", "st"))
     assert(StrUtils.toLowercaseCopy("TEST") == "test")

@@ -1,9 +1,9 @@
-#include "RaZ/Script/LuaWrapper.hpp"
+#include "TestUtils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaMath Angle", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local deg = Degreesf.new(180)
     assert(-deg == Degreesf.new(-180))
     assert(deg + 180 == Degreesf.new(360))
@@ -23,7 +23,7 @@ TEST_CASE("LuaMath Angle", "[script][lua][math]") {
 }
 
 TEST_CASE("LuaMath MathUtils", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     assert(MathUtils.lerp(1, 2, 0.25) == 1.25)
     assert(MathUtils.lerp(Vec3f.new(1), Vec3f.new(2), 0.25) == Vec3f.new(1.25))
 
@@ -36,7 +36,7 @@ TEST_CASE("LuaMath MathUtils", "[script][lua][math]") {
 }
 
 TEST_CASE("LuaMath Matrix", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local mat2 = Mat2f.new()
     mat2       = Mat2f.new(Mat3f.identity())
     mat2       = Mat2f.new(1, 2,
@@ -183,7 +183,7 @@ TEST_CASE("LuaMath Matrix", "[script][lua][math]") {
 }
 
 TEST_CASE("LuaMath PerlinNoise", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     assert(FloatUtils.areNearlyEqual(PerlinNoise.compute1D(0.1), -0.106848))
     assert(FloatUtils.areNearlyEqual(PerlinNoise.compute1D(0.1, 2), -0.224224))
     assert(FloatUtils.areNearlyEqual(PerlinNoise.compute1D(0.1, 2, true), 0.387888))
@@ -199,7 +199,7 @@ TEST_CASE("LuaMath PerlinNoise", "[script][lua][math]") {
 }
 
 TEST_CASE("LuaMath Quaternion", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local quat = Quaternionf.new(1, 0, 0, 0)
     quat       = Quaternionf.identity()
     quat       = Quaternionf.new(Degreesf.new(180), Axis.Y)
@@ -234,7 +234,7 @@ TEST_CASE("LuaMath Quaternion", "[script][lua][math]") {
 }
 
 TEST_CASE("LuaMath Transform", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local trans = Transform.new()
     trans       = Transform.new(Vec3f.new())
     trans       = Transform.new(Vec3f.new(), Quaternionf.identity())
@@ -281,7 +281,7 @@ TEST_CASE("LuaMath Transform", "[script][lua][math]") {
 }
 
 TEST_CASE("LuaMath Vector byte", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local vec2 = Vec2b.new()
     vec2       = Vec2b.new(1)
     vec2       = Vec2b.new(1, 2)
@@ -355,7 +355,7 @@ TEST_CASE("LuaMath Vector byte", "[script][lua][math]") {
 }
 
 TEST_CASE("LuaMath Vector float", "[script][lua][math]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local vec2 = Vec2f.new()
     vec2       = Vec2f.new(1)
     vec2       = Vec2f.new(1, 2)

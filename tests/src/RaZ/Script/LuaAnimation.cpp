@@ -1,9 +1,9 @@
-#include "RaZ/Script/LuaWrapper.hpp"
+#include "TestUtils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaAnimation Skeleton", "[script][lua][animation]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local skeleton = Skeleton.new()
     skeleton       = Skeleton.new(0)
     skeleton       = BvhFormat.load(FilePath.new(RAZ_TESTS_ROOT .. "assets/animation/ànîm.bvh"))

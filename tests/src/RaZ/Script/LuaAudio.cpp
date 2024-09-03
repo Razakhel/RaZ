@@ -1,9 +1,9 @@
-#include "RaZ/Script/LuaWrapper.hpp"
+#include "TestUtils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("LuaAudio AudioSystem", "[script][lua][audio]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local audioSystem = AudioSystem.new()
     audioSystem       = AudioSystem.new("")
 
@@ -21,7 +21,7 @@ TEST_CASE("LuaAudio AudioSystem", "[script][lua][audio]") {
 }
 
 TEST_CASE("LuaAudio Listener", "[script][lua][audio]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
     local listener = Listener.new()
@@ -50,7 +50,7 @@ TEST_CASE("LuaAudio Listener", "[script][lua][audio]") {
 }
 
 TEST_CASE("LuaAudio Microphone", "[script][lua][audio]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local microphone = Microphone.new(AudioFormat.MONO_U8, 8000, 1)
     microphone       = Microphone.new(AudioFormat.MONO_I16, 8000, 1, "")
 
@@ -68,7 +68,7 @@ TEST_CASE("LuaAudio Microphone", "[script][lua][audio]") {
 }
 
 TEST_CASE("LuaAudio Sound", "[script][lua][audio]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
     local sound = Sound.new()
@@ -102,7 +102,7 @@ TEST_CASE("LuaAudio Sound", "[script][lua][audio]") {
   )"));
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
     local sound = Sound.new()
@@ -114,7 +114,7 @@ TEST_CASE("LuaAudio Sound", "[script][lua][audio]") {
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
 TEST_CASE("LuaAudio SoundEffect", "[script][lua][audio]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
     local soundEffect = SoundEffect.new()
@@ -179,7 +179,7 @@ TEST_CASE("LuaAudio SoundEffect", "[script][lua][audio]") {
 }
 
 TEST_CASE("LuaAudio SoundEffectSlot", "[script][lua][audio]") {
-  CHECK(Raz::LuaWrapper::execute(R"(
+  CHECK(TestUtils::executeLuaScript(R"(
     local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
     local soundEffectSlot = SoundEffectSlot.new()
