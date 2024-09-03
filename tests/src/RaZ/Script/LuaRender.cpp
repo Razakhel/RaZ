@@ -1100,8 +1100,6 @@ TEST_CASE("LuaRender Window", "[script][lua][render]") {
     window:updateCallbacks()
     assert(window:run(0))
     assert(window:recoverMousePosition():x() >= 0)
-    window:setShouldClose()
-    window:close()
   )"));
 
 #if !defined(RAZ_NO_OVERLAY)

@@ -51,6 +51,8 @@ MAKE_ENUM_FLAG(WindowSetting)
 
 /// Graphical window to render the scenes on, with input custom actions.
 class Window {
+  friend class RenderSystem;
+
 public:
   /// Creates a window.
   /// \param renderSystem Render system containing this window.
@@ -163,10 +165,6 @@ public:
   /// Fetches the mouse position onto the window.
   /// \return 2D vector representing the mouse's position relative to the window.
   Vec2f recoverMousePosition() const;
-  /// Tells the window that it should close.
-  void setShouldClose() const;
-  /// Closes the window.
-  void close();
 
   Window& operator=(const Window&) = delete;
   Window& operator=(Window&&) noexcept = default;
@@ -177,6 +175,10 @@ private:
   /// Processes actions corresponding to keyboard & mouse inputs.
   /// \param deltaTime Amount of time elapsed since the last frame.
   void processInputs(float deltaTime);
+  /// Tells the window that it should close.
+  void setShouldClose() const;
+  /// Closes the window.
+  void close();
 
   static inline int s_refCounter = 0;
 

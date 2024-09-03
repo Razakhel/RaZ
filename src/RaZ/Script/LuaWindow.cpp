@@ -68,8 +68,6 @@ void LuaWrapper::registerWindowTypes() {
 #endif
     window["run"]                      = &Window::run;
     window["recoverMousePosition"]     = &Window::recoverMousePosition;
-    window["setShouldClose"]           = &Window::setShouldClose;
-    window["close"]                    = &Window::close;
 
     state.new_enum<WindowSetting>("WindowSetting", {
       { "FOCUSED",        WindowSetting::FOCUSED },

@@ -440,6 +440,34 @@ Vec2f Window::recoverMousePosition() const {
   return Vec2f(static_cast<float>(xPos), static_cast<float>(yPos));
 }
 
+void Window::processInputs(float deltaTime) {
+  ZoneScopedN("Window::processInputs");
+
+  {
+    ZoneScopedN("glfwPollEvents");
+    glfwPollEvents();
+  }
+
+  auto& actions   = std::get<InputActions>(m_callbacks);
+  auto actionIter = actions.cbegin();
+
+  while (actionIter != actions.cend()) {
+    const auto& action = actionIter->second;
+
+    // An action consists of two parts:
+    // - A callback associated to the triggered key or button
+    // - A value indicating if it should be executed only once or every frame
+
+    action.first(deltaTime);
+
+    // Removing the current action if ONCE is given, or simply increment the iterator
+    if (action.second == Input::ONCE)
+      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
+    else
+      ++actionIter;
+  }
+}
+
 void Window::setShouldClose() const {
   glfwSetWindowShouldClose(m_windowHandle, true);
 }
@@ -467,34 +495,6 @@ void Window::close() {
   }
 
   Logger::debug("[Window] Closed");
-}
-
-void Window::processInputs(float deltaTime) {
-  ZoneScopedN("Window::processInputs");
-
-  {
-    ZoneScopedN("glfwPollEvents");
-    glfwPollEvents();
-  }
-
-  auto& actions   = std::get<InputActions>(m_callbacks);
-  auto actionIter = actions.cbegin();
-
-  while (actionIter != actions.cend()) {
-    const auto& action = actionIter->second;
-
-    // An action consists of two parts:
-    // - A callback associated to the triggered key or button
-    // - A value indicating if it should be executed only once or every frame
-
-    action.first(deltaTime);
-
-    // Removing the current action if ONCE is given, or simply increment the iterator
-    if (action.second == Input::ONCE)
-      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
-    else
-      ++actionIter;
-  }
 }
 
 } // namespace Raz
