@@ -336,6 +336,10 @@ end)";
                       [&vignette] (float value) { vignette.setOpacity(value); },
                       0.f, 1.f, 1.f);
 
+    overlay.addColorPicker("Vignette color",
+                           [&vignette] (const Raz::Color& color) { vignette.setColor(color); },
+                           Raz::ColorPreset::Black);
+
     overlay.addSlider("Film grain strength",
                       [&filmGrain] (float value) { filmGrain.setStrength(value); },
                       0.f, 1.f, 0.05f);
