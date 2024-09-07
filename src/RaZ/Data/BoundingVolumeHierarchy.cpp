@@ -22,11 +22,15 @@ Entity* BoundingVolumeHierarchyNode::query(const Ray& ray, RayHit* hit) const {
   // The following call can produce way too many zones, *drastically* increasing the profiling time & memory consumption
   //ZoneScopedN("BoundingVolumeHierarchyNode::query");
 
+  if (isLeaf()) {
+    if (ray.intersects(m_triangleInfo.triangle, hit))
+      return m_triangleInfo.entity;
+
+    return nullptr;
+  }
+
   if (!ray.intersects(m_boundingBox, hit))
     return nullptr;
-
-  if (isLeaf() && ray.intersects(m_triangleInfo.triangle, hit))
-    return m_triangleInfo.entity;
 
   RayHit leftHit;
   RayHit rightHit;
