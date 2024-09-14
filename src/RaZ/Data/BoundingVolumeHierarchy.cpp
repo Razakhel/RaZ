@@ -29,7 +29,7 @@ Entity* BoundingVolumeHierarchyNode::query(const Ray& ray, RayHit* hit) const {
     return nullptr;
   }
 
-  if (!ray.intersects(m_boundingBox, hit))
+  if (!ray.intersects(m_boundingBox))
     return nullptr;
 
   RayHit leftHit;
