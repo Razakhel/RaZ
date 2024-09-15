@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2023 spnda
+ * Copyright (C) 2022 - 2024 spnda
  * This file is part of fastgltf <https://github.com/spnda/fastgltf>.
  *
  * Permission is hereby granted, free of charge, to any person
@@ -26,22 +26,18 @@
 
 #pragma once
 
+#if !defined(FASTGLTF_USE_STD_MODULE) || !FASTGLTF_USE_STD_MODULE
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <string_view>
-#include <vector>
+#endif
+
+#include <fastgltf/types.hpp>
 
 #ifdef _MSC_VER
 #pragma warning(push) // attribute 'x' is not recognized
 #pragma warning(disable : 5030)
-#endif
-
-#if defined(__x86_64__) || defined(_M_AMD64) || defined(_M_IX86)
-#define FASTGLTF_IS_X86
-#elif defined(_M_ARM64) || defined(__aarch64__)
-// __ARM_NEON is only for general Neon availability. It does not guarantee the full A64 instruction set.
-#define FASTGLTF_IS_A64
 #endif
 
 namespace fastgltf::base64 {
@@ -51,7 +47,7 @@ namespace fastgltf::base64 {
      * points to the original string that has a size that is a multiple of 4 and is at least
      * 4 chars long.
      */
-    [[gnu::always_inline]] constexpr std::size_t getPadding(std::string_view string) {
+    FASTGLTF_EXPORT [[gnu::always_inline]] constexpr std::size_t getPadding(std::string_view string) {
         assert(string.size() >= 4 && string.size() % 4 == 0);
         const auto size = string.size();
         for (auto i = 1; i < 4; ++i)
@@ -64,7 +60,7 @@ namespace fastgltf::base64 {
      * Calculates the size of the decoded string based on the size of the base64 encoded string and
      * the amount of padding the encoded data contains.
      */
-    [[gnu::always_inline]] constexpr std::size_t getOutputSize(std::size_t encodedSize, std::size_t padding) noexcept {
+    FASTGLTF_EXPORT [[gnu::always_inline]] constexpr std::size_t getOutputSize(std::size_t encodedSize, std::size_t padding) noexcept {
         assert(encodedSize % 4 == 0);
         return (encodedSize / 4) * 3 - padding;
     }
@@ -73,17 +69,17 @@ namespace fastgltf::base64 {
     void sse4_decode_inplace(std::string_view encoded, std::uint8_t* output, std::size_t padding);
     void avx2_decode_inplace(std::string_view encoded, std::uint8_t* output, std::size_t padding);
 
-    [[nodiscard]] std::vector<std::uint8_t> sse4_decode(std::string_view encoded);
-    [[nodiscard]] std::vector<std::uint8_t> avx2_decode(std::string_view encoded);
+    [[nodiscard]] StaticVector<std::uint8_t> sse4_decode(std::string_view encoded);
+    [[nodiscard]] StaticVector<std::uint8_t> avx2_decode(std::string_view encoded);
 #elif defined(FASTGLTF_IS_A64)
     void neon_decode_inplace(std::string_view encoded, std::uint8_t* output, std::size_t padding);
-    [[nodiscard]] std::vector<std::uint8_t> neon_decode(std::string_view encoded);
+    [[nodiscard]] StaticVector<std::uint8_t> neon_decode(std::string_view encoded);
 #endif
     void fallback_decode_inplace(std::string_view encoded, std::uint8_t* output, std::size_t padding);
-    void decode_inplace(std::string_view encoded, std::uint8_t* output, std::size_t padding);
+    FASTGLTF_EXPORT void decode_inplace(std::string_view encoded, std::uint8_t* output, std::size_t padding);
 
-    [[nodiscard]] std::vector<std::uint8_t> fallback_decode(std::string_view encoded);
-    [[nodiscard]] std::vector<std::uint8_t> decode(std::string_view encoded);
+    [[nodiscard]] StaticVector<std::uint8_t> fallback_decode(std::string_view encoded);
+    FASTGLTF_EXPORT [[nodiscard]] StaticVector<std::uint8_t> decode(std::string_view encoded);
 } // namespace fastgltf::base64
 
 #ifdef _MSC_VER

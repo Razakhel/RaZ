@@ -1,6 +1,6 @@
 The MIT License
 
-Copyright (c) 2022 spnda.
+Copyright (c) 2022 - 2024 spnda.
 All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

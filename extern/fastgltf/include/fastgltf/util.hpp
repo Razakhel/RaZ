@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2023 spnda
+ * Copyright (C) 2022 - 2024 spnda
  * This file is part of fastgltf <https://github.com/spnda/fastgltf>.
  *
  * Permission is hereby granted, free of charge, to any person
@@ -26,11 +26,21 @@
 
 #pragma once
 
+#if !defined(FASTGLTF_USE_STD_MODULE) || !FASTGLTF_USE_STD_MODULE
 #include <array>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <limits>
+#include <memory>
 #include <string_view>
 #include <type_traits>
+#endif
+
+#ifndef FASTGLTF_EXPORT
+#define FASTGLTF_EXPORT
+#endif
 
 // Macros to determine C++ standard version
 #if (!defined(_MSVC_LANG) && __cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
@@ -41,6 +51,7 @@
 
 #if (!defined(_MSVC_LANG) && __cplusplus >= 202002L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
 #define FASTGLTF_CPP_20 1
+#include <version>
 #else
 #define FASTGLTF_CPP_20 0
 #endif
@@ -53,26 +64,68 @@
 
 #if FASTGLTF_CPP_20 && defined(__cpp_lib_bitops) && __cpp_lib_bitops >= 201907L
 #define FASTGLTF_HAS_BIT 1
+#if !defined(FASTGLTF_USE_STD_MODULE) || !FASTGLTF_USE_STD_MODULE
 #include <bit>
+#endif
 #else
 #define FASTGLTF_HAS_BIT 0
 #endif
 
-#if FASTGLTF_CPP_20 && defined(__cpp_concepts) && __cpp_concepts >= 202002L
+#if FASTGLTF_CPP_20 && defined(__cpp_concepts) && __cpp_concepts >= 201907L
 #define FASTGLTF_HAS_CONCEPTS 1
+#if !defined(FASTGLTF_USE_STD_MODULE) || !FASTGLTF_USE_STD_MODULE
 #include <concepts>
+#endif
 #else
 #define FASTGLTF_HAS_CONCEPTS 0
 #endif
 
 #if FASTGLTF_CPP_23
 #define FASTGLTF_UNREACHABLE std::unreachable();
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__clang__)
 #define FASTGLTF_UNREACHABLE __builtin_unreachable();
 #elif defined(_MSC_VER)
 #define FASTGLTF_UNREACHABLE __assume(false);
 #else
 #define FASTGLTF_UNREACHABLE assert(0);
+#endif
+
+#if defined(__has_builtin)
+#define FASTGLTF_HAS_BUILTIN(x) __has_builtin(x)
+#else
+#define FASTGLTF_HAS_BUILTIN(x) 0
+#endif
+
+#if defined(__x86_64__) || defined(_M_AMD64) || defined(_M_IX86)
+#define FASTGLTF_IS_X86 1
+#elif defined(_M_ARM64) || defined(__aarch64__)
+// __ARM_NEON is only for general Neon availability. It does not guarantee the full A64 instruction set.
+#define FASTGLTF_IS_A64 1
+#endif
+
+#if FASTGLTF_CPP_20 || (defined(__clang__) && __clang_major__ >= 12) || (defined(__GNUC__) && __GNUC__ >= 9)
+// These attributes were introduced with C++20, but Clang 12 already supports them since C++11.
+#define FASTGLTF_LIKELY [[likely]]
+#define FASTGLTF_UNLIKELY [[unlikely]]
+#else
+#define FASTGLTF_LIKELY
+#define FASTGLTF_UNLIKELY
+#endif
+
+#if (_MSC_VER && !defined(__clang__)) || FASTGLTF_CPP_20 && __has_cpp_attribute(msvc::intrinsic)
+#define FASTGLTF_INTRINSIC [[msvc::intrinsic]]
+#else
+#define FASTGLTF_INTRINSIC
+#endif
+
+#if defined(_MSC_VER)
+#define FASTGLTF_FORCEINLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+#define FASTGLTF_FORCEINLINE [[gnu::always_inline]] inline
+#else
+// On other compilers we need the inline specifier, so that the functions in this compilation unit
+// can be properly inlined without the "function body can be overwritten at link time" error.
+#define FASTGLTF_FORCEINLINE inline
 #endif
 
 #ifdef _MSC_VER
@@ -82,18 +135,18 @@
 #endif
 
 namespace fastgltf {
-    template<typename T>
+    FASTGLTF_EXPORT template<typename T>
 #if FASTGLTF_HAS_CONCEPTS
     requires std::is_enum_v<T>
 #endif
-    [[nodiscard]] constexpr std::underlying_type_t<T> to_underlying(T t) noexcept {
+    [[nodiscard]] FASTGLTF_INTRINSIC constexpr std::underlying_type_t<T> to_underlying(T t) noexcept {
 #if !FASTGLTF_HAS_CONCEPTS
         static_assert(std::is_enum_v<T>, "to_underlying only works with enum types.");
 #endif
         return static_cast<std::underlying_type_t<T>>(t);
     }
 
-    template <typename T, typename U>
+    FASTGLTF_EXPORT template <typename T, typename U>
 #if FASTGLTF_HAS_CONCEPTS
     requires ((std::is_enum_v<T> && std::integral<std::underlying_type_t<T>>) || std::integral<T>) && requires (T t, U u) {
         { t & u } -> std::same_as<U>;
@@ -106,9 +159,9 @@ namespace fastgltf {
         return (flags & bit) == bit;
     }
 
-    template <typename T>
-    [[nodiscard]] constexpr T alignUp(T base, T alignment) {
-        static_assert(std::is_signed_v<T>, "alignUp requires type T to be signed.");
+    template <typename T, typename U>
+    [[nodiscard]] constexpr T alignUp(T base, U alignment) {
+        static_assert(std::is_signed_v<U>, "alignUp requires type U to be signed.");
         return (base + alignment - 1) & -alignment;
     }
 
@@ -117,57 +170,33 @@ namespace fastgltf {
         return base - (base % alignment);
     }
 
-    template <typename T>
+	FASTGLTF_EXPORT template <typename T>
 #if FASTGLTF_HAS_CONCEPTS
-    requires requires (T t) {
-        { t > t } -> std::same_as<bool>;
-    }
+	requires requires (T t) {
+		{ t > t } -> std::same_as<bool>;
+	}
 #endif
-    [[nodiscard]] constexpr T max(T a, T b) noexcept {
-        return (a > b) ? a : b;
-    }
+	[[nodiscard]] constexpr const T& max(const T& a, const T& b) noexcept {
+		return (a > b) ? a : b;
+	}
 
-    /**
-     * Decomposes a transform matrix into the translation, rotation, and scale components. This
-     * function does not support skew, shear, or perspective. This currently uses a quick algorithm
-     * to calculate the quaternion from the rotation matrix, which might occasionally loose some
-     * precision, though we try to use doubles here.
-     */
-    inline void decomposeTransformMatrix(std::array<float, 16> matrix, std::array<float, 3>& scale, std::array<float, 4>& rotation, std::array<float, 3>& translation) {
-        // Extract the translation. We zero the translation out, as we reuse the matrix as
-        // the rotation matrix at the end.
-        translation = {matrix[12], matrix[13], matrix[14]};
-        matrix[12] = matrix[13] = matrix[14] = 0;
+	FASTGLTF_EXPORT template <typename T>
+#if FASTGLTF_HAS_CONCEPTS
+	requires requires (T t) {
+		{ t < t } -> std::same_as<bool>;
+	}
+#endif
+	[[nodiscard]] constexpr const T& min(const T& a, const T& b) noexcept {
+		return (a < b) ? a : b;
+	}
 
-        // Extract the scale. We calculate the euclidean length of the columns. We then
-        // construct a vector with those lengths. My gcc's stdlib doesn't include std::sqrtf
-        // for some reason...
-        auto s1 = sqrtf(matrix[0] * matrix[0] + matrix[1] * matrix[1] +  matrix[2] * matrix[2]);
-        auto s2 = sqrtf(matrix[4] * matrix[4] + matrix[5] * matrix[5] +  matrix[6] * matrix[6]);
-        auto s3 = sqrtf(matrix[8] * matrix[8] + matrix[9] * matrix[9] + matrix[10] * matrix[10]);
-        scale = {s1, s2, s3};
-
-        // Remove the scaling from the matrix, leaving only the rotation. matrix is now the
-        // rotation matrix.
-        matrix[0] /= s1; matrix[1] /= s1;  matrix[2] /= s1;
-        matrix[4] /= s2; matrix[5] /= s2;  matrix[6] /= s2;
-        matrix[8] /= s3; matrix[9] /= s3; matrix[10] /= s3;
-
-        // Construct the quaternion. This algo is copied from here:
-        // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/christian.htm.
-        // glTF orders the components as x,y,z,w
-        rotation = {
-            max(.0f, 1 + matrix[0] - matrix[5] - matrix[10]),
-            max(.0f, 1 - matrix[0] + matrix[5] - matrix[10]),
-            max(.0f, 1 - matrix[0] - matrix[5] + matrix[10]),
-            max(.0f, 1 + matrix[0] + matrix[5] + matrix[10]),
-        };
-        for (auto& x : rotation) {
-            x = static_cast<float>(std::sqrt(static_cast<double>(x)) / 2);
-        }
-        rotation[0] = std::copysignf(rotation[0], matrix[6] - matrix[9]);
-        rotation[1] = std::copysignf(rotation[1], matrix[8] - matrix[2]);
-        rotation[2] = std::copysignf(rotation[2], matrix[1] - matrix[4]);
+    template<typename T, typename... A>
+    [[noreturn]] constexpr void raise(A&&... args) {
+#ifdef __cpp_exceptions
+        throw T(std::forward<A>(args)...);
+#else
+        std::abort();
+#endif
     }
 
     /**
@@ -222,13 +251,18 @@ namespace fastgltf {
         return crc;
     }
 
-#if defined(__x86_64__) || defined(_M_AMD64) || defined(_M_IX86)
+#if defined(FASTGLTF_IS_X86)
     /**
      * Variant of crc32 that uses SSE4.2 instructions to increase performance. Note that this does not
      * check for availability of said instructions.
      */
-    [[gnu::hot, gnu::const]] std::uint32_t hwcrc32c(std::string_view str) noexcept;
-    [[gnu::hot, gnu::const]] std::uint32_t hwcrc32c(const std::uint8_t* d, std::size_t len) noexcept;
+    [[gnu::hot, gnu::const]] std::uint32_t sse_crc32c(std::string_view str) noexcept;
+    [[gnu::hot, gnu::const]] std::uint32_t sse_crc32c(const std::uint8_t* d, std::size_t len) noexcept;
+#elif defined(FASTGLTF_IS_A64) && !defined(_MSC_VER) && !defined(__ANDROID__)
+	// Both MSVC stdlib and Android NDK don't include the arm intrinsics. TODO: Find a workaround?
+#define FASTGLTF_ENABLE_ARMV8_CRC 1
+	[[gnu::hot, gnu::const]] std::uint32_t armv8_crc32c(std::string_view str) noexcept;
+	[[gnu::hot, gnu::const]] std::uint32_t armv8_crc32c(const std::uint8_t* d, std::size_t len) noexcept;
 #endif
 
     /**
@@ -247,7 +281,7 @@ namespace fastgltf {
 #if FASTGLTF_HAS_CONCEPTS
     requires std::integral<T>
 #endif
-    [[gnu::const]] inline std::uint8_t clz(T value) {
+    [[gnu::const]] constexpr std::uint8_t clz(T value) {
         static_assert(std::is_integral_v<T>);
 #if FASTGLTF_HAS_BIT
         return static_cast<std::uint8_t>(std::countl_zero(value));
@@ -267,7 +301,7 @@ namespace fastgltf {
     }
 
 	template <typename T>
-	[[gnu::const]] inline std::uint8_t popcount(T value) {
+	[[gnu::const]] constexpr std::uint8_t popcount(T value) {
 		static_assert(std::is_integral_v<T>);
 #if FASTGLTF_HAS_BIT
 		return static_cast<std::uint8_t>(std::popcount(value));
@@ -300,33 +334,102 @@ namespace fastgltf {
 	 * Helper type in order to allow building a visitor out of multiple lambdas within a call to
 	 * std::visit
 	 */
-	template<class... Ts> 
+	FASTGLTF_EXPORT template<class... Ts>
 	struct visitor : Ts... {
 		using Ts::operator()...;
 	};
 
-	template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
+	FASTGLTF_EXPORT template<class... Ts> visitor(Ts...) -> visitor<Ts...>;
 
     // For simple ops like &, |, +, - taking a left and right operand.
 #define FASTGLTF_ARITHMETIC_OP_TEMPLATE_MACRO(T1, T2, op) \
-    constexpr T1 operator op(const T1& a, const T2& b) noexcept { \
+    FASTGLTF_EXPORT constexpr T1 operator op(const T1& a, const T2& b) noexcept { \
         static_assert(std::is_enum_v<T1> && std::is_enum_v<T2>); \
         return static_cast<T1>(to_underlying(a) op to_underlying(b)); \
     }
 
     // For any ops like |=, &=, +=, -=
 #define FASTGLTF_ASSIGNMENT_OP_TEMPLATE_MACRO(T1, T2, op) \
-    constexpr T1& operator op##=(T1& a, const T2& b) noexcept { \
+    FASTGLTF_EXPORT constexpr T1& operator op##=(T1& a, const T2& b) noexcept { \
         static_assert(std::is_enum_v<T1> && std::is_enum_v<T2>); \
         return a = static_cast<T1>(to_underlying(a) op to_underlying(b)), a; \
     }
 
     // For unary +, unary -, and bitwise NOT
 #define FASTGLTF_UNARY_OP_TEMPLATE_MACRO(T, op) \
-    constexpr T operator op(const T& a) noexcept { \
+    FASTGLTF_EXPORT constexpr T operator op(const T& a) noexcept { \
         static_assert(std::is_enum_v<T>); \
         return static_cast<T>(op to_underlying(a)); \
     }
+
+#if FASTGLTF_CPP_20 && defined(__cpp_lib_bit_cast) && __cpp_lib_bit_cast >= 201806L
+#define FASTGLTF_CONSTEXPR_BITCAST 1
+    template<typename To, typename From>
+    [[nodiscard]] constexpr To bit_cast(const From& from) noexcept {
+        return std::bit_cast<To>(from);
+    }
+#elif (defined(__clang__) || __clang_major__ >= 9) || (defined(__GNUC__) && __GNUC__ >= 11) || FASTGLTF_HAS_BUILTIN(__builtin_bit_cast)
+#define FASTGLTF_CONSTEXPR_BITCAST 1
+    template<typename To, typename From>
+    [[nodiscard]] constexpr To bit_cast(const From& from) noexcept {
+        // Available since Clang 9, GCC 11.1, and MSVC 16.6. Otherwise, this function could not be constexpr.
+        return __builtin_bit_cast(To, from);
+    }
+#else
+#define FASTGLTF_CONSTEXPR_BITCAST 0
+	template<typename To, typename From>
+	[[nodiscard]] To bit_cast(const From& from) noexcept {
+		static_assert(std::is_trivially_constructible_v<To>);
+		To dst;
+		std::memcpy(&dst, &from, sizeof(To));
+		return dst;
+	}
+#endif
+
+#if FASTGLTF_CPP_20 && defined(__cpp_lib_byteswap) && __cpp_lib_byteswap >= 202110L
+	template<class T>
+	constexpr T byteswap(T n) noexcept {
+		return std::byteswap(n);
+	}
+#else
+	template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+#if FASTGLTF_CONSTEXPR_BITCAST
+	constexpr
+#endif
+	auto byteswap(T value) noexcept {
+		static_assert(std::has_unique_object_representations_v<T>, "T may not have padding bits");
+		auto bytes = bit_cast<std::array<std::byte, sizeof(T)>>(value);
+		bytes = decltype(bytes)(bytes.rbegin(), bytes.rend());
+		return bit_cast<T>(bytes);
+	}
+#endif
+
+	/**
+	 * Returns the absolute value of the given integer in its unsigned type.
+	 * This avoids the issue with two complementary signed integers not being able to represent INT_MIN.
+	 */
+	template <typename T>
+	constexpr std::make_unsigned_t<T> uabs(T val) {
+		if constexpr (std::is_signed_v<T>) {
+			using unsigned_t = std::make_unsigned_t<T>;
+			return (val < 0)
+				   ? static_cast<unsigned_t>(-(val + 1)) + 1
+				   : static_cast<unsigned_t>(val);
+		} else {
+			return val;
+		}
+	}
+
+	template <auto callback>
+	struct UniqueDeleter {
+		template <typename T>
+		constexpr void operator()(T* t) const {
+			callback(t);
+		}
+	};
+
+	template <typename T, auto callback>
+	using deletable_unique_ptr = std::unique_ptr<T, UniqueDeleter<callback>>;
 } // namespace fastgltf
 
 #ifdef _MSC_VER

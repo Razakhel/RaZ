@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - 2023 spnda
+ * Copyright (C) 2022 - 2024 spnda
  * This file is part of fastgltf <https://github.com/spnda/fastgltf>.
  *
  * Permission is hereby granted, free of charge, to any person
@@ -26,18 +26,21 @@
 
 #pragma once
 
+#if !defined(FASTGLTF_USE_STD_MODULE) || !FASTGLTF_USE_STD_MODULE
 #include <cassert>
 #include <cstddef>
 #include <cstring>
-#include <cstdint>
 #include <filesystem>
 #include <optional>
+#include <string>
 #include <utility>
 #include <variant>
 #include <vector>
+#endif
 
 // Utils header already includes some headers, which we'll try and avoid including twice.
-#include "util.hpp"
+#include <fastgltf/util.hpp>
+#include <fastgltf/math.hpp>
 
 #if defined(_GLIBCXX_USE_CXX11_ABI) && !_GLIBCXX_USE_CXX11_ABI
 // polymorphic allocators are only supported with the 'new' GCC ABI.
@@ -61,7 +64,9 @@
 #endif
 
 #if !FASTGLTF_DISABLE_CUSTOM_MEMORY_POOL
+#if !defined(FASTGLTF_USE_STD_MODULE) || !FASTGLTF_USE_STD_MODULE
 #include <memory_resource>
+#endif
 #endif
 
 #if FASTGLTF_DISABLE_CUSTOM_MEMORY_POOL
@@ -69,15 +74,19 @@
 #define FASTGLTF_FG_PMR_NS ::fastgltf
 
 #define FASTGLTF_CONSTRUCT_PMR_RESOURCE(type, memoryResource, ...) type(__VA_ARGS__)
+#define FASTGLTF_IF_PMR(expr)
 #else
 #define FASTGLTF_STD_PMR_NS ::std::pmr
 #define FASTGLTF_FG_PMR_NS ::fastgltf::pmr
 
 #define FASTGLTF_CONSTRUCT_PMR_RESOURCE(type, memoryResource, ...) type(__VA_ARGS__, memoryResource)
+#define FASTGLTF_IF_PMR(expr) expr
 #endif
 
 #if FASTGLTF_CPP_20
+#if !defined(FASTGLTF_USE_STD_MODULE) || !FASTGLTF_USE_STD_MODULE
 #include <span>
+#endif
 #endif
 
 #ifdef _MSC_VER
@@ -90,7 +99,7 @@
 #define FASTGLTF_QUOTE(x) FASTGLTF_QUOTE_Q(x)
 
 // fastgltf version string. Use FASTGLTF_QUOTE to stringify.
-#define FASTGLTF_VERSION 0.6.1
+#define FASTGLTF_VERSION 0.8.0
 
 namespace fastgltf {
 #if defined(FASTGLTF_USE_64BIT_FLOAT) && FASTGLTF_USE_64BIT_FLOAT
@@ -99,9 +108,15 @@ namespace fastgltf {
 	using num = float;
 #endif
 
+	namespace math {
+		FASTGLTF_EXPORT using nvec2 = math::vec<num, 2>;
+		FASTGLTF_EXPORT using nvec3 = math::vec<num, 3>;
+		FASTGLTF_EXPORT using nvec4 = math::vec<num, 4>;
+	}
+
 #pragma region Enums
     // clang-format off
-    enum class PrimitiveType : std::uint8_t {
+    FASTGLTF_EXPORT enum class PrimitiveType : std::uint8_t {
         Points = 0,
         Lines = 1,
         LineLoop = 2,
@@ -117,47 +132,54 @@ namespace fastgltf {
      * We encode these values with the number of components in their top 8 bits for fast
      * access & storage. Therefore, use the fastgltf::getNumComponents and fastgltf::getElementByteSize
      * functions to extract data from this enum.
+     *
+     * 0aaaaabbb, where a is the component num, and b is the type index.
      */
-    enum class AccessorType : std::uint16_t {
+    FASTGLTF_EXPORT enum class AccessorType : std::uint8_t {
         Invalid = 0,
-        Scalar  = ( 1 << 8) | 1,
-        Vec2    = ( 2 << 8) | 2,
-        Vec3    = ( 3 << 8) | 3,
-        Vec4    = ( 4 << 8) | 4,
-        Mat2    = ( 4 << 8) | 5,
-        Mat3    = ( 9 << 8) | 6,
-        Mat4    = (16 << 8) | 7,
+        Scalar  = ( 1 << 3) | 1,
+        Vec2    = ( 2 << 3) | 2,
+        Vec3    = ( 3 << 3) | 3,
+        Vec4    = ( 4 << 3) | 4,
+        Mat2    = ( 4 << 3) | 5,
+        Mat3    = ( 9 << 3) | 6,
+        Mat4    = (16 << 3) | 7,
     };
 
     /**
      * Represents the various types of components an accessor could point at. This describes the
      * format each component of the structure, which in return is described by fastgltf::AccessorType, is in.
      *
-     * We use the top 16-bits to encode the amount of bits this component type needs.
-     * The lower 16-bits are used to store the glTF ID for the type. Therefore, use the fastgltf::getComponentBitSize
-     * and fastgltf::getGLComponentType functions should be used to extract data from this enum.
+     * As the constants used to identify component type in glTF fit within 13-bits, we store them in the lower 13 bits.
+     * The remaining three bits are then used to store the byte width of the type, minus 1, as 8 is not representable
+     * with just three bits.
+     *
+     * To get the byte or bit size of a component, use the fastgltf::getComponentByteSize or fastgltf::getComponentBitSize,
+     * respectively. To get the OpenGL constant for the component type, use fastgltf::getGLComponentType.
+     *
+     * aaabbbbbbbbbbbbb, where a is the byte size, and b the OpenGL type enumeration.
      */
-    enum class ComponentType : std::uint32_t {
+    FASTGLTF_EXPORT enum class ComponentType : std::uint16_t {
         Invalid         = 0,
-        Byte            = ( 8 << 16) | 5120,
-        UnsignedByte    = ( 8 << 16) | 5121,
-        Short           = (16 << 16) | 5122,
-        UnsignedShort   = (16 << 16) | 5123,
+        Byte            = (0 << 13) | 5120,
+        UnsignedByte    = (0 << 13) | 5121,
+        Short           = (1 << 13) | 5122,
+        UnsignedShort   = (1 << 13) | 5123,
         /**
          * Signed integers are not officially allowed by the glTF spec, but are placed here for
          * the sake of completeness.
          */
-        Int             = (32 << 16) | 5124,
-        UnsignedInt     = (32 << 16) | 5125,
-        Float           = (32 << 16) | 5126,
+        Int             = (3 << 13) | 5124,
+        UnsignedInt     = (3 << 13) | 5125,
+        Float           = (3 << 13) | 5126,
         /**
-         * Doubles are not officially allowed by the glTF spec, but can be enabled by passing
-         * Options::AllowDouble if you require it.
+         * Doubles are only allowed through the KHR_accessor_float64 extension, but can also
+         * be enabled by specifying the AllowDouble option.
          */
-        Double          = (64 << 16) | 5130,
+        Double          = (7 << 13) | 5130,
     };
 
-    enum class Filter : std::uint16_t {
+    FASTGLTF_EXPORT enum class Filter : std::uint16_t {
         Nearest = 9728,
         Linear = 9729,
         NearestMipMapNearest = 9984,
@@ -166,7 +188,7 @@ namespace fastgltf {
         LinearMipMapLinear = 9987,
     };
 
-    enum class Wrap : std::uint16_t {
+    FASTGLTF_EXPORT enum class Wrap : std::uint16_t {
         ClampToEdge = 33071,
         MirroredRepeat = 33648,
         Repeat = 10497,
@@ -175,12 +197,12 @@ namespace fastgltf {
     /**
      * Represents the intended OpenGL GPU buffer type to use with this buffer view.
      */
-    enum class BufferTarget : std::uint16_t {
+    FASTGLTF_EXPORT enum class BufferTarget : std::uint16_t {
         ArrayBuffer = 34962,
         ElementArrayBuffer = 34963,
     };
 
-    enum class MimeType : std::uint16_t {
+    FASTGLTF_EXPORT enum class MimeType : std::uint8_t {
         None = 0,
         JPEG = 1,
         PNG = 2,
@@ -190,7 +212,7 @@ namespace fastgltf {
         OctetStream = 6,
     };
 
-    enum class AnimationInterpolation : std::uint16_t {
+    FASTGLTF_EXPORT enum class AnimationInterpolation : std::uint8_t {
         /**
          * The animated values are linearly interpolated between keyframes. When targeting a
          * rotation, spherical linear interpolation (slerp) SHOULD be used to interpolate quaternions.
@@ -210,7 +232,7 @@ namespace fastgltf {
         CubicSpline = 2,
     };
 
-    enum class AnimationPath : std::uint16_t {
+    FASTGLTF_EXPORT enum class AnimationPath : std::uint8_t {
         /**
          * The values are the translation along the X, Y, and Z axes.
          */
@@ -226,38 +248,32 @@ namespace fastgltf {
         Weights = 4,
     };
 
-    enum class CameraType : std::uint8_t {
-        Perspective = 0,
-        Orthographic = 1,
-    };
-
-    enum class AlphaMode : std::uint8_t {
+    FASTGLTF_EXPORT enum class AlphaMode : std::uint8_t {
         Opaque,
         Mask,
         Blend,
     };
 
-    enum class MeshoptCompressionMode : std::uint8_t {
-        None = 0,
+    FASTGLTF_EXPORT enum class MeshoptCompressionMode : std::uint8_t {
         Attributes,
         Triangles,
         Indices,
     };
 
-    enum class MeshoptCompressionFilter : std::uint8_t {
+    FASTGLTF_EXPORT enum class MeshoptCompressionFilter : std::uint8_t {
         None = 0,
         Octahedral,
         Quaternion,
         Exponential,
     };
 
-    enum class LightType : std::uint8_t {
+    FASTGLTF_EXPORT enum class LightType : std::uint8_t {
         Directional,
         Spot,
         Point,
     };
 
-    enum class Category : std::uint32_t {
+    FASTGLTF_EXPORT enum class Category : std::uint32_t {
         None        = 0,
         Buffers     = 1 <<  0,
         BufferViews = 1 <<  1,
@@ -293,25 +309,70 @@ namespace fastgltf {
      * Gets the number of components for each element for the given accessor type. For example, with
      * a Vec3 accessor type this will return 3, as a Vec3 contains 3 components.
      */
-    constexpr std::uint8_t getNumComponents(AccessorType type) noexcept {
-        return (to_underlying(type) >> 8U) & 0xFFU;
-    }
-
-    constexpr std::uint16_t getComponentBitSize(ComponentType componentType) noexcept {
-        auto masked = to_underlying(componentType) & 0xFFFF0000;
-        return static_cast<std::uint16_t>(masked >> 16U);
-    }
-
-    constexpr std::uint16_t getElementByteSize(AccessorType type, ComponentType componentType) noexcept {
-        return static_cast<std::uint16_t>(getNumComponents(type)) * (getComponentBitSize(componentType) / 8);
-    }
-
-    constexpr std::uint16_t getGLComponentType(ComponentType type) noexcept {
-        return to_underlying(type) & 0xFFFF;
+    FASTGLTF_EXPORT constexpr auto getNumComponents(AccessorType type) noexcept {
+    	static_assert(std::is_same_v<std::underlying_type_t<AccessorType>, std::uint8_t>);
+        return static_cast<std::size_t>(to_underlying(type) >> 3U);
     }
 
     /**
-     * Don't use this, use getComponenType instead.
+     * Returns the number of rows in the given accessor type.
+     */
+    FASTGLTF_EXPORT constexpr auto getElementRowCount(AccessorType type) noexcept {
+        switch (type) {
+            case AccessorType::Mat2:
+            case AccessorType::Vec2:
+                return std::size_t(2U);
+            case AccessorType::Mat3:
+            case AccessorType::Vec3:
+                return std::size_t(3U);
+            case AccessorType::Mat4:
+            case AccessorType::Vec4:
+                return std::size_t(4U);
+            default:
+                return std::size_t(1U);
+        }
+    }
+
+    FASTGLTF_EXPORT constexpr bool isMatrix(AccessorType type) noexcept {
+        return type == AccessorType::Mat2 || type == AccessorType::Mat3 || type == AccessorType::Mat4;
+    }
+
+	FASTGLTF_EXPORT constexpr auto getComponentByteSize(ComponentType componentType) noexcept {
+		static_assert(std::is_same_v<std::underlying_type_t<ComponentType>, std::uint16_t>);
+		if (componentType == ComponentType::Invalid)
+			return std::size_t(0U);
+		return static_cast<std::size_t>(to_underlying(componentType) >> 13U) + 1;
+	}
+
+	FASTGLTF_EXPORT constexpr auto getComponentBitSize(ComponentType componentType) noexcept {
+		return getComponentByteSize(componentType) * 8U;
+	}
+
+    FASTGLTF_EXPORT constexpr auto getElementByteSize(AccessorType type, ComponentType componentType) noexcept {
+        const auto componentSize = getComponentByteSize(componentType);
+        auto numComponents = getNumComponents(type);
+        const auto rowCount = getElementRowCount(type);
+        if (isMatrix(type) && (rowCount * componentSize) % 4 != 0) {
+            // Matrices need extra padding per-column which affects their size.
+            numComponents += rowCount * (4 - (rowCount % 4));
+        }
+        return numComponents * componentSize;
+    }
+
+    /**
+     * Returns the OpenGL component type enumeration for the given component type.
+     * All OpenGL enumerations use GLenum, which is a 32-bit wide integer, which is why
+     * this function returns a std::uint32_t.
+     *
+     * For example, getGLComponentType(ComponentType::Float) will return GL_FLOAT (0x1406).
+     */
+    FASTGLTF_EXPORT constexpr auto getGLComponentType(ComponentType type) noexcept {
+    	static_assert(std::is_same_v<std::underlying_type_t<ComponentType>, std::uint16_t>);
+        return static_cast<std::uint32_t>(to_underlying(type) & 0x1FFF); // 2^13 - 1 in hex, to mask the lower 13 bits.
+    }
+
+    /**
+     * Don't use this, use getComponentType instead.
      * This order matters as we assume that their glTF constant is ascending to index it.
      */
     static constexpr std::array<ComponentType, 11> components = {
@@ -328,10 +389,11 @@ namespace fastgltf {
         ComponentType::Double,
     };
 
-    constexpr ComponentType getComponentType(std::underlying_type_t<ComponentType> componentType) noexcept {
-        const auto index = componentType - getGLComponentType(ComponentType::Byte);
-        if (index >= components.size())
+    constexpr auto getComponentType(std::underlying_type_t<ComponentType> componentType) noexcept {
+        const auto index = static_cast<std::size_t>(componentType - getGLComponentType(ComponentType::Byte));
+        if (index >= components.size()) {
             return ComponentType::Invalid;
+		}
         return components[index];
     }
 
@@ -349,29 +411,202 @@ namespace fastgltf {
     /**
      * Gets the AccessorType by its string representation found in glTF files.
      */
-    constexpr AccessorType getAccessorType(std::string_view accessorTypeName) noexcept {
+    constexpr auto getAccessorType(std::string_view accessorTypeName) noexcept {
         assert(!accessorTypeName.empty());
         switch (accessorTypeName[0]) {
             case 'S': return AccessorType::Scalar;
             case 'V': {
-                auto componentCount = static_cast<std::size_t>(accessorTypeName[3] - '2');
-                if (componentCount + 1 >= accessorTypes.size())
+                const auto componentCount = static_cast<std::size_t>(accessorTypeName[3] - '2');
+                if (componentCount + 1 >= accessorTypes.size()) {
                     return AccessorType::Invalid;
+                }
                 return accessorTypes[componentCount + 1];
             }
             case 'M': {
-                auto componentCount = static_cast<std::size_t>(accessorTypeName[3] - '2');
-                if (componentCount + 4 >= accessorTypes.size())
+                const auto componentCount = static_cast<std::size_t>(accessorTypeName[3] - '2');
+                if (componentCount + 4 >= accessorTypes.size()) {
                     return AccessorType::Invalid;
+                }
                 return accessorTypes[componentCount + 4];
             }
+        	default:
+        		return AccessorType::Invalid;
         }
-
-        return AccessorType::Invalid;
     }
+
+	static constexpr std::array<std::string_view, 7> accessorTypeNames = {
+		"SCALAR",
+		"VEC2",
+		"VEC3",
+		"VEC4",
+		"MAT2",
+		"MAT3",
+		"MAT4"
+	};
+
+	constexpr std::string_view getAccessorTypeName(AccessorType type) noexcept {
+    	static_assert(std::is_same_v<std::underlying_type_t<AccessorType>, std::uint8_t>);
+		if (type == AccessorType::Invalid)
+			return "";
+		auto idx = to_underlying(type) & 0x7;
+		return accessorTypeNames[idx - 1];
+	}
+
+	constexpr std::string_view mimeTypeJpeg = "image/jpeg";
+	constexpr std::string_view mimeTypePng = "image/png";
+	constexpr std::string_view mimeTypeKtx = "image/ktx2";
+	constexpr std::string_view mimeTypeDds = "image/vnd-ms.dds";
+	constexpr std::string_view mimeTypeGltfBuffer = "application/gltf-buffer";
+	constexpr std::string_view mimeTypeOctetStream = "application/octet-stream";
+
+	constexpr std::string_view getMimeTypeString(MimeType mimeType) noexcept {
+		switch (mimeType) {
+			case MimeType::JPEG:
+				return mimeTypeJpeg;
+			case MimeType::PNG:
+				return mimeTypePng;
+			case MimeType::KTX2:
+				return mimeTypeKtx;
+			case MimeType::DDS:
+				return mimeTypeDds;
+			case MimeType::GltfBuffer:
+				return mimeTypeGltfBuffer;
+			case MimeType::OctetStream:
+				return mimeTypeOctetStream;
+			default:
+				return "";
+		}
+	}
 #pragma endregion
 
 #pragma region Containers
+    /**
+     * A static vector which cannot be resized freely. When constructed, the backing array is allocated once.
+     */
+    FASTGLTF_EXPORT template <typename T>
+    class StaticVector final {
+	public:
+		using value_type = T;
+		using size_type = std::size_t;
+        using array_t = value_type[];
+
+	private:
+		size_type _size = 0;
+        std::unique_ptr<array_t> _array;
+
+		void copy(const T* first, size_type count, T* result) {
+            if (count > 0) {
+				if constexpr (std::is_trivially_copyable_v<T>) {
+					std::memcpy(result, first, count * sizeof(T));
+				} else {
+					*result++ = *first;
+					for (size_type i = 1; i < count; ++i) {
+						*result++ = *++first;
+					}
+				}
+            }
+        }
+
+    public:
+		using reference = value_type&;
+		using const_reference = const value_type&;
+        using pointer = value_type*;
+        using const_pointer = const value_type*;
+        using iterator = pointer;
+        using const_iterator = const_pointer;
+
+        explicit StaticVector(std::size_t size) : _size(size), _array(std::move(std::unique_ptr<array_t>(new std::remove_extent_t<array_t>[size]))) {}
+		explicit StaticVector(std::size_t size, const T& initialValue) : _size(size), _array(std::move(std::unique_ptr<array_t>(new std::remove_extent_t<array_t>[size]))) {
+			for (auto& value : *this) {
+				value = initialValue;
+			}
+		}
+
+        StaticVector(const StaticVector& other) {
+            if (other.size() == 0) {
+                _array.reset();
+                _size = 0;
+            } else {
+                _array.reset(new std::remove_extent_t<array_t>[other.size()]);
+                _size = other.size();
+				copy(other.begin(), _size, begin());
+            }
+        }
+
+        StaticVector(StaticVector&& other) noexcept {
+            _array = std::move(other._array);
+            _size = other.size();
+        }
+
+		StaticVector& operator=(StaticVector&& other) noexcept {
+			_array = std::move(other._array);
+			_size = other.size();
+			return *this;
+		}
+
+		/**
+		 * Copies the contents of the given vector into a new StaticVector.
+		 */
+		static StaticVector<T> fromVector(std::vector<T> vector) {
+			StaticVector<T> staticVector(vector.size());
+			if constexpr (std::is_trivially_copyable_v<T>) {
+				std::memcpy(staticVector.data(), vector.data(), vector.size());
+			} else {
+				for (auto it = vector.begin(); it != vector.end(); ++it) {
+					staticVector[std::distance(vector.begin(), it)] = *it;
+				}
+			}
+			return staticVector;
+		}
+
+        [[nodiscard]] pointer data() noexcept {
+            return &_array.get()[0];
+        }
+
+        [[nodiscard]] const_pointer data() const noexcept {
+            return &_array.get()[0];
+        }
+
+        [[nodiscard]] size_type size() const noexcept {
+            return _size;
+        }
+
+        [[nodiscard]] size_type size_bytes() const noexcept {
+            return _size * sizeof(value_type);
+        }
+
+        [[nodiscard]] bool empty() const noexcept {
+            return _size == 0;
+        }
+
+        [[nodiscard]] iterator begin() noexcept { return data(); }
+        [[nodiscard]] const_iterator begin() const noexcept { return data(); }
+        [[nodiscard]] const_iterator cbegin() const noexcept { return data(); }
+        [[nodiscard]] iterator end() noexcept { return begin() + size(); }
+        [[nodiscard]] const_iterator end() const noexcept { return begin() + size(); }
+        [[nodiscard]] const_iterator cend() const noexcept { return begin() + size(); }
+
+		[[nodiscard]] T& operator[](std::size_t idx) {
+            assert(idx < size());
+            return begin()[idx];
+        }
+        [[nodiscard]] const T& operator[](std::size_t idx) const {
+            assert(idx < size());
+            return begin()[idx];
+        }
+
+        bool operator==(const StaticVector<value_type>& other) const {
+            if (other.size() != size()) return false;
+            return std::memcmp(data(), other.data(), size_bytes()) == 0;
+        }
+
+        // This is mostly just here for compatibility and the tests
+        bool operator==(const std::vector<value_type>& other) const {
+            if (other.size() != size()) return false;
+            return std::memcmp(data(), other.data(), size_bytes()) == 0;
+        }
+    };
+
 	/*
 	 * The amount of items that the SmallVector can initially store in the storage
 	 * allocated within the object itself.
@@ -385,7 +620,7 @@ namespace fastgltf {
      * SmallVector is also mostly conformant to C++17's std::vector, and can therefore be used as a drop-in replacement.
      * @note It is also available with polymorphic allocators in the fastgltf::pmr namespace.
      */
-    template <typename T, std::size_t N = initialSmallVectorStorage, typename Allocator = std::allocator<T>>
+    FASTGLTF_EXPORT template <typename T, std::size_t N = initialSmallVectorStorage, typename Allocator = std::allocator<T>>
     class SmallVector final {
         static_assert(N != 0, "Cannot create a SmallVector with 0 initial capacity");
 
@@ -677,27 +912,19 @@ namespace fastgltf {
             // We reserve enough capacity for the new element, and then just increment the size.
 			reserve(_size + 1);
 			++_size;
-            T& result = *(new (std::addressof(back())) T(std::forward<Args>(args)...));
-            return (result);
+            new (std::addressof(back())) T(std::forward<Args>(args)...);
+            return (back());
         }
 
         [[nodiscard]] T& at(std::size_t idx) {
             if (idx >= size()) {
-#ifdef __cpp_exceptions
-                throw std::out_of_range("Index is out of range for SmallVector");
-#else
-				std::abort();
-#endif
+                raise<std::out_of_range>("Index is out of range for SmallVector");
             }
             return begin()[idx];
         }
         [[nodiscard]] const T& at(std::size_t idx) const {
             if (idx >= size()) {
-#ifdef __cpp_exceptions
-                throw std::out_of_range("Index is out of range for SmallVector");
-#else
-	            std::abort();
-#endif
+                raise<std::out_of_range>("Index is out of range for SmallVector");
             }
             return begin()[idx];
         }
@@ -732,7 +959,7 @@ namespace fastgltf {
 
 #if !FASTGLTF_MISSING_MEMORY_RESOURCE
 	namespace pmr {
-		template<typename T, std::size_t N>
+		FASTGLTF_EXPORT template<typename T, std::size_t N>
 		using SmallVector = SmallVector<T, N, std::pmr::polymorphic_allocator<T>>;
 	} // namespace pmr
 #endif
@@ -742,26 +969,26 @@ namespace fastgltf {
 #endif
 
 #if FASTGLTF_USE_CUSTOM_SMALLVECTOR
-	template <typename T, std::size_t N = initialSmallVectorStorage>
+	FASTGLTF_EXPORT template <typename T, std::size_t N = initialSmallVectorStorage>
 	using MaybeSmallVector = SmallVector<T, N>;
 #else
-	template <typename T, std::size_t N = 0>
+	FASTGLTF_EXPORT template <typename T, std::size_t N = 0>
 	using MaybeSmallVector = std::vector<T>;
 #endif
 
 #if !FASTGLTF_MISSING_MEMORY_RESOURCE
 	namespace pmr {
 #if FASTGLTF_USE_CUSTOM_SMALLVECTOR
-		template <typename T, std::size_t N = initialSmallVectorStorage>
+		FASTGLTF_EXPORT template <typename T, std::size_t N = initialSmallVectorStorage>
 		using MaybeSmallVector = pmr::SmallVector<T, N>;
 #else
-		template <typename T, std::size_t N = 0>
+		FASTGLTF_EXPORT template <typename T, std::size_t N = 0>
 		using MaybeSmallVector = std::pmr::vector<T>;
 #endif
 	} // namespace pmr
 #endif
 
-	template<typename, typename = void>
+	FASTGLTF_EXPORT template<typename, typename = void>
 	struct OptionalFlagValue {
 		static constexpr std::nullopt_t missing_value = std::nullopt;
 	};
@@ -803,7 +1030,7 @@ namespace fastgltf {
 	 * If no specialization for T of OptionalFlagValue is provided, a static assert will be triggered.
 	 * In those cases, use std::optional or fastgltf::Optional instead.
 	 */
-	template<typename T>
+	FASTGLTF_EXPORT template<typename T>
 	class OptionalWithFlagValue final {
 		static_assert(!std::is_same_v<std::nullopt_t, std::remove_const_t<decltype(OptionalFlagValue<T>::missing_value)>>,
 			"OptionalWithFlagValue can only be used when there is an appropriate specialization of OptionalFlagValue<T>.");
@@ -906,28 +1133,28 @@ namespace fastgltf {
 
 		[[nodiscard]] T& value()& {
 			if (!has_value()) {
-				throw std::bad_optional_access();
+                raise<std::bad_optional_access>();
 			}
 			return _value;
 		}
 
 		[[nodiscard]] const T& value() const& {
 			if (!has_value()) {
-				throw std::bad_optional_access();
+				raise<std::bad_optional_access>();
 			}
 			return _value;
 		}
 
 		[[nodiscard]] T&& value()&& {
 			if (!has_value()) {
-				throw std::bad_optional_access();
+				raise<std::bad_optional_access>();
 			}
 			return std::move(_value);
 		}
 
 		[[nodiscard]] const T&& value() const&& {
 			if (!has_value()) {
-				throw std::bad_optional_access();
+				raise<std::bad_optional_access>();
 			}
 			return std::move(_value);
 		}
@@ -940,6 +1167,44 @@ namespace fastgltf {
 		template<typename U>
 		[[nodiscard]] T value_or(U&& default_value)&& {
 			return has_value() ? std::move(**this) : static_cast<T>(std::forward<U>(default_value));
+		}
+
+		template <typename F>
+		[[nodiscard]] OptionalWithFlagValue<T> and_then(F&& func)& {
+			if (!has_value())
+				return std::nullopt;
+			return func(value());
+		}
+
+		template <typename F>
+		[[nodiscard]] OptionalWithFlagValue<T> and_then(F&& func)&& {
+			if (!has_value())
+				return std::nullopt;
+			return func(std::move(value()));
+		}
+
+		template <typename F>
+		[[nodiscard]] OptionalWithFlagValue<T> transform(F&& func)& {
+			if (!has_value())
+				return std::nullopt;
+			return OptionalWithFlagValue<T>(func(value()));
+		}
+
+		template <typename F>
+		[[nodiscard]] OptionalWithFlagValue<T> transform(F&& func)&& {
+			if (!has_value())
+				return std::nullopt;
+			return OptionalWithFlagValue<T>(func(std::move(value())));
+		}
+
+		template <typename F>
+		[[nodiscard]] T or_else(F&& func) const& {
+			return *this ? *this : std::forward<F>(func)();
+		}
+
+		template <typename F>
+		[[nodiscard]] T or_else(F&& func)&& {
+			return *this ? std::move(*this) : std::forward<F>(func)();
 		}
 
 		void swap(OptionalWithFlagValue<T>& other) noexcept(std::is_nothrow_move_constructible_v<T> &&
@@ -961,12 +1226,14 @@ namespace fastgltf {
 		template <typename... Args>
 		T& emplace(Args&&... args) {
 			new (std::addressof(_value)) T(std::forward<Args>(args)...);
+			return _value;
 		}
 
 		template <typename U, typename... Args>
 		T& emplace(std::initializer_list<U> list, Args&&... args) {
 			static_assert(std::is_constructible_v<T, std::initializer_list<U>&, Args&&...>);
 			new (std::addressof(_value)) T(list, std::forward<Args>(args)...);
+			return _value;
 		}
 
 		explicit operator bool() const noexcept {
@@ -998,41 +1265,51 @@ namespace fastgltf {
 		}
 	};
 
-	template <typename T, typename U>
+	FASTGLTF_EXPORT template <typename T, typename U>
+	bool operator==(const OptionalWithFlagValue<T>& lhs, const OptionalWithFlagValue<U>& rhs) {
+		return bool(lhs) == bool(rhs) && !bool(lhs) && *lhs == *rhs;
+	}
+
+	FASTGLTF_EXPORT template <typename T, typename U>
+	bool operator!=(const OptionalWithFlagValue<T>& lhs, const OptionalWithFlagValue<U>& rhs) {
+		return !(lhs == rhs);
+	}
+
+	FASTGLTF_EXPORT template <typename T, typename U>
 	bool operator==(const OptionalWithFlagValue<T>& opt, const U& value) {
 		return opt.has_value() && (*opt) == value;
 	}
 
-	template <typename T, typename U>
+	FASTGLTF_EXPORT template <typename T, typename U>
 	bool operator!=(const OptionalWithFlagValue<T>& opt, const U& value) {
 		return !(opt == value);
 	}
 
-	template <typename T, typename U>
+	FASTGLTF_EXPORT template <typename T, typename U>
 	bool operator<(const OptionalWithFlagValue<T>& opt, const U& value) {
-		return opt.has_value() && (*opt) < value;
+		return opt.has_value() && *opt < value;
 	}
 
-	template <typename T, typename U>
+	FASTGLTF_EXPORT template <typename T, typename U>
 	bool operator<=(const OptionalWithFlagValue<T>& opt, const U& value) {
-		return opt.has_value() && (*opt) <= value;
+		return opt.has_value() && *opt <= value;
 	}
 
-	template <typename T, typename U>
+	FASTGLTF_EXPORT template <typename T, typename U>
 	bool operator>(const OptionalWithFlagValue<T>& opt, const U& value) {
-		return opt.has_value() && (*opt) > value;
+		return opt.has_value() && *opt > value;
 	}
 
-	template <typename T, typename U>
+	FASTGLTF_EXPORT template <typename T, typename U>
 	bool operator>=(const OptionalWithFlagValue<T>& opt, const U& value) {
-		return opt.has_value() && (*opt) >= value;
+		return opt.has_value() && *opt >= value;
 	}
 
 	/**
 	 * A type alias which checks if there is a specialization of OptionalFlagValue for T and "switches"
 	 * between fastgltf::OptionalWithFlagValue and std::optional.
 	 */
-	template <typename T>
+	FASTGLTF_EXPORT template <typename T>
 	using Optional = std::conditional_t<
 		!std::is_same_v<std::nullopt_t, std::remove_const_t<decltype(OptionalFlagValue<T>::missing_value)>>,
 		OptionalWithFlagValue<T>,
@@ -1040,7 +1317,7 @@ namespace fastgltf {
 #pragma endregion
 
 #pragma region Structs
-	class URI;
+	FASTGLTF_EXPORT class URI;
 
 	/**
 	 * Custom URI class for fastgltf's needs. glTF 2.0 only allows two types of URIs:
@@ -1054,7 +1331,7 @@ namespace fastgltf {
 	 * This class, unlike fastgltf::URI, only holds a std::string_view to the URI and therefore
 	 * doesn't own the allocation.
 	 */
-	class URIView {
+	FASTGLTF_EXPORT class URIView {
 		friend class URI;
 
 		std::string_view view;
@@ -1122,7 +1399,7 @@ namespace fastgltf {
 
 		explicit URI(std::string uri) noexcept;
 		explicit URI(std::string_view uri) noexcept;
-		explicit URI(URIView view) noexcept;
+		explicit URI(const URIView& view) noexcept;
 
 		URI(const URI& other);
 		URI(URI&& other) noexcept;
@@ -1136,6 +1413,7 @@ namespace fastgltf {
 		static void decodePercents(std::string& x) noexcept;
 
 		[[nodiscard]] auto string() const noexcept -> std::string_view;
+		[[nodiscard]] auto c_str() const noexcept -> const char*;
 
 		[[nodiscard]] auto scheme() const noexcept -> std::string_view;
 		[[nodiscard]] auto userinfo() const noexcept -> std::string_view;
@@ -1151,13 +1429,13 @@ namespace fastgltf {
 		[[nodiscard]] bool isDataUri() const noexcept;
     };
 
-    inline constexpr std::size_t dynamic_extent = std::numeric_limits<std::size_t>::max();
+    FASTGLTF_EXPORT inline constexpr std::size_t dynamic_extent = std::numeric_limits<std::size_t>::max();
 
     /**
      * Custom span class imitating C++20's std::span for referencing bytes without owning the
      * allocation. Can also directly be converted to a std::span or used by itself.
      */
-    template <typename T, std::size_t Extent = dynamic_extent>
+    FASTGLTF_EXPORT template <typename T, std::size_t Extent = dynamic_extent>
     class span {
         using element_type = T;
         using value_type = std::remove_cv_t<T>;
@@ -1177,12 +1455,23 @@ namespace fastgltf {
         template <typename Iterator>
         explicit constexpr span(Iterator first, size_type count) : _ptr(first), _size(count) {}
 
+#if FASTGLTF_CPP_20
+        constexpr span(std::span<T> data) : _ptr(data.data()), _size(data.size()) {}
+#endif
+
         constexpr span(const span& other) noexcept = default;
         constexpr span& operator=(const span& other) noexcept = default;
 
         [[nodiscard]] constexpr reference operator[](size_type idx) const {
             return data()[idx];
         }
+
+		[[nodiscard]] constexpr reference at(size_type idx) const {
+			if (idx >= size()) {
+                raise<std::out_of_range>("Index is out of range for span");
+			}
+			return data()[idx];
+		}
 
         [[nodiscard]] constexpr pointer data() const noexcept {
             return _ptr;
@@ -1204,6 +1493,14 @@ namespace fastgltf {
             return span(_ptr, count);
         }
 
+        [[nodiscard]] constexpr span<T, Extent> last(size_type count) const {
+            return span(&data()[size() - count], count);
+        }
+
+        [[nodiscard]] constexpr span<T, Extent> subspan(size_type offset, size_type count = dynamic_extent) const {
+            return span(&data()[offset], count == dynamic_extent ? size() - offset : count);
+        }
+
 #if FASTGLTF_CPP_20
         operator std::span<T>() const {
             return std::span(data(), size());
@@ -1211,79 +1508,89 @@ namespace fastgltf {
 #endif
     };
 
-    using CustomBufferId = std::uint64_t;
+	// Deduction guide for easily instantiating spans
+	FASTGLTF_EXPORT template <typename T>
+	span(const T* data, std::size_t size) -> span<const T>;
+
+    FASTGLTF_EXPORT using CustomBufferId = std::uint64_t;
 
     /**
      * Namespace for structs that describe individual sources of data for images and/or buffers.
      */
     namespace sources {
-        struct BufferView {
+        FASTGLTF_EXPORT struct BufferView {
             std::size_t bufferViewIndex;
-            MimeType mimeType;
+            MimeType mimeType = MimeType::None;
         };
 
-        struct URI {
+        FASTGLTF_EXPORT struct URI {
             std::size_t fileByteOffset;
             fastgltf::URI uri;
-            MimeType mimeType;
+            MimeType mimeType = MimeType::None;
         };
 
-        struct Vector {
-            std::vector<std::uint8_t> bytes;
-            MimeType mimeType;
+        FASTGLTF_EXPORT struct Array {
+            StaticVector<std::byte> bytes;
+            MimeType mimeType = MimeType::None;
         };
 
-        struct CustomBuffer {
+		/** @note This type is not used by the fastgltf parser and is only used for exporting. Use sources::Array instead when importing intead. */
+		FASTGLTF_EXPORT struct Vector {
+			std::vector<std::byte> bytes;
+			MimeType mimeType = MimeType::None;
+		};
+
+        FASTGLTF_EXPORT struct CustomBuffer {
             CustomBufferId id;
-            MimeType mimeType;
+            MimeType mimeType = MimeType::None;
         };
 
-        struct ByteView {
+        FASTGLTF_EXPORT struct ByteView {
             span<const std::byte> bytes;
-            MimeType mimeType;
+            MimeType mimeType = MimeType::None;
         };
 
-		struct Fallback {};
+		FASTGLTF_EXPORT struct Fallback {};
     } // namespace sources
 
     /**
      * Represents the data source of a buffer or image. These could be a buffer view, a file path
-     * (including offsets), a ordinary vector (if #Options::LoadExternalBuffers or #Options::LoadGLBBuffers
+     * (including offsets), a StaticVector (if #Options::LoadExternalBuffers or #Options::LoadGLBBuffers
      * was specified), or the ID of a custom buffer.
      *
-     * @note As a user, you should never encounter this variant holding the std::monostate, as that would be a ill-formed glTF,
+     * @note As a user, you should never encounter this variant holding the std::monostate, as that would be an ill-formed glTF,
      * which fastgltf already checks for while parsing.
      *
      * @note For buffers, this variant will never hold a sources::BufferView, as only images are able to reference buffer views as a source.
      */
-    using DataSource = std::variant<std::monostate, sources::BufferView, sources::URI, sources::Vector, sources::CustomBuffer, sources::ByteView, sources::Fallback>;
+    FASTGLTF_EXPORT using DataSource = std::variant<std::monostate, sources::BufferView, sources::URI, sources::Array, sources::Vector, sources::CustomBuffer, sources::ByteView, sources::Fallback>;
 
-    struct AnimationChannel {
+    FASTGLTF_EXPORT struct AnimationChannel {
         std::size_t samplerIndex;
-        std::size_t nodeIndex;
+        Optional<std::size_t> nodeIndex;
         AnimationPath path;
     };
 
-    struct AnimationSampler {
+    FASTGLTF_EXPORT struct AnimationSampler {
         std::size_t inputAccessor;
         std::size_t outputAccessor;
-        AnimationInterpolation interpolation;
+        AnimationInterpolation interpolation = AnimationInterpolation::Linear;
     };
 
-    struct Animation {
+    FASTGLTF_EXPORT struct Animation {
 	    FASTGLTF_FG_PMR_NS::MaybeSmallVector<AnimationChannel> channels;
 	    FASTGLTF_FG_PMR_NS::MaybeSmallVector<AnimationSampler> samplers;
 
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct AssetInfo {
+    FASTGLTF_EXPORT struct AssetInfo {
         FASTGLTF_STD_PMR_NS::string gltfVersion;
         FASTGLTF_STD_PMR_NS::string copyright;
         FASTGLTF_STD_PMR_NS::string generator;
     };
 
-    struct Camera {
+    FASTGLTF_EXPORT struct Camera {
         struct Orthographic {
             num xmag;
             num ymag;
@@ -1306,30 +1613,41 @@ namespace fastgltf {
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Skin {
-	    FASTGLTF_FG_PMR_NS::MaybeSmallVector<std::size_t> joints;
-	    Optional<std::size_t> skeleton;
+    FASTGLTF_EXPORT struct Skin {
 	    Optional<std::size_t> inverseBindMatrices;
+        Optional<std::size_t> skeleton;
+        FASTGLTF_FG_PMR_NS::MaybeSmallVector<std::size_t> joints;
 
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Sampler {
+    FASTGLTF_EXPORT struct Sampler {
 	    Optional<Filter> magFilter;
 	    Optional<Filter> minFilter;
-        Wrap wrapS;
-        Wrap wrapT;
+        Wrap wrapS = Wrap::Repeat;
+        Wrap wrapT = Wrap::Repeat;
 
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Scene {
+    FASTGLTF_EXPORT struct Scene {
 	    FASTGLTF_FG_PMR_NS::MaybeSmallVector<std::size_t> nodeIndices;
 
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Node {
+	FASTGLTF_EXPORT struct TRS {
+		math::fvec3 translation = math::fvec3(0.f);
+		math::fquat rotation = math::fquat(0.f, 0.f, 0.f, 1.f);
+		math::fvec3 scale = math::fvec3(1.f);
+	};
+
+	FASTGLTF_EXPORT struct Attribute {
+		FASTGLTF_STD_PMR_NS::string name;
+		std::size_t accessorIndex;
+	};
+
+    FASTGLTF_EXPORT struct Node {
         Optional<std::size_t> meshIndex;
 	    Optional<std::size_t> skinIndex;
 	    Optional<std::size_t> cameraIndex;
@@ -1342,30 +1660,23 @@ namespace fastgltf {
 	    FASTGLTF_FG_PMR_NS::MaybeSmallVector<std::size_t> children;
 	    FASTGLTF_FG_PMR_NS::MaybeSmallVector<num> weights;
 
-        struct TRS {
-            std::array<num, 3> translation;
-            std::array<num, 4> rotation;
-            std::array<num, 3> scale;
-        };
-        using TransformMatrix = std::array<num, 16>;
-
         /**
          * Variant holding either the three TRS components; transform, rotation, and scale, or a
          * transformation matrix, which cannot skew or shear. The latter can be decomposed into
          * the TRS components by specifying Options::DecomposeNodeMatrices.
          */
-        std::variant<TRS, TransformMatrix> transform;
+        std::variant<TRS, math::fmat4x4> transform;
 
         /**
          * Only ever non-empty when EXT_mesh_gpu_instancing is enabled and used by the asset.
          */
-        FASTGLTF_STD_PMR_NS::vector<std::pair<FASTGLTF_STD_PMR_NS::string, std::size_t>> instancingAttributes;
+        FASTGLTF_STD_PMR_NS::vector<Attribute> instancingAttributes;
 
         FASTGLTF_STD_PMR_NS::string name;
- 
+
         [[nodiscard]] auto findInstancingAttribute(std::string_view attributeName) noexcept {
             for (auto it = instancingAttributes.begin(); it != instancingAttributes.end(); ++it) {
-                if (it->first == attributeName)
+                if (it->name == attributeName)
                     return it;
             }
             return instancingAttributes.end();
@@ -1373,37 +1684,42 @@ namespace fastgltf {
 
         [[nodiscard]] auto findInstancingAttribute(std::string_view attributeName) const noexcept {
             for (auto it = instancingAttributes.cbegin(); it != instancingAttributes.cend(); ++it) {
-                if (it->first == attributeName)
+                if (it->name == attributeName)
                     return it;
             }
             return instancingAttributes.cend();
         }
-   };
+    };
 
-    struct Primitive {
-		using attribute_type = std::pair<FASTGLTF_STD_PMR_NS::string, std::size_t>;
-
+    FASTGLTF_EXPORT struct Primitive {
 		// Instead of a map, we have a list of attributes here. Each pair contains
 		// the name of the attribute and the corresponding accessor index.
-		FASTGLTF_FG_PMR_NS::SmallVector<attribute_type, 4> attributes;
-        PrimitiveType type;
+		FASTGLTF_FG_PMR_NS::SmallVector<Attribute, 4> attributes;
+        PrimitiveType type = PrimitiveType::Triangles;
 
-        FASTGLTF_STD_PMR_NS::vector<FASTGLTF_FG_PMR_NS::SmallVector<attribute_type, 4>> targets;
+        FASTGLTF_STD_PMR_NS::vector<FASTGLTF_FG_PMR_NS::SmallVector<Attribute, 4>> targets;
 
         Optional<std::size_t> indicesAccessor;
         Optional<std::size_t> materialIndex;
 
+		/**
+		 * Represents the mappings data from KHR_material_variants.
+		 * Use the variant index to index into this array to get the corresponding material index to use.
+		 * If the optional has no value, the normal materialIndex should be used as a fallback.
+		 */
+		std::vector<Optional<std::size_t>> mappings;
+
 		[[nodiscard]] auto findAttribute(std::string_view name) noexcept {
-			for (decltype(attributes)::iterator it = attributes.begin(); it != attributes.end(); ++it) {
-				if (it->first == name)
+			for (auto* it = attributes.begin(); it != attributes.end(); ++it) {
+				if (it->name == name)
 					return it;
 			}
 			return attributes.end();
 		}
 
 		[[nodiscard]] auto findAttribute(std::string_view name) const noexcept {
-			for (decltype(attributes)::const_iterator it = attributes.cbegin(); it != attributes.cend(); ++it) {
-				if (it->first == name)
+			for (const auto* it = attributes.cbegin(); it != attributes.cend(); ++it) {
+				if (it->name == name)
 					return it;
 			}
 			return attributes.cend();
@@ -1411,8 +1727,8 @@ namespace fastgltf {
 
 		[[nodiscard]] auto findTargetAttribute(std::size_t targetIndex, std::string_view name) noexcept {
 			auto& targetAttributes = targets[targetIndex];
-			for (std::remove_reference_t<decltype(targetAttributes)>::iterator it = targetAttributes.begin(); it != targetAttributes.end(); ++it) {
-				if (it->first == name)
+			for (auto* it = targetAttributes.begin(); it != targetAttributes.end(); ++it) {
+				if (it->name == name)
 					return it;
 			}
 			return targetAttributes.end();
@@ -1420,15 +1736,15 @@ namespace fastgltf {
 
 		[[nodiscard]] auto findTargetAttribute(std::size_t targetIndex, std::string_view name) const noexcept {
 			const auto& targetAttributes = targets[targetIndex];
-			for (std::remove_reference_t<decltype(targetAttributes)>::const_iterator it = targetAttributes.cbegin(); it != targetAttributes.cend(); ++it) {
-				if (it->first == name)
+			for (const auto* it = targetAttributes.cbegin(); it != targetAttributes.cend(); ++it) {
+				if (it->name == name)
 					return it;
 			}
 			return targetAttributes.cend();
 		}
 	};
 
-    struct Mesh {
+    FASTGLTF_EXPORT struct Mesh {
 		FASTGLTF_FG_PMR_NS::MaybeSmallVector<Primitive, 2> primitives;
 	    FASTGLTF_FG_PMR_NS::MaybeSmallVector<num> weights;
 
@@ -1438,21 +1754,21 @@ namespace fastgltf {
     /**
      * Texture transform information as per KHR_texture_transform.
      */
-    struct TextureTransform {
-        /**
-         * The offset of the UV coordinate origin as a factor of the texture dimensions.
-         */
-        num rotation;
-
+    FASTGLTF_EXPORT struct TextureTransform {
         /**
          * Rotate the UVs by this many radians counter-clockwise around the origin. This is equivalent to a similar rotation of the image clockwise.
          */
-        std::array<num, 2> uvOffset;
+        num rotation;
 
-        /**
-         * The scale factor applied to the components of the UV coordinates.
-         */
-        std::array<num, 2> uvScale;
+		/**
+		 * The offset of the UV coordinate origin as a factor of the texture dimensions.
+		 */
+		math::nvec2 uvOffset = math::nvec2(0);
+
+		/**
+		 * The scale factor applied to the components of the UV coordinates.
+		 */
+		math::nvec2 uvScale = math::nvec2(1);
 
         /**
          * Overrides the textureInfo texCoord value if supplied.
@@ -1460,9 +1776,9 @@ namespace fastgltf {
         Optional<std::size_t> texCoordIndex;
     };
 
-    struct TextureInfo {
+    FASTGLTF_EXPORT struct TextureInfo {
         std::size_t textureIndex;
-        std::size_t texCoordIndex;
+        std::size_t texCoordIndex = 0;
 
         /**
          * Data from KHR_texture_transform, and nullptr if the extension wasn't enabled or used.
@@ -1470,19 +1786,19 @@ namespace fastgltf {
         std::unique_ptr<TextureTransform> transform;
     };
 
-	struct NormalTextureInfo : TextureInfo {
-		num scale;
+	FASTGLTF_EXPORT struct NormalTextureInfo : TextureInfo {
+		num scale = 1.f;
 	};
 
-	struct OcclusionTextureInfo : TextureInfo {
-		num strength;
+	FASTGLTF_EXPORT struct OcclusionTextureInfo : TextureInfo {
+		num strength = 1.f;
 	};
 
-    struct PBRData {
-        /**
-         * The factors for the base color of then material.
-         */
-        std::array<num, 4> baseColorFactor = {{ 1, 1, 1, 1 }};
+    FASTGLTF_EXPORT struct PBRData {
+		/**
+		 * The factors for the base color of then material.
+		 */
+		math::nvec4 baseColorFactor = math::nvec4(1);
 
         /**
          * The factor for the metalness of the material.
@@ -1498,61 +1814,61 @@ namespace fastgltf {
         Optional<TextureInfo> metallicRoughnessTexture;
     };
 
-	struct MaterialAnisotropy {
-		num anisotropyStrength;
-		num anisotropyRotation;
+	FASTGLTF_EXPORT struct MaterialAnisotropy {
+		num anisotropyStrength = 0.0f;
+		num anisotropyRotation = 0.0f;
 		Optional<TextureInfo> anisotropyTexture;
 	};
 
     /**
      * Specular information from KHR_materials_specular.
      */
-    struct MaterialSpecular {
-        num specularFactor;
+    FASTGLTF_EXPORT struct MaterialSpecular {
+        num specularFactor = 1.0f;
         Optional<TextureInfo> specularTexture;
-        std::array<num, 3> specularColorFactor;
+		math::nvec3 specularColorFactor = math::nvec3(1);
         Optional<TextureInfo> specularColorTexture;
     };
 
     /**
      * Iridescence information from KHR_materials_iridescence
      */
-    struct MaterialIridescence {
-        num iridescenceFactor;
+    FASTGLTF_EXPORT struct MaterialIridescence {
+        num iridescenceFactor = 0.0f;
         Optional<TextureInfo> iridescenceTexture;
-        num iridescenceIor;
-        num iridescenceThicknessMinimum;
-        num iridescenceThicknessMaximum;
+        num iridescenceIor = 1.3f;
+        num iridescenceThicknessMinimum = 100.0f;
+        num iridescenceThicknessMaximum = 400.0f;
         Optional<TextureInfo> iridescenceThicknessTexture;
     };
 
     /**
      * Volume information from KHR_materials_volume
      */
-    struct MaterialVolume {
-        num thicknessFactor;
+    FASTGLTF_EXPORT struct MaterialVolume {
+        num thicknessFactor = 0.0f;
         Optional<TextureInfo> thicknessTexture;
-        num attenuationDistance;
-        std::array<num, 3> attenuationColor;
+        num attenuationDistance = std::numeric_limits<num>::infinity();
+		math::nvec3 attenuationColor = math::nvec3(1);
     };
 
-    struct MaterialTransmission {
-        num transmissionFactor;
+    FASTGLTF_EXPORT struct MaterialTransmission {
+        num transmissionFactor = 0.0f;
         Optional<TextureInfo> transmissionTexture;
     };
 
-    struct MaterialClearcoat {
-        num clearcoatFactor;
+    FASTGLTF_EXPORT struct MaterialClearcoat {
+        num clearcoatFactor = 0.0f;
         Optional<TextureInfo> clearcoatTexture;
-        num clearcoatRoughnessFactor;
+        num clearcoatRoughnessFactor = 0.0f;
         Optional<TextureInfo> clearcoatRoughnessTexture;
         Optional<TextureInfo> clearcoatNormalTexture;
     };
 
-    struct MaterialSheen {
-        std::array<num, 3> sheenColorFactor;
+    FASTGLTF_EXPORT struct MaterialSheen {
+		math::nvec3 sheenColorFactor = math::nvec3(0);
         Optional<TextureInfo> sheenColorTexture;
-        num sheenRoughnessFactor;
+        num sheenRoughnessFactor = 0.0f;
         Optional<TextureInfo> sheenRoughnessTexture;
     };
 
@@ -1560,16 +1876,22 @@ namespace fastgltf {
     /**
      * Specular/Glossiness information from KHR_materials_pbrSpecularGlossiness.
      */
-    struct MaterialSpecularGlossiness {
-        std::array<num, 4> diffuseFactor;
+    FASTGLTF_EXPORT struct MaterialSpecularGlossiness {
+		math::nvec4 diffuseFactor = math::nvec4(1);
         Optional<TextureInfo> diffuseTexture;
-        std::array<num, 3> specularFactor;
-        num glossinessFactor;
+		math::nvec3 specularFactor = math::nvec3(1);
+        num glossinessFactor = 1.0f;
         Optional<TextureInfo> specularGlossinessTexture;
     };
 #endif
 
-    struct Material {
+	FASTGLTF_EXPORT struct MaterialPackedTextures {
+		Optional<TextureInfo> occlusionRoughnessMetallicTexture;
+		Optional<TextureInfo> roughnessMetallicOcclusionTexture;
+		Optional<TextureInfo> normalTexture;
+	};
+
+    FASTGLTF_EXPORT struct Material {
         /**
          * A set of parameter values that are used to define the metallic-roughness material model
          * from Physically Based Rendering (PBR) methodology.
@@ -1583,27 +1905,46 @@ namespace fastgltf {
         Optional<OcclusionTextureInfo> occlusionTexture;
         Optional<TextureInfo> emissiveTexture;
 
-        /**
-         * The factors for the emissive color of the material. Defaults to 0,0,0
-         */
-        std::array<num, 3> emissiveFactor;
+		/**
+		 * The factors for the emissive color of the material.
+		 */
+		math::nvec3 emissiveFactor = math::nvec3(0);
 
         /**
          * The values used to determine the transparency of the material.
-         * Defaults to #AlphaMode::Opaque.
          */
-        AlphaMode alphaMode;
+        AlphaMode alphaMode = AlphaMode::Opaque;
+
+		/**
+		 * Determines whether back-face culling should be disabled when using this material.
+		 */
+		bool doubleSided = false;
+
+		/**
+		 * Only true when KHR_materials_unlit is enabled and specified for this material.
+		 */
+		bool unlit = false;
 
 		/**
 		 * The alpha value that determines the upper limit for fragments that
-		 * should be discarded for transparency. Defaults to 0.5.
+		 * should be discarded for transparency.
 		 */
-        num alphaCutoff;
+        num alphaCutoff = 0.5f;
 
-        /**
-         * Determines whether back-face culling should be disabled when using this material.
-         */
-        bool doubleSided;
+		/**
+		 * The emissive strength from the KHR_materials_emissive_strength extension.
+		 */
+		num emissiveStrength = 1.0f;
+
+		/**
+		 * The index of refraction as specified through KHR_materials_ior.
+		 */
+		num ior = 1.5f;
+
+		/**
+		 * The dispersion factor from KHR_materials_dispersion, specifies as 20/Abbe number (20/V).
+		 */
+		num dispersion = 0.0f;
 
 		std::unique_ptr<MaterialAnisotropy> anisotropy;
 
@@ -1638,29 +1979,22 @@ namespace fastgltf {
          */
         std::unique_ptr<MaterialVolume> volume;
 
-        /**
-         * The emissive strength from the KHR_materials_emissive_strength extension.
-         */
-        Optional<num> emissiveStrength;
+		/**
+		 * The index of a packed texture from the MSFT_packing_normalRoughnessMetallic extension,
+		 * providing normal, roughness and metallic data.
+		 */
+		Optional<TextureInfo> packedNormalMetallicRoughnessTexture;
 
-        /**
-         * The index of refraction as specified through KHR_materials_ior.
-         */
-        Optional<num> ior;
-
-        /**
-         * Only applicable if KHR_materials_unlit is enabled.
-         */
-        bool unlit;
+		std::unique_ptr<MaterialPackedTextures> packedOcclusionRoughnessMetallicTextures;
 
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Texture {
+    FASTGLTF_EXPORT struct Texture {
 		/**
 		 * If no sampler is specified, use a default sampler with repeat wrap and auto filter.
 		 */
-		 Optional<std::size_t> samplerIndex;
+		Optional<std::size_t> samplerIndex;
 
 		/**
 		 * The index of the image used by this texture. Either this will have a value,
@@ -1687,28 +2021,28 @@ namespace fastgltf {
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Image {
+    FASTGLTF_EXPORT struct Image {
         DataSource data;
 
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct SparseAccessor {
+    FASTGLTF_EXPORT struct SparseAccessor {
         std::size_t count;
         std::size_t indicesBufferView;
-        std::size_t indicesByteOffset;
+        std::size_t indicesByteOffset = 0;
         std::size_t valuesBufferView;
-        std::size_t valuesByteOffset;
+        std::size_t valuesByteOffset = 0;
         ComponentType indexComponentType;
     };
 
-    struct Accessor {
-        std::size_t byteOffset;
+    FASTGLTF_EXPORT struct Accessor {
+        std::size_t byteOffset = 0;
         std::size_t count;
         AccessorType type;
         ComponentType componentType;
-        bool normalized;
-        
+        bool normalized = false;
+
         std::variant<std::monostate, FASTGLTF_STD_PMR_NS::vector<double>, FASTGLTF_STD_PMR_NS::vector<std::int64_t>> max;
         std::variant<std::monostate, FASTGLTF_STD_PMR_NS::vector<double>, FASTGLTF_STD_PMR_NS::vector<std::int64_t>> min;
 
@@ -1720,7 +2054,7 @@ namespace fastgltf {
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct CompressedBufferView {
+    FASTGLTF_EXPORT struct CompressedBufferView {
         std::size_t bufferIndex;
         std::size_t byteOffset;
         std::size_t byteLength;
@@ -1731,9 +2065,9 @@ namespace fastgltf {
         std::size_t byteStride;
     };
 
-    struct BufferView {
+    FASTGLTF_EXPORT struct BufferView {
         std::size_t bufferIndex;
-        std::size_t byteOffset;
+        std::size_t byteOffset = 0;
         std::size_t byteLength;
 
         Optional<std::size_t> byteStride;
@@ -1747,7 +2081,7 @@ namespace fastgltf {
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Buffer {
+    FASTGLTF_EXPORT struct Buffer {
         std::size_t byteLength;
 
         DataSource data;
@@ -1755,16 +2089,17 @@ namespace fastgltf {
         FASTGLTF_STD_PMR_NS::string name;
     };
 
-    struct Light {
+    FASTGLTF_EXPORT struct Light {
         LightType type;
         /** RGB light color in linear space. */
-        std::array<num, 3> color;
+        math::nvec3 color;
 
         /** Point and spot lights use candela (lm/sr) while directional use lux (lm/m^2) */
         num intensity;
         /** Range for point and spot lights. If not present, range is infinite. */
         Optional<num> range;
 
+		/** The inner and outer cone angles only apply to spot lights */
         Optional<num> innerConeAngle;
         Optional<num> outerConeAngle;
 
@@ -1772,9 +2107,9 @@ namespace fastgltf {
     };
 
 	class ChunkMemoryResource;
-	class Parser;
+	FASTGLTF_EXPORT class Parser;
 
-	class Asset {
+	FASTGLTF_EXPORT class Asset {
 		friend class Parser;
 
 #if !FASTGLTF_DISABLE_CUSTOM_MEMORY_POOL
@@ -1807,6 +2142,8 @@ namespace fastgltf {
         std::vector<Skin> skins;
         std::vector<Texture> textures;
 
+		std::vector<std::string> materialVariants;
+
         // Keeps tracked of categories that were actually parsed.
         Category availableCategories = Category::None;
 
@@ -1834,13 +2171,11 @@ namespace fastgltf {
 				scenes(std::move(other.scenes)),
 				skins(std::move(other.skins)),
 				textures(std::move(other.textures)),
+				materialVariants(std::move(other.materialVariants)),
 				availableCategories(other.availableCategories) {}
 
 		Asset& operator=(const Asset& other) = delete;
 		Asset& operator=(Asset&& other) noexcept {
-#if !FASTGLTF_DISABLE_CUSTOM_MEMORY_POOL
-			memoryResource = std::move(other.memoryResource);
-#endif
 			assetInfo = std::move(other.assetInfo);
 			extensionsUsed = std::move(other.extensionsUsed);
 			extensionsRequired = std::move(other.extensionsRequired);
@@ -1859,7 +2194,12 @@ namespace fastgltf {
 			scenes = std::move(other.scenes);
 			skins = std::move(other.skins);
 			textures = std::move(other.textures);
+			materialVariants = std::move(other.materialVariants);
 			availableCategories = other.availableCategories;
+#if !FASTGLTF_DISABLE_CUSTOM_MEMORY_POOL
+			// This needs to be last to not destroy the old memoryResource for the current data.
+			memoryResource = std::move(other.memoryResource);
+#endif
 			return *this;
 		}
     };

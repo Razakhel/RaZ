@@ -8,7 +8,9 @@
 #include "RaZ/Utils/FileUtils.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
-#include "fastgltf/parser.hpp"
+#include "fastgltf/core.hpp"
+#include "fastgltf/math.hpp"
+#include "fastgltf/tools.hpp"
 
 #include "tracy/Tracy.hpp"
 
@@ -17,14 +19,14 @@ namespace Raz::GltfFormat {
 namespace {
 
 Transform loadTransform(const fastgltf::Node& node) {
-  const auto* transform = std::get_if<fastgltf::Node::TRS>(&node.transform);
+  const auto* transform = std::get_if<fastgltf::TRS>(&node.transform);
 
   if (transform == nullptr) // Shouldn't happen with the option that splits a matrix in TRS components
     throw std::invalid_argument("[GltfLoad] Unexpected node transform type.");
 
-  return Transform(Vec3f(transform->translation[0], transform->translation[1], transform->translation[2]),
-                   Quaternionf(transform->rotation[3], transform->rotation[0], transform->rotation[1], transform->rotation[2]), // Input is XYZW
-                   Vec3f(transform->scale[0], transform->scale[1], transform->scale[2]));
+  return Transform(Vec3f(transform->translation.x(), transform->translation.y(), transform->translation.z()),
+                   Quaternionf(transform->rotation.w(), transform->rotation.x(), transform->rotation.y(), transform->rotation.z()),
+                   Vec3f(transform->scale.x(), transform->scale.y(), transform->scale.z()));
 
 }
 
@@ -71,48 +73,37 @@ std::vector<std::optional<Transform>> loadTransforms(const std::vector<fastgltf:
   return transforms;
 }
 
-template <typename T>
-void loadVertexData(const fastgltf::Accessor& accessor,
-                    const std::vector<fastgltf::Buffer>& buffers,
-                    const std::vector<fastgltf::BufferView>& bufferViews,
-                    std::vector<Vertex>& vertices,
-                    void (*callback)(Vertex&, const T*)) {
+template <typename T, typename FuncT>
+void loadVertexData(const fastgltf::Asset& asset,
+                    const fastgltf::Primitive& primitive,
+                    std::string_view attribName,
+                    FuncT&& callback) {
+  static_assert(std::is_invocable_v<FuncT, T, std::size_t>);
+
   ZoneScopedN("[GltfLoad]::loadVertexData");
 
-  assert("Error: Loading vertex data requires the accessor to reference a buffer view." && accessor.bufferViewIndex.has_value());
+  const auto attribIter = primitive.findAttribute(attribName);
 
-  const fastgltf::BufferView& bufferView = bufferViews[*accessor.bufferViewIndex];
-  const fastgltf::DataSource& bufferData = buffers[bufferView.bufferIndex].data;
+  if (attribIter == primitive.attributes.end())
+    return;
 
-  if (!std::holds_alternative<fastgltf::sources::Vector>(bufferData))
-    throw std::runtime_error("Error: Cannot load glTF data from sources other than vectors.");
-
-  const std::size_t dataOffset    = bufferView.byteOffset + accessor.byteOffset;
-  const uint8_t* const vertexData = std::get<fastgltf::sources::Vector>(bufferData).bytes.data() + dataOffset;
-  const std::size_t dataStride    = bufferView.byteStride.value_or(fastgltf::getElementByteSize(accessor.type, accessor.componentType));
-
-  for (std::size_t vertIndex = 0; vertIndex < vertices.size(); ++vertIndex) {
-    const auto* data = reinterpret_cast<const T*>(vertexData + vertIndex * dataStride);
-    callback(vertices[vertIndex], data);
-  }
+  fastgltf::iterateAccessorWithIndex<T>(asset, asset.accessors[attribIter->accessorIndex], std::forward<FuncT>(callback));
 }
 
-void loadVertices(const fastgltf::Primitive& primitive,
-                  const std::vector<fastgltf::Buffer>& buffers,
-                  const std::vector<fastgltf::BufferView>& bufferViews,
-                  const std::vector<fastgltf::Accessor>& accessors,
+void loadVertices(const fastgltf::Asset& asset,
+                  const fastgltf::Primitive& primitive,
                   const std::optional<Transform>& transform,
                   Submesh& submesh) {
   ZoneScopedN("[GltfLoad]::loadVertices");
 
   Logger::debug("[GltfLoad] Loading vertices...");
 
-  const auto positionIt = primitive.findAttribute("POSITION");
+  const auto positionIter = primitive.findAttribute("POSITION");
 
-  if (positionIt == primitive.attributes.end())
+  if (positionIter == primitive.attributes.end())
     throw std::invalid_argument("Error: Required 'POSITION' attribute not found in the glTF file.");
 
-  const fastgltf::Accessor& positionAccessor = accessors[positionIt->second];
+  const fastgltf::Accessor& positionAccessor = asset.accessors[positionIter->accessorIndex];
 
   if (!positionAccessor.bufferViewIndex.has_value())
     return;
@@ -120,49 +111,36 @@ void loadVertices(const fastgltf::Primitive& primitive,
   std::vector<Vertex>& vertices = submesh.getVertices();
   vertices.resize(positionAccessor.count);
 
-  loadVertexData<float>(positionAccessor, buffers, bufferViews, vertices, [] (Vertex& vert, const float* data) {
-    vert.position = Vec3f(data[0], data[1], data[2]);
+  fastgltf::iterateAccessorWithIndex<fastgltf::math::fvec3>(asset, positionAccessor, [&vertices] (fastgltf::math::fvec3 position, std::size_t vertexIndex) noexcept {
+    vertices[vertexIndex].position = Vec3f(position.x(), position.y(), position.z());
   });
 
-  constexpr std::array<std::pair<std::string_view, void (*)(Vertex&, const float*)>, 3> attributes = {{
-    { "TEXCOORD_0", [] (Vertex& vert, const float* data) {
-      // The texcoords can be outside the [0; 1] range; they're normalized according to the REPEAT mode. This may be subject to change
-      //   See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#_wrapping
-      vert.texcoords = Vec2f(data[0], data[1]);
+  loadVertexData<fastgltf::math::fvec2>(asset, primitive, "TEXCOORD_0", [&vertices] (fastgltf::math::fvec2 uv, std::size_t vertexIndex) noexcept {
+    // The texcoords can be outside the [0; 1] range; they're normalized according to the REPEAT mode. This may be subject to change
+    // See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#_wrapping
+    vertices[vertexIndex].texcoords = Vec2f(uv.x(), uv.y());
 
-      for (float& elt : vert.texcoords.getData()) {
-        if (elt < -1.f || elt > 1.f) elt = std::fmod(elt, 1.f);
-        if (elt < 0.f) elt += 1.f;
-      }
-    }},
-    { "NORMAL",  [] (Vertex& vert, const float* data) { vert.normal = Vec3f(data[0], data[1], data[2]); } },
-    { "TANGENT", [] (Vertex& vert, const float* data) {
-      // The tangent's input W component (data[3]) is either 1 or -1 and represents the handedness
-      //   See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
-      vert.tangent = Vec3f(data[0], data[1], data[2]) * data[3];
-    }}
-  }};
-
-  bool hasLoadedTangents = false;
-
-  for (auto&& [attribName, callback] : attributes) {
-    const auto attribIter = primitive.findAttribute(attribName);
-
-    if (attribIter == primitive.attributes.end())
-      continue;
-
-    const fastgltf::Accessor& attribAccessor = accessors[attribIter->second];
-
-    if (attribAccessor.bufferViewIndex.has_value()) {
-      loadVertexData(attribAccessor, buffers, bufferViews, vertices, callback);
-
-      if (attribName == "TANGENT")
-        hasLoadedTangents = true;
+    for (float& elt : vertices[vertexIndex].texcoords.getData()) {
+      if (elt < -1.f || elt > 1.f) elt = std::fmod(elt, 1.f);
+      if (elt < 0.f) elt += 1.f;
     }
-  }
+  });
 
-  if (!hasLoadedTangents)
+  loadVertexData<fastgltf::math::fvec3>(asset, primitive, "NORMAL", [&vertices] (fastgltf::math::fvec3 normal, std::size_t vertexIndex) noexcept {
+    vertices[vertexIndex].normal = Vec3f(normal.x(), normal.y(), normal.z());
+  });
+
+  const bool hasTangents = (primitive.findAttribute("TANGENT") != primitive.attributes.end());
+
+  if (hasTangents) {
+    loadVertexData<fastgltf::math::fvec4>(asset, primitive, "TANGENT", [&vertices] (fastgltf::math::fvec4 tangent, std::size_t vertexIndex) noexcept {
+      // The tangent's input W component is either 1 or -1 and represents the handedness
+      // See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#meshes-overview
+      vertices[vertexIndex].tangent = Vec3f(tangent.x(), tangent.y(), tangent.z()) * tangent.w();
+    });
+  } else {
     submesh.computeTangents();
+  }
 
   if (transform.has_value()) {
     for (Vertex& vert : submesh.getVertices()) {
@@ -175,9 +153,8 @@ void loadVertices(const fastgltf::Primitive& primitive,
   Logger::debug("[GltfLoad] Loaded vertices");
 }
 
-void loadIndices(const fastgltf::Accessor& indicesAccessor,
-                 const std::vector<fastgltf::Buffer>& buffers,
-                 const std::vector<fastgltf::BufferView>& bufferViews,
+void loadIndices(const fastgltf::Asset& asset,
+                 const fastgltf::Accessor& indicesAccessor,
                  std::vector<unsigned int>& indices) {
   ZoneScopedN("[GltfLoad]::loadIndices");
 
@@ -187,50 +164,16 @@ void loadIndices(const fastgltf::Accessor& indicesAccessor,
     throw std::invalid_argument("Error: Missing glTF buffer to load indices from.");
 
   indices.resize(indicesAccessor.count);
-
-  const fastgltf::BufferView& indicesView = bufferViews[*indicesAccessor.bufferViewIndex];
-  const fastgltf::Buffer& indicesBuffer   = buffers[indicesView.bufferIndex];
-
-  if (!std::holds_alternative<fastgltf::sources::Vector>(indicesBuffer.data))
-    throw std::runtime_error("Error: Cannot load glTF data from sources other than vectors.");
-
-  const std::size_t dataOffset     = indicesView.byteOffset + indicesAccessor.byteOffset;
-  const uint8_t* const indicesData = std::get<fastgltf::sources::Vector>(indicesBuffer.data).bytes.data() + dataOffset;
-  const std::size_t dataSize       = fastgltf::getElementByteSize(indicesAccessor.type, indicesAccessor.componentType);
-  const std::size_t dataStride     = indicesView.byteStride.value_or(dataSize);
-
-  for (std::size_t i = 0; i < indices.size(); ++i) {
-    const uint8_t* const indexData = indicesData + i * dataStride;
-
-    // The indices must be of an unsigned integer type, but its size is unspecified
-    // See: https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#_mesh_primitive_indices
-    switch (dataSize) {
-      case 1:
-        indices[i] = *indexData;
-        break;
-
-      case 2:
-        indices[i] = *reinterpret_cast<const uint16_t*>(indexData);
-        break;
-
-      case 4:
-        indices[i] = *reinterpret_cast<const uint32_t*>(indexData);
-        break;
-
-      default:
-        throw std::invalid_argument("Error: Unexpected indices data size (" + std::to_string(dataSize) + ").");
-    }
-  }
+  fastgltf::copyFromAccessor<unsigned int>(asset, indicesAccessor, indices.data());
 
   Logger::debug("[GltfLoad] Loaded indices");
 }
 
-std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& meshes,
-                                         const std::vector<fastgltf::Buffer>& buffers,
-                                         const std::vector<fastgltf::BufferView>& bufferViews,
-                                         const std::vector<fastgltf::Accessor>& accessors,
+std::pair<Mesh, MeshRenderer> loadMeshes(const fastgltf::Asset& asset,
                                          const std::vector<std::optional<Transform>>& transforms) {
   ZoneScopedN("[GltfLoad]::loadMeshes");
+
+  const std::vector<fastgltf::Mesh>& meshes = asset.meshes;
 
   Logger::debug("[GltfLoad] Loading " + std::to_string(meshes.size()) + " mesh(es)...");
 
@@ -246,8 +189,8 @@ std::pair<Mesh, MeshRenderer> loadMeshes(const std::vector<fastgltf::Mesh>& mesh
       SubmeshRenderer& submeshRenderer = loadedMeshRenderer.addSubmeshRenderer();
 
       // Indices must be loaded first as they are needed to compute the tangents if necessary
-      loadIndices(accessors[*primitive.indicesAccessor], buffers, bufferViews, submesh.getTriangleIndices());
-      loadVertices(primitive, buffers, bufferViews, accessors, transforms[meshIndex], submesh);
+      loadIndices(asset, asset.accessors[*primitive.indicesAccessor], submesh.getTriangleIndices());
+      loadVertices(asset, primitive, transforms[meshIndex], submesh);
 
       submeshRenderer.load(submesh, (primitive.type == fastgltf::PrimitiveType::Triangles ? RenderMode::TRIANGLE : RenderMode::POINT));
       submeshRenderer.setMaterialIndex(primitive.materialIndex.value_or(0));
@@ -281,15 +224,17 @@ std::vector<std::optional<Image>> loadImages(const std::vector<fastgltf::Image>&
         loadedImages.emplace_back(ImageFormat::load(rootFilePath + imgPath.uri.path()));
       },
       [&loadedImages] (const fastgltf::sources::Vector& imgData) {
-        loadedImages.emplace_back(ImageFormat::loadFromData(imgData.bytes));
+        const auto* imgBytes = reinterpret_cast<const unsigned char*>(imgData.bytes.data());
+        loadedImages.emplace_back(ImageFormat::loadFromData(imgBytes, imgData.bytes.size()));
       },
       [&bufferViews, &buffers, &loadedImages] (const fastgltf::sources::BufferView& bufferViewSource) {
         const fastgltf::BufferView& imgView = bufferViews[bufferViewSource.bufferViewIndex];
         const fastgltf::Buffer& imgBuffer   = buffers[imgView.bufferIndex];
 
         std::visit(fastgltf::visitor {
-          [&loadedImages, &imgView] (const fastgltf::sources::Vector& imgData) {
-            loadedImages.emplace_back(ImageFormat::loadFromData(imgData.bytes.data() + imgView.byteOffset, imgView.byteLength));
+          [&loadedImages, &imgView] (const fastgltf::sources::Array& imgData) {
+            const auto* imgBytes = reinterpret_cast<const unsigned char*>(imgData.bytes.data());
+            loadedImages.emplace_back(ImageFormat::loadFromData(imgBytes + imgView.byteOffset, imgView.byteLength));
           },
           loadFailure
         }, imgBuffer.data);
@@ -380,7 +325,7 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials,
                                   mat.pbrData.baseColorFactor[2]), MaterialAttribute::BaseColor);
     matProgram.setAttribute(Vec3f(mat.emissiveFactor[0],
                                   mat.emissiveFactor[1],
-                                  mat.emissiveFactor[2]) * mat.emissiveStrength.value_or(1.f), MaterialAttribute::Emissive);
+                                  mat.emissiveFactor[2]) * mat.emissiveStrength, MaterialAttribute::Emissive);
     matProgram.setAttribute(mat.pbrData.metallicFactor, MaterialAttribute::Metallic);
     matProgram.setAttribute(mat.pbrData.roughnessFactor, MaterialAttribute::Roughness);
 
@@ -423,34 +368,24 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   if (!FileUtils::isReadable(filePath))
     throw std::invalid_argument("Error: The glTF file '" + filePath + "' either does not exist or cannot be opened.");
 
-  fastgltf::GltfDataBuffer data;
+  fastgltf::Expected<fastgltf::GltfDataBuffer> data = fastgltf::GltfDataBuffer::FromPath(filePath.getPath());
 
-  if (!data.loadFromFile(filePath.getPath()))
+  if (data.error() != fastgltf::Error::None)
     throw std::invalid_argument("Error: Could not load the glTF file.");
 
   const FilePath parentPath = filePath.recoverPathToFile();
-  fastgltf::Expected<fastgltf::Asset> asset(fastgltf::Error::None);
 
   fastgltf::Parser parser;
 
-  switch (fastgltf::determineGltfFileType(&data)) {
-    case fastgltf::GltfType::glTF:
-      asset = parser.loadGLTF(&data, parentPath.getPath(), fastgltf::Options::LoadExternalBuffers | fastgltf::Options::DecomposeNodeMatrices);
-      break;
-
-    case fastgltf::GltfType::GLB:
-      asset = parser.loadBinaryGLTF(&data, parentPath.getPath(), fastgltf::Options::LoadGLBBuffers | fastgltf::Options::DecomposeNodeMatrices);
-      break;
-
-    default:
-      throw std::invalid_argument("Error: Failed to determine glTF container.");
-  }
+  fastgltf::Expected<fastgltf::Asset> asset = parser.loadGltf(data.get(),
+                                                              parentPath.getPath(),
+                                                              fastgltf::Options::LoadExternalBuffers | fastgltf::Options::DecomposeNodeMatrices);
 
   if (asset.error() != fastgltf::Error::None)
     throw std::invalid_argument("Error: Failed to load glTF: " + fastgltf::getErrorMessage(asset.error()));
 
   const std::vector<std::optional<Transform>> transforms = loadTransforms(asset->nodes, asset->meshes.size());
-  auto [mesh, meshRenderer] = loadMeshes(asset->meshes, asset->buffers, asset->bufferViews, asset->accessors, transforms);
+  auto [mesh, meshRenderer] = loadMeshes(asset.get(), transforms);
 
   const std::vector<std::optional<Image>> images = loadImages(asset->images, asset->buffers, asset->bufferViews, parentPath);
   loadMaterials(asset->materials, asset->textures, images, meshRenderer);
