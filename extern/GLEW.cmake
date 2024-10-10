@@ -52,9 +52,8 @@ target_compile_definitions(
     GLEW
 
     PUBLIC
-
-    -DGLEW_STATIC
-    -DGLEW_NO_GLU
+        GLEW_STATIC
+        GLEW_NO_GLU
 )
 
 # Disabling all compilers warnings

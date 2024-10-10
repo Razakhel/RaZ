@@ -34,8 +34,8 @@ target_sources(Catch2 PRIVATE ${CATCH2_FILES})
 
 target_include_directories(
     Catch2
-
     SYSTEM
+
     PUBLIC
         catch
         "${CMAKE_BINARY_DIR}/generated-includes"

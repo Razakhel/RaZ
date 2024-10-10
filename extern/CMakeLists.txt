@@ -14,6 +14,8 @@ if (NOT RAZ_USE_EMSCRIPTEN)
     if (RAZ_USE_WINDOW)
         include(GLFW)
     endif ()
+
+    include(OpenXR) # XR currently isn't available with Emscripten
 endif ()
 
 option(RAZ_USE_IMGUI "Use ImGui" ON)
