@@ -471,6 +471,11 @@ endif ()
 
 target_link_libraries(RaZ PRIVATE fastgltf simdjson stb)
 
+if (NOT RAZ_USE_EMSCRIPTEN)
+    # XR currently isn't available with Emscripten
+    target_link_libraries(RaZ PRIVATE OpenXR)
+endif ()
+
 # Compiling RaZ's sources
 target_sources(RaZ PRIVATE ${RAZ_FILES})
 
