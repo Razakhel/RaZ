@@ -471,6 +471,12 @@ endif ()
 
 target_link_libraries(RaZ PRIVATE fastgltf simdjson stb)
 
+if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN AND RAZ_USE_WINDOW)
+    # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
+    # TODO: this makes XR unavailable from the GUI editor
+    target_link_libraries(RaZ PRIVATE OpenXR)
+endif ()
+
 # Compiling RaZ's sources
 target_sources(RaZ PRIVATE ${RAZ_FILES})
 

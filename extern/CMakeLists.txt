@@ -14,6 +14,11 @@ if (NOT RAZ_USE_EMSCRIPTEN)
     if (RAZ_USE_WINDOW)
         include(GLFW)
     endif ()
+
+    if (NOT RAZ_PLATFORM_MAC AND RAZ_USE_WINDOW)
+        # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
+        include(OpenXR)
+    endif ()
 endif ()
 
 option(RAZ_USE_IMGUI "Use ImGui" ON)
