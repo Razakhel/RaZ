@@ -78,6 +78,11 @@ if (RAZ_USE_WINDOW OR RAZ_USE_EMSCRIPTEN)
         add_executable(RaZ_TessellationDemo tessellationDemo.cpp)
         target_link_libraries(RaZ_TessellationDemo RaZ_Examples)
     endif ()
+
+    if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN) # XR currently isn't available with macOS or Emscripten
+        add_executable(RaZ_XRDemo xrDemo.cpp)
+        target_link_libraries(RaZ_XRDemo RaZ_Examples)
+    endif ()
 endif ()
 
 if (RAZ_USE_EMSCRIPTEN)
