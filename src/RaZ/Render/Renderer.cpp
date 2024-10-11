@@ -15,13 +15,13 @@ namespace Raz {
 namespace {
 
 #if !defined(RAZ_PLATFORM_MAC) && !defined(USE_OPENGL_ES)
-inline void GLAPIENTRY callbackDebugLog(GLenum source,
-                                        GLenum type,
-                                        unsigned int id,
-                                        GLenum severity,
-                                        int /* length */,
-                                        const char* message,
-                                        const void* /* userParam */) {
+inline void GLAPIENTRY logCallback(GLenum source,
+                                   GLenum type,
+                                   unsigned int id,
+                                   GLenum severity,
+                                   int /* length */,
+                                   const char* message,
+                                   const void* /* userParam */) {
   if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
     return;
 
@@ -132,7 +132,7 @@ void Renderer::initialize() {
   if (checkVersion(4, 3)) {
     enable(Capability::DEBUG_OUTPUT);
     enable(Capability::DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(&callbackDebugLog, nullptr);
+    glDebugMessageCallback(&logCallback, nullptr);
   }
 #endif
 
