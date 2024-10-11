@@ -239,6 +239,17 @@ set(
     include/RaZ/Utils/*.inl
 )
 
+if (NOT RAZ_USE_EMSCRIPTEN)
+    # XR currently isn't available with Emscripten
+    list(
+        APPEND
+        RAZ_SRC
+
+        src/RaZ/XR/*.cpp
+        include/RaZ/XR/*.hpp
+    )
+endif ()
+
 # Adding every file to be compiled
 file(
     GLOB
