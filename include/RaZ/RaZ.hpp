@@ -93,6 +93,7 @@
 #include "Utils/Threading.hpp"
 #include "Utils/ThreadPool.hpp"
 #include "Utils/TypeUtils.hpp"
+#include "XR/XrContext.hpp"
 
 using namespace Raz::Literals;
 

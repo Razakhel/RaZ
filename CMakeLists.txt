@@ -239,6 +239,18 @@ set(
     include/RaZ/Utils/*.inl
 )
 
+if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN AND RAZ_USE_WINDOW)
+    # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
+    # TODO: this makes XR unavailable from the GUI editor
+    list(
+        APPEND
+        RAZ_SRC
+
+        src/RaZ/XR/*.cpp
+        include/RaZ/XR/*.hpp
+    )
+endif ()
+
 # Adding every file to be compiled
 file(
     GLOB

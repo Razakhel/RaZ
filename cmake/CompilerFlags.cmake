@@ -68,6 +68,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
             -Wno-comment
             -Wno-format-nonliteral
+            -Wno-missing-field-initializers
         )
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
@@ -122,6 +123,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             -Wno-global-constructors
             -Wno-mismatched-tags
             -Wno-missing-braces
+            -Wno-missing-field-initializers
             -Wno-newline-eof
             -Wno-padded
             -Wno-reserved-id-macro
