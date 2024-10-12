@@ -41,42 +41,48 @@ inline TextureFormat recoverFormat(TextureColorspace colorspace) {
 }
 
 inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace, TextureDataType dataType) {
-  if (dataType == TextureDataType::BYTE) {
-    if (colorspace == TextureColorspace::SRGB)
-      return TextureInternalFormat::SRGB8;
-
-    if (colorspace == TextureColorspace::SRGBA)
-      return TextureInternalFormat::SRGBA8;
-
-    // If the texture is of a byte data type and not an sRGB colorspace, its internal format is the same as its format
-    return static_cast<TextureInternalFormat>(recoverFormat(colorspace));
-  }
-
-  // Floating-point sRGB(A) textures are not treated as sRGB, which is necessarily an integer format; they are therefore interpreted as floating-point RGB(A)
   switch (colorspace) {
     case TextureColorspace::INVALID:
     default:
       break;
 
     case TextureColorspace::GRAY:
-      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::R16F : TextureInternalFormat::R32F);
+      return (dataType == TextureDataType::BYTE    ? TextureInternalFormat::R8
+           : (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::R16F
+                                                   : TextureInternalFormat::R32F));
 
     case TextureColorspace::RG:
-      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RG16F : TextureInternalFormat::RG32F);
+      return (dataType == TextureDataType::BYTE    ? TextureInternalFormat::RG8
+           : (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RG16F
+                                                   : TextureInternalFormat::RG32F));
 
     case TextureColorspace::RGB:
-    case TextureColorspace::SRGB:
-      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGB16F : TextureInternalFormat::RGB32F);
+      return (dataType == TextureDataType::BYTE    ? TextureInternalFormat::RGB8
+           : (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGB16F
+                                                   : TextureInternalFormat::RGB32F));
 
     case TextureColorspace::RGBA:
+      return (dataType == TextureDataType::BYTE    ? TextureInternalFormat::RGBA8
+           : (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGBA16F
+                                                   : TextureInternalFormat::RGBA32F));
+
+    // Floating-point sRGB(A) textures are not treated as sRGB, which is necessarily an integer format; they are therefore interpreted as floating-point RGB(A)
+
+    case TextureColorspace::SRGB:
+      return (dataType == TextureDataType::BYTE    ? TextureInternalFormat::SRGB8
+           : (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGB16F
+                                                   : TextureInternalFormat::RGB32F));
+
     case TextureColorspace::SRGBA:
-      return (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGBA16F : TextureInternalFormat::RGBA32F);
+      return (dataType == TextureDataType::BYTE    ? TextureInternalFormat::SRGBA8
+           : (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGBA16F
+                                                   : TextureInternalFormat::RGBA32F));
 
     case TextureColorspace::DEPTH:
       return TextureInternalFormat::DEPTH32F;
   }
 
-  throw std::invalid_argument("Error: Invalid texture colorspace");
+  throw std::invalid_argument("[Texture] Invalid texture colorspace to recover the internal format from");
 }
 
 inline TextureParamValue recoverParam(TextureFilter filter) {
@@ -220,7 +226,12 @@ void Texture::setLoadedParameters(bool createMipmaps) const {
     Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_A, (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1));
   }
 
-  if (createMipmaps) {
+  if (createMipmaps
+#if defined(USE_WEBGL)
+    // WebGL doesn't seem to support mipmap generation for sRGB textures
+    && m_colorspace != TextureColorspace::SRGB && m_colorspace != TextureColorspace::SRGBA
+#endif
+  ) {
     generateMipmaps();
     setFilter(TextureFilter::LINEAR, TextureFilter::LINEAR, TextureFilter::LINEAR);
   } else {
