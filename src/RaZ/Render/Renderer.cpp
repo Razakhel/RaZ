@@ -116,6 +116,15 @@ void Renderer::initialize() {
       s_extensions.emplace(getExtension(static_cast<unsigned int>(extIndex)));
   }
 
+#if !defined(NDEBUG) || defined(RAZ_FORCE_DEBUG_LOG)
+  {
+    std::string extMsg = "[Renderer] Available extensions:";
+    for (const std::string& extension : s_extensions)
+      extMsg += "\n    - " + extension;
+    Logger::debug(extMsg);
+  }
+#endif
+
 #if !defined(RAZ_PLATFORM_MAC) && !defined(USE_OPENGL_ES) // Setting the debug message callback provokes a crash on macOS & isn't available on OpenGL ES
   if (checkVersion(4, 3)) {
     enable(Capability::DEBUG_OUTPUT);
