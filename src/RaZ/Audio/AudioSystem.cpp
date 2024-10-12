@@ -44,8 +44,17 @@ AudioSystem::AudioSystem(const std::string& deviceName) {
   registerComponents<Sound, Listener>();
   openDevice(deviceName);
 
-  if (m_device && m_context && alGetString(AL_RENDERER) != std::string_view("OpenAL Soft"))
+  if (m_device == nullptr || m_context == nullptr)
+    return;
+
+  const std::string_view alRenderer = alGetString(AL_RENDERER);
+
+  Logger::debug("[AudioSystem] OpenAL renderer: " + std::string(alRenderer));
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN) // Emscripten has its own implementation with some OpenAL Soft extensions
+  if (alRenderer != "OpenAL Soft")
     Logger::warn("[OpenAL] Standard OpenAL detected; make sure to use OpenAL Soft to get all possible features");
+#endif
 }
 
 std::vector<std::string> AudioSystem::recoverDevices() {
