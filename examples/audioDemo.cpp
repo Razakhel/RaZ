@@ -141,7 +141,8 @@ int main() {
       microphone.openDevice(recoverFormat(isCaptureStereo, captureBitDepth), 16000, 1.f, captureDevice);
     });
 #else
-    overlayAudio.addLabel("Output & input devices cannot be changed with Emscripten");
+    overlayAudio.addLabel("Output & input devices cannot be changed with Emscripten\n"
+                          "Reload the page if you changed them externally");
 #endif
 
     overlayAudio.addSlider("Listener gain", [&listener] (float val) noexcept {

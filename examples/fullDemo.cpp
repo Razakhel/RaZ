@@ -98,8 +98,8 @@ int main() {
     // Canny
 
     // Note that in an ordinary Canny edge detection process, the input of the gradient information computing pass (here Sobel)
-    //  should be applied a gaussian blur to attempt removing high frequencies (small details). It's not made here to avoid
-    //  computing another blur, as one is already done further below
+    //  should be applied a gaussian blur to attempt removing high frequencies (small details). It's not done here to avoid
+    //  computing another blur, as one already is further below
 
     auto& canny = renderGraph.addRenderProcess<Raz::CannyFilterRenderProcess>();
     canny.setInputGradientBuffer(gradientBuffer);
@@ -114,7 +114,7 @@ int main() {
 
       uniform sampler2D uniColorBuffer;
       uniform sampler2D uniEdgeBuffer;
-      uniform float uniBlendFactor = 0.0;
+      uniform float uniBlendFactor;
 
       layout(location = 0) out vec4 fragColor;
 
@@ -128,6 +128,8 @@ int main() {
         fragColor       = vec4(finalColor, 1.0);
       }
     )"));
+    edgeBlend.getProgram().setAttribute(0.f, "uniBlendFactor");
+    edgeBlend.getProgram().sendAttributes();
     edgeBlend.addReadTexture(colorBuffer, "uniColorBuffer");
     edgeBlend.addReadTexture(edgeBuffer, "uniEdgeBuffer");
     edgeBlend.addWriteColorTexture(edgeBlendBuffer, 0);

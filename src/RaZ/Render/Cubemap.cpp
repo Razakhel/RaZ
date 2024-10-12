@@ -30,7 +30,7 @@ constexpr std::string_view vertSource = R"(
   void main() {
     fragTexcoords = vertPosition;
 
-    vec4 pos    = uniProjectionMat * mat4(mat3(uniViewMat)) * vec4(vertPosition, 1.0);
+    vec4 pos    = uniProjectionMat * (mat4(mat3(uniViewMat)) * vec4(vertPosition, 1.0));
     gl_Position = pos.xyww;
   }
 )";

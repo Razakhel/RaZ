@@ -33,5 +33,5 @@ void main() {
   vec3 bitangent = cross(normal, tangent);
   vertMeshInfo.vertTBNMatrix = mat3(tangent, bitangent, normal);
 
-  gl_Position = uniViewProjectionMat * uniModelMat * vec4(vertPosition, 1.0);
+  gl_Position = uniViewProjectionMat * (uniModelMat * vec4(vertPosition, 1.0));
 }
