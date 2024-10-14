@@ -198,7 +198,7 @@ bool Window::recoverVerticalSyncState() const {
   return true;
 #elif defined(RAZ_PLATFORM_LINUX)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
-    unsigned int interval;
+    unsigned int interval {};
     glXQueryDrawable(glXGetCurrentDisplay(), glXGetCurrentDrawable(), GLX_SWAP_INTERVAL_EXT, &interval);
 
     return static_cast<bool>(interval);

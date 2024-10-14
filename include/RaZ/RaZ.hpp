@@ -94,6 +94,7 @@
 #include "Utils/ThreadPool.hpp"
 #include "Utils/TypeUtils.hpp"
 #include "XR/XrContext.hpp"
+#include "XR/XrSession.hpp"
 
 using namespace Raz::Literals;
 
