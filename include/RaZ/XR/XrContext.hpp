@@ -14,6 +14,7 @@ namespace Raz {
 
 class XrContext {
   friend class XrSession;
+  friend class XrSystem;
 
 public:
   explicit XrContext(const std::string& appName);

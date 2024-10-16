@@ -17,6 +17,8 @@ namespace Raz {
 class XrContext;
 
 class XrSession {
+  friend class XrSystem;
+
 public:
   explicit XrSession(const XrContext& context);
 

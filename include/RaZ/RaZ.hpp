@@ -95,6 +95,7 @@
 #include "Utils/TypeUtils.hpp"
 #include "XR/XrContext.hpp"
 #include "XR/XrSession.hpp"
+#include "XR/XrSystem.hpp"
 
 using namespace Raz::Literals;
 
