@@ -107,7 +107,7 @@ void Renderer::initialize() {
 
   // Recovering supported extensions
   {
-    int extCount{};
+    int extCount {};
     getParameter(StateParameter::EXTENSION_COUNT, &extCount);
 
     s_extensions.reserve(static_cast<std::size_t>(extCount));
@@ -124,6 +124,9 @@ void Renderer::initialize() {
     Logger::debug(extMsg);
   }
 #endif
+
+  recoverDefaultFramebufferColorFormat();
+  recoverDefaultFramebufferDepthFormat();
 
 #if !defined(RAZ_PLATFORM_MAC) && !defined(USE_OPENGL_ES) // Setting the debug message callback provokes a crash on macOS & isn't available on OpenGL ES
   if (checkVersion(4, 3)) {
@@ -1451,6 +1454,17 @@ void Renderer::setFramebufferTexture3D(FramebufferAttachment attachment,
 }
 #endif
 
+void Renderer::recoverFramebufferAttachmentParameter(FramebufferAttachment attachment,
+                                                     FramebufferAttachmentParam param,
+                                                     int* values,
+                                                     FramebufferType type) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGetFramebufferAttachmentParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(attachment), static_cast<unsigned int>(param), values);
+
+  printConditionalErrors();
+}
+
 void Renderer::setReadBuffer(ReadBuffer buffer) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
@@ -1714,6 +1728,147 @@ void Renderer::printErrors() {
       Logger::error("[OpenGL] " + std::string(recoverGlErrorStr(errorValue)) + " (code " + std::to_string(errorValue) + ')');
     }
   }
+}
+
+void Renderer::recoverDefaultFramebufferColorFormat() {
+  struct ColorInfo {
+    int redBitCount {};
+    int greenBitCount {};
+    int blueBitCount {};
+    int alphaBitCount {};
+    int compType {};
+    int encoding {};
+  };
+
+  struct ColorFormat {
+    ColorInfo colorInfo {};
+    TextureInternalFormat format {};
+    std::string_view formatStr;
+  };
+
+  constexpr std::array<ColorFormat, 26> formats = {{
+    { ColorInfo{ 8,  8,  8,  0,  GL_UNSIGNED_NORMALIZED, GL_LINEAR }, TextureInternalFormat::RGB8,           "RGB8"           },
+    { ColorInfo{ 8,  8,  8,  8,  GL_UNSIGNED_NORMALIZED, GL_LINEAR }, TextureInternalFormat::RGBA8,          "RGBA8"          },
+    { ColorInfo{ 8,  8,  8,  0,  GL_UNSIGNED_NORMALIZED, GL_SRGB   }, TextureInternalFormat::SRGB8,          "SRGB8"          },
+    { ColorInfo{ 8,  8,  8,  8,  GL_UNSIGNED_NORMALIZED, GL_SRGB   }, TextureInternalFormat::SRGBA8,         "SRGBA8"         },
+    { ColorInfo{ 8,  8,  8,  0,  GL_INT,                 GL_LINEAR }, TextureInternalFormat::RGB8I,          "RGB8I"          },
+    { ColorInfo{ 8,  8,  8,  8,  GL_INT,                 GL_LINEAR }, TextureInternalFormat::RGBA8I,         "RGBA8I"         },
+    { ColorInfo{ 8,  8,  8,  0,  GL_UNSIGNED_INT,        GL_LINEAR }, TextureInternalFormat::RGB8UI,         "RGB8UI"         },
+    { ColorInfo{ 8,  8,  8,  8,  GL_UNSIGNED_INT,        GL_LINEAR }, TextureInternalFormat::RGBA8UI,        "RGBA8UI"        },
+    { ColorInfo{ 8,  8,  8,  0,  GL_SIGNED_NORMALIZED,   GL_LINEAR }, TextureInternalFormat::RGB8_SNORM,     "RGB8_SNORM"     },
+    { ColorInfo{ 8,  8,  8,  8,  GL_SIGNED_NORMALIZED,   GL_LINEAR }, TextureInternalFormat::RGBA8_SNORM,    "RGBA8_SNORM"    },
+    { ColorInfo{ 16, 16, 16, 16, GL_UNSIGNED_NORMALIZED, GL_LINEAR }, TextureInternalFormat::RGBA16,         "RGBA16"         },
+    { ColorInfo{ 16, 16, 16, 0,  GL_INT,                 GL_LINEAR }, TextureInternalFormat::RGB16I,         "RGB16I"         },
+    { ColorInfo{ 16, 16, 16, 16, GL_INT,                 GL_LINEAR }, TextureInternalFormat::RGBA16I,        "RGBA16I"        },
+    { ColorInfo{ 16, 16, 16, 0,  GL_UNSIGNED_INT,        GL_LINEAR }, TextureInternalFormat::RGB16UI,        "RGB16UI"        },
+    { ColorInfo{ 16, 16, 16, 16, GL_UNSIGNED_INT,        GL_LINEAR }, TextureInternalFormat::RGBA16UI,       "RGBA16UI"       },
+    { ColorInfo{ 16, 16, 16, 0,  GL_FLOAT,               GL_LINEAR }, TextureInternalFormat::RGB16F,         "RGB16F"         },
+    { ColorInfo{ 16, 16, 16, 16, GL_FLOAT,               GL_LINEAR }, TextureInternalFormat::RGBA16F,        "RGBA16F"        },
+    { ColorInfo{ 32, 32, 32, 0,  GL_INT,                 GL_LINEAR }, TextureInternalFormat::RGB32I,         "RGB32I"         },
+    { ColorInfo{ 32, 32, 32, 32, GL_INT,                 GL_LINEAR }, TextureInternalFormat::RGBA32I,        "RGBA32I"        },
+    { ColorInfo{ 32, 32, 32, 0,  GL_UNSIGNED_INT,        GL_LINEAR }, TextureInternalFormat::RGB32UI,        "RGB32UI"        },
+    { ColorInfo{ 32, 32, 32, 32, GL_UNSIGNED_INT,        GL_LINEAR }, TextureInternalFormat::RGBA32UI,       "RGBA32UI"       },
+    { ColorInfo{ 32, 32, 32, 0,  GL_FLOAT,               GL_LINEAR }, TextureInternalFormat::RGB32F,         "RGB32F"         },
+    { ColorInfo{ 32, 32, 32, 32, GL_FLOAT,               GL_LINEAR }, TextureInternalFormat::RGBA32F,        "RGBA32F"        },
+    { ColorInfo{ 10, 10, 10, 2,  GL_UNSIGNED_NORMALIZED, GL_LINEAR }, TextureInternalFormat::RGB10_A2,       "RGB10_A2"       },
+    { ColorInfo{ 10, 10, 10, 2,  GL_UNSIGNED_INT,        GL_LINEAR }, TextureInternalFormat::RGB10_A2UI,     "RGB10_A2UI"     },
+    { ColorInfo{ 11, 11, 10, 0,  GL_FLOAT,               GL_LINEAR }, TextureInternalFormat::R11F_G11F_B10F, "R11F_G11F_B10F" }
+  }};
+
+#if defined(USE_WEBGL)
+  // WebGL requires getting a color attachment for the default framebuffer
+  // See: https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getFramebufferAttachmentParameter#attachment
+  constexpr FramebufferAttachment attachment = FramebufferAttachment::COLOR0;
+#elif defined(USE_OPENGL_ES)
+  constexpr FramebufferAttachment attachment = FramebufferAttachment::DEFAULT_BACK;
+#else
+  constexpr FramebufferAttachment attachment = FramebufferAttachment::DEFAULT_BACK_LEFT;
+#endif
+  ColorInfo colorInfo;
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::RED_SIZE, &colorInfo.redBitCount);
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::GREEN_SIZE, &colorInfo.greenBitCount);
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::BLUE_SIZE, &colorInfo.blueBitCount);
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::ALPHA_SIZE, &colorInfo.alphaBitCount);
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COMPONENT_TYPE, &colorInfo.compType);
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COLOR_ENCODING, &colorInfo.encoding);
+
+  const auto colorFormatIter = std::find_if(formats.cbegin(), formats.cend(), [&colorInfo] (const ColorFormat& format) {
+    return (colorInfo.redBitCount == format.colorInfo.redBitCount
+         && colorInfo.greenBitCount == format.colorInfo.greenBitCount
+         && colorInfo.blueBitCount == format.colorInfo.blueBitCount
+         && colorInfo.alphaBitCount == format.colorInfo.alphaBitCount
+         && colorInfo.compType == format.colorInfo.compType
+         && colorInfo.encoding == format.colorInfo.encoding);
+  });
+
+  if (colorFormatIter == formats.cend()) {
+    Logger::error("[Renderer] Unknown default framebuffer color bits combination (red " + std::to_string(colorInfo.redBitCount) + ", green "
+                + std::to_string(colorInfo.greenBitCount) + ", blue " + std::to_string(colorInfo.blueBitCount) + ", alpha "
+                + std::to_string(colorInfo.alphaBitCount) + ", component type " + std::to_string(colorInfo.compType) + ", encoding "
+                + std::to_string(colorInfo.encoding) + ')');
+    return;
+  }
+
+  s_defaultFramebufferColor = colorFormatIter->format;
+
+  Logger::debug("[Renderer] Found default framebuffer color format " + std::string(colorFormatIter->formatStr) + " (value "
+              + std::to_string(static_cast<unsigned int>(s_defaultFramebufferColor)) + "; red " + std::to_string(colorInfo.redBitCount)
+              + ", green " + std::to_string(colorInfo.greenBitCount) + ", blue " + std::to_string(colorInfo.blueBitCount) + ", alpha "
+              + std::to_string(colorInfo.alphaBitCount) + ", component type " + std::to_string(colorInfo.compType) + ", encoding "
+              + std::to_string(colorInfo.encoding) + ')');
+}
+
+void Renderer::recoverDefaultFramebufferDepthFormat() {
+  struct DepthInfo {
+    int depthBitCount {};
+    int stencilBitCount {};
+    int compType {};
+  };
+
+  struct DepthFormat {
+    DepthInfo depthInfo {};
+    TextureInternalFormat format {};
+    std::string_view formatStr;
+  };
+
+  constexpr std::array<DepthFormat, 6> formats = {{
+    { DepthInfo{ 16, 0, GL_UNSIGNED_NORMALIZED }, TextureInternalFormat::DEPTH16,           "DEPTH16"           },
+    { DepthInfo{ 24, 0, GL_UNSIGNED_NORMALIZED }, TextureInternalFormat::DEPTH24,           "DEPTH24"           },
+    { DepthInfo{ 24, 8, GL_UNSIGNED_NORMALIZED }, TextureInternalFormat::DEPTH24_STENCIL8,  "DEPTH24_STENCIL8"  },
+    { DepthInfo{ 32, 0, GL_UNSIGNED_NORMALIZED }, TextureInternalFormat::DEPTH32,           "DEPTH32"           },
+    { DepthInfo{ 32, 0, GL_FLOAT               }, TextureInternalFormat::DEPTH32F,          "DEPTH32F"          },
+    { DepthInfo{ 32, 8, GL_FLOAT               }, TextureInternalFormat::DEPTH32F_STENCIL8, "DEPTH32F_STENCIL8" }
+  }};
+
+#if defined(USE_WEBGL)
+  // WebGL requires getting explicitly the depth attachment for the default framebuffer
+  // See: https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getFramebufferAttachmentParameter#attachment
+  constexpr FramebufferAttachment attachment = FramebufferAttachment::DEPTH;
+#else
+  constexpr FramebufferAttachment attachment = FramebufferAttachment::DEFAULT_DEPTH;
+#endif
+  DepthInfo depthInfo {};
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::DEPTH_SIZE, &depthInfo.depthBitCount);
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::STENCIL_SIZE, &depthInfo.stencilBitCount);
+  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COMPONENT_TYPE, &depthInfo.compType);
+
+  const auto depthFormatIter = std::find_if(formats.cbegin(), formats.cend(), [&depthInfo] (const DepthFormat& format) {
+    return (depthInfo.depthBitCount == format.depthInfo.depthBitCount
+         && depthInfo.stencilBitCount == format.depthInfo.stencilBitCount
+         && depthInfo.compType == format.depthInfo.compType);
+  });
+
+  if (depthFormatIter == formats.cend()) {
+    Logger::error("[Renderer] Unknown default framebuffer depth bits combination (depth " + std::to_string(depthInfo.depthBitCount)
+                + ", stencil " + std::to_string(depthInfo.stencilBitCount) + ", component type: " + std::to_string(depthInfo.compType) + ')');
+    return;
+  }
+
+  s_defaultFramebufferDepth = depthFormatIter->format;
+
+  Logger::debug("[Renderer] Found default framebuffer depth format " + std::string(depthFormatIter->formatStr) + " (value "
+              + std::to_string(static_cast<unsigned int>(s_defaultFramebufferDepth)) + "; depth " + std::to_string(depthInfo.depthBitCount)
+              + ", stencil " + std::to_string(depthInfo.stencilBitCount) + ", component type " + std::to_string(depthInfo.compType) + ')');
 }
 
 } // namespace Raz

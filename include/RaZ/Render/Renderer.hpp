@@ -422,15 +422,16 @@ enum class TextureInternalFormat : unsigned int {
   RGB32F   = 34837 /* GL_RGB32F             */, ///<
   RGBA32F  = 34836 /* GL_RGBA32F            */, ///<
 
+  RGB10_A2       = 32857 /* GL_RGB10_A2       */, ///<
+  RGB10_A2UI     = 36975 /* GL_RGB10_A2UI     */, ///<
+  R11F_G11F_B10F = 35898 /* GL_R11F_G11F_B10F */, ///<
+
   DEPTH16           = 33189 /* GL_DEPTH_COMPONENT16  */, ///<
   DEPTH24           = 33190 /* GL_DEPTH_COMPONENT24  */, ///<
   DEPTH24_STENCIL8  = 35056 /* GL_DEPTH24_STENCIL8   */, ///<
+  DEPTH32           = 33191 /* GL_DEPTH_COMPONENT32  */, ///<
   DEPTH32F          = 36012 /* GL_DEPTH_COMPONENT32F */, ///<
-  DEPTH32F_STENCIL8 = 36013 /* GL_DEPTH32F_STENCIL8  */, ///<
-
-  RGB10_A2       = 32857 /* GL_RGB10_A2       */, ///<
-  RGB10_A2UI     = 36975 /* GL_RGB10_A2UI     */, ///<
-  R11F_G11F_B10F = 35898 /* GL_R11F_G11F_B10F */  ///<
+  DEPTH32F_STENCIL8 = 36013 /* GL_DEPTH32F_STENCIL8  */  ///<
 };
 
 enum class PixelDataType : unsigned int {
@@ -729,7 +730,38 @@ enum class FramebufferAttachment : unsigned int {
   COLOR4 = 36068 /* GL_COLOR_ATTACHMENT4 */, ///< Color attachment 4.
   COLOR5 = 36069 /* GL_COLOR_ATTACHMENT5 */, ///< Color attachment 5.
   COLOR6 = 36070 /* GL_COLOR_ATTACHMENT6 */, ///< Color attachment 6.
-  COLOR7 = 36071 /* GL_COLOR_ATTACHMENT7 */  ///< Color attachment 7.
+  COLOR7 = 36071 /* GL_COLOR_ATTACHMENT7 */, ///< Color attachment 7.
+
+  // Default framebuffer attachments
+#if !defined(USE_WEBGL)
+#if !defined(USE_OPENGL_ES)
+  DEFAULT_FRONT_LEFT  = 1024 /* GL_FRONT_LEFT  */, ///<
+  DEFAULT_FRONT_RIGHT = 1025 /* GL_FRONT_RIGHT */, ///<
+  DEFAULT_BACK_LEFT   = 1026 /* GL_BACK_LEFT   */, ///<
+  DEFAULT_BACK_RIGHT  = 1027 /* GL_BACK_RIGHT  */, ///<
+#else
+  DEFAULT_BACK        = 1029 /* GL_BACK        */, ///<
+#endif
+  DEFAULT_DEPTH       = 6145 /* GL_DEPTH       */, ///<
+  DEFAULT_STENCIL     = 6146 /* GL_STENCIL     */  ///<
+#endif
+};
+
+enum class FramebufferAttachmentParam : unsigned int {
+  RED_SIZE              = 33298 /* GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE              */, ///<
+  GREEN_SIZE            = 33299 /* GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE            */, ///<
+  BLUE_SIZE             = 33300 /* GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE             */, ///<
+  ALPHA_SIZE            = 33301 /* GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE            */, ///<
+  DEPTH_SIZE            = 33302 /* GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE            */, ///<
+  STENCIL_SIZE          = 33303 /* GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE          */, ///<
+  COMPONENT_TYPE        = 33297 /* GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE        */, ///<
+  COLOR_ENCODING        = 33296 /* GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING        */, ///<
+  OBJECT_TYPE           = 36048 /* GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE           */, ///<
+  OBJECT_NAME           = 36049 /* GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME           */, ///<
+  TEXTURE_LEVEL         = 36050 /* GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL         */, ///<
+  TEXTURE_CUBE_MAP_FACE = 36051 /* GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE */, ///<
+  TEXTURE_LAYER         = 36052 /* GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER         */, ///<
+  LAYERED               = 36263 /* GL_FRAMEBUFFER_ATTACHMENT_LAYERED               */  ///<
 };
 
 enum class ReadBuffer : unsigned int {
@@ -740,10 +772,11 @@ enum class ReadBuffer : unsigned int {
   FRONT       = 1028 /* GL_FRONT       */, ///<
   LEFT        = 1030 /* GL_LEFT        */, ///<
   RIGHT       = 1031 /* GL_RIGHT       */, ///<
-  FRONT_LEFT  = 1024 /* GL_FRONT_LEFT  */, ///<
-  FRONT_RIGHT = 1025 /* GL_FRONT_RIGHT */, ///<
-  BACK_LEFT   = 1026 /* GL_BACK_LEFT   */, ///<
-  BACK_RIGHT  = 1027 /* GL_BACK_RIGHT  */, ///<
+
+  FRONT_LEFT  = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_FRONT_LEFT),  ///<
+  FRONT_RIGHT = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_FRONT_RIGHT), ///<
+  BACK_LEFT   = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_BACK_LEFT),   ///<
+  BACK_RIGHT  = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_BACK_RIGHT),  ///<
 #endif
 
   COLOR_ATTACHMENT0 = static_cast<unsigned int>(FramebufferAttachment::COLOR0), ///< Color attachment 0.
@@ -760,10 +793,10 @@ enum class DrawBuffer : unsigned int {
   NONE = static_cast<unsigned int>(ReadBuffer::NONE), ///<
 
 #if !defined(USE_OPENGL_ES)
-  FRONT_LEFT  = static_cast<unsigned int>(ReadBuffer::FRONT_LEFT),  ///<
-  FRONT_RIGHT = static_cast<unsigned int>(ReadBuffer::FRONT_RIGHT), ///<
-  BACK_LEFT   = static_cast<unsigned int>(ReadBuffer::BACK_LEFT),   ///<
-  BACK_RIGHT  = static_cast<unsigned int>(ReadBuffer::BACK_RIGHT),  ///<
+  FRONT_LEFT  = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_FRONT_LEFT),  ///<
+  FRONT_RIGHT = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_FRONT_RIGHT), ///<
+  BACK_LEFT   = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_BACK_LEFT),   ///<
+  BACK_RIGHT  = static_cast<unsigned int>(FramebufferAttachment::DEFAULT_BACK_RIGHT),  ///<
 #else
   BACK = static_cast<unsigned int>(ReadBuffer::BACK), ///<
 #endif
@@ -913,6 +946,8 @@ public:
   /// \return True if the given version is higher than or equal to the current one, false otherwise.
   static bool checkVersion(int major, int minor) noexcept { return (s_majorVersion > major || (s_majorVersion == major && s_minorVersion >= minor)); }
   static bool isExtensionSupported(const std::string& extension) { return (s_extensions.find(extension) != s_extensions.cend()); }
+  static TextureInternalFormat getDefaultFramebufferColorFormat() { return s_defaultFramebufferColor; }
+  static TextureInternalFormat getDefaultFramebufferDepthFormat() { return s_defaultFramebufferDepth; }
   static void enable(Capability capability);
   static void disable(Capability capability);
   static bool isEnabled(Capability capability);
@@ -1338,6 +1373,10 @@ public:
                                       unsigned int textureIndex, unsigned int mipmapLevel, unsigned int layer,
                                       FramebufferType type = FramebufferType::FRAMEBUFFER);
 #endif
+  static void recoverFramebufferAttachmentParameter(FramebufferAttachment attachment,
+                                                    FramebufferAttachmentParam param,
+                                                    int* values,
+                                                    FramebufferType type = FramebufferType::FRAMEBUFFER);
   static void setReadBuffer(ReadBuffer buffer);
   static void setDrawBuffers(unsigned int count, const DrawBuffer* buffers);
   template <std::size_t N> static void setDrawBuffers(DrawBuffer (&buffers)[N]) { setDrawBuffers(N, buffers); }
@@ -1432,6 +1471,8 @@ public:
   ~Renderer() = delete;
 
 private:
+  static void recoverDefaultFramebufferColorFormat();
+  static void recoverDefaultFramebufferDepthFormat();
   /// Prints OpenGL errors only in Debug mode and if SKIP_RENDERER_ERRORS hasn't been defined.
   static void printConditionalErrors() {
 #if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
@@ -1444,6 +1485,8 @@ private:
   static inline int s_majorVersion {};
   static inline int s_minorVersion {};
   static inline std::unordered_set<std::string> s_extensions {};
+  static inline TextureInternalFormat s_defaultFramebufferColor {};
+  static inline TextureInternalFormat s_defaultFramebufferDepth {};
 };
 
 } // namespace Raz
