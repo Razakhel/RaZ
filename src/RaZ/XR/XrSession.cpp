@@ -1,4 +1,5 @@
 #include "RaZ/Data/Color.hpp"
+#include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/XR/XrContext.hpp"
@@ -25,6 +26,7 @@
 #include "openxr/openxr_platform.h"
 
 #include "tracy/Tracy.hpp"
+#include "tracy/TracyOpenGL.hpp"
 
 #include <algorithm>
 #include <array>
@@ -128,35 +130,6 @@ int64_t selectDepthSwapchainFormat(const std::vector<int64_t>& formats) {
 
 } // namespace
 
-struct XrSession::ImageViewCreateInfo {
-  void* image;
-  enum class Type : uint8_t {
-    RTV,
-    DSV,
-    SRV,
-    UAV
-  } type;
-  enum class View : uint8_t {
-    TYPE_1D,
-    TYPE_2D,
-    TYPE_3D,
-    TYPE_CUBE,
-    TYPE_1D_ARRAY,
-    TYPE_2D_ARRAY,
-    TYPE_CUBE_ARRAY,
-  } view;
-  int64_t format;
-  enum class Aspect : uint8_t {
-    COLOR   = 1,
-    DEPTH   = 2,
-    STENCIL = 4
-  } aspect;
-  uint32_t baseMipLevel;
-  uint32_t levelCount;
-  uint32_t baseArrayLayer;
-  uint32_t layerCount;
-};
-
 struct XrSession::RenderLayerInfo {
   XrTime predictedDisplayTime {};
   std::vector<XrCompositionLayerBaseHeader*> layers;
@@ -234,7 +207,8 @@ void XrSession::end() {
 
 void XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConfigViews,
                             unsigned int viewConfigType,
-                            unsigned int environmentBlendMode) {
+                            unsigned int environmentBlendMode,
+                            const ViewRenderFunc& viewRenderFunc) {
   ZoneScopedN("XrSession::renderFrame");
 
   if (!m_isRunning)
@@ -259,7 +233,7 @@ void XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConf
   renderLayerInfo.predictedDisplayTime = frameState.predictedDisplayTime;
 
   const bool isSessionActive = (m_state == XR_SESSION_STATE_SYNCHRONIZED || m_state == XR_SESSION_STATE_VISIBLE || m_state == XR_SESSION_STATE_FOCUSED);
-  if (isSessionActive && frameState.shouldRender && renderLayer(renderLayerInfo, viewConfigViews, viewConfigType))
+  if (isSessionActive && frameState.shouldRender && renderLayer(renderLayerInfo, viewConfigViews, viewConfigType, viewRenderFunc))
     renderLayerInfo.layers.emplace_back(reinterpret_cast<XrCompositionLayerBaseHeader*>(&renderLayerInfo.layerProjection));
 
   XrFrameEndInfo frameEndInfo {};
@@ -317,7 +291,6 @@ void XrSession::createSwapchains(const std::vector<XrViewConfigurationView>& vie
     swapchainCreateInfo.arraySize   = 1;
     swapchainCreateInfo.mipCount    = 1;
     checkLog(xrCreateSwapchain(m_handle, &swapchainCreateInfo, &colorSwapchainInfo.swapchain), "Failed to create color swapchain", m_instance);
-    colorSwapchainInfo.swapchainFormat = swapchainCreateInfo.format;
 
     swapchainCreateInfo.createFlags = 0;
     swapchainCreateInfo.usageFlags  = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT; // Technically ignored with OpenGL
@@ -329,7 +302,6 @@ void XrSession::createSwapchains(const std::vector<XrViewConfigurationView>& vie
     swapchainCreateInfo.arraySize   = 1;
     swapchainCreateInfo.mipCount    = 1;
     checkLog(xrCreateSwapchain(m_handle, &swapchainCreateInfo, &depthSwapchainInfo.swapchain), "Failed to create depth swapchain", m_instance);
-    depthSwapchainInfo.swapchainFormat = swapchainCreateInfo.format;
 
     createSwapchainImages(colorSwapchainInfo, SwapchainType::COLOR);
     createSwapchainImages(depthSwapchainInfo, SwapchainType::DEPTH);
@@ -347,13 +319,8 @@ void XrSession::destroySwapchains() {
     SwapchainInfo& colorSwapchainInfo = m_colorSwapchainInfos[swapchainIndex];
     SwapchainInfo& depthSwapchainInfo = m_depthSwapchainInfos[swapchainIndex];
 
-    for (void* imageView : colorSwapchainInfo.imageViews)
-      destroySwapchainImageView(imageView);
-    colorSwapchainInfo.imageViews.clear();
-
-    for (void* imageView : depthSwapchainInfo.imageViews)
-      destroySwapchainImageView(imageView);
-    depthSwapchainInfo.imageViews.clear();
+    colorSwapchainInfo.images.clear();
+    depthSwapchainInfo.images.clear();
 
     m_swapchainImages[colorSwapchainInfo.swapchain].second.clear();
     m_swapchainImages.erase(colorSwapchainInfo.swapchain);
@@ -388,62 +355,10 @@ void XrSession::createSwapchainImages(SwapchainInfo& swapchainInfo, SwapchainTyp
            "Failed to enumerate " + typeStr + " swapchain images",
            m_instance);
 
-  for (uint32_t imageIndex = 0; imageIndex < swapchainImageCount; ++imageIndex) {
-    ImageViewCreateInfo imageViewCreateInfo {};
-    imageViewCreateInfo.image          = reinterpret_cast<void*>(static_cast<uint64_t>(images[imageIndex].image));
-    imageViewCreateInfo.type           = (swapchainType == SwapchainType::DEPTH ? ImageViewCreateInfo::Type::DSV : ImageViewCreateInfo::Type::RTV);
-    imageViewCreateInfo.view           = ImageViewCreateInfo::View::TYPE_2D;
-    imageViewCreateInfo.format         = swapchainInfo.swapchainFormat;
-    imageViewCreateInfo.aspect         = (swapchainType == SwapchainType::DEPTH ? ImageViewCreateInfo::Aspect::DEPTH : ImageViewCreateInfo::Aspect::COLOR);
-    imageViewCreateInfo.baseMipLevel   = 0;
-    imageViewCreateInfo.levelCount     = 1;
-    imageViewCreateInfo.baseArrayLayer = 0;
-    imageViewCreateInfo.layerCount     = 1;
-    swapchainInfo.imageViews.emplace_back(reinterpret_cast<void*>(static_cast<uint64_t>(createSwapchainImageView(imageViewCreateInfo))));
-  }
+  for (uint32_t imageIndex = 0; imageIndex < swapchainImageCount; ++imageIndex)
+    swapchainInfo.images.emplace_back(images[imageIndex].image);
 
   Logger::debug("[XrSession] Created " + typeStr + " swapchain images");
-}
-
-unsigned int XrSession::createSwapchainImageView(const ImageViewCreateInfo& imageViewCreateInfo) {
-  ZoneScopedN("XrSession::createSwapchainImageView");
-
-  unsigned int framebuffer {};
-  glGenFramebuffers(1, &framebuffer);
-
-  const unsigned int attachment   = (imageViewCreateInfo.aspect == ImageViewCreateInfo::Aspect::COLOR ? GL_COLOR_ATTACHMENT0 : GL_DEPTH_ATTACHMENT);
-  const unsigned int textureIndex = reinterpret_cast<uint64_t>(imageViewCreateInfo.image);
-
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-  switch (imageViewCreateInfo.view) {
-    case ImageViewCreateInfo::View::TYPE_2D_ARRAY:
-      glFramebufferTextureMultiviewOVR(GL_DRAW_FRAMEBUFFER, attachment, textureIndex,
-                                       imageViewCreateInfo.baseMipLevel, imageViewCreateInfo.baseArrayLayer, imageViewCreateInfo.layerCount);
-      break;
-
-    case ImageViewCreateInfo::View::TYPE_2D:
-      glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, attachment, GL_TEXTURE_2D, textureIndex, imageViewCreateInfo.baseMipLevel);
-      break;
-
-    default:
-      Logger::error("[XrSession] Unknown image view type");
-      break;
-  }
-
-  if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    Logger::error("[XrSession] Swapchain image view (framebuffer) is incomplete");
-
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-  m_imageViews[framebuffer] = imageViewCreateInfo;
-
-  return framebuffer;
-}
-
-void XrSession::destroySwapchainImageView(void* imageView) {
-  const unsigned int framebuffer = reinterpret_cast<uint64_t>(imageView);
-  m_imageViews.erase(framebuffer);
-  glDeleteFramebuffers(1, &framebuffer);
 }
 
 void XrSession::createReferenceSpace() {
@@ -468,18 +383,19 @@ void XrSession::destroyReferenceSpace() {
 
 bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
                             const std::vector<XrViewConfigurationView>& viewConfigViews,
-                            unsigned int viewConfigType) {
+                            unsigned int viewConfigType,
+                            const ViewRenderFunc& viewRenderFunc) {
   ZoneScopedN("XrSession::renderLayer");
 
   std::vector<XrView> views(m_swapchainImages.size(), { XR_TYPE_VIEW });
 
-  XrViewState viewState {};
-  viewState.type = XR_TYPE_VIEW_STATE;
   XrViewLocateInfo viewLocateInfo {};
   viewLocateInfo.type                  = XR_TYPE_VIEW_LOCATE_INFO;
   viewLocateInfo.viewConfigurationType = static_cast<XrViewConfigurationType>(viewConfigType);
   viewLocateInfo.displayTime           = layerInfo.predictedDisplayTime;
   viewLocateInfo.space                 = m_localSpace;
+  XrViewState viewState {};
+  viewState.type = XR_TYPE_VIEW_STATE;
   uint32_t viewCount {};
   if (xrLocateViews(m_handle, &viewLocateInfo, &viewState, static_cast<uint32_t>(views.size()), &viewCount, views.data()) != XR_SUCCESS) {
     Logger::error("[XrSession] Failed to locate views");
@@ -491,6 +407,12 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
   layerInfo.layerProjectionViews.resize(viewCount, { XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW });
 
   for (uint32_t viewIndex = 0; viewIndex < viewCount; ++viewIndex) {
+    const char* eyeStr = (viewCount == 1 ? "Single view"
+                       : (viewIndex == 0 ? "Left eye"
+                                         : "Right eye"));
+
+    ZoneTransientN(cpuEyeZone, eyeStr, true);
+
     const SwapchainInfo& colorSwapchainInfo = m_colorSwapchainInfos[viewIndex];
     const SwapchainInfo& depthSwapchainInfo = m_depthSwapchainInfos[viewIndex];
 
@@ -514,16 +436,36 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
     const uint32_t width  = viewConfigViews[viewIndex].recommendedImageRectWidth;
     const uint32_t height = viewConfigViews[viewIndex].recommendedImageRectHeight;
 
+    const XrView& currentView = views[viewIndex];
+
     XrCompositionLayerProjectionView& layerProjectionView = layerInfo.layerProjectionViews[viewIndex];
     layerProjectionView.type                      = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
-    layerProjectionView.pose                      = views[viewIndex].pose;
-    layerProjectionView.fov                       = views[viewIndex].fov;
+    layerProjectionView.pose                      = currentView.pose;
+    layerProjectionView.fov                       = currentView.fov;
     layerProjectionView.subImage.swapchain        = colorSwapchainInfo.swapchain;
     layerProjectionView.subImage.imageRect.offset = { 0, 0 };
     layerProjectionView.subImage.imageRect.extent = { static_cast<int32_t>(width), static_cast<int32_t>(height) };
     layerProjectionView.subImage.imageArrayIndex  = 0;  // Useful for multiview rendering
 
-    // TODO: do proper rendering
+    TracyGpuZoneTransient(gpuEyeZone, eyeStr, true)
+
+#if defined(RAZ_CONFIG_DEBUG)
+    if (Renderer::checkVersion(4, 3))
+      Renderer::pushDebugGroup(eyeStr);
+#endif
+
+    const auto& [colorBuffer, depthBuffer] = viewRenderFunc(Vec3f(currentView.pose.position.x, currentView.pose.position.y, currentView.pose.position.z),
+                                                            Quaternionf(currentView.pose.orientation.w, currentView.pose.orientation.x,
+                                                                        currentView.pose.orientation.y, currentView.pose.orientation.z),
+                                                            ViewFov{ Radiansf(currentView.fov.angleRight), Radiansf(currentView.fov.angleLeft),
+                                                                     Radiansf(currentView.fov.angleUp), Radiansf(currentView.fov.angleDown) });
+
+    // TODO: copy the rendered buffers into the swapchain's
+
+#if defined(RAZ_CONFIG_DEBUG)
+    if (Renderer::checkVersion(4, 3))
+      Renderer::popDebugGroup();
+#endif
 
     XrSwapchainImageReleaseInfo releaseInfo {};
     releaseInfo.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
