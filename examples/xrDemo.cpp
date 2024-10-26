@@ -20,8 +20,11 @@ int main() {
 
     // The camera parameters aren't technically used for XR rendering, but its transform may be later
     world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
-    world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f))
-      .addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::AABB(Raz::Vec3f(-1.f), Raz::Vec3f(1.f))));
+
+    world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, -1.f, -5.f), Raz::Quaternionf(90_deg, Raz::Axis::Y), Raz::Vec3f(0.01f))
+      .addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj").second);
+
+    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Z, 1.f, Raz::ColorPreset::White);
 
     // TODO: the textures' dimensions must be the same as the rendering viewport's
     const auto colorBuffer = Raz::Texture2D::create(2468, 2584, Raz::TextureColorspace::RGBA);

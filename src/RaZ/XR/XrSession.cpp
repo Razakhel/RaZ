@@ -36,6 +36,22 @@ namespace Raz {
 
 namespace {
 
+constexpr std::string_view swapchainCopySource = R"(
+  in vec2 fragTexcoords;
+
+  uniform sampler2D uniFinalColorBuffer;
+  uniform sampler2D uniFinalDepthBuffer;
+
+  layout(location = 0) out vec4 fragColor;
+
+  void main() {
+    fragColor     = texture(uniFinalColorBuffer, fragTexcoords).rgba;
+    // Gamma uncorrection, as the swapchain seems to apply it itself
+    fragColor.rgb = pow(fragColor.rgb, vec3(2.2));
+    gl_FragDepth  = texture(uniFinalDepthBuffer, fragTexcoords).r;
+  }
+)";
+
 const char* getResultStr(XrInstance instance, XrResult result) {
   static std::array<char, XR_MAX_RESULT_STRING_SIZE> errorStr {};
   xrResultToString(instance, result, errorStr.data());
@@ -142,7 +158,8 @@ enum class XrSession::SwapchainType : uint8_t {
   DEPTH
 };
 
-XrSession::XrSession(const XrContext& context) : m_instance{ context.m_instance } {
+XrSession::XrSession(const XrContext& context) : m_instance{ context.m_instance },
+                                                 m_swapchainCopyPass(FragmentShader::loadFromSource(swapchainCopySource), "Swapchain copy pass") {
   ZoneScopedN("XrSession::XrSession");
 
   Logger::debug("[XrSession] Creating session...");
@@ -184,6 +201,16 @@ XrSession::XrSession(const XrContext& context) : m_instance{ context.m_instance 
   checkThrow(xrCreateSession(m_instance, &sessionCreateInfo, &m_handle), "Failed to create session", m_instance);
 
   createReferenceSpace();
+
+  RenderShaderProgram& swapchainCopyProgram = m_swapchainCopyPass.getProgram();
+  swapchainCopyProgram.setAttribute(0, "uniFinalColorBuffer");
+  swapchainCopyProgram.setAttribute(1, "uniFinalDepthBuffer");
+  swapchainCopyProgram.sendAttributes();
+
+  constexpr DrawBuffer drawBuffer = DrawBuffer::COLOR_ATTACHMENT0;
+  Renderer::bindFramebuffer(m_swapchainCopyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);
+  Renderer::setDrawBuffers(1, &drawBuffer);
+  Renderer::bindFramebuffer(0);
 
   Logger::debug("[XrSession] Created session");
 }
@@ -236,13 +263,18 @@ void XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConf
   if (isSessionActive && frameState.shouldRender && renderLayer(renderLayerInfo, viewConfigViews, viewConfigType, viewRenderFunc))
     renderLayerInfo.layers.emplace_back(reinterpret_cast<XrCompositionLayerBaseHeader*>(&renderLayerInfo.layerProjection));
 
-  XrFrameEndInfo frameEndInfo {};
-  frameEndInfo.type                 = XR_TYPE_FRAME_END_INFO;
-  frameEndInfo.displayTime          = frameState.predictedDisplayTime;
-  frameEndInfo.environmentBlendMode = static_cast<XrEnvironmentBlendMode>(environmentBlendMode);
-  frameEndInfo.layerCount           = static_cast<uint32_t>(renderLayerInfo.layers.size());
-  frameEndInfo.layers               = renderLayerInfo.layers.data();
-  checkLog(xrEndFrame(m_handle, &frameEndInfo), "Failed to end the XR frame", m_instance);
+  {
+    ZoneNamedN(endFrameZone, "xrEndFrame", true);
+    TracyGpuZone("xrEndFrame")
+
+    XrFrameEndInfo frameEndInfo {};
+    frameEndInfo.type                 = XR_TYPE_FRAME_END_INFO;
+    frameEndInfo.displayTime          = frameState.predictedDisplayTime;
+    frameEndInfo.environmentBlendMode = static_cast<XrEnvironmentBlendMode>(environmentBlendMode);
+    frameEndInfo.layerCount           = static_cast<uint32_t>(renderLayerInfo.layers.size());
+    frameEndInfo.layers               = renderLayerInfo.layers.data();
+    checkLog(xrEndFrame(m_handle, &frameEndInfo), "Failed to end the XR frame", m_instance);
+  }
 }
 
 XrSession::~XrSession() {
@@ -271,13 +303,13 @@ void XrSession::createSwapchains(const std::vector<XrViewConfigurationView>& vie
   if (selectDepthSwapchainFormat(formats) == 0)
     Logger::error("[XrSession] Failed to find a supported depth swapchain format");
 
-  m_colorSwapchainInfos.resize(viewConfigViews.size());
-  m_depthSwapchainInfos.resize(viewConfigViews.size());
+  m_colorSwapchains.resize(viewConfigViews.size());
+  m_depthSwapchains.resize(viewConfigViews.size());
   m_swapchainImages.reserve(viewConfigViews.size());
 
   for (std::size_t viewIndex = 0; viewIndex < viewConfigViews.size(); ++viewIndex) {
-    SwapchainInfo& colorSwapchainInfo = m_colorSwapchainInfos[viewIndex];
-    SwapchainInfo& depthSwapchainInfo = m_depthSwapchainInfos[viewIndex];
+    XrSwapchain& colorSwapchain = m_colorSwapchains[viewIndex];
+    XrSwapchain& depthSwapchain = m_depthSwapchains[viewIndex];
 
     XrSwapchainCreateInfo swapchainCreateInfo {};
     swapchainCreateInfo.type        = XR_TYPE_SWAPCHAIN_CREATE_INFO;
@@ -290,7 +322,7 @@ void XrSession::createSwapchains(const std::vector<XrViewConfigurationView>& vie
     swapchainCreateInfo.faceCount   = 1;
     swapchainCreateInfo.arraySize   = 1;
     swapchainCreateInfo.mipCount    = 1;
-    checkLog(xrCreateSwapchain(m_handle, &swapchainCreateInfo, &colorSwapchainInfo.swapchain), "Failed to create color swapchain", m_instance);
+    checkLog(xrCreateSwapchain(m_handle, &swapchainCreateInfo, &colorSwapchain), "Failed to create color swapchain", m_instance);
 
     swapchainCreateInfo.createFlags = 0;
     swapchainCreateInfo.usageFlags  = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT; // Technically ignored with OpenGL
@@ -301,10 +333,10 @@ void XrSession::createSwapchains(const std::vector<XrViewConfigurationView>& vie
     swapchainCreateInfo.faceCount   = 1;
     swapchainCreateInfo.arraySize   = 1;
     swapchainCreateInfo.mipCount    = 1;
-    checkLog(xrCreateSwapchain(m_handle, &swapchainCreateInfo, &depthSwapchainInfo.swapchain), "Failed to create depth swapchain", m_instance);
+    checkLog(xrCreateSwapchain(m_handle, &swapchainCreateInfo, &depthSwapchain), "Failed to create depth swapchain", m_instance);
 
-    createSwapchainImages(colorSwapchainInfo, SwapchainType::COLOR);
-    createSwapchainImages(depthSwapchainInfo, SwapchainType::DEPTH);
+    createSwapchainImages(colorSwapchain, SwapchainType::COLOR);
+    createSwapchainImages(depthSwapchain, SwapchainType::DEPTH);
   }
 
   Logger::debug("[XrSession] Created swapchains");
@@ -315,27 +347,17 @@ void XrSession::destroySwapchains() {
 
   Logger::debug("[XrSession] Destroying swapchains...");
 
-  for (std::size_t swapchainIndex = 0; swapchainIndex < m_colorSwapchainInfos.size(); ++swapchainIndex) {
-    SwapchainInfo& colorSwapchainInfo = m_colorSwapchainInfos[swapchainIndex];
-    SwapchainInfo& depthSwapchainInfo = m_depthSwapchainInfos[swapchainIndex];
-
-    colorSwapchainInfo.images.clear();
-    depthSwapchainInfo.images.clear();
-
-    m_swapchainImages[colorSwapchainInfo.swapchain].second.clear();
-    m_swapchainImages.erase(colorSwapchainInfo.swapchain);
-
-    m_swapchainImages[depthSwapchainInfo.swapchain].second.clear();
-    m_swapchainImages.erase(depthSwapchainInfo.swapchain);
-
-    checkLog(xrDestroySwapchain(colorSwapchainInfo.swapchain), "Failed to destroy color swapchain", m_instance);
-    checkLog(xrDestroySwapchain(depthSwapchainInfo.swapchain), "Failed to destroy depth swapchain", m_instance);
+  for (std::size_t swapchainIndex = 0; swapchainIndex < m_colorSwapchains.size(); ++swapchainIndex) {
+    checkLog(xrDestroySwapchain(m_colorSwapchains[swapchainIndex]), "Failed to destroy color swapchain", m_instance);
+    checkLog(xrDestroySwapchain(m_depthSwapchains[swapchainIndex]), "Failed to destroy depth swapchain", m_instance);
   }
+
+  m_swapchainImages.clear();
 
   Logger::debug("[XrSession] Destroyed swapchains");
 }
 
-void XrSession::createSwapchainImages(SwapchainInfo& swapchainInfo, SwapchainType swapchainType) {
+void XrSession::createSwapchainImages(XrSwapchain swapchain, SwapchainType swapchainType) {
   ZoneScopedN("XrSession::createSwapchainImages");
 
   const std::string typeStr = (swapchainType == SwapchainType::DEPTH ? "depth" : "color");
@@ -343,20 +365,16 @@ void XrSession::createSwapchainImages(SwapchainInfo& swapchainInfo, SwapchainTyp
   Logger::debug("[XrSession] Creating " + typeStr + " swapchain images...");
 
   uint32_t swapchainImageCount {};
-  checkLog(xrEnumerateSwapchainImages(swapchainInfo.swapchain, 0, &swapchainImageCount, nullptr),
+  checkLog(xrEnumerateSwapchainImages(swapchain, 0, &swapchainImageCount, nullptr),
            "Failed to get " + typeStr + " swapchain image count",
            m_instance);
 
-  auto& [type, images] = m_swapchainImages[swapchainInfo.swapchain];
-  type = swapchainType;
+  std::vector<XrSwapchainImageOpenGLKHR>& images = m_swapchainImages[swapchain];
   images.resize(swapchainImageCount, { XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR });
-  checkLog(xrEnumerateSwapchainImages(swapchainInfo.swapchain, swapchainImageCount, &swapchainImageCount,
+  checkLog(xrEnumerateSwapchainImages(swapchain, swapchainImageCount, &swapchainImageCount,
                                       reinterpret_cast<XrSwapchainImageBaseHeader*>(images.data())),
            "Failed to enumerate " + typeStr + " swapchain images",
            m_instance);
-
-  for (uint32_t imageIndex = 0; imageIndex < swapchainImageCount; ++imageIndex)
-    swapchainInfo.images.emplace_back(images[imageIndex].image);
 
   Logger::debug("[XrSession] Created " + typeStr + " swapchain images");
 }
@@ -413,25 +431,25 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
 
     ZoneTransientN(cpuEyeZone, eyeStr, true);
 
-    const SwapchainInfo& colorSwapchainInfo = m_colorSwapchainInfos[viewIndex];
-    const SwapchainInfo& depthSwapchainInfo = m_depthSwapchainInfos[viewIndex];
+    const XrSwapchain colorSwapchain = m_colorSwapchains[viewIndex];
+    const XrSwapchain depthSwapchain = m_depthSwapchains[viewIndex];
 
     XrSwapchainImageAcquireInfo acquireInfo {};
     acquireInfo.type = XR_TYPE_SWAPCHAIN_IMAGE_ACQUIRE_INFO;
     uint32_t colorImageIndex {};
     uint32_t depthImageIndex {};
-    checkLog(xrAcquireSwapchainImage(colorSwapchainInfo.swapchain, &acquireInfo, &colorImageIndex),
+    checkLog(xrAcquireSwapchainImage(colorSwapchain, &acquireInfo, &colorImageIndex),
              "Failed to acquire image from the color swapchain",
              m_instance);
-    checkLog(xrAcquireSwapchainImage(depthSwapchainInfo.swapchain, &acquireInfo, &depthImageIndex),
+    checkLog(xrAcquireSwapchainImage(depthSwapchain, &acquireInfo, &depthImageIndex),
              "Failed to acquire image from the depth swapchain",
              m_instance);
 
     XrSwapchainImageWaitInfo waitInfo {};
     waitInfo.type    = XR_TYPE_SWAPCHAIN_IMAGE_WAIT_INFO;
     waitInfo.timeout = XR_INFINITE_DURATION;
-    checkLog(xrWaitSwapchainImage(colorSwapchainInfo.swapchain, &waitInfo), "Failed to wait for image from the color swapchain", m_instance);
-    checkLog(xrWaitSwapchainImage(depthSwapchainInfo.swapchain, &waitInfo), "Failed to wait for image from the depth swapchain", m_instance);
+    checkLog(xrWaitSwapchainImage(colorSwapchain, &waitInfo), "Failed to wait for image from the color swapchain", m_instance);
+    checkLog(xrWaitSwapchainImage(depthSwapchain, &waitInfo), "Failed to wait for image from the depth swapchain", m_instance);
 
     const uint32_t width  = viewConfigViews[viewIndex].recommendedImageRectWidth;
     const uint32_t height = viewConfigViews[viewIndex].recommendedImageRectHeight;
@@ -442,7 +460,7 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
     layerProjectionView.type                      = XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW;
     layerProjectionView.pose                      = currentView.pose;
     layerProjectionView.fov                       = currentView.fov;
-    layerProjectionView.subImage.swapchain        = colorSwapchainInfo.swapchain;
+    layerProjectionView.subImage.swapchain        = colorSwapchain;
     layerProjectionView.subImage.imageRect.offset = { 0, 0 };
     layerProjectionView.subImage.imageRect.extent = { static_cast<int32_t>(width), static_cast<int32_t>(height) };
     layerProjectionView.subImage.imageArrayIndex  = 0;  // Useful for multiview rendering
@@ -460,7 +478,9 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
                                                             ViewFov{ Radiansf(currentView.fov.angleRight), Radiansf(currentView.fov.angleLeft),
                                                                      Radiansf(currentView.fov.angleUp), Radiansf(currentView.fov.angleDown) });
 
-    // TODO: copy the rendered buffers into the swapchain's
+    const uint32_t colorSwapchainImage = m_swapchainImages.find(colorSwapchain)->second[colorImageIndex].image;
+    const uint32_t depthSwapchainImage = m_swapchainImages.find(depthSwapchain)->second[depthImageIndex].image;
+    copyToSwapchains(colorBuffer, depthBuffer, colorSwapchainImage, depthSwapchainImage);
 
 #if defined(RAZ_CONFIG_DEBUG)
     if (Renderer::checkVersion(4, 3))
@@ -469,8 +489,8 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
 
     XrSwapchainImageReleaseInfo releaseInfo {};
     releaseInfo.type = XR_TYPE_SWAPCHAIN_IMAGE_RELEASE_INFO;
-    checkLog(xrReleaseSwapchainImage(colorSwapchainInfo.swapchain, &releaseInfo), "Failed to release image back to the color swapchain", m_instance);
-    checkLog(xrReleaseSwapchainImage(depthSwapchainInfo.swapchain, &releaseInfo), "Failed to release image back to the depth swapchain", m_instance);
+    checkLog(xrReleaseSwapchainImage(colorSwapchain, &releaseInfo), "Failed to release image back to the color swapchain", m_instance);
+    checkLog(xrReleaseSwapchainImage(depthSwapchain, &releaseInfo), "Failed to release image back to the depth swapchain", m_instance);
   }
 
   layerInfo.layerProjection.layerFlags = XR_COMPOSITION_LAYER_BLEND_TEXTURE_SOURCE_ALPHA_BIT
@@ -480,6 +500,25 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
   layerInfo.layerProjection.views      = layerInfo.layerProjectionViews.data();
 
   return true;
+}
+
+void XrSession::copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& depthBuffer, uint32_t colorSwapchainImage, uint32_t depthSwapchainImage) {
+  ZoneScopedN("XrSession::copyToSwapchains");
+  TracyGpuZone("XrSession::copyToSwapchains")
+
+  m_swapchainCopyPass.getProgram().use();
+  Renderer::activateTexture(0);
+  colorBuffer.bind();
+  Renderer::activateTexture(1);
+  depthBuffer.bind();
+
+  Renderer::bindFramebuffer(m_swapchainCopyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);
+  Renderer::setFramebufferTexture2D(FramebufferAttachment::COLOR0, colorSwapchainImage, 0);
+  Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, depthSwapchainImage, 0);
+
+  Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
+
+  m_swapchainCopyPass.execute();
 }
 
 } // namespace Raz

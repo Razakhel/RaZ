@@ -4,6 +4,7 @@
 #define RAZ_XRSESSION_HPP
 
 #include "RaZ/Math/Angle.hpp"
+#include "RaZ/Render/RenderPass.hpp"
 
 using XrSession = struct XrSession_T*;
 struct XrInstance_T;
@@ -55,31 +56,29 @@ private:
   struct RenderLayerInfo;
   enum class SwapchainType : uint8_t;
 
-  struct SwapchainInfo {
-    XrSwapchain swapchain {};
-    std::vector<uint32_t> images;
-  };
-
   void createSwapchains(const std::vector<XrViewConfigurationView>& viewConfigViews);
   void destroySwapchains();
-  void createSwapchainImages(SwapchainInfo& swapchainInfo, SwapchainType swapchainType);
+  void createSwapchainImages(XrSwapchain swapchain, SwapchainType swapchainType);
   void createReferenceSpace();
   void destroyReferenceSpace();
   bool renderLayer(RenderLayerInfo& layerInfo,
                    const std::vector<XrViewConfigurationView>& viewConfigViews,
                    unsigned int viewConfigType,
                    const ViewRenderFunc& viewRenderFunc);
+  void copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& depthBuffer, uint32_t colorSwapchainImage, uint32_t depthSwapchainImage);
 
   ::XrSession m_handle {};
   XrInstance m_instance {};
   int m_state {};
   bool m_isRunning = false;
 
-  std::vector<SwapchainInfo> m_colorSwapchainInfos;
-  std::vector<SwapchainInfo> m_depthSwapchainInfos;
-  std::unordered_map<XrSwapchain, std::pair<SwapchainType, std::vector<XrSwapchainImageOpenGLKHR>>> m_swapchainImages;
+  std::vector<XrSwapchain> m_colorSwapchains;
+  std::vector<XrSwapchain> m_depthSwapchains;
+  std::unordered_map<XrSwapchain, std::vector<XrSwapchainImageOpenGLKHR>> m_swapchainImages;
 
   XrSpace m_localSpace {};
+
+  RenderPass m_swapchainCopyPass {};
 };
 
 } // namespace Raz
