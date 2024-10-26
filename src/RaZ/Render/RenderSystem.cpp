@@ -7,6 +7,9 @@
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/Renderer.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
+#if defined(RAZ_USE_XR)
+#include "RaZ/XR/XrSystem.hpp"
+#endif
 
 #include "tracy/Tracy.hpp"
 #include "GL/glew.h" // Needed by TracyOpenGL.hpp
@@ -18,6 +21,15 @@ void RenderSystem::setCubemap(Cubemap&& cubemap) {
   m_cubemap = std::move(cubemap);
   m_cameraUbo.bindUniformBlock(m_cubemap->getProgram(), "uboCameraInfo", 0);
 }
+
+#if defined(RAZ_USE_XR)
+void RenderSystem::enableXr(XrSystem& xrSystem) {
+  m_xrSystem = &xrSystem;
+
+  const Vec2u optimalViewSize = xrSystem.recoverOptimalViewSize();
+  resizeViewport(optimalViewSize.x(), optimalViewSize.y());
+}
+#endif
 
 void RenderSystem::resizeViewport(unsigned int width, unsigned int height) {
   ZoneScopedN("RenderSystem::resizeViewport");
@@ -55,9 +67,15 @@ bool RenderSystem::update(const FrameTimeInfo& timeInfo) {
   m_timeUbo.sendData(timeInfo.deltaTime, 0);
   m_timeUbo.sendData(timeInfo.globalTime, sizeof(float));
 
-  sendCameraInfo();
-
-  m_renderGraph.execute(*this);
+#if defined(RAZ_USE_XR)
+  if (m_xrSystem) {
+    renderXrFrame();
+  } else
+#endif
+  {
+    sendCameraInfo();
+    m_renderGraph.execute(*this);
+  }
 
 #if defined(RAZ_CONFIG_DEBUG) && !defined(SKIP_RENDERER_ERRORS)
   Renderer::printErrors();
@@ -226,23 +244,6 @@ void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight)
   resizeViewport(sceneWidth, sceneHeight);
 }
 
-void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) const {
-  const auto& light = entity.getComponent<Light>();
-  const std::size_t dataStride = sizeof(Vec4f) * 4 * lightIndex;
-
-  if (light.getType() == LightType::DIRECTIONAL) {
-    m_lightsUbo.sendData(Vec4f(0.f), static_cast<unsigned int>(dataStride));
-  } else {
-    assert("Error: A non-directional light needs to have a Transform component." && entity.hasComponent<Transform>());
-    m_lightsUbo.sendData(Vec4f(entity.getComponent<Transform>().getPosition(), 1.f), static_cast<unsigned int>(dataStride));
-  }
-
-  m_lightsUbo.sendData(light.getDirection(), static_cast<unsigned int>(dataStride + sizeof(Vec4f)));
-  m_lightsUbo.sendData(light.getColor(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 2));
-  m_lightsUbo.sendData(light.getEnergy(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3));
-  m_lightsUbo.sendData(light.getAngle().value, static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3 + sizeof(float)));
-}
-
 void RenderSystem::sendCameraInfo() const {
   assert("Error: The render system needs a camera to send its info." && (m_cameraEntity != nullptr));
   assert("Error: The camera must have a transform component to send its info." && m_cameraEntity->hasComponent<Transform>());
@@ -273,5 +274,64 @@ void RenderSystem::sendCameraInfo() const {
   sendInverseProjectionMatrix(camera.getInverseProjectionMatrix());
   sendViewProjectionMatrix(camera.getProjectionMatrix() * camera.getViewMatrix());
 }
+
+void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) const {
+  const auto& light = entity.getComponent<Light>();
+  const std::size_t dataStride = sizeof(Vec4f) * 4 * lightIndex;
+
+  if (light.getType() == LightType::DIRECTIONAL) {
+    m_lightsUbo.sendData(Vec4f(0.f), static_cast<unsigned int>(dataStride));
+  } else {
+    assert("Error: A non-directional light needs to have a Transform component." && entity.hasComponent<Transform>());
+    m_lightsUbo.sendData(Vec4f(entity.getComponent<Transform>().getPosition(), 1.f), static_cast<unsigned int>(dataStride));
+  }
+
+  m_lightsUbo.sendData(light.getDirection(), static_cast<unsigned int>(dataStride + sizeof(Vec4f)));
+  m_lightsUbo.sendData(light.getColor(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 2));
+  m_lightsUbo.sendData(light.getEnergy(), static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3));
+  m_lightsUbo.sendData(light.getAngle().value, static_cast<unsigned int>(dataStride + sizeof(Vec4f) * 3 + sizeof(float)));
+}
+
+#if defined(RAZ_USE_XR)
+void RenderSystem::renderXrFrame() {
+  m_xrSystem->renderFrame([this] (const Vec3f& position, const Quaternionf& rotation, const ViewFov& viewFov) {
+    Mat4f invViewMat = rotation.computeMatrix();
+    invViewMat.getElement(3, 0) = position.x();
+    invViewMat.getElement(3, 1) = position.y();
+    invViewMat.getElement(3, 2) = position.z();
+    const Mat4f viewMat = invViewMat.inverse();
+
+    const float tanAngleRight    = std::tan(viewFov.angleRight.value);
+    const float tanAngleLeft     = std::tan(viewFov.angleLeft.value);
+    const float tanAngleUp       = std::tan(viewFov.angleUp.value);
+    const float tanAngleDown     = std::tan(viewFov.angleDown.value);
+    const float invAngleWidth    = 1.f / (tanAngleRight - tanAngleLeft);
+    const float invAngleHeight   = 1.f / (tanAngleUp - tanAngleDown);
+    const float angleWidthDiff   = tanAngleRight + tanAngleLeft;
+    const float angleHeightDiff  = tanAngleUp + tanAngleDown;
+    constexpr float nearZ        = 0.1f;
+    constexpr float farZ         = 1000.f;
+    constexpr float invDepthDiff = 1.f / (farZ - nearZ);
+    const Mat4f projMatrix(2.f * invAngleWidth, 0.f,                  angleWidthDiff * invAngleWidth,   0.f,
+                           0.f,                 2.f * invAngleHeight, angleHeightDiff * invAngleHeight, 0.f,
+                           0.f,                 0.f,                  -(farZ + nearZ) * invDepthDiff,   -(farZ * (nearZ + nearZ)) * invDepthDiff,
+                           0.f,                 0.f,                  -1.f,                             0.f);
+
+    m_cameraUbo.bind();
+    sendViewMatrix(viewMat);
+    sendInverseViewMatrix(invViewMat);
+    sendProjectionMatrix(projMatrix);
+    sendInverseProjectionMatrix(projMatrix.inverse());
+    sendViewProjectionMatrix(projMatrix * viewMat);
+    sendCameraPosition(position);
+
+    m_renderGraph.execute(*this);
+
+    // TODO: the returned color buffer must be the one from the render pass executed last
+    const Framebuffer& geomFramebuffer = m_renderGraph.m_geometryPass.getFramebuffer();
+    return std::make_pair(std::cref(geomFramebuffer.getColorBuffer(0)), std::cref(geomFramebuffer.getDepthBuffer()));
+  });
+}
+#endif
 
 } // namespace Raz

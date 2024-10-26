@@ -10,10 +10,18 @@
 #include "RaZ/Render/UniformBuffer.hpp"
 #include "RaZ/Render/Window.hpp"
 
+#if !defined(__APPLE__) && !defined(__EMSCRIPTEN__) && !defined(RAZ_NO_WINDOW)
+// XR currently isn't available with macOS or Emscripten and requires windowing capabilities
+#define RAZ_USE_XR
+#endif
+
 namespace Raz {
 
 class Entity;
 class MeshRenderer;
+#if defined(RAZ_USE_XR)
+class XrSystem;
+#endif
 
 /// RenderSystem class, handling the rendering part.
 class RenderSystem final : public System {
@@ -57,6 +65,9 @@ public:
   const Cubemap& getCubemap() const { assert("Error: The cubemap must be set before being accessed." && hasCubemap()); return *m_cubemap; }
 
   void setCubemap(Cubemap&& cubemap);
+#if defined(RAZ_USE_XR)
+  void enableXr(XrSystem& xrSystem);
+#endif
 
 #if !defined(RAZ_NO_WINDOW)
   void createWindow(unsigned int width, unsigned int height,
@@ -98,6 +109,9 @@ private:
   /// \param entity Light entity to be updated; if not a directional light, needs to have a Transform component.
   /// \param lightIndex Index of the light to be updated.
   void updateLight(const Entity& entity, unsigned int lightIndex) const;
+#if defined(RAZ_USE_XR)
+  void renderXrFrame();
+#endif
 
   unsigned int m_sceneWidth {};
   unsigned int m_sceneHeight {};
@@ -114,6 +128,10 @@ private:
   UniformBuffer m_modelUbo  = UniformBuffer(sizeof(Mat4f), UniformBufferUsage::STREAM);
 
   std::optional<Cubemap> m_cubemap {};
+
+#if defined(RAZ_USE_XR)
+  XrSystem* m_xrSystem {};
+#endif
 };
 
 } // namespace Raz

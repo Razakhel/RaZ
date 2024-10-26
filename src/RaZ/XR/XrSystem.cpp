@@ -102,6 +102,25 @@ bool XrSystem::update(const FrameTimeInfo&) {
 
 XrSystem::~XrSystem() = default;
 
+Vec2u XrSystem::recoverOptimalViewSize() const {
+  assert("[XrSystem] View configuration views must be recovered before getting the optimal view size" && !m_viewConfigViews.empty());
+
+  Vec2u optimalViewSize(m_viewConfigViews.front().recommendedImageRectWidth, m_viewConfigViews.front().recommendedImageRectHeight);
+
+  if (m_viewConfigViews.size() > 1) {
+    for (const XrViewConfigurationView& viewConfigView : m_viewConfigViews) {
+      if (viewConfigView.recommendedImageRectWidth != optimalViewSize.x() || viewConfigView.recommendedImageRectHeight != optimalViewSize.y())
+        Logger::warn("[XrSystem] The optimal configuration view size is not the same for all views; rendering may be altered");
+    }
+  }
+
+  return optimalViewSize;
+}
+
+void XrSystem::renderFrame(const ViewRenderFunc& viewRenderFunc) {
+  m_session.renderFrame(m_viewConfigViews, m_viewConfigType, m_environmentBlendMode, viewRenderFunc);
+}
+
 void XrSystem::recoverViewConfigurations() {
   uint32_t viewConfigCount {};
   checkLog(xrEnumerateViewConfigurations(m_context.m_instance, m_context.m_systemId, 0, &viewConfigCount, nullptr),

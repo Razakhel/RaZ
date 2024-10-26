@@ -15,6 +15,8 @@ struct XrViewConfigurationView;
 namespace Raz {
 
 class XrSystem final : public System {
+  friend class RenderSystem;
+
 public:
   explicit XrSystem(const std::string& appName);
 
@@ -23,6 +25,9 @@ public:
   ~XrSystem() override;
 
 private:
+  Vec2u recoverOptimalViewSize() const;
+  void renderFrame(const ViewRenderFunc& viewRenderFunc);
+
   void recoverViewConfigurations();
   void recoverEnvironmentBlendModes();
   bool processSessionStateChanged(const XrEventDataSessionStateChanged& sessionStateChanged);

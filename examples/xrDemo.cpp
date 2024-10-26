@@ -15,11 +15,21 @@ int main() {
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
-    world.addSystem<Raz::XrSystem>("RaZ - XR demo");
+    auto& xr = world.addSystem<Raz::XrSystem>("RaZ - XR demo");
+    render.enableXr(xr);
 
+    // The camera parameters aren't technically used for XR rendering, but its transform may be later
     world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
     world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, -5.f))
       .addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::AABB(Raz::Vec3f(-1.f), Raz::Vec3f(1.f))));
+
+    // TODO: the textures' dimensions must be the same as the rendering viewport's
+    const auto colorBuffer = Raz::Texture2D::create(2468, 2584, Raz::TextureColorspace::RGBA);
+    const auto depthBuffer = Raz::Texture2D::create(2468, 2584, Raz::TextureColorspace::DEPTH);
+
+    Raz::RenderPass& geomPass = render.getGeometryPass();
+    geomPass.addWriteColorTexture(colorBuffer, 0);
+    geomPass.setWriteDepthTexture(depthBuffer);
 
     app.run();
   } catch (const std::exception& exception) {
