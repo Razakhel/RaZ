@@ -112,6 +112,7 @@ private:
 #if defined(RAZ_USE_XR)
   void renderXrFrame();
 #endif
+  void copyToWindow(const Texture2D& colorBuffer, const Texture2D& depthBuffer, unsigned int windowWidth, unsigned int windowHeight) const;
 
   unsigned int m_sceneWidth {};
   unsigned int m_sceneHeight {};

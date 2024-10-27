@@ -294,6 +294,9 @@ void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) co
 
 #if defined(RAZ_USE_XR)
 void RenderSystem::renderXrFrame() {
+  ZoneScopedN("RenderSystem::renderXrFrame");
+  TracyGpuZone("RenderSystem::renderXrFrame")
+
   m_xrSystem->renderFrame([this] (const Vec3f& position, const Quaternionf& rotation, const ViewFov& viewFov) {
     Mat4f invViewMat = rotation.computeMatrix();
     invViewMat.getElement(3, 0) = position.x();
@@ -312,17 +315,17 @@ void RenderSystem::renderXrFrame() {
     constexpr float nearZ        = 0.1f;
     constexpr float farZ         = 1000.f;
     constexpr float invDepthDiff = 1.f / (farZ - nearZ);
-    const Mat4f projMatrix(2.f * invAngleWidth, 0.f,                  angleWidthDiff * invAngleWidth,   0.f,
-                           0.f,                 2.f * invAngleHeight, angleHeightDiff * invAngleHeight, 0.f,
-                           0.f,                 0.f,                  -(farZ + nearZ) * invDepthDiff,   -(farZ * (nearZ + nearZ)) * invDepthDiff,
-                           0.f,                 0.f,                  -1.f,                             0.f);
+    const Mat4f projMat(2.f * invAngleWidth, 0.f,                  angleWidthDiff * invAngleWidth,   0.f,
+                        0.f,                 2.f * invAngleHeight, angleHeightDiff * invAngleHeight, 0.f,
+                        0.f,                 0.f,                  -(farZ + nearZ) * invDepthDiff,   -(farZ * (nearZ + nearZ)) * invDepthDiff,
+                        0.f,                 0.f,                  -1.f,                             0.f);
 
     m_cameraUbo.bind();
     sendViewMatrix(viewMat);
     sendInverseViewMatrix(invViewMat);
-    sendProjectionMatrix(projMatrix);
-    sendInverseProjectionMatrix(projMatrix.inverse());
-    sendViewProjectionMatrix(projMatrix * viewMat);
+    sendProjectionMatrix(projMat);
+    sendInverseProjectionMatrix(projMat.inverse());
+    sendViewProjectionMatrix(projMat * viewMat);
     sendCameraPosition(position);
 
     m_renderGraph.execute(*this);
@@ -331,7 +334,64 @@ void RenderSystem::renderXrFrame() {
     const Framebuffer& geomFramebuffer = m_renderGraph.m_geometryPass.getFramebuffer();
     return std::make_pair(std::cref(geomFramebuffer.getColorBuffer(0)), std::cref(geomFramebuffer.getDepthBuffer()));
   });
+
+#if !defined(RAZ_NO_WINDOW)
+  // TODO: the copied color buffer must be the one from the render pass executed last
+  const Framebuffer& geomFramebuffer = m_renderGraph.m_geometryPass.getFramebuffer();
+  copyToWindow(geomFramebuffer.getColorBuffer(0), geomFramebuffer.getDepthBuffer(), m_window->getWidth(), m_window->getHeight());
+#endif
 }
 #endif
+
+void RenderSystem::copyToWindow(const Texture2D& colorBuffer, const Texture2D& depthBuffer, unsigned int windowWidth, unsigned int windowHeight) const {
+  assert("Error: The given color buffer must have a valid & non-depth colorspace to be copied to the window."
+      && colorBuffer.getColorspace() != TextureColorspace::DEPTH && colorBuffer.getColorspace() != TextureColorspace::INVALID);
+  assert("Error: The given depth buffer must have a depth colorspace to be copied to the window."
+      && depthBuffer.getColorspace() == TextureColorspace::DEPTH);
+
+  ZoneScopedN("RenderSystem::copyToWindow");
+  TracyGpuZone("RenderSystem::copyToWindow")
+
+  static RenderPass windowCopyPass = [] () {
+    RenderPass copyPass(FragmentShader::loadFromSource(R"(
+      in vec2 fragTexcoords;
+
+      uniform sampler2D uniFinalColorBuffer;
+      uniform sampler2D uniFinalDepthBuffer;
+      uniform vec2 uniSizeFactor;
+
+      layout(location = 0) out vec4 fragColor;
+
+      void main() {
+        vec2 scaledUv = fragTexcoords * uniSizeFactor;
+        fragColor     = texture(uniFinalColorBuffer, scaledUv).rgba;
+        gl_FragDepth  = texture(uniFinalDepthBuffer, scaledUv).r;
+      }
+    )"), "Window copy pass");
+
+    RenderShaderProgram& copyProgram = copyPass.getProgram();
+    copyProgram.setAttribute(0, "uniFinalColorBuffer");
+    copyProgram.setAttribute(1, "uniFinalDepthBuffer");
+
+    return copyPass;
+  }();
+
+  RenderShaderProgram& windowCopyProgram = windowCopyPass.getProgram();
+
+  const Vec2f sizeFactor(static_cast<float>(m_sceneWidth) / static_cast<float>(windowWidth),
+                         static_cast<float>(m_sceneHeight) / static_cast<float>(windowHeight));
+  windowCopyProgram.setAttribute(sizeFactor, "uniSizeFactor");
+  windowCopyProgram.sendAttributes();
+
+  windowCopyProgram.use();
+  Renderer::activateTexture(0);
+  colorBuffer.bind();
+  Renderer::activateTexture(1);
+  depthBuffer.bind();
+
+  Renderer::bindFramebuffer(0);
+  Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
+  windowCopyPass.execute();
+}
 
 } // namespace Raz

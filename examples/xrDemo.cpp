@@ -9,7 +9,9 @@ int main() {
     Raz::Application app;
     Raz::World& world = app.addWorld();
 
-    auto& render        = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ");
+    // Dimensions of [2468, 2584] (definition of each view of the Meta Quest 2) divided by 3
+    auto& render = world.addSystem<Raz::RenderSystem>(823, 861, "RaZ", Raz::WindowSetting::NON_RESIZABLE);
+
     Raz::Window& window = render.getWindow();
 
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
