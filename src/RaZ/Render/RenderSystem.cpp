@@ -244,7 +244,8 @@ void RenderSystem::updateLight(const Entity& entity, unsigned int lightIndex) co
 }
 
 void RenderSystem::sendCameraInfo() const {
-  assert("Error: A camera must be given to a RenderSystem to send its info." && (m_cameraEntity != nullptr));
+  assert("Error: The render system needs a camera to send its info." && (m_cameraEntity != nullptr));
+  assert("Error: The camera must have a transform component to send its info." && m_cameraEntity->hasComponent<Transform>());
 
   ZoneScopedN("RenderSystem::sendCameraInfo");
 

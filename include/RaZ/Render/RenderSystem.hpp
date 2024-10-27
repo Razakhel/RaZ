@@ -28,16 +28,20 @@ public:
   RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight) : RenderSystem() { resizeViewport(sceneWidth, sceneHeight); }
 #if !defined(RAZ_NO_WINDOW)
   /// Creates a render system along with a window.
-  /// \param sceneWidth Width of the scene.
-  /// \param sceneHeight Height of the scene.
+  /// \param windowWidth Width of the window.
+  /// \param windowHeight Height of the window.
   /// \param windowTitle Title of the window.
   /// \param settings Settings to create the window with.
   /// \param antiAliasingSampleCount Number of anti-aliasing samples.
-  RenderSystem(unsigned int sceneWidth, unsigned int sceneHeight,
+  /// \note The window's width & height are to be considered just hints; the window manager remains responsible for the actual dimensions, which may be lower.
+  ///   This can notably happen when the requested window size exceeds what the screens can display. The actual window's size can be queried afterward.
+  /// \see getWindow(), Window::getWidth(), Window::getHeight()
+  RenderSystem(unsigned int windowWidth, unsigned int windowHeight,
                const std::string& windowTitle,
-               WindowSetting settings = WindowSetting::DEFAULT,
+               WindowSetting windowSettings = WindowSetting::DEFAULT,
                uint8_t antiAliasingSampleCount = 1)
-    : m_window{ Window::create(*this, sceneWidth, sceneHeight, windowTitle, settings, antiAliasingSampleCount) } { initialize(sceneWidth, sceneHeight); }
+    : m_window{ Window::create(*this, windowWidth, windowHeight, windowTitle, windowSettings, antiAliasingSampleCount) } { initialize(m_window->getWidth(),
+                                                                                                                                      m_window->getHeight()); }
 #endif
 
 #if !defined(RAZ_NO_WINDOW)

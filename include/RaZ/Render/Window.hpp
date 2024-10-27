@@ -61,6 +61,9 @@ public:
   /// \param title Title of the window.
   /// \param settings Settings to create the window with.
   /// \param antiAliasingSampleCount Number of anti-aliasing samples.
+  /// \note The width & height are to be considered just hints; the window manager remains responsible for the actual dimensions, which may be lower.
+  ///   This can notably happen when the requested window size exceeds what the screens can display. The actual window's size can be queried afterward.
+  /// \see getWidth(), getHeight()
   Window(RenderSystem& renderSystem,
          unsigned int width, unsigned int height,
          const std::string& title = {},
@@ -88,6 +91,9 @@ public:
   /// Resizes the window.
   /// \param width New window width.
   /// \param height New window height.
+  /// \note The width & height are to be considered just hints; the window manager remains responsible for the actual dimensions, which may be lower.
+  ///   This can notably happen when the requested window size exceeds what the screens can display. The actual window's size can be queried afterward.
+  /// \see getWidth(), getHeight()
   void resize(unsigned int width, unsigned int height);
   /// Sets the window in a fullscreen mode, taking the whole main monitor's screen.
   /// \note To quit fullscreen, call makeWindowed().

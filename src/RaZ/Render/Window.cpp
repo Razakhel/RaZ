@@ -32,7 +32,7 @@ Window::Window(RenderSystem& renderSystem,
                unsigned int width, unsigned int height,
                const std::string& title,
                WindowSetting settings,
-               uint8_t antiAliasingSampleCount) : m_renderSystem{ &renderSystem }, m_width{ static_cast<int>(width) }, m_height{ static_cast<int>(height) } {
+               uint8_t antiAliasingSampleCount) : m_renderSystem{ &renderSystem } {
   ZoneScopedN("Window::Window");
 
   Logger::debug("[Window] Initializing...");
@@ -90,7 +90,7 @@ Window::Window(RenderSystem& renderSystem,
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
 
-    m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, glfwGetCurrentContext());
+    m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, glfwGetCurrentContext());
 
     if (m_windowHandle)
       break;
@@ -104,10 +104,11 @@ Window::Window(RenderSystem& renderSystem,
     throw std::runtime_error("Error: Failed to create GLFW Window");
   }
 #else
-  m_windowHandle = glfwCreateWindow(m_width, m_height, title.c_str(), nullptr, glfwGetCurrentContext());
+  m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, glfwGetCurrentContext());
 #endif
 
   glfwSetWindowUserPointer(m_windowHandle, this);
+  glfwGetWindowSize(m_windowHandle, &m_width, &m_height);
   glfwGetWindowPos(m_windowHandle, &m_posX, &m_posY);
 
   if (glfwGetCurrentContext() == nullptr)
@@ -161,10 +162,8 @@ void Window::setIcon(const Image& img) const {
 }
 
 void Window::resize(unsigned int width, unsigned int height) {
-  m_width  = static_cast<int>(width);
-  m_height = static_cast<int>(height);
-
   glfwSetWindowSize(m_windowHandle, static_cast<int>(width), static_cast<int>(height));
+  glfwGetWindowSize(m_windowHandle, &m_width, &m_height);
 }
 
 void Window::makeFullscreen() {
@@ -198,7 +197,7 @@ bool Window::recoverVerticalSyncState() const {
   return true;
 #elif defined(RAZ_PLATFORM_LINUX)
   if (glXQueryExtensionsString(glXGetCurrentDisplay(), 0)) {
-    unsigned int interval;
+    unsigned int interval {};
     glXQueryDrawable(glXGetCurrentDisplay(), glXGetCurrentDrawable(), GLX_SWAP_INTERVAL_EXT, &interval);
 
     return static_cast<bool>(interval);
