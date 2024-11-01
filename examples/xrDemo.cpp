@@ -1,5 +1,7 @@
 #include "RaZ/RaZ.hpp"
 
+#include "DemoUtils.hpp"
+
 using namespace std::literals;
 
 int main() {
@@ -20,8 +22,11 @@ int main() {
     auto& xr = world.addSystem<Raz::XrSystem>("RaZ - XR demo");
     render.enableXr(xr);
 
-    // The camera parameters aren't technically used for XR rendering, but its transform may be later
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    // In an XR workflow, the camera is optional; its parameters aren't technically used, but its transform is
+    auto& camera = world.addEntityWithComponent<Raz::Transform>();
+    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+
+    DemoUtils::setupCameraControls(camera, window);
 
     world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, -1.f, -5.f), Raz::Quaternionf(90_deg, Raz::Axis::Y), Raz::Vec3f(0.01f))
       .addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj").second);

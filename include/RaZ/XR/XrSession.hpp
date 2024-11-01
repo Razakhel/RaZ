@@ -32,7 +32,7 @@ struct ViewFov {
   Radiansf angleUp;
   Radiansf angleDown;
 };
-using ViewRenderFunc = std::function<std::pair<const Texture2D&, const Texture2D&>(const Vec3f&, const Quaternionf&, const ViewFov&)>;
+using ViewRenderFunc = std::function<std::pair<const Texture2D&, const Texture2D&>(Vec3f, Quaternionf, ViewFov)>;
 
 class XrSession {
   friend class XrSystem;

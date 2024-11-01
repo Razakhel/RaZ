@@ -297,7 +297,13 @@ void RenderSystem::renderXrFrame() {
   ZoneScopedN("RenderSystem::renderXrFrame");
   TracyGpuZone("RenderSystem::renderXrFrame")
 
-  m_xrSystem->renderFrame([this] (const Vec3f& position, const Quaternionf& rotation, const ViewFov& viewFov) {
+  m_xrSystem->renderFrame([this] (Vec3f position, Quaternionf rotation, ViewFov viewFov) {
+    if (m_cameraEntity) {
+      const auto& camTransform = m_cameraEntity->getComponent<Transform>();
+      position = camTransform.getRotation() * position + camTransform.getPosition();
+      rotation = camTransform.getRotation() * rotation;
+    }
+
     Mat4f invViewMat = rotation.computeMatrix();
     invViewMat.getElement(3, 0) = position.x();
     invViewMat.getElement(3, 1) = position.y();
