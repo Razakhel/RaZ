@@ -397,7 +397,10 @@ void RenderSystem::copyToWindow(const Texture2D& colorBuffer, const Texture2D& d
 
   Renderer::bindFramebuffer(0);
   Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
+
+  Renderer::setDepthFunction(DepthStencilFunction::ALWAYS);
   windowCopyPass.execute();
+  Renderer::setDepthFunction(DepthStencilFunction::LESS);
 }
 
 } // namespace Raz

@@ -243,17 +243,14 @@ void Cubemap::draw() const {
   ZoneScopedN("Cubemap::draw");
   TracyGpuZone("Cubemap::draw")
 
-  Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);
-
   const MeshRenderer& displayCube = getDisplayCube();
 
   displayCube.getMaterials().front().getProgram().use();
-
   Renderer::activateTexture(0);
   bind();
 
+  Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);
   displayCube.draw();
-
   Renderer::setDepthFunction(DepthStencilFunction::LESS);
 }
 

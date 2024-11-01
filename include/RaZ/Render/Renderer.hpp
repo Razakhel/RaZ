@@ -409,18 +409,18 @@ enum class TextureInternalFormat : unsigned int {
   RGB16_SNORM  = 36762 /* GL_RGB16_SNORM  */, ///<
   RGBA16_SNORM = 36763 /* GL_RGBA16_SNORM */, ///<
 
-  R32I     = 33333 /* GL_R32I               */, ///<
-  RG32I    = 33339 /* GL_RG32I              */, ///<
-  RGB32I   = 36227 /* GL_RGB32I             */, ///<
-  RGBA32I  = 36226 /* GL_RGBA32I            */, ///<
-  R32UI    = 33334 /* GL_R32UI              */, ///<
-  RG32UI   = 33340 /* GL_RG32UI             */, ///<
-  RGB32UI  = 36209 /* GL_RGB32UI            */, ///<
-  RGBA32UI = 36208 /* GL_RGBA32UI           */, ///<
-  R32F     = 33326 /* GL_R32F               */, ///<
-  RG32F    = 33328 /* GL_RG32F              */, ///<
-  RGB32F   = 34837 /* GL_RGB32F             */, ///<
-  RGBA32F  = 34836 /* GL_RGBA32F            */, ///<
+  R32I     = 33333 /* GL_R32I     */, ///<
+  RG32I    = 33339 /* GL_RG32I    */, ///<
+  RGB32I   = 36227 /* GL_RGB32I   */, ///<
+  RGBA32I  = 36226 /* GL_RGBA32I  */, ///<
+  R32UI    = 33334 /* GL_R32UI    */, ///<
+  RG32UI   = 33340 /* GL_RG32UI   */, ///<
+  RGB32UI  = 36209 /* GL_RGB32UI  */, ///<
+  RGBA32UI = 36208 /* GL_RGBA32UI */, ///<
+  R32F     = 33326 /* GL_R32F     */, ///<
+  RG32F    = 33328 /* GL_RG32F    */, ///<
+  RGB32F   = 34837 /* GL_RGB32F   */, ///<
+  RGBA32F  = 34836 /* GL_RGBA32F  */, ///<
 
   RGB10_A2       = 32857 /* GL_RGB10_A2       */, ///<
   RGB10_A2UI     = 36975 /* GL_RGB10_A2UI     */, ///<

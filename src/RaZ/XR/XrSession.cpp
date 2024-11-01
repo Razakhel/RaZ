@@ -515,10 +515,11 @@ void XrSession::copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& 
   Renderer::bindFramebuffer(m_swapchainCopyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);
   Renderer::setFramebufferTexture2D(FramebufferAttachment::COLOR0, colorSwapchainImage, 0);
   Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, depthSwapchainImage, 0);
-
   Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
 
+  Renderer::setDepthFunction(DepthStencilFunction::ALWAYS);
   m_swapchainCopyPass.execute();
+  Renderer::setDepthFunction(DepthStencilFunction::LESS);
 }
 
 } // namespace Raz
