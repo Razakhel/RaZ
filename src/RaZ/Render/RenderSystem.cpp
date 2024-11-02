@@ -336,18 +336,25 @@ void RenderSystem::renderXrFrame() {
 
     m_renderGraph.execute(*this);
 
-    // TODO: the returned color buffer must be the one from the render pass executed last
-    const Framebuffer& geomFramebuffer = m_renderGraph.m_geometryPass.getFramebuffer();
-    return std::make_pair(std::cref(geomFramebuffer.getColorBuffer(0)), std::cref(geomFramebuffer.getDepthBuffer()));
+    assert("Error: There is no valid last executed pass." && m_renderGraph.m_lastExecutedPass);
+    const Framebuffer& finalFramebuffer = m_renderGraph.m_lastExecutedPass->getFramebuffer();
+    assert("Error: The last executed pass must have at least one write color buffer." && finalFramebuffer.getColorBufferCount() >= 1);
+    assert("Error: Either the last executed pass or the geometry pass must have a write depth buffer."
+      && (finalFramebuffer.hasDepthBuffer() || m_renderGraph.m_geometryPass.getFramebuffer().hasDepthBuffer()));
+
+    const Texture2D& depthBuffer = (finalFramebuffer.hasDepthBuffer() ? finalFramebuffer.getDepthBuffer()
+                                                                      : m_renderGraph.m_geometryPass.getFramebuffer().getDepthBuffer());
+    return std::make_pair(std::cref(finalFramebuffer.getColorBuffer(0)), std::cref(depthBuffer));
   });
 
 #if !defined(RAZ_NO_WINDOW)
   if (!hasRendered)
     return;
 
-  // TODO: the copied color buffer must be the one from the render pass executed last
-  const Framebuffer& geomFramebuffer = m_renderGraph.m_geometryPass.getFramebuffer();
-  copyToWindow(geomFramebuffer.getColorBuffer(0), geomFramebuffer.getDepthBuffer(), m_window->getWidth(), m_window->getHeight());
+  const Framebuffer& finalFramebuffer = m_renderGraph.m_lastExecutedPass->getFramebuffer();
+  const Texture2D& depthBuffer        = (finalFramebuffer.hasDepthBuffer() ? finalFramebuffer.getDepthBuffer()
+                                                                           : m_renderGraph.m_geometryPass.getFramebuffer().getDepthBuffer());
+  copyToWindow(finalFramebuffer.getColorBuffer(0), depthBuffer, m_window->getWidth(), m_window->getHeight());
 #endif
 }
 #endif

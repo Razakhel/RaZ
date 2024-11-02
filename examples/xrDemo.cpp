@@ -37,6 +37,7 @@ int main() {
     const auto colorBuffer = Raz::Texture2D::create(2468, 2584, Raz::TextureColorspace::RGBA);
     const auto depthBuffer = Raz::Texture2D::create(2468, 2584, Raz::TextureColorspace::DEPTH);
 
+    // The last executed pass *MUST* have a write color buffer, and at least the geometry pass *MUST* have a write depth buffer
     Raz::RenderPass& geomPass = render.getGeometryPass();
     geomPass.addWriteColorTexture(colorBuffer, 0);
     geomPass.setWriteDepthTexture(depthBuffer);

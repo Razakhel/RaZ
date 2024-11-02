@@ -44,6 +44,7 @@ void RenderGraph::execute(RenderSystem& renderSystem) {
   }
 
   executeGeometryPass(renderSystem);
+  m_lastExecutedPass = &m_geometryPass;
 
   m_executedPasses.reserve(m_nodes.size() + 1);
   m_executedPasses.emplace(&m_geometryPass);
@@ -110,6 +111,7 @@ void RenderGraph::executePass(const RenderPass& renderPass) {
     executePass(*parentPass);
 
   renderPass.execute();
+  m_lastExecutedPass = &renderPass;
 
   m_executedPasses.emplace(&renderPass);
 }

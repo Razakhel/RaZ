@@ -52,6 +52,7 @@ private:
   RenderPass m_geometryPass {};
   std::vector<std::unique_ptr<RenderProcess>> m_renderProcesses {};
   std::unordered_set<const RenderPass*> m_executedPasses {};
+  const RenderPass* m_lastExecutedPass {};
 };
 
 } // namespace Raz
