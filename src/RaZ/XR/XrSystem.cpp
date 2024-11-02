@@ -117,8 +117,8 @@ Vec2u XrSystem::recoverOptimalViewSize() const {
   return optimalViewSize;
 }
 
-void XrSystem::renderFrame(const ViewRenderFunc& viewRenderFunc) {
-  m_session.renderFrame(m_viewConfigViews, m_viewConfigType, m_environmentBlendMode, viewRenderFunc);
+bool XrSystem::renderFrame(const ViewRenderFunc& viewRenderFunc) {
+  return m_session.renderFrame(m_viewConfigViews, m_viewConfigType, m_environmentBlendMode, viewRenderFunc);
 }
 
 void XrSystem::recoverViewConfigurations() {

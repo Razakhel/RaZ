@@ -26,7 +26,7 @@ public:
 
 private:
   Vec2u recoverOptimalViewSize() const;
-  void renderFrame(const ViewRenderFunc& viewRenderFunc);
+  bool renderFrame(const ViewRenderFunc& viewRenderFunc);
 
   void recoverViewConfigurations();
   void recoverEnvironmentBlendModes();

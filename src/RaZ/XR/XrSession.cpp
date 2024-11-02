@@ -232,14 +232,14 @@ void XrSession::end() {
   Logger::debug("[XrSession] Ended session");
 }
 
-void XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConfigViews,
+bool XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConfigViews,
                             unsigned int viewConfigType,
                             unsigned int environmentBlendMode,
                             const ViewRenderFunc& viewRenderFunc) {
   ZoneScopedN("XrSession::renderFrame");
 
   if (!m_isRunning)
-    return;
+    return false;
 
   XrFrameWaitInfo frameWaitInfo {};
   frameWaitInfo.type = XR_TYPE_FRAME_WAIT_INFO;
@@ -275,6 +275,8 @@ void XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConf
     frameEndInfo.layers               = renderLayerInfo.layers.data();
     checkLog(xrEndFrame(m_handle, &frameEndInfo), "Failed to end the XR frame", m_instance);
   }
+
+  return !renderLayerInfo.layers.empty();
 }
 
 XrSession::~XrSession() {

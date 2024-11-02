@@ -42,7 +42,7 @@ public:
 
   void begin(unsigned int viewConfigType);
   void end();
-  void renderFrame(const std::vector<XrViewConfigurationView>& viewConfigViews,
+  bool renderFrame(const std::vector<XrViewConfigurationView>& viewConfigViews,
                    unsigned int viewConfigType,
                    unsigned int environmentBlendMode,
                    const ViewRenderFunc& viewRenderFunc);

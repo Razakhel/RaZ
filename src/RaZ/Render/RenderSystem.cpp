@@ -297,7 +297,7 @@ void RenderSystem::renderXrFrame() {
   ZoneScopedN("RenderSystem::renderXrFrame");
   TracyGpuZone("RenderSystem::renderXrFrame")
 
-  m_xrSystem->renderFrame([this] (Vec3f position, Quaternionf rotation, ViewFov viewFov) {
+  const bool hasRendered = m_xrSystem->renderFrame([this] (Vec3f position, Quaternionf rotation, ViewFov viewFov) {
     if (m_cameraEntity) {
       const auto& camTransform = m_cameraEntity->getComponent<Transform>();
       position = camTransform.getRotation() * position + camTransform.getPosition();
@@ -342,6 +342,9 @@ void RenderSystem::renderXrFrame() {
   });
 
 #if !defined(RAZ_NO_WINDOW)
+  if (!hasRendered)
+    return;
+
   // TODO: the copied color buffer must be the one from the render pass executed last
   const Framebuffer& geomFramebuffer = m_renderGraph.m_geometryPass.getFramebuffer();
   copyToWindow(geomFramebuffer.getColorBuffer(0), geomFramebuffer.getDepthBuffer(), m_window->getWidth(), m_window->getHeight());
