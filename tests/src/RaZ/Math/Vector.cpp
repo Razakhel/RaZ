@@ -7,6 +7,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <unordered_map>
+#include <utility>
 
 namespace {
 
@@ -320,6 +321,103 @@ TEST_CASE("Vector interpolation", "[math]") {
   CHECK_THAT(vec3d1.lerp(vec3d2, 0.5), IsNearlyEqualToVector((vec3d1 + vec3d2) / 2, 0.000000000000001));
   CHECK_THAT(vec3d1.lerp(vec3d2, 0.75), IsNearlyEqualToVector(Raz::Vec3d(5.232499999999998, 1188.0002499925003, 52.76909915874989)));
   CHECK_THAT(vec3d1.lerp(vec3d2, 1.0), IsNearlyEqualToVector(vec3d2, 0.000000000001));
+}
+
+TEST_CASE("Vector structured bindings", "[math]") {
+  static_assert(std::tuple_size_v<decltype(vec3b1)> == 3);
+  static_assert(std::tuple_size_v<decltype(vec4f1)> == 4);
+  static_assert(std::tuple_size_v<decltype(Raz::Vector<bool, 1>())> == 1);
+
+  static_assert(std::is_same_v<std::tuple_element_t<0, decltype(vec3i1)>, const int>);
+  static_assert(std::is_same_v<std::tuple_element_t<2, decltype(vec3d1)>, const double>);
+  static_assert(std::is_same_v<std::tuple_element_t<0, decltype(Raz::Vector<bool, 1>())>, bool>);
+  static_assert(std::is_same_v<std::tuple_element_t<0, decltype(Raz::Vector<const bool, 1>())>, const bool>);
+  static_assert(std::is_same_v<std::tuple_element_t<0, std::add_const_t<decltype(Raz::Vector<bool, 1>())>>, const bool>);
+
+  // When using structured bindings, Raz::get<I>(e) is exclusively found using ADL (https://en.cppreference.com/w/cpp/language/adl)
+  static_assert(Raz::get<0>(vec3f1) == vec3f1[0]);
+  static_assert(Raz::get<1>(vec3f1) == vec3f1[1]);
+  static_assert(Raz::get<2>(vec3f1) == vec3f1[2]);
+
+  {
+    const auto [x, y, z] = vec3b2;
+    static_assert(std::is_same_v<decltype(x), const uint8_t>);
+    static_assert(std::is_same_v<decltype(y), const uint8_t>);
+    static_assert(std::is_same_v<decltype(z), const uint8_t>);
+
+    CHECK(x == vec3b2.x());
+    CHECK(y == vec3b2.y());
+    CHECK(z == vec3b2.z());
+
+    // Elements are new variables
+    CHECK_FALSE(&x == &vec3b2.x());
+    CHECK_FALSE(&y == &vec3b2.y());
+    CHECK_FALSE(&z == &vec3b2.z());
+  }
+
+  {
+    const auto& [x, y, z] = vec3d2;
+    // decltype-ing a structured binding doesn't show a reference...
+    static_assert(std::is_same_v<decltype(x), const double>);
+    static_assert(std::is_same_v<decltype(y), const double>);
+    static_assert(std::is_same_v<decltype(z), const double>);
+    // ... but getting the elements independently does...
+    static_assert(std::is_same_v<decltype(Raz::get<0>(vec3d2)), const double&>);
+    static_assert(std::is_same_v<decltype(Raz::get<1>(vec3d2)), const double&>);
+    static_assert(std::is_same_v<decltype(Raz::get<2>(vec3d2)), const double&>);
+
+    CHECK(x == vec3d2.x());
+    CHECK(y == vec3d2.y());
+    CHECK(z == vec3d2.z());
+
+    // ... and the elements are linked as expected
+    CHECK(&x == &vec3d2.x());
+    CHECK(&y == &vec3d2.y());
+    CHECK(&z == &vec3d2.z());
+  }
+
+  {
+    Raz::Vector<bool, 1> boolVec(38);
+
+    {
+      const auto [x] = boolVec;
+      static_assert(std::is_same_v<decltype(x), const bool>);
+      CHECK(x == boolVec.x());
+      CHECK_FALSE(&x == &boolVec.x());
+    }
+
+    {
+      auto [x] = boolVec;
+      static_assert(std::is_same_v<decltype(x), bool>);
+      CHECK(x == boolVec.x());
+      CHECK_FALSE(&x == &boolVec.x());
+    }
+
+    {
+      const auto& [x] = boolVec;
+      static_assert(std::is_same_v<decltype(x), const bool>);
+      static_assert(std::is_same_v<decltype(Raz::get<0>(std::as_const(boolVec))), const bool&>);
+      CHECK(x == boolVec.x());
+      CHECK(&x == &boolVec.x());
+    }
+
+    {
+      auto& [x] = boolVec;
+      static_assert(std::is_same_v<decltype(x), bool>);
+      static_assert(std::is_same_v<decltype(Raz::get<0>(boolVec)), bool&>);
+      CHECK(x == boolVec.x());
+      CHECK(&x == &boolVec.x());
+    }
+
+    {
+      auto&& [x] = std::move(boolVec);
+      static_assert(std::is_same_v<decltype(x), bool>);
+      static_assert(std::is_same_v<decltype(Raz::get<0>(std::move(boolVec))), bool&&>); // xvalue
+      static_assert(std::is_same_v<decltype(Raz::get<0>(Raz::Vector<bool, 1>())), bool&&>); // prvalue
+      CHECK(x == boolVec.x());
+      CHECK(&x == &boolVec.x());
+    }
+  }
 }
 
 TEST_CASE("Vector hash", "[math]") {

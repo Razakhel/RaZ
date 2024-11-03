@@ -293,7 +293,47 @@ constexpr Vec3f Z(0.f, 0.f, 1.f);
 
 } // namespace Axis
 
+/// Vector element fetching function for a constant lvalue reference.
+/// \tparam I Index of the element.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+/// \param vec Vector to get the element from.
+/// \return Constant lvalue reference on the vector's element.
+template <std::size_t I, typename T, std::size_t Size>
+constexpr const T& get(const Vector<T, Size>& vec) noexcept { static_assert(I < Size); return vec[I]; }
+
+/// Vector element fetching function for a non-constant lvalue reference.
+/// \tparam I Index of the element.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+/// \param vec Vector to get the element from.
+/// \return Non-constant lvalue reference on the vector's element.
+template <std::size_t I, typename T, std::size_t Size>
+constexpr T& get(Vector<T, Size>& vec) noexcept { static_assert(I < Size); return vec[I]; }
+
+/// Vector element fetching function for a non-constant rvalue reference.
+/// \tparam I Index of the element.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+/// \param vec Vector to get the element from.
+/// \return Non-constant rvalue reference on the vector's element.
+template <std::size_t I, typename T, std::size_t Size>
+constexpr T&& get(Vector<T, Size>&& vec) noexcept { static_assert(I < Size); return std::move(vec[I]); }
+
 } // namespace Raz
+
+/// Specialization of std::tuple_size for Vector.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+template <typename T, std::size_t Size>
+struct std::tuple_size<Raz::Vector<T, Size>> : std::integral_constant<std::size_t, Size> {};
+
+/// Specialization of std::tuple_element for Vector.
+/// \tparam I Index of the element.
+/// \tparam T Type of the vector's data.
+/// \tparam Size Vector's size.
+template <std::size_t I, typename T, std::size_t Size>
+struct std::tuple_element<I, Raz::Vector<T, Size>> { using type = T; };
 
 /// Specialization of std::hash for Vector.
 /// \tparam T Type of the vector's data.
