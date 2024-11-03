@@ -205,6 +205,60 @@ TEST_CASE("Quaternion/quaternion multiplication", "[math]") {
                                                                        0.f,           0.f,           0.f,          1.f)));
 }
 
+TEST_CASE("Quaternion structured bindings", "[math]") {
+  static_assert(std::tuple_size_v<decltype(quat1)> == 4);
+  static_assert(std::tuple_size_v<decltype(Raz::Quaterniond::identity())> == 4);
+
+  static_assert(std::is_same_v<std::tuple_element_t<0, decltype(quat1)>, const float>);
+  static_assert(std::is_same_v<std::tuple_element_t<2, decltype(Raz::Quaterniond::identity())>, double>);
+  static_assert(std::is_same_v<std::tuple_element_t<3, decltype(Raz::Quaternion<const double>::identity())>, const double>);
+
+  // When using structured bindings, Raz::get<I>(e) is exclusively found using ADL (https://en.cppreference.com/w/cpp/language/adl)
+  CHECK(Raz::get<0>(quat1) == quat1.w());
+  CHECK(Raz::get<1>(quat1) == quat1.x());
+  CHECK(Raz::get<2>(quat1) == quat1.y());
+  CHECK(Raz::get<3>(quat1) == quat1.z());
+
+  {
+    const auto [w, x, y, z] = quat1;
+    static_assert(std::is_same_v<decltype(w), const float>);
+    static_assert(std::is_same_v<decltype(x), const float>);
+    static_assert(std::is_same_v<decltype(y), const float>);
+    static_assert(std::is_same_v<decltype(z), const float>);
+    // Only values are returned, never references
+    static_assert(std::is_same_v<decltype(Raz::get<0>(quat1)), float>);
+    static_assert(std::is_same_v<decltype(Raz::get<1>(quat1)), float>);
+    static_assert(std::is_same_v<decltype(Raz::get<2>(quat1)), float>);
+    static_assert(std::is_same_v<decltype(Raz::get<3>(quat1)), float>);
+
+    CHECK(w == quat1.w());
+    CHECK(x == quat1.x());
+    CHECK(y == quat1.y());
+    CHECK(z == quat1.z());
+  }
+
+  {
+    constexpr Raz::Quaterniond quatDouble(1.0, 2.0, 3.0, 4.0);
+    auto [w, x, y, z] = quatDouble;
+    static_assert(std::is_same_v<decltype(w), double>);
+    static_assert(std::is_same_v<decltype(x), double>);
+    static_assert(std::is_same_v<decltype(y), double>);
+    static_assert(std::is_same_v<decltype(z), double>);
+    // Only values are returned, never references
+    static_assert(std::is_same_v<decltype(Raz::get<0>(quatDouble)), double>);
+    static_assert(std::is_same_v<decltype(Raz::get<1>(quatDouble)), double>);
+    static_assert(std::is_same_v<decltype(Raz::get<2>(quatDouble)), double>);
+    static_assert(std::is_same_v<decltype(Raz::get<3>(quatDouble)), double>);
+
+    CHECK(w == quatDouble.w());
+    CHECK(x == quatDouble.x());
+    CHECK(y == quatDouble.y());
+    CHECK(z == quatDouble.z());
+  }
+
+  // Not checking structured bindings with reference types, as quaternions never return any
+}
+
 TEST_CASE("Quaternion near-equality", "[math]") {
   CHECK_FALSE(quat1 == quat2);
 

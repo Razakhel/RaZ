@@ -159,7 +159,32 @@ Quaternion(Degrees<T>, ...) -> Quaternion<T>;
 using Quaternionf = Quaternion<float>;
 using Quaterniond = Quaternion<double>;
 
+/// Quaternion element fetching function.
+/// \tparam I Index of the element (0, 1, 2 or 3 for the W, X, Y or Z component, respectively).
+/// \tparam T Type of the quaternion's data.
+/// \param quat Quaternion to get the element from.
+/// \return Quaternion's element.
+template <std::size_t I, typename T>
+constexpr T get(const Quaternion<T>& quat) noexcept {
+  static_assert(I < 4);
+  if constexpr (I == 0)      return quat.w();
+  else if constexpr (I == 1) return quat.x();
+  else if constexpr (I == 2) return quat.y();
+  else                       return quat.z();
+}
+
 } // namespace Raz
+
+/// Specialization of std::tuple_size for Quaternion.
+/// \tparam T Type of the quaternion's data.
+template <typename T>
+struct std::tuple_size<Raz::Quaternion<T>> : std::integral_constant<std::size_t, 4> {};
+
+/// Specialization of std::tuple_element for Quaternion.
+/// \tparam I Index of the element (0, 1, 2 or 3 for the W, X, Y or Z component, respectively).
+/// \tparam T Type of the quaternion's data.
+template <std::size_t I, typename T>
+struct std::tuple_element<I, Raz::Quaternion<T>> { using type = T; };
 
 #include "RaZ/Math/Quaternion.inl"
 
