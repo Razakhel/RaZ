@@ -11,6 +11,7 @@
 
 #include "openxr/openxr.h"
 #include "openxr/openxr_platform.h"
+
 #include "tracy/Tracy.hpp"
 
 #include <algorithm>

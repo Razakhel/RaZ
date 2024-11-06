@@ -26,8 +26,8 @@ void RenderSystem::setCubemap(Cubemap&& cubemap) {
 void RenderSystem::enableXr(XrSystem& xrSystem) {
   m_xrSystem = &xrSystem;
 
-  const Vec2u optimalViewSize = xrSystem.recoverOptimalViewSize();
-  resizeViewport(optimalViewSize.x(), optimalViewSize.y());
+  xrSystem.initializeSession();
+  resizeViewport(xrSystem.getOptimalViewWidth(), xrSystem.getOptimalViewHeight());
 }
 #endif
 

@@ -20,16 +20,18 @@ class XrSystem final : public System {
 public:
   explicit XrSystem(const std::string& appName);
 
+  unsigned int getOptimalViewWidth() const { return m_optimalViewWidth; }
+  unsigned int getOptimalViewHeight() const { return m_optimalViewHeight; }
+
   bool update(const FrameTimeInfo&) override;
 
   ~XrSystem() override;
 
 private:
-  Vec2u recoverOptimalViewSize() const;
-  bool renderFrame(const ViewRenderFunc& viewRenderFunc);
-
   void recoverViewConfigurations();
   void recoverEnvironmentBlendModes();
+  void initializeSession();
+  bool renderFrame(const ViewRenderFunc& viewRenderFunc);
   bool processSessionStateChanged(const XrEventDataSessionStateChanged& sessionStateChanged);
 
   XrContext m_context;
@@ -38,6 +40,8 @@ private:
   std::vector<unsigned int> m_viewConfigTypes;
   unsigned int m_viewConfigType {};
   std::vector<XrViewConfigurationView> m_viewConfigViews;
+  unsigned int m_optimalViewWidth {};
+  unsigned int m_optimalViewHeight {};
 
   std::vector<unsigned int> m_environmentBlendModes;
   unsigned int m_environmentBlendMode {};

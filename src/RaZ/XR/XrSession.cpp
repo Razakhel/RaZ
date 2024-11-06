@@ -1,6 +1,6 @@
-#include "RaZ/Data/Color.hpp"
 #include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Render/RenderPass.hpp"
 #include "RaZ/Utils/Logger.hpp"
 #include "RaZ/XR/XrContext.hpp"
 #include "RaZ/XR/XrSession.hpp"
@@ -158,61 +158,9 @@ enum class XrSession::SwapchainType : uint8_t {
   DEPTH
 };
 
-XrSession::XrSession(const XrContext& context) : m_instance{ context.m_instance },
-                                                 m_swapchainCopyPass(FragmentShader::loadFromSource(swapchainCopySource), "Swapchain copy pass") {
-  ZoneScopedN("XrSession::XrSession");
-
-  Logger::debug("[XrSession] Creating session...");
-
+XrSession::XrSession(const XrContext& context) : m_instance{ context.m_instance } {
   if (m_instance == XR_NULL_HANDLE)
     throw std::runtime_error("[XrSession] The XR instance must be valid");
-
-  if (!Renderer::isInitialized())
-    throw std::runtime_error("[XrSession] The renderer must be initialized");
-
-  PFN_xrGetOpenGLGraphicsRequirementsKHR xrGetOpenGLGraphicsRequirementsKHR {};
-  checkLog(xrGetInstanceProcAddr(m_instance,
-                                 "xrGetOpenGLGraphicsRequirementsKHR",
-                                 reinterpret_cast<PFN_xrVoidFunction*>(&xrGetOpenGLGraphicsRequirementsKHR)),
-           "Failed to get OpenGL graphics requirements get function",
-           m_instance);
-  XrGraphicsRequirementsOpenGLKHR graphicsRequirements {};
-  graphicsRequirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_OPENGL_KHR;
-  checkLog(xrGetOpenGLGraphicsRequirementsKHR(m_instance, context.m_systemId, &graphicsRequirements),
-           "Failed to get graphics requirements for OpenGL", m_instance);
-
-  const XrVersion graphicsApiVersion = XR_MAKE_VERSION(Renderer::getMajorVersion(), Renderer::getMinorVersion(), 0);
-  if (graphicsRequirements.minApiVersionSupported > graphicsApiVersion) {
-    const uint16_t requiredMajorVersion = XR_VERSION_MAJOR(graphicsRequirements.minApiVersionSupported);
-    const uint16_t requiredMinorVersion = XR_VERSION_MINOR(graphicsRequirements.minApiVersionSupported);
-    throw std::runtime_error("[XrSession] The current OpenGL version "
-                             + std::to_string(Renderer::getMajorVersion()) + '.' + std::to_string(Renderer::getMinorVersion())
-                             + " does not meet the minimum required version "
-                             + std::to_string(requiredMajorVersion) + '.' + std::to_string(requiredMinorVersion)
-                             + " for OpenXR");
-  }
-
-  const GraphicsBinding graphicsBinding = getGraphicsBinding();
-  XrSessionCreateInfo sessionCreateInfo {};
-  sessionCreateInfo.type        = XR_TYPE_SESSION_CREATE_INFO;
-  sessionCreateInfo.next        = &graphicsBinding;
-  sessionCreateInfo.createFlags = 0;
-  sessionCreateInfo.systemId    = context.m_systemId;
-  checkThrow(xrCreateSession(m_instance, &sessionCreateInfo, &m_handle), "Failed to create session", m_instance);
-
-  createReferenceSpace();
-
-  RenderShaderProgram& swapchainCopyProgram = m_swapchainCopyPass.getProgram();
-  swapchainCopyProgram.setAttribute(0, "uniFinalColorBuffer");
-  swapchainCopyProgram.setAttribute(1, "uniFinalDepthBuffer");
-  swapchainCopyProgram.sendAttributes();
-
-  constexpr DrawBuffer drawBuffer = DrawBuffer::COLOR_ATTACHMENT0;
-  Renderer::bindFramebuffer(m_swapchainCopyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);
-  Renderer::setDrawBuffers(1, &drawBuffer);
-  Renderer::bindFramebuffer(0);
-
-  Logger::debug("[XrSession] Created session");
 }
 
 void XrSession::begin(unsigned int viewConfigType) {
@@ -255,6 +203,7 @@ bool XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConf
   // TODO: either the application should use this display time, or the application's global & delta times should be used here somehow
   //  See:
   //  - https://registry.khronos.org/OpenXR/specs/1.0/man/html/xrWaitFrame.html#_description
+  //  - https://registry.khronos.org/OpenXR/specs/1.0/man/html/xrEndFrame.html#_description
   //  - https://registry.khronos.org/OpenXR/specs/1.0/man/html/XrTime.html
   //  - https://registry.khronos.org/OpenXR/specs/1.0/man/html/XR_KHR_convert_timespec_time.html
   renderLayerInfo.predictedDisplayTime = frameState.predictedDisplayTime;
@@ -292,10 +241,76 @@ XrSession::~XrSession() {
   Logger::debug("[XrSession] Destroyed session");
 }
 
+void XrSession::initialize(uint64_t systemId) {
+  ZoneScopedN("XrSession::initialize");
+
+  Logger::debug("[XrSession] Initializing...");
+
+  if (!Renderer::isInitialized())
+    throw std::runtime_error("[XrSession] The renderer must be initialized");
+
+  PFN_xrGetOpenGLGraphicsRequirementsKHR xrGetOpenGLGraphicsRequirementsKHR {};
+  checkLog(xrGetInstanceProcAddr(m_instance,
+                                 "xrGetOpenGLGraphicsRequirementsKHR",
+                                 reinterpret_cast<PFN_xrVoidFunction*>(&xrGetOpenGLGraphicsRequirementsKHR)),
+           "Failed to get OpenGL graphics requirements get function",
+           m_instance);
+  XrGraphicsRequirementsOpenGLKHR graphicsRequirements {};
+  graphicsRequirements.type = XR_TYPE_GRAPHICS_REQUIREMENTS_OPENGL_KHR;
+  checkLog(xrGetOpenGLGraphicsRequirementsKHR(m_instance, systemId, &graphicsRequirements),
+           "Failed to get graphics requirements for OpenGL", m_instance);
+
+  const XrVersion graphicsApiVersion = XR_MAKE_VERSION(Renderer::getMajorVersion(), Renderer::getMinorVersion(), 0);
+  if (graphicsRequirements.minApiVersionSupported > graphicsApiVersion) {
+    const uint16_t requiredMajorVersion = XR_VERSION_MAJOR(graphicsRequirements.minApiVersionSupported);
+    const uint16_t requiredMinorVersion = XR_VERSION_MINOR(graphicsRequirements.minApiVersionSupported);
+    throw std::runtime_error("[XrSession] The current OpenGL version "
+                             + std::to_string(Renderer::getMajorVersion()) + '.' + std::to_string(Renderer::getMinorVersion())
+                             + " does not meet the minimum required version "
+                             + std::to_string(requiredMajorVersion) + '.' + std::to_string(requiredMinorVersion)
+                             + " for OpenXR");
+  }
+
+  const GraphicsBinding graphicsBinding = getGraphicsBinding();
+  XrSessionCreateInfo sessionCreateInfo {};
+  sessionCreateInfo.type        = XR_TYPE_SESSION_CREATE_INFO;
+  sessionCreateInfo.next        = &graphicsBinding;
+  sessionCreateInfo.createFlags = 0;
+  sessionCreateInfo.systemId    = systemId;
+  checkThrow(xrCreateSession(m_instance, &sessionCreateInfo, &m_handle), "Failed to create session", m_instance);
+
+  createReferenceSpace();
+
+  Logger::debug("[XrSession] Initialized");
+}
+
+void XrSession::createReferenceSpace() {
+  ZoneScopedN("XrSession::createReferenceSpace");
+
+  Logger::debug("[XrSession] Creating reference space...");
+
+  XrReferenceSpaceCreateInfo referenceSpaceCreateInfo {};
+  referenceSpaceCreateInfo.type                 = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
+  referenceSpaceCreateInfo.referenceSpaceType   = XR_REFERENCE_SPACE_TYPE_LOCAL;
+  referenceSpaceCreateInfo.poseInReferenceSpace = { XrQuaternionf{ 0.f, 0.f, 0.f, 1.f }, XrVector3f{ 0.f, 0.f, 0.f }};
+  checkLog(xrCreateReferenceSpace(m_handle, &referenceSpaceCreateInfo, &m_localSpace), "Failed to create reference space", m_instance);
+
+  Logger::debug("[XrSession] Created reference space");
+}
+
+void XrSession::destroyReferenceSpace() {
+  Logger::debug("[XrSession] Destroying reference space...");
+  checkLog(xrDestroySpace(m_localSpace), "Failed to destroy space", m_instance);
+  Logger::debug("[XrSession] Destroyed reference space");
+}
+
 void XrSession::createSwapchains(const std::vector<XrViewConfigurationView>& viewConfigViews) {
   ZoneScopedN("XrSession::createSwapchains");
 
   Logger::debug("[XrSession] Creating swapchains...");
+
+  if (m_handle == nullptr)
+    throw std::runtime_error("[XrSession] The session has not been initialized");
 
   uint32_t formatCount {};
   checkLog(xrEnumerateSwapchainFormats(m_handle, 0, &formatCount, nullptr), "Failed to get swapchain format count", m_instance);
@@ -314,7 +329,8 @@ void XrSession::createSwapchains(const std::vector<XrViewConfigurationView>& vie
     XrSwapchain& depthSwapchain = m_depthSwapchains[viewIndex];
 
     XrSwapchainCreateInfo swapchainCreateInfo {};
-    swapchainCreateInfo.type        = XR_TYPE_SWAPCHAIN_CREATE_INFO;
+    swapchainCreateInfo.type = XR_TYPE_SWAPCHAIN_CREATE_INFO;
+
     swapchainCreateInfo.createFlags = 0;
     swapchainCreateInfo.usageFlags  = XR_SWAPCHAIN_USAGE_SAMPLED_BIT | XR_SWAPCHAIN_USAGE_COLOR_ATTACHMENT_BIT; // Technically ignored with OpenGL
     swapchainCreateInfo.format      = selectColorSwapchainFormat(formats);
@@ -379,26 +395,6 @@ void XrSession::createSwapchainImages(XrSwapchain swapchain, SwapchainType swapc
            m_instance);
 
   Logger::debug("[XrSession] Created " + typeStr + " swapchain images");
-}
-
-void XrSession::createReferenceSpace() {
-  ZoneScopedN("XrSession::createReferenceSpace");
-
-  Logger::debug("[XrSession] Creating reference space...");
-
-  XrReferenceSpaceCreateInfo referenceSpaceCreateInfo {};
-  referenceSpaceCreateInfo.type                 = XR_TYPE_REFERENCE_SPACE_CREATE_INFO;
-  referenceSpaceCreateInfo.referenceSpaceType   = XR_REFERENCE_SPACE_TYPE_LOCAL;
-  referenceSpaceCreateInfo.poseInReferenceSpace = { XrQuaternionf{ 0.f, 0.f, 0.f, 1.f }, XrVector3f{ 0.f, 0.f, 0.f }};
-  checkLog(xrCreateReferenceSpace(m_handle, &referenceSpaceCreateInfo, &m_localSpace), "Failed to create reference space", m_instance);
-
-  Logger::debug("[XrSession] Created reference space");
-}
-
-void XrSession::destroyReferenceSpace() {
-  Logger::debug("[XrSession] Destroying reference space...");
-  checkLog(xrDestroySpace(m_localSpace), "Failed to destroy space", m_instance);
-  Logger::debug("[XrSession] Destroyed reference space");
 }
 
 bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
@@ -505,22 +501,40 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
 }
 
 void XrSession::copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& depthBuffer, uint32_t colorSwapchainImage, uint32_t depthSwapchainImage) {
+  // https://docs.gl/gl4/glCopyImageSubData *could* be a viable and more direct solution, but expects both textures to have compatible internal formats
+  //  (https://registry.khronos.org/OpenGL/specs/gl/glspec46.core.pdf#page=295), which we simply cannot have any guarantee of
+
   ZoneScopedN("XrSession::copyToSwapchains");
   TracyGpuZone("XrSession::copyToSwapchains")
 
-  m_swapchainCopyPass.getProgram().use();
+  static RenderPass swapchainCopyPass = [] () {
+    RenderPass copyPass(FragmentShader::loadFromSource(swapchainCopySource), "Swapchain copy pass");
+
+    RenderShaderProgram& copyProgram = copyPass.getProgram();
+    copyProgram.setAttribute(0, "uniFinalColorBuffer");
+    copyProgram.setAttribute(1, "uniFinalDepthBuffer");
+
+    constexpr DrawBuffer drawBuffer = DrawBuffer::COLOR_ATTACHMENT0;
+    Renderer::bindFramebuffer(copyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);
+    Renderer::setDrawBuffers(1, &drawBuffer);
+    Renderer::bindFramebuffer(0);
+
+    return copyPass;
+  }();
+
+  swapchainCopyPass.getProgram().use();
   Renderer::activateTexture(0);
   colorBuffer.bind();
   Renderer::activateTexture(1);
   depthBuffer.bind();
 
-  Renderer::bindFramebuffer(m_swapchainCopyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);
+  Renderer::bindFramebuffer(swapchainCopyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);
   Renderer::setFramebufferTexture2D(FramebufferAttachment::COLOR0, colorSwapchainImage, 0);
   Renderer::setFramebufferTexture2D(FramebufferAttachment::DEPTH, depthSwapchainImage, 0);
   Renderer::clear(MaskType::COLOR | MaskType::DEPTH | MaskType::STENCIL);
 
   Renderer::setDepthFunction(DepthStencilFunction::ALWAYS);
-  m_swapchainCopyPass.execute();
+  swapchainCopyPass.execute();
   Renderer::setDepthFunction(DepthStencilFunction::LESS);
 }
 

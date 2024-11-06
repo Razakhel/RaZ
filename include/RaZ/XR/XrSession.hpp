@@ -4,7 +4,6 @@
 #define RAZ_XRSESSION_HPP
 
 #include "RaZ/Math/Angle.hpp"
-#include "RaZ/Render/RenderPass.hpp"
 
 using XrSession = struct XrSession_T*;
 struct XrInstance_T;
@@ -15,13 +14,8 @@ struct XrViewConfigurationView;
 
 namespace Raz {
 
-template <typename T>
-class Quaternion;
 using Quaternionf = Quaternion<float>;
-
-template <typename T, std::size_t Size>
-class Vector;
-using Vec3f = Vector<float, 3>;
+using Vec3f       = Vector<float, 3>;
 
 class Texture2D;
 class XrContext;
@@ -56,11 +50,12 @@ private:
   struct RenderLayerInfo;
   enum class SwapchainType : uint8_t;
 
+  void initialize(uint64_t systemId);
+  void createReferenceSpace();
+  void destroyReferenceSpace();
   void createSwapchains(const std::vector<XrViewConfigurationView>& viewConfigViews);
   void destroySwapchains();
   void createSwapchainImages(XrSwapchain swapchain, SwapchainType swapchainType);
-  void createReferenceSpace();
-  void destroyReferenceSpace();
   bool renderLayer(RenderLayerInfo& layerInfo,
                    const std::vector<XrViewConfigurationView>& viewConfigViews,
                    unsigned int viewConfigType,
@@ -72,13 +67,11 @@ private:
   int m_state {};
   bool m_isRunning = false;
 
+  XrSpace m_localSpace {};
+
   std::vector<XrSwapchain> m_colorSwapchains;
   std::vector<XrSwapchain> m_depthSwapchains;
   std::unordered_map<XrSwapchain, std::vector<XrSwapchainImageOpenGLKHR>> m_swapchainImages;
-
-  XrSpace m_localSpace {};
-
-  RenderPass m_swapchainCopyPass {};
 };
 
 } // namespace Raz

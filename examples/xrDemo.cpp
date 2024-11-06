@@ -11,8 +11,15 @@ int main() {
     Raz::Application app;
     Raz::World& world = app.addWorld();
 
-    // Dimensions of [2468, 2584] (definition of each view of the Meta Quest 2) divided by 3
-    auto& render = world.addSystem<Raz::RenderSystem>(823, 861, "RaZ", Raz::WindowSetting::NON_RESIZABLE);
+    auto& xr = world.addSystem<Raz::XrSystem>("RaZ - XR demo");
+
+    // The dimensions given to the window are of one third of the XR device's views. This works well for e.g. the Meta Quest 2, yielding dimensions
+    //   of [822; 861]. Ideally, this should be more flexible and make a window of a good enough size according to what the monitor allows
+    // In an XR application, the window shouldn't be resizable:
+    // - At the time of writing, resizing it will also resize the rendering viewport, breaking XR rendering (which requires fixed dimensions)
+    // - As the visualization depends on what's rendered from the XR device, which has its own definition for each view, the aspect ratio should be
+    //    maintained to preserve a clean, undistorted image
+    auto& render = world.addSystem<Raz::RenderSystem>(xr.getOptimalViewWidth() / 3, xr.getOptimalViewHeight() / 3, "RaZ", Raz::WindowSetting::NON_RESIZABLE);
 
     Raz::Window& window = render.getWindow();
 
@@ -20,7 +27,6 @@ int main() {
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
     // Enabling XR in the render system changes the render viewport's size according to what the detected XR device expects
-    auto& xr = world.addSystem<Raz::XrSystem>("RaZ - XR demo");
     render.enableXr(xr);
 
     // In an XR workflow, the camera is optional; its parameters aren't technically used, but its transform is

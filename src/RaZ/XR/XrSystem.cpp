@@ -1,12 +1,9 @@
-#include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Logger.hpp"
-#include "RaZ/XR/XrContext.hpp"
 #include "RaZ/XR/XrSystem.hpp"
 
 #include "openxr/openxr.h"
 
 #include <array>
-#include <cassert>
 
 namespace Raz {
 
@@ -62,7 +59,17 @@ void processEventData(const XrEventDataReferenceSpaceChangePending& referenceSpa
 
 XrSystem::XrSystem(const std::string& appName) : m_context(appName), m_session(m_context) {
   recoverViewConfigurations();
-  m_session.createSwapchains(m_viewConfigViews);
+
+  m_optimalViewWidth  = m_viewConfigViews.front().recommendedImageRectWidth;
+  m_optimalViewHeight = m_viewConfigViews.front().recommendedImageRectHeight;
+
+  if (m_viewConfigViews.size() > 1) {
+    for (const XrViewConfigurationView& viewConfigView : m_viewConfigViews) {
+      if (viewConfigView.recommendedImageRectWidth != m_optimalViewWidth || viewConfigView.recommendedImageRectHeight != m_optimalViewHeight)
+        Logger::warn("[XrSystem] The optimal configuration view size is not the same for all views; rendering may be altered");
+    }
+  }
+
   recoverEnvironmentBlendModes();
 }
 
@@ -101,25 +108,6 @@ bool XrSystem::update(const FrameTimeInfo&) {
 }
 
 XrSystem::~XrSystem() = default;
-
-Vec2u XrSystem::recoverOptimalViewSize() const {
-  assert("[XrSystem] View configuration views must be recovered before getting the optimal view size" && !m_viewConfigViews.empty());
-
-  Vec2u optimalViewSize(m_viewConfigViews.front().recommendedImageRectWidth, m_viewConfigViews.front().recommendedImageRectHeight);
-
-  if (m_viewConfigViews.size() > 1) {
-    for (const XrViewConfigurationView& viewConfigView : m_viewConfigViews) {
-      if (viewConfigView.recommendedImageRectWidth != optimalViewSize.x() || viewConfigView.recommendedImageRectHeight != optimalViewSize.y())
-        Logger::warn("[XrSystem] The optimal configuration view size is not the same for all views; rendering may be altered");
-    }
-  }
-
-  return optimalViewSize;
-}
-
-bool XrSystem::renderFrame(const ViewRenderFunc& viewRenderFunc) {
-  return m_session.renderFrame(m_viewConfigViews, m_viewConfigType, m_environmentBlendMode, viewRenderFunc);
-}
 
 void XrSystem::recoverViewConfigurations() {
   uint32_t viewConfigCount {};
@@ -199,6 +187,15 @@ void XrSystem::recoverEnvironmentBlendModes() {
     Logger::warn("Failed to find a compatible blend mode; defaulting to XR_ENVIRONMENT_BLEND_MODE_OPAQUE");
     m_environmentBlendMode = XR_ENVIRONMENT_BLEND_MODE_OPAQUE;
   }
+}
+
+void XrSystem::initializeSession() {
+  m_session.initialize(m_context.m_systemId);
+  m_session.createSwapchains(m_viewConfigViews);
+}
+
+bool XrSystem::renderFrame(const ViewRenderFunc& viewRenderFunc) {
+  return m_session.renderFrame(m_viewConfigViews, m_viewConfigType, m_environmentBlendMode, viewRenderFunc);
 }
 
 bool XrSystem::processSessionStateChanged(const XrEventDataSessionStateChanged& sessionStateChanged) {
