@@ -27,8 +27,9 @@ Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath =
   window.run(0.f);
 
   // Recovering the rendered frame into an image
-  Raz::Image renderedImg(window.getWidth(), window.getHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
-  Raz::Renderer::recoverFrame(window.getWidth(), window.getHeight(), Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, renderedImg.getDataPtr());
+  auto& renderSystem = world.getSystem<Raz::RenderSystem>();
+  Raz::Image renderedImg(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
+  Raz::Renderer::recoverFrame(renderedImg.getWidth(), renderedImg.getHeight(), Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, renderedImg.getDataPtr());
 
   if (!renderedImgPath.isEmpty())
     Raz::ImageFormat::save(renderedImgPath, renderedImg, true);
@@ -64,7 +65,7 @@ TEST_CASE("RenderSystem Cook-Torrance ball", "[render]") {
 
   Raz::Entity& camera = world.addEntity();
   auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f));
-  auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+  auto& cameraComp    = camera.addComponent<Raz::Camera>(renderSystem.getSceneWidth(), renderSystem.getSceneHeight());
 
   world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_TESTS_ROOT "../assets/meshes/ball.obj").second);
 
@@ -99,10 +100,10 @@ TEST_CASE("RenderSystem Cook-Torrance alpha mask", "[render]") {
 
   const Raz::Window& window = TestUtils::getWindow();
 
-  world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+  auto& renderSystem = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
 
   Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f));
-  camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+  camera.addComponent<Raz::Camera>(renderSystem.getSceneWidth(), renderSystem.getSceneHeight());
 
   Raz::Entity& plane = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f), Raz::Quaternionf(90_deg, Raz::Axis::X));
   auto& meshRenderer = plane.addComponent<Raz::MeshRenderer>(Raz::Mesh(Raz::Plane(0.f), 1.f, 1.f));

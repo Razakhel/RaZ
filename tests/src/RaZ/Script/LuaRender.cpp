@@ -588,6 +588,8 @@ TEST_CASE("LuaRender RenderSystem", "[script][lua][render]") {
     local renderSystem = RenderSystem.new()
     renderSystem       = RenderSystem.new(1, 1)
 
+    assert(renderSystem:getSceneWidth() == 1)
+    assert(renderSystem:getSceneHeight() == 1)
     assert(renderSystem:getGeometryPass() ~= nil)
     assert(renderSystem:getRenderGraph() ~= nil)
 

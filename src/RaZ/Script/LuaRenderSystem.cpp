@@ -27,6 +27,8 @@ void LuaWrapper::registerRenderSystemTypes() {
 #endif
                                                                                                   >(),
                                                                                 sol::base_classes, sol::bases<System>());
+    renderSystem["getSceneWidth"]      = &RenderSystem::getSceneWidth;
+    renderSystem["getSceneHeight"]     = &RenderSystem::getSceneHeight;
 #if !defined(RAZ_NO_WINDOW)
     renderSystem["hasWindow"]          = &RenderSystem::hasWindow;
     renderSystem["getWindow"]          = PickNonConstOverload<>(&RenderSystem::getWindow);

@@ -115,7 +115,7 @@ int main() {
 
     Raz::Entity& camera = world.addEntity();
     auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    camera.addComponent<Raz::Camera>(render.getSceneWidth(), render.getSceneHeight());
 
     //////////////////
     // Light entity //

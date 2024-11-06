@@ -10,7 +10,7 @@ window:setCloseCallback(function () app:quit() end)
 
 local camera = world:addEntity()
 camera:addComponent(Transform.new(Vec3f.new(0, 0, 5)))
-camera:addComponent(Camera.new(window:getWidth(), window:getHeight()))
+camera:addComponent(Camera.new(render:getSceneWidth(), render:getSceneHeight()))
 
 local shield      = world:addEntity()
 local shieldTrans = shield:addComponent(Transform.new(Vec3f.new(), Quaternionf.identity(), Vec3f.new(0.1)))

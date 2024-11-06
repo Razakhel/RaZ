@@ -27,7 +27,7 @@ int main() {
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
     Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    camera.addComponent<Raz::Camera>(render.getSceneWidth(), render.getSceneHeight());
 
     DemoUtils::setupCameraControls(camera, window);
 
@@ -53,8 +53,9 @@ int main() {
     Raz::RenderGraph& renderGraph = render.getRenderGraph();
     Raz::RenderPass& geometryPass = renderGraph.getGeometryPass();
 
-    const auto depthBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
-    const auto colorBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
+    const auto depthBuffer = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(), Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                    Raz::TextureColorspace::RGB, Raz::TextureDataType::FLOAT16);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {

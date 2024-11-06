@@ -58,16 +58,16 @@ int main() {
     // For demonstration purposes, a buffer is created here for each process' output. However, this is far from ideal;
     //   always reuse buffers across passes whenever you can, as it may save a lot of memory
     // Note though that a buffer cannot be set as both read & write in the same pass or process
-    const auto depthBuffer      = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::DEPTH);
-    const auto colorBuffer      = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto gradientBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto gradDirBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto edgeBuffer       = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::GRAY);
-    const auto edgeBlendBuffer  = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto chromAberrBuffer = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto blurredBuffer    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto vignetteBuffer   = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
-    const auto filmGrainBuffer  = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB);
+    const auto depthBuffer      = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer      = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
+    const auto gradientBuffer   = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
+    const auto gradDirBuffer    = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
+    const auto edgeBuffer       = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::GRAY);
+    const auto edgeBlendBuffer  = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
+    const auto chromAberrBuffer = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
+    const auto blurredBuffer    = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
+    const auto vignetteBuffer   = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
+    const auto filmGrainBuffer  = Raz::Texture2D::create(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::TextureColorspace::RGB);
 
 #if !defined(USE_OPENGL_ES)
     if (Raz::Renderer::checkVersion(4, 3)) {
@@ -174,7 +174,7 @@ int main() {
     ////////////
 
     Raz::Entity& camera = world.addEntity();
-    auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    auto& cameraComp    = camera.addComponent<Raz::Camera>(renderSystem.getSceneWidth(), renderSystem.getSceneHeight());
     auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
 
     DemoUtils::setupCameraControls(camera, window);

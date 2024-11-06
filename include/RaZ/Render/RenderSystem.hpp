@@ -52,6 +52,8 @@ public:
                                                                                                                                       m_window->getHeight()); }
 #endif
 
+  unsigned int getSceneWidth() const { return m_sceneWidth; }
+  unsigned int getSceneHeight() const { return m_sceneHeight; }
 #if !defined(RAZ_NO_WINDOW)
   bool hasWindow() const { return (m_window != nullptr); }
   const Window& getWindow() const { assert("Error: The window must be set before being accessed." && hasWindow()); return *m_window; }

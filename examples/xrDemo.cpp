@@ -19,12 +19,13 @@ int main() {
     window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float) noexcept { app.quit(); });
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
+    // Enabling XR in the render system changes the render viewport's size according to what the detected XR device expects
     auto& xr = world.addSystem<Raz::XrSystem>("RaZ - XR demo");
     render.enableXr(xr);
 
     // In an XR workflow, the camera is optional; its parameters aren't technically used, but its transform is
     auto& camera = world.addEntityWithComponent<Raz::Transform>();
-    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    camera.addComponent<Raz::Camera>(render.getSceneWidth(), render.getSceneHeight());
 
     DemoUtils::setupCameraControls(camera, window);
 
@@ -33,9 +34,8 @@ int main() {
 
     world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Z, 1.f, Raz::ColorPreset::White);
 
-    // TODO: the textures' dimensions must be the same as the rendering viewport's
-    const auto colorBuffer = Raz::Texture2D::create(2468, 2584, Raz::TextureColorspace::RGBA);
-    const auto depthBuffer = Raz::Texture2D::create(2468, 2584, Raz::TextureColorspace::DEPTH);
+    const auto colorBuffer = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(), Raz::TextureColorspace::RGBA);
+    const auto depthBuffer = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(), Raz::TextureColorspace::DEPTH);
 
     // The last executed pass *MUST* have a write color buffer, and at least the geometry pass *MUST* have a write depth buffer
     Raz::RenderPass& geomPass = render.getGeometryPass();

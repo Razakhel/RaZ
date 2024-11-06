@@ -17,7 +17,7 @@ int main() {
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
     Raz::Entity& camera = world.addEntity();
-    auto& cameraComp    = camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    auto& cameraComp    = camera.addComponent<Raz::Camera>(render.getSceneWidth(), render.getSceneHeight());
     auto& cameraTrans   = camera.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 10.f, 25.f));
     cameraComp.setCameraType(Raz::CameraType::LOOK_AT);
 

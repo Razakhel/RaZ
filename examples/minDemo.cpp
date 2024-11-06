@@ -15,7 +15,7 @@ int main() {
     window.setCloseCallback([&app] () noexcept { app.quit(); });
 
     Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 5.f));
-    camera.addComponent<Raz::Camera>(window.getWidth(), window.getHeight());
+    camera.addComponent<Raz::Camera>(render.getSceneWidth(), render.getSceneHeight());
 
     Raz::Entity& mesh = world.addEntityWithComponent<Raz::Transform>();
     mesh.addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);

@@ -43,15 +43,16 @@ TEST_CASE("CannyFilterRenderProcess execution", "[render]") {
   world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
   const Raz::Image gradientImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_sobel_grad.png", true);
-  REQUIRE(gradientImg.getWidth() == window.getWidth());
-  REQUIRE(gradientImg.getHeight() == window.getHeight());
+  REQUIRE(gradientImg.getWidth() == render.getSceneWidth());
+  REQUIRE(gradientImg.getHeight() == render.getSceneHeight());
   const Raz::Image gradDirImg  = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_sobel_grad_dir.png", true);
-  REQUIRE(gradDirImg.getWidth() == window.getWidth());
-  REQUIRE(gradDirImg.getHeight() == window.getHeight());
+  REQUIRE(gradDirImg.getWidth() == render.getSceneWidth());
+  REQUIRE(gradDirImg.getHeight() == render.getSceneHeight());
 
   Raz::Texture2DPtr gradientInput = Raz::Texture2D::create(gradientImg);
   Raz::Texture2DPtr gradDirInput  = Raz::Texture2D::create(gradDirImg);
-  const Raz::Texture2DPtr output  = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::GRAY, Raz::TextureDataType::BYTE);
+  const Raz::Texture2DPtr output  = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                           Raz::TextureColorspace::GRAY, Raz::TextureDataType::BYTE);
 
   auto& canny = render.getRenderGraph().addRenderProcess<Raz::CannyFilterRenderProcess>();
   canny.addParent(render.getGeometryPass());
@@ -82,11 +83,12 @@ TEST_CASE("ChromaticAberrationRenderProcess execution", "[render]") {
   world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
   const Raz::Image baseImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true);
-  REQUIRE(baseImg.getWidth() == window.getWidth());
-  REQUIRE(baseImg.getHeight() == window.getHeight());
+  REQUIRE(baseImg.getWidth() == render.getSceneWidth());
+  REQUIRE(baseImg.getHeight() == render.getSceneHeight());
 
   Raz::Texture2DPtr input = Raz::Texture2D::create(baseImg);
-  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                          Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& chromaticAberration = render.getRenderGraph().addRenderProcess<Raz::ChromaticAberrationRenderProcess>();
   chromaticAberration.addParent(render.getGeometryPass());
@@ -128,11 +130,12 @@ TEST_CASE("ConvolutionRenderProcess execution", "[render]") {
   world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
   const Raz::Image baseImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true);
-  REQUIRE(baseImg.getWidth() == window.getWidth());
-  REQUIRE(baseImg.getHeight() == window.getHeight());
+  REQUIRE(baseImg.getWidth() == render.getSceneWidth());
+  REQUIRE(baseImg.getHeight() == render.getSceneHeight());
 
   Raz::Texture2DPtr input = Raz::Texture2D::create(baseImg);
-  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                          Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   // Giving a unit kernel so that the output is the same as the input
   auto& convolution = render.getRenderGraph().addRenderProcess<Raz::ConvolutionRenderProcess>(Raz::Mat3f(0.f, 0.f, 0.f,
@@ -162,8 +165,9 @@ TEST_CASE("FilmGrainRenderProcess execution", "[render][!mayfail]") { // May fai
   // RenderSystem::update() needs a Camera with a Transform component
   world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
-  Raz::Texture2DPtr input = Raz::Texture2D::create(Raz::ColorPreset::White, window.getWidth(), window.getHeight());
-  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  Raz::Texture2DPtr input = Raz::Texture2D::create(Raz::ColorPreset::White, render.getSceneWidth(), render.getSceneHeight());
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                          Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& filmGrain = render.getRenderGraph().addRenderProcess<Raz::FilmGrainRenderProcess>();
   filmGrain.addParent(render.getGeometryPass());
@@ -189,11 +193,12 @@ TEST_CASE("PixelizationRenderProcess execution", "[render][!mayfail]") { // May 
   world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
   const Raz::Image baseImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true);
-  REQUIRE(baseImg.getWidth() == window.getWidth());
-  REQUIRE(baseImg.getHeight() == window.getHeight());
+  REQUIRE(baseImg.getWidth() == render.getSceneWidth());
+  REQUIRE(baseImg.getHeight() == render.getSceneHeight());
 
   Raz::Texture2DPtr input = Raz::Texture2D::create(baseImg);
-  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                          Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& pixelization = render.getRenderGraph().addRenderProcess<Raz::PixelizationRenderProcess>();
   pixelization.addParent(render.getGeometryPass());
@@ -219,12 +224,14 @@ TEST_CASE("SobelFilterRenderProcess execution", "[render]") {
   world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
   const Raz::Image baseImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true);
-  REQUIRE(baseImg.getWidth() == window.getWidth());
-  REQUIRE(baseImg.getHeight() == window.getHeight());
+  REQUIRE(baseImg.getWidth() == render.getSceneWidth());
+  REQUIRE(baseImg.getHeight() == render.getSceneHeight());
 
   Raz::Texture2DPtr input = Raz::Texture2D::create(baseImg);
-  const Raz::Texture2DPtr outputGrad    = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
-  const Raz::Texture2DPtr outputGradDir = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  const Raz::Texture2DPtr outputGrad    = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                                 Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  const Raz::Texture2DPtr outputGradDir = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                                 Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& sobel = render.getRenderGraph().addRenderProcess<Raz::SobelFilterRenderProcess>();
   sobel.addParent(render.getGeometryPass());
@@ -249,8 +256,9 @@ TEST_CASE("VignetteRenderProcess execution", "[render]") {
   // RenderSystem::update() needs a Camera with a Transform component
   world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
 
-  Raz::Texture2DPtr input = Raz::Texture2D::create(Raz::ColorPreset::White, window.getWidth(), window.getHeight());
-  const Raz::Texture2DPtr output = Raz::Texture2D::create(window.getWidth(), window.getHeight(), Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
+  Raz::Texture2DPtr input = Raz::Texture2D::create(Raz::ColorPreset::White, render.getSceneWidth(), render.getSceneHeight());
+  const Raz::Texture2DPtr output = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(),
+                                                          Raz::TextureColorspace::RGB, Raz::TextureDataType::BYTE);
 
   auto& vignette = render.getRenderGraph().addRenderProcess<Raz::VignetteRenderProcess>();
   vignette.addParent(render.getGeometryPass());
