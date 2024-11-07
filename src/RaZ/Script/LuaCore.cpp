@@ -8,6 +8,7 @@
 #include "RaZ/Render/RenderSystem.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
+#include "RaZ/XR/XrSystem.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
 #include "sol/sol.hpp"
@@ -72,6 +73,9 @@ void LuaWrapper::registerCoreTypes() {
                                                                                 WindowSetting, uint8_t>
 #endif
                                                               );
+#if defined(RAZ_USE_XR)
+    world["addXrSystem"]                      = &World::addSystem<XrSystem, const std::string&>;
+#endif
     world["addEntity"]                        = sol::overload([] (World& w) { return &w.addEntity(); },
                                                               PickOverload<bool>(&World::addEntity));
     world["removeEntity"]                     = &World::removeEntity;

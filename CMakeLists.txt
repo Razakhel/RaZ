@@ -470,6 +470,14 @@ else ()
     message(STATUS "[RaZ] Lua scripting DISABLED")
 endif ()
 
+if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN AND RAZ_USE_WINDOW)
+    # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
+    # TODO: requiring windowing currently makes XR unavailable from the GUI editor, as it handles the windowing part on its own
+    target_link_libraries(RaZ PRIVATE OpenXR)
+else ()
+    list(REMOVE_ITEM RAZ_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaXr.cpp")
+endif ()
+
 # The target is always linked, as the include files & their macros should be unconditionally available for ease of use; Tracy macros do something only
 #  if the expected definition is available, which only is if the related CMake option is set
 # It also always compiles the implementation file, but making it conditional would be much more of a hassle. This may change in the future
@@ -482,12 +490,6 @@ else ()
 endif ()
 
 target_link_libraries(RaZ PRIVATE fastgltf simdjson stb)
-
-if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN AND RAZ_USE_WINDOW)
-    # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
-    # TODO: this makes XR unavailable from the GUI editor
-    target_link_libraries(RaZ PRIVATE OpenXR)
-endif ()
 
 # Compiling RaZ's sources
 target_sources(RaZ PRIVATE ${RAZ_FILES})

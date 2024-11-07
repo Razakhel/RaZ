@@ -52,6 +52,7 @@ private:
   static void registerUtilsTypes();
   static void registerVectorTypes();
   static void registerWindowTypes();
+  static void registerXrTypes();
 
   static sol::state& getState();
 };

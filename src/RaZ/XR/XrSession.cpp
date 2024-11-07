@@ -183,7 +183,7 @@ void XrSession::end() {
 bool XrSession::renderFrame(const std::vector<XrViewConfigurationView>& viewConfigViews,
                             unsigned int viewConfigType,
                             unsigned int environmentBlendMode,
-                            const ViewRenderFunc& viewRenderFunc) {
+                            const ViewRenderFunc& viewRenderFunc) const {
   ZoneScopedN("XrSession::renderFrame");
 
   if (!m_isRunning)
@@ -400,7 +400,7 @@ void XrSession::createSwapchainImages(XrSwapchain swapchain, SwapchainType swapc
 bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
                             const std::vector<XrViewConfigurationView>& viewConfigViews,
                             unsigned int viewConfigType,
-                            const ViewRenderFunc& viewRenderFunc) {
+                            const ViewRenderFunc& viewRenderFunc) const {
   ZoneScopedN("XrSession::renderLayer");
 
   std::vector<XrView> views(m_swapchainImages.size(), { XR_TYPE_VIEW });
@@ -500,7 +500,7 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
   return true;
 }
 
-void XrSession::copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& depthBuffer, uint32_t colorSwapchainImage, uint32_t depthSwapchainImage) {
+void XrSession::copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& depthBuffer, uint32_t colorSwapchainImage, uint32_t depthSwapchainImage) const {
   // https://docs.gl/gl4/glCopyImageSubData *could* be a viable and more direct solution, but expects both textures to have compatible internal formats
   //  (https://registry.khronos.org/OpenGL/specs/gl/glspec46.core.pdf#page=295), which we simply cannot have any guarantee of
 

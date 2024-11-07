@@ -133,7 +133,7 @@ private:
   std::optional<Cubemap> m_cubemap {};
 
 #if defined(RAZ_USE_XR)
-  XrSystem* m_xrSystem {};
+  const XrSystem* m_xrSystem {};
 #endif
 };
 

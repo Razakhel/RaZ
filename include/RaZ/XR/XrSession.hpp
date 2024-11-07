@@ -5,6 +5,8 @@
 
 #include "RaZ/Math/Angle.hpp"
 
+#include <functional>
+
 using XrSession = struct XrSession_T*;
 struct XrInstance_T;
 struct XrSpace_T;
@@ -39,7 +41,7 @@ public:
   bool renderFrame(const std::vector<XrViewConfigurationView>& viewConfigViews,
                    unsigned int viewConfigType,
                    unsigned int environmentBlendMode,
-                   const ViewRenderFunc& viewRenderFunc);
+                   const ViewRenderFunc& viewRenderFunc) const;
 
   ~XrSession();
 
@@ -59,8 +61,8 @@ private:
   bool renderLayer(RenderLayerInfo& layerInfo,
                    const std::vector<XrViewConfigurationView>& viewConfigViews,
                    unsigned int viewConfigType,
-                   const ViewRenderFunc& viewRenderFunc);
-  void copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& depthBuffer, uint32_t colorSwapchainImage, uint32_t depthSwapchainImage);
+                   const ViewRenderFunc& viewRenderFunc) const;
+  void copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& depthBuffer, uint32_t colorSwapchainImage, uint32_t depthSwapchainImage) const;
 
   ::XrSession m_handle {};
   XrInstance m_instance {};

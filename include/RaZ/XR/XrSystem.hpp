@@ -31,7 +31,7 @@ private:
   void recoverViewConfigurations();
   void recoverEnvironmentBlendModes();
   void initializeSession();
-  bool renderFrame(const ViewRenderFunc& viewRenderFunc);
+  bool renderFrame(const ViewRenderFunc& viewRenderFunc) const;
   bool processSessionStateChanged(const XrEventDataSessionStateChanged& sessionStateChanged);
 
   XrContext m_context;

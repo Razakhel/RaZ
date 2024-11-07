@@ -194,7 +194,7 @@ void XrSystem::initializeSession() {
   m_session.createSwapchains(m_viewConfigViews);
 }
 
-bool XrSystem::renderFrame(const ViewRenderFunc& viewRenderFunc) {
+bool XrSystem::renderFrame(const ViewRenderFunc& viewRenderFunc) const {
   return m_session.renderFrame(m_viewConfigViews, m_viewConfigType, m_environmentBlendMode, viewRenderFunc);
 }
 

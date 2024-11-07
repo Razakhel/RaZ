@@ -603,6 +603,7 @@ TEST_CASE("LuaRender RenderSystem", "[script][lua][render]") {
     renderSystem:updateLights()
     renderSystem:updateShaders()
     renderSystem:updateMaterials()
+    renderSystem:updateMaterials(MeshRenderer.new())
     renderSystem:saveToImage(FilePath.new("téstÊxpørt.jpg"))
     renderSystem:saveToImage(FilePath.new("téstÊxpørt.hdr"), TextureFormat.DEPTH)
     renderSystem:saveToImage(FilePath.new("téstÊxpørt.png"), TextureFormat.RGBA, PixelDataType.UBYTE)
@@ -626,6 +627,8 @@ TEST_CASE("LuaRender RenderSystem", "[script][lua][render]") {
     renderSystem:createWindow(1, 1, "Test", WindowSetting.INVISIBLE, 1)
   )"));
 #endif
+
+  // Enabling XR rendering cannot be tested, as it requires having available XR device & runtime
 }
 
 TEST_CASE("LuaRender Shader", "[script][lua][render]") {

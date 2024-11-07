@@ -46,6 +46,9 @@ void LuaWrapper::registerTypes() {
 #if !defined(RAZ_NO_WINDOW)
     registerWindowTypes();
 #endif
+#if !defined(__APPLE__) && !defined(__EMSCRIPTEN__) && !defined(RAZ_NO_WINDOW)
+    registerXrTypes();
+#endif
 
     Logger::debug("[LuaWrapper] Registered types");
 
