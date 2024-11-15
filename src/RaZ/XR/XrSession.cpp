@@ -423,9 +423,9 @@ bool XrSession::renderLayer(RenderLayerInfo& layerInfo,
   layerInfo.layerProjectionViews.resize(viewCount, { XR_TYPE_COMPOSITION_LAYER_PROJECTION_VIEW });
 
   for (uint32_t viewIndex = 0; viewIndex < viewCount; ++viewIndex) {
-    const char* eyeStr = (viewCount == 1 ? "Single view"
-                       : (viewIndex == 0 ? "Left eye"
-                                         : "Right eye"));
+    [[maybe_unused]] const char* eyeStr = (viewCount == 1 ? "Single view"
+                                        : (viewIndex == 0 ? "Left eye"
+                                                          : "Right eye"));
 
     ZoneTransientN(cpuEyeZone, eyeStr, true);
 

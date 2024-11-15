@@ -239,18 +239,6 @@ set(
     include/RaZ/Utils/*.inl
 )
 
-if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN AND RAZ_USE_WINDOW)
-    # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
-    # TODO: this makes XR unavailable from the GUI editor
-    list(
-        APPEND
-        RAZ_SRC
-
-        src/RaZ/XR/*.cpp
-        include/RaZ/XR/*.hpp
-    )
-endif ()
-
 # Adding every file to be compiled
 file(
     GLOB
@@ -473,6 +461,16 @@ endif ()
 if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN AND RAZ_USE_WINDOW)
     # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
     # TODO: requiring windowing currently makes XR unavailable from the GUI editor, as it handles the windowing part on its own
+
+    file(
+        GLOB
+        RAZ_XR_FILES
+
+        "${PROJECT_SOURCE_DIR}/src/RaZ/XR/*.cpp"
+        "${PROJECT_SOURCE_DIR}/include/RaZ/XR/*.hpp"
+    )
+    list(APPEND RAZ_FILES ${RAZ_XR_FILES})
+
     target_link_libraries(RaZ PRIVATE OpenXR)
 else ()
     list(REMOVE_ITEM RAZ_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaXr.cpp")
