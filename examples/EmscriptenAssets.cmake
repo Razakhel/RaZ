@@ -177,31 +177,33 @@ target_link_options(
 # Assets - ScriptDemo #
 #######################
 
-set(
-    RaZ_ScriptDemo_ASSETS
+if (RAZ_USE_LUA)
+    set(
+        RaZ_ScriptDemo_ASSETS
 
-    assets/meshes/shield.obj
-    assets/materials/shield.mtl
-    assets/textures/shield_albedo.png
-    assets/textures/shield_normal.png
-    assets/textures/shield_metallic.png
-    assets/textures/shield_roughness.png
-    assets/textures/shield_ao.png
-)
+        assets/meshes/shield.obj
+        assets/materials/shield.mtl
+        assets/textures/shield_albedo.png
+        assets/textures/shield_normal.png
+        assets/textures/shield_metallic.png
+        assets/textures/shield_roughness.png
+        assets/textures/shield_ao.png
+    )
 
-foreach (ASSET_PATH ${RaZ_ScriptDemo_ASSETS})
-    target_link_options(RaZ_ScriptDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
-endforeach ()
+    foreach (ASSET_PATH ${RaZ_ScriptDemo_ASSETS})
+        target_link_options(RaZ_ScriptDemo PRIVATE "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/${ASSET_PATH}@${ASSET_PATH}")
+    endforeach ()
 
-target_link_options(
-    RaZ_ScriptDemo
+    target_link_options(
+        RaZ_ScriptDemo
 
-    PRIVATE
+        PRIVATE
 
-    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/scripts@scripts"
-    "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
-    "SHELL:-s ALLOW_MEMORY_GROWTH=1"
-)
+        "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/scripts@scripts"
+        "SHELL:--preload-file ${CMAKE_SOURCE_DIR}/shaders@shaders"
+        "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+    )
+endif ()
 
 ####################
 # Assets - SSRDemo #

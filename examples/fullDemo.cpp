@@ -219,6 +219,7 @@ int main() {
     // Scripting //
     ///////////////
 
+#if !defined(RAZ_NO_LUA)
     constexpr std::string_view luaScriptSource = R"(
 local rotAngle = Degreesf.new(20)
 
@@ -235,6 +236,7 @@ end)";
     world.addSystem<Raz::ScriptSystem>();
 
     auto& luaScript = mesh.addComponent<Raz::LuaScript>(luaScriptSource.data());
+#endif
 
     ///////////
     // Audio //
@@ -272,6 +274,7 @@ end)";
     DemoUtils::insertOverlayCullingOption(window, overlay);
     DemoUtils::insertOverlayVerticalSyncOption(window, overlay);
 
+#if !defined(RAZ_NO_LUA)
     constexpr float overlayScriptWidth        = 600.f;
     constexpr float overlayScriptSourceHeight = 225.f;
     constexpr float overlayScriptHeight       = overlayScriptSourceHeight + 60.f;
@@ -300,6 +303,7 @@ end)";
     });
 
     overlay.addButton("Edit script", [&overlayScript] () noexcept { overlayScript.enable(!overlayScript.isEnabled()); });
+#endif
 
     overlay.addSeparator();
 

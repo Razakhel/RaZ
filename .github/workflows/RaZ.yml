@@ -10,6 +10,7 @@ jobs:
   linux:
     name: "Linux (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
       ${{ !matrix.use_audio && ', no audio' || '' }}\
+      ${{ !matrix.use_lua && ', no Lua' || '' }}\
       ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: ubuntu-latest
 
@@ -24,11 +25,14 @@ jobs:
           - Release
         use_audio:
           - true
+        use_lua:
+          - true
         use_window:
           - true
         include:
-          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: false, use_window: true }
-          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_window: false }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: false, use_lua: true, use_window: true }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: false, use_window: true }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: true, use_window: false }
 
     steps:
     - uses: actions/checkout@v4
@@ -77,6 +81,7 @@ jobs:
               -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
               -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON \
               -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_USE_LUA=${{ matrix.use_lua && 'ON' || 'OFF' }} \
               -DRAZ_USE_WINDOW=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_IMGUI=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON ${{ matrix.compiler.c == 'gcc' && '-DRAZ_ENABLE_COVERAGE=ON' || '' }} \
@@ -112,7 +117,7 @@ jobs:
 
     # Preparing code coverage; only done with GCC in Debug with all features enabled
     - name: Coverage setup
-      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_window
+      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_lua && matrix.use_window
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
@@ -121,7 +126,7 @@ jobs:
 
     # Processing code coverage; only done with GCC in Debug with all features enabled
     - name: Coverage processing
-      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_window
+      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_lua && matrix.use_window
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -133,7 +138,7 @@ jobs:
       run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      if: matrix.use_audio && matrix.use_window
+      if: matrix.use_audio && matrix.use_lua && matrix.use_window
       uses: actions/upload-artifact@v4
       with:
         name: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
@@ -148,6 +153,7 @@ jobs:
   windows:
     name: "Windows (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
       ${{ !matrix.use_audio && ', no audio' || '' }}\
+      ${{ !matrix.use_lua && ', no Lua' || '' }}\
       ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: windows-2022
     env:
@@ -163,11 +169,14 @@ jobs:
           - Release
         use_audio:
           - true
+        use_lua:
+          - true
         use_window:
           - true
         include:
-          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: false, use_window: true }
-          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: true, use_window: false }
+          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: false, use_lua: true, use_window: true }
+          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: true, use_lua: false, use_window: true }
+          - { compiler: { c: cl, cpp: cl }, build_type: Debug, use_audio: true, use_lua: true, use_window: false }
 
     steps:
     - uses: actions/checkout@v4
@@ -202,6 +211,7 @@ jobs:
               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
               -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF \
               -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_USE_LUA=${{ matrix.use_lua && 'ON' || 'OFF' }} \
               -DRAZ_USE_WINDOW=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_IMGUI=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON \
@@ -221,7 +231,7 @@ jobs:
       run: cmake --install . --prefix C:/RaZ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      if: matrix.use_audio && matrix.use_window
+      if: matrix.use_audio && matrix.use_lua && matrix.use_window
       uses: actions/upload-artifact@v4
       with:
         name: RaZ-windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
@@ -235,6 +245,7 @@ jobs:
   macos:
     name: "macOS (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
       ${{ !matrix.use_audio && ', no audio' || '' }}\
+      ${{ !matrix.use_lua && ', no Lua' || '' }}\
       ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: macos-latest
 
@@ -248,11 +259,14 @@ jobs:
           - Release
         use_audio:
           - true
+        use_lua:
+          - true
         use_window:
           - true
         include:
-          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: false, use_window: true }
-          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: true, use_window: false }
+          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: false, use_lua: true, use_window: true }
+          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: true, use_lua: false, use_window: true }
+          - { compiler: { c: clang, cpp: clang++ }, build_type: Debug, use_audio: true, use_lua: true, use_window: false }
 
     steps:
     - uses: actions/checkout@v4
@@ -278,6 +292,7 @@ jobs:
               -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
               -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF \
               -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+              -DRAZ_USE_LUA=${{ matrix.use_lua && 'ON' || 'OFF' }} \
               -DRAZ_USE_WINDOW=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_IMGUI=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON \
@@ -298,7 +313,7 @@ jobs:
       run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      if: matrix.use_audio && matrix.use_window
+      if: matrix.use_audio && matrix.use_lua && matrix.use_window
       uses: actions/upload-artifact@v4
       with:
         name: RaZ-macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
@@ -312,7 +327,8 @@ jobs:
 
   emscripten:
     name: "Emscripten (${{ matrix.compiler.c }}, ${{ matrix.build_type }}\
-      ${{ !matrix.use_audio && ', no audio' || '' }})"
+      ${{ !matrix.use_audio && ', no audio' || '' }}\
+      ${{ !matrix.use_lua && ', no Lua' || '' }})"
     runs-on: ubuntu-latest
     env:
       EMSCRIPTEN_VERSION: 3.1.0 # The 'latest' version may fail to build
@@ -327,8 +343,11 @@ jobs:
           - Release
         use_audio:
           - true
+        use_lua:
+          - true
         include:
-          - { compiler: { c: emcc, cpp: em++ }, build_type: Debug, use_audio: false }
+          - { compiler: { c: emcc, cpp: em++ }, build_type: Debug, use_audio: false, use_lua: true }
+          - { compiler: { c: emcc, cpp: em++ }, build_type: Debug, use_audio: true, use_lua: false }
 
     steps:
       - uses: actions/checkout@v4
@@ -382,6 +401,7 @@ jobs:
                         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                         -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=OFF \
                         -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
+                        -DRAZ_USE_LUA=${{ matrix.use_lua && 'ON' || 'OFF' }} \
                         -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON ${{ matrix.build_type == 'Debug' && '-DRAZ_EMSCRIPTEN_DEBUG_FAST_LINK=ON' || '' }} \
                         -DSKIP_RENDERER_ERRORS=ON -DENABLE_DEBUG_INFO=ON \
                         $GITHUB_WORKSPACE &&
