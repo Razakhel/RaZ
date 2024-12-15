@@ -97,6 +97,7 @@ TEST_CASE("LuaCore World", "[script][lua][core]") {
     world:addPhysicsSystem()
     world:addRenderSystem()
     world:addRenderSystem(1, 1)
+    world:addTriggerSystem()
   )"));
 
 #if defined(RAZ_USE_AUDIO)

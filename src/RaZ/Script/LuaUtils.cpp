@@ -5,6 +5,8 @@
 #include "RaZ/Utils/Ray.hpp"
 #include "RaZ/Utils/Shape.hpp"
 #include "RaZ/Utils/StrUtils.hpp"
+#include "RaZ/Utils/TriggerSystem.hpp"
+#include "RaZ/Utils/TriggerVolume.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
@@ -108,6 +110,29 @@ void LuaWrapper::registerUtilsTypes() {
     strUtils["trimRightCopy"]   = PickOverload<std::string>(&StrUtils::trimRightCopy);
     strUtils["trimCopy"]        = PickOverload<std::string>(&StrUtils::trimCopy);
     strUtils["split"]           = PickOverload<std::string, char>(&StrUtils::split);
+  }
+
+  {
+    state.new_usertype<Triggerer>("Triggerer", sol::constructors<Triggerer()>());
+  }
+
+  {
+    state.new_usertype<TriggerSystem>("TriggerSystem", sol::constructors<TriggerSystem()>());
+  }
+
+  {
+    sol::usertype<TriggerVolume> triggerVolume = state.new_usertype<TriggerVolume>("TriggerVolume",
+                                                                                   sol::constructors<TriggerVolume(const AABB&),
+                                                                                                     TriggerVolume(const Sphere&)>());
+    triggerVolume["setEnterAction"]   = &TriggerVolume::setEnterAction;
+    triggerVolume["setStayAction"]    = &TriggerVolume::setStayAction;
+    triggerVolume["setLeaveAction"]   = &TriggerVolume::setLeaveAction;
+    triggerVolume["enable"]           = sol::overload([] (TriggerVolume& v) { v.enable(); },
+                                                      PickOverload<bool>(&TriggerVolume::enable));
+    triggerVolume["disable"]          = &TriggerVolume::disable;
+    triggerVolume["resetEnterAction"] = &TriggerVolume::resetEnterAction;
+    triggerVolume["resetStayAction"]  = &TriggerVolume::resetStayAction;
+    triggerVolume["resetLeaveAction"] = &TriggerVolume::resetLeaveAction;
   }
 }
 

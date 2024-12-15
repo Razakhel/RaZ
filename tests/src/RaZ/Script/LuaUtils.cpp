@@ -185,3 +185,23 @@ TEST_CASE("LuaUtils StrUtils", "[script][lua][utils]") {
     assert(splittedStr[4] == "test")
   )"));
 }
+
+TEST_CASE("LuaUtils TriggerVolume", "[script][lua][utils]") {
+  CHECK(TestUtils::executeLuaScript(R"(
+    local triggerer = Triggerer.new()
+
+    local triggerSystem = TriggerSystem.new()
+
+    local triggerVolume = TriggerVolume.new(AABB.new(Vec3f.new(-1), Vec3f.new(1)))
+    triggerVolume       = TriggerVolume.new(Sphere.new(Vec3f.new(0), 1))
+    triggerVolume:setEnterAction(function () end)
+    triggerVolume:setStayAction(function () end)
+    triggerVolume:setLeaveAction(function () end)
+    triggerVolume:enable()
+    triggerVolume:enable(true)
+    triggerVolume:disable()
+    triggerVolume:resetEnterAction()
+    triggerVolume:resetStayAction()
+    triggerVolume:resetLeaveAction()
+  )"));
+}

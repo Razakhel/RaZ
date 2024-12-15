@@ -7,6 +7,7 @@
 #include "RaZ/Physics/PhysicsSystem.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
+#include "RaZ/Utils/TriggerSystem.hpp"
 #include "RaZ/Utils/TypeUtils.hpp"
 #include "RaZ/XR/XrSystem.hpp"
 
@@ -73,6 +74,7 @@ void LuaWrapper::registerCoreTypes() {
                                                                                 WindowSetting, uint8_t>
 #endif
                                                               );
+    world["addTriggerSystem"]                 = &World::addSystem<TriggerSystem>;
 #if defined(RAZ_USE_XR)
     world["addXrSystem"]                      = &World::addSystem<XrSystem, const std::string&>;
 #endif

@@ -22,9 +22,9 @@ TEST_CASE("PhysicsSystem basic", "[physics]") {
 TEST_CASE("PhysicsSystem accepted components", "[physics]") {
   Raz::World world(2);
 
-  auto& physics = world.addSystem<Raz::PhysicsSystem>();
+  const auto& physics = world.addSystem<Raz::PhysicsSystem>();
 
-  const Raz::Entity& rigidBody = world.addEntityWithComponent<Raz::RigidBody>(1.f, 1.f); // RenderSystem::update() needs a Camera with a Transform component
+  const Raz::Entity& rigidBody = world.addEntityWithComponent<Raz::RigidBody>(1.f, 1.f);
   const Raz::Entity& collider  = world.addEntityWithComponent<Raz::Collider>(Raz::Plane(0.f));
 
   world.update({});

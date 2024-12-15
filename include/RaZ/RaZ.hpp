@@ -92,6 +92,8 @@
 #include "Utils/StrUtils.hpp"
 #include "Utils/Threading.hpp"
 #include "Utils/ThreadPool.hpp"
+#include "Utils/TriggerSystem.hpp"
+#include "Utils/TriggerVolume.hpp"
 #include "Utils/TypeUtils.hpp"
 #include "XR/XrContext.hpp"
 #include "XR/XrSession.hpp"
