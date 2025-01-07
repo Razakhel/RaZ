@@ -367,7 +367,7 @@ inline std::vector<std::wstring> split(std::wstring text, wchar_t delimiter) {
   return parts;
 }
 
-/// Converts a wide string to an UTF-8 encoded one.
+/// Converts a wide string to a UTF-8 encoded one.
 /// \param text Wide string to convert.
 /// \return Converted UTF-8 string.
 inline std::string toUtf8(const std::wstring& text) {
@@ -385,7 +385,7 @@ constexpr const std::string& toUtf8(const std::string& text) {
   return text;
 }
 
-/// Converts an UTF-8 encoded string to a wide one.
+/// Converts a UTF-8 encoded string to a wide one.
 /// \param text UTF-8 string to convert.
 /// \return Converted wide string.
 inline std::wstring toWide(const std::string& text) {

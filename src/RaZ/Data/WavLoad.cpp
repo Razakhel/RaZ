@@ -81,7 +81,7 @@ inline WavInfo validateWav(std::ifstream& file) {
   // 80: MPEG
 
   if (info.audioFormat != 1)
-    Logger::warn("Only WAV files with a PCM format are supported.");
+    Logger::warn("[WavLoad] Only WAV files with a PCM format are supported.");
 
   file.read(reinterpret_cast<char*>(bytes.data()), 2); // Channel count
   info.channelCount = fromLittleEndian(bytes[0], bytes[1]);
@@ -104,41 +104,25 @@ inline WavInfo validateWav(std::ifstream& file) {
   file.read(reinterpret_cast<char*>(bytes.data()), 2); // Bits per sample (bit depth)
   info.bitsPerSample = fromLittleEndian(bytes[0], bytes[1]);
 
-  if (info.audioFormat == 0)
-    Logger::warn("Failed to recover the WAV sound format.");
-
   ////////////////
   // Data block //
   ////////////////
 
   file.read(reinterpret_cast<char*>(bytes.data()), 4); // Supposed to be 'data'
 
-  // A 'cue ' field can be specified; if so, the given amount of bytes will be ignored
-  // See: https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#cue
-  if (bytes[0] == 'c' && bytes[1] == 'u' && bytes[2] == 'e' && bytes[3] == ' ') {
-    file.read(reinterpret_cast<char*>(bytes.data()), 4); // Cue data size
-
-    const uint32_t cueDataSize = fromLittleEndian(bytes);
-    file.ignore(cueDataSize);
-
-    file.read(reinterpret_cast<char*>(bytes.data()), 4);
-  }
-
-  // A 'LIST' field can be specified; if so, the given amount of bytes will be ignored
+  // Additional chunks can be present (such as 'cue ', 'LIST', 'bext' and others), which aren't supported there. They must be skipped
   // See:
-  // - https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#list
   // - https://en.wikipedia.org/wiki/WAV#RIFF_WAVE
-  if (bytes[0] == 'L' && bytes[1] == 'I' && bytes[2] == 'S' && bytes[3] == 'T') {
-    file.read(reinterpret_cast<char*>(bytes.data()), 4); // List data size
+  // - https://en.wikipedia.org/wiki/Broadcast_Wave_Format#Details
+  // - https://stackoverflow.com/a/76137824/3292304
+  while (bytes[0] != 'd' && bytes[1] != 'a' && bytes[2] != 't' && bytes[3] != 'a') {
+    file.read(reinterpret_cast<char*>(bytes.data()), 4); // Reading the chunk size
 
-    const uint32_t listDataSize = fromLittleEndian(bytes);
-    file.ignore(listDataSize);
+    const uint32_t chunkSize = fromLittleEndian(bytes);
+    file.ignore(chunkSize);
 
     file.read(reinterpret_cast<char*>(bytes.data()), 4);
   }
-
-  if (bytes[0] != 'd' && bytes[1] != 'a' && bytes[2] != 't' && bytes[3] != 'a')
-    return info;
 
   file.read(reinterpret_cast<char*>(bytes.data()), 4); // Data size (file size - header size (theoretically 44 bytes))
   info.dataSize = fromLittleEndian(bytes);
