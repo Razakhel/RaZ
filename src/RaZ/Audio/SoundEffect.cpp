@@ -211,7 +211,7 @@ void SoundEffect::destroy() {
 
   Logger::debug("[SoundEffect] Destroying (ID: " + std::to_string(m_index) + ")...");
 
-  if (m_index.isValid() && alIsEffect(m_index)) {
+  if (alIsEffect(m_index)) {
     alDeleteEffects(1, &m_index.get());
     checkError("Failed to delete sound effect");
   }

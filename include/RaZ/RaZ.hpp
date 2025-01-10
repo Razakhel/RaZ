@@ -9,6 +9,7 @@
 #include "System.hpp"
 #include "World.hpp"
 #include "Animation/Skeleton.hpp"
+#include "Audio/AudioData.hpp"
 #include "Audio/AudioSystem.hpp"
 #include "Audio/Listener.hpp"
 #include "Audio/Microphone.hpp"

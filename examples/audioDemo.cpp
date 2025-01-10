@@ -50,6 +50,9 @@ int main() {
     // Audio //
     ///////////
 
+    static const Raz::AudioData knockAudio        = Raz::WavFormat::load(RAZ_ROOT "assets/sounds/knock.wav");
+    static const Raz::AudioData waveSeagullsAudio = Raz::WavFormat::load(RAZ_ROOT "assets/sounds/wave_seagulls.wav");
+
     auto& audio = world.addSystem<Raz::AudioSystem>();
 
     // The Listener entity requires a Transform component
@@ -57,7 +60,7 @@ int main() {
 
     Raz::Entity& sound = world.addEntity();
     auto& soundTrans   = sound.addComponent<Raz::Transform>();
-    auto& soundComp    = sound.addComponent<Raz::Sound>(Raz::WavFormat::load(RAZ_ROOT "assets/sounds/knock.wav"));
+    auto& soundComp    = sound.addComponent<Raz::Sound>(knockAudio);
 
     Raz::Microphone microphone(Raz::AudioFormat::MONO_U8, 16000, 1.f);
 
@@ -109,7 +112,6 @@ int main() {
       listener.setGain(listenerGain);
 
       soundComp.init();
-      soundComp.load();
       soundComp.setRepeat(isRepeating);
       soundComp.setGain(soundGain);
       soundComp.setPitch(soundPitch);
@@ -162,11 +164,11 @@ int main() {
       switch (i) {
         case 0:
         default:
-          soundComp = Raz::WavFormat::load(RAZ_ROOT "assets/sounds/knock.wav");
+          soundComp.load(knockAudio);
           break;
 
         case 1:
-          soundComp = Raz::WavFormat::load(RAZ_ROOT "assets/sounds/wave_seagulls.wav");
+          soundComp.load(waveSeagullsAudio);
           break;
       }
 
@@ -605,7 +607,7 @@ int main() {
     // Starting application //
     //////////////////////////
 
-    std::vector<uint8_t> captureData;
+    Raz::AudioData captureData;
 
     app.run([&] (const Raz::FrameTimeInfo& timeInfo) {
       soundTrans.setPosition((moveSource ? Raz::Vec3f(std::sin(timeInfo.globalTime) * 3.f, 0.f, 1.f) : Raz::Vec3f(0.f)));
@@ -624,23 +626,23 @@ int main() {
         constexpr float factorI16 = 1.f / 32767;
 
         if (captureBitDepth == 8) {
-          for (std::size_t i = 0; i < captureData.size(); ++i) {
+          for (std::size_t i = 0; i < captureData.buffer.size(); ++i) {
             if (isCaptureStereo) { // Stereo 8
-              leftCapturePlot.push(static_cast<float>(captureData[i]) * factorU8 - 1.f);
-              rightCapturePlot.push(static_cast<float>(captureData[i + 1]) * factorU8 - 1.f);
+              leftCapturePlot.push(static_cast<float>(captureData.buffer[i]) * factorU8 - 1.f);
+              rightCapturePlot.push(static_cast<float>(captureData.buffer[i + 1]) * factorU8 - 1.f);
               ++i;
             } else { // Mono 8
-              monoCapturePlot.push(static_cast<float>(captureData[i]) * factorU8 - 1.f);
+              monoCapturePlot.push(static_cast<float>(captureData.buffer[i]) * factorU8 - 1.f);
             }
           }
         } else {
-          for (std::size_t i = 0; i < captureData.size(); i += 2) {
+          for (std::size_t i = 0; i < captureData.buffer.size(); i += 2) {
             if (isCaptureStereo) { // Stereo 16
-              leftCapturePlot.push(static_cast<float>(static_cast<int16_t>((captureData[i] << 0u) | (captureData[i + 1] << 8u))) * factorI16);
-              rightCapturePlot.push(static_cast<float>(static_cast<int16_t>((captureData[i + 2] << 0u) | (captureData[i + 3] << 8u))) * factorI16);
+              leftCapturePlot.push(static_cast<float>(static_cast<int16_t>(captureData.buffer[i] | (captureData.buffer[i + 1] << 8u))) * factorI16);
+              rightCapturePlot.push(static_cast<float>(static_cast<int16_t>(captureData.buffer[i + 2] | (captureData.buffer[i + 3] << 8u))) * factorI16);
               i += 2;
             } else { // Mono 16
-              monoCapturePlot.push(static_cast<float>(static_cast<int16_t>((captureData[i] << 0u) | (captureData[i + 1] << 8u))) * factorI16);
+              monoCapturePlot.push(static_cast<float>(static_cast<int16_t>(captureData.buffer[i] | (captureData.buffer[i + 1] << 8u))) * factorI16);
             }
           }
         }

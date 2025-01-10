@@ -20,6 +20,25 @@ void LuaWrapper::registerAudioTypes() {
   sol::state& state = getState();
 
   {
+    sol::usertype<AudioData> audioData = state.new_usertype<AudioData>("AudioData",
+                                                                       sol::constructors<AudioData()>());
+    audioData["format"]    = &AudioData::format;
+    audioData["frequency"] = &AudioData::frequency;
+    audioData["buffer"]    = &AudioData::buffer;
+
+    state.new_enum<AudioFormat>("AudioFormat", {
+      { "MONO_U8",    AudioFormat::MONO_U8 },
+      { "STEREO_U8",  AudioFormat::STEREO_U8 },
+      { "MONO_I16",   AudioFormat::MONO_I16 },
+      { "STEREO_I16", AudioFormat::STEREO_I16 },
+      { "MONO_F32",   AudioFormat::MONO_F32 },
+      { "STEREO_F32", AudioFormat::STEREO_F32 },
+      { "MONO_F64",   AudioFormat::MONO_F64 },
+      { "STEREO_F64", AudioFormat::STEREO_F64 }
+    });
+  }
+
+  {
     sol::usertype<AudioSystem> audioSystem = state.new_usertype<AudioSystem>("AudioSystem",
                                                                              sol::constructors<AudioSystem(),
                                                                                                AudioSystem(const std::string&)>(),
@@ -28,17 +47,6 @@ void LuaWrapper::registerAudioTypes() {
     audioSystem["openDevice"]           = sol::overload([] (AudioSystem& s) { s.openDevice(); },
                                                         PickOverload<const std::string&>(&AudioSystem::openDevice));
     audioSystem["recoverCurrentDevice"] = &AudioSystem::recoverCurrentDevice;
-
-    state.new_enum<AudioFormat>("AudioFormat", {
-      { "MONO_U8", AudioFormat::MONO_U8 },
-      { "STEREO_U8", AudioFormat::STEREO_U8 },
-      { "MONO_I16", AudioFormat::MONO_I16 },
-      { "STEREO_I16", AudioFormat::STEREO_I16 },
-      { "MONO_F32", AudioFormat::MONO_F32 },
-      { "STEREO_F32", AudioFormat::STEREO_F32 },
-      { "MONO_F64", AudioFormat::MONO_F64 },
-      { "STEREO_F64", AudioFormat::STEREO_F64 }
-    });
   }
 
   {
@@ -72,21 +80,19 @@ void LuaWrapper::registerAudioTypes() {
     microphone["stop"]                        = &Microphone::stop;
     microphone["recoverAvailableSampleCount"] = &Microphone::recoverAvailableSampleCount;
     microphone["recoverAvailableDuration"]    = &Microphone::recoverAvailableDuration;
-    microphone["recoverData"]                 = sol::overload([] (Microphone& m) { return m.recoverData(); },
+    microphone["recoverData"]                 = sol::overload([] (const Microphone& m) { return m.recoverData(); },
                                                               PickOverload<float>(&Microphone::recoverData));
-    microphone["recoverSound"]                = sol::overload([] (Microphone& m) { return m.recoverSound(); },
-                                                              PickOverload<float>(&Microphone::recoverSound));
   }
 
   {
     sol::usertype<Sound> sound = state.new_usertype<Sound>("Sound",
-                                                           sol::constructors<Sound()>(),
+                                                           sol::constructors<Sound(),
+                                                                             Sound(AudioData)>(),
                                                            sol::base_classes, sol::bases<Component>());
     sound["getBufferIndex"]     = &Sound::getBufferIndex;
-    sound["getFormat"]          = &Sound::getFormat;
-    sound["getFrequency"]       = &Sound::getFrequency;
+    sound["getData"]            = &Sound::getData;
     sound["init"]               = &Sound::init;
-    sound["load"]               = &Sound::load;
+    sound["load"]               = PickOverload<AudioData>(&Sound::load);
     sound["pitch"]              = sol::property(&Sound::recoverPitch, &Sound::setPitch);
     sound["gain"]               = sol::property(&Sound::recoverGain, &Sound::setGain);
     sound["position"]           = sol::property(&Sound::recoverPosition, PickOverload<const Vec3f&>(&Sound::setPosition));

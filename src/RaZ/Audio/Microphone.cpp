@@ -7,6 +7,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#include <stdexcept>
 #include <string>
 
 namespace Raz {
@@ -52,7 +53,7 @@ constexpr int recoverFrameSize(AudioFormat format) {
       break;
 
     default:
-      throw std::invalid_argument("Error: Unhandled audio format");
+      throw std::invalid_argument("[Microphone] Unhandled audio format");
   }
 
   switch (format) {
@@ -77,7 +78,7 @@ constexpr int recoverFrameSize(AudioFormat format) {
       break;
 
     default:
-      throw std::invalid_argument("Error: Unhandled audio format");
+      throw std::invalid_argument("[Microphone] Unhandled audio format");
   }
 
   return channelCount * bitCount / 8;
@@ -170,17 +171,19 @@ float Microphone::recoverAvailableDuration() const noexcept {
   return (static_cast<float>(recoverAvailableSampleCount()) / static_cast<float>(m_frequency));
 }
 
-std::vector<uint8_t> Microphone::recoverData(float maxDuration) const {
-  std::vector<uint8_t> data;
+AudioData Microphone::recoverData(float maxDuration) const {
+  AudioData data {};
   recoverData(data, maxDuration);
 
   return data;
 }
 
-void Microphone::recoverData(std::vector<uint8_t>& data, float maxDuration) const {
+void Microphone::recoverData(AudioData& data, float maxDuration) const {
   ZoneScopedN("Microphone::recoverData");
 
-  data.clear();
+  data.format    = m_format;
+  data.frequency = m_frequency;
+  data.buffer.clear();
 
   if (maxDuration == 0.f)
     return;
@@ -193,23 +196,10 @@ void Microphone::recoverData(std::vector<uint8_t>& data, float maxDuration) cons
   if (maxDuration > 0.f)
     sampleCount = std::min(sampleCount, static_cast<int>(maxDuration * static_cast<float>(m_frequency)));
 
-  data.resize(recoverFrameSize(m_format) * sampleCount);
+  data.buffer.resize(recoverFrameSize(m_format) * sampleCount);
 
-  alcCaptureSamples(static_cast<ALCdevice*>(m_device), data.data(), sampleCount);
+  alcCaptureSamples(static_cast<ALCdevice*>(m_device), data.buffer.data(), sampleCount);
   checkError(m_device, "Failed to recover captured data");
-}
-
-Sound Microphone::recoverSound(float maxDuration) const {
-  ZoneScopedN("Microphone::recoverSound");
-
-  Sound sound;
-
-  sound.m_format    = m_format;
-  sound.m_frequency = static_cast<int>(m_frequency);
-  sound.m_data      = recoverData(maxDuration);
-  sound.load();
-
-  return sound;
 }
 
 void Microphone::destroy() {

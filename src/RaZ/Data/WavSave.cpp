@@ -20,20 +20,18 @@ constexpr std::array<char, 2> toLittleEndian16(uint16_t val) {
 
 } // namespace
 
-void save(const FilePath& filePath, const Sound& sound) {
+void save(const FilePath& filePath, const AudioData& data) {
   std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Unable to create a WAV file as '" + filePath + "'; path to file must exist");
-
-  const std::vector<uint8_t>& soundData = Internal::SoundAccess::getData(sound);
+    throw std::invalid_argument("[WavSave] Unable to create a WAV file as '" + filePath + "'; path to file must exist");
 
   ////////////
   // Header //
   ////////////
 
   file << "RIFF";
-  file.write(toLittleEndian32(static_cast<uint32_t>(soundData.size()) + 36).data(), 4); // File size - 8
+  file.write(toLittleEndian32(static_cast<uint32_t>(data.buffer.size()) + 36).data(), 4); // File size - 8
   file << "WAVE";
 
   //////////////////
@@ -45,7 +43,7 @@ void save(const FilePath& filePath, const Sound& sound) {
 
   uint8_t bitCount {};
 
-  switch (sound.getFormat()) {
+  switch (data.format) {
     case AudioFormat::MONO_U8:
     case AudioFormat::STEREO_U8:
       bitCount = 8;
@@ -67,14 +65,14 @@ void save(const FilePath& filePath, const Sound& sound) {
       break;
 
     default:
-      throw std::invalid_argument("Error: Unhandled audio format");
+      throw std::invalid_argument("[WavSave] Unhandled audio format");
   }
 
   file.write(toLittleEndian16((bitCount >= 32 ? 3 : 1)).data(), 2); // Writing 1 if integer, 3 if floating-point
 
   uint16_t channelCount {};
 
-  switch (sound.getFormat()) {
+  switch (data.format) {
     case AudioFormat::MONO_U8:
     case AudioFormat::MONO_I16:
     case AudioFormat::MONO_F32:
@@ -90,15 +88,15 @@ void save(const FilePath& filePath, const Sound& sound) {
       break;
 
     default:
-      throw std::invalid_argument("Error: Unhandled audio format");
+      throw std::invalid_argument("[WavSave] Unhandled audio format");
   }
 
   file.write(toLittleEndian16(channelCount).data(), 2);
-  file.write(toLittleEndian32(static_cast<uint32_t>(sound.getFrequency())).data(), 4);
+  file.write(toLittleEndian32(static_cast<uint32_t>(data.frequency)).data(), 4);
 
   const auto frameSize = static_cast<uint16_t>(bitCount / 8 * channelCount);
 
-  file.write(toLittleEndian32(static_cast<uint32_t>(sound.getFrequency()) * frameSize).data(), 4); // Bytes per second
+  file.write(toLittleEndian32(static_cast<uint32_t>(data.frequency) * frameSize).data(), 4); // Bytes per second
   file.write(toLittleEndian16(frameSize).data(), 2); // Bytes per block (bits per sample / 8 * channel count)
   file.write(toLittleEndian16(bitCount).data(), 2); // Bits per sample (bit depth)
 
@@ -107,8 +105,8 @@ void save(const FilePath& filePath, const Sound& sound) {
   ////////////////
 
   file << "data";
-  file.write(toLittleEndian32(static_cast<uint32_t>(soundData.size())).data(), 4);
-  file.write(reinterpret_cast<const char*>(soundData.data()), static_cast<std::streamsize>(soundData.size()));
+  file.write(toLittleEndian32(static_cast<uint32_t>(data.buffer.size())).data(), 4);
+  file.write(reinterpret_cast<const char*>(data.buffer.data()), static_cast<std::streamsize>(data.buffer.size()));
 }
 
 } // namespace Raz::WavFormat

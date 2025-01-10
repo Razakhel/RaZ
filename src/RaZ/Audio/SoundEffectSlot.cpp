@@ -106,7 +106,7 @@ void SoundEffectSlot::destroy() {
 
   Logger::debug("[SoundEffectSlot] Destroying (ID: " + std::to_string(m_index) + ")...");
 
-  if (m_index.isValid() && alIsAuxiliaryEffectSlot(m_index)) {
+  if (alIsAuxiliaryEffectSlot(m_index)) {
     alDeleteAuxiliaryEffectSlots(1, &m_index.get());
     checkError("Failed to delete sound effect slot");
   }

@@ -5,20 +5,20 @@
 
 namespace Raz {
 
+struct AudioData;
 class FilePath;
-class Sound;
 
 namespace WavFormat {
 
-/// Loads a [WAV](https://en.wikipedia.org/wiki/WAV) audio from a file.
+/// Loads audio data from a [WAV](https://en.wikipedia.org/wiki/WAV) file.
 /// \param filePath File from which to load the audio.
-/// \return Imported sound.
-Sound load(const FilePath& filePath);
+/// \return Imported audio data.
+AudioData load(const FilePath& filePath);
 
-/// Saves a sound to a WAV file.
+/// Saves audio data to a [WAV](https://en.wikipedia.org/wiki/WAV) file.
 /// \param filePath File to which to save the sound.
-/// \param sound Sound to export data from.
-void save(const FilePath& filePath, const Sound& sound);
+/// \param data Audio data to export.
+void save(const FilePath& filePath, const AudioData& data);
 
 } // namespace WavFormat
 

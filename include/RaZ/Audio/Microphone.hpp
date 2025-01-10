@@ -3,11 +3,11 @@
 #ifndef RAZ_MICROPHONE_HPP
 #define RAZ_MICROPHONE_HPP
 
-#include "RaZ/Audio/AudioSystem.hpp"
+#include "RaZ/Audio/AudioData.hpp"
+
+#include <string>
 
 namespace Raz {
-
-class Sound;
 
 class Microphone {
 public:
@@ -45,21 +45,16 @@ public:
   /// Recovers the amount of currently captured time.
   /// \return Available captured duration, in seconds.
   float recoverAvailableDuration() const noexcept;
-  /// Recovers captured samples.
-  /// \note This flushes the recovered captured data; if recovering something, the available sample count right after this call will be less than it was before.
+  /// Recovers captured audio data.
+  /// \note This flushes the captured data; if recovering something, the available sample count right after this call will be less than it was before.
   /// \param maxDuration Maximum amount of time to recover, in seconds. Giving a negative value will result in recovering all available samples.
-  /// \return Captured samples.
-  std::vector<uint8_t> recoverData(float maxDuration = -1.f) const;
-  /// Recovers captured samples. This overload can be used to avoid reallocating the whole memory range on each call.
-  /// \note This flushes the recovered captured data; if recovering something, the available sample count right after this call will be less than it was before.
-  /// \param data Data to be filled with the captured samples.
+  /// \return Captured audio data. The format & frequency are those of the current audio input device.
+  AudioData recoverData(float maxDuration = -1.f) const;
+  /// Recovers captured audio data. This overload can be used to avoid reallocating the whole memory range on each call.
+  /// \note This flushes the captured data; if recovering something, the available sample count right after this call will be less than it was before.
+  /// \param data Data to be filled with the captured audio.
   /// \param maxDuration Maximum amount of time to recover, in seconds. Giving a negative value will result in recovering all available samples.
-  void recoverData(std::vector<uint8_t>& data, float maxDuration = -1.f) const;
-  /// Recovers captured samples as a Sound object.
-  /// \note This flushes the recovered captured data; if recovering something, the available sample count right after this call will be less than it was before.
-  /// \param maxDuration Maximum amount of time to recover, in seconds. Giving a negative value will result in recovering all available samples.
-  /// \return Captured sound.
-  Sound recoverSound(float maxDuration = -1.f) const;
+  void recoverData(AudioData& data, float maxDuration = -1.f) const;
 
   Microphone& operator=(const Microphone&) = delete;
   Microphone& operator=(Microphone&&) = delete;

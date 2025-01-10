@@ -62,8 +62,7 @@ TEST_CASE("LuaAudio Microphone", "[script][lua][audio]") {
     microphone:stop()
     assert(microphone:recoverAvailableSampleCount() ~= nil)
     assert(microphone:recoverAvailableDuration() ~= nil)
-    assert(#microphone:recoverData() == #microphone:recoverData(0))
-    assert(microphone:recoverSound() ~= microphone:recoverSound(0))
+    assert(#microphone:recoverData().buffer == 0)
   )"));
 }
 
@@ -71,15 +70,18 @@ TEST_CASE("LuaAudio Sound", "[script][lua][audio]") {
   CHECK(TestUtils::executeLuaScript(R"(
     local audioSystem = AudioSystem.new() -- Initializing the audio device & context, needed before all audio action
 
+    local audioData = WavFormat.load(FilePath.new(RAZ_TESTS_ROOT .. "assets/sounds/notif_ting.wav"))
+
     local sound = Sound.new()
-    sound       = WavFormat.load(FilePath.new(RAZ_TESTS_ROOT .. "assets/sounds/notif_ting.wav"))
+    sound       = Sound.new(audioData)
 
     assert(sound:getBufferIndex() >= 0)
-    assert(sound:getFormat() == AudioFormat.MONO_I16)
-    assert(sound:getFrequency() == 48000)
+    assert(sound:getData().format == AudioFormat.MONO_I16)
+    assert(sound:getData().frequency == 48000)
+    assert(#sound:getData().buffer == 608894)
 
     sound:init()
-    sound:load()
+    sound:load(audioData)
 
     sound.pitch    = 0.5
     sound.gain     = 0

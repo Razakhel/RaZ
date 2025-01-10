@@ -4,16 +4,12 @@
 #define RAZ_SOUND_HPP
 
 #include "RaZ/Component.hpp"
-#include "RaZ/Audio/AudioSystem.hpp"
+#include "RaZ/Audio/AudioData.hpp"
 #include "RaZ/Data/OwnerValue.hpp"
 
-#include <cstddef>
 #include <limits>
-#include <vector>
 
 namespace Raz {
-
-namespace Internal { class SoundAccess; }
 
 class SoundEffectSlot;
 
@@ -29,24 +25,25 @@ enum class SoundState : int {
 };
 
 class Sound final : public Component {
-  friend Internal::SoundAccess;
-  friend class Microphone;
-
 public:
   Sound() { init(); }
+  explicit Sound(AudioData data) : Sound() { load(std::move(data)); }
   Sound(const Sound&) = delete;
   Sound(Sound&&) noexcept = default;
 
-  constexpr unsigned int getBufferIndex() const noexcept { return m_buffer; }
-  constexpr AudioFormat getFormat() const noexcept { return m_format; }
-  constexpr int getFrequency() const noexcept { return m_frequency; }
+  constexpr unsigned int getBufferIndex() const noexcept { return m_bufferIndex; }
+  constexpr const AudioData& getData() const noexcept { return m_data; }
 
-  /// Initializes the sound.
+  /// Initializes the sound. If there is audio data, also loads it into memory.
   /// \note A Sound must be initialized again after opening an audio device.
   /// \see AudioSystem::open()
   void init();
-  /// Loads the sound's data into memory.
-  void load();
+  /// Loads the given audio data into memory.
+  /// @param data Data to be loaded.
+  void load(AudioData data) {
+    m_data = std::move(data);
+    load();
+  }
   /// Sets the sound's pitch multiplier.
   /// \param pitch Sound's pitch multiplier; must be positive. 1 is the default.
   void setPitch(float pitch) const noexcept;
@@ -128,29 +125,14 @@ public:
   ~Sound() override { destroy(); }
 
 private:
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_buffer {};
-  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_source {};
+  /// Loads the audio data into memory.
+  void load();
 
-  AudioFormat m_format {};
-  int m_frequency {};
-  std::vector<uint8_t> m_data {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_bufferIndex {};
+  OwnerValue<unsigned int, std::numeric_limits<unsigned int>::max()> m_sourceIndex {};
+
+  AudioData m_data {};
 };
-
-namespace Internal {
-
-/// Class giving direct access to a Sound's private members; useful for file importers.
-/// \note This class is not meant to be used in user code.
-class SoundAccess {
-public:
-  SoundAccess() = delete;
-
-  static AudioFormat& getFormat(Sound& sound) { return sound.m_format; }
-  static int& getFrequency(Sound& sound) { return sound.m_frequency; }
-  static const std::vector<uint8_t>& getData(const Sound& sound) { return sound.m_data; }
-  static std::vector<uint8_t>& getData(Sound& sound) { return sound.m_data; }
-};
-
-} // namespace Internal
 
 } // namespace Raz
 
