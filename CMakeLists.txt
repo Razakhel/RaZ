@@ -485,6 +485,7 @@ if (RAZ_USE_PROFILING)
     message(STATUS "[RaZ] Profiling ENABLED")
 else ()
     message(STATUS "[RaZ] Profiling DISABLED")
+    list(REMOVE_ITEM RAZ_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Utils/Memory.cpp")
 endif ()
 
 target_link_libraries(RaZ PRIVATE fastgltf simdjson stb)
