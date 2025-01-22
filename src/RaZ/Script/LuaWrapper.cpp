@@ -78,6 +78,7 @@ bool LuaWrapper::execute(const std::string& code) {
 
 bool LuaWrapper::executeFromFile(const FilePath& filePath) {
   ZoneScopedN("LuaWrapper::executeFromFile");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   if (filePath.isEmpty())
     return false;

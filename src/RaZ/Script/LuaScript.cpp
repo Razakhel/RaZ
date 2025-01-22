@@ -46,6 +46,7 @@ void LuaScript::loadCode(const std::string& code) {
 
 void LuaScript::loadCodeFromFile(const FilePath& filePath) {
   ZoneScopedN("LuaScript::loadCodeFromFile");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   Logger::debug("[LuaScript] Loading code from file ('" + filePath + "')...");
   loadCode(FileUtils::readFileToString(filePath));

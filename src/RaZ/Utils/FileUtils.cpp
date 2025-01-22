@@ -12,6 +12,7 @@ namespace {
 template <typename T>
 T readFile(const FilePath& filePath) {
   ZoneScopedN("[FileUtils]::readFile");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   std::ifstream file(filePath, std::ios::binary | std::ios::ate);
 
@@ -44,11 +45,13 @@ bool isReadable(const FilePath& filePath) {
 
 std::vector<unsigned char> readFileToArray(const FilePath& filePath) {
   ZoneScopedN("FileUtils::readFileToArray");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
   return readFile<std::vector<unsigned char>>(filePath);
 }
 
 std::string readFileToString(const FilePath& filePath) {
   ZoneScopedN("FileUtils::readFileToString");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
   return readFile<std::string>(filePath);
 }
 

@@ -93,6 +93,7 @@ void loadJoint(std::ifstream& file, std::unordered_map<std::string, SkeletonJoin
 
 Skeleton load(const FilePath& filePath) {
   ZoneScopedN("BvhFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 

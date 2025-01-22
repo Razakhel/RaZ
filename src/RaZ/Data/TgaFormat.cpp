@@ -13,8 +13,11 @@ namespace Raz::TgaFormat {
 
 Image load(const FilePath& filePath, bool flipVertically) {
   ZoneScopedN("TgaFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+  Logger::debug("[TgaFormat] Loading TGA file ('" + filePath + "')...");
+
+  std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
     throw std::invalid_argument("Error: Could not open the PNG file '" + filePath + "'");
@@ -130,6 +133,8 @@ Image load(const FilePath& filePath, bool flipVertically) {
   } else {
     throw std::runtime_error("Error: RLE on TGA images is not handled yet");
   }
+
+  Logger::debug("[TgaFormat] Loaded TGA file");
 
   return image;
 }

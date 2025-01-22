@@ -135,10 +135,11 @@ inline WavInfo validateWav(std::ifstream& file) {
 
 AudioData load(const FilePath& filePath) {
   ZoneScopedN("WavFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   Logger::debug("[WavLoad] Loading WAV file ('" + filePath + "')...");
 
-  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+  std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
     throw std::invalid_argument("[WavLoad] Could not open the WAV file '" + filePath + "'");

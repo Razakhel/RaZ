@@ -3,6 +3,8 @@
 #include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
+#include "tracy/Tracy.hpp"
+
 #include <array>
 #include <fstream>
 
@@ -21,7 +23,12 @@ constexpr std::array<char, 2> toLittleEndian16(uint16_t val) {
 } // namespace
 
 void save(const FilePath& filePath, const AudioData& data) {
-  std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
+  ZoneScopedN("WavFormat::save");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
+
+  Logger::debug("[WavSave] Saving WAV file ('" + filePath + "')...");
+
+  std::ofstream file(filePath, std::ios_base::binary);
 
   if (!file)
     throw std::invalid_argument("[WavSave] Unable to create a WAV file as '" + filePath + "'; path to file must exist");
@@ -107,6 +114,8 @@ void save(const FilePath& filePath, const AudioData& data) {
   file << "data";
   file.write(toLittleEndian32(static_cast<uint32_t>(data.buffer.size())).data(), 4);
   file.write(reinterpret_cast<const char*>(data.buffer.data()), static_cast<std::streamsize>(data.buffer.size()));
+
+  Logger::debug("[WavSave] Saved WAV file");
 }
 
 } // namespace Raz::WavFormat

@@ -362,6 +362,7 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials,
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   ZoneScopedN("GltfFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   Logger::debug("[GltfLoad] Loading glTF file ('" + filePath + "')...");
 

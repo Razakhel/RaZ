@@ -75,6 +75,7 @@ Image createImageFromData(int width, int height, int channelCount, bool isHdr, c
 
 Image load(const FilePath& filePath, bool flipVertically) {
   ZoneScopedN("ImageFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   Logger::debug("[ImageFormat] Loading image '" + filePath + "'...");
 

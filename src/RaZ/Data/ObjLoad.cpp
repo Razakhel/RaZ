@@ -20,6 +20,7 @@ namespace {
 
 inline Texture2DPtr loadTexture(const FilePath& textureFilePath, const Color& defaultColor, bool shouldUseSrgb = false) {
   ZoneScopedN("[ObjLoad]::loadTexture");
+  ZoneTextF("Path: %s", textureFilePath.toUtf8().c_str());
 
   if (!FileUtils::isReadable(textureFilePath)) {
     Logger::warn("[ObjLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
@@ -34,10 +35,11 @@ inline void loadMtl(const FilePath& mtlFilePath,
                     std::vector<Material>& materials,
                     std::unordered_map<std::string, std::size_t>& materialCorrespIndices) {
   ZoneScopedN("[ObjLoad]::loadMtl");
+  ZoneTextF("Path: %s", mtlFilePath.toUtf8().c_str());
 
   Logger::debug("[ObjLoad] Loading MTL file ('" + mtlFilePath + "')...");
 
-  std::ifstream file(mtlFilePath, std::ios_base::in | std::ios_base::binary);
+  std::ifstream file(mtlFilePath, std::ios_base::binary);
 
   if (!file) {
     Logger::error("[ObjLoad] Could not open the MTL file '" + mtlFilePath + "'.");
@@ -140,10 +142,11 @@ inline void loadMtl(const FilePath& mtlFilePath,
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   ZoneScopedN("ObjFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   Logger::debug("[ObjLoad] Loading OBJ file ('" + filePath + "')...");
 
-  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+  std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
     throw std::invalid_argument("Error: Couldn't open the OBJ file '" + filePath + '\'');

@@ -11,10 +11,11 @@ namespace Raz::OffFormat {
 
 Mesh load(const FilePath& filePath) {
   ZoneScopedN("OffFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   Logger::debug("[OffLoad] Loading OFF file ('" + filePath + "')...");
 
-  std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+  std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
     throw std::invalid_argument("Error: Could not open the OFF file '" + filePath + '\'');

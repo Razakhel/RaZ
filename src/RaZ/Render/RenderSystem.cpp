@@ -162,6 +162,7 @@ void RenderSystem::updateMaterials() const {
 
 void RenderSystem::saveToImage(const FilePath& filePath, TextureFormat format, PixelDataType dataType) const {
   ZoneScopedN("RenderSystem::saveToImage");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   ImageColorspace colorspace = ImageColorspace::RGB;
 

@@ -37,6 +37,7 @@ bool LuaEnvironment::execute(const std::string& code) const {
 
 bool LuaEnvironment::executeFromFile(const FilePath& filePath) const {
   ZoneScopedN("LuaEnvironment::executeFromFile");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   if (filePath.isEmpty())
     return false;

@@ -18,6 +18,7 @@ namespace {
 
 inline Texture2DPtr loadTexture(const FilePath& textureFilePath, const Color& defaultColor, bool shouldUseSrgb = false) {
   ZoneScopedN("[FbxLoad]::loadTexture");
+  ZoneTextF("Path: %s", textureFilePath.toUtf8().c_str());
 
   if (!FileUtils::isReadable(textureFilePath)) {
     Logger::warn("[FbxLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
@@ -119,6 +120,7 @@ void loadMaterials(fbxsdk::FbxScene* scene, std::vector<Material>& materials, co
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   ZoneScopedN("FbxFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   fbxsdk::FbxManager* manager = fbxsdk::FbxManager::Create();
   manager->SetIOSettings(fbxsdk::FbxIOSettings::Create(manager, IOSROOT));

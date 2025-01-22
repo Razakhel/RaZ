@@ -5,6 +5,7 @@
 #include "RaZ/Render/Material.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Utils/FilePath.hpp"
+#include "RaZ/Utils/Logger.hpp"
 
 #include "tracy/Tracy.hpp"
 
@@ -52,8 +53,9 @@ inline void writeTexture(std::ofstream& file, std::string_view tag, const std::s
 
 void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials) {
   ZoneScopedN("[ObjSave]::saveMtl");
+  ZoneTextF("Path: %s", mtlFilePath.toUtf8().c_str());
 
-  std::ofstream mtlFile(mtlFilePath, std::ios_base::out | std::ios_base::binary);
+  std::ofstream mtlFile(mtlFilePath, std::ios_base::binary);
 
   mtlFile << "# MTL file created with RaZ - https://github.com/Razakhel/RaZ\n";
 
@@ -91,8 +93,11 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
 
 void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRenderer) {
   ZoneScopedN("ObjFormat::save");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
+  Logger::debug("[ObjSave] Saving OBJ file ('" + filePath + "')...");
+
+  std::ofstream file(filePath, std::ios_base::binary);
 
   if (!file)
     throw std::invalid_argument("Error: Unable to create an OBJ file as '" + filePath + "'; path to file must exist");
@@ -177,6 +182,8 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
       file << posIndex  << '/' << texIndex  << '/' << normIndex << '\n';
     }
   }
+
+  Logger::debug("[ObjSave] Saved OBJ file");
 }
 
 } // namespace Raz::ObjFormat

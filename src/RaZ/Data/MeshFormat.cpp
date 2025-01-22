@@ -14,6 +14,7 @@ namespace Raz::MeshFormat {
 
 std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   ZoneScopedN("MeshFormat::load");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
@@ -38,6 +39,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
 void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRenderer) {
   ZoneScopedN("MeshFormat::save");
+  ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
