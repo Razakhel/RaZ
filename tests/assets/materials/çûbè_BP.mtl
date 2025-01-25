@@ -3,6 +3,7 @@ newmtl cube_BP
   Ke 0.75 0.75 0.75
   Ka 0.50 0.50 0.50
   Ks 0.25 0.25 0.25
+  d 0.01
 
   map_Kd ../textures/ŔĜBŖĀ.png
   map_Ke ../textures/ŔŖȒȐ.png

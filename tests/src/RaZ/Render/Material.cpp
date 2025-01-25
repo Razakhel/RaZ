@@ -5,7 +5,7 @@
 TEST_CASE("Material predefined types", "[render]") {
   Raz::Material material(Raz::MaterialType::COOK_TORRANCE);
 
-  CHECK(material.getProgram().getAttributeCount() == 4);
+  CHECK(material.getProgram().getAttributeCount() == 5);
   REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor));
   CHECK(material.getProgram().getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(1.f));
   REQUIRE(material.getProgram().hasAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive));
@@ -14,14 +14,17 @@ TEST_CASE("Material predefined types", "[render]") {
   CHECK(material.getProgram().getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.f);
   REQUIRE(material.getProgram().hasAttribute<float>(Raz::MaterialAttribute::Roughness));
   CHECK(material.getProgram().getAttribute<float>(Raz::MaterialAttribute::Roughness) == 1.f);
+  REQUIRE(material.getProgram().hasAttribute<Raz::Vec4f>(Raz::MaterialAttribute::Sheen));
+  CHECK(material.getProgram().getAttribute<Raz::Vec4f>(Raz::MaterialAttribute::Sheen) == Raz::Vec4f(0.f));
 
-  CHECK(material.getProgram().getTextureCount() == 6);
+  CHECK(material.getProgram().getTextureCount() == 7);
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::BaseColor));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Emissive));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Normal));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Metallic));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Roughness));
   CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Ambient));
+  CHECK(material.getProgram().hasTexture(Raz::MaterialTexture::Sheen));
 
   material.getProgram().clearAttributes();
   material.getProgram().clearTextures();

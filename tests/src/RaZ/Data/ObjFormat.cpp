@@ -53,6 +53,7 @@ Raz::MeshRenderer createMeshRenderer() {
     matProgram.setAttribute(Raz::Vec3f(0.f, 1.f, 0.f), Raz::MaterialAttribute::Emissive);
     matProgram.setAttribute(0.25f, Raz::MaterialAttribute::Metallic);
     matProgram.setAttribute(0.75f, Raz::MaterialAttribute::Roughness);
+    matProgram.setAttribute(Raz::Vec4f(0.f, 0.33f, 0.66f, 1.f), Raz::MaterialAttribute::Sheen);
   }
 
   {
@@ -122,10 +123,14 @@ TEST_CASE("ObjFormat load Blinn-Phong", "[data]") {
 
   const Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials().front().getProgram();
 
+  CHECK(matProgram.getAttributeCount() == 5);
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.99f));
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.75f));
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient) == Raz::Vec3f(0.5f));
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Specular) == Raz::Vec3f(0.25f));
+  CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Opacity) == 0.01f);
+
+  CHECK(matProgram.getTextureCount() == 6);
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -359,10 +364,14 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
 
   const Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials().front().getProgram();
 
+  CHECK(matProgram.getAttributeCount() == 5);
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.99f));
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.75f));
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.5f);
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.25f);
+  CHECK(matProgram.getAttribute<Raz::Vec4f>(Raz::MaterialAttribute::Sheen) == Raz::Vec4f(0.1f, 0.2f, 0.3f, 0.4f));
+
+  CHECK(matProgram.getTextureCount() == 7);
 
   // Each texture is flipped vertically when imported; the values are checked accordingly:
   //    ---------
@@ -530,6 +539,47 @@ TEST_CASE("ObjFormat load Cook-Torrance", "[data]") {
     CHECK(roughnessImg.recoverByteValue(1, 1, 0) == 0);
   }
 
+  // Sheen map
+  {
+    const auto& sheenMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Sheen));
+
+    CHECK(sheenMap.getWidth() == 2);
+    CHECK(sheenMap.getHeight() == 2);
+    CHECK(sheenMap.getColorspace() == Raz::TextureColorspace::SRGBA);
+    REQUIRE(sheenMap.getDataType() == Raz::TextureDataType::BYTE);
+
+    const Raz::Image sheenImg = sheenMap.recoverImage();
+    REQUIRE_FALSE(sheenImg.isEmpty());
+
+    // RGBR image with alpha, flipped vertically: checking that values are BRRG with 50% opacity
+
+    // ---------
+    // | R | G |
+    // |-------|
+    // | B | R |
+    // ---------
+
+    CHECK(sheenImg.recoverByteValue(0, 0, 0) == 0);
+    CHECK(sheenImg.recoverByteValue(0, 0, 1) == 0);
+    CHECK(sheenImg.recoverByteValue(0, 0, 2) == 255);
+    CHECK(sheenImg.recoverByteValue(0, 0, 3) == 127);
+
+    CHECK(sheenImg.recoverByteValue(1, 0, 0) == 255);
+    CHECK(sheenImg.recoverByteValue(1, 0, 1) == 0);
+    CHECK(sheenImg.recoverByteValue(1, 0, 2) == 0);
+    CHECK(sheenImg.recoverByteValue(1, 0, 3) == 127);
+
+    CHECK(sheenImg.recoverByteValue(0, 1, 0) == 255);
+    CHECK(sheenImg.recoverByteValue(0, 1, 1) == 0);
+    CHECK(sheenImg.recoverByteValue(0, 1, 2) == 0);
+    CHECK(sheenImg.recoverByteValue(0, 1, 3) == 127);
+
+    CHECK(sheenImg.recoverByteValue(1, 1, 0) == 0);
+    CHECK(sheenImg.recoverByteValue(1, 1, 1) == 255);
+    CHECK(sheenImg.recoverByteValue(1, 1, 2) == 0);
+    CHECK(sheenImg.recoverByteValue(1, 1, 3) == 127);
+  }
+
   // Ambient occlusion map
   {
     const auto& ambientOcclusionMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Ambient));
@@ -632,14 +682,17 @@ TEST_CASE("ObjFormat save", "[data]") {
 
     {
       const Raz::RenderShaderProgram& matProgram = meshRendererData.getMaterials()[0].getProgram();
+      CHECK(matProgram.getAttributeCount() == 5);
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
       CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.25f);
       CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.75f);
+      CHECK(matProgram.getAttribute<Raz::Vec4f>(Raz::MaterialAttribute::Sheen).strictlyEquals(Raz::Vec4f(0.f, 0.33f, 0.66f, 1.f)));
     }
 
     {
       const Raz::RenderShaderProgram& matProgram = meshRendererData.getMaterials()[1].getProgram();
+      CHECK(matProgram.getAttributeCount() == 5);
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor).strictlyEquals(Raz::Vec3f(1.f, 0.f, 0.f)));
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive).strictlyEquals(Raz::Vec3f(0.f, 1.f, 0.f)));
       CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Ambient).strictlyEquals(Raz::Vec3f(0.f, 0.f, 1.f)));

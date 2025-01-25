@@ -366,11 +366,11 @@ private:
 
 class RenderShaderProgram final : public ShaderProgram {
 public:
-  RenderShaderProgram() noexcept : ShaderProgram() {}
-  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader) noexcept
+  RenderShaderProgram() = default;
+  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader)
     : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(fragShader)); }
 #if !defined(USE_OPENGL_ES)
-  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader) noexcept
+  RenderShaderProgram(VertexShader&& vertShader, FragmentShader&& fragShader, GeometryShader&& geomShader)
     : RenderShaderProgram() { setShaders(std::move(vertShader), std::move(geomShader), std::move(fragShader)); }
 #endif
 
@@ -433,7 +433,7 @@ private:
 #if !defined(USE_WEBGL)
 class ComputeShaderProgram final : public ShaderProgram {
 public:
-  ComputeShaderProgram() : ShaderProgram() {}
+  ComputeShaderProgram() = default;
   explicit ComputeShaderProgram(ComputeShader&& compShader) : ComputeShaderProgram() { setShader(std::move(compShader)); }
 
   const ComputeShader& getShader() const noexcept { return m_compShader; }

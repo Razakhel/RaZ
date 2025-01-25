@@ -74,6 +74,7 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
     writeAttribute<float, 1>(mtlFile, "d",  matProgram, MaterialAttribute::Opacity);
     writeAttribute<float, 1>(mtlFile, "Pm", matProgram, MaterialAttribute::Metallic);
     writeAttribute<float, 1>(mtlFile, "Pr", matProgram, MaterialAttribute::Roughness);
+    writeAttribute<float, 4>(mtlFile, "Ps", matProgram, MaterialAttribute::Sheen);
 
 #if !defined(USE_OPENGL_ES)
     writeTexture(mtlFile, "map_Kd",   materialName, "baseColor", matProgram, MaterialTexture::BaseColor);
@@ -85,6 +86,7 @@ void saveMtl(const FilePath& mtlFilePath, const std::vector<Material>& materials
     writeTexture(mtlFile, "norm",     materialName, "normal",    matProgram, MaterialTexture::Normal);
     writeTexture(mtlFile, "map_Pm",   materialName, "metallic",  matProgram, MaterialTexture::Metallic);
     writeTexture(mtlFile, "map_Pr",   materialName, "roughness", matProgram, MaterialTexture::Roughness);
+    writeTexture(mtlFile, "map_Ps",   materialName, "sheen",     matProgram, MaterialTexture::Sheen);
 #endif
   }
 }

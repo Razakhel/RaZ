@@ -5,7 +5,6 @@
 
 #include "RaZ/Data/Submesh.hpp"
 #include "RaZ/Render/GraphicObjects.hpp"
-#include "RaZ/Utils/Shape.hpp"
 
 #include <functional>
 

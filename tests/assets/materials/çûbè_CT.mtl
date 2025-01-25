@@ -3,10 +3,12 @@ newmtl cube_CT
   Ke 0.75 0.75 0.75
   Pm 0.50
   Pr 0.25
+  Ps 0.1 0.2 0.3 0.4
 
   map_Kd ../textures/ŔĜBŖĀ.png
   map_Ke ../textures/ŔŖȒȐ.png
   norm ../textures/BƁḂɃ.png
   map_Pm ../textures/₁₁₁₁.png
   map_Pr ../textures/₀₀₀₀.png
+  map_Ps ../textures/ŔĜBŖĀ.png
   map_Ka ../textures/₁₀₀₁.png

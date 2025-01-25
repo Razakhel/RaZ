@@ -46,10 +46,14 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
 
   const Raz::RenderShaderProgram& matProgram = meshRenderer.getMaterials()[0].getProgram();
 
+  CHECK(matProgram.getAttributeCount() == 5);
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::BaseColor) == Raz::Vec3f(0.99f));
   CHECK(matProgram.getAttribute<Raz::Vec3f>(Raz::MaterialAttribute::Emissive) == Raz::Vec3f(0.75f));
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Metallic) == 0.5f);
   CHECK(matProgram.getAttribute<float>(Raz::MaterialAttribute::Roughness) == 0.25f);
+  CHECK(matProgram.getAttribute<Raz::Vec4f>(Raz::MaterialAttribute::Sheen) == Raz::Vec4f(0.1f, 0.2f, 0.3f, 0.4f));
+
+  CHECK(matProgram.getTextureCount() == 7);
 
   {
     REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::BaseColor));
@@ -188,6 +192,33 @@ TEST_CASE("GltfFormat load glTF", "[data]") {
     CHECK(roughnessImg.recoverPixel<uint8_t>(1, 0) == 255);
     CHECK(roughnessImg.recoverPixel<uint8_t>(0, 1) == 0);
     CHECK(roughnessImg.recoverPixel<uint8_t>(1, 1) == 0);
+  }
+
+  {
+    REQUIRE(matProgram.hasTexture(Raz::MaterialTexture::Sheen));
+
+    const auto& sheenMap = static_cast<const Raz::Texture2D&>(matProgram.getTexture(Raz::MaterialTexture::Sheen));
+
+    REQUIRE(sheenMap.getWidth() == 2);
+    REQUIRE(sheenMap.getHeight() == 2);
+    REQUIRE(sheenMap.getColorspace() == Raz::TextureColorspace::SRGBA);
+    REQUIRE(sheenMap.getDataType() == Raz::TextureDataType::BYTE);
+
+    const Raz::Image sheenImg = sheenMap.recoverImage();
+    REQUIRE_FALSE(sheenImg.isEmpty());
+
+    // RGBR image with 1001 alpha
+
+    // ---------   ---------
+    // | R | G |   | 1 | 0 |
+    // |-------| + |-------|
+    // | B | R |   | 0 | 1 |
+    // ---------   ---------
+
+    CHECK(sheenImg.recoverPixel<uint8_t, 4>(0, 0) == Raz::Vec4b(Raz::Vec3b(Raz::ColorPreset::Red), 255));
+    CHECK(sheenImg.recoverPixel<uint8_t, 4>(1, 0) == Raz::Vec4b(Raz::Vec3b(Raz::ColorPreset::Green), 0));
+    CHECK(sheenImg.recoverPixel<uint8_t, 4>(0, 1) == Raz::Vec4b(Raz::Vec3b(Raz::ColorPreset::Blue), 0));
+    CHECK(sheenImg.recoverPixel<uint8_t, 4>(1, 1) == Raz::Vec4b(Raz::Vec3b(Raz::ColorPreset::Red), 255));
   }
 
   {

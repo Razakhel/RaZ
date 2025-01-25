@@ -213,7 +213,7 @@ std::vector<std::optional<Image>> loadImages(const std::vector<fastgltf::Image>&
   std::vector<std::optional<Image>> loadedImages;
   loadedImages.reserve(images.size());
 
-  static auto loadFailure = [&loadedImages] (const auto&) {
+  const auto loadFailure = [&loadedImages] (const auto&) {
     Logger::error("[GltfLoad] Cannot find a suitable way of loading an image.");
     loadedImages.emplace_back(std::nullopt);
   };
@@ -227,7 +227,7 @@ std::vector<std::optional<Image>> loadImages(const std::vector<fastgltf::Image>&
         const auto* imgBytes = reinterpret_cast<const unsigned char*>(imgData.bytes.data());
         loadedImages.emplace_back(ImageFormat::loadFromData(imgBytes, imgData.bytes.size()));
       },
-      [&bufferViews, &buffers, &loadedImages] (const fastgltf::sources::BufferView& bufferViewSource) {
+      [&bufferViews, &buffers, &loadedImages, &loadFailure] (const fastgltf::sources::BufferView& bufferViewSource) {
         const fastgltf::BufferView& imgView = bufferViews[bufferViewSource.bufferViewIndex];
         const fastgltf::Buffer& imgBuffer   = buffers[imgView.bufferIndex];
 
@@ -286,6 +286,50 @@ std::pair<Image, Image> extractMetalnessRoughnessImages(const Image& metalRoughI
   return { std::move(metalnessImg), std::move(roughnessImg) };
 }
 
+Image mergeImages(const Image& image1, const Image& image2) {
+  if (image1.isEmpty())
+    return image2;
+
+  if (image2.isEmpty() || image1 == image2)
+    return image1;
+
+  if (image1.getWidth() != image2.getWidth()
+   || image1.getHeight() != image2.getHeight()
+   || image1.getDataType() != image2.getDataType()) {
+    throw std::invalid_argument("[GltfLoad] The images' attributes need to be the same in order to be merged");
+  }
+
+  if (image1.getDataType() != ImageDataType::BYTE)
+    throw std::invalid_argument("[GltfLoad] Images with a floating-point data type cannot be merged");
+
+  // TODO: the channels to copy from each image should be definable
+  const uint8_t totalChannelCount = image1.getChannelCount() + image2.getChannelCount();
+  assert("Error: There shouldn't be only one channel to be merged." && totalChannelCount > 1);
+
+  if (totalChannelCount > 4)
+    throw std::invalid_argument("[GltfLoad] Too many channels to merge images into");
+
+  const bool isSrgb = (image1.getColorspace() == ImageColorspace::SRGB || image2.getColorspace() == ImageColorspace::SRGB);
+  const ImageColorspace colorspace = (totalChannelCount == 2 ? ImageColorspace::GRAY_ALPHA
+                                   : (totalChannelCount == 3 ? ImageColorspace::RGB
+                                   : (isSrgb                 ? ImageColorspace::SRGBA
+                                                             : ImageColorspace::RGBA)));
+
+  Image res(image1.getWidth(), image1.getHeight(), colorspace, image1.getDataType());
+
+  for (unsigned int heightIndex = 0; heightIndex < image1.getHeight(); ++heightIndex) {
+    for (unsigned int widthIndex = 0; widthIndex < image1.getWidth(); ++widthIndex) {
+      for (uint8_t channelIndex = 0; channelIndex < image1.getChannelCount(); ++channelIndex)
+        res.setByteValue(widthIndex, heightIndex, channelIndex, image1.recoverByteValue(widthIndex, heightIndex, channelIndex));
+
+      for (uint8_t channelIndex = 0; channelIndex < image2.getChannelCount(); ++channelIndex)
+        res.setByteValue(widthIndex, heightIndex, channelIndex + image1.getChannelCount(), image2.recoverByteValue(widthIndex, heightIndex, channelIndex));
+    }
+  }
+
+  return res;
+}
+
 template <template <typename> typename OptionalT, typename TextureInfoT, typename FuncT>
 void loadTexture(const OptionalT<TextureInfoT>& textureInfo,
                  const std::vector<fastgltf::Texture>& textures,
@@ -304,6 +348,40 @@ void loadTexture(const OptionalT<TextureInfoT>& textureInfo,
     return;
 
   callback(*images[*imgIndex]);
+}
+
+void loadSheen(const fastgltf::MaterialSheen& matSheen,
+               const std::vector<fastgltf::Texture>& textures,
+               const std::vector<std::optional<Image>>& images,
+               RenderShaderProgram& matProgram) {
+  ZoneScopedN("[GltfLoad]::loadSheen");
+
+  const Vec4f sheenFactors(matSheen.sheenColorFactor.x(), matSheen.sheenColorFactor.y(), matSheen.sheenColorFactor.z(), matSheen.sheenRoughnessFactor);
+  matProgram.setAttribute(sheenFactors, MaterialAttribute::Sheen);
+
+  if (!matSheen.sheenColorTexture.has_value() && !matSheen.sheenRoughnessTexture.has_value())
+    return;
+
+  // If the textures are the same, load either of them
+  if (matSheen.sheenColorTexture && matSheen.sheenRoughnessTexture
+   && matSheen.sheenColorTexture->textureIndex == matSheen.sheenRoughnessTexture->textureIndex) {
+    loadTexture(matSheen.sheenColorTexture, textures, images, [&matProgram] (const Image& img) {
+      matProgram.setTexture(Texture2D::create(img, true, true), MaterialTexture::Sheen);
+    });
+
+    return;
+  }
+
+  // If either only one texture is set or they are different, merge them
+  Image sheenColorImg;
+  Image sheenRoughnessImg;
+  loadTexture(matSheen.sheenColorTexture, textures, images, [&sheenColorImg] (Image img) {
+    sheenColorImg = std::move(img);
+  });
+  loadTexture(matSheen.sheenRoughnessTexture, textures, images, [&sheenRoughnessImg] (Image img) {
+    sheenRoughnessImg = std::move(img);
+  });
+  matProgram.setTexture(Texture2D::create(mergeImages(sheenColorImg, sheenRoughnessImg), true, true), MaterialTexture::Sheen);
 }
 
 void loadMaterials(const std::vector<fastgltf::Material>& materials,
@@ -352,6 +430,9 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials,
       matProgram.setTexture(Texture2D::create(roughnessImg), MaterialTexture::Roughness);
     });
 
+    if (mat.sheen)
+      loadSheen(*mat.sheen, textures, images, matProgram);
+
     loadedMat.loadType(MaterialType::COOK_TORRANCE);
   }
 
@@ -376,7 +457,8 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 
   const FilePath parentPath = filePath.recoverPathToFile();
 
-  fastgltf::Parser parser;
+  constexpr fastgltf::Extensions extensions = fastgltf::Extensions::KHR_materials_sheen;
+  fastgltf::Parser parser(extensions);
 
   fastgltf::Expected<fastgltf::Asset> asset = parser.loadGltf(data.get(),
                                                               parentPath.getPath(),

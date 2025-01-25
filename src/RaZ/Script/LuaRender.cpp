@@ -163,6 +163,7 @@ void LuaWrapper::registerRenderTypes() {
       { "Emissive",  MaterialAttribute::Emissive },
       { "Metallic",  MaterialAttribute::Metallic },
       { "Roughness", MaterialAttribute::Roughness },
+      { "Sheen",     MaterialAttribute::Sheen },
       { "Ambient",   MaterialAttribute::Ambient },
       { "Specular",  MaterialAttribute::Specular },
       { "Opacity",   MaterialAttribute::Opacity }
@@ -175,6 +176,7 @@ void LuaWrapper::registerRenderTypes() {
       { "Normal",    MaterialTexture::Normal },
       { "Metallic",  MaterialTexture::Metallic },
       { "Roughness", MaterialTexture::Roughness },
+      { "Sheen",     MaterialTexture::Sheen },
       { "Specular",  MaterialTexture::Specular },
       { "Opacity",   MaterialTexture::Opacity },
       { "Bump",      MaterialTexture::Bump }

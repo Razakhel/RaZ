@@ -124,6 +124,12 @@
       "uri": "çûbè.bin"
     }
   ],
+  "extensionsRequired": [
+    "KHR_materials_sheen"
+  ],
+  "extensionsUsed": [
+    "KHR_materials_sheen"
+  ],
   "images": [
     {
       "uri": "../textures/ŔĜBŖĀ.png"
@@ -133,6 +139,12 @@
     },
     {
       "uri": "../textures/ĜƓGǦ.png"
+    },
+    {
+      "uri": "../textures/ŔĜBŖ.png"
+    },
+    {
+      "uri": "../textures/₁₀₀₁.png"
     }
   ],
   "materials": [
@@ -167,6 +179,22 @@
       ],
       "emissiveTexture": {
         "index": 0
+      },
+      "extensions": {
+        "KHR_materials_sheen": {
+          "sheenColorFactor": [
+            0.1,
+            0.2,
+            0.3
+          ],
+          "sheenColorTexture": {
+            "index": 3
+          },
+          "sheenRoughnessFactor": 0.4,
+          "sheenRoughnessTexture": {
+            "index": 4
+          }
+        }
       }
     }
   ],
@@ -311,6 +339,14 @@
     {
       "sampler": 0,
       "source": 0
+    },
+    {
+      "sampler": 0,
+      "source": 3
+    },
+    {
+      "sampler": 0,
+      "source": 4
     }
   ]
 }

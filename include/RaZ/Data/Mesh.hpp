@@ -22,7 +22,7 @@ public:
   Mesh(const Plane& plane, float width, float depth);
   /// Creates a mesh from a Sphere.
   /// \param sphere Sphere to create the mesh with.
-  /// \param subdivCount Amount of subdivisions (for an UV sphere, represents both the amount of vertical & horizontal lines to be created).
+  /// \param subdivCount Amount of subdivisions (for a UV sphere, represents both the amount of vertical & horizontal lines to be created).
   /// \param type Type of the sphere mesh to create.
   Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type);
   Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords);

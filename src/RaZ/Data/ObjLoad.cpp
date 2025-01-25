@@ -73,10 +73,17 @@ inline void loadMtl(const FilePath& mtlFilePath,
     } else if (tag[0] == 'P') {          // PBR properties [P*]
       const float factor = std::stof(nextValue);
 
-      if (tag[1] == 'm')                 // Metallic factor [Pm]
+      if (tag[1] == 'm') {               // Metallic factor [Pm]
         material.getProgram().setAttribute(factor, MaterialAttribute::Metallic);
-      else if (tag[1] == 'r')            // Roughness factor [Pr]
+      } else if (tag[1] == 'r') {        // Roughness factor [Pr]
         material.getProgram().setAttribute(factor, MaterialAttribute::Roughness);
+      } else if (tag[1] == 's') {        // Sheen factors [Ps]
+        std::string secondValue;
+        std::string thirdValue;
+        std::string fourthValue;
+        file >> secondValue >> thirdValue >> fourthValue;
+        material.getProgram().setAttribute(Vec4f(factor, std::stof(secondValue), std::stof(thirdValue), std::stof(fourthValue)), MaterialAttribute::Sheen);
+      }
 
       materialType = MaterialType::COOK_TORRANCE;
     } else if (tag[0] == 'm') {          // Import texture [map_*]
@@ -96,6 +103,8 @@ inline void loadMtl(const FilePath& mtlFilePath,
           material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::Red), MaterialTexture::Metallic);
         else if (tag[5] == 'r')          // Roughness map [map_Pr]
           material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::Red), MaterialTexture::Roughness);
+        else if (tag[5] == 's')          // Sheen map [map_Ps]
+          material.getProgram().setTexture(loadTexture(textureFilePath, ColorPreset::White, true), MaterialTexture::Sheen); // TODO: should be an RGBA texture with an alpha of 1
 
         materialType = MaterialType::COOK_TORRANCE;
       } else if (tag[4] == 'd') {        // Opacity (dissolve) map [map_d]

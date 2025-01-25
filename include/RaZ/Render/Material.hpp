@@ -24,6 +24,7 @@ static constexpr const char* Emissive  = "uniMaterial.emissive";  ///< Emissive 
 // PBR attributes
 static constexpr const char* Metallic  = "uniMaterial.metallicFactor";  ///< Metallic factor.
 static constexpr const char* Roughness = "uniMaterial.roughnessFactor"; ///< Roughness factor.
+static constexpr const char* Sheen     = "uniMaterial.sheenFactors";    ///< Sheen color (RGB) & roughness (A) factors.
 
 // Legacy attributes
 static constexpr const char* Ambient  = "uniMaterial.ambient";  ///< Ambient factor.
@@ -44,6 +45,7 @@ static constexpr const char* Ambient   = "uniMaterial.ambientMap";   ///< Ambien
 static constexpr const char* Normal    = "uniMaterial.normalMap";    ///< Normal map.
 static constexpr const char* Metallic  = "uniMaterial.metallicMap";  ///< Metalness map.
 static constexpr const char* Roughness = "uniMaterial.roughnessMap"; ///< Roughness map.
+static constexpr const char* Sheen     = "uniMaterial.sheenMap";     ///< Sheen color (RGB) & roughness (A) map.
 
 // Legacy textures
 static constexpr const char* Specular = "uniMaterial.specularMap"; ///< Specular map

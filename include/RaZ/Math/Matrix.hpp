@@ -72,13 +72,13 @@ public:
   template <typename... VecsTs>
   static constexpr Matrix fromColumns(VecsTs&&... vecs) noexcept;
 
-  /// Transposed matrix computation.
+  /// Computes the transpose of the matrix.
   /// \return Transposed matrix.
   constexpr Matrix<T, H, W> transpose() const noexcept;
-  /// Determinant computation.
+  /// Computes the determinant of the matrix.
   /// \return Matrix's determinant.
   constexpr T computeDeterminant() const noexcept;
-  /// Inverse matrix computation.
+  /// Compute the inverse of the matrix.
   /// \return Matrix's inverse.
   constexpr Matrix inverse() const noexcept;
   /// Recovers the values in the row at the given index.

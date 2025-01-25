@@ -45,6 +45,8 @@ void Material::loadType(MaterialType type) {
         m_program.setAttribute(0.f, MaterialAttribute::Metallic);
       if (!m_program.hasAttribute(MaterialAttribute::Roughness))
         m_program.setAttribute(1.f, MaterialAttribute::Roughness);
+      if (!m_program.hasAttribute(MaterialAttribute::Sheen))
+        m_program.setAttribute(Vec4f(0.f), MaterialAttribute::Sheen);
 
       if (!m_program.hasTexture(MaterialTexture::BaseColor))
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::BaseColor);
@@ -58,6 +60,8 @@ void Material::loadType(MaterialType type) {
         m_program.setTexture(Texture2D::create(ColorPreset::Red), MaterialTexture::Roughness);
       if (!m_program.hasTexture(MaterialTexture::Ambient))
         m_program.setTexture(Texture2D::create(ColorPreset::Red), MaterialTexture::Ambient);
+      if (!m_program.hasTexture(MaterialTexture::Sheen))
+        m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Sheen); // TODO: should be an RGBA texture with an alpha of 1
 
       break;
 
