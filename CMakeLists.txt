@@ -116,8 +116,6 @@ else ()
     string(TOUPPER ${CMAKE_BUILD_TYPE} CONFIG_STR_UPPER)
 endif ()
 
-set(RAZ_BUILD_FLAGS "${CMAKE_CXX_FLAGS_${CONFIG_STR_UPPER}}")
-
 option(ENABLE_DEBUG_INFO "Creates a debug target which prints useful values" OFF)
 
 if (ENABLE_DEBUG_INFO)
@@ -156,7 +154,7 @@ if (ENABLE_DEBUG_INFO)
         ${CMAKE_COMMAND} -E echo "  RAZ_CONFIG_SHORT:   ${RAZ_CONFIG_SHORT}" &&
         ${CMAKE_COMMAND} -E echo "" &&
 
-        ${CMAKE_COMMAND} -E echo "--- Build flags: '${RAZ_BUILD_FLAGS}'" &&
+        ${CMAKE_COMMAND} -E echo "--- Build flags: '${CMAKE_CXX_FLAGS_${CONFIG_STR_UPPER}}'" &&
         ${CMAKE_COMMAND} -E echo ""
     )
 endif ()
@@ -172,7 +170,7 @@ endif ()
 ########################
 
 include(CompilerFlags)
-add_compiler_flags(RaZ PRIVATE)
+add_compiler_flags(TARGET RaZ SCOPE PRIVATE)
 
 if (RAZ_COMPILER_GCC)
     # Enabling code coverage
@@ -197,12 +195,12 @@ if (RAZ_COMPILER_GCC)
 endif ()
 
 if (RAZ_PLATFORM_LINUX)
-    set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} pthread)
+    list(APPEND RAZ_LINKER_FLAGS pthread)
 endif ()
 
 if (RAZ_USE_EMSCRIPTEN)
     target_link_options(RaZ PUBLIC "SHELL:-s USE_GLFW=3")
-    set(RAZ_LINKER_FLAGS ${RAZ_LINKER_FLAGS} glfw)
+    list(APPEND RAZ_LINKER_FLAGS glfw)
 endif ()
 
 ######################
@@ -261,10 +259,10 @@ if (RAZ_PLATFORM_LINUX)
                 -fsanitize=leak
         )
 
-        set(
+        list(
+            APPEND
             RAZ_LINKER_FLAGS
 
-            ${RAZ_LINKER_FLAGS}
             asan
             ubsan
         )
@@ -370,7 +368,12 @@ endif ()
 #########################
 
 include(EmbedFiles)
-embed_files("${PROJECT_SOURCE_DIR}/shaders/*.*" "${CMAKE_BINARY_DIR}/shaders" RaZ Shaders)
+embed_files(
+    INPUT_PATTERN "${PROJECT_SOURCE_DIR}/shaders/*.*"
+    OUTPUT_FOLDER "${CMAKE_BINARY_DIR}/shaders"
+    MAIN_TARGET RaZ
+    EMBED_TARGET_SUFFIX Shaders
+)
 
 ###############
 # RaZ - Build #

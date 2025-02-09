@@ -16,7 +16,7 @@ enable_testing()
 ##############################
 
 include(CompilerFlags)
-add_compiler_flags(RaZ_Tests PRIVATE)
+add_compiler_flags(TARGET RaZ_Tests SCOPE PRIVATE)
 
 if (RAZ_COMPILER_CLANG)
     target_compile_options(

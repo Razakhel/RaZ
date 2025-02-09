@@ -1,8 +1,24 @@
 # Allows to define useful compiler flags (warnings, needed definitions, ...)
 
-function(add_compiler_flags TARGET_NAME SCOPE)
+function(add_compiler_flags)
+    set(options)
+    set(oneValueArgs TARGET SCOPE)
+    set(multiValueArgs)
+    cmake_parse_arguments(
+        PARSE_ARGV 0
+        arg
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+    )
+    foreach (REQUIRED_ARG IN LISTS oneValueArgs)
+        if (NOT arg_${REQUIRED_ARG})
+            message(FATAL_ERROR "Adding compiler flags requires a value for the '${REQUIRED_ARG}' argument")
+        endif ()
+    endforeach ()
+
     # The definitions MUST be propagated to avoid warnings and/or errors in headers
-    set(DEFINITIONS_SCOPE ${SCOPE})
+    set(DEFINITIONS_SCOPE ${arg_SCOPE})
     if (DEFINITIONS_SCOPE STREQUAL "PRIVATE")
         set(DEFINITIONS_SCOPE "PUBLIC")
     endif ()
@@ -25,7 +41,8 @@ function(add_compiler_flags TARGET_NAME SCOPE)
     endif ()
 
     if (COMPILER_GCC)
-        set(
+        list(
+            APPEND
             COMPILER_FLAGS
 
             -pedantic
@@ -72,10 +89,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         )
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
-            set(
+            list(
+                APPEND
                 COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 -fsized-deallocation
                 -Warray-bounds=2
                 -Wformat-signedness
@@ -84,20 +101,20 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 6)
-            set(
+            list(
+                APPEND
                 COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 -Wduplicated-cond
                 #-Wnull-dereference # Lua bindings (Sol) generate a lot of these
             )
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7)
-            set(
+            list(
+                APPEND
                 COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 -Waligned-new
                 -Walloca
                 -Walloc-zero
@@ -106,7 +123,8 @@ function(add_compiler_flags TARGET_NAME SCOPE)
             )
         endif ()
     elseif (COMPILER_CLANG)
-        set(
+        list(
+            APPEND
             COMPILER_FLAGS
 
             -Weverything
@@ -133,20 +151,20 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         )
 
         if (COMPILER_CLANG_CL)
-            set(
+            list(
+                APPEND
                 COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Disabling warnings triggered in externals
                 -Wno-language-extension-token
                 -Wno-nonportable-system-include-path
                 -Wno-zero-as-null-pointer-constant
             )
         else ()
-            set(
+            list(
+                APPEND
                 COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Other flags not recognized by clang-cl
                 -pedantic
                 -pedantic-errors
@@ -154,24 +172,15 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 5)
-            set(
-                COMPILER_FLAGS
-
-                ${COMPILER_FLAGS}
-                -Wno-unused-template
-            )
+            list(APPEND COMPILER_FLAGS -Wno-unused-template)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
-            set(
-                COMPILER_FLAGS
-
-                ${COMPILER_FLAGS}
-                -Wno-unsafe-buffer-usage
-            )
+            list(APPEND COMPILER_FLAGS -Wno-unsafe-buffer-usage)
         endif ()
     elseif (COMPILER_MSVC)
-        set(
+        list(
+            APPEND
             COMPILER_FLAGS
 
             /Wall
@@ -219,24 +228,24 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         )
 
         # Automatically export all classes & functions
-        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+        set_property(TARGET ${arg_TARGET} PROPERTY WINDOWS_EXPORT_ALL_SYMBOLS ON)
     endif ()
 
     if (COMPILER_MINGW)
-        set(
+        list(
+            APPEND
             COMPILER_FLAGS
 
-            ${COMPILER_FLAGS}
             -Wa,-mbig-obj # Allowing big object files
             -fuse-ld=lld # Using LLVM LLD as the linker
         )
     endif ()
 
     if (COMPILER_MSVC OR COMPILER_CLANG_CL)
-        set(
+        list(
+            APPEND
             COMPILER_FLAGS
 
-            ${COMPILER_FLAGS}
             /permissive- # Improving standard compliance
             /bigobj # Allowing object files to be bigger
             /EHsc # Enabling exceptions
@@ -256,9 +265,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         )
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.13)
-            set(COMPILER_FLAGS
+            list(
+                APPEND
+                COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Allowing external linkage for 'extern constexpr' variables
                 # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-externconstexpr
                 /Zc:externConstexpr
@@ -266,9 +276,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.14)
-            set(COMPILER_FLAGS
+            list(
+                APPEND
+                COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Forcing the '__cplusplus' definition to be of the proper value
                 # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-cplusplus
                 /Zc:__cplusplus
@@ -276,9 +287,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.25)
-            set(COMPILER_FLAGS
+            list(
+                APPEND
+                COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Forcing the preprocessor to be compliant with C++11 and above
                 # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-preprocessor
                 /Zc:preprocessor
@@ -286,9 +298,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.28)
-            set(COMPILER_FLAGS
+            list(
+                APPEND
+                COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Forcing lambdas' parsing to be standard compliant
                 # To be removed in C++20 (implied by /std:c++20)
                 # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-lambda
@@ -297,9 +310,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.34)
-            set(COMPILER_FLAGS
+            list(
+                APPEND
+                COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Forcing standard enumeration type deduction
                 # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-enumtypes
                 /Zc:enumTypes
@@ -307,9 +321,10 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         endif ()
 
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 19.35)
-            set(COMPILER_FLAGS
+            list(
+                APPEND
+                COMPILER_FLAGS
 
-                ${COMPILER_FLAGS}
                 # Forcing template parameters' names to not be reused (shadowed)
                 # See: https://learn.microsoft.com/en-us/cpp/build/reference/zc-templatescope
                 /Zc:templateScope
@@ -324,7 +339,7 @@ function(add_compiler_flags TARGET_NAME SCOPE)
 
     if (WIN32 OR CYGWIN)
         target_compile_definitions(
-            ${TARGET_NAME}
+            ${arg_TARGET}
 
             ${DEFINITIONS_SCOPE}
 
@@ -345,26 +360,26 @@ function(add_compiler_flags TARGET_NAME SCOPE)
                 # See https://emscripten.org/docs/optimizing/Optimizing-Code.html#link-times for details on improving link times
 
                 target_link_options(
-                    ${TARGET_NAME}
+                    ${arg_TARGET}
 
-                    ${SCOPE}
+                    ${arg_SCOPE}
 
                     "SHELL:-s ERROR_ON_WASM_CHANGES_AFTER_LINK" # Produces a linking error if the linker requires modifying the generated WASM
                     "SHELL:-s WASM_BIGINT" # Enabling BigInt support
                 )
             else ()
-                set(
+                list(
+                    APPEND
                     COMPILER_FLAGS
 
-                    ${COMPILER_FLAGS}
                     -g
                     #-fsanitize=address,undefined # Enable sanitizers
                 )
 
                 target_link_options(
-                    ${TARGET_NAME}
+                    ${arg_TARGET}
 
-                    ${SCOPE}
+                    ${arg_SCOPE}
 
                     #-fsanitize=address,undefined # Enable sanitizers
                     "SHELL:-s ASSERTIONS=1" # Enable assertions
@@ -376,12 +391,12 @@ function(add_compiler_flags TARGET_NAME SCOPE)
                 )
             endif ()
 
-            set(COMPILER_FLAGS ${COMPILER_FLAGS} -O0)
+            list(APPEND COMPILER_FLAGS -O0)
 
             target_link_options(
-                ${TARGET_NAME}
+                ${arg_TARGET}
 
-                ${SCOPE}
+                ${arg_SCOPE}
 
                 --emrun # Forward stdout & stderr to the launching console
                 --cpuprofiler # Display a CPU profiler on the page
@@ -389,26 +404,26 @@ function(add_compiler_flags TARGET_NAME SCOPE)
                 #-gsource-map # Generate source map
             )
         else ()
-            target_compile_definitions(${TARGET_NAME} ${DEFINITIONS_SCOPE} NDEBUG)
-            set(COMPILER_FLAGS ${COMPILER_FLAGS} -O3)
+            target_compile_definitions(${arg_TARGET} ${DEFINITIONS_SCOPE} NDEBUG)
+            list(APPEND COMPILER_FLAGS -O3)
         endif ()
 
         # Threading is available on Emscripten's side (see arguments below), but may not be on the browser's. This will need to be checked again in the future
         # See: https://emscripten.org/docs/porting/pthreads.html
 
-        set(
+        list(
+            APPEND
             COMPILER_FLAGS
 
-            ${COMPILER_FLAGS}
             -c # Emit object files (may be unrequired)
             #-pthread # Enabling pthread
             "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
         )
 
         target_link_options(
-            ${TARGET_NAME}
+            ${arg_TARGET}
 
-            ${SCOPE}
+            ${arg_SCOPE}
 
             #-pthread # Enabling pthread
             "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed
@@ -421,5 +436,5 @@ function(add_compiler_flags TARGET_NAME SCOPE)
         )
     endif ()
 
-    target_compile_options(${TARGET_NAME} ${SCOPE} ${COMPILER_FLAGS})
+    target_compile_options(${arg_TARGET} ${arg_SCOPE} ${COMPILER_FLAGS})
 endfunction()
