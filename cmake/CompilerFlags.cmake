@@ -437,4 +437,28 @@ function(add_compiler_flags)
     endif ()
 
     target_compile_options(${arg_TARGET} ${arg_SCOPE} ${COMPILER_FLAGS})
+
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        # Enabling assertions in the standard library in Debug mode
+        # The files in which the symbols are checked are those where the symbols are directly defined. They do exist at the time of writing, but that may
+        #  not always be so. Should that not be the case, the symbols will be considered nonexistent and the behavior will remain the default
+        include(CheckCXXSymbolExists)
+        check_cxx_symbol_exists("__GLIBCXX__" "bits/c++config.h" USING_LIBSTDCPP)
+        check_cxx_symbol_exists("_LIBCPP_VERSION" "__config" USING_LIBCPP)
+
+        if (USING_LIBSTDCPP)
+            # See https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_macros.html
+            target_compile_definitions(${arg_TARGET} ${DEFINITIONS_SCOPE} _GLIBCXX_ASSERTIONS)
+
+            # libstdc++ also supports a "debug mode", with optional backtrace reporting. This changes the size and behavior of types and so isn't enabled
+            #  by default here, but can be useful in certain cases. This implies _GLIBCXX_ASSERTIONS
+            # See https://gcc.gnu.org/onlinedocs/libstdc++/manual/debug_mode_using.html#debug_mode.using.mode
+            #target_compile_definitions(${arg_TARGET} ${DEFINITIONS_SCOPE} _GLIBCXX_DEBUG _GLIBCXX_DEBUG_BACKTRACE)
+            #target_link_libraries(${arg_TARGET} ${DEFINITIONS_SCOPE} stdc++exp) # Required for the backtrace support
+        elseif (USING_LIBCPP)
+            # Enabling hardening mode; see https://libcxx.llvm.org/Hardening.html
+            # The extensive mode's checks may be enough, but only the debug one seems to output error messages on assertions
+            target_compile_definitions(${arg_TARGET} ${DEFINITIONS_SCOPE} _LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG)
+        endif ()
+    endif ()
 endfunction()
