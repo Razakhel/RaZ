@@ -115,7 +115,7 @@ inline WavInfo validateWav(std::ifstream& file) {
   // - https://en.wikipedia.org/wiki/WAV#RIFF_WAVE
   // - https://en.wikipedia.org/wiki/Broadcast_Wave_Format#Details
   // - https://stackoverflow.com/a/76137824/3292304
-  while (bytes[0] != 'd' && bytes[1] != 'a' && bytes[2] != 't' && bytes[3] != 'a') {
+  while (bytes[0] != 'd' || bytes[1] != 'a' || bytes[2] != 't' || bytes[3] != 'a') {
     file.read(reinterpret_cast<char*>(bytes.data()), 4); // Reading the chunk size
 
     const uint32_t chunkSize = fromLittleEndian(bytes);
