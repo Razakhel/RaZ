@@ -74,7 +74,6 @@ find_library(
 )
 
 if (WIN32)
-    # Under Windows, finding the DLL may be useful in some cases
     find_file(
         FBX_DLL
 
@@ -94,7 +93,6 @@ endif ()
 
 if (FBX_LIBRARY AND FBX_INCLUDE_DIR)
     set(FBX_FOUND ON)
-    set(FBX_DEFINITIONS -DFBXSDK_SHARED)
 
     message(STATUS "[FBX] Found:")
     message(STATUS "  - Include directory: ${FBX_INCLUDE_DIR}")
@@ -103,7 +101,26 @@ if (FBX_LIBRARY AND FBX_INCLUDE_DIR)
         message(STATUS "  - DLL: ${FBX_DLL}")
     endif ()
 
+    add_library(FBX SHARED IMPORTED)
+    target_include_directories(FBX SYSTEM INTERFACE ${FBX_INCLUDE_DIR})
+    target_compile_definitions(FBX INTERFACE FBXSDK_SHARED)
+
     if (UNIX)
-        list(APPEND FBX_LIBRARY xml2) # The SDK requires libxml2
+        target_link_libraries(
+            FBX
+
+            INTERFACE
+                # The FBX SDK requires libxml2 & zlib
+                xml2
+                z
+        )
     endif ()
+
+    set_target_properties(FBX PROPERTIES IMPORTED_IMPLIB ${FBX_LIBRARY})
+
+    if (WIN32)
+        set_target_properties(FBX PROPERTIES IMPORTED_LOCATION ${FBX_DLL})
+    endif ()
+
+    add_library(FBX::FBX ALIAS FBX)
 endif ()

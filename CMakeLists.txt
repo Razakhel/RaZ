@@ -329,7 +329,9 @@ endif ()
 # RaZ - FBX file format #
 #########################
 
-if (RAZ_COMPILER_MSVC OR (RAZ_COMPILER_GCC AND NOT MINGW)) # FBX SDK unavailable for MinGW, which is considered as GCC
+# Under Windows, Clang (not Clang-cl) uses Windows'/MSVC's libraries by default, and so should be compatible with the FBX SDK
+# The SDK is unavailable with MinGW, which is considered as GCC
+if (RAZ_COMPILER_MSVC OR RAZ_COMPILER_CLANG OR (RAZ_COMPILER_GCC AND NOT MINGW))
     find_package(FBX)
     option(RAZ_USE_FBX "Allows to import/export FBX models (requires the FBX SDK to be installed)" ${FBX_FOUND})
 
@@ -338,13 +340,8 @@ if (RAZ_COMPILER_MSVC OR (RAZ_COMPILER_GCC AND NOT MINGW)) # FBX SDK unavailable
             message(SEND_ERROR "FBX required but SDK not found; please review its location")
         endif ()
 
-        target_include_directories(RaZ SYSTEM PRIVATE ${FBX_INCLUDE_DIR})
-        target_link_libraries(RaZ PRIVATE ${FBX_LIBRARY})
-        target_compile_definitions(RaZ PUBLIC RAZ_USE_FBX ${FBX_DEFINITIONS})
-
-        if (UNIX)
-            target_link_libraries(RaZ PRIVATE z) # Linking zlib
-        endif ()
+        target_link_libraries(RaZ PRIVATE FBX::FBX)
+        target_compile_definitions(RaZ PUBLIC RAZ_USE_FBX)
 
         message(STATUS "[RaZ] FBX support ENABLED")
     else ()
