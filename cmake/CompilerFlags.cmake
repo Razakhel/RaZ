@@ -1,6 +1,6 @@
 # Allows to define useful compiler flags (warnings, needed definitions, ...)
 
-function(add_compiler_flags)
+function (add_compiler_flags)
     set(options)
     set(oneValueArgs TARGET SCOPE)
     set(multiValueArgs)
@@ -461,4 +461,4 @@ function(add_compiler_flags)
             target_compile_definitions(${arg_TARGET} ${DEFINITIONS_SCOPE} _LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG)
         endif ()
     endif ()
-endfunction()
+endfunction ()

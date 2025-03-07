@@ -35,72 +35,46 @@ endif ()
 
 target_compile_options(RaZ_Examples INTERFACE ${RAZ_EXAMPLES_DISABLED_WARNINGS})
 
+macro (add_example TARGET_NAME MAIN_FILE)
+    add_executable(${TARGET_NAME} ${MAIN_FILE})
+    target_link_libraries(${TARGET_NAME} RaZ_Examples)
+    list(APPEND EXAMPLE_TARGETS ${TARGET_NAME})
+endmacro ()
+
 if (RAZ_USE_WINDOW OR RAZ_USE_EMSCRIPTEN)
+    add_example(RaZ_BloomDemo    bloomDemo.cpp)
+    add_example(RaZ_DeferredDemo deferredDemo.cpp)
+    add_example(RaZ_FullDemo     fullDemo.cpp)
+    add_example(RaZ_MinDemo      minDemo.cpp)
+    add_example(RaZ_PhysicsDemo  physicsDemo.cpp)
+    add_example(RaZ_SSRDemo      ssrDemo.cpp)
+
     if (RAZ_USE_AUDIO)
-        add_executable(RaZ_AudioDemo audioDemo.cpp)
-        target_link_libraries(RaZ_AudioDemo RaZ_Examples)
+        add_example(RaZ_AudioDemo audioDemo.cpp)
     endif ()
-
-    add_executable(RaZ_BloomDemo bloomDemo.cpp)
-    target_link_libraries(RaZ_BloomDemo RaZ_Examples)
-
-    if (NOT RAZ_USE_EMSCRIPTEN) # Compute shaders are unavailable with WebGL
-        add_executable(RaZ_ComputeDemo computeDemo.cpp)
-        target_link_libraries(RaZ_ComputeDemo RaZ_Examples)
-    endif ()
-
-    add_executable(RaZ_DeferredDemo deferredDemo.cpp)
-    target_link_libraries(RaZ_DeferredDemo RaZ_Examples)
-
-    add_executable(RaZ_FullDemo fullDemo.cpp)
-    target_link_libraries(RaZ_FullDemo RaZ_Examples)
-
-    add_executable(RaZ_MinDemo minDemo.cpp)
-    target_link_libraries(RaZ_MinDemo RaZ_Examples)
-
-    add_executable(RaZ_PhysicsDemo physicsDemo.cpp)
-    target_link_libraries(RaZ_PhysicsDemo RaZ_Examples)
 
     if (RAZ_USE_LUA)
-        add_executable(RaZ_ScriptDemo scriptDemo.cpp)
-        target_link_libraries(RaZ_ScriptDemo RaZ_Examples)
-    endif()
-
-    if (NOT RAZ_USE_EMSCRIPTEN) # Too many assets to be built (command line too long)
-        add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
-        target_link_libraries(RaZ_ShowcaseDemo RaZ_Examples)
+        add_example(RaZ_ScriptDemo scriptDemo.cpp)
     endif ()
 
-    add_executable(RaZ_SSRDemo ssrDemo.cpp)
-    target_link_libraries(RaZ_SSRDemo RaZ_Examples)
+    if (NOT RAZ_USE_EMSCRIPTEN)
+        add_example(RaZ_ComputeDemo      computeDemo.cpp)      # Compute shaders are unavailable with WebGL
+        add_example(RaZ_ShowcaseDemo     showcaseDemo.cpp)     # Too many assets to be built (command line too long)
+        add_example(RaZ_TessellationDemo tessellationDemo.cpp) # Tessellation shaders are unavailable with WebGL
 
-    if (NOT RAZ_USE_EMSCRIPTEN) # Tessellation shaders are unavailable with WebGL
-        add_executable(RaZ_TessellationDemo tessellationDemo.cpp)
-        target_link_libraries(RaZ_TessellationDemo RaZ_Examples)
-    endif ()
-
-    if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN) # XR currently isn't available with macOS or Emscripten
-        add_executable(RaZ_XRDemo xrDemo.cpp)
-        target_link_libraries(RaZ_XRDemo RaZ_Examples)
+        if (NOT RAZ_PLATFORM_MAC)
+            add_example(RaZ_XRDemo xrDemo.cpp) # XR currently isn't available with macOS or Emscripten
+        endif ()
     endif ()
 endif ()
 
-if (RAZ_USE_EMSCRIPTEN)
-    set_target_properties(RaZ_BloomDemo    PROPERTIES SUFFIX ".html")
-    set_target_properties(RaZ_DeferredDemo PROPERTIES SUFFIX ".html")
-    set_target_properties(RaZ_FullDemo     PROPERTIES SUFFIX ".html")
-    set_target_properties(RaZ_MinDemo      PROPERTIES SUFFIX ".html")
-    set_target_properties(RaZ_PhysicsDemo  PROPERTIES SUFFIX ".html")
-    set_target_properties(RaZ_SSRDemo      PROPERTIES SUFFIX ".html")
-
-    if (RAZ_USE_AUDIO)
-        set_target_properties(RaZ_AudioDemo PROPERTIES SUFFIX ".html")
+foreach (EXAMPLE_TARGET IN LISTS EXAMPLE_TARGETS)
+    if (RAZ_USE_EMSCRIPTEN)
+        set_target_properties(${EXAMPLE_TARGET} PROPERTIES SUFFIX ".html")
     endif ()
+endforeach ()
 
-    if (RAZ_USE_LUA)
-        set_target_properties(RaZ_ScriptDemo PROPERTIES SUFFIX ".html")
-    endif()
-
+if (RAZ_USE_EMSCRIPTEN)
     include(EmscriptenAssets.cmake)
 endif ()
 

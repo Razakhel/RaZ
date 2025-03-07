@@ -1,6 +1,6 @@
 # Allows to create embeddable (#include-able) files directly in code
 
-function(embed_files)
+function (embed_files)
     set(options)
     set(oneValueArgs INPUT_PATTERN OUTPUT_FOLDER MAIN_TARGET EMBED_TARGET_SUFFIX)
     set(multiValueArgs)
@@ -55,4 +55,4 @@ function(embed_files)
 
     # Adding the embedded files directory to the include dirs, so that we can include them directly in code
     target_include_directories(${arg_MAIN_TARGET} PUBLIC "${arg_OUTPUT_FOLDER}")
-endfunction()
+endfunction ()
