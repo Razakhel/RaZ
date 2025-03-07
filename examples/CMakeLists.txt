@@ -72,6 +72,17 @@ foreach (EXAMPLE_TARGET IN LISTS EXAMPLE_TARGETS)
     if (RAZ_USE_EMSCRIPTEN)
         set_target_properties(${EXAMPLE_TARGET} PROPERTIES SUFFIX ".html")
     endif ()
+
+    if (WIN32 AND RAZ_USE_FBX)
+        add_custom_command(
+            TARGET ${EXAMPLE_TARGET}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_RUNTIME_DLLS:${EXAMPLE_TARGET}>
+                $<TARGET_FILE_DIR:${EXAMPLE_TARGET}>
+            COMMAND_EXPAND_LISTS
+        )
+    endif ()
 endforeach ()
 
 if (RAZ_USE_EMSCRIPTEN)
@@ -79,13 +90,7 @@ if (RAZ_USE_EMSCRIPTEN)
 endif ()
 
 # Copying DLLs to the examples folder to link the libraries properly
-if (WIN32)
-    if (RAZ_USE_AUDIO)
-        file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/examples/OpenAL32.dll")
-        file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/examples/libopenal-1.dll")
-    endif ()
-
-    if (MSVC AND RAZ_USE_FBX)
-        file(COPY "${FBX_DLL}" DESTINATION "${CMAKE_BINARY_DIR}/examples/")
-    endif ()
+if (WIN32 AND RAZ_USE_AUDIO)
+    file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/examples/OpenAL32.dll")
+    file(COPY_FILE "${OPENAL_DLL}" "${CMAKE_BINARY_DIR}/examples/libopenal-1.dll")
 endif ()

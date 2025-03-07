@@ -119,10 +119,7 @@ endif ()
 # RaZ Tests - FBX file format #
 ###############################
 
-if (MSVC AND RAZ_USE_FBX)
-    # Copying the FBX SDK's DLL to the tests folder
-    file(COPY "${FBX_DLL}" DESTINATION "${CMAKE_BINARY_DIR}/tests/")
-else ()
+if (NOT RAZ_USE_FBX)
     list(
         REMOVE_ITEM
         RAZ_TEST_FILES
@@ -149,5 +146,16 @@ target_link_libraries(
         RaZ
         Catch2
 )
+
+if (WIN32 AND RAZ_USE_FBX)
+    add_custom_command(
+        TARGET RaZ_Tests
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:RaZ_Tests>
+            $<TARGET_FILE_DIR:RaZ_Tests>
+        COMMAND_EXPAND_LISTS
+    )
+endif ()
 
 add_test(RaZ_Tests RaZ_Tests)
