@@ -40,30 +40,38 @@ if (WIN32 OR CYGWIN)
         OPENAL_LIBRARY
 
         NAMES
-            OpenAL al openal OpenAL32
+            OpenAL
+            al
+            openal
+            OpenAL32
         HINTS
             ENV OPENALDIR
             ENV OPENAL_SDK_PATH
         PATHS
             ${OPENAL_SEARCH_PATHS}
         PATH_SUFFIXES
-            lib64 lib libs64 libs libs/Win64
+            lib64
+            lib
+            libs64
+            libs
+            libs/Win64
     )
 
     if (WIN32)
-        # Under Windows, finding the DLL may be useful in some cases
         find_file(
             OPENAL_DLL
 
             NAMES
-                soft_oal.dll libopenal-1.dll
+                soft_oal.dll
+                libopenal-1.dll
             HINTS
                 ENV OPENALDIR
                 ENV OPENAL_SDK_PATH
             PATHS
                 ${OPENAL_SEARCH_PATHS}
             PATH_SUFFIXES
-                bin bin/Win64
+                bin
+                bin/Win64
         )
     endif ()
 elseif (APPLE)
@@ -106,7 +114,11 @@ find_path(
     PATHS
         ${OPENAL_SEARCH_PATHS}
     PATH_SUFFIXES
-        include/AL include/OpenAL include AL OpenAL
+        include/AL
+        include/OpenAL
+        include
+        AL
+        OpenAL
 )
 
 if (OPENAL_LIBRARY AND OPENAL_INCLUDE_DIR)
@@ -118,4 +130,24 @@ if (OPENAL_LIBRARY AND OPENAL_INCLUDE_DIR)
     if (WIN32)
         message(STATUS "  - DLL: ${OPENAL_DLL}")
     endif ()
+
+    if (WIN32)
+        add_library(OpenAL SHARED IMPORTED)
+        set_target_properties(OpenAL PROPERTIES IMPORTED_IMPLIB ${OPENAL_LIBRARY})
+
+        # The DLL isn't set as the found file doesn't have the expected name; as there doesn't seem to be any easier way, it is copied manually later
+        # Executables made through MSYS2 need libopenal-1.dll available, while in other cases they require OpenAL32.dll. The one found is named soft_oal.dll
+        # If later it eventually is loaded manually from the code, or there's a way to easily change the name of a required DLL, it should be reenabled
+        #if (WIN32)
+        #    set_target_properties(OpenAL PROPERTIES IMPORTED_LOCATION ${OPENAL_DLL})
+        #endif ()
+    else ()
+        # Linux & macOS don't reference a file but the system's library; it can't use an imported library target
+        add_library(OpenAL INTERFACE)
+        target_link_libraries(OpenAL INTERFACE ${OPENAL_LIBRARY})
+    endif ()
+
+    target_include_directories(OpenAL SYSTEM INTERFACE ${OPENAL_INCLUDE_DIR})
+
+    add_library(OpenAL::OpenAL ALIAS OpenAL)
 endif ()

@@ -300,9 +300,8 @@ if (RAZ_USE_AUDIO)
     endif ()
 
     if (NOT RAZ_USE_EMSCRIPTEN)
-        # Emscripten manages the includes & library on its own; adding the include directory messes up predefined types
-        target_include_directories(RaZ SYSTEM PRIVATE ${OPENAL_INCLUDE_DIR})
-        target_link_libraries(RaZ PRIVATE ${OPENAL_LIBRARY})
+        # Emscripten manages OpenAL on its own; linking to it messes up predefined types
+        target_link_libraries(RaZ PRIVATE OpenAL::OpenAL)
     endif ()
     target_compile_definitions(RaZ PUBLIC RAZ_USE_AUDIO)
 
