@@ -7,6 +7,7 @@
 
 #include <array>
 #include <fstream>
+#include <optional>
 #include <string>
 
 namespace Raz::WavFormat {
@@ -22,8 +23,6 @@ constexpr uint16_t fromLittleEndian(uint8_t byte1, uint8_t byte2) {
 }
 
 struct WavInfo {
-  bool isValid = false;
-
   uint32_t fileSize {};
   uint32_t formatBlockSize {};
   uint16_t audioFormat {};
@@ -35,33 +34,8 @@ struct WavInfo {
   uint32_t dataSize {};
 };
 
-inline WavInfo validateWav(std::ifstream& file) {
-  WavInfo info {};
-
+void loadFmt(std::ifstream& file, WavInfo& info) {
   std::array<uint8_t, 4> bytes {};
-
-  ////////////
-  // Header //
-  ////////////
-
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'RIFF'
-  if (bytes[0] != 'R' && bytes[1] != 'I' && bytes[2] != 'F' && bytes[3] != 'F')
-    return info;
-
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // File size - 8
-  info.fileSize = fromLittleEndian(bytes); // Values are in little-endian; they must be converted
-
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'WAVE'
-  if (bytes[0] != 'W' && bytes[1] != 'A' && bytes[2] != 'V' && bytes[3] != 'E')
-    return info;
-
-  //////////////////
-  // Audio format //
-  //////////////////
-
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // "fmt "
-  if (bytes[0] != 'f' && bytes[1] != 'm' && bytes[2] != 't' && bytes[3] != ' ')
-    return info;
 
   file.read(reinterpret_cast<char*>(bytes.data()), 4); // Format block size - 16
   info.formatBlockSize = fromLittleEndian(bytes);
@@ -103,32 +77,50 @@ inline WavInfo validateWav(std::ifstream& file) {
 
   file.read(reinterpret_cast<char*>(bytes.data()), 2); // Bits per sample (bit depth)
   info.bitsPerSample = fromLittleEndian(bytes[0], bytes[1]);
+}
 
-  ////////////////
-  // Data block //
-  ////////////////
+std::optional<WavInfo> validateWav(std::ifstream& file) {
+  WavInfo info {};
 
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // Supposed to be 'data'
+  std::array<uint8_t, 4> bytes {};
 
-  // Additional chunks can be present (such as 'cue ', 'LIST', 'bext' and others), which aren't supported there. They must be skipped
+  file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'RIFF'
+  if (bytes[0] != 'R' && bytes[1] != 'I' && bytes[2] != 'F' && bytes[3] != 'F')
+    return std::nullopt;
+
+  file.read(reinterpret_cast<char*>(bytes.data()), 4); // File size - 8
+  info.fileSize = fromLittleEndian(bytes); // Values are in little-endian; they must be converted
+
+  file.read(reinterpret_cast<char*>(bytes.data()), 4); // 'WAVE'
+  if (bytes[0] != 'W' && bytes[1] != 'A' && bytes[2] != 'V' && bytes[3] != 'E')
+    return std::nullopt;
+
+  // Additional chunks can be present (such as 'JUNK', 'cue ', 'LIST', 'bext' and others), which aren't supported there. They must be skipped
   // See:
-  // - https://en.wikipedia.org/wiki/WAV#RIFF_WAVE
+  // - https://en.wikipedia.org/wiki/WAV#File_specifications
   // - https://en.wikipedia.org/wiki/Broadcast_Wave_Format#Details
   // - https://stackoverflow.com/a/76137824/3292304
-  while (bytes[0] != 'd' || bytes[1] != 'a' || bytes[2] != 't' || bytes[3] != 'a') {
-    file.read(reinterpret_cast<char*>(bytes.data()), 4); // Reading the chunk size
-
-    const uint32_t chunkSize = fromLittleEndian(bytes);
-    file.ignore(chunkSize);
-
+  while (file) {
     file.read(reinterpret_cast<char*>(bytes.data()), 4);
+
+    if (bytes[0] == 'f' && bytes[1] == 'm' && bytes[2] == 't' && bytes[3] == ' ') {
+      loadFmt(file, info);
+      continue;
+    }
+
+    if (bytes[0] == 'd' && bytes[1] == 'a' && bytes[2] == 't' && bytes[3] == 'a') {
+      file.read(reinterpret_cast<char*>(bytes.data()), 4); // Data size (file size - header size (theoretically 44 bytes))
+      info.dataSize = fromLittleEndian(bytes);
+
+      return info;
+    }
+
+    // Unsupported chunk, skip it
+    file.read(reinterpret_cast<char*>(bytes.data()), 4); // Chunk size
+    file.ignore(fromLittleEndian(bytes));
   }
 
-  file.read(reinterpret_cast<char*>(bytes.data()), 4); // Data size (file size - header size (theoretically 44 bytes))
-  info.dataSize = fromLittleEndian(bytes);
-
-  info.isValid = true;
-  return info;
+  throw std::invalid_argument("[WavLoad] No data block found");
 }
 
 } // namespace
@@ -144,55 +136,55 @@ AudioData load(const FilePath& filePath) {
   if (!file)
     throw std::invalid_argument("[WavLoad] Could not open the WAV file '" + filePath + "'");
 
-  const WavInfo info = validateWav(file);
+  const std::optional<WavInfo> info = validateWav(file);
 
-  if (!info.isValid)
+  if (info == std::nullopt)
     throw std::runtime_error("[WavLoad] '" + filePath + "' is not a valid WAV audio file");
 
   AudioData audioData {};
 
   // Determining the right audio format
-  switch (info.bitsPerSample) {
+  switch (info->bitsPerSample) {
     case 8:
-      if (info.channelCount == 1)
+      if (info->channelCount == 1)
         audioData.format = AudioFormat::MONO_U8;
-      else if (info.channelCount == 2)
+      else if (info->channelCount == 2)
         audioData.format = AudioFormat::STEREO_U8;
       break;
 
     case 16:
-      if (info.channelCount == 1)
+      if (info->channelCount == 1)
         audioData.format = AudioFormat::MONO_I16;
-      else if (info.channelCount == 2)
+      else if (info->channelCount == 2)
         audioData.format = AudioFormat::STEREO_I16;
       break;
 
     case 32:
-      if (info.channelCount == 1)
+      if (info->channelCount == 1)
         audioData.format = AudioFormat::MONO_F32;
-      else if (info.channelCount == 2)
+      else if (info->channelCount == 2)
         audioData.format = AudioFormat::STEREO_F32;
       break;
 
     case 64:
-      if (info.channelCount == 1)
+      if (info->channelCount == 1)
         audioData.format = AudioFormat::MONO_F64;
-      else if (info.channelCount == 2)
+      else if (info->channelCount == 2)
         audioData.format = AudioFormat::STEREO_F64;
       break;
 
     default:
-      throw std::runtime_error("[WavLoad] " + std::to_string(info.bitsPerSample) + " bits WAV files are unsupported");
+      throw std::runtime_error("[WavLoad] " + std::to_string(info->bitsPerSample) + " bits WAV files are unsupported");
   }
 
   // If the format is still unassigned, it is invalid
   if (static_cast<int>(audioData.format) == 0)
     throw std::runtime_error("[WavLoad] Unsupported WAV channel count");
 
-  audioData.frequency = static_cast<int>(info.frequency);
+  audioData.frequency = static_cast<int>(info->frequency);
 
   // Reading the actual audio data from the file
-  audioData.buffer.resize(info.dataSize);
+  audioData.buffer.resize(info->dataSize);
   file.read(reinterpret_cast<char*>(audioData.buffer.data()), static_cast<std::streamsize>(audioData.buffer.size()));
 
   Logger::debug("[WavLoad] Loaded WAV file");
