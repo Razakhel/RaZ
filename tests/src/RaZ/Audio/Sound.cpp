@@ -2,6 +2,7 @@
 #include "RaZ/Audio/Sound.hpp"
 #include "RaZ/Data/WavFormat.hpp"
 #include "RaZ/Math/Vector.hpp"
+#include "RaZ/Utils/FilePath.hpp"
 #include "RaZ/Utils/Threading.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -16,14 +17,15 @@ TEST_CASE("Sound initialization", "[audio]") {
 TEST_CASE("Sound move", "[audio]") {
   const Raz::AudioSystem audio;
 
-  Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
+  Raz::Sound sound(Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav"));
   REQUIRE(sound.getBufferIndex() != std::numeric_limits<unsigned int>::max());
 
   const unsigned int bufferIndex = sound.getBufferIndex();
-  const Raz::AudioFormat format  = sound.getFormat();
-  const int frequency   = sound.getFrequency();
-  constexpr float pitch = 0.123f;
-  constexpr float gain  = 0.987f;
+  const Raz::AudioFormat format  = sound.getData().format;
+  const unsigned int frequency   = sound.getData().frequency;
+  const std::size_t bufferSize   = sound.getData().buffer.size();
+  constexpr float pitch          = 0.123f;
+  constexpr float gain           = 0.987f;
   constexpr Raz::Vec3f position(1.f, 2.f, 3.f);
   constexpr Raz::Vec3f velocity(3.f, 2.f, 1.f);
 
@@ -38,8 +40,9 @@ TEST_CASE("Sound move", "[audio]") {
 
   // The new sound has the same values as the original one
   CHECK(movedSoundCtor.getBufferIndex() == bufferIndex);
-  CHECK(movedSoundCtor.getFormat() == format);
-  CHECK(movedSoundCtor.getFrequency() == frequency);
+  CHECK(movedSoundCtor.getData().format == format);
+  CHECK(movedSoundCtor.getData().frequency == frequency);
+  CHECK(movedSoundCtor.getData().buffer.size() == bufferSize);
   CHECK(movedSoundCtor.recoverPitch() == pitch);
   CHECK(movedSoundCtor.recoverGain() == gain);
   CHECK(movedSoundCtor.recoverPosition() == position);
@@ -71,8 +74,9 @@ TEST_CASE("Sound move", "[audio]") {
   movedSoundOp = std::move(movedSoundCtor);
 
   CHECK(movedSoundOp.getBufferIndex() == bufferIndex);
-  CHECK(movedSoundOp.getFormat() == format);
-  CHECK(movedSoundOp.getFrequency() == frequency);
+  CHECK(movedSoundOp.getData().format == format);
+  CHECK(movedSoundOp.getData().frequency == frequency);
+  CHECK(movedSoundOp.getData().buffer.size() == bufferSize);
   CHECK(movedSoundOp.recoverPitch() == pitch);
   CHECK(movedSoundOp.recoverGain() == gain);
   CHECK(movedSoundOp.recoverPosition() == position);
@@ -89,7 +93,7 @@ TEST_CASE("Sound move", "[audio]") {
 TEST_CASE("Sound operations", "[audio]") {
   const Raz::AudioSystem audio;
 
-  const Raz::Sound sound = Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav");
+  const Raz::Sound sound(Raz::WavFormat::load(RAZ_TESTS_ROOT "assets/sounds/notif_ting.wav"));
   REQUIRE(sound.getBufferIndex() != std::numeric_limits<unsigned int>::max());
 
   sound.setGain(0.f); // Nobody wants his ears assaulted by a wild sound when launching tests

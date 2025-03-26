@@ -92,12 +92,7 @@ file(
 ############################
 
 if (RAZ_USE_AUDIO)
-    file(
-        GLOB
-        RAZ_AUDIO_FILES
-
-        "${PROJECT_SOURCE_DIR}/src/RaZ/Audio/*.cpp"
-    )
+    file(GLOB RAZ_AUDIO_TEST_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Audio/*.cpp")
     list(APPEND RAZ_TEST_FILES ${RAZ_AUDIO_TEST_FILES})
 
     if (WIN32)
