@@ -11,6 +11,7 @@
 #include "Animation/Skeleton.hpp"
 #include "Audio/AudioData.hpp"
 #include "Audio/AudioSystem.hpp"
+#include "Audio/AudioUtils.hpp"
 #include "Audio/Listener.hpp"
 #include "Audio/Microphone.hpp"
 #include "Audio/Sound.hpp"
