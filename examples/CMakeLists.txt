@@ -7,7 +7,7 @@ target_link_libraries(RaZ_Examples INTERFACE RaZ)
 target_sources(RaZ_Examples INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/DemoUtils.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/DemoUtils.hpp")
 
 include(CompilerFlags)
-add_compiler_flags(TARGET RaZ_Examples SCOPE INTERFACE)
+add_compiler_flags(TARGET RaZ_Examples SCOPE INTERFACE ${SANITIZERS_OPTION})
 
 # Disabling some warnings, which are intendedly present
 if (RAZ_COMPILER_GCC)

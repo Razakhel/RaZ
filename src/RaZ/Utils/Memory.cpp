@@ -1,3 +1,5 @@
+#if !defined(_MSC_VER) || !defined(__SANITIZE_ADDRESS__) // MSVC's ASan redefines the new & delete operators, which end up being in conflict with those
+
 #include <tracy/Tracy.hpp>
 
 // See https://en.cppreference.com/w/cpp/memory/new/operator_new
@@ -67,3 +69,5 @@ void operator delete[](void* ptr, std::size_t) noexcept {
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
   operator delete[](ptr);
 }
+
+#endif

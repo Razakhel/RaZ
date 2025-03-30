@@ -1,7 +1,7 @@
 # Allows to define useful compiler flags (warnings, needed definitions, ...)
 
 function (add_compiler_flags)
-    set(options)
+    set(options USE_SANITIZERS)
     set(oneValueArgs TARGET SCOPE)
     set(multiValueArgs)
     cmake_parse_arguments(
@@ -342,11 +342,80 @@ function (add_compiler_flags)
             ${arg_TARGET}
 
             ${DEFINITIONS_SCOPE}
-
-            NOMINMAX # Preventing definitions of min & max macros
-            NOGDI # Preventing definition of the 'ERROR' macro
-            _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING # Ignoring std::codecvt deprecation warnings
+                NOMINMAX # Preventing definitions of min & max macros
+                NOGDI # Preventing definition of the 'ERROR' macro
+                _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING # Ignoring std::codecvt deprecation warnings
         )
+    endif ()
+
+    if (arg_USE_SANITIZERS)
+        if (COMPILER_MSVC)
+            if (NOT TARGET MSVC_ASan)
+                add_library(MSVC_ASan SHARED IMPORTED)
+
+                cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH MSVC_BIN_DIR)
+                string(REGEX REPLACE "/bin/Host.*/(.*)" "/lib/\\1" MSVC_LIB_DIR "${MSVC_BIN_DIR}")
+                # From VS 2022 17.7 (mid-2023) onward, a single DLL is needed for all runtimes. Versions prior to that are currently unsupported here
+                # See: https://devblogs.microsoft.com/cppblog/msvc-address-sanitizer-one-dll-for-all-runtime-configurations/#link-time-changes-(/inferasanlibs)
+                set(CLANG_RT_ASAN clang_rt.asan_dynamic-x86_64)
+
+                set_target_properties(
+                    MSVC_ASan
+                    PROPERTIES
+                        IMPORTED_IMPLIB   "${MSVC_LIB_DIR}/${CLANG_RT_ASAN}.lib"
+                        IMPORTED_LOCATION "${MSVC_BIN_DIR}/${CLANG_RT_ASAN}.dll"
+                )
+
+                target_compile_definitions(
+                    MSVC_ASan
+
+                    INTERFACE
+                        _DISABLE_STRING_ANNOTATION
+                        _DISABLE_VECTOR_ANNOTATION
+                )
+
+                target_compile_options(
+                    MSVC_ASan
+
+                    INTERFACE
+                        /fsanitize=address
+                        /Zi # Generate debug information
+                )
+
+                target_link_options(
+                    MSVC_ASan
+
+                    INTERFACE
+                        /DEBUG
+                        /INCREMENTAL:NO
+                )
+            endif ()
+
+            target_link_libraries(${arg_TARGET} ${arg_SCOPE} MSVC_ASan)
+        elseif (UNIX AND (COMPILER_GCC OR COMPILER_CLANG))
+            set(
+                SANITIZERS
+
+                -fsanitize=address
+                -fsanitize=leak
+                -fsanitize=undefined
+            )
+
+            list(
+                APPEND
+                COMPILER_FLAGS
+
+                -g
+                -fno-omit-frame-pointer
+                -fno-optimize-sibling-calls
+                -fsanitize-address-use-after-scope
+                ${SANITIZERS}
+            )
+
+            target_link_options(${arg_TARGET} ${arg_SCOPE} ${SANITIZERS})
+        else ()
+            message(WARNING "Sanitizers are not supported with the current compiler")
+        endif ()
     endif ()
 
     if (COMPILER_EMSCRIPTEN)
@@ -363,9 +432,8 @@ function (add_compiler_flags)
                     ${arg_TARGET}
 
                     ${arg_SCOPE}
-
-                    "SHELL:-s ERROR_ON_WASM_CHANGES_AFTER_LINK" # Produces a linking error if the linker requires modifying the generated WASM
-                    "SHELL:-s WASM_BIGINT" # Enabling BigInt support
+                        "SHELL:-s ERROR_ON_WASM_CHANGES_AFTER_LINK" # Produces a linking error if the linker requires modifying the generated WASM
+                        "SHELL:-s WASM_BIGINT" # Enabling BigInt support
                 )
             else ()
                 list(
@@ -380,14 +448,13 @@ function (add_compiler_flags)
                     ${arg_TARGET}
 
                     ${arg_SCOPE}
-
-                    #-fsanitize=address,undefined # Enable sanitizers
-                    "SHELL:-s ASSERTIONS=1" # Enable assertions
-                    "SHELL:-s GL_ASSERTIONS=1" # Enable OpenGL error checks
-                    #"SHELL:-s GL_TESTING=1" # Keep the drawing buffer alive to allow testing
-                    #"SHELL:-s INITIAL_MEMORY=300MB" # Expanding the initial memory pool; required for asan
-                    "SHELL:-s SAFE_HEAP=1" # Enable heap checks
-                    "SHELL:-s STACK_OVERFLOW_CHECK=2" # Enhance call stack precision
+                        #-fsanitize=address,undefined # Enable sanitizers
+                        "SHELL:-s ASSERTIONS=1" # Enable assertions
+                        "SHELL:-s GL_ASSERTIONS=1" # Enable OpenGL error checks
+                        #"SHELL:-s GL_TESTING=1" # Keep the drawing buffer alive to allow testing
+                        #"SHELL:-s INITIAL_MEMORY=300MB" # Expanding the initial memory pool; required for asan
+                        "SHELL:-s SAFE_HEAP=1" # Enable heap checks
+                        "SHELL:-s STACK_OVERFLOW_CHECK=2" # Enhance call stack precision
                 )
             endif ()
 
@@ -397,11 +464,10 @@ function (add_compiler_flags)
                 ${arg_TARGET}
 
                 ${arg_SCOPE}
-
-                --emrun # Forward stdout & stderr to the launching console
-                --cpuprofiler # Display a CPU profiler on the page
-                #--memoryprofiler # Display a memory profiler on the page (SAFE_HEAP needs to be disabled: "maximum call stack size exceeded")
-                #-gsource-map # Generate source map
+                    --emrun # Forward stdout & stderr to the launching console
+                    --cpuprofiler # Display a CPU profiler on the page
+                    #--memoryprofiler # Display a memory profiler on the page (SAFE_HEAP needs to be disabled: "maximum call stack size exceeded")
+                    #-gsource-map # Generate source map
             )
         else ()
             target_compile_definitions(${arg_TARGET} ${DEFINITIONS_SCOPE} NDEBUG)
@@ -424,15 +490,14 @@ function (add_compiler_flags)
             ${arg_TARGET}
 
             ${arg_SCOPE}
-
-            #-pthread # Enabling pthread
-            "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed
-            "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
-            "SHELL:-s OFFSCREEN_FRAMEBUFFER=1" # Enable rendering to offscreen targets
-            "SHELL:-s OFFSCREENCANVAS_SUPPORT=1" # Allow creating multiple GL contexts on separate threads & swapping between them
-            #"SHELL:-s PROXY_TO_PTHREAD" # Runs the whole program into a separate thread
-            #"SHELL:-s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency" # Setting the initial thread pool size to the system's thread count
-            "SHELL:-s USE_WEBGL2=1" # Force the use of WebGL2
+                #-pthread # Enabling pthread
+                "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed
+                "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
+                "SHELL:-s OFFSCREEN_FRAMEBUFFER=1" # Enable rendering to offscreen targets
+                "SHELL:-s OFFSCREENCANVAS_SUPPORT=1" # Allow creating multiple GL contexts on separate threads & swapping between them
+                #"SHELL:-s PROXY_TO_PTHREAD" # Runs the whole program into a separate thread
+                #"SHELL:-s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency" # Setting the initial thread pool size to the system's thread count
+                "SHELL:-s USE_WEBGL2=1" # Force the use of WebGL2
         )
     endif ()
 

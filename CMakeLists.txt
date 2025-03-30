@@ -1,10 +1,12 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.14...3.30.5)
 
-if (POLICY CMP0092)
-    cmake_policy(SET CMP0092 NEW) # Removing the default /W3 from MSVC targets (CMake 3.15+)
-endif ()
-
-project(RaZ)
+project(
+    RaZ
+    VERSION 0.0.1
+    DESCRIPTION "Modern & multiplatform 3D game engine"
+    HOMEPAGE_URL https://github.com/Razakhel/RaZ
+    LANGUAGES CXX
+)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -169,8 +171,14 @@ endif ()
 # RaZ - Compiler flags #
 ########################
 
+option(RAZ_USE_SANITIZERS "Use compiler sanitizers" OFF)
+
+if (RAZ_USE_SANITIZERS)
+    set(SANITIZERS_OPTION USE_SANITIZERS)
+endif ()
+
 include(CompilerFlags)
-add_compiler_flags(TARGET RaZ SCOPE PRIVATE)
+add_compiler_flags(TARGET RaZ SCOPE PRIVATE ${SANITIZERS_OPTION})
 
 if (RAZ_COMPILER_GCC)
     # Enabling code coverage
@@ -244,30 +252,6 @@ file(
 
     ${RAZ_SRC}
 )
-
-# Defining platform-dependent options & linking flags
-if (RAZ_PLATFORM_LINUX)
-    option(RAZ_USE_SANITIZERS "Use sanitizers" OFF)
-
-    if (RAZ_USE_SANITIZERS)
-        target_compile_definitions(
-            RaZ
-
-            PRIVATE
-                -fsanitize=undefined
-                -fsanitize=address
-                -fsanitize=leak
-        )
-
-        list(
-            APPEND
-            RAZ_LINKER_FLAGS
-
-            asan
-            ubsan
-        )
-    endif ()
-endif ()
 
 ######################
 # RaZ - Audio/OpenAL #

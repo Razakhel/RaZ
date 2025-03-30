@@ -16,18 +16,17 @@ enable_testing()
 ##############################
 
 include(CompilerFlags)
-add_compiler_flags(TARGET RaZ_Tests SCOPE PRIVATE)
+add_compiler_flags(TARGET RaZ_Tests SCOPE PRIVATE ${SANITIZERS_OPTION})
 
 if (RAZ_COMPILER_CLANG)
     target_compile_options(
         RaZ_Tests
 
         PRIVATE
-
-        -Wno-double-promotion # [long] double/float operations are voluntarily made
-        -Wno-float-conversion # Can occur voluntarily for readability
-        -Wno-implicit-int-float-conversion # Can occur voluntarily for readability
-        -Wno-unneeded-member-function # Test structures may contain unnecessary member functions
+            -Wno-double-promotion # [long] double/float operations are voluntarily made
+            -Wno-float-conversion # Can occur voluntarily for readability
+            -Wno-implicit-int-float-conversion # Can occur voluntarily for readability
+            -Wno-unneeded-member-function # Test structures may contain unnecessary member functions
     )
 
     # Disabling some other warnings available since Clang 13.X
@@ -39,16 +38,15 @@ elseif (RAZ_COMPILER_MSVC)
         RaZ_Tests
 
         PRIVATE
+            /wd4723 # Potential divide by 0
 
-        /wd4723 # Potential divide by 0
-
-        # Warnings triggered by Catch
-        /wd4388 # Signed/unsigned mismatch (equality comparison)
-        /wd4583 # Destructor not implicitly called
-        /wd4623 # Default constructor implicitly deleted
-        /wd4868 # Evaluation order not guaranteed in braced initializing list
-        /wd5219 # Implicit conversion, possible loss of data
-        /wd5267 # Assignment operator implicitly deleted
+            # Warnings triggered by Catch
+            /wd4388 # Signed/unsigned mismatch (equality comparison)
+            /wd4583 # Destructor not implicitly called
+            /wd4623 # Default constructor implicitly deleted
+            /wd4868 # Evaluation order not guaranteed in braced initializing list
+            /wd5219 # Implicit conversion, possible loss of data
+            /wd5267 # Assignment operator implicitly deleted
     )
 endif ()
 
