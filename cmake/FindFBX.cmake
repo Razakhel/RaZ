@@ -122,5 +122,11 @@ if (FBX_LIBRARY AND FBX_INCLUDE_DIR)
         set_target_properties(FBX PROPERTIES IMPORTED_LOCATION ${FBX_DLL})
     endif ()
 
+    install(
+        IMPORTED_RUNTIME_ARTIFACTS FBX
+        LIBRARY DESTINATION "lib/$<CONFIG>"
+        RUNTIME DESTINATION "bin/$<CONFIG>"
+    )
+
     add_library(FBX::FBX ALIAS FBX)
 endif ()

@@ -504,19 +504,18 @@ if (RAZ_PLATFORM_WINDOWS)
     set(CMAKE_INSTALL_PREFIX "C:/RaZ")
 endif ()
 
-install(TARGETS RaZ DESTINATION "lib/$<CONFIG>")
+install(
+    TARGETS RaZ
+    ARCHIVE DESTINATION "lib/$<CONFIG>"
+    LIBRARY DESTINATION "lib/$<CONFIG>"
+    RUNTIME DESTINATION "bin/$<CONFIG>"
+)
 
 # Installing the headers
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/RaZ" DESTINATION include)
 
 # Installing DLL files into the bin/ folder
-if (RAZ_COMPILER_MSVC)
-    if (RAZ_USE_AUDIO)
-        install(FILES "${OPENAL_DLL}" RENAME "OpenAL32.dll" DESTINATION "bin/$<CONFIG>")
-        install(FILES "${OPENAL_DLL}" RENAME "libopenal-1.dll" DESTINATION "bin/$<CONFIG>")
-    endif ()
-
-    if (RAZ_USE_FBX)
-        install(FILES "${FBX_DLL}" DESTINATION "bin/$<CONFIG>")
-    endif ()
+if (RAZ_COMPILER_MSVC AND RAZ_USE_AUDIO)
+    install(FILES "${OPENAL_DLL}" RENAME "OpenAL32.dll"    DESTINATION "bin/$<CONFIG>")
+    install(FILES "${OPENAL_DLL}" RENAME "libopenal-1.dll" DESTINATION "bin/$<CONFIG>")
 endif ()

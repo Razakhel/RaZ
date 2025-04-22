@@ -389,6 +389,12 @@ function (add_compiler_flags)
                         /DEBUG
                         /INCREMENTAL:NO
                 )
+
+                install(
+                    IMPORTED_RUNTIME_ARTIFACTS MSVC_ASan
+                    LIBRARY DESTINATION "lib/$<CONFIG>"
+                    RUNTIME DESTINATION "bin/$<CONFIG>"
+                )
             endif ()
 
             target_link_libraries(${arg_TARGET} ${arg_SCOPE} MSVC_ASan)
