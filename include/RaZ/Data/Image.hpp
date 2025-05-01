@@ -4,6 +4,7 @@
 #define RAZ_IMAGE_HPP
 
 #include <cassert>
+#include <cstdint>
 #include <memory>
 #include <vector>
 

@@ -372,6 +372,7 @@ inline std::vector<std::wstring> split(std::wstring text, wchar_t delimiter) {
 /// \return Converted UTF-8 string.
 inline std::string toUtf8(const std::wstring& text) {
   PUSH_WARNINGS_STATE
+  DISABLE_WARNING_GCC(-Wdeprecated-declarations)
   DISABLE_WARNING_CLANG(-Wdeprecated-declarations)
   return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().to_bytes(text);
   POP_WARNINGS_STATE
@@ -390,6 +391,7 @@ constexpr const std::string& toUtf8(const std::string& text) {
 /// \return Converted wide string.
 inline std::wstring toWide(const std::string& text) {
   PUSH_WARNINGS_STATE
+  DISABLE_WARNING_GCC(-Wdeprecated-declarations)
   DISABLE_WARNING_CLANG(-Wdeprecated-declarations)
   return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(text);
   POP_WARNINGS_STATE
