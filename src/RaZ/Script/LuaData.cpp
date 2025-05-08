@@ -2,6 +2,7 @@
 #include "RaZ/Data/BoundingVolumeHierarchy.hpp"
 #include "RaZ/Data/BoundingVolumeHierarchySystem.hpp"
 #include "RaZ/Data/Color.hpp"
+#include "RaZ/Data/Grid3.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/MeshDistanceField.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
@@ -100,6 +101,24 @@ void LuaWrapper::registerDataTypes() {
     colorPreset["Magenta"]     = ColorPreset::Magenta;
     colorPreset["Yellow"]      = ColorPreset::Yellow;
     colorPreset["White"]       = ColorPreset::White;
+  }
+
+  {
+    sol::usertype<Grid3b> grid3b = state.new_usertype<Grid3b>("Grid3b",
+                                                              sol::constructors<Grid3b(std::size_t, std::size_t, std::size_t)>());
+    grid3b["getWidth"]  = &Grid3b::getWidth;
+    grid3b["getHeight"] = &Grid3b::getHeight;
+    grid3b["getDepth"]  = &Grid3b::getDepth;
+    grid3b["getValue"]  = &Grid3b::getValue;
+    grid3b["setValue"]  = &Grid3b::setValue;
+
+    sol::usertype<Grid3f> grid3f = state.new_usertype<Grid3f>("Grid3f",
+                                                              sol::constructors<Grid3f(std::size_t, std::size_t, std::size_t)>());
+    grid3f["getWidth"]  = &Grid3f::getWidth;
+    grid3f["getHeight"] = &Grid3f::getHeight;
+    grid3f["getDepth"]  = &Grid3f::getDepth;
+    grid3f["getValue"]  = &Grid3f::getValue;
+    grid3f["setValue"]  = &Grid3f::setValue;
   }
 
   {
