@@ -178,7 +178,7 @@ TEST_CASE("LuaData MeshDistanceField", "[script][lua][data]") {
   CHECK(TestUtils::executeLuaScript(R"(
     local mdf = MeshDistanceField.new(AABB.new(Vec3f.new(), Vec3f.new()), 2, 2, 2)
 
-    assert(mdf:getDistance(0, 0, 0) ~= 0)
+    assert(mdf:getValue(0, 0, 0) ~= 0)
     mdf:setBvh(BoundingVolumeHierarchy.new())
     mdf:compute(1)
     assert(mdf:recoverSlices():size() == 2)

@@ -124,9 +124,9 @@ void LuaWrapper::registerDataTypes() {
   {
     sol::usertype<MeshDistanceField> mdf = state.new_usertype<MeshDistanceField>("MeshDistanceField",
                                                                                  sol::constructors<
-                                                                                   MeshDistanceField(const Raz::AABB&, unsigned int, unsigned int, unsigned int)
-                                                                                 >());
-    mdf["getDistance"]   = &MeshDistanceField::getDistance;
+                                                                                   MeshDistanceField(const AABB&, unsigned int, unsigned int, unsigned int)
+                                                                                 >(),
+                                                                                 sol::base_classes, sol::bases<Grid3f>());
     mdf["setBvh"]        = &MeshDistanceField::setBvh;
     mdf["compute"]       = &MeshDistanceField::compute;
     mdf["recoverSlices"] = &MeshDistanceField::recoverSlices;
