@@ -82,6 +82,22 @@ TEST_CASE("LuaData Color", "[script][lua][data]") {
   )"));
 }
 
+TEST_CASE("LuaData Grid2", "[script][lua][data]") {
+  CHECK(TestUtils::executeLuaScript(R"(
+    local grid2b = Grid2b.new(1, 1)
+    assert(grid2b:getWidth() == 1)
+    assert(grid2b:getHeight() == 1)
+    grid2b:setValue(0, 0, true)
+    assert(grid2b:getValue(0, 0) == true)
+
+    local grid2f = Grid2f.new(1, 1)
+    assert(grid2f:getWidth() == 1)
+    assert(grid2f:getHeight() == 1)
+    grid2f:setValue(0, 0, 3)
+    assert(grid2f:getValue(0, 0) == 3)
+  )"));
+}
+
 TEST_CASE("LuaData Grid3", "[script][lua][data]") {
   CHECK(TestUtils::executeLuaScript(R"(
     local grid3b = Grid3b.new(1, 1, 1)

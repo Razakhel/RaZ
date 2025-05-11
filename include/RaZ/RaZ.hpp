@@ -25,6 +25,7 @@
 #include "Data/FbxFormat.hpp"
 #include "Data/GltfFormat.hpp"
 #include "Data/Graph.hpp"
+#include "Data/Grid2.hpp"
 #include "Data/Grid3.hpp"
 #include "Data/Image.hpp"
 #include "Data/ImageFormat.hpp"

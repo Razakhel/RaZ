@@ -2,6 +2,7 @@
 #include "RaZ/Data/BoundingVolumeHierarchy.hpp"
 #include "RaZ/Data/BoundingVolumeHierarchySystem.hpp"
 #include "RaZ/Data/Color.hpp"
+#include "RaZ/Data/Grid2.hpp"
 #include "RaZ/Data/Grid3.hpp"
 #include "RaZ/Data/Image.hpp"
 #include "RaZ/Data/MeshDistanceField.hpp"
@@ -101,6 +102,22 @@ void LuaWrapper::registerDataTypes() {
     colorPreset["Magenta"]     = ColorPreset::Magenta;
     colorPreset["Yellow"]      = ColorPreset::Yellow;
     colorPreset["White"]       = ColorPreset::White;
+  }
+
+  {
+    sol::usertype<Grid2b> grid2b = state.new_usertype<Grid2b>("Grid2b",
+                                                              sol::constructors<Grid2b(std::size_t, std::size_t)>());
+    grid2b["getWidth"]  = &Grid2b::getWidth;
+    grid2b["getHeight"] = &Grid2b::getHeight;
+    grid2b["getValue"]  = &Grid2b::getValue;
+    grid2b["setValue"]  = &Grid2b::setValue;
+
+    sol::usertype<Grid2f> grid2f = state.new_usertype<Grid2f>("Grid2f",
+                                                              sol::constructors<Grid2f(std::size_t, std::size_t)>());
+    grid2f["getWidth"]  = &Grid2f::getWidth;
+    grid2f["getHeight"] = &Grid2f::getHeight;
+    grid2f["getValue"]  = &Grid2f::getValue;
+    grid2f["setValue"]  = &Grid2f::setValue;
   }
 
   {
