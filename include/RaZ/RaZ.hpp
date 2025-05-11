@@ -29,6 +29,7 @@
 #include "Data/Grid3.hpp"
 #include "Data/Image.hpp"
 #include "Data/ImageFormat.hpp"
+#include "Data/MarchingSquares.hpp"
 #include "Data/Mesh.hpp"
 #include "Data/MeshDistanceField.hpp"
 #include "Data/MeshFormat.hpp"

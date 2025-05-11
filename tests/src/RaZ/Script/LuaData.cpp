@@ -148,6 +148,13 @@ TEST_CASE("LuaData Image", "[script][lua][data]") {
   )"));
 }
 
+TEST_CASE("LuaData MarchingSquares", "[script][lua][data]") {
+  CHECK(TestUtils::executeLuaScript(R"(
+    local mesh = MarchingSquares.compute(Grid2b.new(2, 2))
+    assert(mesh:recoverVertexCount() == 0)
+  )"));
+}
+
 TEST_CASE("LuaData Mesh", "[script][lua][data]") {
   CHECK(TestUtils::executeLuaScript(R"(
     local mesh = Mesh.new()
