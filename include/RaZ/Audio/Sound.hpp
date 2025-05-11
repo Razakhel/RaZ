@@ -39,7 +39,7 @@ public:
   /// \see AudioSystem::open()
   void init();
   /// Loads the given audio data into memory.
-  /// @param data Data to be loaded.
+  /// \param data Data to be loaded.
   void load(AudioData data) {
     m_data = std::move(data);
     load();
