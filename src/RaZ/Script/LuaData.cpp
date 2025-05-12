@@ -5,6 +5,7 @@
 #include "RaZ/Data/Grid2.hpp"
 #include "RaZ/Data/Grid3.hpp"
 #include "RaZ/Data/Image.hpp"
+#include "RaZ/Data/MarchingCubes.hpp"
 #include "RaZ/Data/MarchingSquares.hpp"
 #include "RaZ/Data/Mesh.hpp"
 #include "RaZ/Data/MeshDistanceField.hpp"
@@ -138,6 +139,11 @@ void LuaWrapper::registerDataTypes() {
     grid3f["getDepth"]  = &Grid3f::getDepth;
     grid3f["getValue"]  = &Grid3f::getValue;
     grid3f["setValue"]  = &Grid3f::setValue;
+  }
+
+  {
+    sol::table marchingCubes = state["MarchingCubes"].get_or_create<sol::table>();
+    marchingCubes["compute"] = &MarchingCubes::compute;
   }
 
   {
