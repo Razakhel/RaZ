@@ -101,9 +101,15 @@ void main() {
   float roughness = texture(uniMaterial.roughnessMap, vertMeshInfo.vertTexcoords).r * uniMaterial.roughnessFactor;
   float ambOcc    = texture(uniMaterial.ambientMap, vertMeshInfo.vertTexcoords).r;
 
-  vec3 normal = texture(uniMaterial.normalMap, vertMeshInfo.vertTexcoords).rgb;
-  normal      = normalize(normal * 2.0 - 1.0);
-  normal      = normalize(vertMeshInfo.vertTBNMatrix * normal);
+  vec3 normal = vec3(0.0);
+  // If the tangent is valid use the normal map, else use the plain normal
+  if (abs(dot(vertMeshInfo.vertTBNMatrix[0], vertMeshInfo.vertTBNMatrix[0])) > 0.000001) {
+    normal = texture(uniMaterial.normalMap, vertMeshInfo.vertTexcoords).rgb;
+    normal = normalize(normal * 2.0 - 1.0);
+    normal = normalize(vertMeshInfo.vertTBNMatrix * normal);
+  } else {
+    normal = vertMeshInfo.vertTBNMatrix[2];
+  }
 
   vec3 viewDir = normalize(uniCameraPos - vertMeshInfo.vertPosition);
 

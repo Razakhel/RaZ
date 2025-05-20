@@ -22,12 +22,12 @@ namespace {
 Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath = {}) {
   Raz::Window& window = TestUtils::getWindow();
 
-  // Rendering a frame of the scene by updating the World's RenderSystem, and running the Window to render its overlay
+  // Rendering a frame of the scene by updating the World's RenderSystem and running the Window to render its overlay
   world.update({});
   window.run(0.f);
 
   // Recovering the rendered frame into an image
-  auto& renderSystem = world.getSystem<Raz::RenderSystem>();
+  const auto& renderSystem = world.getSystem<Raz::RenderSystem>();
   Raz::Image renderedImg(renderSystem.getSceneWidth(), renderSystem.getSceneHeight(), Raz::ImageColorspace::RGB, Raz::ImageDataType::BYTE);
   Raz::Renderer::recoverFrame(renderedImg.getWidth(), renderedImg.getHeight(), Raz::TextureFormat::RGB, Raz::PixelDataType::UBYTE, renderedImg.getDataPtr());
 
@@ -42,7 +42,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath =
 TEST_CASE("RenderSystem accepted components", "[render]") {
   Raz::World world(3);
 
-  auto& renderSystem = world.addSystem<Raz::RenderSystem>(0, 0);
+  const auto& renderSystem = world.addSystem<Raz::RenderSystem>(0, 0);
 
   // RenderSystem::update() needs a Camera with a Transform component
   const Raz::Entity& camera       = world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
@@ -81,7 +81,7 @@ TEST_CASE("RenderSystem Cook-Torrance ball", "[render]") {
 
   CHECK_THAT(renderFrame(world), IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_base.png", true)));
 
-  // Setting a cubemap & moving the camera to look the ball from below, in order to see the left, top & back faces of the cubemap
+  // Setting a cubemap & moving the camera to look at the ball from below, in order to see the left, top & back faces of the cubemap
 
   const Raz::Image redImg   = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ŔŖȒȐ.png");
   const Raz::Image greenImg = Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/textures/ĜƓGǦ.png");
@@ -100,7 +100,7 @@ TEST_CASE("RenderSystem Cook-Torrance alpha mask", "[render]") {
 
   const Raz::Window& window = TestUtils::getWindow();
 
-  auto& renderSystem = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+  const auto& renderSystem = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
 
   Raz::Entity& camera = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f));
   camera.addComponent<Raz::Camera>(renderSystem.getSceneWidth(), renderSystem.getSceneHeight());
@@ -124,6 +124,56 @@ TEST_CASE("RenderSystem Cook-Torrance alpha mask", "[render]") {
   // This would not happen in a real-world case, where the texture definition would be much higher
   CHECK_THAT(renderFrame(world),
              IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_plane_alpha_mask.png", true)));
+}
+
+TEST_CASE("RenderSystem Cook-Torrance no tangent", "[render]") {
+  Raz::World world(6);
+
+  const Raz::Window& window = TestUtils::getWindow();
+
+  const auto& renderSystem = world.addSystem<Raz::RenderSystem>(window.getWidth(), window.getHeight());
+
+  world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 3.f))
+    .addComponent<Raz::Camera>(renderSystem.getSceneWidth(), renderSystem.getSceneHeight());
+
+  Raz::Mesh mesh;
+  Raz::Submesh& submesh = mesh.addSubmesh();
+  submesh.getVertices() = {
+    // Tangents are voluntarily set to 0
+    { Raz::Vec3f(-0.5f, -0.5f, 0.f), {}, Raz::Axis::Z, Raz::Vec3f(0.f) },
+    { Raz::Vec3f(0.5f, -0.5f, 0.f), {}, Raz::Axis::Z, Raz::Vec3f(0.f) },
+    { Raz::Vec3f(0.f, 0.5f, 0.f), {}, Raz::Axis::Z, Raz::Vec3f(0.f) },
+
+    { Raz::Vec3f(-0.5f, -0.5f, 0.f), {}, Raz::Vec3f(0, -0.707107f, 0.707107f), Raz::Vec3f(0.f) },
+    { Raz::Vec3f(0.f, -1.f, -0.5f), {}, Raz::Vec3f(0, -0.707107f, 0.707107f), Raz::Vec3f(0.f) },
+    { Raz::Vec3f(0.5f, -0.5f, 0.f), {}, Raz::Vec3f(0, -0.707107f, 0.707107f), Raz::Vec3f(0.f) },
+
+    { Raz::Vec3f(0.5f, -0.5f, 0.f), {}, Raz::Vec3f(0.5547f, 0.27735f, 0.784465f), Raz::Vec3f(0.f) },
+    { Raz::Vec3f(0.707107f, 0.5f, -0.5f), {}, Raz::Vec3f(0.5547f, 0.27735f, 0.784465f), Raz::Vec3f(0.f) },
+    { Raz::Vec3f(0.f, 0.5f, 0.f), {}, Raz::Vec3f(0.5547f, 0.27735f, 0.784465f), Raz::Vec3f(0.f) },
+
+    { Raz::Vec3f(-0.5f, -0.5f, 0.f), {}, Raz::Vec3f(-0.5547f, 0.27735f, 0.784465f), Raz::Vec3f(0.f) },
+    { Raz::Vec3f(0.f, 0.5f, 0.f), {}, Raz::Vec3f(-0.5547f, 0.27735f, 0.784465f), Raz::Vec3f(0.f) },
+    { Raz::Vec3f(-0.707107f, 0.5f, -0.5f), {}, Raz::Vec3f(-0.5547f, 0.27735f, 0.784465f), Raz::Vec3f(0.f) }
+  };
+  submesh.getTriangleIndices() = {
+    0, 1, 2,
+    3, 4, 5,
+    6, 7, 8,
+    9, 10, 11
+  };
+  world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::MeshRenderer>(mesh);
+
+  world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, 0.f, 1.5f)).addComponent<Raz::Light>(Raz::LightType::POINT, 1.5f, Raz::ColorPreset::White);
+  world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(5.f, 0.f, -1.f).normalize(),
+                                                                          1.f, Raz::ColorPreset::Yellow);
+  world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(-5.f, 0.f, -1.f).normalize(),
+                                                                          1.f, Raz::ColorPreset::Magenta);
+  world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(0.f, 5.f, -1.f).normalize(),
+                                                                          1.f, Raz::ColorPreset::Cyan);
+
+  CHECK_THAT(renderFrame(world),
+             IsNearlyEqualToImage(Raz::ImageFormat::load(RAZ_TESTS_ROOT "assets/renders/cook-torrance_ball_no_tangent.png", true), 0.0783f));
 }
 
 #if !defined(RAZ_NO_OVERLAY)
