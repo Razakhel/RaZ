@@ -127,7 +127,7 @@ TEST_CASE("String splitting", "[utils]") {
 
     const std::vector<std::string> spaceSplit = Raz::StrUtils::split(baseStr, ' ');
 
-    CHECK(spaceSplit.size() == 5);
+    REQUIRE(spaceSplit.size() == 5);
     CHECK(spaceSplit[0] == "ͳhîs'†èsτ");
     CHECK(spaceSplit[1] == "(ís");
     CHECK(spaceSplit[2] == "ä)");
@@ -136,7 +136,7 @@ TEST_CASE("String splitting", "[utils]") {
 
     const std::vector<std::string> slashSplit = Raz::StrUtils::split(baseStr, '/');
 
-    CHECK(slashSplit.size() == 2);
+    REQUIRE(slashSplit.size() == 2);
     CHECK(slashSplit[0] == "ͳhîs'†èsτ  (ís ä)     gøθd");
     CHECK(slashSplit[1] == "†èsτ");
   }
@@ -147,7 +147,7 @@ TEST_CASE("String splitting", "[utils]") {
 
     const std::vector<std::wstring> spaceSplit = Raz::StrUtils::split(baseStr, L' ');
 
-    CHECK(spaceSplit.size() == 5);
+    REQUIRE(spaceSplit.size() == 5);
     CHECK(spaceSplit[0] == L"ͳhîs'†èsτ");
     CHECK(spaceSplit[1] == L"(ís");
     CHECK(spaceSplit[2] == L"ä)");
@@ -156,7 +156,7 @@ TEST_CASE("String splitting", "[utils]") {
 
     const std::vector<std::wstring> slashSplit = Raz::StrUtils::split(baseStr, L'/');
 
-    CHECK(slashSplit.size() == 2);
+    REQUIRE(slashSplit.size() == 2);
     CHECK(slashSplit[0] == L"ͳhîs'†èsτ  (ís ä)     gøθd");
     CHECK(slashSplit[1] == L"†èsτ");
   }

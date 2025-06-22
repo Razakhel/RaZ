@@ -109,7 +109,7 @@ void LuaWrapper::registerUtilsTypes() {
     strUtils["trimLeftCopy"]    = PickOverload<std::string>(&StrUtils::trimLeftCopy);
     strUtils["trimRightCopy"]   = PickOverload<std::string>(&StrUtils::trimRightCopy);
     strUtils["trimCopy"]        = PickOverload<std::string>(&StrUtils::trimCopy);
-    strUtils["split"]           = PickOverload<std::string, char>(&StrUtils::split);
+    strUtils["split"]           = &StrUtils::split<std::string>;
   }
 
   {

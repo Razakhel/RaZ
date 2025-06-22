@@ -314,40 +314,15 @@ inline std::wstring trimCopy(std::wstring text) {
 }
 
 /// Splits a string with a given delimiter.
+/// \tparam StringT Type of the string to be split.
 /// \param text String to be split.
 /// \param delimiter Character used to split into parts.
 /// \return Parts of the split string.
-inline std::vector<std::string> split(std::string text, char delimiter) {
+template <typename StringT>
+std::vector<StringT> split(StringT text, char delimiter) {
   trimRight(text);
 
-  std::vector<std::string> parts {};
-
-  while (!text.empty()) {
-    const std::size_t delimPos = text.find_first_of(delimiter);
-
-    if (delimPos > text.size()) {
-      parts.emplace_back(std::move(text));
-      break;
-    }
-
-    parts.emplace_back(text.substr(0, delimPos));
-    trimRight(parts.back());
-
-    text.erase(0, delimPos + 1);
-    trimLeft(text);
-  }
-
-  return parts;
-}
-
-/// Splits a wide string with a given delimiter.
-/// \param text Wide string to be split.
-/// \param delimiter Wide character used to split into parts.
-/// \return Parts of the split wide string.
-inline std::vector<std::wstring> split(std::wstring text, wchar_t delimiter) {
-  trimRight(text);
-
-  std::vector<std::wstring> parts {};
+  std::vector<StringT> parts;
 
   while (!text.empty()) {
     const std::size_t delimPos = text.find_first_of(delimiter);
@@ -378,14 +353,6 @@ inline std::string toUtf8(const std::wstring& text) {
   POP_WARNINGS_STATE
 }
 
-/// Returns the current UTF-8 encoded string.
-/// \note This does nothing & exists only to avoid using preprocessor switches.
-/// \param text UTF-8 string to be returned.
-/// \return Input UTF-8 string.
-constexpr const std::string& toUtf8(const std::string& text) {
-  return text;
-}
-
 /// Converts a UTF-8 encoded string to a wide one.
 /// \param text UTF-8 string to convert.
 /// \return Converted wide string.
@@ -395,14 +362,6 @@ inline std::wstring toWide(const std::string& text) {
   DISABLE_WARNING_CLANG(-Wdeprecated-declarations)
   return std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(text);
   POP_WARNINGS_STATE
-}
-
-/// Returns the current wide string.
-/// \note This does nothing & exists only to avoid using preprocessor switches.
-/// \param text Wide string to be returned.
-/// \return Input wide string.
-constexpr const std::wstring& toWide(const std::wstring& text) {
-  return text;
 }
 
 } // namespace Raz::StrUtils

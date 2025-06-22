@@ -48,13 +48,13 @@
     </tbody>
 </table>
 
-| <img alt="Codacy" src="https://seeklogo.com/images/C/codacy-logo-1A40ABD314-seeklogo.com.png" align="center" height="30" width="30" /><br />Codacy | <img alt="Coveralls" src="https://avatars3.githubusercontent.com/ml/318?s=140&v=4" align="center" height="30" width="30" /><br />Coveralls |
-|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------:|
-|      [![Codacy status](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://app.codacy.com/gh/Razakhel/RaZ)       |          [![Coverage status](https://coveralls.io/repos/github/Razakhel/RaZ/badge.svg)](https://coveralls.io/github/Razakhel/RaZ)          |
+|             <img alt="Codacy" src="https://avatars.githubusercontent.com/u/1834093?s=30&v=4" align="center" /><br />Codacy              |    <img alt="Coveralls" src="https://avatars3.githubusercontent.com/ml/318?s=30&v=4" align="center" /><br />Coveralls    |
+|:---------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------:|
+| [![Codacy status](https://api.codacy.com/project/badge/Grade/2c8f744cfabc41ada9bd73f72ddd080f)](https://app.codacy.com/gh/Razakhel/RaZ) | [![Coverage status](https://coveralls.io/repos/github/Razakhel/RaZ/badge.svg)](https://coveralls.io/github/Razakhel/RaZ) |
 
 ## Summary
 
-**RaZ** comes from, as you may have noticed, my username **Raz**akhel. This was also meant as a pun, since in french _RàZ_ is the acronym for "Remise à zéro", which basically means "reset". I didn't have any particular intent behind this double meaning. Except maybe hoping that using RaZ might reset your mind because of its awesomeness? Oh well.
+**RaZ** comes from, as you may have noticed, my username **Raz**akhel. This was also meant as a pun, since in French _RàZ_ is the acronym for "Remise à zéro", which basically means "reset". I didn't have any particular intent behind this double meaning. Except maybe hoping that using RaZ might reset your mind because of its awesomeness? Oh well.
 
 Written in modern C++ (17), ECS driven, it is primarily developed for learning purposes. It is intended to be very intuitive & easy to use and tinker with, while trying to stay as optimized & modular as possible.
 
