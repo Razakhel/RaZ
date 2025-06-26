@@ -2,14 +2,20 @@
 
 #ifdef RAZ_THREADS_AVAILABLE
 
-namespace Raz::Threading {
+#include "common/TracySystem.hpp"
 
-ThreadPool& getDefaultThreadPool() {
+namespace Raz {
+
+void Threading::setCurrentThreadName(const std::string& name) {
+  tracy::SetThreadName(name.c_str());
+}
+
+ThreadPool& Threading::getDefaultThreadPool() {
   static ThreadPool threadPool;
   return threadPool;
 }
 
-void parallelize(const std::function<void()>& action, unsigned int taskCount) {
+void Threading::parallelize(const std::function<void()>& action, unsigned int taskCount) {
   if (taskCount == 0)
     throw std::invalid_argument("[Threading] The number of tasks cannot be 0.");
 
@@ -35,7 +41,7 @@ void parallelize(const std::function<void()>& action, unsigned int taskCount) {
 #endif
 }
 
-void parallelize(std::initializer_list<std::function<void()>> actions) {
+void Threading::parallelize(std::initializer_list<std::function<void()>> actions) {
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN)
   ThreadPool& threadPool = getDefaultThreadPool();
 
@@ -59,6 +65,6 @@ void parallelize(std::initializer_list<std::function<void()>> actions) {
 #endif
 }
 
-} // namespace Raz::Threading
+} // namespace Raz
 
 #endif // RAZ_THREADS_AVAILABLE
