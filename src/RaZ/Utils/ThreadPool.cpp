@@ -6,9 +6,9 @@
 
 namespace Raz {
 
-ThreadPool::ThreadPool() : ThreadPool(Threading::getSystemThreadCount()) {}
+ThreadPool::ThreadPool(const std::string& threadNamePrefix) : ThreadPool(Threading::getSystemThreadCount(), threadNamePrefix) {}
 
-ThreadPool::ThreadPool(unsigned int threadCount) {
+ThreadPool::ThreadPool(unsigned int threadCount, const std::string& threadNamePrefix) {
   ZoneScopedN("ThreadPool::ThreadPool");
 
   Logger::debug("[ThreadPool] Initializing (with " + std::to_string(threadCount) + " thread(s))...");
@@ -16,8 +16,7 @@ ThreadPool::ThreadPool(unsigned int threadCount) {
   m_threads.reserve(threadCount);
 
   for (unsigned int threadIndex = 0; threadIndex < threadCount; ++threadIndex) {
-    m_threads.emplace_back([this, threadIndex] () {
-      const std::string threadName = "Thread pool - #" + std::to_string(threadIndex + 1);
+    m_threads.emplace_back([this, threadName = threadNamePrefix + ' ' + std::to_string(threadIndex + 1)] () {
       Threading::setCurrentThreadName(threadName);
 
       std::function<void()> task;

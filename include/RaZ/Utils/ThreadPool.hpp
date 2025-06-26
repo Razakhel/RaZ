@@ -24,9 +24,16 @@ namespace Raz {
 
 class ThreadPool {
 public:
-  ThreadPool();
-  explicit ThreadPool(unsigned int threadCount);
+  /// Creates a thread pool with a number of threads determined by the current hardware.
+  /// \param threadNamePrefix Name that will be given to each thread, followed by their respective index.
+  explicit ThreadPool(const std::string& threadNamePrefix = "Pool worker");
+  /// Creates a thread pool with the given number of threads.
+  /// \param threadCount Number of threads to create.
+  /// \param threadNamePrefix Name that will be given to each thread, followed by their respective index.
+  explicit ThreadPool(unsigned int threadCount, const std::string& threadNamePrefix = "Pool worker");
 
+  /// Enqueues a task to be executed by an available thread.
+  /// \param task Task to be executed.
   void addTask(std::function<void()> task);
 
   ~ThreadPool();
