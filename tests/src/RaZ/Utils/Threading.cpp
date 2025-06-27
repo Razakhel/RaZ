@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <array>
+#include <numeric>
 
 #ifdef RAZ_THREADS_AVAILABLE
 
@@ -60,8 +61,8 @@ TEST_CASE("Threading multi parallelization", "[utils]") {
   CHECK(i == 5);
 }
 
-TEST_CASE("Threading index parallelization", "[utils]") {
-  std::mutex mutex; // Catch's macros are not thread-safe and must be protected
+TEST_CASE("Threading parallelization index", "[utils]") {
+  std::mutex mutex; // Catch's macros aren't thread-safe and must be protected
 
   Raz::Threading::parallelize(0, 9, [&mutex] (const Raz::Threading::IndexRange& range) {
     const std::scoped_lock lock(mutex);
@@ -90,10 +91,10 @@ TEST_CASE("Threading index parallelization", "[utils]") {
   });
 }
 
-TEST_CASE("Threading iterator parallelization", "[utils]") {
+TEST_CASE("Threading parallelization iterator", "[utils]") {
   {
     static constexpr std::array<int, 9> dummy {};
-    std::mutex mutex; // Catch's macros are not thread-safe and must be protected
+    std::mutex mutex; // Catch's macros aren't thread-safe and must be protected
 
     Raz::Threading::parallelize(dummy.begin(), dummy.end(), [&mutex] (const Raz::Threading::IterRange<std::array<int, 9>::const_iterator>& range) {
       const std::scoped_lock lock(mutex);
@@ -121,6 +122,99 @@ TEST_CASE("Threading iterator parallelization", "[utils]") {
         ++value;
     }, threadCount);
   });
+}
+
+// Using a non-copyable type to show how it can be moved around with parallelization functions
+struct NonCopyable {
+  constexpr NonCopyable(int i) : val{ i } {}
+  constexpr NonCopyable(const NonCopyable&) = delete;
+  constexpr NonCopyable(NonCopyable&&) noexcept = default;
+  constexpr NonCopyable& operator=(const NonCopyable&) = delete;
+  constexpr NonCopyable& operator=(NonCopyable&&) noexcept = default;
+
+  int val;
+};
+
+TEST_CASE("Threading parallel reduce basic", "[utils]") {
+  CHECK(Raz::Threading::parallelizeReduce(0, 10, [] (const auto& range) {
+    return range.endIndex - range.beginIndex;
+  }, std::plus<>(), 4) == 10);
+
+  constexpr std::array<int, 10> data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+  CHECK(Raz::Threading::parallelizeReduce(data.begin(), data.end(), [] (const auto& range) {
+    return std::accumulate(range.begin(), range.end(), 0);
+  }, std::plus<>(), 4) == 45);
+
+  CHECK(Raz::Threading::parallelizeReduce(data, [] (const auto& range) {
+    return std::accumulate(range.begin(), range.end(), 0);
+  }, std::plus<>(), 4) == 45);
+}
+
+TEST_CASE("Threading parallel reduce index", "[utils]") {
+  std::array<NonCopyable, 9> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  std::mutex mutex; // Catch's macros aren't thread-safe and must be protected
+
+  const std::vector<NonCopyable> result = Raz::Threading::parallelizeReduce(0, data.size(), [&mutex, &data] (const Raz::Threading::IndexRange& range) {
+    {
+      const std::scoped_lock lock(mutex);
+      CHECK(((range.beginIndex == 0 && range.endIndex == 3)    // 3 elements (0, 1, 2)
+          || (range.beginIndex == 3 && range.endIndex == 5)    // 2 elements (3, 4)
+          || (range.beginIndex == 5 && range.endIndex == 7)    // 2 elements (5, 6)
+          || (range.beginIndex == 7 && range.endIndex == 9))); // 2 elements (7, 8)
+    }
+    return std::vector<NonCopyable>(std::move_iterator(data.begin() + range.beginIndex), std::move_iterator(data.begin() + range.endIndex));
+  }, [] (std::vector<NonCopyable> reduction, std::vector<NonCopyable>&& values) {
+    reduction.insert(reduction.end(), std::move_iterator(values.begin()), std::move_iterator(values.end()));
+    // If the returned value is either argument and taken as an rvalue ref, GCC (observed with 15.1.1) fails to move it automatically
+    //  (MSVC and Clang are fine); it can still be moved explicitly. The second argument can freely be an rvalue ref if wanted
+    return reduction;
+  }, 4);
+
+  CHECK(std::equal(result.begin(), result.end(), data.begin(), data.end(), [] (const NonCopyable& lhs, const NonCopyable& rhs) { return lhs.val == rhs.val; }));
+}
+
+TEST_CASE("Threading parallel reduce iterator", "[utils]") {
+  std::array<NonCopyable, 9> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  std::mutex mutex; // Catch's macros aren't thread-safe and must be protected
+
+  const std::vector<NonCopyable> result = Raz::Threading::parallelizeReduce(data.begin(), data.end(),
+    [&mutex, &data] (const Raz::Threading::IterRange<std::array<NonCopyable, 9>::iterator>& range) {
+      {
+        const std::scoped_lock lock(mutex);
+        CHECK(((range.begin() == data.begin() + 0 && range.end() == data.begin() + 3)    // 3 elements (0, 1, 2)
+            || (range.begin() == data.begin() + 3 && range.end() == data.begin() + 5)    // 2 elements (3, 4)
+            || (range.begin() == data.begin() + 5 && range.end() == data.begin() + 7)    // 2 elements (5, 6)
+            || (range.begin() == data.begin() + 7 && range.end() == data.begin() + 9))); // 2 elements (7, 8)
+      }
+      return std::vector<NonCopyable>(std::move_iterator(range.begin()), std::move_iterator(range.end()));
+    }, [] (std::vector<NonCopyable> reduction, std::vector<NonCopyable>&& values) {
+      reduction.insert(reduction.end(), std::move_iterator(values.begin()), std::move_iterator(values.end()));
+      return reduction;
+    }, 4);
+
+  CHECK(std::equal(result.begin(), result.end(), data.begin(), data.end(), [] (const NonCopyable& lhs, const NonCopyable& rhs) { return lhs.val == rhs.val; }));
+}
+
+TEST_CASE("Threading parallel reduce collection", "[utils]") {
+  std::array<NonCopyable, 9> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  std::mutex mutex; // Catch's macros aren't thread-safe and must be protected
+
+  const std::vector<NonCopyable> result = Raz::Threading::parallelizeReduce(data, [&mutex, &data] (const auto& range) {
+      {
+        const std::scoped_lock lock(mutex);
+        CHECK(((range.begin() == data.begin() + 0 && range.end() == data.begin() + 3)    // 3 elements (0, 1, 2)
+            || (range.begin() == data.begin() + 3 && range.end() == data.begin() + 5)    // 2 elements (3, 4)
+            || (range.begin() == data.begin() + 5 && range.end() == data.begin() + 7)    // 2 elements (5, 6)
+            || (range.begin() == data.begin() + 7 && range.end() == data.begin() + 9))); // 2 elements (7, 8)
+      }
+      return std::vector<NonCopyable>(std::move_iterator(range.begin()), std::move_iterator(range.end()));
+    }, [] (std::vector<NonCopyable> reduction, std::vector<NonCopyable>&& values) {
+      reduction.insert(reduction.end(), std::move_iterator(values.begin()), std::move_iterator(values.end()));
+      return reduction;
+    }, 4);
+
+  CHECK(std::equal(result.begin(), result.end(), data.begin(), data.end(), [] (const NonCopyable& lhs, const NonCopyable& rhs) { return lhs.val == rhs.val; }));
 }
 
 #endif // RAZ_THREADS_AVAILABLE

@@ -85,7 +85,7 @@ void parallelize(const std::function<void()>& action, unsigned int taskCount = g
 void parallelize(std::initializer_list<std::function<void()>> actions);
 
 /// Calls a function in parallel over an index range.
-/// The given index range is automatically split, providing a separate start/past-the-end index subrange to each task.
+/// The given range is automatically split, providing a separate start/past-the-end subrange to each task.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam BegIndexT Type of the begin index.
 /// \tparam EndIndexT Type of the end index.
@@ -98,7 +98,7 @@ template <typename BegIndexT, typename EndIndexT, typename FuncT, typename = std
 void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int taskCount = getSystemThreadCount());
 
 /// Calls a function in parallel over an iterator range.
-/// The given iterator range is automatically split, providing a separate start/past-the-end iterator subrange to each task.
+/// The given range is automatically split, providing a separate start/past-the-end subrange to each task.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam IterT Type of the iterators.
 /// \tparam FuncT Type of the action to be executed.
@@ -110,7 +110,7 @@ template <typename IterT, typename FuncT, typename = typename std::iterator_trai
 void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskCount = getSystemThreadCount());
 
 /// Calls a function in parallel over a collection.
-/// The given collection is automatically split, providing a separate start/past-the-end iterator subrange to each task.
+/// The given collection is automatically split, providing a separate start/past-the-end subrange to each task.
 /// \note The container must either be a constant-size C array or have public begin() & end() functions.
 /// \note If using Emscripten this call will be synchronous, threads being unsupported with it for now.
 /// \tparam ContainerT Type of the collection to iterate over.
@@ -121,6 +121,55 @@ void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskC
 template <typename ContainerT, typename FuncT, typename = decltype(std::begin(std::declval<ContainerT>()))>
 void parallelize(ContainerT&& collection, const FuncT& action, unsigned int taskCount = getSystemThreadCount()) {
   parallelize(std::begin(collection), std::end(collection), action, taskCount);
+}
+
+/// Calls a function in parallel over an index range, then merges (reduces) their results sequentially into a single one.
+/// The given range is automatically split, providing a separate start/past-the-end subrange to each task.
+/// \tparam BegIndexT Type of the begin index.
+/// \tparam EndIndexT Type of the end index.
+/// \tparam ParallelFuncT Type of the parallelization action to be executed. Must return the type to be reduced.
+/// \tparam ReduceFuncT Type of the reduce action to be executed.
+/// \tparam ResultT Return type of the parallelization.
+/// \param beginIndex Starting index of the whole range. Must be lower than the end index.
+/// \param endIndex Past-the-last index of the whole range. Must be greater than the begin index.
+/// \param action Action to be performed in parallel, taking an index range as boundaries and returning a value.
+/// \param reduce Action to be performed sequentially, taking two parallel results and returning their reduction.
+/// \param taskCount Number of tasks to start.
+/// \return Final result of the reduction steps.
+template <typename BegIndexT, typename EndIndexT, typename ParallelFuncT, typename ReduceFuncT,
+          typename = std::enable_if_t<std::is_integral_v<BegIndexT> && std::is_integral_v<EndIndexT>>>
+auto parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex,
+                       const ParallelFuncT& action, const ReduceFuncT& reduce,
+                       unsigned int taskCount = getSystemThreadCount());
+
+/// Calls a function in parallel over an iterator range, then merges (reduces) their results sequentially into a single one.
+/// The given range is automatically split, providing a separate start/past-the-end subrange to each task.
+/// \tparam IterT Type of the iterators.
+/// \tparam ParallelFuncT Type of the parallelization action to be executed. Must return the type to be reduced.
+/// \tparam ReduceFuncT Type of the reduce action to be executed.
+/// \tparam ResultT Return type of the parallelization.
+/// \param begin Begin iterator of the whole range. Must be lower than the end iterator.
+/// \param end End iterator of the whole range. Must be greater than the begin iterator.
+/// \param action Action to be performed in parallel, taking an iterator range as boundaries and returning a value.
+/// \param reduce Action to be performed sequentially, taking two parallel results and returning their reduction.
+/// \param taskCount Number of tasks to start.
+/// \return Final result of the reduction steps.
+template <typename IterT, typename ParallelFuncT, typename ReduceFuncT, typename = typename std::iterator_traits<IterT>::iterator_category>
+auto parallelizeReduce(IterT begin, IterT end, const ParallelFuncT& action, const ReduceFuncT& reduce, unsigned int taskCount = getSystemThreadCount());
+
+/// Calls a function in parallel over a collection, then merges (reduces) their results sequentially into a single one.
+/// The given collection is automatically split, providing a separate start/past-the-end subrange to each task.
+/// \tparam ContainerT Type of the collection to iterate over.
+/// \tparam ParallelFuncT Type of the parallelization action to be executed. Must return the type to be reduced.
+/// \tparam ReduceFuncT Type of the reduce action to be executed.
+/// \param collection Collection to iterate over in parallel.
+/// \param action Action to be performed in parallel, taking an iterator range as boundaries and returning a value.
+/// \param reduce Action to be performed sequentially, taking two parallel results and returning their reduction.
+/// \param taskCount Number of tasks to start.
+/// \return Final result of the reduction steps.
+template <typename ContainerT, typename ParallelFuncT, typename ReduceFuncT, typename = decltype(std::begin(std::declval<ContainerT>()))>
+auto parallelizeReduce(ContainerT&& collection, const ParallelFuncT& action, const ReduceFuncT& reduce, unsigned int taskCount = getSystemThreadCount()) {
+  return parallelizeReduce(std::begin(collection), std::end(collection), action, reduce, taskCount);
 }
 
 } // namespace Threading
