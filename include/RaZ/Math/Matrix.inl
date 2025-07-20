@@ -5,7 +5,7 @@
 
 namespace Raz {
 
-namespace {
+namespace Details {
 
 template <typename T>
 constexpr T computeMatrixDeterminant(const Mat2<T>& mat) noexcept {
@@ -53,124 +53,81 @@ constexpr T computeMatrixDeterminant(const Mat4<T>& mat) noexcept {
 }
 
 template <typename T>
-constexpr Mat2<T> computeMatrixInverse(const Mat2<T>& mat, T invDeterminant) noexcept {
+constexpr Mat2<T> computeMatrixInverse(const Mat2<T>& mat) noexcept {
+  const T determinant = Details::computeMatrixDeterminant(mat);
+
+  if (determinant == 0)
+    return mat;
+
+  const T invDeterminant = static_cast<T>(1) / determinant;
+
   return Mat2<T>( mat[3] * invDeterminant, -mat[1] * invDeterminant,
                  -mat[2] * invDeterminant,  mat[0] * invDeterminant);
 }
 
 template <typename T>
-constexpr Mat3<T> computeMatrixInverse(const Mat3<T>& mat, T invDeterminant) noexcept {
-  const Mat2<T> topLeft(mat[4], mat[5],
-                        mat[7], mat[8]);
-  const Mat2<T> topCenter(mat[3], mat[5],
-                          mat[6], mat[8]);
-  const Mat2<T> topRight(mat[3], mat[4],
-                         mat[6], mat[7]);
+constexpr Mat3<T> computeMatrixInverse(const Mat3<T>& mat) noexcept {
+  const Vector<T, 3> col1(mat[0], mat[1], mat[2]);
+  const Vector<T, 3> col2(mat[3], mat[4], mat[5]);
+  const Vector<T, 3> col3(mat[6], mat[7], mat[8]);
 
-  const Mat2<T> midLeft(mat[1], mat[2],
-                        mat[7], mat[8]);
-  const Mat2<T> midCenter(mat[0], mat[2],
-                          mat[6], mat[8]);
-  const Mat2<T> midRight(mat[0], mat[1],
-                         mat[6], mat[7]);
+  const Vector<T, 3> resultRow1 = col2.cross(col3);
+  const Vector<T, 3> resultRow2 = col3.cross(col1);
+  const Vector<T, 3> resultRow3 = col1.cross(col2);
 
-  const Mat2<T> botLeft(mat[1], mat[2],
-                        mat[4], mat[5]);
-  const Mat2<T> botCenter(mat[0], mat[2],
-                          mat[3], mat[5]);
-  const Mat2<T> botRight(mat[0], mat[1],
-                         mat[3], mat[4]);
+  const T determinant = resultRow3.dot(col3);
 
-  const Mat3<T> cofactors( topLeft.computeDeterminant(), -topCenter.computeDeterminant(),  topRight.computeDeterminant(),
-                          -midLeft.computeDeterminant(),  midCenter.computeDeterminant(), -midRight.computeDeterminant(),
-                           botLeft.computeDeterminant(), -botCenter.computeDeterminant(),  botRight.computeDeterminant());
+  if (determinant == 0)
+    return mat;
 
-  return cofactors * invDeterminant;
+  const T invDeterminant = static_cast<T>(1) / determinant;
+
+  return Mat3<T>(resultRow1.x() * invDeterminant, resultRow1.y() * invDeterminant, resultRow1.z() * invDeterminant,
+                 resultRow2.x() * invDeterminant, resultRow2.y() * invDeterminant, resultRow2.z() * invDeterminant,
+                 resultRow3.x() * invDeterminant, resultRow3.y() * invDeterminant, resultRow3.z() * invDeterminant);
 }
 
 template <typename T>
-constexpr Mat4<T> computeMatrixInverse(const Mat4<T>& mat, T invDeterminant) noexcept {
-  const Mat3<T> topLeft(mat[5],  mat[6],  mat[7],
-                        mat[9],  mat[10], mat[11],
-                        mat[13], mat[14], mat[15]);
-  const Mat3<T> topCenterLeft(mat[4],  mat[6],  mat[7],
-                              mat[8],  mat[10], mat[11],
-                              mat[12], mat[14], mat[15]);
-  const Mat3<T> topCenterRight(mat[4],  mat[5],  mat[7],
-                               mat[8],  mat[9],  mat[11],
-                               mat[12], mat[13], mat[15]);
-  const Mat3<T> topRight(mat[4],  mat[5],  mat[6],
-                         mat[8],  mat[9],  mat[10],
-                         mat[12], mat[13], mat[14]);
+constexpr Mat4<T> computeMatrixInverse(const Mat4<T>& mat) noexcept {
+  const Vector<T, 3> upperCol1(mat[0], mat[1], mat[2]);
+  const Vector<T, 3> upperCol2(mat[4], mat[5], mat[6]);
+  const Vector<T, 3> upperCol3(mat[8], mat[9], mat[10]);
+  const Vector<T, 3> upperCol4(mat[12], mat[13], mat[14]);
 
-  const Mat3<T> midTopLeft(mat[1],  mat[2],  mat[3],
-                           mat[9],  mat[10], mat[11],
-                           mat[13], mat[14], mat[15]);
-  const Mat3<T> midTopCenterLeft(mat[0],  mat[2],  mat[3],
-                                 mat[8],  mat[10], mat[11],
-                                 mat[12], mat[14], mat[15]);
-  const Mat3<T> midTopCenterRight(mat[0],  mat[1],  mat[3],
-                                  mat[8],  mat[9],  mat[11],
-                                  mat[12], mat[13], mat[15]);
-  const Mat3<T> midTopRight(mat[0],  mat[1],  mat[2],
-                            mat[8],  mat[9],  mat[10],
-                            mat[12], mat[13], mat[14]);
+  const T lastRowX = mat[3];
+  const T lastRowY = mat[7];
+  const T lastRowZ = mat[11];
+  const T lastRowW = mat[15];
 
-  const Mat3<T> midBotLeft(mat[1],  mat[2],  mat[3],
-                           mat[5],  mat[6],  mat[7],
-                           mat[13], mat[14], mat[15]);
-  const Mat3<T> midBotCenterLeft(mat[0],  mat[2],  mat[3],
-                                 mat[4],  mat[6],  mat[7],
-                                 mat[12], mat[14], mat[15]);
-  const Mat3<T> midBotCenterRight(mat[0],  mat[1],  mat[3],
-                                  mat[4],  mat[5],  mat[7],
-                                  mat[12], mat[13], mat[15]);
-  const Mat3<T> midBotRight(mat[0],  mat[1],  mat[2],
-                            mat[4],  mat[5],  mat[6],
-                            mat[12], mat[13], mat[14]);
+  Vector<T, 3> minorCofactor1 = upperCol1.cross(upperCol2);
+  Vector<T, 3> minorCofactor2 = upperCol3.cross(upperCol4);
+  Vector<T, 3> adjointTerm1   = upperCol1 * lastRowY - upperCol2 * lastRowX;
+  Vector<T, 3> adjointTerm2   = upperCol3 * lastRowW - upperCol4 * lastRowZ;
 
-  const Mat3<T> botLeft(mat[1], mat[2], mat[3],
-                        mat[5], mat[6], mat[7],
-                        mat[9], mat[10], mat[11]);
-  const Mat3<T> botCenterLeft(mat[0], mat[2],  mat[3],
-                              mat[4], mat[6],  mat[7],
-                              mat[8], mat[10], mat[11]);
-  const Mat3<T> botCenterRight(mat[0], mat[1], mat[3],
-                               mat[4], mat[5], mat[7],
-                               mat[8], mat[9], mat[11]);
-  const Mat3<T> botRight(mat[0], mat[1], mat[2],
-                         mat[4], mat[5], mat[6],
-                         mat[8], mat[9], mat[10]);
+  const T determinant = minorCofactor1.dot(adjointTerm2) + minorCofactor2.dot(adjointTerm1);
 
-  const T topLeftDeterm        = topLeft.computeDeterminant();
-  const T topCenterLeftDeterm  = topCenterLeft.computeDeterminant();
-  const T topCenterRightDeterm = topCenterRight.computeDeterminant();
-  const T topRightDeterm       = topRight.computeDeterminant();
+  if (determinant == 0)
+    return mat;
 
-  const T midTopLeftDeterm        = midTopLeft.computeDeterminant();
-  const T midTopCenterLeftDeterm  = midTopCenterLeft.computeDeterminant();
-  const T midTopCenterRightDeterm = midTopCenterRight.computeDeterminant();
-  const T midTopRightDeterm       = midTopRight.computeDeterminant();
+  const T invDeterminant = static_cast<T>(1) / determinant;
 
-  const T midBotLeftDeterm        = midBotLeft.computeDeterminant();
-  const T midBotCenterLeftDeterm  = midBotCenterLeft.computeDeterminant();
-  const T midBotCenterRightDeterm = midBotCenterRight.computeDeterminant();
-  const T midBotRightDeterm       = midBotRight.computeDeterminant();
+  minorCofactor1 *= invDeterminant;
+  minorCofactor2 *= invDeterminant;
+  adjointTerm1   *= invDeterminant;
+  adjointTerm2   *= invDeterminant;
 
-  const T botLeftDeterm        = botLeft.computeDeterminant();
-  const T botCenterLeftDeterm  = botCenterLeft.computeDeterminant();
-  const T botCenterRightDeterm = botCenterRight.computeDeterminant();
-  const T botRightDeterm       = botRight.computeDeterminant();
+  const Vector<T, 3> resultRow1 = upperCol2.cross(adjointTerm2) + minorCofactor2 * lastRowY;
+  const Vector<T, 3> resultRow2 = adjointTerm2.cross(upperCol1) - minorCofactor2 * lastRowX;
+  const Vector<T, 3> resultRow3 = upperCol4.cross(adjointTerm1) + minorCofactor1 * lastRowW;
+  const Vector<T, 3> resultRow4 = adjointTerm1.cross(upperCol3) - minorCofactor1 * lastRowZ;
 
-  const Mat4<T> cofactors( topLeftDeterm,    -topCenterLeftDeterm,     topCenterRightDeterm,    -topRightDeterm,
-                          -midTopLeftDeterm,  midTopCenterLeftDeterm, -midTopCenterRightDeterm,  midTopRightDeterm,
-                           midBotLeftDeterm, -midBotCenterLeftDeterm,  midBotCenterRightDeterm, -midBotRightDeterm,
-                          -botLeftDeterm,     botCenterLeftDeterm,    -botCenterRightDeterm,     botRightDeterm);
-
-  return cofactors * invDeterminant;
+  return Mat4<T>(resultRow1.x(), resultRow1.y(), resultRow1.z(), -upperCol2.dot(minorCofactor2),
+                 resultRow2.x(), resultRow2.y(), resultRow2.z(),  upperCol1.dot(minorCofactor2),
+                 resultRow3.x(), resultRow3.y(), resultRow3.z(), -upperCol4.dot(minorCofactor1),
+                 resultRow4.x(), resultRow4.y(), resultRow4.z(),  upperCol3.dot(minorCofactor1));
 }
 
-} // namespace
+} // namespace Details
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H>::Matrix(const Matrix<T, W + 1, H + 1>& mat) noexcept {
@@ -264,20 +221,13 @@ constexpr Matrix<T, H, W> Matrix<T, W, H>::transpose() const noexcept {
 template <typename T, std::size_t W, std::size_t H>
 constexpr T Matrix<T, W, H>::computeDeterminant() const noexcept {
   static_assert(W == H, "Error: Matrix must be a square one.");
-
-  return computeMatrixDeterminant(*this);
+  return Details::computeMatrixDeterminant(*this);
 }
 
 template <typename T, std::size_t W, std::size_t H>
 constexpr Matrix<T, W, H> Matrix<T, W, H>::inverse() const noexcept {
   static_assert(W == H, "Error: Matrix must be a square one.");
-
-  const T determ = computeMatrixDeterminant(*this);
-
-  if (determ == 0)
-    return *this;
-
-  return computeMatrixInverse(*this, static_cast<T>(1) / determ);
+  return Details::computeMatrixInverse(*this);
 }
 
 template <typename T, std::size_t W, std::size_t H>

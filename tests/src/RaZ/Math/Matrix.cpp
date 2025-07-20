@@ -288,26 +288,26 @@ TEST_CASE("Matrix/matrix operations", "[math]") {
 }
 
 TEST_CASE("Matrix/vector multiplication", "[math]") {
-  const Raz::Mat3f matRotX(1.f,         0.f,          0.f,
-                           0.f, 0.70710677f, -0.70710677f,
-                           0.f, 0.70710677f,  0.70710677f);
+  constexpr Raz::Mat3f matRotX(1.f,         0.f,          0.f,
+                               0.f, 0.70710677f, -0.70710677f,
+                               0.f, 0.70710677f,  0.70710677f);
   CHECK(matRotX * Raz::Axis::X == Raz::Axis::X);
   CHECK(Raz::Axis::X * matRotX == Raz::Axis::X);
 
-  const Raz::Mat3f matRotY( 0.70710677f, 0.f, 0.70710677f,
-                                    0.f, 1.f,         0.f,
-                           -0.70710677f, 0.f, 0.70710677f);
+  constexpr Raz::Mat3f matRotY( 0.70710677f, 0.f, 0.70710677f,
+                                        0.f, 1.f,         0.f,
+                               -0.70710677f, 0.f, 0.70710677f);
   CHECK(matRotY * Raz::Axis::X == Raz::Vec3f(0.70710677f, 0.f, -0.70710677f));
   CHECK(Raz::Axis::X * matRotY == Raz::Vec3f(0.70710677f, 0.f, 0.70710677f));
 
-  const Raz::Mat3f matRotZ(0.70710677f, -0.70710677f, 0.f,
-                           0.70710677f,  0.70710677f, 0.f,
-                                   0.f,          0.f, 1.f);
+  constexpr Raz::Mat3f matRotZ(0.70710677f, -0.70710677f, 0.f,
+                               0.70710677f,  0.70710677f, 0.f,
+                                       0.f,          0.f, 1.f);
   CHECK(matRotZ * Raz::Axis::X == Raz::Vec3f(0.70710677f, 0.70710677f, 0.f));
   CHECK(Raz::Axis::X * matRotZ == Raz::Vec3f(0.70710677f, -0.70710677f, 0.f));
 
   // See: https://www.geogebra.org/m/je2vyv75
-  const Raz::Vec3f vec3(3.18f, 4.2f, 0.874f);
+  constexpr Raz::Vec3f vec3(3.18f, 4.2f, 0.874f);
 
   CHECK(matRotX * vec3 == Raz::Vec3f(vec3.x(), 2.35183716f, 3.58785963f));
   CHECK(vec3 * matRotX == Raz::Vec3f(vec3.x(), 3.58785963f, -2.35183716f));
@@ -342,7 +342,7 @@ TEST_CASE("Matrix/vector multiplication", "[math]") {
   CHECK(vec3 * mat2x3 == Raz::Vec2f(20.15f, 28.404f)); // https://tinyurl.com/4m9teh6a
   CHECK(mat2x3 * vec2 == Raz::Vec3f(10.2f, 30.4f, 50.6f)); // https://tinyurl.com/2p85wpk6
 
-  const Raz::Vec4f vec4(84.47f, 2.f, 0.001f, 847.12f);
+  constexpr Raz::Vec4f vec4(84.47f, 2.f, 0.001f, 847.12f);
 
   CHECK(mat41 * vec4 == Raz::Vec4f(62692.896451f, 159652.86849f, 31668.27f, 644394.3890001f));
   CHECK(vec4 * mat41 == Raz::Vec4f(103945.469f, -58878.6719f, 194661.125f, 640796.625f));
@@ -403,7 +403,7 @@ TEST_CASE("Matrix hash", "[math]") {
 TEST_CASE("Matrix near-equality", "[math]") {
   CHECK_FALSE(mat31 == mat32);
 
-  const Raz::Mat2f baseMat = Raz::Mat2f::identity();
+  constexpr Raz::Mat2f baseMat = Raz::Mat2f::identity();
   Raz::Mat2f compMat = baseMat;
 
   CHECK(baseMat[0] == compMat[0]); // Copied, strict equality
