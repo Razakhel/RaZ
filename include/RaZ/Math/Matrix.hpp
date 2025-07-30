@@ -113,12 +113,12 @@ public:
   /// \return Result of the matrix summed with the value.
   constexpr Matrix operator+(T val) const noexcept;
   /// Element-wise matrix-matrix substraction operator.
-  /// \param mat Matrix to be substracted.
-  /// \return Result of the substracted matrices.
+  /// \param mat Matrix to be subtracted.
+  /// \return Result of the subtracted matrices.
   constexpr Matrix operator-(const Matrix& mat) const noexcept;
   /// Element-wise matrix-value substraction operator.
-  /// \param val Value to be substracted.
-  /// \return Result of the matrix substracted by the value.
+  /// \param val Value to be subtracted.
+  /// \return Result of the matrix subtracted by the value.
   constexpr Matrix operator-(T val) const noexcept;
   /// Element-wise matrix-matrix multiplication operator.
   /// \param mat Matrix to be multiplied by.

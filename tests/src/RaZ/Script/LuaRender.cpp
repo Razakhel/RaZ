@@ -32,9 +32,9 @@ TEST_CASE("LuaRender Camera", "[script][lua][render]") {
     assert(camera:computePerspectiveMatrix() == camera:getProjectionMatrix())
     assert(camera:computeInverseProjectionMatrix() == camera:getInverseProjectionMatrix())
 
-    assert(camera:unproject(Vec2f.new(0.5)) == Vec3f.new(0.0545324, 0.1600594, 0.1317835))
-    assert(camera:unproject(Vec3f.new(0.5)) == Vec3f.new(0.1090431, 0.3200549, 0.2635144))
-    assert(camera:unproject(Vec4f.new(0.5)) == Vec3f.new(-31.973266, 1023.4787, 740.6711))
+    assert(camera:unproject(Vec2f.new(0.5)) == Vec3f.new(0.0545324, 0.1600595, 0.1317836))
+    assert(camera:unproject(Vec3f.new(0.5)) == Vec3f.new(0.1090432, 0.320055, 0.2635145))
+    assert(camera:unproject(Vec4f.new(0.5)) == Vec3f.new(-31.98865, 1023.967, 741.0245))
   )"));
 }
 

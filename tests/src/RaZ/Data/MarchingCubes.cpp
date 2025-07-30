@@ -53,7 +53,7 @@ TEST_CASE("MarchingCubes computation", "[data]") {
     const Raz::Submesh& submesh = mesh.getSubmeshes().front();
     const std::vector<Raz::Vertex>& vertices = submesh.getVertices();
 
-    constexpr std::array<Raz::Vec3f, 90> expectedPositions = {
+    static constexpr std::array<Raz::Vec3f, 90> expectedPositions = {
       // Nothing for configuration 0 (no corner)
       Raz::Vec3f(2.f, 0.f, 0.5f), Raz::Vec3f(1.5f, 1.f, 0.f), Raz::Vec3f(2.f, 1.f, 0.5f),
       Raz::Vec3f(1.5f, 0.f, 0.f), Raz::Vec3f(1.5f, 1.f, 0.f), Raz::Vec3f(2.f, 0.f, 0.5f),
@@ -88,7 +88,7 @@ TEST_CASE("MarchingCubes computation", "[data]") {
     };
 
     // All 3 vertices in a triangle have the same normal
-    constexpr std::array<Raz::Vec3f, 30> expectedNormals = {
+    static constexpr std::array<Raz::Vec3f, 30> expectedNormals = {
       Raz::Vec3f(0.7071067691f, 0.f, -0.7071067691f),
       Raz::Vec3f(0.7071067691f, 0.f, -0.7071067691f),
       Raz::Vec3f(-0.7071067691f, 0.f, -0.7071067691f),
@@ -159,7 +159,7 @@ TEST_CASE("MarchingCubes computation", "[data]") {
     const Raz::Submesh& submesh = mesh.getSubmeshes().front();
     const std::vector<Raz::Vertex>& vertices = submesh.getVertices();
 
-    constexpr std::array<Raz::Vec3f, 102> expectedPositions = {
+    static constexpr std::array<Raz::Vec3f, 102> expectedPositions = {
       Raz::Vec3f(1.f, 0.f, 0.5f), Raz::Vec3f(1.f, 1.f, 0.5f), Raz::Vec3f(0.f, 0.f, 0.5f),
       Raz::Vec3f(0.f, 0.f, 0.5f), Raz::Vec3f(1.f, 1.f, 0.5f), Raz::Vec3f(0.f, 1.f, 0.5f),
       Raz::Vec3f(1.f, 1.f, 0.5f), Raz::Vec3f(1.f, 0.f, 0.5f), Raz::Vec3f(1.5f, 0.f, 0.f),
@@ -198,7 +198,7 @@ TEST_CASE("MarchingCubes computation", "[data]") {
     };
 
     // All 3 vertices in a triangle have the same normal
-    constexpr std::array<Raz::Vec3f, 34> expectedNormals = {
+    static constexpr std::array<Raz::Vec3f, 34> expectedNormals = {
       Raz::Axis::Z,
       Raz::Axis::Z,
       Raz::Vec3f(0.7071067691f, 0.f, 0.7071067691f),

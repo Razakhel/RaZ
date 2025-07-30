@@ -57,7 +57,7 @@ TEST_CASE("MarchingSquares computation", "[data]") {
   // ^       ^       ^       ^       ^       ^       ^       ^       ^       ^       ^       ^       ^       ^       ^       ^       ^
   // 0       1       2       3       4       5       6       7       8       9      10      11      12      13      14      15      16   = width
 
-  constexpr std::array<Raz::Vec2f, 32> expectedPositions = {
+  static constexpr std::array<Raz::Vec2f, 32> expectedPositions = {
     // Nothing for configuration 0 (no corner)
     Raz::Vec2f(1.5f, 0.f), Raz::Vec2f(1.5f, 1.f),
     Raz::Vec2f(2.5f, 0.f), Raz::Vec2f(2.5f, 1.f),
