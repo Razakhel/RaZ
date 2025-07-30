@@ -28,8 +28,7 @@ namespace internal {
   auto detect_check(char) -> detect_impl<std::false_type, D>;
 
   template <typename D, template <typename...> class Check, typename... Args>
-  auto detect_check(int) -> decltype(void_t<Check<Args...>>(),
-                                    detect_impl<std::true_type, Check<Args...>>{});
+  auto detect_check(int) -> decltype(sizeof(Check<Args...>), detect_impl<std::true_type, Check<Args...>>{});
 
   template <typename D, typename Void, template <typename...> class Check, typename... Args>
   struct detect : decltype(detect_check<D, Check, Args...>(0)) {};
@@ -41,31 +40,10 @@ using is_detected = typename internal::detect<nonesuch, void, Check, Args...>::v
 template <template <typename...> class Check, typename... Args>
 inline constexpr bool is_detected_v = is_detected<Check, Args...>::value;
 
+// Add this new alias for the detected type (replaces old DetectedT)
+template <template <typename...> class Check, typename... Args>
+using detected_t = typename internal::detect<nonesuch, void, Check, Args...>::type;
 
-template <typename... Args>
-struct ConstOverload {
-  template <typename RetT, typename T>
-  constexpr auto operator()(RetT (T::*ptr)(Args...) const) const noexcept { return ptr; }
-};
-
-template <typename... Args>
-struct NonConstOverload {
-  template <typename RetT, typename T>
-  constexpr auto operator()(RetT (T::*ptr)(Args...)) const noexcept { return ptr; }
-};
-
-template <typename... Args>
-struct Overload : ConstOverload<Args...>, NonConstOverload<Args...> {
-  using ConstOverload<Args...>::operator();
-  using NonConstOverload<Args...>::operator();
-
-  template <typename RetT>
-  constexpr auto operator()(RetT (*ptr)(Args...)) const noexcept { return ptr; }
-};
-
-template <typename... Args> constexpr ConstOverload<Args...> PickConstOverload {};
-template <typename... Args> constexpr NonConstOverload<Args...> PickNonConstOverload {};
-template <typename... Args> constexpr Overload<Args...> PickOverload {};
 
 /// Recovers a string of the given type's name at compile-time.
 /// \tparam T Type to recover the name of.
@@ -183,46 +161,15 @@ constexpr std::string_view getEnumStr() noexcept {
 // This implementation works correctly with MSVC, GCC, and Clang
 // See: https://en.cppreference.com/w/cpp/experimental/is_detected
 
-namespace Details {
-
-struct Nonesuch {
-  Nonesuch(const Nonesuch&) = delete;
-  void operator=(const Nonesuch&) = delete;
-  ~Nonesuch() = delete;
-};
-
-template <typename Default, typename AlwaysVoid, template <typename...> typename Attr, typename... Args>
-struct Detector {
-  using ValueT = std::false_type;
-  using Type = Default;
-};
-
-template <typename Default, template <typename...> typename Attr, typename... Args>
-struct Detector<Default, std::void_t<Attr<Args...>>, Attr, Args...> {
-  using ValueT = std::true_type;
-  using Type = Attr<Args...>;
-};
-
+// Replace these (if present) with:
 template <template <typename...> typename Attr, typename... Args>
-using IsDetectedT = typename Details::Detector<Nonesuch, void, Attr, Args...>::ValueT;
-
-template <template <typename...> typename Attr, typename... Args>
-using DetectedT = typename Details::Detector<Nonesuch, void, Attr, Args...>::Type;
-
-template <typename Default, template <typename...> typename Attr, typename... Args>
-using DetectedOr = Details::Detector<Default, void, Attr, Args...>;
-
-template <typename Default, template <typename...> typename Attr, typename... Args>
-using DetectedOrT = typename DetectedOr<Default, Attr, Args...>::Type;
+using is_detected_t = is_detected<Attr, Args...>;  // Type: std::true_type or std::false_type
 
 template <typename Expected, template <typename...> typename Attr, typename... Args>
-using IsDetectedExactT = std::is_same<Expected, DetectedT<Attr, Args...>>;
+using is_detected_exact_t = std::is_same<Expected, detected_t<Attr, Args...>>;
 
 template <typename To, template <typename...> typename Attr, typename... Args>
-using IsDetectedConvertibleT = std::is_convertible<DetectedT<Attr, Args...>, To>;
-
-
-} // namespace Details
+using is_detected_convertible_t = std::is_convertible<detected_t<Attr, Args...>, To>;
 
 namespace Attribute {
 
@@ -281,8 +228,7 @@ constexpr bool hasAttribute() {
 /// \return True if the attribute's return type is the same as expected, false otherwise.
 template <typename Expected, template <typename...> typename Attr, typename... Args>
 constexpr bool hasReturnType() {
-  using DetectedType = typename internal::detect<nonesuch, void, Attr, Args...>::type;
-  return std::is_same_v<Expected, DetectedType>;
+  return is_detected_exact_t<Expected, Attr, Args...>::value;
 }
 
 /// Checks if the given types' attribute return type is convertible to the given one.
@@ -292,8 +238,7 @@ constexpr bool hasReturnType() {
 /// \return True if the attribute's return type is convertible, false otherwise.
 template <typename To, template <typename...> typename Attr, typename... Args>
 constexpr bool hasReturnTypeConvertible() {
-  using DetectedType = typename internal::detect<nonesuch, void, Attr, Args...>::type;
-  return std::is_convertible_v<DetectedType, To>;
+  return is_detected_convertible_t<To, Attr, Args...>::value;
 }
 
 /// Checks if the default constructor is available for the given type.
