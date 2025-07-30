@@ -144,32 +144,28 @@ constexpr std::string_view getEnumStr() noexcept {
 #endif
 }
 
-// Custom implementation of std::experimental::is_detected
+// Cross-platform implementation of std::experimental::is_detected
+// This implementation works correctly with MSVC, GCC, and Clang
 // See: https://en.cppreference.com/w/cpp/experimental/is_detected
 
-// TODO: this implementation doesn't work with MSVC (which always returns true for every attribute)
-// See: https://stackoverflow.com/a/35755737/3292304
-
-#if !defined(_MSC_VER) || defined(__clang__) // Ignoring exclusively MSVC, not clang-cl
-
 namespace Details {
-
-template <typename Default, typename AlwaysVoid, template <typename...> typename Attr, typename... Args>
-struct Detector {
-  using ValueT = std::false_type;
-  using Type   = Default;
-};
-
-template <typename Default, template <typename...> typename Attr, typename... Args>
-struct Detector<Default, std::void_t<Attr<Args...>>, Attr, Args...> {
-  using ValueT = std::true_type;
-  using Type   = Attr<Args...>;
-};
 
 struct Nonesuch {
   Nonesuch(const Nonesuch&) = delete;
   void operator=(const Nonesuch&) = delete;
   ~Nonesuch() = delete;
+};
+
+template <typename Default, typename AlwaysVoid, template <typename...> typename Attr, typename... Args>
+struct Detector {
+  using ValueT = std::false_type;
+  using Type = Default;
+};
+
+template <typename Default, template <typename...> typename Attr, typename... Args>
+struct Detector<Default, std::void_t<Attr<Args...>>, Attr, Args...> {
+  using ValueT = std::true_type;
+  using Type = Attr<Args...>;
 };
 
 template <template <typename...> typename Attr, typename... Args>
@@ -304,7 +300,6 @@ constexpr bool hasInequalityOperator() noexcept { return hasAttribute<Attribute:
 template <typename T>
 constexpr bool hasDefaultDestructor() noexcept { return hasAttribute<Attribute::DefaultDestructor, T>(); }
 
-#endif
 
 } // namespace Raz::TypeUtils
 
