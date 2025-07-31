@@ -7,6 +7,41 @@
 
 namespace Raz::TypeUtils {
 
+struct nonesuch {
+  nonesuch() = delete;
+  ~nonesuch() = delete;
+  nonesuch(const nonesuch&) = delete;
+  nonesuch& operator=(const nonesuch&) = delete;
+};
+
+template <typename...>
+using void_t = void;
+
+namespace internal {
+  template <typename V, typename D>
+  struct detect_impl {
+    using value_t = V;
+    using type = D;
+  };
+
+  template <typename D, template <typename...> class Check, typename... Args>
+  auto detect_check(char) -> detect_impl<std::false_type, D>;
+
+  template <typename D, template <typename...> class Check, typename... Args>
+  auto detect_check(int) -> decltype(void_t<Check<Args...>>(),
+                                    detect_impl<std::true_type, Check<Args...>>{});
+
+  template <typename D, typename Void, template <typename...> class Check, typename... Args>
+  struct detect : decltype(detect_check<D, Check, Args...>(0)) {};
+} // namespace internal
+
+template <template <typename...> class Check, typename... Args>
+using is_detected = typename internal::detect<nonesuch, void, Check, Args...>::value_t;
+
+template <template <typename...> class Check, typename... Args>
+inline constexpr bool is_detected_v = is_detected<Check, Args...>::value;
+
+
 template <typename... Args>
 struct ConstOverload {
   template <typename RetT, typename T>
@@ -186,6 +221,7 @@ using IsDetectedExactT = std::is_same<Expected, DetectedT<Attr, Args...>>;
 template <typename To, template <typename...> typename Attr, typename... Args>
 using IsDetectedConvertibleT = std::is_convertible<DetectedT<Attr, Args...>, To>;
 
+
 } // namespace Details
 
 namespace Attribute {
@@ -234,7 +270,9 @@ using DefaultDestructor = decltype(std::declval<T&>().~T());
 /// \tparam Args Types in which to check the attribute's existence.
 /// \return True if the attribute exists & is accessible, false otherwise.
 template <template <typename...> typename Attr, typename... Args>
-constexpr bool hasAttribute() { return Details::IsDetectedT<Attr, Args...>::value; }
+constexpr bool hasAttribute() {
+  return is_detected_v<Attr, Args...>;
+}
 
 /// Checks if the given types' attribute returns the specific expected type.
 /// \tparam Expected Return type to be checked.
@@ -242,7 +280,10 @@ constexpr bool hasAttribute() { return Details::IsDetectedT<Attr, Args...>::valu
 /// \tparam Args Types for which to check the attribute's return type.
 /// \return True if the attribute's return type is the same as expected, false otherwise.
 template <typename Expected, template <typename...> typename Attr, typename... Args>
-constexpr bool hasReturnType() { return Details::IsDetectedExactT<Expected, Attr, Args...>::value; }
+constexpr bool hasReturnType() {
+  using DetectedType = typename internal::detect<nonesuch, void, Attr, Args...>::type;
+  return std::is_same_v<Expected, DetectedType>;
+}
 
 /// Checks if the given types' attribute return type is convertible to the given one.
 /// \tparam To Convertible return type to be checked.
@@ -250,7 +291,10 @@ constexpr bool hasReturnType() { return Details::IsDetectedExactT<Expected, Attr
 /// \tparam Args Types for which to check the attribute's return type.
 /// \return True if the attribute's return type is convertible, false otherwise.
 template <typename To, template <typename...> typename Attr, typename... Args>
-constexpr bool hasReturnTypeConvertible() { return Details::IsDetectedConvertibleT<To, Attr, Args...>::value; }
+constexpr bool hasReturnTypeConvertible() {
+  using DetectedType = typename internal::detect<nonesuch, void, Attr, Args...>::type;
+  return std::is_convertible_v<DetectedType, To>;
+}
 
 /// Checks if the default constructor is available for the given type.
 /// \tparam T Type to check the attribute for.
