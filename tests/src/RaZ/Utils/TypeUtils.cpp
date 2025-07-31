@@ -74,8 +74,6 @@ TEST_CASE("TypeUtils enum str", "[utils]") {
 #endif
 }
 
-#if !defined(RAZ_COMPILER_MSVC)
-
 TEST_CASE("TypeUtils has attribute", "[utils]") {
   CHECK(Raz::TypeUtils::hasDefaultConstructor<AttributeTest>());
   CHECK(Raz::TypeUtils::hasCopyConstructor<AttributeTest>());
@@ -95,5 +93,3 @@ TEST_CASE("TypeUtils has attribute", "[utils]") {
   // AttributeTest has a non-explicit operator bool(); the created object is then implicitly convertible to bool
   CHECK(Raz::TypeUtils::hasReturnTypeConvertible<bool, Raz::TypeUtils::Attribute::DefaultConstructor, AttributeTest>());
 }
-
-#endif
