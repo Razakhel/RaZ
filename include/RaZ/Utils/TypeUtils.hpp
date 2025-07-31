@@ -44,6 +44,31 @@ inline constexpr bool is_detected_v = is_detected<Check, Args...>::value;
 template <template <typename...> class Check, typename... Args>
 using detected_t = typename internal::detect<nonesuch, void, Check, Args...>::type;
 
+template <typename... Args>
+struct ConstOverload {
+  template <typename RetT, typename T>
+  constexpr auto operator()(RetT (T::*ptr)(Args...) const) const noexcept { return ptr; }
+};
+
+template <typename... Args>
+struct NonConstOverload {
+  template <typename RetT, typename T>
+  constexpr auto operator()(RetT (T::*ptr)(Args...)) const noexcept { return ptr; }
+};
+
+template <typename... Args>
+struct Overload : ConstOverload<Args...>, NonConstOverload<Args...> {
+  using ConstOverload<Args...>::operator();
+  using NonConstOverload<Args...>::operator();
+
+  template <typename RetT>
+  constexpr auto operator()(RetT (*ptr)(Args...)) const noexcept { return ptr; }
+};
+
+template <typename... Args> constexpr ConstOverload<Args...> PickConstOverload {};
+template <typename... Args> constexpr NonConstOverload<Args...> PickNonConstOverload {};
+template <typename... Args> constexpr Overload<Args...> PickOverload {};
+
 
 /// Recovers a string of the given type's name at compile-time.
 /// \tparam T Type to recover the name of.
