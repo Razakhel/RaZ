@@ -27,8 +27,9 @@ namespace internal {
   template <typename D, template <typename...> class Check, typename... Args>
   auto detect_check(char) -> detect_impl<std::false_type, D>;
 
-  template <typename D, template <typename...> class Check, typename... Args>
-  auto detect_check(int) -> decltype(sizeof(Check<Args...>), detect_impl<std::true_type, Check<Args...>>{});
+  template <typename D, template <typename...> class Check, typename... Args,
+            typename Dummy = Check<Args...>>
+  auto detect_check(int) -> detect_impl<std::true_type, Dummy>;
 
   template <typename D, typename Void, template <typename...> class Check, typename... Args>
   struct detect : decltype(detect_check<D, Check, Args...>(0)) {};
@@ -40,7 +41,6 @@ using is_detected = typename internal::detect<nonesuch, void, Check, Args...>::v
 template <template <typename...> class Check, typename... Args>
 inline constexpr bool is_detected_v = is_detected<Check, Args...>::value;
 
-// Add this new alias for the detected type (replaces old DetectedT)
 template <template <typename...> class Check, typename... Args>
 using detected_t = typename internal::detect<nonesuch, void, Check, Args...>::type;
 
@@ -68,6 +68,20 @@ struct Overload : ConstOverload<Args...>, NonConstOverload<Args...> {
 template <typename... Args> constexpr ConstOverload<Args...> PickConstOverload {};
 template <typename... Args> constexpr NonConstOverload<Args...> PickNonConstOverload {};
 template <typename... Args> constexpr Overload<Args...> PickOverload {};
+
+// Cross-platform implementation of std::experimental::is_detected
+// This works correctly on MSVC (respects private/protected access), GCC, and Clang
+// Adapted from: https://stackoverflow.com/a/35755737/3292304
+// See also: https://en.cppreference.com/w/cpp/experimental/is_detected
+
+template <template <typename...> typename Attr, typename... Args>
+using is_detected_t = is_detected<Attr, Args...>;
+
+template <typename Expected, template <typename...> typename Attr, typename... Args>
+using is_detected_exact_t = std::is_same<Expected, detected_t<Attr, Args...>>;
+
+template <typename To, template <typename...> typename Attr, typename... Args>
+using is_detected_convertible_t = std::is_convertible<detected_t<Attr, Args...>, To>;
 
 
 /// Recovers a string of the given type's name at compile-time.
@@ -181,20 +195,6 @@ constexpr std::string_view getEnumStr() noexcept {
   return {};
 #endif
 }
-
-// Cross-platform implementation of std::experimental::is_detected
-// This implementation works correctly with MSVC, GCC, and Clang
-// See: https://en.cppreference.com/w/cpp/experimental/is_detected
-
-// Replace these (if present) with:
-template <template <typename...> typename Attr, typename... Args>
-using is_detected_t = is_detected<Attr, Args...>;  // Type: std::true_type or std::false_type
-
-template <typename Expected, template <typename...> typename Attr, typename... Args>
-using is_detected_exact_t = std::is_same<Expected, detected_t<Attr, Args...>>;
-
-template <typename To, template <typename...> typename Attr, typename... Args>
-using is_detected_convertible_t = std::is_convertible<detected_t<Attr, Args...>, To>;
 
 namespace Attribute {
 
