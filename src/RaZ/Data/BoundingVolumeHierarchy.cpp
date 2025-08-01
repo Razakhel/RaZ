@@ -61,7 +61,6 @@ void BoundingVolumeHierarchyNode::build(std::vector<TriangleInfo>& trianglesInfo
     return;
   }
 
-  // TODO: wait for a parallel/reduce to be implemented in order to optimize the following loop
   for (std::size_t i = beginIndex + 1; i < endIndex; ++i) {
     const AABB triangleBox = trianglesInfo[i].triangle.computeBoundingBox();
 
