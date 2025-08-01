@@ -1,8 +1,11 @@
 #include "RaZ/Data/Grid3.hpp"
 #include "RaZ/Data/MarchingCubes.hpp"
 #include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Utils/Threading.hpp"
 
 #include "tracy/Tracy.hpp"
+
+#include <numeric>
 
 namespace Raz {
 
@@ -336,13 +339,13 @@ uint8_t computeCellConfiguration(const Grid3b& grid, std::size_t widthIndex, std
   // |   |   |   | -> 0      |   |   |   | -> 40     |   |   |   | -> 90    |   |   |   | -> 255
   // O - O   O - O           X - O   O - O           X - O   O - X          X - X   X - X
 
-  return static_cast<uint8_t>(grid.getValue(widthIndex,     heightIndex,     depthIndex + 1))         // Bottom-left back
-       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex,     depthIndex + 1) << 1u)   // Bottom-right back
-       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex,     depthIndex    ) << 2u)   // Bottom-right front
-       | static_cast<uint8_t>(grid.getValue(widthIndex,     heightIndex,     depthIndex    ) << 3u)   // Bottom-left front
-       | static_cast<uint8_t>(grid.getValue(widthIndex,     heightIndex + 1, depthIndex + 1) << 4u)   // Top-left back
-       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex + 1, depthIndex + 1) << 5u)   // Top-right back
-       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex + 1, depthIndex    ) << 6u)   // Top-right front
+  return static_cast<uint8_t>(grid.getValue(widthIndex,     heightIndex,     depthIndex + 1))        // Bottom-left back
+       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex,     depthIndex + 1) << 1u)  // Bottom-right back
+       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex,     depthIndex    ) << 2u)  // Bottom-right front
+       | static_cast<uint8_t>(grid.getValue(widthIndex,     heightIndex,     depthIndex    ) << 3u)  // Bottom-left front
+       | static_cast<uint8_t>(grid.getValue(widthIndex,     heightIndex + 1, depthIndex + 1) << 4u)  // Top-left back
+       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex + 1, depthIndex + 1) << 5u)  // Top-right back
+       | static_cast<uint8_t>(grid.getValue(widthIndex + 1, heightIndex + 1, depthIndex    ) << 6u)  // Top-right front
        | static_cast<uint8_t>(grid.getValue(widthIndex,     heightIndex + 1, depthIndex    ) << 7u); // Top-left front
 }
 
@@ -356,42 +359,51 @@ Mesh MarchingCubes::compute(const Grid3b& grid) {
 
   Mesh mesh;
   Submesh& submesh = mesh.addSubmesh();
-  std::vector<Vertex>& vertices = submesh.getVertices();
-  std::vector<unsigned int>& indices = submesh.getTriangleIndices();
 
   const Vec3f globalOffset(static_cast<float>(grid.getWidth() - 1) * 0.5f,
                            static_cast<float>(grid.getHeight() - 1) * 0.5f,
                            static_cast<float>(grid.getDepth() - 1) * 0.5f);
 
-  // TODO: parallelize these loops, most likely with a parallel/reduce
-  for (std::size_t depthIndex = 0; depthIndex < grid.getDepth() - 1; ++depthIndex) {
-    for (std::size_t heightIndex = 0; heightIndex < grid.getHeight() - 1; ++heightIndex) {
-      for (std::size_t widthIndex = 0; widthIndex < grid.getWidth() - 1; ++widthIndex) {
-        const uint8_t cellConfig = computeCellConfiguration(grid, widthIndex, heightIndex, depthIndex);
-        const std::array<int8_t, 15>& edgeIndices = trianglesIndices[cellConfig];
-        const Vec3f localOffset(static_cast<float>(widthIndex), static_cast<float>(heightIndex), static_cast<float>(depthIndex));
+  submesh.getVertices() = Threading::parallelizeReduce(0, grid.getDepth() - 1, [&grid, globalOffset] (const auto& range) {
+    ZoneScopedN("MarchingCubes::compute");
 
-        for (std::size_t edgeIndex = 0; edgeIndex < edgeIndices.size(); edgeIndex += 3) {
-          if (edgeIndices[edgeIndex] == NONE)
-            break;
+    std::vector<Vertex> vertices;
 
-          // TODO: compute texcoords
-          // TODO: compute tangent
-          const Vec3f firstPoint  = edgeVertices[edgeIndices[edgeIndex    ]] - globalOffset + localOffset;
-          const Vec3f secondPoint = edgeVertices[edgeIndices[edgeIndex + 1]] - globalOffset + localOffset;
-          const Vec3f thirdPoint  = edgeVertices[edgeIndices[edgeIndex + 2]] - globalOffset + localOffset;
-          const Vec3f normal      = (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize();
-          vertices.emplace_back(Vertex{ firstPoint, Vec2f(), normal });
-          vertices.emplace_back(Vertex{ secondPoint, Vec2f(), normal });
-          vertices.emplace_back(Vertex{ thirdPoint, Vec2f(), normal });
+    for (std::size_t depthIndex = range.beginIndex; depthIndex < range.endIndex; ++depthIndex) {
+      for (std::size_t heightIndex = 0; heightIndex < grid.getHeight() - 1; ++heightIndex) {
+        for (std::size_t widthIndex = 0; widthIndex < grid.getWidth() - 1; ++widthIndex) {
+          const uint8_t cellConfig = computeCellConfiguration(grid, widthIndex, heightIndex, depthIndex);
+          const std::array<int8_t, 15>& edgeIndices = trianglesIndices[cellConfig];
+          const Vec3f localOffset(static_cast<float>(widthIndex), static_cast<float>(heightIndex), static_cast<float>(depthIndex));
 
-          indices.emplace_back(static_cast<unsigned int>(vertices.size() - 3));
-          indices.emplace_back(static_cast<unsigned int>(vertices.size() - 2));
-          indices.emplace_back(static_cast<unsigned int>(vertices.size() - 1));
+          for (std::size_t edgeIndex = 0; edgeIndex < edgeIndices.size(); edgeIndex += 3) {
+            if (edgeIndices[edgeIndex] == NONE)
+              break;
+
+            // TODO: compute texcoords
+            // TODO: compute tangent
+            const Vec3f firstPoint  = edgeVertices[edgeIndices[edgeIndex    ]] - globalOffset + localOffset;
+            const Vec3f secondPoint = edgeVertices[edgeIndices[edgeIndex + 1]] - globalOffset + localOffset;
+            const Vec3f thirdPoint  = edgeVertices[edgeIndices[edgeIndex + 2]] - globalOffset + localOffset;
+            const Vec3f normal      = (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize();
+            vertices.emplace_back(Vertex{ firstPoint, Vec2f(), normal });
+            vertices.emplace_back(Vertex{ secondPoint, Vec2f(), normal });
+            vertices.emplace_back(Vertex{ thirdPoint, Vec2f(), normal });
+          }
         }
       }
     }
-  }
+
+    return vertices;
+  }, [] (std::vector<Vertex>&& result, const std::vector<Vertex>& vertices) {
+    ZoneScopedN("Reduce");
+    result.insert(result.end(), vertices.begin(), vertices.end());
+    return std::move(result);
+  });
+
+  std::vector<unsigned int>& indices = submesh.getTriangleIndices();
+  indices.resize(submesh.getVertices().size());
+  std::iota(indices.begin(), indices.end(), 0);
 
   return mesh;
 }
