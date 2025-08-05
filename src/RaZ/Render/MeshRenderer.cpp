@@ -67,7 +67,7 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
   ZoneScopedN("MeshRenderer::load");
 
   if (mesh.getSubmeshes().empty()) {
-    Logger::error("[MeshRenderer] Cannot load an empty mesh.");
+    Logger::error("[MeshRenderer] Cannot load an empty mesh");
     return;
   }
 

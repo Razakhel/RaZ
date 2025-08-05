@@ -302,7 +302,7 @@ enum class TextureType : unsigned int {
 #endif
 };
 
-enum class TextureParam : unsigned int {
+enum class TextureParameter : unsigned int {
   MINIFY_FILTER  = 10241 /* GL_TEXTURE_MIN_FILTER   */, ///<
   MAGNIFY_FILTER = 10240 /* GL_TEXTURE_MAG_FILTER   */, ///<
   WRAP_S         = 10242 /* GL_TEXTURE_WRAP_S       */, ///<
@@ -317,7 +317,7 @@ enum class TextureParam : unsigned int {
 #endif
 };
 
-enum class TextureParamValue : unsigned int {
+enum class TextureParameterValue : unsigned int {
   NEAREST                = 9728  /* GL_NEAREST                */, ///<
   LINEAR                 = 9729  /* GL_LINEAR                 */, ///<
   NEAREST_MIPMAP_NEAREST = 9984  /* GL_NEAREST_MIPMAP_NEAREST */, ///<
@@ -512,6 +512,35 @@ enum class ImageInternalFormat : unsigned int {
   RGB10_A2UI     = static_cast<unsigned int>(TextureInternalFormat::RGB10_A2UI),    ///<
   R11F_G11F_B10F = static_cast<unsigned int>(TextureInternalFormat::R11F_G11F_B10F) ///<
 #endif
+};
+
+enum class SamplerParameter : unsigned int {
+  MINIFY_FILTER  = static_cast<unsigned int>(TextureParameter::MINIFY_FILTER)  /* GL_TEXTURE_MIN_FILTER   */, ///<
+  MAGNIFY_FILTER = static_cast<unsigned int>(TextureParameter::MAGNIFY_FILTER) /* GL_TEXTURE_MAG_FILTER   */, ///<
+  WRAP_S         = static_cast<unsigned int>(TextureParameter::WRAP_S)         /* GL_TEXTURE_WRAP_S       */, ///<
+  WRAP_T         = static_cast<unsigned int>(TextureParameter::WRAP_T)         /* GL_TEXTURE_WRAP_T       */, ///<
+  WRAP_R         = static_cast<unsigned int>(TextureParameter::WRAP_R)         /* GL_TEXTURE_WRAP_R       */, ///<
+#if !defined(OPENGL_ES)
+  BORDER_COLOR   = 4100                                                        /* GL_TEXTURE_BORDER_COLOR */, ///<
+#endif
+  MIN_LOD        = 33082                                                       /* GL_TEXTURE_MIN_LOD      */, ///<
+  MAX_LOD        = 33083                                                       /* GL_TEXTURE_MAX_LOD      */, ///<
+#if !defined(OPENGL_ES)
+  LOD_BIAS       = 34049                                                       /* GL_TEXTURE_LOD_BIAS     */, ///<
+#endif
+  COMPARE_MODE   = 34892                                                       /* GL_TEXTURE_COMPARE_MODE */, ///<
+  COMPARE_FUNC   = 34893                                                       /* GL_TEXTURE_COMPARE_FUNC */  ///<
+};
+
+enum class SamplerParameterValue : unsigned int {
+  NEAREST                = static_cast<unsigned int>(TextureParameterValue::NEAREST),                ///<
+  LINEAR                 = static_cast<unsigned int>(TextureParameterValue::LINEAR),                 ///<
+  NEAREST_MIPMAP_NEAREST = static_cast<unsigned int>(TextureParameterValue::NEAREST_MIPMAP_NEAREST), ///<
+  LINEAR_MIPMAP_NEAREST  = static_cast<unsigned int>(TextureParameterValue::LINEAR_MIPMAP_NEAREST),  ///<
+  NEAREST_MIPMAP_LINEAR  = static_cast<unsigned int>(TextureParameterValue::NEAREST_MIPMAP_LINEAR),  ///<
+  LINEAR_MIPMAP_LINEAR   = static_cast<unsigned int>(TextureParameterValue::LINEAR_MIPMAP_LINEAR),   ///<
+  REPEAT                 = static_cast<unsigned int>(TextureParameterValue::REPEAT),                 ///<
+  CLAMP_TO_EDGE          = static_cast<unsigned int>(TextureParameterValue::CLAMP_TO_EDGE)           ///<
 };
 
 enum class ProgramParameter : unsigned int {
@@ -812,8 +841,8 @@ enum class DrawBuffer : unsigned int {
 };
 
 enum class BlitFilter : unsigned int {
-  NEAREST = static_cast<unsigned int>(TextureParamValue::NEAREST), ///<
-  LINEAR  = static_cast<unsigned int>(TextureParamValue::LINEAR)   ///<
+  NEAREST = static_cast<unsigned int>(TextureParameterValue::NEAREST), ///<
+  LINEAR  = static_cast<unsigned int>(TextureParameterValue::LINEAR)   ///<
 };
 
 enum class PrimitiveType : unsigned int {
@@ -1011,8 +1040,8 @@ public:
   static void enableVertexAttribArray(unsigned int index);
   static void setVertexAttrib(unsigned int index, AttribDataType dataType, uint8_t size, unsigned int stride, unsigned int offset, bool normalize = false);
   static void setVertexAttribDivisor(unsigned int index, unsigned int divisor);
-  static void deleteVertexArrays(unsigned int count, unsigned int* indices);
-  static void deleteVertexArray(unsigned int& index) { deleteVertexArrays(1, &index); }
+  static void deleteVertexArrays(unsigned int count, const unsigned int* indices);
+  static void deleteVertexArray(unsigned int index) { deleteVertexArrays(1, &index); }
   static void generateBuffers(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateBuffers(unsigned int (&indices)[N]) { generateBuffers(N, indices); }
   static void generateBuffer(unsigned int& index) { generateBuffers(1, &index); }
@@ -1024,13 +1053,13 @@ public:
   static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::ptrdiff_t dataSize, const void* data);
   template <typename T> static void sendBufferSubData(BufferType type, std::ptrdiff_t offset, const T& data) { sendBufferSubData(type, offset,
                                                                                                                                  sizeof(T), &data); }
-  static void deleteBuffers(unsigned int count, unsigned int* indices);
-  template <std::size_t N> static void deleteBuffers(unsigned int (&indices)[N]) { deleteBuffers(N, indices); }
-  static void deleteBuffer(unsigned int& index) { deleteBuffers(1, &index); }
-  static bool isTexture(unsigned int index);
+  static void deleteBuffers(unsigned int count, const unsigned int* indices);
+  template <std::size_t N> static void deleteBuffers(const unsigned int (&indices)[N]) { deleteBuffers(N, indices); }
+  static void deleteBuffer(unsigned int index) { deleteBuffers(1, &index); }
   static void generateTextures(unsigned int count, unsigned int* indices);
   template <std::size_t N> static void generateTextures(unsigned int (&indices)[N]) { generateTextures(N, indices); }
   static void generateTexture(unsigned int& index) { generateTextures(1, &index); }
+  static bool isTexture(unsigned int index);
   static void bindTexture(TextureType type, unsigned int index);
   static void unbindTexture(TextureType type) { bindTexture(type, 0); }
 #if !defined(USE_WEBGL)
@@ -1038,64 +1067,67 @@ public:
                                bool isLayered, int layer,
                                ImageAccess imgAccess, ImageInternalFormat imgFormat);
 #endif
-  static void activateTexture(unsigned int index);
+  static void setActiveTexture(unsigned int index);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param value Value to be set.
-  static void setTextureParameter(TextureType type, TextureParam param, int value);
+  static void setTextureParameter(TextureType type, TextureParameter param, int value);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param value Value to be set.
-  static void setTextureParameter(TextureType type, TextureParam param, float value);
+  static void setTextureParameter(TextureType type, TextureParameter param, float value);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param values Values to be set.
-  static void setTextureParameter(TextureType type, TextureParam param, const int* values);
+  static void setTextureParameter(TextureType type, TextureParameter param, const int* values);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param values Values to be set.
-  static void setTextureParameter(TextureType type, TextureParam param, const float* values);
+  static void setTextureParameter(TextureType type, TextureParameter param, const float* values);
   /// Sets a parameter to the currently bound texture.
   /// \param type Type of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param value Value to be set.
-  static void setTextureParameter(TextureType type, TextureParam param, TextureParamValue value) { setTextureParameter(type, param, static_cast<int>(value)); }
+  static void setTextureParameter(TextureType type, TextureParameter param, TextureParameterValue value) {
+    setTextureParameter(type, param, static_cast<int>(value));
+  }
 #if !defined(USE_OPENGL_ES)
   /// Sets a parameter to the given texture.
   /// \note Requires OpenGL 4.5+.
   /// \param textureIndex Index of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param value Value to be set.
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, int value);
+  static void setTextureParameter(unsigned int textureIndex, TextureParameter param, int value);
   /// Sets a parameter to the given texture.
   /// \note Requires OpenGL 4.5+.
   /// \param textureIndex Index of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param value Value to be set.
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, float value);
+  static void setTextureParameter(unsigned int textureIndex, TextureParameter param, float value);
   /// Sets a parameter to the given texture.
   /// \note Requires OpenGL 4.5+.
   /// \param textureIndex Index of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param values Values to be set.
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values);
+  static void setTextureParameter(unsigned int textureIndex, TextureParameter param, const int* values);
   /// Sets a parameter to the given texture.
   /// \note Requires OpenGL 4.5+.
   /// \param textureIndex Index of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param values Values to be set.
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values);
+  static void setTextureParameter(unsigned int textureIndex, TextureParameter param, const float* values);
   /// Sets a parameter to the given texture.
   /// \note Requires OpenGL 4.5+.
   /// \param textureIndex Index of the texture to set the parameter to.
   /// \param param Parameter to set.
   /// \param value Value to be set.
-  static void setTextureParameter(unsigned int textureIndex, TextureParam param, TextureParamValue value) { setTextureParameter(textureIndex, param,
-                                                                                                                                static_cast<int>(value)); }
+  static void setTextureParameter(unsigned int textureIndex, TextureParameter param, TextureParameterValue value) {
+    setTextureParameter(textureIndex, param, static_cast<int>(value));
+  }
   /// Sends the image's data corresponding to the currently bound 1D texture.
   /// \note Unavailable with OpenGL ES; use a Nx1 2D texture instead.
   /// \param type Type of the texture.
@@ -1210,9 +1242,44 @@ public:
   /// \param textureIndex Index of the texture to generate mipmaps for.
   static void generateMipmap(unsigned int textureIndex);
 #endif
-  static void deleteTextures(unsigned int count, unsigned int* indices);
-  template <std::size_t N> static void deleteTextures(unsigned int (&indices)[N]) { deleteTextures(N, indices); }
-  static void deleteTexture(unsigned int& index) { deleteTextures(1, &index); }
+  static void deleteTextures(unsigned int count, const unsigned int* indices);
+  template <std::size_t N> static void deleteTextures(const unsigned int (&indices)[N]) { deleteTextures(N, indices); }
+  static void deleteTexture(unsigned int index) { deleteTextures(1, &index); }
+  static void generateSamplers(unsigned int count, unsigned int* indices);
+  template <std::size_t N> static void generateSamplers(unsigned int (&indices)[N]) { generateSamplers(N, indices); }
+  static void generateSampler(unsigned int& index) { generateSamplers(1, &index); }
+  static bool isSampler(unsigned int index);
+  static void bindSampler(unsigned int textureUnit, unsigned int samplerIndex);
+  static void unbindSampler(unsigned int textureUnit) { bindSampler(textureUnit, 0); }
+  /// Sets a parameter to the given sampler.
+  /// \param samplerIndex Index of the sampler to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
+  static void setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, int value);
+  /// Sets a parameter to the given sampler.
+  /// \param samplerIndex Index of the sampler to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
+  static void setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, float value);
+  /// Sets a parameter to the given sampler.
+  /// \param samplerIndex Index of the sampler to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param values Values to be set.
+  static void setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, const int* values);
+  /// Sets a parameter to the given sampler.
+  /// \param samplerIndex Index of the sampler to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param values Values to be set.
+  static void setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, const float* values);
+  /// Sets a parameter to the given sampler.
+  /// \param samplerIndex Index of the sampler to set the parameter to.
+  /// \param param Parameter to set.
+  /// \param value Value to be set.
+  static void setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, SamplerParameterValue value) {
+    setSamplerParameter(samplerIndex, param, static_cast<int>(value));
+  }
+  static void deleteSamplers(unsigned int count, const unsigned int* indices);
+  static void deleteSampler(unsigned int index) { deleteSamplers(1, &index); }
   static void resizeViewport(int xOrigin, int yOrigin, unsigned int width, unsigned int height);
   static unsigned int createProgram();
   static void getProgramParameter(unsigned int index, ProgramParameter parameter, int* parameters);
@@ -1383,9 +1450,9 @@ public:
   static void blitFramebuffer(int readMinX, int readMinY, int readMaxX, int readMaxY,
                               int writeMinX, int writeMinY, int writeMaxX, int writeMaxY,
                               MaskType mask, BlitFilter filter);
-  static void deleteFramebuffers(unsigned int count, unsigned int* indices);
-  template <std::size_t N> static void deleteFramebuffers(unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
-  static void deleteFramebuffer(unsigned int& index) { deleteFramebuffers(1, &index); }
+  static void deleteFramebuffers(unsigned int count, const unsigned int* indices);
+  template <std::size_t N> static void deleteFramebuffers(const unsigned int (&indices)[N]) { deleteFramebuffers(N, indices); }
+  static void deleteFramebuffer(unsigned int index) { deleteFramebuffers(1, &index); }
   static void drawArrays(PrimitiveType type, unsigned int first, unsigned int count);
   static void drawArrays(PrimitiveType type, unsigned int count) { drawArrays(type, 0, count); }
   static void drawArraysInstanced(PrimitiveType type, unsigned int first, unsigned int primitiveCount, unsigned int instanceCount);
@@ -1427,8 +1494,8 @@ public:
   static void recoverQueryResult(unsigned int index, int64_t& result);
   static void recoverQueryResult(unsigned int index, uint64_t& result);
 #endif
-  static void deleteQueries(unsigned int count, unsigned int* indices);
-  static void deleteQuery(unsigned int& index) { deleteQueries(1, &index); }
+  static void deleteQueries(unsigned int count, const unsigned int* indices);
+  static void deleteQuery(unsigned int index) { deleteQueries(1, &index); }
 #if !defined (USE_OPENGL_ES)
   /// Assigns a label to a graphic object.
   /// \note Requires OpenGL 4.3+.

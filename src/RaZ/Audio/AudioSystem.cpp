@@ -33,7 +33,7 @@ inline void checkError(void* device, const std::string& errorMsg) {
   const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
 
   if (errorCode != ALC_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlcErrorStr(errorCode) + ").");
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlcErrorStr(errorCode) + ')');
 }
 
 } // namespace
@@ -84,7 +84,7 @@ void AudioSystem::openDevice(const std::string& deviceName) {
 
   m_device = alcOpenDevice((!deviceName.empty() ? deviceName.c_str() : nullptr));
   if (!m_device) {
-    Logger::error("[OpenAL] Failed to open an audio device.");
+    Logger::error("[OpenAL] Failed to open an audio device");
     return;
   }
 
@@ -92,7 +92,7 @@ void AudioSystem::openDevice(const std::string& deviceName) {
   checkError(m_device, "Failed to create context");
 
   if (!alcMakeContextCurrent(static_cast<ALCcontext*>(m_context))) {
-    Logger::error("[OpenAL] Failed to make the audio context current.");
+    Logger::error("[OpenAL] Failed to make the audio context current");
     alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
   }
 
@@ -181,7 +181,7 @@ void AudioSystem::destroy() {
 
   if (m_device != nullptr) {
     if (!alcCloseDevice(static_cast<ALCdevice*>(m_device)))
-      Logger::error("[OpenAL] Failed to close the audio device.");
+      Logger::error("[OpenAL] Failed to close the audio device");
 
     m_device = nullptr;
   }

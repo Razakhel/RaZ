@@ -7,11 +7,12 @@ namespace Raz {
 
 namespace {
 
-inline BufferDataUsage recoverDataUsage(UniformBufferUsage usage) {
+constexpr BufferDataUsage recoverDataUsage(UniformBufferUsage usage) {
   switch (usage) {
     case UniformBufferUsage::STATIC:  return BufferDataUsage::STATIC_DRAW;
     case UniformBufferUsage::DYNAMIC: return BufferDataUsage::DYNAMIC_DRAW;
     case UniformBufferUsage::STREAM:  return BufferDataUsage::STREAM_DRAW;
+    default:                          break;
   }
 
   throw std::invalid_argument("Error: Invalid uniform buffer usage");

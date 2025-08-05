@@ -23,7 +23,7 @@ inline Texture2DPtr loadTexture(const FilePath& textureFilePath, const Color& de
   ZoneTextF("Path: %s", textureFilePath.toUtf8().c_str());
 
   if (!FileUtils::isReadable(textureFilePath)) {
-    Logger::warn("[ObjLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
+    Logger::warn("[ObjLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened");
     return Texture2D::create(defaultColor);
   }
 
@@ -42,7 +42,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
   std::ifstream file(mtlFilePath, std::ios_base::binary);
 
   if (!file) {
-    Logger::error("[ObjLoad] Could not open the MTL file '" + mtlFilePath + "'.");
+    Logger::error("[ObjLoad] Could not open the MTL file '" + mtlFilePath + '\'');
     materials.emplace_back(MaterialType::COOK_TORRANCE);
     return;
   }
@@ -275,7 +275,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
       const auto correspMaterial = materialCorrespIndices.find(materialName);
 
       if (correspMaterial == materialCorrespIndices.cend())
-        Logger::error("[ObjLoad] No corresponding material found with the name '" + materialName + "'.");
+        Logger::error("[ObjLoad] No corresponding material found with the name '" + materialName + '\'');
       else
         meshRenderer.getSubmeshRenderers().back().setMaterialIndex(correspMaterial->second);
     } else if (line[0] == 'o' || line[0] == 'g') {

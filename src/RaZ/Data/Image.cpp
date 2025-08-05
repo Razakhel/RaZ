@@ -50,7 +50,7 @@ Image::Image(ImageColorspace colorspace, ImageDataType dataType) : m_colorspace{
       break;
 
     default:
-      throw std::invalid_argument("Error: Invalid colorspace to create an image with");
+      throw std::invalid_argument("[Image] Invalid colorspace to create an image with");
   }
 }
 
@@ -82,6 +82,9 @@ Image::Image(const Image& img) : m_width{ img.m_width },
     case ImageDataType::FLOAT:
       m_data = ImageDataF::create(*static_cast<ImageDataF*>(img.m_data.get()));
       break;
+
+    default:
+      throw std::invalid_argument("[Image] Invalid data type");
   }
 }
 
@@ -121,6 +124,9 @@ Image& Image::operator=(const Image& img) {
       case ImageDataType::FLOAT:
         m_data = ImageDataF::create(*static_cast<ImageDataF*>(img.m_data.get()));
         break;
+
+      default:
+        throw std::invalid_argument("[Image] Invalid data type");
     }
   } else {
     m_data.reset();

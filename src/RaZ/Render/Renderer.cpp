@@ -94,7 +94,7 @@ void Renderer::initialize() {
   glewExperimental = GL_TRUE;
 
   if (glewInit() != GLEW_OK) {
-    Logger::error("Failed to initialize GLEW.");
+    Logger::error("[Renderer] Failed to initialize GLEW");
     return;
   }
 
@@ -393,7 +393,7 @@ void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
   const ErrorCodes errorCodes = Renderer::recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_VALUE])
-    Logger::error("Renderer::setPixelStorage - " + std::to_string(value) + " is not a valid alignment value. Only 1, 2, 4 & 8 are accepted.");
+    Logger::error("Renderer::setPixelStorage - " + std::to_string(value) + " is not a valid alignment value. Only 1, 2, 4 & 8 are accepted");
 #endif
 }
 
@@ -447,7 +447,7 @@ void Renderer::setVertexAttribDivisor(unsigned int index, unsigned int divisor) 
   printConditionalErrors();
 }
 
-void Renderer::deleteVertexArrays(unsigned int count, unsigned int* indices) {
+void Renderer::deleteVertexArrays(unsigned int count, const unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDeleteVertexArrays(static_cast<int>(count), indices);
@@ -503,10 +503,18 @@ void Renderer::sendBufferSubData(BufferType type, std::ptrdiff_t offset, std::pt
   printConditionalErrors();
 }
 
-void Renderer::deleteBuffers(unsigned int count, unsigned int* indices) {
+void Renderer::deleteBuffers(unsigned int count, const unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDeleteBuffers(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
+void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenTextures(static_cast<int>(count), indices);
 
   printConditionalErrors();
 }
@@ -519,14 +527,6 @@ bool Renderer::isTexture(unsigned int index) {
   printConditionalErrors();
 
   return isTexture;
-}
-
-void Renderer::generateTextures(unsigned int count, unsigned int* indices) {
-  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
-
-  glGenTextures(static_cast<int>(count), indices);
-
-  printConditionalErrors();
 }
 
 void Renderer::bindTexture(TextureType type, unsigned int index) {
@@ -554,7 +554,7 @@ void Renderer::bindImageTexture(unsigned int imageUnitIndex, unsigned int textur
 }
 #endif
 
-void Renderer::activateTexture(unsigned int index) {
+void Renderer::setActiveTexture(unsigned int index) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glActiveTexture(GL_TEXTURE0 + index);
@@ -562,7 +562,7 @@ void Renderer::activateTexture(unsigned int index) {
   printConditionalErrors();
 }
 
-void Renderer::setTextureParameter(TextureType type, TextureParam param, int value) {
+void Renderer::setTextureParameter(TextureType type, TextureParameter param, int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glTexParameteri(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
@@ -570,7 +570,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, int val
   printConditionalErrors();
 }
 
-void Renderer::setTextureParameter(TextureType type, TextureParam param, float value) {
+void Renderer::setTextureParameter(TextureType type, TextureParameter param, float value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glTexParameterf(static_cast<unsigned int>(type), static_cast<unsigned int>(param), value);
@@ -578,7 +578,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, float v
   printConditionalErrors();
 }
 
-void Renderer::setTextureParameter(TextureType type, TextureParam param, const int* values) {
+void Renderer::setTextureParameter(TextureType type, TextureParameter param, const int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glTexParameteriv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), values);
@@ -586,7 +586,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const i
   printConditionalErrors();
 }
 
-void Renderer::setTextureParameter(TextureType type, TextureParam param, const float* values) {
+void Renderer::setTextureParameter(TextureType type, TextureParameter param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glTexParameterfv(static_cast<unsigned int>(type), static_cast<unsigned int>(param), values);
@@ -595,7 +595,7 @@ void Renderer::setTextureParameter(TextureType type, TextureParam param, const f
 }
 
 #if !defined(USE_OPENGL_ES)
-void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, int value) {
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParameter param, int value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
@@ -604,7 +604,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   printConditionalErrors();
 }
 
-void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, float value) {
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParameter param, float value) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
@@ -613,7 +613,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   printConditionalErrors();
 }
 
-void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const int* values) {
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParameter param, const int* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
@@ -622,7 +622,7 @@ void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param
   printConditionalErrors();
 }
 
-void Renderer::setTextureParameter(unsigned int textureIndex, TextureParam param, const float* values) {
+void Renderer::setTextureParameter(unsigned int textureIndex, TextureParameter param, const float* values) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
   assert("Error: OpenGL 4.5+ is needed to set a parameter with a texture index." && checkVersion(4, 5));
 
@@ -853,10 +853,76 @@ void Renderer::generateMipmap(unsigned int textureIndex) {
 }
 #endif
 
-void Renderer::deleteTextures(unsigned int count, unsigned int* indices) {
+void Renderer::deleteTextures(unsigned int count, const unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDeleteTextures(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
+void Renderer::generateSamplers(unsigned int count, unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glGenSamplers(static_cast<int>(count), indices);
+
+  printConditionalErrors();
+}
+
+bool Renderer::isSampler(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  const bool isSampler = (glIsSampler(index) == GL_TRUE);
+
+  printConditionalErrors();
+
+  return isSampler;
+}
+
+void Renderer::bindSampler(unsigned int textureUnit, unsigned int samplerIndex) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glBindSampler(textureUnit, samplerIndex);
+
+  printConditionalErrors();
+}
+
+void Renderer::setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, int value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glSamplerParameteri(samplerIndex, static_cast<unsigned int>(param), value);
+
+  printConditionalErrors();
+}
+
+void Renderer::setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, float value) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glSamplerParameterf(samplerIndex, static_cast<unsigned int>(param), value);
+
+  printConditionalErrors();
+}
+
+void Renderer::setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, const int* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glSamplerParameteriv(samplerIndex, static_cast<unsigned int>(param), values);
+
+  printConditionalErrors();
+}
+
+void Renderer::setSamplerParameter(unsigned int samplerIndex, SamplerParameter param, const float* values) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glSamplerParameterfv(samplerIndex, static_cast<unsigned int>(param), values);
+
+  printConditionalErrors();
+}
+
+void Renderer::deleteSamplers(unsigned int count, const unsigned int* indices) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDeleteSamplers(static_cast<int>(count), indices);
 
   printConditionalErrors();
 }
@@ -951,7 +1017,7 @@ void Renderer::useProgram(unsigned int index) {
   const ErrorCodes errorCodes = Renderer::recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_VALUE])
-    Logger::error("Renderer::useProgram - Invalid shader program index (" + std::to_string(index) + ").");
+    Logger::error("Renderer::useProgram - Invalid shader program index (" + std::to_string(index) + ')');
 
   if (errorCodes[ErrorCode::INVALID_OPERATION]) {
     std::string errorMsg = "Renderer::useProgram - ";
@@ -1091,7 +1157,7 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   printErrors();
 
   if (location == -1)
-    Logger::warn("Uniform '" + std::string(uniformName) + "' unrecognized.");
+    Logger::warn("Uniform '" + std::string(uniformName) + "' unrecognized");
 #endif
 
   return location;
@@ -1122,7 +1188,7 @@ void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int unifor
     return;
 
   if (errorCodes[ErrorCode::INVALID_OPERATION])
-    Logger::error("Renderer::recoverUniformInfo - Tried to fetch program information from a non-program object.");
+    Logger::error("Renderer::recoverUniformInfo - Tried to fetch program information from a non-program object");
 
   if (errorCodes[ErrorCode::INVALID_VALUE]) {
     std::string errorMsg = "Renderer::recoverUniformInfo - ";
@@ -1371,7 +1437,7 @@ void Renderer::bindFramebuffer(unsigned int index, FramebufferType type) {
   const ErrorCodes errorCodes = recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_OPERATION])
-    Logger::error("Renderer::bindFramebuffer - Bound object is not a valid framebuffer.");
+    Logger::error("Renderer::bindFramebuffer - Bound object is not a valid framebuffer");
 #endif
 }
 
@@ -1495,7 +1561,7 @@ void Renderer::blitFramebuffer(int readMinX, int readMinY, int readMaxX, int rea
   printConditionalErrors();
 }
 
-void Renderer::deleteFramebuffers(unsigned int count, unsigned int* indices) {
+void Renderer::deleteFramebuffers(unsigned int count, const unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDeleteFramebuffers(static_cast<int>(count), indices);
@@ -1636,7 +1702,7 @@ void Renderer::recoverQueryResult(unsigned int index, uint64_t& result) {
 }
 #endif
 
-void Renderer::deleteQueries(unsigned int count, unsigned int* indices) {
+void Renderer::deleteQueries(unsigned int count, const unsigned int* indices) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
   glDeleteQueries(static_cast<int>(count), indices);

@@ -67,7 +67,7 @@ bool LuaWrapper::execute(const std::string& code) {
   try {
     getState().script(code);
   } catch (const sol::error& err) {
-    Logger::error("[LuaWrapper] Error executing code: '" + std::string(err.what()) + "'.");
+    Logger::error("[LuaWrapper] Error executing code: '" + std::string(err.what()) + '\'');
     return false;
   }
 
@@ -88,7 +88,7 @@ bool LuaWrapper::executeFromFile(const FilePath& filePath) {
   try {
     getState().script_file(filePath.toUtf8());
   } catch (const sol::error& err) {
-    Logger::error("[LuaWrapper] Error executing code from file: '" + std::string(err.what()) + "'.");
+    Logger::error("[LuaWrapper] Error executing code from file: '" + std::string(err.what()) + '\'');
     return false;
   }
 

@@ -38,7 +38,7 @@ Window::Window(RenderSystem& renderSystem,
   Logger::debug("[Window] Initializing...");
 
   glfwSetErrorCallback([] (int errorCode, const char* description) {
-    Logger::error("[GLFW] " + std::string(description) + " (error code " + std::to_string(errorCode) + ").");
+    Logger::error("[GLFW] " + std::string(description) + " (error code " + std::to_string(errorCode) + ')');
   });
 
   if (!glfwInit())
@@ -96,7 +96,7 @@ Window::Window(RenderSystem& renderSystem,
       break;
 
     if (glfwGetError(nullptr) == GLFW_VERSION_UNAVAILABLE) {
-      Logger::error("[Window] OpenGL " + std::to_string(major) + '.' + std::to_string(minor) + " unsupported; attempting to fallback to a lower version.");
+      Logger::error("[Window] OpenGL " + std::to_string(major) + '.' + std::to_string(minor) + " unsupported; attempting to fallback to a lower version");
       continue;
     }
 
@@ -141,17 +141,17 @@ void Window::setTitle(const std::string& title) const {
 
 void Window::setIcon(const Image& img) const {
   if (img.isEmpty()) {
-    Logger::error("[Window] Empty image given as window icon.");
+    Logger::error("[Window] Empty image given as window icon");
     return;
   }
 
   if (img.getColorspace() != ImageColorspace::RGBA) {
-    Logger::error("[Window] The window icon can only be created from an image having an RGBA colorspace.");
+    Logger::error("[Window] The window icon can only be created from an image having an RGBA colorspace");
     return;
   }
 
   if (img.getDataType() != ImageDataType::BYTE) {
-    Logger::error("[Window] The window icon can only be created from an image having byte data.");
+    Logger::error("[Window] The window icon can only be created from an image having byte data");
     return;
   }
 
@@ -207,7 +207,7 @@ bool Window::recoverVerticalSyncState() const {
 #elif defined(RAZ_PLATFORM_MAC)
   return true;
 #else
-  Logger::warn("Vertical synchronization unsupported.");
+  Logger::warn("Vertical synchronization unsupported");
   return false;
 #endif
 }
@@ -229,7 +229,7 @@ void Window::enableVerticalSync([[maybe_unused]] bool value) const {
 #elif defined(RAZ_PLATFORM_MAC)
   glfwSwapInterval(value);
 #else
-  Logger::warn("Vertical synchronization unsupported.");
+  Logger::warn("Vertical synchronization unsupported");
 #endif
 }
 

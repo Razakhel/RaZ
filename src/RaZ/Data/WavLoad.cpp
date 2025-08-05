@@ -55,7 +55,7 @@ void loadFmt(std::ifstream& file, WavInfo& info) {
   // 80: MPEG
 
   if (info.audioFormat != 1)
-    Logger::warn("[WavLoad] Only WAV files with a PCM format are supported.");
+    Logger::warn("[WavLoad] Only WAV files with a PCM format are supported");
 
   file.read(reinterpret_cast<char*>(bytes.data()), 2); // Channel count
   info.channelCount = fromLittleEndian(bytes[0], bytes[1]);

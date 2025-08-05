@@ -18,7 +18,7 @@ using EntityPtr = std::unique_ptr<Entity>;
 /// Entity class representing an aggregate of Component objects.
 class Entity {
 public:
-  explicit Entity(std::size_t index, bool enabled = true) : m_id{ index }, m_enabled{ enabled } {}
+  explicit Entity(std::size_t index, bool enabled = true) noexcept : m_id{ index }, m_enabled{ enabled } {}
   Entity(const Entity&) = delete;
   Entity(Entity&&) noexcept = delete;
 

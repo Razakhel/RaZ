@@ -30,7 +30,7 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ").");
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
 }
 
 // Auxiliary effect slot functions
@@ -73,7 +73,7 @@ void SoundEffectSlot::init() {
   ZoneScopedN("SoundEffectSlot::init");
 
   if (!alcIsExtensionPresent(alcGetContextsDevice(alcGetCurrentContext()), "ALC_EXT_EFX")) {
-    Logger::error("[SoundEffectSlot] Sound effects are unavailable.");
+    Logger::error("[SoundEffectSlot] Sound effects are unavailable");
     return;
   }
 

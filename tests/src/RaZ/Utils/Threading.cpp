@@ -136,7 +136,7 @@ struct NonCopyable {
 };
 
 TEST_CASE("Threading parallel reduce basic", "[utils]") {
-  CHECK(Raz::Threading::parallelizeReduce(0, 10, [] (const auto& range) {
+  CHECK(Raz::Threading::parallelizeReduce(0, 10, [] (const auto& range) noexcept {
     return range.endIndex - range.beginIndex;
   }, std::plus<>(), 4) == 10);
 

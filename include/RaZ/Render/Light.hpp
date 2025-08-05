@@ -17,11 +17,11 @@ enum class LightType {
 
 class Light final : public Component {
 public:
-  constexpr Light(LightType type, float energy, const Color& color = ColorPreset::White)
+  constexpr Light(LightType type, float energy, const Color& color = ColorPreset::White) noexcept
     : m_type{ type }, m_energy{ energy }, m_color{ color } {}
-  constexpr Light(LightType type, const Vec3f& direction, float energy, const Color& color = ColorPreset::White)
+  constexpr Light(LightType type, const Vec3f& direction, float energy, const Color& color = ColorPreset::White) noexcept
     : m_type{ type }, m_direction{ direction }, m_energy{ energy }, m_color{ color } {}
-  constexpr Light(LightType type, const Vec3f& direction, float energy, Radiansf angle, const Color& color = ColorPreset::White)
+  constexpr Light(LightType type, const Vec3f& direction, float energy, Radiansf angle, const Color& color = ColorPreset::White) noexcept
     : m_type{ type }, m_direction{ direction }, m_energy{ energy }, m_color{ color }, m_angle{ angle } {}
 
   constexpr LightType getType() const noexcept { return m_type; }
