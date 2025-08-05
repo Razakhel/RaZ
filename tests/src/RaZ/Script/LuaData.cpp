@@ -233,7 +233,7 @@ TEST_CASE("LuaData Submesh", "[script][lua][data]") {
     vertex.tangent   = Axis.X
     assert(vertex.position == Vec3f.new(1, 2, 3))
     assert(vertex.texcoords == Vec2f.new(0.25, 0.75))
-    assert(vertex.normal == Axis.Y)
-    assert(vertex.tangent == Axis.X)
+    assert(vertex.normal == Axis.Up)
+    assert(vertex.tangent == Axis.Right)
   )"));
 }

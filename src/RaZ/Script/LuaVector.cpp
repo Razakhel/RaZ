@@ -169,10 +169,16 @@ void LuaWrapper::registerVectorTypes() {
                                                                    PickOverload<float>(&Vec3f::operator/)));
     vec3f.set_function(sol::meta_function::index, PickConstOverload<std::size_t>(&Vec3f::operator[]));
 
-    sol::table axis = state["Axis"].get_or_create<sol::table>();
-    axis["X"]       = Axis::X;
-    axis["Y"]       = Axis::Y;
-    axis["Z"]       = Axis::Z;
+    sol::table axis  = state["Axis"].get_or_create<sol::table>();
+    axis["X"]        = Axis::X;
+    axis["Y"]        = Axis::Y;
+    axis["Z"]        = Axis::Z;
+    axis["Right"]    = Axis::Right;
+    axis["Left"]     = Axis::Left;
+    axis["Up"]       = Axis::Up;
+    axis["Down"]     = Axis::Down;
+    axis["Forward"]  = Axis::Forward;
+    axis["Backward"] = Axis::Backward;
   }
 
   {

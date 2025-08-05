@@ -183,8 +183,8 @@ private:
 /// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
 class Plane final : public Shape {
 public:
-  explicit Plane(float distance, const Vec3f& normal = Axis::Y) noexcept : m_distance{ distance }, m_normal{ normal } {}
-  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Y) noexcept : m_distance{ position.computeLength() }, m_normal{ normal } {}
+  explicit Plane(float distance, const Vec3f& normal = Axis::Up) noexcept : m_distance{ distance }, m_normal{ normal } {}
+  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Up) noexcept : m_distance{ position.computeLength() }, m_normal{ normal } {}
   Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint) noexcept
     : m_distance{ ((firstPoint + secondPoint + thirdPoint) / 3.f).computeLength() },
       m_normal{ (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize() } {}

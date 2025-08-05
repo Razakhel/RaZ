@@ -38,14 +38,14 @@ TEST_CASE("LuaAudio Listener", "[script][lua][audio]") {
     listener.velocity = Vec3f.new(0, 0, 10)
     assert(listener.velocity == Vec3f.new(0, 0, 10))
 
-    listener:setOrientation(Axis.Z, Axis.Y)
+    listener:setOrientation(Axis.Backward, Axis.Down)
     listener:setOrientation(Mat3f.identity())
 
     local forward, up = listener:recoverOrientation()
-    assert(forward == -Axis.Z)
-    assert(up == Axis.Y)
-    assert(listener:recoverForwardOrientation() == -Axis.Z)
-    assert(listener:recoverUpOrientation() == Axis.Y)
+    assert(forward == Axis.Forward)
+    assert(up == Axis.Up)
+    assert(listener:recoverForwardOrientation() == Axis.Forward)
+    assert(listener:recoverUpOrientation() == Axis.Up)
   )"));
 }
 

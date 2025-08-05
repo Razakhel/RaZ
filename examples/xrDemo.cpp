@@ -35,10 +35,10 @@ int main() {
 
     DemoUtils::setupCameraControls(camera, window);
 
-    world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, -1.f, -5.f), Raz::Quaternionf(90_deg, Raz::Axis::Y), Raz::Vec3f(0.01f))
+    world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(0.f, -1.f, -5.f), Raz::Quaternionf(90_deg, Raz::Axis::Up), Raz::Vec3f(0.01f))
       .addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj").second);
 
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Z, 1.f, Raz::ColorPreset::White);
+    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::Forward, 1.f, Raz::ColorPreset::White);
 
     const auto colorBuffer = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(), Raz::TextureColorspace::RGBA);
     const auto depthBuffer = Raz::Texture2D::create(render.getSceneWidth(), render.getSceneHeight(), Raz::TextureColorspace::DEPTH);

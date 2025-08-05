@@ -87,7 +87,7 @@ Vec3f Listener::recoverVelocity() const noexcept {
 }
 
 void Listener::setOrientation(const Vec3f& forwardDirection) const noexcept {
-  setOrientation(forwardDirection, Axis::Y);
+  setOrientation(forwardDirection, Axis::Up);
 }
 
 void Listener::setOrientation(const Vec3f& forwardDirection, const Vec3f& upDirection) const noexcept {

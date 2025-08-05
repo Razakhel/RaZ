@@ -115,7 +115,7 @@ private:
   ProjectionType m_projType = ProjectionType::PERSPECTIVE;
 
   Vec3f m_target = Vec3f(0.f);
-  Vec3f m_upAxis = Axis::Y;
+  Vec3f m_upAxis = Axis::Up;
 
   Mat4f m_viewMat    = Mat4f::identity();
   Mat4f m_invViewMat = Mat4f::identity();
