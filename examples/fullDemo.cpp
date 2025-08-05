@@ -207,7 +207,7 @@ int main() {
                                                      1.f,                      // Energy
                                                      Raz::ColorPreset::White); // Color*/
     auto& lightComp = light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                                     -Raz::Axis::Z,               // Direction
+                                                     Raz::Axis::Forward,          // Direction
                                                      1.f,                         // Energy
                                                      Raz::ColorPreset::White);    // Color
     auto& lightTrans = light.addComponent<Raz::Transform>(Raz::Vec3f(0.f, 1.f, 0.f));
@@ -225,12 +225,12 @@ local rotAngle = Degreesf.new(20)
 
 function setup()
     -- 'this' always represents the entity containing the script
-    this:getTransform().rotation = Quaternionf.new(-rotAngle, Axis.Y)
+    this:getTransform().rotation = Quaternionf.new(-rotAngle, Axis.Up)
 end
 
 function update(timeInfo)
     local angle = rotAngle * math.sin(timeInfo.globalTime) * timeInfo.deltaTime
-    this:getTransform():rotate(Quaternionf.new(angle, Axis.Y))
+    this:getTransform():rotate(Quaternionf.new(angle, Axis.Up))
 end)";
 
     world.addSystem<Raz::ScriptSystem>();

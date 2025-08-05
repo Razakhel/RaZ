@@ -69,8 +69,8 @@ TEST_CASE("AudioSystem attributes update", "[audio]") {
   world.update({});
 
   CHECK(listenerComp.recoverPosition() == listenerTrans.getPosition());
-  CHECK(listenerComp.recoverForwardOrientation() == -Raz::Axis::Z);
-  CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::Y);
+  CHECK(listenerComp.recoverForwardOrientation() == Raz::Axis::Forward);
+  CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::Up);
   CHECK(listenerComp.recoverVelocity() == listenerRigidBody.getVelocity());
   CHECK(sound1Comp.recoverPosition() == sound1Trans.getPosition());
   CHECK(sound1Comp.recoverVelocity() == sound1RigidBody.getVelocity());
@@ -87,8 +87,8 @@ TEST_CASE("AudioSystem attributes update", "[audio]") {
   world.update({});
 
   CHECK(listenerComp.recoverPosition() == listenerTrans.getPosition());
-  CHECK(listenerComp.recoverForwardOrientation() == -Raz::Axis::Y);
-  CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::X);
+  CHECK(listenerComp.recoverForwardOrientation() == Raz::Axis::Down);
+  CHECK(listenerComp.recoverUpOrientation() == Raz::Axis::Right);
   CHECK(listenerComp.recoverVelocity() == listenerRigidBody.getVelocity());
   CHECK(sound1Comp.recoverPosition() == sound1Trans.getPosition());
   CHECK(sound1Comp.recoverVelocity() == sound1RigidBody.getVelocity());

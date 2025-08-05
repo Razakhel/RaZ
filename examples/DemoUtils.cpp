@@ -116,10 +116,10 @@ void setupMeshControls(Raz::Entity& meshEntity, Raz::Window& window) {
   // Mesh rotation //
   ///////////////////
 
-  window.addKeyCallback(Raz::Keyboard::UP,    [&meshTransform] (float deltaTime) { meshTransform.rotate(90_deg * deltaTime, Raz::Axis::X); });
-  window.addKeyCallback(Raz::Keyboard::DOWN,  [&meshTransform] (float deltaTime) { meshTransform.rotate(-90_deg * deltaTime, Raz::Axis::X); });
-  window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTransform] (float deltaTime) { meshTransform.rotate(90_deg * deltaTime, Raz::Axis::Y); });
-  window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTransform] (float deltaTime) { meshTransform.rotate(-90_deg * deltaTime, Raz::Axis::Y); });
+  window.addKeyCallback(Raz::Keyboard::UP,    [&meshTransform] (float deltaTime) { meshTransform.rotate(90_deg * deltaTime, Raz::Axis::Right); });
+  window.addKeyCallback(Raz::Keyboard::DOWN,  [&meshTransform] (float deltaTime) { meshTransform.rotate(-90_deg * deltaTime, Raz::Axis::Right); });
+  window.addKeyCallback(Raz::Keyboard::LEFT,  [&meshTransform] (float deltaTime) { meshTransform.rotate(90_deg * deltaTime, Raz::Axis::Up); });
+  window.addKeyCallback(Raz::Keyboard::RIGHT, [&meshTransform] (float deltaTime) { meshTransform.rotate(-90_deg * deltaTime, Raz::Axis::Up); });
 }
 
 void setupLightControls(Raz::Entity& lightEntity, const Raz::RenderSystem& renderSystem, Raz::Window& window) {

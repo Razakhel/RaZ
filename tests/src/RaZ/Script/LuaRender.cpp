@@ -109,18 +109,18 @@ TEST_CASE("LuaRender Light", "[script][lua][render]") {
   CHECK(TestUtils::executeLuaScript(R"(
     local light = Light.new(LightType.POINT, 1)
     light       = Light.new(LightType.POINT, 1, ColorPreset.White)
-    light       = Light.new(LightType.DIRECTIONAL, Axis.Z, 1)
-    light       = Light.new(LightType.DIRECTIONAL, Axis.Z, 1, ColorPreset.White)
-    light       = Light.new(LightType.SPOT, Axis.Z, 1, Radiansf.new(0))
-    light       = Light.new(LightType.SPOT, Axis.Z, 1, Radiansf.new(0), ColorPreset.White)
+    light       = Light.new(LightType.DIRECTIONAL, Axis.Left, 1)
+    light       = Light.new(LightType.DIRECTIONAL, Axis.Down, 1, ColorPreset.White)
+    light       = Light.new(LightType.SPOT, Axis.Forward, 1, Radiansf.new(0))
+    light       = Light.new(LightType.SPOT, Axis.Backward, 1, Radiansf.new(0), ColorPreset.White)
 
     light.type      = LightType.POINT
-    light.direction = Axis.X
+    light.direction = Axis.Right
     light.energy    = 10
     light.color     = ColorPreset.Black
     light.angle     = Radiansf.new(Constant.Pi)
     assert(light.type == LightType.POINT)
-    assert(light.direction == Axis.X)
+    assert(light.direction == Axis.Right)
     assert(light.energy == 10)
     assert(light.color == ColorPreset.Black)
     assert(light.angle == Radiansf.new(Constant.Pi))

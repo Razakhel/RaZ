@@ -125,7 +125,7 @@ int main() {
 
     Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
     light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                   -Raz::Axis::Z,               // Direction
+                                   Raz::Axis::Forward,          // Direction
                                    3.f,                         // Energy
                                    Raz::ColorPreset::White);    // Color
 
@@ -154,40 +154,40 @@ int main() {
     //   interpolations made in the tessellation evaluation shader must be crossed for the clockwiseness to be as expected
 
     // Right
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::X, -Raz::Axis::Z });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, 0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::X, -Raz::Axis::Z });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::X, -Raz::Axis::Z });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::X, -Raz::Axis::Z });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Right, Raz::Axis::Forward });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f,  0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Right, Raz::Axis::Forward });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Right, Raz::Axis::Forward });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f,  0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Right, Raz::Axis::Forward });
 
     // Left
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::X, Raz::Axis::Z });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::X, Raz::Axis::Z });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), -Raz::Axis::X, Raz::Axis::Z });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f, 0.57735f), Raz::Vec2f(), -Raz::Axis::X, Raz::Axis::Z });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Left, Raz::Axis::Backward });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f,  0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Left, Raz::Axis::Backward });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Left, Raz::Axis::Backward });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f,  0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Left, Raz::Axis::Backward });
 
     // Top
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Y, Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Y, Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, 0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Y, Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Y, Raz::Axis::X });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Up, Raz::Axis::Right });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Up, Raz::Axis::Right });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f, 0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Up, Raz::Axis::Right });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Up, Raz::Axis::Right });
 
     // Bottom
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), -Raz::Axis::Y, -Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::Y, -Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), -Raz::Axis::Y, -Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::Y, -Raz::Axis::X });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f, -0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Down, Raz::Axis::Left });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Down, Raz::Axis::Left });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f,  0.57735f), Raz::Vec2f(), Raz::Axis::Down, Raz::Axis::Left });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Down, Raz::Axis::Left });
 
     // Front
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Z, Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Z, Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Z, Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, 0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Z, Raz::Axis::X });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Backward, Raz::Axis::Right });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f,  0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Backward, Raz::Axis::Right });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f, -0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Backward, Raz::Axis::Right });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f,  0.57735f, 0.57735f), Raz::Vec2f(), Raz::Axis::Backward, Raz::Axis::Right });
 
     // Back
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::Z, -Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::Z, -Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::Z, -Raz::Axis::X });
-    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, 0.57735f, -0.57735f), Raz::Vec2f(), -Raz::Axis::Z, -Raz::Axis::X });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Forward, Raz::Axis::Left });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f( 0.57735f,  0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Forward, Raz::Axis::Left });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f, -0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Forward, Raz::Axis::Left });
+    vertices.emplace_back(Raz::Vertex{ Raz::Vec3f(-0.57735f,  0.57735f, -0.57735f), Raz::Vec2f(), Raz::Axis::Forward, Raz::Axis::Left });
 
     Raz::Entity& entity = world.addEntity();
     auto& transform     = entity.addComponent<Raz::Transform>();
@@ -243,7 +243,7 @@ int main() {
     }, true);
 
     app.run([&] (const Raz::FrameTimeInfo& timeInfo) {
-      transform.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Y);
+      transform.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Up);
     });
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occurred: "s + exception.what());

@@ -22,7 +22,7 @@ int main() {
 
     Raz::Entity& light = world.addEntityWithComponent<Raz::Transform>();
     light.addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, // Type
-                                   -Raz::Axis::Z,               // Direction
+                                   Raz::Axis::Forward,          // Direction
                                    1.f,                         // Energy
                                    Raz::ColorPreset::White);    // Color
 

@@ -285,14 +285,6 @@ using Vec2d = Vec2<double>;
 using Vec3d = Vec3<double>;
 using Vec4d = Vec4<double>;
 
-namespace Axis {
-
-constexpr Vec3f X(1.f, 0.f, 0.f);
-constexpr Vec3f Y(0.f, 1.f, 0.f);
-constexpr Vec3f Z(0.f, 0.f, 1.f);
-
-} // namespace Axis
-
 /// Vector element fetching function for a constant lvalue reference.
 /// \tparam I Index of the element.
 /// \tparam T Type of the vector's data.
@@ -382,5 +374,22 @@ struct std::less<Raz::Vector<T, Size>> {
 };
 
 #include "RaZ/Math/Vector.inl"
+
+namespace Raz::Axis {
+
+// The following may need the functions' definitions, and so are defined at the end
+
+constexpr Vec3f X(1.f, 0.f, 0.f);
+constexpr Vec3f Y(0.f, 1.f, 0.f);
+constexpr Vec3f Z(0.f, 0.f, 1.f);
+
+constexpr Vec3f Right    = X;
+constexpr Vec3f Up       = Y;
+constexpr Vec3f Backward = Z;
+constexpr Vec3f Left     = -Right;
+constexpr Vec3f Down     = -Up;
+constexpr Vec3f Forward  = -Backward;
+
+} // namespace Raz::Axis
 
 #endif // RAZ_VECTOR_HPP

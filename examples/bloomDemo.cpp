@@ -35,7 +35,7 @@ int main() {
     auto& meshTrans    = mesh.addComponent<Raz::Transform>();
     auto& meshRenderer = mesh.addComponent<Raz::MeshRenderer>(Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/ball.obj").second);
 
-    auto& whiteLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Z,
+    auto& whiteLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::Forward,
                                                                                                3.f, Raz::ColorPreset::White);
     auto& yellowLight = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Vec3f(5.f, 0.f, -1.f),
                                                                                                 1.f, Raz::ColorPreset::Yellow);
@@ -194,7 +194,7 @@ int main() {
     //////////////////////////
 
     app.run([&] (const Raz::FrameTimeInfo& timeInfo) {
-      meshTrans.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Y);
+      meshTrans.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Up);
 
 #if !defined(USE_OPENGL_ES)
       geomPlot.push(geometryPass.recoverElapsedTime());

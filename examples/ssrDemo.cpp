@@ -83,10 +83,10 @@ int main() {
     blueBallMat.getProgram().setAttribute(Raz::ColorPreset::Blue, Raz::MaterialAttribute::BaseColor);
     blueBallMat.getProgram().setAttribute(0.f, Raz::MaterialAttribute::Roughness);
 
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Y, 1.f);
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::Z, 1.f);
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL,  Raz::Axis::X, 1.f);
-    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, -Raz::Axis::X, 1.f);
+    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::Down, 1.f);
+    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::Forward, 1.f);
+    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::Right, 1.f);
+    world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::Left, 1.f);
 
     /////////
     // SSR //
