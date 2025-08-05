@@ -37,7 +37,7 @@ inline TextureFormat recoverFormat(TextureColorspace colorspace) {
       return TextureFormat::DEPTH;
   }
 
-  throw std::invalid_argument("Error: Invalid texture colorspace");
+  throw std::invalid_argument("[Texture] Invalid texture colorspace");
 }
 
 inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace, TextureDataType dataType) {
@@ -66,7 +66,7 @@ inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace,
            : (dataType == TextureDataType::FLOAT16 ? TextureInternalFormat::RGBA16F
                                                    : TextureInternalFormat::RGBA32F));
 
-    // Floating-point sRGB(A) textures are not treated as sRGB, which is necessarily an integer format; they are therefore interpreted as floating-point RGB(A)
+    // Floating-point sRGB(A) textures aren't treated as sRGB, which is necessarily an integer format; they're therefore interpreted as floating-point RGB(A)
 
     case TextureColorspace::SRGB:
       return (dataType == TextureDataType::BYTE    ? TextureInternalFormat::SRGB8
@@ -85,43 +85,42 @@ inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace,
   throw std::invalid_argument("[Texture] Invalid texture colorspace to recover the internal format from");
 }
 
-inline TextureParamValue recoverParam(TextureFilter filter) {
+constexpr TextureParameterValue recoverParam(TextureFilter filter) {
   switch (filter) {
-    case TextureFilter::NEAREST:
-      return TextureParamValue::NEAREST;
-
-    case TextureFilter::LINEAR:
-      return TextureParamValue::LINEAR;
+    case TextureFilter::NEAREST: return TextureParameterValue::NEAREST;
+    case TextureFilter::LINEAR:  return TextureParameterValue::LINEAR;
+    default:                     break;
   }
 
-  throw std::invalid_argument("Error: Invalid texture filter");
+  throw std::invalid_argument("[Texture] Invalid texture filter");
 }
 
-inline TextureParamValue recoverParam(TextureFilter filter, TextureFilter mipmapFilter) {
+constexpr TextureParameterValue recoverParam(TextureFilter filter, TextureFilter mipmapFilter) {
   switch (filter) {
     case TextureFilter::NEAREST:
-      return (mipmapFilter == TextureFilter::NEAREST ? TextureParamValue::NEAREST_MIPMAP_NEAREST : TextureParamValue::NEAREST_MIPMAP_LINEAR);
+      return (mipmapFilter == TextureFilter::NEAREST ? TextureParameterValue::NEAREST_MIPMAP_NEAREST : TextureParameterValue::NEAREST_MIPMAP_LINEAR);
 
     case TextureFilter::LINEAR:
-      return (mipmapFilter == TextureFilter::NEAREST ? TextureParamValue::LINEAR_MIPMAP_NEAREST : TextureParamValue::LINEAR_MIPMAP_LINEAR);
+      return (mipmapFilter == TextureFilter::NEAREST ? TextureParameterValue::LINEAR_MIPMAP_NEAREST : TextureParameterValue::LINEAR_MIPMAP_LINEAR);
+
+    default:
+      break;
   }
 
-  throw std::invalid_argument("Error: Invalid texture filter");
+  throw std::invalid_argument("[Texture] Invalid texture filter");
 }
 
-inline TextureParamValue recoverParam(TextureWrapping wrapping) {
+constexpr TextureParameterValue recoverParam(TextureWrapping wrapping) {
   switch (wrapping) {
-    case TextureWrapping::REPEAT:
-      return TextureParamValue::REPEAT;
-
-    case TextureWrapping::CLAMP:
-      return TextureParamValue::CLAMP_TO_EDGE;
+    case TextureWrapping::REPEAT: return TextureParameterValue::REPEAT;
+    case TextureWrapping::CLAMP:  return TextureParameterValue::CLAMP_TO_EDGE;
+    default:                      break;
   }
 
-  throw std::invalid_argument("Error: Invalid texture wrapping");
+  throw std::invalid_argument("[Texture] Invalid texture wrapping");
 }
 
-inline TextureColorspace recoverColorspace(ImageColorspace imgColorspace, bool shouldUseSrgb) {
+constexpr TextureColorspace recoverColorspace(ImageColorspace imgColorspace, bool shouldUseSrgb) {
   auto texColorspace = static_cast<TextureColorspace>(imgColorspace);
 
   if (shouldUseSrgb) {
@@ -148,8 +147,8 @@ void Texture::setFilter(TextureFilter minify, TextureFilter magnify) const {
   ZoneScopedN("Texture::setFilter");
 
   bind();
-  Renderer::setTextureParameter(m_type, TextureParam::MINIFY_FILTER, recoverParam(minify));
-  Renderer::setTextureParameter(m_type, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MINIFY_FILTER, recoverParam(minify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MAGNIFY_FILTER, recoverParam(magnify));
   unbind();
 }
 
@@ -157,20 +156,20 @@ void Texture::setFilter(TextureFilter minify, TextureFilter mipmapMinify, Textur
   ZoneScopedN("Texture::setFilter");
 
   bind();
-  Renderer::setTextureParameter(m_type, TextureParam::MINIFY_FILTER, recoverParam(minify, mipmapMinify));
-  Renderer::setTextureParameter(m_type, TextureParam::MAGNIFY_FILTER, recoverParam(magnify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MINIFY_FILTER, recoverParam(minify, mipmapMinify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MAGNIFY_FILTER, recoverParam(magnify));
   unbind();
 }
 
 void Texture::setWrapping(TextureWrapping wrapping) const {
   ZoneScopedN("Texture::setWrapping");
 
-  const TextureParamValue value = recoverParam(wrapping);
+  const TextureParameterValue value = recoverParam(wrapping);
 
   bind();
-  Renderer::setTextureParameter(m_type, TextureParam::WRAP_S, value);
-  Renderer::setTextureParameter(m_type, TextureParam::WRAP_T, value);
-  Renderer::setTextureParameter(m_type, TextureParam::WRAP_R, value);
+  Renderer::setTextureParameter(m_type, TextureParameter::WRAP_S, value);
+  Renderer::setTextureParameter(m_type, TextureParameter::WRAP_T, value);
+  Renderer::setTextureParameter(m_type, TextureParameter::WRAP_R, value);
   unbind();
 }
 
@@ -220,10 +219,10 @@ void Texture::setLoadedParameters(bool createMipmaps) const {
   ZoneScopedN("Texture::setLoadedParameters");
 
   if (m_colorspace == TextureColorspace::GRAY || m_colorspace == TextureColorspace::RG) {
-    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_R, static_cast<int>(TextureFormat::RED));
-    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_G, static_cast<int>(TextureFormat::RED));
-    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_B, static_cast<int>(TextureFormat::RED));
-    Renderer::setTextureParameter(m_type, TextureParam::SWIZZLE_A, (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1));
+    Renderer::setTextureParameter(m_type, TextureParameter::SWIZZLE_R, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(m_type, TextureParameter::SWIZZLE_G, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(m_type, TextureParameter::SWIZZLE_B, static_cast<int>(TextureFormat::RED));
+    Renderer::setTextureParameter(m_type, TextureParameter::SWIZZLE_A, (m_colorspace == TextureColorspace::RG ? static_cast<int>(TextureFormat::GREEN) : 1));
   }
 
   if (createMipmaps

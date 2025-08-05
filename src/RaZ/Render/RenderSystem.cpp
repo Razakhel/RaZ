@@ -401,9 +401,9 @@ void RenderSystem::copyToWindow(const Texture2D& colorBuffer, const Texture2D& d
   windowCopyProgram.sendAttributes();
 
   windowCopyProgram.use();
-  Renderer::activateTexture(0);
+  Renderer::setActiveTexture(0);
   colorBuffer.bind();
-  Renderer::activateTexture(1);
+  Renderer::setActiveTexture(1);
   depthBuffer.bind();
 
   Renderer::bindFramebuffer(0);

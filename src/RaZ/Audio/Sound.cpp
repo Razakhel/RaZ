@@ -30,7 +30,7 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ").");
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
 }
 
 } // namespace
@@ -222,12 +222,12 @@ void Sound::load() {
   alSourcei(m_sourceIndex, AL_BUFFER, 0); // Detaching the previous buffer (if any) from the source
 
   if ((m_data.format == AudioFormat::MONO_F32 || m_data.format == AudioFormat::STEREO_F32) && !alIsExtensionPresent("AL_EXT_float32")) {
-    Logger::error("[Sound] Float audio format is not supported by the audio driver.");
+    Logger::error("[Sound] Float audio format is not supported by the audio driver");
     return;
   }
 
   if ((m_data.format == AudioFormat::MONO_F64 || m_data.format == AudioFormat::STEREO_F64) && !alIsExtensionPresent("AL_EXT_double")) {
-    Logger::error("[Sound] Double audio format is not supported by the audio driver.");
+    Logger::error("[Sound] Double audio format is not supported by the audio driver");
     return;
   }
 

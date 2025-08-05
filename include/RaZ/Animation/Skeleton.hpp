@@ -15,7 +15,7 @@ using Mat4f = Matrix<float, 4, 4>;
 class SkeletonJoint final : public GraphNode<SkeletonJoint> {
 public:
   SkeletonJoint() = default;
-  SkeletonJoint(const Quaternionf& rotation, const Vec3f& translation) : m_rotation{ rotation }, m_translation{ translation } {}
+  SkeletonJoint(const Quaternionf& rotation, const Vec3f& translation) noexcept : m_rotation{ rotation }, m_translation{ translation } {}
   SkeletonJoint(const SkeletonJoint&) = delete;
   SkeletonJoint(SkeletonJoint&&) noexcept = default;
 

@@ -12,13 +12,18 @@ namespace Raz {
 
 class Color;
 class Image;
-using TexturePtr   = std::shared_ptr<class Texture>;
-#if !defined(USE_OPENGL_ES)
-using Texture1DPtr = std::shared_ptr<class Texture1D>;
-#endif
-using Texture2DPtr = std::shared_ptr<class Texture2D>;
-using Texture3DPtr = std::shared_ptr<class Texture3D>;
+class Texture;
+class Texture1D;
+class Texture2D;
+class Texture3D;
 enum class TextureType : unsigned int;
+
+using TexturePtr   = std::shared_ptr<Texture>;
+#if !defined(USE_OPENGL_ES)
+using Texture1DPtr = std::shared_ptr<Texture1D>;
+#endif
+using Texture2DPtr = std::shared_ptr<Texture2D>;
+using Texture3DPtr = std::shared_ptr<Texture3D>;
 
 enum class TextureColorspace {
   INVALID = -1,

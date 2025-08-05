@@ -42,7 +42,7 @@ void computeNodeTransform(const fastgltf::Node& currentNode,
   const std::size_t currentMeshIndex = *currentNode.meshIndex;
 
   if (currentMeshIndex >= transforms.size()) {
-    Logger::error("[GltfLoad] Unexpected node mesh index.");
+    Logger::error("[GltfLoad] Unexpected node mesh index");
     return;
   }
 
@@ -214,7 +214,7 @@ std::vector<std::optional<Image>> loadImages(const std::vector<fastgltf::Image>&
   loadedImages.reserve(images.size());
 
   const auto loadFailure = [&loadedImages] (const auto&) {
-    Logger::error("[GltfLoad] Cannot find a suitable way of loading an image.");
+    Logger::error("[GltfLoad] Cannot find a suitable way of loading an image");
     loadedImages.emplace_back(std::nullopt);
   };
 

@@ -11,7 +11,7 @@ namespace {
 inline void checkProgramUsed([[maybe_unused]] const ShaderProgram& program) {
 #if defined(RAZ_CONFIG_DEBUG)
   if (!program.isUsed())
-    Logger::error("The current shader program must be defined as used before sending uniforms to it.");
+    Logger::error("The current shader program must be defined as used before sending uniforms to it");
 #endif
 }
 
@@ -246,7 +246,7 @@ void ShaderProgram::bindTextures() const {
   unsigned int textureIndex = 0;
 
   for (const auto& [texture, _] : m_textures) {
-    Renderer::activateTexture(textureIndex++);
+    Renderer::setActiveTexture(textureIndex++);
     texture->bind();
   }
 }

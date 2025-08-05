@@ -523,9 +523,9 @@ void XrSession::copyToSwapchains(const Texture2D& colorBuffer, const Texture2D& 
   }();
 
   swapchainCopyPass.getProgram().use();
-  Renderer::activateTexture(0);
+  Renderer::setActiveTexture(0);
   colorBuffer.bind();
-  Renderer::activateTexture(1);
+  Renderer::setActiveTexture(1);
   depthBuffer.bind();
 
   Renderer::bindFramebuffer(swapchainCopyPass.getFramebuffer().getIndex(), FramebufferType::DRAW_FRAMEBUFFER);

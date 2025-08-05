@@ -27,17 +27,17 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ").");
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
 }
 
 } // namespace
 
-Listener::Listener(const Vec3f& position, const Vec3f& forwardDir, const Vec3f& upDir) {
+Listener::Listener(const Vec3f& position, const Vec3f& forwardDirection, const Vec3f& upDirection) noexcept {
   setPosition(position);
-  setOrientation(forwardDir, upDir);
+  setOrientation(forwardDirection, upDirection);
 }
 
-Listener::Listener(const Vec3f& position, const Mat3f& rotationMatrix) {
+Listener::Listener(const Vec3f& position, const Mat3f& rotationMatrix) noexcept {
   setPosition(position);
   setOrientation(rotationMatrix);
 }

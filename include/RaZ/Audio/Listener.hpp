@@ -18,9 +18,9 @@ using Vec3f = Vector<float, 3>;
 class Listener final : public Component {
 public:
   Listener() = default;
-  explicit Listener(const Vec3f& position) { setPosition(position); }
-  Listener(const Vec3f& position, const Vec3f& forwardDirection, const Vec3f& upDirection);
-  Listener(const Vec3f& position, const Mat3f& rotationMatrix);
+  explicit Listener(const Vec3f& position) noexcept { setPosition(position); }
+  Listener(const Vec3f& position, const Vec3f& forwardDirection, const Vec3f& upDirection) noexcept;
+  Listener(const Vec3f& position, const Mat3f& rotationMatrix) noexcept;
   Listener(const Listener&) = delete;
   Listener(Listener&&) noexcept = default;
 

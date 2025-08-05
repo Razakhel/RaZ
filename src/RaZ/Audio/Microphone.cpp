@@ -30,7 +30,7 @@ inline void checkError(void* device, const std::string& errorMsg) {
   const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
 
   if (errorCode != ALC_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlcErrorStr(errorCode) + ").");
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlcErrorStr(errorCode) + ')');
 }
 
 constexpr int recoverFrameSize(AudioFormat format) {
@@ -117,19 +117,19 @@ void Microphone::openDevice(AudioFormat format, unsigned int frequency, float du
   destroy();
 
   if ((format == AudioFormat::MONO_F32 || format == AudioFormat::STEREO_F32) && !alIsExtensionPresent("AL_EXT_float32")) {
-    Logger::error("[Microphone] Float audio capture format is not supported by the audio driver.");
+    Logger::error("[Microphone] Float audio capture format is not supported by the audio driver");
     return;
   }
 
   if ((format == AudioFormat::MONO_F64 || format == AudioFormat::STEREO_F64) && !alIsExtensionPresent("AL_EXT_double")) {
-    Logger::error("[Microphone] Double audio capture format is not supported by the audio driver.");
+    Logger::error("[Microphone] Double audio capture format is not supported by the audio driver");
     return;
   }
 
   m_device = alcCaptureOpenDevice((!deviceName.empty() ? deviceName.c_str() : nullptr), frequency,
                                   static_cast<int>(format), static_cast<int>(duration * static_cast<float>(frequency)));
   if (!m_device) {
-    Logger::error("[OpenAL] Failed to open an audio capture device.");
+    Logger::error("[OpenAL] Failed to open an audio capture device");
     return;
   }
 
@@ -211,7 +211,7 @@ void Microphone::destroy() {
   Logger::debug("[Microphone] Destroying...");
 
   if (!alcCaptureCloseDevice(static_cast<ALCdevice*>(m_device)))
-    Logger::error("[OpenAL] Failed to close the audio capture device.");
+    Logger::error("[OpenAL] Failed to close the audio capture device");
 
   m_device = nullptr;
 

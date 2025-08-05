@@ -26,7 +26,7 @@ bool LuaEnvironment::execute(const std::string& code) const {
   try {
     LuaWrapper::getState().script(code, *m_environment);
   } catch (const sol::error& err) {
-    Logger::error("[LuaEnvironment] Error executing code: '" + std::string(err.what()) + "'.");
+    Logger::error("[LuaEnvironment] Error executing code: '" + std::string(err.what()) + '\'');
     return false;
   }
 
@@ -47,7 +47,7 @@ bool LuaEnvironment::executeFromFile(const FilePath& filePath) const {
   try {
     LuaWrapper::getState().script_file(filePath.toUtf8(), *m_environment);
   } catch (const sol::error& err) {
-    Logger::error("[LuaEnvironment] Error executing code from file: '" + std::string(err.what()) + "'.");
+    Logger::error("[LuaEnvironment] Error executing code from file: '" + std::string(err.what()) + '\'');
     return false;
   }
 

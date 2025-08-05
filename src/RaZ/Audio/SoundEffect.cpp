@@ -27,7 +27,7 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ").");
+    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
 }
 
 // Effect functions
@@ -70,7 +70,7 @@ void SoundEffect::init() {
   ZoneScopedN("SoundEffect::init");
 
   if (!alcIsExtensionPresent(alcGetContextsDevice(alcGetCurrentContext()), "ALC_EXT_EFX")) {
-    Logger::error("[SoundEffect] Sound effects are unavailable.");
+    Logger::error("[SoundEffect] Sound effects are unavailable");
     return;
   }
 
@@ -144,7 +144,7 @@ void SoundEffect::load(const ChorusParams& params) {
   alEffecti(m_index, AL_EFFECT_TYPE, AL_EFFECT_CHORUS);
 
   if (alGetError() != AL_NO_ERROR) {
-    Logger::error("[OpenAL] Failed to set the chorus effect.");
+    Logger::error("[OpenAL] Failed to set the chorus effect");
     return;
   }
 
@@ -164,7 +164,7 @@ void SoundEffect::load(const DistortionParams& params) {
   alEffecti(m_index, AL_EFFECT_TYPE, AL_EFFECT_DISTORTION);
 
   if (alGetError() != AL_NO_ERROR) {
-    Logger::error("[OpenAL] Failed to set the distortion effect.");
+    Logger::error("[OpenAL] Failed to set the distortion effect");
     return;
   }
 
@@ -183,7 +183,7 @@ void SoundEffect::load(const EchoParams& params) {
   alEffecti(m_index, AL_EFFECT_TYPE, AL_EFFECT_ECHO);
 
   if (alGetError() != AL_NO_ERROR) {
-    Logger::error("[OpenAL] Failed to set the echo effect.");
+    Logger::error("[OpenAL] Failed to set the echo effect");
     return;
   }
 

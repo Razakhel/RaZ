@@ -27,7 +27,7 @@ public:
   constexpr Vector(const Vector<T, Size - 1>& vec, T val) noexcept;
   constexpr explicit Vector(T val) noexcept;
   template <typename... Args,
-            typename = std::enable_if_t<sizeof...(Args) == Size>, // There can't be more or less values than Size
+            typename = std::enable_if_t<sizeof...(Args) == Size>, // There can't be more or fewer values than Size
             typename = std::enable_if_t<(std::is_convertible_v<std::decay_t<Args>, T> && ...)>> // Given values must be of a convertible type
   constexpr explicit Vector(Args&&... args) noexcept : m_data{ static_cast<T>(args)... } {}
   constexpr Vector(const Vector&) noexcept = default;

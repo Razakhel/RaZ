@@ -179,7 +179,7 @@ void Cubemap::load(const Image& right, const Image& left, const Image& top, cons
 
   constexpr auto mapImage = [] (const Image& img, TextureType type) {
     if (img.isEmpty()) {
-      Logger::error("[Cubemap] Empty image given as cubemap face.");
+      Logger::error("[Cubemap] Empty image given as cubemap face");
       return;
     }
 
@@ -216,11 +216,11 @@ void Cubemap::load(const Image& right, const Image& left, const Image& top, cons
   mapImage(front, TextureType::CUBEMAP_POS_Z);
   mapImage(back, TextureType::CUBEMAP_NEG_Z);
 
-  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MINIFY_FILTER, TextureParamValue::LINEAR);
-  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::MAGNIFY_FILTER, TextureParamValue::LINEAR);
-  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::WRAP_S, TextureParamValue::CLAMP_TO_EDGE);
-  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::WRAP_T, TextureParamValue::CLAMP_TO_EDGE);
-  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParam::WRAP_R, TextureParamValue::CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParameter::MINIFY_FILTER, TextureParameterValue::LINEAR);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParameter::MAGNIFY_FILTER, TextureParameterValue::LINEAR);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParameter::WRAP_S, TextureParameterValue::CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParameter::WRAP_T, TextureParameterValue::CLAMP_TO_EDGE);
+  Renderer::setTextureParameter(TextureType::CUBEMAP, TextureParameter::WRAP_R, TextureParameterValue::CLAMP_TO_EDGE);
 
   unbind();
 
@@ -246,7 +246,7 @@ void Cubemap::draw() const {
   const MeshRenderer& displayCube = getDisplayCube();
 
   displayCube.getMaterials().front().getProgram().use();
-  Renderer::activateTexture(0);
+  Renderer::setActiveTexture(0);
   bind();
 
   Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);

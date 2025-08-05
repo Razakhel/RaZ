@@ -21,7 +21,7 @@ inline Texture2DPtr loadTexture(const FilePath& textureFilePath, const Color& de
   ZoneTextF("Path: %s", textureFilePath.toUtf8().c_str());
 
   if (!FileUtils::isReadable(textureFilePath)) {
-    Logger::warn("[FbxLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened.");
+    Logger::warn("[FbxLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened");
     return Texture2D::create(defaultColor);
   }
 
@@ -240,7 +240,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
         // TODO: small hack to avoid segfaulting when mesh count > material count, but clearly wrong; find another way
         submeshRenderer.setMaterialIndex(std::min(meshIndex, scene->GetMaterialCount() - 1));
       else
-        Logger::error("[FbxLoad] Materials can't be mapped to anything other than the whole submesh.");
+        Logger::error("[FbxLoad] Materials can't be mapped to anything other than the whole submesh");
     }
 
     mesh.addSubmesh(std::move(submesh));
