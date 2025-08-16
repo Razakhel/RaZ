@@ -112,11 +112,11 @@ public:
   /// \param val Value to be added.
   /// \return Result of the matrix summed with the value.
   constexpr Matrix operator+(T val) const noexcept;
-  /// Element-wise matrix-matrix substraction operator.
+  /// Element-wise matrix-matrix subtraction operator.
   /// \param mat Matrix to be subtracted.
   /// \return Result of the subtracted matrices.
   constexpr Matrix operator-(const Matrix& mat) const noexcept;
-  /// Element-wise matrix-value substraction operator.
+  /// Element-wise matrix-value subtraction operator.
   /// \param val Value to be subtracted.
   /// \return Result of the matrix subtracted by the value.
   constexpr Matrix operator-(T val) const noexcept;
@@ -144,12 +144,12 @@ public:
   /// \param val Value to be added.
   /// \return Reference to the modified original matrix.
   constexpr Matrix& operator+=(T val) noexcept;
-  /// Element-wise matrix-matrix substraction assignment operator.
-  /// \param mat Matrix to be substracted.
+  /// Element-wise matrix-matrix subtraction assignment operator.
+  /// \param mat Matrix to be subtracted.
   /// \return Reference to the modified original matrix.
   constexpr Matrix& operator-=(const Matrix& mat) noexcept;
-  /// Element-wise matrix-value substraction assignment operator.
-  /// \param val Value to be substracted.
+  /// Element-wise matrix-value subtraction assignment operator.
+  /// \param val Value to be subtracted.
   /// \return Reference to the modified original matrix.
   constexpr Matrix& operator-=(T val) noexcept;
   /// Element-wise matrix-matrix multiplication assignment operator.

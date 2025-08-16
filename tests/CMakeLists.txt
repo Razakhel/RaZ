@@ -6,8 +6,8 @@ project(RaZ_Tests)
 
 add_executable(RaZ_Tests)
 
-# Using C++17
-target_compile_features(RaZ_Tests PRIVATE cxx_std_17)
+# Using C++20
+target_compile_features(RaZ_Tests PRIVATE cxx_std_20)
 
 enable_testing()
 

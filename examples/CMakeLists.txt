@@ -2,7 +2,7 @@ project(RaZ_Examples)
 
 # Defining an interface library to hold common settings for all examples
 add_library(RaZ_Examples INTERFACE)
-target_compile_features(RaZ_Examples INTERFACE cxx_std_17)
+target_compile_features(RaZ_Examples INTERFACE cxx_std_20)
 target_link_libraries(RaZ_Examples INTERFACE RaZ)
 target_sources(RaZ_Examples INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/DemoUtils.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/DemoUtils.hpp")
 

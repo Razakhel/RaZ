@@ -19,6 +19,12 @@ endif ()
 # RaZ - Library #
 #################
 
+# Disabling globally the C++20 modules scan. Maybe not the best idea, but is unneeded for now and is much easier than doing it per target
+# Files mentioned in the `CXX_MODULES` file set of a target will always be scanned and should be the proper way of using modules
+# If needed, can be replaced with `set_target_properties(TargetName PROPERTIES CXX_SCAN_FOR_MODULES OFF)` for each target
+# See: https://cmake.org/cmake/help/latest/prop_tgt/CXX_SCAN_FOR_MODULES.html
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 option(RAZ_BUILD_STATIC "Build RaZ statically" ON)
 if (RAZ_BUILD_STATIC)
     add_library(RaZ STATIC)
@@ -26,8 +32,8 @@ else ()
     add_library(RaZ SHARED)
 endif ()
 
-# Using C++17
-target_compile_features(RaZ PRIVATE cxx_std_17)
+# Using C++20
+target_compile_features(RaZ PRIVATE cxx_std_20)
 
 ##########################
 # RaZ - Useful variables #

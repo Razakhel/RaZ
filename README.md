@@ -4,7 +4,7 @@
     RaZ
 </h1>
 
-<h4 align="center">Modern &amp; multiplatform 3D game engine in C++17</h4>
+<h4 align="center">Modern &amp; multiplatform 3D game engine in C++20</h4>
 
 ---
 
@@ -56,7 +56,7 @@
 
 **RaZ** comes from, as you may have noticed, my username **Raz**akhel. This was also meant as a pun, since in French _RàZ_ is the acronym for "Remise à zéro", which basically means "reset". I didn't have any particular intent behind this double meaning. Except maybe hoping that using RaZ might reset your mind because of its awesomeness? Oh well.
 
-Written in modern C++ (17), ECS driven, it is primarily developed for learning purposes. It is intended to be very intuitive & easy to use and tinker with, while trying to stay as optimized & modular as possible.
+Written in modern C++ (20), ECS driven, it is primarily developed for learning purposes. It is intended to be very intuitive & easy to use and tinker with, while trying to stay as optimized & modular as possible.
 
 The engine is available under Windows, Linux & macOS; it can also run in a web browser through [WebAssembly](https://webassembly.org/) (using [Emscripten](https://emscripten.org/)).
 

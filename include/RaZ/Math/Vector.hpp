@@ -148,13 +148,13 @@ public:
   /// \param val Value to be added.
   /// \return Result of the vector summed with the value.
   constexpr Vector operator+(T val) const noexcept;
-  /// Element-wise vector-vector substraction operator.
-  /// \param vec Vector to be substracted.
-  /// \return Result of the substracted vectors.
+  /// Element-wise vector-vector subtraction operator.
+  /// \param vec Vector to be subtracted.
+  /// \return Result of the subtracted vectors.
   constexpr Vector operator-(const Vector& vec) const noexcept;
-  /// Element-wise vector-value substraction operator.
-  /// \param val Value to be substracted.
-  /// \return Result of the vector substracted by the value.
+  /// Element-wise vector-value subtraction operator.
+  /// \param val Value to be subtracted.
+  /// \return Result of the vector subtracted by the value.
   constexpr Vector operator-(T val) const noexcept;
   /// Element-wise vector-vector multiplication operator (performs an [Hadamard product](https://en.wikipedia.org/wiki/Hadamard_product_(matrices)).
   /// \param vec Vector to be multiplied by.
@@ -180,12 +180,12 @@ public:
   /// \param val Value to be added.
   /// \return Reference to the modified original vector.
   constexpr Vector& operator+=(T val) noexcept;
-  /// Element-wise vector-vector substraction assignment operator.
-  /// \param vec Vector to be substracted.
+  /// Element-wise vector-vector subtraction assignment operator.
+  /// \param vec Vector to be subtracted.
   /// \return Reference to the modified original vector.
   constexpr Vector& operator-=(const Vector& vec) noexcept;
-  /// Element-wise vector-value substraction assignment operator.
-  /// \param val Value to be substracted.
+  /// Element-wise vector-value subtraction assignment operator.
+  /// \param val Value to be subtracted.
   /// \return Reference to the modified original vector.
   constexpr Vector& operator-=(T val) noexcept;
   /// Element-wise vector-vector multiplication assignment operator (performs an [Hadamard product](https://en.wikipedia.org/wiki/Hadamard_product_(matrices)).

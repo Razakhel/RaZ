@@ -82,7 +82,7 @@ enum Key {
   DECIMAL   = 330 /* GLFW_KEY_KP_DECIMAL  */, ///< Numeric keypad decimal (.) key.
   DIVIDE    = 331 /* GLFW_KEY_KP_DIVIDE   */, ///< Numeric keypad divide (/) key.
   MULTIPLY  = 332 /* GLFW_KEY_KP_MULTIPLY */, ///< Numeric keypad multiply (*) key.
-  SUBSTRACT = 333 /* GLFW_KEY_KP_SUBTRACT */, ///< Numeric keypad substract (-) key.
+  SUBTRACT  = 333 /* GLFW_KEY_KP_SUBTRACT */, ///< Numeric keypad subtract (-) key.
   ADD       = 334 /* GLFW_KEY_KP_ADD      */, ///< Numeric keypad add (+) key.
 
   // Modifiers
