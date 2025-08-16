@@ -16,6 +16,16 @@ file(
     lua/*.h
 )
 
+# Removing unwanted files just in case
+list(
+    REMOVE_ITEM
+    LUA_FILES
+
+    "${CMAKE_CURRENT_LIST_DIR}/lua/linit.c" # Initialization for the standalone interpreter
+    "${CMAKE_CURRENT_LIST_DIR}/lua/lua.c"   # Standalone interpreter
+    "${CMAKE_CURRENT_LIST_DIR}/lua/luac.c"  # Compiler
+)
+
 target_sources(Lua PRIVATE ${LUA_FILES})
 
 target_include_directories(Lua SYSTEM PUBLIC lua)
