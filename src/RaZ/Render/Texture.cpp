@@ -85,7 +85,7 @@ inline TextureInternalFormat recoverInternalFormat(TextureColorspace colorspace,
   throw std::invalid_argument("[Texture] Invalid texture colorspace to recover the internal format from");
 }
 
-constexpr TextureParameterValue recoverParam(TextureFilter filter) {
+constexpr TextureParameterValue recoverParameter(TextureFilter filter) {
   switch (filter) {
     case TextureFilter::NEAREST: return TextureParameterValue::NEAREST;
     case TextureFilter::LINEAR:  return TextureParameterValue::LINEAR;
@@ -95,7 +95,7 @@ constexpr TextureParameterValue recoverParam(TextureFilter filter) {
   throw std::invalid_argument("[Texture] Invalid texture filter");
 }
 
-constexpr TextureParameterValue recoverParam(TextureFilter filter, TextureFilter mipmapFilter) {
+constexpr TextureParameterValue recoverParameter(TextureFilter filter, TextureFilter mipmapFilter) {
   switch (filter) {
     case TextureFilter::NEAREST:
       return (mipmapFilter == TextureFilter::NEAREST ? TextureParameterValue::NEAREST_MIPMAP_NEAREST : TextureParameterValue::NEAREST_MIPMAP_LINEAR);
@@ -110,7 +110,7 @@ constexpr TextureParameterValue recoverParam(TextureFilter filter, TextureFilter
   throw std::invalid_argument("[Texture] Invalid texture filter");
 }
 
-constexpr TextureParameterValue recoverParam(TextureWrapping wrapping) {
+constexpr TextureParameterValue recoverParameter(TextureWrapping wrapping) {
   switch (wrapping) {
     case TextureWrapping::REPEAT: return TextureParameterValue::REPEAT;
     case TextureWrapping::CLAMP:  return TextureParameterValue::CLAMP_TO_EDGE;
@@ -147,8 +147,8 @@ void Texture::setFilter(TextureFilter minify, TextureFilter magnify) const {
   ZoneScopedN("Texture::setFilter");
 
   bind();
-  Renderer::setTextureParameter(m_type, TextureParameter::MINIFY_FILTER, recoverParam(minify));
-  Renderer::setTextureParameter(m_type, TextureParameter::MAGNIFY_FILTER, recoverParam(magnify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MINIFY_FILTER, recoverParameter(minify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MAGNIFY_FILTER, recoverParameter(magnify));
   unbind();
 }
 
@@ -156,15 +156,15 @@ void Texture::setFilter(TextureFilter minify, TextureFilter mipmapMinify, Textur
   ZoneScopedN("Texture::setFilter");
 
   bind();
-  Renderer::setTextureParameter(m_type, TextureParameter::MINIFY_FILTER, recoverParam(minify, mipmapMinify));
-  Renderer::setTextureParameter(m_type, TextureParameter::MAGNIFY_FILTER, recoverParam(magnify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MINIFY_FILTER, recoverParameter(minify, mipmapMinify));
+  Renderer::setTextureParameter(m_type, TextureParameter::MAGNIFY_FILTER, recoverParameter(magnify));
   unbind();
 }
 
 void Texture::setWrapping(TextureWrapping wrapping) const {
   ZoneScopedN("Texture::setWrapping");
 
-  const TextureParameterValue value = recoverParam(wrapping);
+  const TextureParameterValue value = recoverParameter(wrapping);
 
   bind();
   Renderer::setTextureParameter(m_type, TextureParameter::WRAP_S, value);

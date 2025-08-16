@@ -37,13 +37,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Installing the needed packages:
+    # Installing the necessary packages:
     #   - Ninja to build the project
     #   - GLEW & X11 as graphical dependencies
     #   - Lcov to output code coverage
     #   - Doxygen & Dot to generate the documentation
     #   - OpenAL-soft to handle the audio part
-    #   - Xvfb to launch a headless server (allows GL context initialisation without a screen)
+    #   - Xvfb to launch a headless server (allows GL context initialization without a screen)
     #   - Gdb to run the unit tests with the debugger
     #   - Mesa-utils to get glxinfo
     # Running glxinfo through xvfb to recover graphics capabilities
@@ -271,7 +271,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # Installing the needed packages:
+    # Installing the necessary packages:
     #   - Ninja to build the project
     #   - OpenAL-soft to handle the audio part
     - name: Packages installation
@@ -331,7 +331,7 @@ jobs:
       ${{ !matrix.use_lua && ', no Lua' || '' }})"
     runs-on: ubuntu-latest
     env:
-      EMSCRIPTEN_VERSION: 3.1.0 # The 'latest' version may fail to build
+      EMSCRIPTEN_VERSION: 4.0.0 # The 'latest' version may fail to build
 
     strategy:
       fail-fast: false
@@ -352,9 +352,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Installing the needed packages:
+      # Installing the necessary packages:
       #   - Ninja to build the project
-      #   - GL & X11 as needed graphical dependencies
+      #   - GL & X11 as required graphical dependencies
       #   - OpenAL-soft to handle the audio part
       - name: Packages installation
         run: |
