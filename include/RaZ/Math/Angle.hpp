@@ -73,14 +73,18 @@ struct Degrees {
   template <typename ValT> constexpr Degrees& operator/=(ValT val) noexcept { value /= static_cast<T>(val); return *this; }
   /// Checks if the current degrees angle is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
+  /// \tparam T2 Type of the degrees object to be compared with.
   /// \param deg Degrees to be compared with.
   /// \return True if degrees' values are nearly equal, false otherwise.
-  constexpr bool operator==(const Degrees& deg) const noexcept { return FloatUtils::areNearlyEqual(value, deg.value); }
+  template <typename T2>
+  constexpr bool operator==(const Degrees<T2>& deg) const noexcept { return FloatUtils::areNearlyEqual(value, static_cast<T>(deg.value)); }
   /// Checks if the current degrees angle is different from another given one.
   /// Uses a near-equality check to take floating-point errors into account.
+  /// \tparam T2 Type of the degrees object to be compared with.
   /// \param deg Degrees to be compared with.
   /// \return True if degrees' values are different, false otherwise.
-  constexpr bool operator!=(const Degrees& deg) const noexcept { return !(*this == deg); }
+  template <typename T2>
+  constexpr bool operator!=(const Degrees<T2>& deg) const noexcept { return !(*this == deg); }
   /// Implicit degrees' value type conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Degrees object of the new type.
@@ -161,14 +165,18 @@ struct Radians {
   template <typename ValT> constexpr Radians& operator/=(ValT val) noexcept { value /= static_cast<T>(val); return *this; }
   /// Checks if the current radians angle is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
+  /// \tparam T2 Type of the radians object to be compared with.
   /// \param rad Radians to be compared with.
   /// \return True if radians' values are nearly equal, false otherwise.
-  constexpr bool operator==(const Radians& rad) const noexcept { return FloatUtils::areNearlyEqual(value, rad.value); }
+  template <typename T2>
+  constexpr bool operator==(const Radians<T2>& rad) const noexcept { return FloatUtils::areNearlyEqual(value, static_cast<T>(rad.value)); }
   /// Checks if the current radians angle is different from another given one.
   /// Uses a near-equality check to take floating-point errors into account.
+  /// \tparam T2 Type of the radians object to be compared with.
   /// \param rad Radians to be compared with.
   /// \return True if radians' values are different, false otherwise.
-  constexpr bool operator!=(const Radians& rad) const noexcept { return !(*this == rad); }
+  template <typename T2>
+  constexpr bool operator!=(const Radians<T2>& rad) const noexcept { return !(*this == rad); }
   /// Implicit radians' value type conversion operator.
   /// \tparam T2 Type to convert the value into.
   /// \return Radians object of the new type.

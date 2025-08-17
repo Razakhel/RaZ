@@ -43,13 +43,17 @@ TEST_CASE("Angle operators", "[math]") {
   // Degrees' & Radians' (un)equality operators automatically verify near-equality
   constexpr Raz::Degreesf degFloat = degTest;
   CHECK(degFloat == degTest);
+  CHECK_FALSE(degFloat != degTest);
   constexpr Raz::Degreesd degDouble = degTest;
   CHECK(degDouble == degTest);
+  CHECK_FALSE(degDouble != degTest);
 
   constexpr Raz::Radiansf radFloat = radTest;
   CHECK(radFloat == radTest);
+  CHECK_FALSE(radFloat != radTest);
   constexpr Raz::Radiansd radDouble = radTest;
   CHECK(radDouble == radTest);
+  CHECK_FALSE(radDouble != radTest);
 
   // Checking that conversion between degrees & radians with different data types works as expected
   constexpr Raz::Degreesf radToDegFloat = radTest;
@@ -61,7 +65,7 @@ TEST_CASE("Angle operators", "[math]") {
   // Mathematical operators
   // Degrees
   auto degAdd = degTest + 2.f;
-  // Checking that mathematical operations keeps the original angle type (no implicit cast to the value type)
+  // Checking that mathematical operations keep the original angle type (no implicit cast to the value type)
   CHECK(std::is_same_v<std::decay_t<decltype(degTest)>, std::decay_t<decltype(degAdd)>>);
   CHECK_THAT(degAdd.value, IsNearlyEqualTo(182.0L));
 
@@ -88,7 +92,7 @@ TEST_CASE("Angle operators", "[math]") {
 
   // Radians
   auto radAdd = radTest + Raz::Pi<float>;
-  // Checking that mathematical operations keeps the original angle type (no implicit cast to the value type)
+  // Checking that mathematical operations keep the original angle type (no implicit cast to the value type)
   CHECK(std::is_same_v<std::decay_t<decltype(radTest)>, std::decay_t<decltype(radAdd)>>);
   // A float epsilon must be specified for the test to pass
   // long double's epsilon is too precise, so we need to compare with a value of the type we made an operation with
