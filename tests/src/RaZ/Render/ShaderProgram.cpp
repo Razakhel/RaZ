@@ -5,7 +5,7 @@
 
 namespace {
 
-class TestShaderProgram : public Raz::ShaderProgram {
+class TestShaderProgram final : public Raz::ShaderProgram {
 public:
   void loadShaders() const override {}
   void compileShaders() const override {}
@@ -30,10 +30,10 @@ constexpr std::string_view vertSource = R"(
 constexpr std::string_view tessCtrlSource = R"(
   #extension GL_ARB_tessellation_shader : enable
 
+  layout(vertices = 4) out;
+
   uniform int uniInt[2];
   uniform bool uniBool;
-
-  layout(vertices = 4) out;
 
   void main() {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
@@ -57,7 +57,7 @@ constexpr std::string_view tessEvalSource = R"(
   uniform float uniFloat;
 
   void main() {
-    gl_Position = vec4(float(uniUint[0]), float(uniUint[1]), float(uniUint[2]), uniFloat);
+    gl_Position = gl_in[0].gl_Position + vec4(float(uniUint[0]), float(uniUint[1]), float(uniUint[2]), uniFloat);
   }
 )";
 
@@ -386,7 +386,7 @@ TEST_CASE("RenderShaderProgram creation", "[render]") {
     CHECK_FALSE(Raz::Renderer::hasErrors());
     CHECK(program.isLinked());
 
-    // But does not declare it as used
+    // But doesn't declare it as used
     CHECK_FALSE(program.isUsed());
 
     program.use();
