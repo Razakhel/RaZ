@@ -196,6 +196,7 @@ if (RAZ_COMPILER_GCC)
                 -fno-default-inline
                 -fprofile-arcs
                 -ftest-coverage
+                -fprofile-update=atomic
         )
 
         target_link_libraries(RaZ PRIVATE gcov)
