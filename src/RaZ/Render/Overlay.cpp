@@ -131,7 +131,7 @@ void OverlayTextArea::clear() {
   m_callback(m_text);
 }
 
-OverlayTexture::OverlayTexture(const Texture2D& texture)
+OverlayTexture::OverlayTexture(const Texture2D& texture) noexcept
   : OverlayTexture(texture, texture.getWidth(), texture.getHeight()) {}
 
 void OverlayTexture::setTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept {
@@ -198,20 +198,12 @@ OverlayTextArea& OverlayWindow::addTextArea(std::string label, std::function<voi
 
 OverlayListBox& OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
                                           std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
-  if (entries.empty())
-    throw std::invalid_argument("[Overlay] Cannot create a list box with no entry");
-
-  assert("Error: A list box's initial index cannot reference a non-existing entry." && initId < entries.size());
   return static_cast<OverlayListBox&>(*m_elements.emplace_back(std::make_unique<OverlayListBox>(std::move(label), std::move(entries),
                                                                                                 std::move(actionChanged), initId)));
 }
 
 OverlayDropdown& OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
                                             std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
-  if (entries.empty())
-    throw std::invalid_argument("[Overlay] Cannot create a dropdown list with no entry");
-
-  assert("Error: A dropdown's initial index cannot reference a non-existing entry." && initId < entries.size());
   return static_cast<OverlayDropdown&>(*m_elements.emplace_back(std::make_unique<OverlayDropdown>(std::move(label), std::move(entries),
                                                                                                   std::move(actionChanged), initId)));
 }
@@ -361,13 +353,13 @@ void OverlayWindow::render() const {
         const ImVec2 dimensions(0, ImGui::GetTextLineHeightWithSpacing() * std::min(static_cast<float>(listBox.m_entries.size()), 5.f) + 2.f);
 
         if (ImGui::BeginListBox(listBox.m_label.c_str(), dimensions)) {
-          for (std::size_t i = 0; i < listBox.m_entries.size(); ++i) {
-            const bool isSelected = (listBox.m_currentId == i);
+          for (std::size_t entryIndex = 0; entryIndex < listBox.m_entries.size(); ++entryIndex) {
+            const bool isSelected = (listBox.m_currentId == entryIndex);
 
-            if (ImGui::Selectable(listBox.m_entries[i].c_str(), isSelected)) {
+            if (ImGui::Selectable(listBox.m_entries[entryIndex].c_str(), isSelected)) {
               if (!isSelected) { // If the item isn't already selected
-                listBox.m_actionChanged(listBox.m_entries[i], i);
-                listBox.m_currentId = i;
+                listBox.m_actionChanged(listBox.m_entries[entryIndex], entryIndex);
+                listBox.m_currentId = entryIndex;
               }
             }
 
@@ -385,14 +377,15 @@ void OverlayWindow::render() const {
       {
         auto& dropdown = static_cast<OverlayDropdown&>(*element);
 
-        if (ImGui::BeginCombo(dropdown.m_label.c_str(), dropdown.m_entries[dropdown.m_currentId].c_str())) {
-          for (std::size_t i = 0; i < dropdown.m_entries.size(); ++i) {
-            const bool isSelected = (dropdown.m_currentId == i);
+        const char* preview = (dropdown.m_currentId < dropdown.m_entries.size() ? dropdown.m_entries[dropdown.m_currentId].c_str() : nullptr);
+        if (ImGui::BeginCombo(dropdown.m_label.c_str(), preview)) {
+          for (std::size_t entryIndex = 0; entryIndex < dropdown.m_entries.size(); ++entryIndex) {
+            const bool isSelected = (dropdown.m_currentId == entryIndex);
 
-            if (ImGui::Selectable(dropdown.m_entries[i].c_str(), isSelected)) {
+            if (ImGui::Selectable(dropdown.m_entries[entryIndex].c_str(), isSelected)) {
               if (!isSelected) { // If the item isn't already selected
-                dropdown.m_actionChanged(dropdown.m_entries[i], i);
-                dropdown.m_currentId = i;
+                dropdown.m_actionChanged(dropdown.m_entries[entryIndex], entryIndex);
+                dropdown.m_currentId = entryIndex;
               }
             }
 
@@ -425,7 +418,7 @@ void OverlayWindow::render() const {
         const ImVec2 textureSize(std::min(texture.m_width, texture.m_width * minRatio),
                                  std::min(texture.m_height, texture.m_height * minRatio));
 
-        // The UV's y component must be reverted, so that the texture isn't flipped upside down
+        // The UV's y component must be reverted so that the texture isn't flipped upside down
         const ImVec2 topCoords(0.f, 1.f);
         const ImVec2 bottomCoords(1.f, 0.f);
 

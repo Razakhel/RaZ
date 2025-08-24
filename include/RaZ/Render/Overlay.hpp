@@ -78,7 +78,7 @@ private:
   /// Destroys the overlay.
   static void destroy();
 
-  std::vector<std::unique_ptr<OverlayWindow>> m_windows {};
+  std::vector<std::unique_ptr<OverlayWindow>> m_windows;
 };
 
 class OverlayElement {
@@ -102,7 +102,7 @@ public:
   virtual ~OverlayElement() = default;
 
 protected:
-  std::string m_label {};
+  std::string m_label;
   bool m_enabled = true;
 };
 
@@ -110,7 +110,7 @@ class OverlayLabel final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  explicit OverlayLabel(std::string label) : OverlayElement(std::move(label)) {}
+  explicit OverlayLabel(std::string label) noexcept : OverlayElement(std::move(label)) {}
 
   OverlayElementType getType() const override { return OverlayElementType::LABEL; }
   const std::string& getText() const noexcept { return m_label; }
@@ -122,7 +122,7 @@ class OverlayColoredLabel final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  explicit OverlayColoredLabel(std::string label, const Color& color, float alpha = 1.f)
+  explicit OverlayColoredLabel(std::string label, const Color& color, float alpha = 1.f) noexcept
     : OverlayElement(std::move(label)), m_color{ color }, m_alpha{ alpha } {}
 
   OverlayElementType getType() const override { return OverlayElementType::COLORED_LABEL; }
@@ -135,7 +135,7 @@ public:
   void setAlpha(float alpha) { m_alpha = alpha; }
 
 private:
-  Color m_color {};
+  Color m_color;
   float m_alpha = 1.f;
 };
 
@@ -143,12 +143,15 @@ class OverlayButton final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayButton(std::string label, std::function<void()> actionClick) : OverlayElement(std::move(label)), m_actionClick{ std::move(actionClick) } {}
+  OverlayButton(std::string label, std::function<void()> actionClick) : OverlayElement(std::move(label)), m_actionClick{ std::move(actionClick) } {
+    if (m_actionClick == nullptr)
+      throw std::invalid_argument("[OverlayButton] The callback function must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::BUTTON; }
 
 private:
-  std::function<void()> m_actionClick {};
+  std::function<void()> m_actionClick;
 };
 
 class OverlayCheckbox final : public OverlayElement {
@@ -156,13 +159,16 @@ class OverlayCheckbox final : public OverlayElement {
 
 public:
   OverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal)
-    : OverlayElement(std::move(label)), m_actionOn{ std::move(actionOn) }, m_actionOff{ std::move(actionOff) }, m_isChecked{ initVal } {}
+  : OverlayElement(std::move(label)), m_actionOn{ std::move(actionOn) }, m_actionOff{ std::move(actionOff) }, m_isChecked{ initVal } {
+    if (m_actionOn == nullptr || m_actionOff == nullptr)
+      throw std::invalid_argument("[OverlayCheckbox] Both callback functions must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::CHECKBOX; }
 
 private:
-  std::function<void()> m_actionOn {};
-  std::function<void()> m_actionOff {};
+  std::function<void()> m_actionOn;
+  std::function<void()> m_actionOff;
   bool m_isChecked {};
 };
 
@@ -171,12 +177,15 @@ class OverlaySlider final : public OverlayElement {
 
 public:
   OverlaySlider(std::string label, std::function<void(float)> actionSlide, float minValue, float maxValue, float initValue)
-    : OverlayElement(std::move(label)), m_actionSlide{ std::move(actionSlide) }, m_minValue{ minValue }, m_maxValue{ maxValue }, m_currentValue{ initValue } {}
+    : OverlayElement(std::move(label)), m_actionSlide{ std::move(actionSlide) }, m_minValue{ minValue }, m_maxValue{ maxValue }, m_currentValue{ initValue } {
+    if (m_actionSlide == nullptr)
+      throw std::invalid_argument("[OverlaySlider] The callback function must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::SLIDER; }
 
 private:
-  std::function<void(float)> m_actionSlide {};
+  std::function<void(float)> m_actionSlide;
   float m_minValue {};
   float m_maxValue {};
   float m_currentValue {};
@@ -187,7 +196,10 @@ class OverlayTextbox final : public OverlayElement {
 
 public:
   OverlayTextbox(std::string label, std::function<void(const std::string&)> callback, std::string initText = {})
-    : OverlayElement(std::move(label)), m_text{ std::move(initText) }, m_callback{ std::move(callback) } {}
+    : OverlayElement(std::move(label)), m_text{ std::move(initText) }, m_callback{ std::move(callback) } {
+    if (m_callback == nullptr)
+      throw std::invalid_argument("[OverlayTextbox] The callback function must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::TEXTBOX; }
   const std::string& getText() const noexcept { return m_text; }
@@ -200,8 +212,8 @@ public:
   OverlayTextbox& operator+=(const std::string& text) { return append(text); }
 
 private:
-  std::string m_text {};
-  std::function<void(const std::string&)> m_callback {};
+  std::string m_text;
+  std::function<void(const std::string&)> m_callback;
 };
 
 class OverlayTextArea final : public OverlayElement {
@@ -209,7 +221,10 @@ class OverlayTextArea final : public OverlayElement {
 
 public:
   OverlayTextArea(std::string label, std::function<void(const std::string&)> callback, std::string initText = {}, float maxHeight = -1.f)
-    : OverlayElement(std::move(label)), m_text{ std::move(initText) }, m_callback{ std::move(callback) }, m_maxHeight{ maxHeight } {}
+    : OverlayElement(std::move(label)), m_text{ std::move(initText) }, m_callback{ std::move(callback) }, m_maxHeight{ maxHeight } {
+    if (m_callback == nullptr)
+      throw std::invalid_argument("[OverlayTextArea] The callback function must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::TEXT_AREA; }
   const std::string& getText() const noexcept { return m_text; }
@@ -222,8 +237,8 @@ public:
   OverlayTextArea& operator+=(const std::string& text) { return append(text); }
 
 private:
-  std::string m_text {};
-  std::function<void(const std::string&)> m_callback {};
+  std::string m_text;
+  std::function<void(const std::string&)> m_callback;
   float m_maxHeight {};
 };
 
@@ -233,13 +248,16 @@ class OverlayListBox final : public OverlayElement {
 public:
   OverlayListBox(std::string label, std::vector<std::string> entries,
                  std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {}
+    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {
+    if (m_actionChanged == nullptr)
+      throw std::invalid_argument("[OverlayListBox] The callback function must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::LIST_BOX; }
 
 private:
-  std::vector<std::string> m_entries {};
-  std::function<void(const std::string&, std::size_t)> m_actionChanged {};
+  std::vector<std::string> m_entries;
+  std::function<void(const std::string&, std::size_t)> m_actionChanged;
   std::size_t m_currentId {};
 };
 
@@ -249,13 +267,16 @@ class OverlayDropdown final : public OverlayElement {
 public:
   OverlayDropdown(std::string label, std::vector<std::string> entries,
                   std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {}
+    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {
+    if (m_actionChanged == nullptr)
+      throw std::invalid_argument("[OverlayDropdown] The callback function must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::DROPDOWN; }
 
 private:
-  std::vector<std::string> m_entries {};
-  std::function<void(const std::string&, std::size_t)> m_actionChanged {};
+  std::vector<std::string> m_entries;
+  std::function<void(const std::string&, std::size_t)> m_actionChanged;
   std::size_t m_currentId {};
 };
 
@@ -264,12 +285,15 @@ class OverlayColorPicker final : public OverlayElement {
 
 public:
   OverlayColorPicker(std::string label, std::function<void(const Color&)> actionChanged, const Color& initColor)
-    : OverlayElement(std::move(label)), m_actionChanged{ std::move(actionChanged) }, m_currentColor{ initColor.red(), initColor.green(), initColor.blue() } {}
+  : OverlayElement(std::move(label)), m_actionChanged{ std::move(actionChanged) }, m_currentColor{ initColor.red(), initColor.green(), initColor.blue() } {
+    if (m_actionChanged == nullptr)
+      throw std::invalid_argument("[OverlayColorPicker] The callback function must be valid");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::COLOR_PICKER; }
 
 private:
-  std::function<void(const Color&)> m_actionChanged {};
+  std::function<void(const Color&)> m_actionChanged;
   std::array<float, 3> m_currentColor {};
 };
 
@@ -277,8 +301,8 @@ class OverlayTexture final : public OverlayElement {
   friend OverlayWindow;
 
 public:
-  OverlayTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) { setTexture(texture, maxWidth, maxHeight); }
-  explicit OverlayTexture(const Texture2D& texture);
+  OverlayTexture(const Texture2D& texture, unsigned int maxWidth, unsigned int maxHeight) noexcept { setTexture(texture, maxWidth, maxHeight); }
+  explicit OverlayTexture(const Texture2D& texture) noexcept;
 
   OverlayElementType getType() const override { return OverlayElementType::TEXTURE; }
 
@@ -296,7 +320,10 @@ class OverlayProgressBar final : public OverlayElement {
 
 public:
   OverlayProgressBar(int minVal, int maxVal, bool showValues = false)
-    : m_minVal{ minVal }, m_maxVal{ maxVal }, m_curVal{ minVal }, m_showValues{ showValues } {}
+    : m_minVal{ minVal }, m_maxVal{ maxVal }, m_curVal{ minVal }, m_showValues{ showValues } {
+    if (m_minVal >= m_maxVal)
+      throw std::invalid_argument("[OverlayProgressBar] The maximum value must be greater than the minimum one");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::PROGRESS_BAR; }
   int getCurrentValue() const noexcept { return m_curVal; }
@@ -333,9 +360,9 @@ private:
   OverlayPlotEntry(std::string name, OverlayPlotType type, std::size_t maxValCount)
     : m_name{ std::move(name) }, m_type{ type }, m_values(maxValCount) {}
 
-  std::string m_name {};
+  std::string m_name;
   OverlayPlotType m_type {};
-  std::vector<float> m_values {};
+  std::vector<float> m_values;
 };
 
 class OverlayPlot final : public OverlayElement {
@@ -353,17 +380,22 @@ public:
       m_minYVal{ minYVal },
       m_maxYVal{ maxYVal },
       m_lockY{ lockYAxis },
-      m_maxHeight{ maxHeight } {}
+      m_maxHeight{ maxHeight } {
+    if (m_maxValCount < 1)
+      throw std::invalid_argument("[OverlayPlot] The maximum value count must be strictly greater than 0");
+    if (m_minYVal >= m_maxYVal)
+      throw std::invalid_argument("[OverlayPlot] The maximum Y value must be greater than the minimum one");
+  }
 
   OverlayElementType getType() const override { return OverlayElementType::PLOT; }
 
   OverlayPlotEntry& addEntry(std::string name, OverlayPlotType type = OverlayPlotType::LINE);
 
 private:
-  std::vector<std::unique_ptr<OverlayPlotEntry>> m_entries {};
+  std::vector<std::unique_ptr<OverlayPlotEntry>> m_entries;
   std::size_t m_maxValCount {};
-  std::string m_xAxisLabel {};
-  std::string m_yAxisLabel {};
+  std::string m_xAxisLabel;
+  std::string m_yAxisLabel;
   float m_minYVal {};
   float m_maxYVal {};
   bool m_lockY {};
@@ -377,14 +409,14 @@ public:
 
 class OverlayFrameTime final : public OverlayElement {
 public:
-  explicit OverlayFrameTime(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
+  explicit OverlayFrameTime(std::string formattedLabel) noexcept : OverlayElement(std::move(formattedLabel)) {}
 
   OverlayElementType getType() const override { return OverlayElementType::FRAME_TIME; }
 };
 
 class OverlayFpsCounter final : public OverlayElement {
 public:
-  explicit OverlayFpsCounter(std::string formattedLabel) : OverlayElement(std::move(formattedLabel)) {}
+  explicit OverlayFpsCounter(std::string formattedLabel) noexcept : OverlayElement(std::move(formattedLabel)) {}
 
   OverlayElementType getType() const override { return OverlayElementType::FPS_COUNTER; }
 };
@@ -413,7 +445,7 @@ public:
   OverlayLabel& addLabel(std::string label);
   /// Adds a colored label on the overlay window.
   /// \param label Text to be displayed.
-  /// \param color Color to display the text with.
+  /// \param color Color to display the text in.
   /// \param alpha Transparency to apply to the text (between 0 for fully transparent and 1 for fully opaque).
   /// \return Reference to the newly added colored label.
   OverlayColoredLabel& addColoredLabel(std::string label, const Color& color, float alpha = 1.f);
@@ -510,14 +542,14 @@ public:
                                      std::string xAxisLabel = {}, std::string yAxisLabel = {},
                                      float minYVal = 0.f, float maxYVal = 100.f, bool lockYAxis = false,
                                      float maxHeight = -1.f);
-  /// Adds an horizontal separator on the overlay window.
+  /// Adds a horizontal separator on the overlay window.
   /// \return Reference to the newly added separator.
   OverlaySeparator& addSeparator();
   /// Adds a frame time display on the overlay window.
   /// \param formattedLabel Text with a formatting placeholder to display the frame time (%.Xf, X being the precision after the comma).
   /// \return Reference to the newly added frame time.
   OverlayFrameTime& addFrameTime(std::string formattedLabel);
-  /// Adds a FPS (frames per second) counter on the overlay window.
+  /// Adds an FPS (frames per second) counter on the overlay window.
   /// \param formattedLabel Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
   /// \return Reference to the newly added FPS counter.
   OverlayFpsCounter& addFpsCounter(std::string formattedLabel);
@@ -528,11 +560,11 @@ public:
   OverlayWindow& operator=(OverlayWindow&&) noexcept = default;
 
 private:
-  std::string m_title {};
-  Vec2f m_currentSize {};
-  Vec2f m_currentPos {};
+  std::string m_title;
+  Vec2f m_currentSize;
+  Vec2f m_currentPos;
   bool m_enabled = true;
-  std::vector<std::unique_ptr<OverlayElement>> m_elements {};
+  std::vector<std::unique_ptr<OverlayElement>> m_elements;
 };
 
 } // namespace Raz

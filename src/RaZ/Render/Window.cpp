@@ -118,8 +118,8 @@ Window::Window(RenderSystem& renderSystem,
   setClearColor(0.15f, 0.15f, 0.15f);
 
   glfwSetFramebufferSizeCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int newWidth, int newHeight) {
-    static_cast<const Window*>(glfwGetWindowUserPointer(windowHandle))->m_renderSystem->resizeViewport(static_cast<unsigned int>(newWidth),
-                                                                                                       static_cast<unsigned int>(newHeight));
+    const auto* window = static_cast<const Window*>(glfwGetWindowUserPointer(windowHandle));
+    window->m_renderSystem->resizeViewport(static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
   });
 
 #if !defined(RAZ_NO_OVERLAY)
@@ -454,7 +454,7 @@ void Window::processInputs(float deltaTime) {
     const auto& action = actionIter->second;
 
     // An action consists of two parts:
-    // - A callback associated to the triggered key or button
+    // - A callback associated with the triggered key or button
     // - A value indicating if it should be executed only once or every frame
 
     action.first(deltaTime);
