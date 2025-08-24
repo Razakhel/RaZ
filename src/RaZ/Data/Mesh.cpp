@@ -54,7 +54,7 @@ Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
   ZoneScopedN("Mesh::Mesh(Sphere)");
 
   if (subdivCount < 1)
-    throw std::invalid_argument("Error: Cannot create a sphere mesh with no subdivision");
+    throw std::invalid_argument("[Mesh] Cannot create a sphere mesh with no subdivision");
 
   switch (type) {
     case SphereMeshType::UV:
@@ -64,6 +64,9 @@ Mesh::Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type) {
     case SphereMeshType::ICO:
       createIcosphere(sphere, subdivCount);
       break;
+
+    default:
+      throw std::invalid_argument("[Mesh] Invalid sphere mesh type");
   }
 
   computeTangents();
