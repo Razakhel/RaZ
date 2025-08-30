@@ -12,7 +12,7 @@ jobs:
       ${{ !matrix.use_audio && ', no audio' || '' }}\
       ${{ !matrix.use_lua && ', no Lua' || '' }}\
       ${{ !matrix.use_window && ', no window' || '' }})"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -247,7 +247,7 @@ jobs:
       ${{ !matrix.use_audio && ', no audio' || '' }}\
       ${{ !matrix.use_lua && ', no Lua' || '' }}\
       ${{ !matrix.use_window && ', no window' || '' }})"
-    runs-on: macos-latest
+    runs-on: macos-15
 
     strategy:
       fail-fast: false
