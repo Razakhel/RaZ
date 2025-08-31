@@ -3,7 +3,6 @@
 #ifndef RAZ_SHAPE_HPP
 #define RAZ_SHAPE_HPP
 
-#include "RaZ/Component.hpp"
 #include "RaZ/Math/Quaternion.hpp"
 #include "RaZ/Math/Vector.hpp"
 #include "RaZ/Utils/Ray.hpp"
@@ -30,8 +29,8 @@ enum class ShapeType {
 
 class Shape {
 public:
-  Shape(const Shape&) = default;
-  Shape(Shape&&) noexcept = default;
+  constexpr Shape(const Shape&) = default;
+  constexpr Shape(Shape&&) noexcept = default;
 
   /// Gets the type of the shape.
   /// \return Shape's type.
@@ -88,23 +87,23 @@ public:
   /// \return Computed bounding box.
   virtual AABB computeBoundingBox() const = 0;
 
-  Shape& operator=(const Shape&) = default;
-  Shape& operator=(Shape&&) noexcept = default;
+  constexpr Shape& operator=(const Shape&) = default;
+  constexpr Shape& operator=(Shape&&) noexcept = default;
 
-  virtual ~Shape() = default;
+  constexpr virtual ~Shape() = default;
 
 protected:
-  Shape() = default;
+  constexpr Shape() = default;
 };
 
 /// Line segment defined by its two extremities' positions.
 class Line final : public Shape {
 public:
-  Line(const Vec3f& beginPos, const Vec3f& endPos) noexcept : m_beginPos{ beginPos }, m_endPos{ endPos } {}
+  constexpr Line(const Vec3f& beginPos, const Vec3f& endPos) noexcept : m_beginPos{ beginPos }, m_endPos{ endPos } {}
 
-  ShapeType getType() const noexcept override { return ShapeType::LINE; }
-  const Vec3f& getBeginPos() const { return m_beginPos; }
-  const Vec3f& getEndPos() const { return m_endPos; }
+  constexpr ShapeType getType() const noexcept override { return ShapeType::LINE; }
+  constexpr const Vec3f& getBeginPos() const { return m_beginPos; }
+  constexpr const Vec3f& getEndPos() const { return m_endPos; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -153,16 +152,16 @@ public:
   Vec3f computeProjection(const Vec3f& point) const override;
   /// Computes the line's centroid, which is the point lying directly between the two extremities.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) * 0.5f; }
+  constexpr Vec3f computeCentroid() const override { return (m_beginPos + m_endPos) * 0.5f; }
   AABB computeBoundingBox() const override;
   /// Line squared length computation.
   /// To be preferred over computeLength() for faster operations.
   /// \return Line's squared length.
-  float computeSquaredLength() const { return (m_endPos - m_beginPos).computeSquaredLength(); }
+  constexpr float computeSquaredLength() const { return (m_endPos - m_beginPos).computeSquaredLength(); }
   /// Line length computation.
   /// To be used if the actual length is needed; otherwise, prefer computeSquaredLength().
   /// \return Line's length.
-  float computeLength() const { return (m_endPos - m_beginPos).computeLength(); }
+  constexpr float computeLength() const { return (m_endPos - m_beginPos).computeLength(); }
 
   /// Checks if the current line is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
@@ -176,27 +175,27 @@ public:
   constexpr bool operator!=(const Line& line) const noexcept { return !(*this == line); }
 
 private:
-  Vec3f m_beginPos {};
-  Vec3f m_endPos {};
+  Vec3f m_beginPos;
+  Vec3f m_endPos;
 };
 
 /// Plane defined by a distance from [ 0; 0; 0 ] and a normal.
 class Plane final : public Shape {
 public:
-  explicit Plane(float distance, const Vec3f& normal = Axis::Up) noexcept : m_distance{ distance }, m_normal{ normal } {}
-  explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Up) noexcept : m_distance{ position.computeLength() }, m_normal{ normal } {}
-  Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint) noexcept
+  constexpr explicit Plane(float distance, const Vec3f& normal = Axis::Up) noexcept : m_distance{ distance }, m_normal{ normal } {}
+  constexpr explicit Plane(const Vec3f& position, const Vec3f& normal = Axis::Up) noexcept : m_distance{ position.computeLength() }, m_normal{ normal } {}
+  constexpr Plane(const Vec3f& firstPoint, const Vec3f& secondPoint, const Vec3f& thirdPoint) noexcept
     : m_distance{ ((firstPoint + secondPoint + thirdPoint) / 3.f).computeLength() },
       m_normal{ (secondPoint - firstPoint).cross(thirdPoint - firstPoint).normalize() } {}
 
-  ShapeType getType() const noexcept override { return ShapeType::PLANE; }
-  float getDistance() const { return m_distance; }
-  const Vec3f& getNormal() const { return m_normal; }
+  constexpr ShapeType getType() const noexcept override { return ShapeType::PLANE; }
+  constexpr float getDistance() const { return m_distance; }
+  constexpr const Vec3f& getNormal() const { return m_normal; }
 
   /// Point containment check.
   /// \param point Point to be checked.
   /// \return True if the point is located on the plane, false otherwise.
-  bool contains(const Vec3f& point) const override { return FloatUtils::areNearlyEqual(m_normal.dot(point) - m_distance, 0.f); }
+  constexpr bool contains(const Vec3f& point) const override { return FloatUtils::areNearlyEqual(m_normal.dot(point) - m_distance, 0.f); }
   /// Plane-line intersection check.
   /// \param line Line to check if there is an intersection with.
   /// \return True if both shapes intersect each other, false otherwise.
@@ -232,15 +231,15 @@ public:
   bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Translates the plane by the given vector.
   /// \param displacement Displacement to be translated by.
-  void translate(const Vec3f& displacement) noexcept override { m_distance = m_normal.dot(computeCentroid() + displacement); }
+  constexpr void translate(const Vec3f& displacement) noexcept override { m_distance = m_normal.dot(computeCentroid() + displacement); }
   /// Computes the projection of a point (closest point) onto the plane.
   /// The projected point is necessarily located on the plane.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto the plane.
-  Vec3f computeProjection(const Vec3f& point) const override { return point - m_normal * (m_normal.dot(point) - m_distance); }
+  constexpr Vec3f computeProjection(const Vec3f& point) const override { return point - m_normal * (m_normal.dot(point) - m_distance); }
   /// Computes the plane's centroid, which is the point lying onto the plane at its distance from the center in its normal direction.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return m_normal * m_distance; }
+  constexpr Vec3f computeCentroid() const override { return m_normal * m_distance; }
   AABB computeBoundingBox() const override;
 
   /// Checks if the current plane is equal to another given one.
@@ -257,17 +256,17 @@ public:
 
 private:
   float m_distance {};
-  Vec3f m_normal {};
+  Vec3f m_normal;
 };
 
 /// Sphere defined by its center position and a radius.
 class Sphere final : public Shape {
 public:
-  Sphere(const Vec3f& centerPos, float radius) noexcept : m_centerPos{ centerPos }, m_radius{ radius } {}
+  constexpr Sphere(const Vec3f& centerPos, float radius) noexcept : m_centerPos{ centerPos }, m_radius{ radius } {}
 
-  ShapeType getType() const noexcept override { return ShapeType::SPHERE; }
-  const Vec3f& getCenter() const { return m_centerPos; }
-  float getRadius() const { return m_radius; }
+  constexpr ShapeType getType() const noexcept override { return ShapeType::SPHERE; }
+  constexpr const Vec3f& getCenter() const { return m_centerPos; }
+  constexpr float getRadius() const { return m_radius; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -308,15 +307,15 @@ public:
   bool intersects(const Ray& ray, RayHit* hit) const override { return ray.intersects(*this, hit); }
   /// Translates the sphere by the given vector.
   /// \param displacement Displacement to be translated by.
-  void translate(const Vec3f& displacement) noexcept override { m_centerPos += displacement; }
+  constexpr void translate(const Vec3f& displacement) noexcept override { m_centerPos += displacement; }
   /// Computes the projection of a point (closest point) onto the sphere.
   /// The projected point may be inside the sphere itself or on its surface.
   /// \param point Point to compute the projection from.
   /// \return Point projected onto/into the sphere.
-  Vec3f computeProjection(const Vec3f& point) const override { return (point - m_centerPos).normalize() * m_radius + m_centerPos; }
+  constexpr Vec3f computeProjection(const Vec3f& point) const override { return (point - m_centerPos).normalize() * m_radius + m_centerPos; }
   /// Computes the sphere's centroid, which is its center. Strictly equivalent to getCenterPos().
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return m_centerPos; }
+  constexpr Vec3f computeCentroid() const override { return m_centerPos; }
   AABB computeBoundingBox() const override;
 
   /// Checks if the current sphere is equal to another given one.
@@ -332,20 +331,20 @@ public:
   constexpr bool operator!=(const Sphere& sphere) const noexcept { return !(*this == sphere); }
 
 private:
-  Vec3f m_centerPos {};
+  Vec3f m_centerPos;
   float m_radius {};
 };
 
 /// Triangle defined by its three vertices' positions, presumably in counter-clockwise order.
 class Triangle final : public Shape {
 public:
-  Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos) noexcept
+  constexpr Triangle(const Vec3f& firstPos, const Vec3f& secondPos, const Vec3f& thirdPos) noexcept
     : m_firstPos{ firstPos }, m_secondPos{ secondPos }, m_thirdPos{ thirdPos } {}
 
-  ShapeType getType() const noexcept override { return ShapeType::TRIANGLE; }
-  const Vec3f& getFirstPos() const { return m_firstPos; }
-  const Vec3f& getSecondPos() const { return m_secondPos; }
-  const Vec3f& getThirdPos() const { return m_thirdPos; }
+  constexpr ShapeType getType() const noexcept override { return ShapeType::TRIANGLE; }
+  constexpr const Vec3f& getFirstPos() const { return m_firstPos; }
+  constexpr const Vec3f& getSecondPos() const { return m_secondPos; }
+  constexpr const Vec3f& getThirdPos() const { return m_thirdPos; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -394,7 +393,7 @@ public:
   Vec3f computeProjection(const Vec3f& point) const override;
   /// Computes the triangle's centroid, which is the point lying directly between its three points.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return (m_firstPos + m_secondPos + m_thirdPos) / 3.f; }
+  constexpr Vec3f computeCentroid() const override { return (m_firstPos + m_secondPos + m_thirdPos) / 3.f; }
   AABB computeBoundingBox() const override;
   /// Computes the triangle's normal from its points.
   /// \return Computed normal.
@@ -421,22 +420,22 @@ public:
   constexpr bool operator!=(const Triangle& triangle) const noexcept { return !(*this == triangle); }
 
 private:
-  Vec3f m_firstPos {};
-  Vec3f m_secondPos {};
-  Vec3f m_thirdPos {};
+  Vec3f m_firstPos;
+  Vec3f m_secondPos;
+  Vec3f m_thirdPos;
 };
 
 /// Quad defined by its four vertices' positions, presumably in counter-clockwise order.
 class Quad final : public Shape {
 public:
-  Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos) noexcept
+  constexpr Quad(const Vec3f& leftTopPos, const Vec3f& rightTopPos, const Vec3f& rightBottomPos, const Vec3f& leftBottomPos) noexcept
     : m_leftTopPos{ leftTopPos }, m_rightTopPos{ rightTopPos }, m_rightBottomPos{ rightBottomPos }, m_leftBottomPos{ leftBottomPos } {}
 
-  ShapeType getType() const noexcept override { return ShapeType::QUAD; }
-  const Vec3f& getLeftTopPos() const { return m_leftTopPos; }
-  const Vec3f& getRightTopPos() const { return m_rightTopPos; }
-  const Vec3f& getRightBottomPos() const { return m_rightBottomPos; }
-  const Vec3f& getLeftBottomPos() const { return m_leftBottomPos; }
+  constexpr ShapeType getType() const noexcept override { return ShapeType::QUAD; }
+  constexpr const Vec3f& getLeftTopPos() const { return m_leftTopPos; }
+  constexpr const Vec3f& getRightTopPos() const { return m_rightTopPos; }
+  constexpr const Vec3f& getRightBottomPos() const { return m_rightBottomPos; }
+  constexpr const Vec3f& getLeftBottomPos() const { return m_leftBottomPos; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -485,7 +484,7 @@ public:
   Vec3f computeProjection(const Vec3f& point) const override;
   /// Computes the quad's centroid, which is the point lying directly between its four points.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return (m_leftTopPos + m_rightTopPos + m_rightBottomPos + m_leftBottomPos) * 0.25f; }
+  constexpr Vec3f computeCentroid() const override { return (m_leftTopPos + m_rightTopPos + m_rightBottomPos + m_leftBottomPos) * 0.25f; }
   AABB computeBoundingBox() const override;
 
   /// Checks if the current quad is equal to another given one.
@@ -503,10 +502,10 @@ public:
   constexpr bool operator!=(const Quad& quad) const noexcept { return !(*this == quad); }
 
 private:
-  Vec3f m_leftTopPos {};
-  Vec3f m_rightTopPos {};
-  Vec3f m_rightBottomPos {};
-  Vec3f m_leftBottomPos {};
+  Vec3f m_leftTopPos;
+  Vec3f m_rightTopPos;
+  Vec3f m_rightBottomPos;
+  Vec3f m_leftBottomPos;
 };
 
 /// Axis-aligned bounding box defined by its minimal and maximal vertices' positions.
@@ -526,11 +525,11 @@ private:
 /// The min position designates the point in [ -X; -Y; -Z ], and the max the point in [ +X; +Y; +Z ].
 class AABB final : public Shape {
 public:
-  AABB(const Vec3f& minPos, const Vec3f& maxPos) noexcept : m_minPos{ minPos }, m_maxPos{ maxPos } {}
+  constexpr AABB(const Vec3f& minPos, const Vec3f& maxPos) noexcept : m_minPos{ minPos }, m_maxPos{ maxPos } {}
 
-  ShapeType getType() const noexcept override { return ShapeType::AABB; }
-  const Vec3f& getMinPosition() const { return m_minPos; }
-  const Vec3f& getMaxPosition() const { return m_maxPos; }
+  constexpr ShapeType getType() const noexcept override { return ShapeType::AABB; }
+  constexpr const Vec3f& getMinPosition() const { return m_minPos; }
+  constexpr const Vec3f& getMaxPosition() const { return m_maxPos; }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -579,9 +578,9 @@ public:
   Vec3f computeProjection(const Vec3f& point) const override;
   /// Computes the AABB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return (m_maxPos + m_minPos) * 0.5f; }
-  AABB computeBoundingBox() const override { return *this; }
-  /// Computes the half extents of the box, starting from its centroid.
+  constexpr Vec3f computeCentroid() const override { return (m_maxPos + m_minPos) * 0.5f; }
+  constexpr AABB computeBoundingBox() const override { return *this; }
+  /// Computes the half-extents of the box, starting from its centroid.
   ///
   ///          _______________________
   ///         /|          ^         /|
@@ -594,8 +593,8 @@ public:
   ///       | /-------------------|-/
   ///       |/                    |/
   ///       -----------------------
-  /// \return AABB's half extents.
-  Vec3f computeHalfExtents() const { return (m_maxPos - m_minPos) * 0.5f; }
+  /// \return AABB's half-extents.
+  constexpr Vec3f computeHalfExtents() const noexcept { return (m_maxPos - m_minPos) * 0.5f; }
 
   /// Checks if the current AABB is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
@@ -609,8 +608,8 @@ public:
   constexpr bool operator!=(const AABB& aabb) const noexcept { return !(*this == aabb); }
 
 private:
-  Vec3f m_minPos {};
-  Vec3f m_maxPos {};
+  Vec3f m_minPos;
+  Vec3f m_maxPos;
 };
 
 /// Oriented bounding box defined by its minimal and maximal vertices' positions, as well as a rotation.
@@ -650,15 +649,15 @@ private:
 ///
 class OBB final : public Shape {
 public:
-  OBB(const Vec3f& minPos, const Vec3f& maxPos) noexcept : m_aabb(minPos, maxPos) {}
-  OBB(const Vec3f& minPos, const Vec3f& maxPos, const Quaternionf& rotation) noexcept : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
-  explicit OBB(const AABB& aabb) noexcept : m_aabb{ aabb } {}
-  OBB(const AABB& aabb, const Quaternionf& rotation) noexcept : m_aabb{ aabb }, m_rotation{ rotation } {}
+  constexpr OBB(const Vec3f& minPos, const Vec3f& maxPos) noexcept : m_aabb(minPos, maxPos) {}
+  constexpr OBB(const Vec3f& minPos, const Vec3f& maxPos, const Quaternionf& rotation) noexcept : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
+  constexpr explicit OBB(const AABB& aabb) noexcept : m_aabb{ aabb } {}
+  constexpr OBB(const AABB& aabb, const Quaternionf& rotation) noexcept : m_aabb{ aabb }, m_rotation{ rotation } {}
 
-  ShapeType getType() const noexcept override { return ShapeType::OBB; }
-  const Vec3f& getMinPosition() const { return m_aabb.getMinPosition(); }
-  const Vec3f& getMaxPosition() const { return m_aabb.getMaxPosition(); }
-  const Quaternionf& getRotation() const { return m_rotation; }
+  constexpr ShapeType getType() const noexcept override { return ShapeType::OBB; }
+  constexpr const Vec3f& getMinPosition() const { return m_aabb.getMinPosition(); }
+  constexpr const Vec3f& getMaxPosition() const { return m_aabb.getMaxPosition(); }
+  constexpr const Quaternionf& getRotation() const { return m_rotation; }
 
   void setRotation(const Quaternionf& rotation);
 
@@ -709,10 +708,10 @@ public:
   Vec3f computeProjection(const Vec3f& point) const override;
   /// Computes the OBB's centroid, which is the point lying directly between its two extremities.
   /// \return Computed centroid.
-  Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
+  constexpr Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
   AABB computeBoundingBox() const override;
-  /// Computes the half extents of the box, starting from its centroid.
-  /// These half extents are oriented according to the box's rotation.
+  /// Computes the half-extents of the box, starting from its centroid.
+  /// These half-extents are oriented according to the box's rotation.
   ///
   ///          _______________________
   ///         /|          ^         /|
@@ -725,8 +724,8 @@ public:
   ///       | /-------------------|-/
   ///       |/                    |/
   ///       -----------------------
-  /// \return OBB's half extents.
-  Vec3f computeHalfExtents() const { return m_aabb.computeHalfExtents() * m_rotation; }
+  /// \return OBB's half-extents.
+  constexpr Vec3f computeHalfExtents() const noexcept { return m_aabb.computeHalfExtents() * m_rotation; }
 
   /// Checks if the current OBB is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
