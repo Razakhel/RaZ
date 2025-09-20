@@ -1,8 +1,11 @@
+#include "RaZ/Math/Angle.hpp"
 #include "RaZ/Utils/Shape.hpp"
 
 #include "CatchCustomMatchers.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+
+using namespace Raz::Literals;
 
 namespace {
 
@@ -79,6 +82,9 @@ constexpr Raz::Triangle triangle3(Raz::Vec3f(0.f, -1.f, 1.f), Raz::Vec3f(-1.5f, 
 constexpr Raz::AABB aabb1(Raz::Vec3f(-0.5f), Raz::Vec3f(0.5f));
 constexpr Raz::AABB aabb2(Raz::Vec3f(2.f, 3.f, -5.f), Raz::Vec3f(5.f));
 constexpr Raz::AABB aabb3(Raz::Vec3f(-10.f, -10.f, -5.f), Raz::Vec3f(-6.f, -5.f, 5.f));
+
+constexpr Raz::OBB obb1(aabb1, Raz::Quaternionf(0.707106769f, 0.707106769f, 0.f, 0.f)); // 90° around X
+constexpr Raz::OBB obb2(aabb2, Raz::Quaternionf(0.923879504f, 0.f, 0.382683456f, 0.f)); // 45° around Y
 
 } // namespace
 
@@ -453,6 +459,11 @@ TEST_CASE("Triangle equality", "[utils]") {
 }
 
 TEST_CASE("AABB basic", "[utils]") {
+  CHECK(aabb1.getMinPosition() == Raz::Vec3f(-0.5f));
+  CHECK(aabb1.getMaxPosition() == Raz::Vec3f(0.5f));
+  CHECK(aabb2.getMinPosition() == Raz::Vec3f(2.f, 3.f, -5.f));
+  CHECK(aabb2.getMaxPosition() == Raz::Vec3f(5.f));
+
   CHECK(aabb1.computeCentroid() == Raz::Vec3f(0.f));
   CHECK(aabb2.computeCentroid() == Raz::Vec3f(3.5f, 4.f, 0.f));
   CHECK(aabb3.computeCentroid() == Raz::Vec3f(-8.f, -7.5f, 0.f));
@@ -565,4 +576,53 @@ TEST_CASE("AABB equality", "[utils]") {
   Raz::AABB aabb1Copy = aabb1;
   aabb1Copy.translate(Raz::Vec3f(std::numeric_limits<float>::epsilon()));
   CHECK(aabb1Copy == aabb1);
+}
+
+TEST_CASE("OBB basic", "[utils]") {
+  // The min & max positions aren't transformed
+  CHECK(obb1.getMinPosition() == Raz::Vec3f(-0.5f));
+  CHECK(obb1.getMaxPosition() == Raz::Vec3f(0.5f));
+  CHECK(obb2.getMinPosition() == Raz::Vec3f(2.f, 3.f, -5.f));
+  CHECK(obb2.getMaxPosition() == Raz::Vec3f(5.f));
+
+  CHECK(obb1.getRotation() == Raz::Quaternionf(90_deg, Raz::Axis::X));
+  CHECK(obb1.getInverseRotation() == Raz::Quaternionf(-90_deg, Raz::Axis::X));
+  CHECK(obb2.getRotation() == Raz::Quaternionf(45_deg, Raz::Axis::Y));
+  CHECK(obb2.getInverseRotation() == Raz::Quaternionf(-45_deg, Raz::Axis::Y));
+
+  CHECK(obb1.computeCentroid() == Raz::Vec3f(0.f));
+  CHECK(obb2.computeCentroid() == Raz::Vec3f(3.5f, 4.f, 0.f));
+
+  // The half-extents aren't transformed
+  CHECK(obb1.computeHalfExtents() == Raz::Vec3f(0.5f));
+  CHECK(obb2.computeHalfExtents() == Raz::Vec3f(1.5f, 1.f, 5.f));
+}
+
+TEST_CASE("OBB point containment", "[utils]") {
+  // See: https://www.geogebra.org/m/bcux726b
+
+  CHECK(obb1.contains(obb1.computeCentroid()));
+  // This box is a cube rotated by 90°; the original bounds are still considered inside
+  CHECK(obb1.contains(obb1.getMinPosition()));
+  CHECK(obb1.contains(obb1.getMaxPosition()));
+
+  // The check includes a slight tolerance to account for floating-point errors
+  CHECK(obb1.contains(obb1.getMinPosition() - 0.00000001f));
+  CHECK(obb1.contains(obb1.getMaxPosition() + 0.00000001f));
+
+  CHECK(obb2.contains(obb2.computeCentroid()));
+  // This box is rotated by 45°; the original bounds can't be inside
+  CHECK_FALSE(obb2.contains(obb2.getMinPosition()));
+  CHECK_FALSE(obb2.contains(obb2.getMaxPosition()));
+
+  // The point must be considered as contained by the box only if it is in its local volume, i.e., the box rotated in its own space
+  // In contrast, the global box is the one rotated in world space, i.e., without taking the box's position into account
+
+  constexpr Raz::Vec3f point1(2.5f, 4.f, 0.f);
+  constexpr Raz::Vec3f point2(6.5f, 4.f, 0.f);
+  constexpr Raz::Vec3f point3(6.5f, 4.f, 3.f);
+
+  CHECK(obb2.contains(point1));       // Inside local, outside global, inside original
+  CHECK_FALSE(obb2.contains(point2)); // Outside local, inside global, outside original
+  CHECK(obb2.contains(point3));       // Inside local, outside global, outside original
 }

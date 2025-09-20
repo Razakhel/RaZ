@@ -316,13 +316,14 @@ Vec3f AABB::computeProjection(const Vec3f& point) const {
 
 // OBB functions
 
-void OBB::setRotation(const Quaternionf& rotation) {
-  m_rotation    = rotation;
-  m_invRotation = m_rotation.inverse();
-}
+bool OBB::contains(const Vec3f& point) const {
+  const Vec3f localPoint  = m_invRotation * (point - computeCentroid());
+  const Vec3f halfExtents = m_aabb.computeHalfExtents();
 
-bool OBB::contains(const Vec3f&) const {
-  throw std::runtime_error("Error: Not implemented yet.");
+  return (std::abs(localPoint.x()) <= halfExtents.x() + std::numeric_limits<float>::epsilon()
+       && std::abs(localPoint.y()) <= halfExtents.y() + std::numeric_limits<float>::epsilon()
+       && std::abs(localPoint.z()) <= halfExtents.z() + std::numeric_limits<float>::epsilon());
+
 }
 
 bool OBB::intersects(const OBB&) const {

@@ -650,16 +650,20 @@ private:
 class OBB final : public Shape {
 public:
   constexpr OBB(const Vec3f& minPos, const Vec3f& maxPos) noexcept : m_aabb(minPos, maxPos) {}
-  constexpr OBB(const Vec3f& minPos, const Vec3f& maxPos, const Quaternionf& rotation) noexcept : m_aabb(minPos, maxPos), m_rotation{ rotation } {}
+  constexpr OBB(const Vec3f& minPos, const Vec3f& maxPos, const Quaternionf& rotation) noexcept : m_aabb(minPos, maxPos) { setRotation(rotation); }
   constexpr explicit OBB(const AABB& aabb) noexcept : m_aabb{ aabb } {}
-  constexpr OBB(const AABB& aabb, const Quaternionf& rotation) noexcept : m_aabb{ aabb }, m_rotation{ rotation } {}
+  constexpr OBB(const AABB& aabb, const Quaternionf& rotation) noexcept : m_aabb{ aabb } { setRotation(rotation); }
 
   constexpr ShapeType getType() const noexcept override { return ShapeType::OBB; }
   constexpr const Vec3f& getMinPosition() const { return m_aabb.getMinPosition(); }
   constexpr const Vec3f& getMaxPosition() const { return m_aabb.getMaxPosition(); }
   constexpr const Quaternionf& getRotation() const { return m_rotation; }
+  constexpr const Quaternionf& getInverseRotation() const { return m_invRotation; }
 
-  void setRotation(const Quaternionf& rotation);
+  constexpr void setRotation(const Quaternionf& rotation) {
+    m_rotation    = rotation;
+    m_invRotation = m_rotation.inverse();
+  }
 
   /// Point containment check.
   /// \param point Point to be checked.
@@ -711,7 +715,6 @@ public:
   constexpr Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
   AABB computeBoundingBox() const override;
   /// Computes the half-extents of the box, starting from its centroid.
-  /// These half-extents are oriented according to the box's rotation.
   ///
   ///          _______________________
   ///         /|          ^         /|
@@ -725,7 +728,7 @@ public:
   ///       |/                    |/
   ///       -----------------------
   /// \return OBB's half-extents.
-  constexpr Vec3f computeHalfExtents() const noexcept { return m_aabb.computeHalfExtents() * m_rotation; }
+  constexpr Vec3f computeHalfExtents() const noexcept { return m_aabb.computeHalfExtents(); }
 
   /// Checks if the current OBB is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.

@@ -111,6 +111,8 @@ TEST_CASE("LuaUtils Shape", "[script][lua][utils]") {
     obb       = OBB.new(aabb, Quaternionf.identity())
     assert(obb:getMinPosition() == aabb:getMinPosition())
     assert(obb:getMaxPosition() == aabb:getMaxPosition())
+    obb:setRotation(Quaternionf.identity())
+    assert(obb:getRotation() == obb:getInverseRotation())
     assert(obb:computeHalfExtents() == aabb:computeHalfExtents())
 
     local plane = Plane.new(0)
@@ -150,6 +152,8 @@ TEST_CASE("LuaUtils Shape", "[script][lua][utils]") {
     assert(triangle:getType() == ShapeType.TRIANGLE)
 
     assert(aabb:contains(Vec3f.new()))
+    assert(obb:contains(Vec3f.new()))
+    assert(sphere:contains(Vec3f.new()))
 
     assert(aabb:intersects(aabb))
     assert(aabb:intersects(line))
