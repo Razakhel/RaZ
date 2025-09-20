@@ -21,11 +21,18 @@ class TriggerVolume final : public Component {
   friend class TriggerSystem;
 
 public:
-  template <typename VolumeT>
-  explicit TriggerVolume(VolumeT&& volume) : m_volume{ std::forward<VolumeT>(volume) } {
-    // TODO: the OBB's point containment check isn't implemented yet
-    static_assert(std::is_same_v<std::decay_t<VolumeT>, AABB> || std::is_same_v<std::decay_t<VolumeT>, Sphere>);
+  explicit TriggerVolume(const AABB& aabb) : m_volume{ aabb } {
+    if (aabb.getMinPosition().x() >= aabb.getMaxPosition().x()
+     || aabb.getMinPosition().y() >= aabb.getMaxPosition().y()
+     || aabb.getMinPosition().z() >= aabb.getMaxPosition().z()) {
+      throw std::invalid_argument("[TriggerVolume] The AABB's max position must be greater than the min on all axes");
+    }
   }
+  explicit TriggerVolume(const Sphere& sphere) : m_volume{ sphere } {
+    if (sphere.getRadius() <= 0.f)
+      throw std::invalid_argument("[TriggerVolume] The sphere's radius must be greater than 0");
+  }
+  // TODO: add OBB once its point containment check has been implemented
 
   void setEnterAction(std::function<void()> enterAction) { m_enterAction = std::move(enterAction); }
   void setStayAction(std::function<void()> stayAction) { m_stayAction = std::move(stayAction); }
