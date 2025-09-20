@@ -469,6 +469,10 @@ TEST_CASE("AABB point containment", "[utils]") {
   CHECK(aabb1.contains(aabb1.getMinPosition()));
   CHECK(aabb1.contains(aabb1.getMaxPosition()));
 
+  // The check includes a slight tolerance to account for floating-point errors
+  CHECK(aabb1.contains(aabb1.getMinPosition() - 0.0000001f));
+  CHECK(aabb1.contains(aabb1.getMaxPosition() + 0.0000001f));
+
   constexpr Raz::Vec3f point1(-0.25f, -0.5f, -0.5f); // Should be contained by aabb1
   constexpr Raz::Vec3f point2(   4.f,   3.f,   0.f); // Should be contained by aabb2 (lying on a face)
   constexpr Raz::Vec3f point3(  -7.f,  -7.f,  -3.f); // Should be contained by aabb3

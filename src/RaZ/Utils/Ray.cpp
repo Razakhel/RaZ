@@ -9,9 +9,10 @@ namespace {
 constexpr bool solveQuadratic(float a, float b, float c, float& firstHitDist, float& secondHitDist) {
   const float discriminant = b * b - 4.f * a * c;
 
-  if (discriminant < 0.f) {
+  if (discriminant < 0.f)
     return false;
-  } else if (discriminant > 0.f) {
+
+  if (discriminant > 0.f) {
     const float q = -0.5f * ((b > 0) ? b + std::sqrt(discriminant) : b - std::sqrt(discriminant));
 
     firstHitDist  = q / a;

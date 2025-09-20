@@ -66,9 +66,9 @@ bool Line::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-void Line::translate(const Vec3f& translation) noexcept {
-  m_beginPos += translation;
-  m_endPos   += translation;
+void Line::translate(const Vec3f& displacement) noexcept {
+  m_beginPos += displacement;
+  m_endPos   += displacement;
 }
 
 Vec3f Line::computeProjection(const Vec3f& point) const {
@@ -190,10 +190,10 @@ bool Triangle::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-void Triangle::translate(const Vec3f& translation) noexcept {
-  m_firstPos  += translation;
-  m_secondPos += translation;
-  m_thirdPos  += translation;
+void Triangle::translate(const Vec3f& displacement) noexcept {
+  m_firstPos  += displacement;
+  m_secondPos += displacement;
+  m_thirdPos  += displacement;
 }
 
 Vec3f Triangle::computeProjection(const Vec3f&) const {
@@ -238,11 +238,11 @@ bool Quad::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-void Quad::translate(const Vec3f& translation) noexcept {
-  m_leftTopPos     += translation;
-  m_rightTopPos    += translation;
-  m_rightBottomPos += translation;
-  m_leftBottomPos  += translation;
+void Quad::translate(const Vec3f& displacement) noexcept {
+  m_leftTopPos     += displacement;
+  m_rightTopPos    += displacement;
+  m_rightBottomPos += displacement;
+  m_leftBottomPos  += displacement;
 }
 
 Vec3f Quad::computeProjection(const Vec3f&) const {
@@ -260,11 +260,12 @@ AABB Quad::computeBoundingBox() const {
 // AABB functions
 
 bool AABB::contains(const Vec3f& point) const {
-  const bool isInBoundsX = point.x() >= m_minPos.x() && point.x() <= m_maxPos.x();
-  const bool isInBoundsY = point.y() >= m_minPos.y() && point.y() <= m_maxPos.y();
-  const bool isInBoundsZ = point.z() >= m_minPos.z() && point.z() <= m_maxPos.z();
+  const Vec3f localPoint  = point - computeCentroid();
+  const Vec3f halfExtents = computeHalfExtents();
 
-  return (isInBoundsX && isInBoundsY && isInBoundsZ);
+  return (std::abs(localPoint.x()) <= halfExtents.x() + std::numeric_limits<float>::epsilon()
+       && std::abs(localPoint.y()) <= halfExtents.y() + std::numeric_limits<float>::epsilon()
+       && std::abs(localPoint.z()) <= halfExtents.z() + std::numeric_limits<float>::epsilon());
 }
 
 bool AABB::intersects(const AABB& aabb) const {
@@ -300,9 +301,9 @@ bool AABB::intersects(const OBB&) const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
-void AABB::translate(const Vec3f& translation) noexcept {
-  m_minPos += translation;
-  m_maxPos += translation;
+void AABB::translate(const Vec3f& displacement) noexcept {
+  m_minPos += displacement;
+  m_maxPos += displacement;
 }
 
 Vec3f AABB::computeProjection(const Vec3f& point) const {

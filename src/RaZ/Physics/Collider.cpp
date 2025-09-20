@@ -40,7 +40,7 @@ void Collider::setShape(Shape&& shape) {
       break;
 
     default:
-      throw std::invalid_argument("Error: Unhandled shape type in the collider shape setter");
+      throw std::invalid_argument("[Collider] Unhandled shape type to create a collider from");
   }
 }
 
@@ -71,7 +71,7 @@ bool Collider::intersects(const Shape& shape) const {
       break;
   }
 
-  throw std::invalid_argument("Error: Unhandled shape type in the collider/shape intersection check");
+  throw std::invalid_argument("[Collider] Unhandled shape type to check a collision with");
 }
 
 bool Collider::intersects(const Ray& ray, RayHit* hit) const {
@@ -104,7 +104,7 @@ bool Collider::intersects(const Ray& ray, RayHit* hit) const {
       break;
   }
 
-  throw std::invalid_argument("Error: Unhandled shape type in the collider/ray intersection check");
+  throw std::invalid_argument("[Collider] Unhandled shape type to check an intersection with");
 }
 
 } // namespace Raz
