@@ -28,11 +28,17 @@ public:
       throw std::invalid_argument("[TriggerVolume] The AABB's max position must be greater than the min on all axes");
     }
   }
+  explicit TriggerVolume(const OBB& obb) : m_volume{ obb } {
+    if (obb.getMinPosition().x() >= obb.getMaxPosition().x()
+     || obb.getMinPosition().y() >= obb.getMaxPosition().y()
+     || obb.getMinPosition().z() >= obb.getMaxPosition().z()) {
+      throw std::invalid_argument("[TriggerVolume] The OBB's max position must be greater than the min on all axes");
+    }
+  }
   explicit TriggerVolume(const Sphere& sphere) : m_volume{ sphere } {
     if (sphere.getRadius() <= 0.f)
       throw std::invalid_argument("[TriggerVolume] The sphere's radius must be greater than 0");
   }
-  // TODO: add OBB once its point containment check has been implemented
 
   void setEnterAction(std::function<void()> enterAction) { m_enterAction = std::move(enterAction); }
   void setStayAction(std::function<void()> stayAction) { m_stayAction = std::move(stayAction); }
@@ -50,7 +56,7 @@ public:
 private:
   bool m_enabled = true;
 
-  std::variant<AABB, Sphere> m_volume;
+  std::variant<AABB, OBB, Sphere> m_volume;
   std::function<void()> m_enterAction;
   std::function<void()> m_stayAction;
   std::function<void()> m_leaveAction;

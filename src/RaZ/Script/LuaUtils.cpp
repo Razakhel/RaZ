@@ -123,6 +123,7 @@ void LuaWrapper::registerUtilsTypes() {
   {
     sol::usertype<TriggerVolume> triggerVolume = state.new_usertype<TriggerVolume>("TriggerVolume",
                                                                                    sol::constructors<TriggerVolume(const AABB&),
+                                                                                                     TriggerVolume(const OBB&),
                                                                                                      TriggerVolume(const Sphere&)>());
     triggerVolume["setEnterAction"]   = &TriggerVolume::setEnterAction;
     triggerVolume["setStayAction"]    = &TriggerVolume::setStayAction;

@@ -197,6 +197,7 @@ TEST_CASE("LuaUtils TriggerVolume", "[script][lua][utils]") {
     local triggerSystem = TriggerSystem.new()
 
     local triggerVolume = TriggerVolume.new(AABB.new(Vec3f.new(-1), Vec3f.new(1)))
+    triggerVolume       = TriggerVolume.new(OBB.new(Vec3f.new(-1), Vec3f.new(1), Quaternionf.identity()))
     triggerVolume       = TriggerVolume.new(Sphere.new(Vec3f.new(0), 1))
     triggerVolume:setEnterAction(function () end)
     triggerVolume:setStayAction(function () end)
