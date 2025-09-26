@@ -1,7 +1,5 @@
 #include "RaZ/RaZ.hpp"
 
-using namespace std::literals;
-
 namespace {
 
 constexpr std::string_view tessCtrlSource = R"(
@@ -246,7 +244,7 @@ int main() {
       transform.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Up);
     });
   } catch (const std::exception& exception) {
-    Raz::Logger::error("Exception occurred: "s + exception.what());
+    Raz::Logger::error("Exception occurred: {}", exception.what());
   }
 
   return EXIT_SUCCESS;

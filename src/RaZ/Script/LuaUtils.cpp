@@ -49,11 +49,11 @@ void LuaWrapper::registerUtilsTypes() {
     logger["setLoggingLevel"]      = &Logger::setLoggingLevel;
     logger["setLoggingFunction"]   = &Logger::setLoggingFunction;
     logger["resetLoggingFunction"] = &Logger::resetLoggingFunction;
-    logger["error"]                = &Logger::error;
-    logger["warn"]                 = &Logger::warn;
-    logger["info"]                 = &Logger::info;
-    logger["debug"]                = sol::overload(PickOverload<const char*>(&Logger::debug),
-                                                   PickOverload<const std::string&>(&Logger::debug));
+    logger["error"]                = static_cast<void(*)(const std::string&)>(&Logger::error);
+    logger["warn"]                 = static_cast<void(*)(const std::string&)>(&Logger::warn);
+    logger["info"]                 = static_cast<void(*)(const std::string&)>(&Logger::info);
+    logger["debug"]                = sol::overload(static_cast<void(*)(const std::string&)>(&Logger::debug),
+                                                   static_cast<void(*)(std::format_string<>)>(&Logger::debug));
 
     state.new_enum<LoggingLevel>("LoggingLevel", {
       { "NONE",    LoggingLevel::NONE },

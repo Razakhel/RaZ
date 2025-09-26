@@ -378,23 +378,23 @@ void XrSession::destroySwapchains() {
 void XrSession::createSwapchainImages(XrSwapchain swapchain, SwapchainType swapchainType) {
   ZoneScopedN("XrSession::createSwapchainImages");
 
-  const std::string typeStr = (swapchainType == SwapchainType::DEPTH ? "depth" : "color");
+  const std::string_view typeStr = (swapchainType == SwapchainType::DEPTH ? "depth" : "color");
 
-  Logger::debug("[XrSession] Creating " + typeStr + " swapchain images...");
+  Logger::debug("[XrSession] Creating {} swapchain images...", typeStr);
 
   uint32_t swapchainImageCount {};
   checkLog(xrEnumerateSwapchainImages(swapchain, 0, &swapchainImageCount, nullptr),
-           "Failed to get " + typeStr + " swapchain image count",
+           std::format("Failed to get {} swapchain image count", typeStr),
            m_instance);
 
   std::vector<XrSwapchainImageOpenGLKHR>& images = m_swapchainImages[swapchain];
   images.resize(swapchainImageCount, { XR_TYPE_SWAPCHAIN_IMAGE_OPENGL_KHR });
   checkLog(xrEnumerateSwapchainImages(swapchain, swapchainImageCount, &swapchainImageCount,
                                       reinterpret_cast<XrSwapchainImageBaseHeader*>(images.data())),
-           "Failed to enumerate " + typeStr + " swapchain images",
+           std::format("Failed to enumerate {} swapchain images", typeStr),
            m_instance);
 
-  Logger::debug("[XrSession] Created " + typeStr + " swapchain images");
+  Logger::debug("[XrSession] Created {} swapchain images", typeStr);
 }
 
 bool XrSession::renderLayer(RenderLayerInfo& layerInfo,

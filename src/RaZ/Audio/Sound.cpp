@@ -30,7 +30,7 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
+    Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlErrorStr(errorCode));
 }
 
 } // namespace
@@ -47,12 +47,12 @@ void Sound::init() {
   Logger::debug("[Sound] Creating buffer...");
   alGenBuffers(1, &m_bufferIndex.get());
   checkError("Failed to create a sound buffer");
-  Logger::debug("[Sound] Created buffer (ID: " + std::to_string(m_bufferIndex) + ')');
+  Logger::debug("[Sound] Created buffer (ID: {})", m_bufferIndex.get());
 
   Logger::debug("[Sound] Creating source...");
   alGenSources(1, &m_sourceIndex.get());
   checkError("Failed to create a sound source");
-  Logger::debug("[Sound] Created source (ID: " + std::to_string(m_sourceIndex) + ')');
+  Logger::debug("[Sound] Created source (ID: {})", m_sourceIndex.get());
 
   if (!m_data.buffer.empty())
     load();
@@ -191,7 +191,7 @@ void Sound::destroy() {
   Logger::debug("[Sound] Destroying...");
 
   if (m_sourceIndex.isValid() && alIsSource(m_sourceIndex)) {
-    Logger::debug("[Sound] Destroying source (ID: " + std::to_string(m_sourceIndex) + ")...");
+    Logger::debug("[Sound] Destroying source (ID: {})...", m_sourceIndex.get());
 
     alDeleteSources(1, &m_sourceIndex.get());
     checkError("Failed to delete source");
@@ -202,7 +202,7 @@ void Sound::destroy() {
   m_sourceIndex.reset();
 
   if (m_bufferIndex.isValid() && alIsBuffer(m_bufferIndex)) {
-    Logger::debug("[Sound] Destroying buffer (ID: " + std::to_string(m_bufferIndex) + ")...");
+    Logger::debug("[Sound] Destroying buffer (ID: {})...", m_bufferIndex.get());
 
     alDeleteBuffers(1, &m_bufferIndex.get());
     checkError("Failed to delete buffer");

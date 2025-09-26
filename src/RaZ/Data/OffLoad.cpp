@@ -13,12 +13,12 @@ Mesh load(const FilePath& filePath) {
   ZoneScopedN("OffFormat::load");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[OffLoad] Loading OFF file ('" + filePath + "')...");
+  Logger::debug("[OffLoad] Loading OFF file ('{}')...", filePath);
 
   std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Could not open the OFF file '" + filePath + '\'');
+    throw std::invalid_argument(std::format("Error: Could not open the OFF file '{}'", filePath));
 
   Mesh mesh;
   Submesh& submesh = mesh.addSubmesh();
@@ -66,8 +66,7 @@ Mesh load(const FilePath& filePath) {
 
   mesh.computeTangents();
 
-  Logger::debug("[OffLoad] Loaded OFF file (" + std::to_string(mesh.recoverVertexCount()) + " vertices, "
-                                              + std::to_string(mesh.recoverTriangleCount()) + " triangles)");
+  Logger::debug("[OffLoad] Loaded OFF file ({} vertices, {} triangles)", mesh.recoverVertexCount(), mesh.recoverTriangleCount());
 
   return mesh;
 }

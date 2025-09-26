@@ -64,7 +64,7 @@ Framebuffer::Framebuffer() {
 
   Logger::debug("[Framebuffer] Creating...");
   Renderer::generateFramebuffer(m_index);
-  Logger::debug("[Framebuffer] Created (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Framebuffer] Created (ID: {})", m_index.get());
 }
 
 VertexShader Framebuffer::recoverVertexShader() {
@@ -138,7 +138,7 @@ void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
 void Framebuffer::mapBuffers() const {
   ZoneScopedN("Framebuffer::mapBuffers");
 
-  Logger::debug("[Framebuffer] Mapping buffers (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[Framebuffer] Mapping buffers (ID: {})...", m_index.get());
 
   Renderer::bindFramebuffer(m_index);
 
@@ -151,7 +151,7 @@ void Framebuffer::mapBuffers() const {
     std::vector<DrawBuffer> drawBuffers(m_colorBuffers.size(), DrawBuffer::NONE);
 
     for (const auto& [colorBuffer, bufferIndex] : m_colorBuffers) {
-      Logger::debug("[Framebuffer] Mapping color buffer " + std::to_string(bufferIndex) + "...");
+      Logger::debug("[Framebuffer] Mapping color buffer {}...", bufferIndex);
 
       const std::size_t colorAttachment = static_cast<unsigned int>(DrawBuffer::COLOR_ATTACHMENT0) + bufferIndex;
 
@@ -193,7 +193,7 @@ Framebuffer::~Framebuffer() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[Framebuffer] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[Framebuffer] Destroying (ID: {})...", m_index.get());
   Renderer::deleteFramebuffer(m_index);
   Logger::debug("[Framebuffer] Destroyed");
 }

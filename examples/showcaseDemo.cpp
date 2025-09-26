@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-using namespace std::literals;
-
 inline void loadSponzaScene(Raz::Entity& mesh, const Raz::RenderSystem& render) {
   auto& meshRenderer = mesh.getComponent<Raz::MeshRenderer>();
   meshRenderer       = Raz::MeshFormat::load(RAZ_ROOT "assets/meshes/crytek_sponza.obj").second;
@@ -224,7 +222,7 @@ int main() {
       meshTrans.rotate(-45.0_deg * timeInfo.deltaTime, Raz::Axis::Up);
     });
   } catch (const std::exception& exception) {
-    Raz::Logger::error("Exception occurred: "s + exception.what());
+    Raz::Logger::error("Exception occurred: {}", exception.what());
   }
 
   return EXIT_SUCCESS;

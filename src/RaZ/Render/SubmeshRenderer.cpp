@@ -123,7 +123,7 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
   m_vbo.unbind();
   m_vao.unbind();
 
-  Logger::debug("[SubmeshRenderer] Loaded submesh vertices (" + std::to_string(vertices.size()) + " vertices loaded)");
+  Logger::debug("[SubmeshRenderer] Loaded submesh vertices ({} vertices loaded)", vertices.size());
 }
 
 void SubmeshRenderer::loadIndices(const Submesh& submesh) {
@@ -148,7 +148,7 @@ void SubmeshRenderer::loadIndices(const Submesh& submesh) {
   m_ibo.unbind();
   m_vao.unbind();
 
-  Logger::debug("[SubmeshRenderer] Loaded submesh indices (" + std::to_string(indices.size()) + " indices loaded)");
+  Logger::debug("[SubmeshRenderer] Loaded submesh indices ({} indices loaded)", indices.size());
 }
 
 } // namespace Raz

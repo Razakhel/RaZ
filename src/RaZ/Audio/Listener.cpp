@@ -27,7 +27,7 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
+    Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlErrorStr(errorCode));
 }
 
 } // namespace

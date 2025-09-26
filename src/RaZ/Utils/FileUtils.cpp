@@ -17,7 +17,7 @@ T readFile(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios::binary | std::ios::ate);
 
   if (!file)
-    throw std::runtime_error("[FileUtils] Could not open the file '" + filePath + '\'');
+    throw std::runtime_error(std::format("[FileUtils] Could not open the file '{}'", filePath));
 
   // Note that tellg() doesn't necessarily return a size, but rather a mark pointing at a specific place in the file
   // When opening a file in binary, however, it is currently pretty much always represented as a byte offset
@@ -25,7 +25,7 @@ T readFile(const FilePath& filePath) {
   const auto fileSize = file.tellg();
 
   if (fileSize == -1)
-    throw std::runtime_error("[FileUtils] Failed to get the size of the file '" + filePath + '\'');
+    throw std::runtime_error(std::format("[FileUtils] Failed to get the size of the file '{}'", filePath));
 
   // Returning at the beginning of the file to read it
   file.seekg(0, std::ios::beg);

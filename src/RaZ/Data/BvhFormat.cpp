@@ -98,12 +98,12 @@ Skeleton load(const FilePath& filePath) {
   std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Could not open the BVH file '" + filePath + "'");
+    throw std::invalid_argument(std::format("Error: Could not open the BVH file '{}'", filePath));
 
   const std::string format = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
 
   if (format != "bvh")
-    throw std::invalid_argument("Error: '" + filePath + "' doesn't have a .bvh extension");
+    throw std::invalid_argument(std::format("Error: '{}' doesn't have a .bvh extension", filePath));
 
   std::string token;
 

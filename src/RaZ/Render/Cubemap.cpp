@@ -165,7 +165,7 @@ Cubemap::Cubemap() {
 
   Logger::debug("[Cubemap] Creating...");
   Renderer::generateTexture(m_index);
-  Logger::debug("[Cubemap] Created (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Cubemap] Created (ID: {})", m_index.get());
 }
 
 const RenderShaderProgram& Cubemap::getProgram() const {
@@ -260,7 +260,7 @@ Cubemap::~Cubemap() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[Cubemap] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[Cubemap] Destroying (ID: {})...", m_index.get());
   Renderer::deleteTexture(m_index);
   Logger::debug("[Cubemap] Destroyed");
 }

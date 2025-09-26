@@ -7,7 +7,7 @@ namespace Raz {
 VertexArray::VertexArray() {
   Logger::debug("[VertexArray] Creating...");
   Renderer::generateVertexArray(m_index);
-  Logger::debug("[VertexArray] Created (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[VertexArray] Created (ID: {})", m_index.get());
 }
 
 void VertexArray::bind() const {
@@ -22,7 +22,7 @@ VertexArray::~VertexArray() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[VertexArray] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[VertexArray] Destroying (ID: {})...", m_index.get());
   Renderer::deleteVertexArray(m_index);
   Logger::debug("[VertexArray] Destroyed");
 }
@@ -30,7 +30,7 @@ VertexArray::~VertexArray() {
 VertexBuffer::VertexBuffer() {
   Logger::debug("[VertexBuffer] Creating...");
   Renderer::generateBuffer(m_index);
-  Logger::debug("[VertexBuffer] Created (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[VertexBuffer] Created (ID: {})", m_index.get());
 }
 
 void VertexBuffer::bind() const {
@@ -45,7 +45,7 @@ VertexBuffer::~VertexBuffer() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[VertexBuffer] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[VertexBuffer] Destroying (ID: {})...", m_index.get());
   Renderer::deleteBuffer(m_index);
   Logger::debug("[VertexBuffer] Destroyed");
 }
@@ -53,7 +53,7 @@ VertexBuffer::~VertexBuffer() {
 IndexBuffer::IndexBuffer() {
   Logger::debug("[IndexBuffer] Creating...");
   Renderer::generateBuffer(m_index);
-  Logger::debug("[IndexBuffer] Created (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[IndexBuffer] Created (ID: {})", m_index.get());
 }
 
 void IndexBuffer::bind() const {
@@ -68,7 +68,7 @@ IndexBuffer::~IndexBuffer() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[IndexBuffer] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[IndexBuffer] Destroying (ID: {})...", m_index.get());
   Renderer::deleteBuffer(m_index);
   Logger::debug("[IndexBuffer] Destroyed");
 }

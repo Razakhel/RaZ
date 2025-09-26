@@ -77,7 +77,7 @@ Image load(const FilePath& filePath, bool flipVertically) {
   ZoneScopedN("ImageFormat::load");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[ImageFormat] Loading image '" + filePath + "'...");
+  Logger::debug("[ImageFormat] Loading image '{}'...", filePath);
 
   const std::string fileStr = filePath.toUtf8();
   const bool isHdr = (stbi_is_hdr(fileStr.c_str()) != 0);
@@ -95,7 +95,7 @@ Image load(const FilePath& filePath, bool flipVertically) {
     data.reset(stbi_load(fileStr.c_str(), &width, &height, &channelCount, 0));
 
   if (data == nullptr)
-    throw std::invalid_argument("[ImageFormat] Cannot load image '" + filePath + "': " + stbi_failure_reason());
+    throw std::invalid_argument(std::format("[ImageFormat] Cannot load image '{}': {}", filePath, stbi_failure_reason()));
 
   Image img = createImageFromData(width, height, channelCount, isHdr, data);
 
@@ -128,7 +128,7 @@ Image loadFromData(const unsigned char* imgData, std::size_t dataSize, bool flip
     data.reset(stbi_load_from_memory(imgData, static_cast<int>(dataSize), &width, &height, &channelCount, 0));
 
   if (data == nullptr)
-    throw std::invalid_argument("[ImageFormat] Cannot load image from data: " + std::string(stbi_failure_reason()));
+    throw std::invalid_argument(std::format("[ImageFormat] Cannot load image from data: {}", stbi_failure_reason()));
 
   Image img = createImageFromData(width, height, static_cast<uint8_t>(channelCount), isHdr, data);
 
@@ -140,7 +140,7 @@ Image loadFromData(const unsigned char* imgData, std::size_t dataSize, bool flip
 void save(const FilePath& filePath, const Image& image, bool flipVertically) {
   ZoneScopedN("ImageFormat::save");
 
-  Logger::debug("[ImageFormat] Saving image to '" + filePath + "'...");
+  Logger::debug("[ImageFormat] Saving image to '{}'...", filePath);
 
   const std::string fileStr = filePath.toUtf8();
   const std::string fileExt = StrUtils::toLowercaseCopy(filePath.recoverExtension().toUtf8());
@@ -197,7 +197,7 @@ void save(const FilePath& filePath, const Image& image, bool flipVertically) {
 
     case FileFormat::UNKNOWN:
     default:
-      throw std::invalid_argument("[ImageFormat] Unsupported image file extension '" + fileExt + "' for saving.");
+      throw std::invalid_argument(std::format("[ImageFormat] Unsupported image file extension '{}' for saving", fileExt));
   }
 
   if (result == 0)

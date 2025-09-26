@@ -26,12 +26,12 @@ void save(const FilePath& filePath, const AudioData& data) {
   ZoneScopedN("WavFormat::save");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[WavSave] Saving WAV file ('" + filePath + "')...");
+  Logger::debug("[WavSave] Saving WAV file ('{}')...", filePath);
 
   std::ofstream file(filePath, std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("[WavSave] Unable to create a WAV file as '" + filePath + "'; path to file must exist");
+    throw std::invalid_argument(std::format("[WavSave] Unable to create a WAV file as '{}'; path to file must exist", filePath));
 
   ////////////
   // Header //

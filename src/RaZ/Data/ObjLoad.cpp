@@ -23,7 +23,7 @@ inline Texture2DPtr loadTexture(const FilePath& textureFilePath, const Color& de
   ZoneTextF("Path: %s", textureFilePath.toUtf8().c_str());
 
   if (!FileUtils::isReadable(textureFilePath)) {
-    Logger::warn("[ObjLoad] Cannot load texture '" + textureFilePath + "'; either the file does not exist or it cannot be opened");
+    Logger::warn("[ObjLoad] Cannot load texture '{}'; either the file does not exist or it cannot be opened", textureFilePath);
     return Texture2D::create(defaultColor);
   }
 
@@ -37,12 +37,12 @@ inline void loadMtl(const FilePath& mtlFilePath,
   ZoneScopedN("[ObjLoad]::loadMtl");
   ZoneTextF("Path: %s", mtlFilePath.toUtf8().c_str());
 
-  Logger::debug("[ObjLoad] Loading MTL file ('" + mtlFilePath + "')...");
+  Logger::debug("[ObjLoad] Loading MTL file ('{}')...", mtlFilePath);
 
   std::ifstream file(mtlFilePath, std::ios_base::binary);
 
   if (!file) {
-    Logger::error("[ObjLoad] Could not open the MTL file '" + mtlFilePath + '\'');
+    Logger::error("[ObjLoad] Could not open the MTL file '{}'", mtlFilePath);
     materials.emplace_back(MaterialType::COOK_TORRANCE);
     return;
   }
@@ -144,7 +144,7 @@ inline void loadMtl(const FilePath& mtlFilePath,
   material.loadType(materialType);
   materials.emplace_back(std::move(material));
 
-  Logger::debug("[ObjLoad] Loaded MTL file (" + std::to_string(materials.size()) + " material(s) loaded)");
+  Logger::debug("[ObjLoad] Loaded MTL file ({} material(s) loaded)", materials.size());
 }
 
 } // namespace
@@ -153,12 +153,12 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   ZoneScopedN("ObjFormat::load");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[ObjLoad] Loading OBJ file ('" + filePath + "')...");
+  Logger::debug("[ObjLoad] Loading OBJ file ('{}')...", filePath);
 
   std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Couldn't open the OBJ file '" + filePath + '\'');
+    throw std::invalid_argument(std::format("Error: Could not open the OBJ file '{}'", filePath));
 
   Mesh mesh;
   MeshRenderer meshRenderer;
@@ -275,7 +275,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
       const auto correspMaterial = materialCorrespIndices.find(materialName);
 
       if (correspMaterial == materialCorrespIndices.cend())
-        Logger::error("[ObjLoad] No corresponding material found with the name '" + materialName + '\'');
+        Logger::error("[ObjLoad] No corresponding material found with the name '{}'", materialName);
       else
         meshRenderer.getSubmeshRenderers().back().setMaterialIndex(correspMaterial->second);
     } else if (line[0] == 'o' || line[0] == 'g') {
@@ -388,10 +388,8 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   // Creating the mesh renderer from the mesh's data
   meshRenderer.load(mesh);
 
-  Logger::debug("[ObjLoad] Loaded OBJ file (" + std::to_string(mesh.getSubmeshes().size()) + " submesh(es), "
-                                              + std::to_string(mesh.recoverVertexCount()) + " vertices, "
-                                              + std::to_string(mesh.recoverTriangleCount()) + " triangles, "
-                                              + std::to_string(meshRenderer.getMaterials().size()) + " material(s))");
+  Logger::debug("[ObjLoad] Loaded OBJ file ({} submesh(es), {} vertices, {} triangles, {} material(s))",
+                mesh.getSubmeshes().size(), mesh.recoverVertexCount(), mesh.recoverTriangleCount(), meshRenderer.getMaterials().size());
 
   return { std::move(mesh), std::move(meshRenderer) };
 }

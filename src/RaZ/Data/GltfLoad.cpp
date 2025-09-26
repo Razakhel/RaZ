@@ -175,7 +175,7 @@ std::pair<Mesh, MeshRenderer> loadMeshes(const fastgltf::Asset& asset,
 
   const std::vector<fastgltf::Mesh>& meshes = asset.meshes;
 
-  Logger::debug("[GltfLoad] Loading " + std::to_string(meshes.size()) + " mesh(es)...");
+  Logger::debug("[GltfLoad] Loading {} mesh(es)...", meshes.size());
 
   Mesh loadedMesh;
   MeshRenderer loadedMeshRenderer;
@@ -208,7 +208,7 @@ std::vector<std::optional<Image>> loadImages(const std::vector<fastgltf::Image>&
                                              const FilePath& rootFilePath) {
   ZoneScopedN("[GltfLoad]::loadImages");
 
-  Logger::debug("[GltfLoad] Loading " + std::to_string(images.size()) + " image(s)...");
+  Logger::debug("[GltfLoad] Loading {} image(s)...", images.size());
 
   std::vector<std::optional<Image>> loadedImages;
   loadedImages.reserve(images.size());
@@ -390,7 +390,7 @@ void loadMaterials(const std::vector<fastgltf::Material>& materials,
                    MeshRenderer& meshRenderer) {
   ZoneScopedN("[GltfLoad]::loadMaterials");
 
-  Logger::debug("[GltfLoad] Loading " + std::to_string(materials.size()) + " material(s)...");
+  Logger::debug("[GltfLoad] Loading {} material(s)...", materials.size());
 
   meshRenderer.getMaterials().clear();
 
@@ -445,10 +445,10 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   ZoneScopedN("GltfFormat::load");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[GltfLoad] Loading glTF file ('" + filePath + "')...");
+  Logger::debug("[GltfLoad] Loading glTF file ('{}')...", filePath);
 
   if (!FileUtils::isReadable(filePath))
-    throw std::invalid_argument("Error: The glTF file '" + filePath + "' either does not exist or cannot be opened.");
+    throw std::invalid_argument(std::format("Error: The glTF file '{}' either does not exist or cannot be opened", filePath));
 
   fastgltf::Expected<fastgltf::GltfDataBuffer> data = fastgltf::GltfDataBuffer::FromPath(filePath.getPath());
 
@@ -465,7 +465,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
                                                               fastgltf::Options::LoadExternalBuffers | fastgltf::Options::DecomposeNodeMatrices);
 
   if (asset.error() != fastgltf::Error::None)
-    throw std::invalid_argument("Error: Failed to load glTF: " + fastgltf::getErrorMessage(asset.error()));
+    throw std::invalid_argument(std::format("Error: Failed to load glTF: {}", fastgltf::getErrorMessage(asset.error())));
 
   const std::vector<std::optional<Transform>> transforms = loadTransforms(asset->nodes, asset->meshes.size());
   auto [mesh, meshRenderer] = loadMeshes(asset.get(), transforms);
@@ -473,10 +473,8 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
   const std::vector<std::optional<Image>> images = loadImages(asset->images, asset->buffers, asset->bufferViews, parentPath);
   loadMaterials(asset->materials, asset->textures, images, meshRenderer);
 
-  Logger::debug("[GltfLoad] Loaded glTF file (" + std::to_string(mesh.getSubmeshes().size()) + " submesh(es), "
-                                                + std::to_string(mesh.recoverVertexCount()) + " vertices, "
-                                                + std::to_string(mesh.recoverTriangleCount()) + " triangles, "
-                                                + std::to_string(meshRenderer.getMaterials().size()) + " material(s))");
+  Logger::debug("[GltfLoad] Loaded glTF file ({} submesh(es), {} vertices, {} triangles, {} material(s))",
+                mesh.getSubmeshes().size(), mesh.recoverVertexCount(), mesh.recoverTriangleCount(), meshRenderer.getMaterials().size());
 
   return { std::move(mesh), std::move(meshRenderer) };
 }

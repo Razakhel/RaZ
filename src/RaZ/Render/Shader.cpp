@@ -17,13 +17,13 @@ void Shader::load() const {
   if (m_path.isEmpty()) // Shader imported directly from source, no path available
     return;
 
-  Logger::debug("[Shader] Loading (ID: " + std::to_string(m_index) + ", path: '" + m_path + "')...");
+  Logger::debug("[Shader] Loading (ID: {}, path: '{}')...", m_index.get(), m_path);
   loadSource(FileUtils::readFileToString(m_path));
   Logger::debug("[Shader] Loaded");
 }
 
 void Shader::compile() const {
-  Logger::debug("[Shader] Compiling (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[Shader] Compiling (ID: {})...", m_index.get());
   Renderer::compileShader(m_index);
   Logger::debug("[Shader] Compiled");
 }
@@ -35,14 +35,14 @@ bool Shader::isCompiled() const noexcept {
 void Shader::loadSource(const std::string& source) const {
   ZoneScopedN("Shader::loadSource");
 
-  Logger::debug("[Shader] Loading source (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[Shader] Loading source (ID: {})...", m_index.get());
 
   // Removing spaces in front so that we can directly check the header tags
   std::string shaderSource = StrUtils::trimLeftCopy(source);
 
   // If the #version tag is missing, add it with the current version
   if (!StrUtils::startsWith(shaderSource, "#version")) {
-    std::string header = "#version " + std::to_string(Renderer::getMajorVersion()) + std::to_string(Renderer::getMinorVersion()) + '0';
+    std::string header = std::format("#version {}{}0", Renderer::getMajorVersion(), Renderer::getMinorVersion());
 
 #if defined(USE_OPENGL_ES)
     header += " es";
@@ -65,7 +65,7 @@ void Shader::destroy() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[Shader] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[Shader] Destroying (ID: {})...", m_index.get());
   Renderer::deleteShader(m_index);
   m_index.reset();
   Logger::debug("[Shader] Destroyed");
@@ -74,7 +74,7 @@ void Shader::destroy() {
 VertexShader::VertexShader() {
   Logger::debug("[Shader] Creating vertex shader...");
   m_index = Renderer::createShader(ShaderType::VERTEX);
-  Logger::debug("[Shader] Created vertex shader (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Shader] Created vertex shader (ID: {})", m_index.get());
 }
 
 VertexShader VertexShader::loadFromSource(const std::string& source) {
@@ -98,7 +98,7 @@ VertexShader VertexShader::clone() const {
 TessellationControlShader::TessellationControlShader() {
   Logger::debug("[Shader] Creating tessellation control shader...");
   m_index = Renderer::createShader(ShaderType::TESSELLATION_CONTROL);
-  Logger::debug("[Shader] Created tessellation control shader (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Shader] Created tessellation control shader (ID: {})", m_index.get());
 }
 
 TessellationControlShader TessellationControlShader::loadFromSource(const std::string& source) {
@@ -121,7 +121,7 @@ TessellationControlShader TessellationControlShader::clone() const {
 TessellationEvaluationShader::TessellationEvaluationShader() {
   Logger::debug("[Shader] Creating tessellation evaluation shader...");
   m_index = Renderer::createShader(ShaderType::TESSELLATION_EVALUATION);
-  Logger::debug("[Shader] Created tessellation evaluation shader (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Shader] Created tessellation evaluation shader (ID: {})", m_index.get());
 }
 
 TessellationEvaluationShader TessellationEvaluationShader::loadFromSource(const std::string& source) {
@@ -144,7 +144,7 @@ TessellationEvaluationShader TessellationEvaluationShader::clone() const {
 GeometryShader::GeometryShader() {
   Logger::debug("[Shader] Creating geometry shader...");
   m_index = Renderer::createShader(ShaderType::GEOMETRY);
-  Logger::debug("[Shader] Created geometry shader (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Shader] Created geometry shader (ID: {})", m_index.get());
 }
 
 GeometryShader GeometryShader::loadFromSource(const std::string& source) {
@@ -168,7 +168,7 @@ GeometryShader GeometryShader::clone() const {
 FragmentShader::FragmentShader() {
   Logger::debug("[Shader] Creating fragment shader...");
   m_index = Renderer::createShader(ShaderType::FRAGMENT);
-  Logger::debug("[Shader] Created fragment shader (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Shader] Created fragment shader (ID: {})", m_index.get());
 }
 
 FragmentShader FragmentShader::loadFromSource(const std::string& source) {
@@ -192,7 +192,7 @@ FragmentShader FragmentShader::clone() const {
 ComputeShader::ComputeShader() {
   Logger::debug("[Shader] Creating compute shader...");
   m_index = Renderer::createShader(ShaderType::COMPUTE);
-  Logger::debug("[Shader] Created compute shader (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Shader] Created compute shader (ID: {})", m_index.get());
 }
 
 ComputeShader ComputeShader::loadFromSource(const std::string& source) {

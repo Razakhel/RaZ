@@ -34,25 +34,21 @@ bool pollNextEvent(XrInstance instance, XrEventDataBuffer& eventData) {
 }
 
 void processEventData(const XrEventDataEventsLost& eventsLost) {
-  Logger::info("[XrSystem] " + std::to_string(eventsLost.lostEventCount) + " events lost");
+  Logger::info("[XrSystem] {} events lost", eventsLost.lostEventCount);
 }
 
 void processEventData(const XrEventDataInstanceLossPending& instanceLossPending) {
   // After the period of time specified by lossTime, the application can try recreating an instance again
   // See: https://registry.khronos.org/OpenXR/specs/1.0/man/html/XrEventDataInstanceLossPending.html#_description
-  Logger::info("[XrSystem] Instance loss pending at: " + std::to_string(instanceLossPending.lossTime));
+  Logger::info("[XrSystem] Instance loss pending at: {}", instanceLossPending.lossTime);
 }
 
 void processEventData(const XrEventDataInteractionProfileChanged& interactionProfileChanged, ::XrSession session) {
-  Logger::info("[XrSystem] Interaction profile changed for "
-             + std::string(interactionProfileChanged.session != session ? "unknown" : "current")
-             + " session");
+  Logger::info("[XrSystem] Interaction profile changed for {} session", (interactionProfileChanged.session != session ? "unknown" : "current"));
 }
 
 void processEventData(const XrEventDataReferenceSpaceChangePending& referenceSpaceChangePending, ::XrSession session) {
-  Logger::info("[XrSystem] Reference space changed pending for "
-             + std::string(referenceSpaceChangePending.session != session ? "unknown" : "current")
-             + " session");
+  Logger::info("[XrSystem] Reference space changed pending for {} session", (referenceSpaceChangePending.session != session ? "unknown" : "current"));
 }
 
 } // namespace
@@ -121,7 +117,7 @@ void XrSystem::recoverViewConfigurations() {
            m_context.m_instance);
 
   for (const XrViewConfigurationType viewConfigType : { XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, XR_VIEW_CONFIGURATION_TYPE_PRIMARY_MONO }) {
-    if (std::find(m_viewConfigTypes.cbegin(), m_viewConfigTypes.cend(), viewConfigType) == m_viewConfigTypes.cend())
+    if (std::ranges::find(m_viewConfigTypes, viewConfigType) == m_viewConfigTypes.cend())
       continue;
 
     m_viewConfigType = viewConfigType;
@@ -149,13 +145,16 @@ void XrSystem::recoverViewConfigurations() {
   {
     std::string viewConfigViewsMsg = "[XrSystem] View configuration views:";
     for (const XrViewConfigurationView& viewConfigView : m_viewConfigViews) {
-      viewConfigViewsMsg += "\n    View:"
-                            "\n        Recom. image rect width:       " + std::to_string(viewConfigView.recommendedImageRectWidth)
-                          + "\n        Max. image rect width:         " + std::to_string(viewConfigView.maxImageRectWidth)
-                          + "\n        Recom. image rect height:      " + std::to_string(viewConfigView.recommendedImageRectHeight)
-                          + "\n        Max. image rect height:        " + std::to_string(viewConfigView.maxImageRectHeight)
-                          + "\n        Recom. swapchain sample count: " + std::to_string(viewConfigView.recommendedSwapchainSampleCount)
-                          + "\n        Max. swapchain sample count:   " + std::to_string(viewConfigView.maxSwapchainSampleCount);
+      viewConfigViewsMsg += std::format(
+        "\n    View:"
+        "\n        Recom. image rect width:       {}"
+        "\n        Max. image rect width:         {}"
+        "\n        Recom. image rect height:      {}"
+        "\n        Max. image rect height:        {}"
+        "\n        Recom. swapchain sample count: {}"
+        "\n        Max. swapchain sample count:   {}",
+        viewConfigView.recommendedImageRectWidth, viewConfigView.maxImageRectWidth, viewConfigView.recommendedImageRectHeight,
+        viewConfigView.maxImageRectHeight, viewConfigView.recommendedSwapchainSampleCount, viewConfigView.maxSwapchainSampleCount);
     }
     Logger::debug(viewConfigViewsMsg);
   }
@@ -176,7 +175,7 @@ void XrSystem::recoverEnvironmentBlendModes() {
            m_context.m_instance);
 
   for (const XrEnvironmentBlendMode environmentBlendMode : { XR_ENVIRONMENT_BLEND_MODE_OPAQUE, XR_ENVIRONMENT_BLEND_MODE_ADDITIVE }) {
-    if (std::find(m_environmentBlendModes.cbegin(), m_environmentBlendModes.cend(), environmentBlendMode) == m_environmentBlendModes.cend())
+    if (std::ranges::find(m_environmentBlendModes, environmentBlendMode) == m_environmentBlendModes.cend())
       continue;
 
     m_environmentBlendMode = environmentBlendMode;

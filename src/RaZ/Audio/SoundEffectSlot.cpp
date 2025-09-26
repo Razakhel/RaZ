@@ -30,7 +30,7 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
+    Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlErrorStr(errorCode));
 }
 
 // Auxiliary effect slot functions
@@ -88,7 +88,7 @@ void SoundEffectSlot::init() {
   alGenAuxiliaryEffectSlots(1, &m_index.get());
   checkError("Failed to create a sound effect slot");
 
-  Logger::debug("[SoundEffectSlot] Initialized (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[SoundEffectSlot] Initialized (ID: {})", m_index.get());
 }
 
 void SoundEffectSlot::loadEffect(const SoundEffect& effect) const noexcept {
@@ -104,7 +104,7 @@ void SoundEffectSlot::destroy() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[SoundEffectSlot] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[SoundEffectSlot] Destroying (ID: {})...", m_index.get());
 
   if (alIsAuxiliaryEffectSlot(m_index)) {
     alDeleteAuxiliaryEffectSlots(1, &m_index.get());

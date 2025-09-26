@@ -199,7 +199,7 @@ Texture::~Texture() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[Texture] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[Texture] Destroying (ID: {})...", m_index.get());
   Renderer::deleteTexture(m_index);
   Logger::debug("[Texture] Destroyed");
 }
@@ -209,7 +209,7 @@ Texture::Texture(TextureType type) : m_type{ type } {
 
   Logger::debug("[Texture] Creating...");
   Renderer::generateTexture(m_index);
-  Logger::debug("[Texture] Created (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[Texture] Created (ID: {})", m_index.get());
 
   setFilter(TextureFilter::LINEAR);
   setWrapping(TextureWrapping::CLAMP);
@@ -339,10 +339,8 @@ void Texture2D::load(const Image& image, bool createMipmaps, bool shouldUseSrgb)
   m_dataType   = (image.getDataType() == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
 
 #if defined(USE_OPENGL_ES)
-  if ((m_width & (m_width - 1)) != 0 || (m_height & (m_height - 1)) != 0) {
-    Logger::warn("[Texture] The given image's dimensions (" + std::to_string(m_width) + 'x' + std::to_string(m_height)
-               + ") are not powers of two; this can give unexpected results.");
-  }
+  if ((m_width & (m_width - 1)) != 0 || (m_height & (m_height - 1)) != 0)
+    Logger::warn("[Texture2D] The given image's dimensions ({}x{}) are not powers of two; this can give unexpected results", m_width, m_height);
 #endif
 
   int unpackAlignment = 4;
@@ -475,10 +473,8 @@ void Texture3D::load(const std::vector<Image>& imageSlices, bool createMipmaps, 
   m_dataType   = (firstImgDataType == ImageDataType::FLOAT ? TextureDataType::FLOAT16 : TextureDataType::BYTE);
 
 #if defined(USE_OPENGL_ES)
-  if ((m_width & (m_width - 1)) != 0 || (m_height & (m_height - 1)) != 0 || (m_depth & (m_depth - 1)) != 0) {
-    Logger::warn("[Texture] The given image's dimensions (" + std::to_string(m_width) + 'x' + std::to_string(m_height) + 'x' + std::to_string(m_depth)
-               + ") are not powers of two; this can give unexpected results.");
-  }
+  if ((m_width & (m_width - 1)) != 0 || (m_height & (m_height - 1)) != 0 || (m_depth & (m_depth - 1)) != 0)
+    Logger::warn("[Texture3D] The given image's dimensions ({}x{}x{}) are not powers of two; this can give unexpected results", m_width, m_height, m_depth);
 #endif
 
   load();

@@ -390,10 +390,10 @@ void Renderer::setPixelStorage(PixelStorage storage, unsigned int value) {
   glPixelStorei(static_cast<unsigned int>(storage), static_cast<int>(value));
 
 #if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
-  const ErrorCodes errorCodes = Renderer::recoverErrors();
+  const ErrorCodes errorCodes = recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_VALUE])
-    Logger::error("Renderer::setPixelStorage - " + std::to_string(value) + " is not a valid alignment value. Only 1, 2, 4 & 8 are accepted");
+    Logger::error("Renderer::setPixelStorage - {} is not a valid alignment value. Only 1, 2, 4 & 8 are accepted", value);
 #endif
 }
 
@@ -1000,7 +1000,7 @@ void Renderer::linkProgram(unsigned int index) {
     char infoLog[512];
 
     glGetProgramInfoLog(index, static_cast<int>(std::size(infoLog)), nullptr, infoLog);
-    Logger::error("Shader program link failed (ID " + std::to_string(index) + "): " + infoLog);
+    Logger::error("[Renderer] Shader program link failed (ID {}): {}", index, infoLog);
   }
 
   printConditionalErrors();
@@ -1014,10 +1014,10 @@ void Renderer::useProgram(unsigned int index) {
   glUseProgram(index);
 
 #if !defined(NDEBUG) && !defined(SKIP_RENDERER_ERRORS)
-  const ErrorCodes errorCodes = Renderer::recoverErrors();
+  const ErrorCodes errorCodes = recoverErrors();
 
   if (errorCodes[ErrorCode::INVALID_VALUE])
-    Logger::error("Renderer::useProgram - Invalid shader program index (" + std::to_string(index) + ')');
+    Logger::error("Renderer::useProgram - Invalid shader program index ({})", index);
 
   if (errorCodes[ErrorCode::INVALID_OPERATION]) {
     std::string errorMsg = "Renderer::useProgram - ";
@@ -1113,7 +1113,7 @@ void Renderer::compileShader(unsigned int index) {
     char infoLog[512];
 
     glGetShaderInfoLog(index, static_cast<int>(std::size(infoLog)), nullptr, infoLog);
-    Logger::error("Shader compilation failed (ID " + std::to_string(index) + "): " + infoLog);
+    Logger::error("[Renderer] Shader compilation failed (ID {}): {}", index, infoLog);
   }
 
   printConditionalErrors();
@@ -1137,7 +1137,7 @@ void Renderer::detachShader(unsigned int programIndex, unsigned int shaderIndex)
 
 bool Renderer::isShaderAttached(unsigned int programIndex, unsigned int shaderIndex) {
   const std::vector<unsigned int> shaderIndices = recoverAttachedShaders(programIndex);
-  return (std::find(shaderIndices.cbegin(), shaderIndices.cend(), shaderIndex) != shaderIndices.cend());
+  return (std::ranges::find(shaderIndices, shaderIndex) != shaderIndices.cend());
 }
 
 void Renderer::deleteShader(unsigned int index) {
@@ -1157,7 +1157,7 @@ int Renderer::recoverUniformLocation(unsigned int programIndex, const char* unif
   printErrors();
 
   if (location == -1)
-    Logger::warn("Uniform '" + std::string(uniformName) + "' unrecognized");
+    Logger::warn("Uniform '{}' unrecognized", uniformName);
 #endif
 
   return location;
@@ -1195,12 +1195,10 @@ void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int unifor
 
     const unsigned int uniCount = recoverActiveUniformCount(programIndex);
 
-    if (uniformIndex >= uniCount) {
-      errorMsg += "The given uniform index (" + std::to_string(uniformIndex) + ") "
-                  "is greater than or equal to the program's active uniform count (" + std::to_string(uniCount) + ").";
-    } else {
-      errorMsg += "The given program index has not been created by OpenGL.";
-    }
+    if (uniformIndex >= uniCount)
+      errorMsg += std::format("The given uniform index ({}) is greater than or equal to the program's active uniform count ({})", uniformIndex, uniCount);
+    else
+      errorMsg += "The given program index has not been created by OpenGL";
 
     Logger::error(errorMsg);
   }
@@ -1791,7 +1789,7 @@ void Renderer::printErrors() {
   for (uint8_t errorIndex = 0; errorIndex < static_cast<uint8_t>(errorCodes.codes.size()); ++errorIndex) {
     if (errorCodes.codes[errorIndex]) {
       const unsigned int errorValue = errorIndex + static_cast<unsigned int>(ErrorCode::INVALID_ENUM);
-      Logger::error("[OpenGL] " + std::string(recoverGlErrorStr(errorValue)) + " (code " + std::to_string(errorValue) + ')');
+      Logger::error("[OpenGL] {} (code {})", recoverGlErrorStr(errorValue), errorValue);
     }
   }
 }
@@ -1851,14 +1849,14 @@ void Renderer::recoverDefaultFramebufferColorFormat() {
   constexpr FramebufferAttachment attachment = FramebufferAttachment::DEFAULT_BACK_LEFT;
 #endif
   ColorInfo colorInfo;
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::RED_SIZE, &colorInfo.redBitCount);
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::GREEN_SIZE, &colorInfo.greenBitCount);
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::BLUE_SIZE, &colorInfo.blueBitCount);
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::ALPHA_SIZE, &colorInfo.alphaBitCount);
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COMPONENT_TYPE, &colorInfo.compType);
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COLOR_ENCODING, &colorInfo.encoding);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::RED_SIZE, &colorInfo.redBitCount);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::GREEN_SIZE, &colorInfo.greenBitCount);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::BLUE_SIZE, &colorInfo.blueBitCount);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::ALPHA_SIZE, &colorInfo.alphaBitCount);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COMPONENT_TYPE, &colorInfo.compType);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COLOR_ENCODING, &colorInfo.encoding);
 
-  const auto colorFormatIter = std::find_if(formats.cbegin(), formats.cend(), [&colorInfo] (const ColorFormat& format) {
+  const auto colorFormatIter = std::ranges::find_if(formats, [&colorInfo] (const ColorFormat& format) noexcept {
     return (colorInfo.redBitCount == format.colorInfo.redBitCount
          && colorInfo.greenBitCount == format.colorInfo.greenBitCount
          && colorInfo.blueBitCount == format.colorInfo.blueBitCount
@@ -1868,20 +1866,16 @@ void Renderer::recoverDefaultFramebufferColorFormat() {
   });
 
   if (colorFormatIter == formats.cend()) {
-    Logger::error("[Renderer] Unknown default framebuffer color bits combination (red " + std::to_string(colorInfo.redBitCount) + ", green "
-                + std::to_string(colorInfo.greenBitCount) + ", blue " + std::to_string(colorInfo.blueBitCount) + ", alpha "
-                + std::to_string(colorInfo.alphaBitCount) + ", component type " + std::to_string(colorInfo.compType) + ", encoding "
-                + std::to_string(colorInfo.encoding) + ')');
+    Logger::error("[Renderer] Unknown default framebuffer color bits combination (red {}, green {}, blue {}, alpha {}, component type {}, encoding {})",
+                  colorInfo.redBitCount, colorInfo.greenBitCount, colorInfo.blueBitCount, colorInfo.alphaBitCount, colorInfo.compType, colorInfo.encoding);
     return;
   }
 
   s_defaultFramebufferColor = colorFormatIter->format;
 
-  Logger::debug("[Renderer] Found default framebuffer color format " + std::string(colorFormatIter->formatStr) + " (value "
-              + std::to_string(static_cast<unsigned int>(s_defaultFramebufferColor)) + "; red " + std::to_string(colorInfo.redBitCount)
-              + ", green " + std::to_string(colorInfo.greenBitCount) + ", blue " + std::to_string(colorInfo.blueBitCount) + ", alpha "
-              + std::to_string(colorInfo.alphaBitCount) + ", component type " + std::to_string(colorInfo.compType) + ", encoding "
-              + std::to_string(colorInfo.encoding) + ')');
+  Logger::debug("[Renderer] Found default framebuffer color format {} (value {}; red {}, green {}, blue {}, alpha {}, component type {}, encoding {})",
+                colorFormatIter->formatStr, static_cast<unsigned int>(s_defaultFramebufferColor), colorInfo.redBitCount, colorInfo.greenBitCount,
+                colorInfo.blueBitCount, colorInfo.alphaBitCount, colorInfo.compType, colorInfo.encoding);
 }
 
 void Renderer::recoverDefaultFramebufferDepthFormat() {
@@ -1914,27 +1908,27 @@ void Renderer::recoverDefaultFramebufferDepthFormat() {
   constexpr FramebufferAttachment attachment = FramebufferAttachment::DEFAULT_DEPTH;
 #endif
   DepthInfo depthInfo {};
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::DEPTH_SIZE, &depthInfo.depthBitCount);
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::STENCIL_SIZE, &depthInfo.stencilBitCount);
-  Renderer::recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COMPONENT_TYPE, &depthInfo.compType);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::DEPTH_SIZE, &depthInfo.depthBitCount);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::STENCIL_SIZE, &depthInfo.stencilBitCount);
+  recoverFramebufferAttachmentParameter(attachment, FramebufferAttachmentParam::COMPONENT_TYPE, &depthInfo.compType);
 
-  const auto depthFormatIter = std::find_if(formats.cbegin(), formats.cend(), [&depthInfo] (const DepthFormat& format) {
+  const auto depthFormatIter = std::ranges::find_if(formats, [&depthInfo] (const DepthFormat& format) noexcept {
     return (depthInfo.depthBitCount == format.depthInfo.depthBitCount
          && depthInfo.stencilBitCount == format.depthInfo.stencilBitCount
          && depthInfo.compType == format.depthInfo.compType);
   });
 
   if (depthFormatIter == formats.cend()) {
-    Logger::error("[Renderer] Unknown default framebuffer depth bits combination (depth " + std::to_string(depthInfo.depthBitCount)
-                + ", stencil " + std::to_string(depthInfo.stencilBitCount) + ", component type: " + std::to_string(depthInfo.compType) + ')');
+    Logger::error("[Renderer] Unknown default framebuffer depth bits combination (depth {}, stencil {}, component type {})",
+                  depthInfo.depthBitCount, depthInfo.stencilBitCount, depthInfo.compType);
     return;
   }
 
   s_defaultFramebufferDepth = depthFormatIter->format;
 
-  Logger::debug("[Renderer] Found default framebuffer depth format " + std::string(depthFormatIter->formatStr) + " (value "
-              + std::to_string(static_cast<unsigned int>(s_defaultFramebufferDepth)) + "; depth " + std::to_string(depthInfo.depthBitCount)
-              + ", stencil " + std::to_string(depthInfo.stencilBitCount) + ", component type " + std::to_string(depthInfo.compType) + ')');
+  Logger::debug("[Renderer] Found default framebuffer depth format {} (value {}; depth {}, stencil {}, component type {})",
+                depthFormatIter->formatStr, static_cast<unsigned int>(s_defaultFramebufferDepth), depthInfo.depthBitCount,
+                depthInfo.stencilBitCount, depthInfo.compType);
 }
 
 } // namespace Raz

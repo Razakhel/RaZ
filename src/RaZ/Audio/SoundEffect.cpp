@@ -27,7 +27,7 @@ inline void checkError(const std::string& errorMsg) {
   const int errorCode = alGetError();
 
   if (errorCode != AL_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlErrorStr(errorCode) + ')');
+    Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlErrorStr(errorCode));
 }
 
 // Effect functions
@@ -85,7 +85,7 @@ void SoundEffect::init() {
   alGenEffects(1, &m_index.get());
   checkError("Failed to create a sound effect");
 
-  Logger::debug("[SoundEffect] Initialized (ID: " + std::to_string(m_index) + ')');
+  Logger::debug("[SoundEffect] Initialized (ID: {})", m_index.get());
 }
 
 void SoundEffect::load(const ReverberationParams& params) {
@@ -209,7 +209,7 @@ void SoundEffect::destroy() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[SoundEffect] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[SoundEffect] Destroying (ID: {})...", m_index.get());
 
   if (alIsEffect(m_index)) {
     alDeleteEffects(1, &m_index.get());

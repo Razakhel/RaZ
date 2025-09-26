@@ -33,7 +33,7 @@ inline void checkError(void* device, const std::string& errorMsg) {
   const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
 
   if (errorCode != ALC_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlcErrorStr(errorCode) + ')');
+    Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlcErrorStr(errorCode));
 }
 
 } // namespace
@@ -49,7 +49,7 @@ AudioSystem::AudioSystem(const std::string& deviceName) {
 
   const std::string_view alRenderer = alGetString(AL_RENDERER);
 
-  Logger::debug("[AudioSystem] OpenAL renderer: " + std::string(alRenderer));
+  Logger::debug("[AudioSystem] OpenAL renderer: {}", alRenderer);
 
 #if !defined(RAZ_PLATFORM_EMSCRIPTEN) // Emscripten has its own implementation with some OpenAL Soft extensions
   if (alRenderer != "OpenAL Soft")
@@ -78,7 +78,7 @@ std::vector<std::string> AudioSystem::recoverDevices() {
 void AudioSystem::openDevice(const std::string& deviceName) {
   ZoneScopedN("AudioSystem::openDevice");
 
-  Logger::debug("[AudioSystem] Opening " + (!deviceName.empty() ? + "device '" + deviceName + '\'' : "default device") + "...");
+  Logger::debug("[AudioSystem] Opening {}...", (!deviceName.empty() ? std::format("device '{}'", deviceName) : "default device"));
 
   destroy();
 
@@ -96,7 +96,7 @@ void AudioSystem::openDevice(const std::string& deviceName) {
     alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
   }
 
-  Logger::debug("[AudioSystem] Opened device '" + recoverCurrentDevice() + '\'');
+  Logger::debug("[AudioSystem] Opened device '{}'", recoverCurrentDevice());
 }
 
 std::string AudioSystem::recoverCurrentDevice() const {

@@ -161,7 +161,7 @@ void ShaderProgram::setImageTexture(TexturePtr texture, const std::string& unifo
 void ShaderProgram::link() {
   ZoneScopedN("ShaderProgram::link");
 
-  Logger::debug("[ShaderProgram] Linking (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[ShaderProgram] Linking (ID: {})...", m_index.get());
 
   Renderer::linkProgram(m_index);
   updateAttributesLocations();
@@ -411,7 +411,7 @@ ShaderProgram::~ShaderProgram() {
   if (!m_index.isValid())
     return;
 
-  Logger::debug("[ShaderProgram] Destroying (ID: " + std::to_string(m_index) + ")...");
+  Logger::debug("[ShaderProgram] Destroying (ID: {})...", m_index.get());
   Renderer::deleteProgram(m_index);
   Logger::debug("[ShaderProgram] Destroyed");
 }
@@ -424,7 +424,7 @@ void ShaderProgram::updateAttributesLocations() {
 }
 
 void RenderShaderProgram::setVertexShader(VertexShader&& vertShader) {
-  Logger::debug("[RenderShaderProgram] Setting vertex shader (ID: " + std::to_string(vertShader.getIndex()) + ", path: '" + vertShader.getPath() + "')");
+  Logger::debug("[RenderShaderProgram] Setting vertex shader (ID: {}, path: '{}')", vertShader.getIndex(), vertShader.getPath());
 
   if (Renderer::isShaderAttached(m_index, m_vertShader.getIndex()))
     Renderer::detachShader(m_index, m_vertShader.getIndex());
@@ -437,8 +437,7 @@ void RenderShaderProgram::setVertexShader(VertexShader&& vertShader) {
 
 #if !defined(USE_OPENGL_ES)
 void RenderShaderProgram::setTessellationControlShader(TessellationControlShader&& tessCtrlShader) {
-  Logger::debug("[RenderShaderProgram] Setting tessellation control shader (ID: "
-                + std::to_string(tessCtrlShader.getIndex()) + ", path: '" + tessCtrlShader.getPath() + "')");
+  Logger::debug("[RenderShaderProgram] Setting tessellation control shader (ID: {}, path: '{}')", tessCtrlShader.getIndex(), tessCtrlShader.getPath());
 
   if (m_tessCtrlShader && Renderer::isShaderAttached(m_index, m_tessCtrlShader->getIndex()))
     Renderer::detachShader(m_index, m_tessCtrlShader->getIndex());
@@ -463,7 +462,7 @@ void RenderShaderProgram::setTessellationEvaluationShader(TessellationEvaluation
 }
 
 void RenderShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
-  Logger::debug("[RenderShaderProgram] Setting geometry shader (ID: " + std::to_string(geomShader.getIndex()) + ", path: '" + geomShader.getPath() + "')");
+  Logger::debug("[RenderShaderProgram] Setting geometry shader (ID: {}, path: '{}')", geomShader.getIndex(), geomShader.getPath());
 
   if (m_geomShader && Renderer::isShaderAttached(m_index, m_geomShader->getIndex()))
     Renderer::detachShader(m_index, m_geomShader->getIndex());
@@ -476,7 +475,7 @@ void RenderShaderProgram::setGeometryShader(GeometryShader&& geomShader) {
 #endif
 
 void RenderShaderProgram::setFragmentShader(FragmentShader&& fragShader) {
-  Logger::debug("[RenderShaderProgram] Setting fragment shader (ID: " + std::to_string(fragShader.getIndex()) + ", path: '" + fragShader.getPath() + "')");
+  Logger::debug("[RenderShaderProgram] Setting fragment shader (ID: {}, path: '{}')", fragShader.getIndex(), fragShader.getPath());
 
   if (Renderer::isShaderAttached(m_index, m_fragShader.getIndex()))
     Renderer::detachShader(m_index, m_fragShader.getIndex());
@@ -635,7 +634,7 @@ void RenderShaderProgram::destroyFragmentShader() {
 
 #if !defined(USE_WEBGL)
 void ComputeShaderProgram::setShader(ComputeShader&& compShader) {
-  Logger::debug("[ComputeShaderProgram] Setting shader (ID: " + std::to_string(compShader.getIndex()) + ", path: '" + compShader.getPath() + "')");
+  Logger::debug("[ComputeShaderProgram] Setting shader (ID: {}, path: '{}')", compShader.getIndex(), compShader.getPath());
 
   if (Renderer::isShaderAttached(m_index, m_compShader.getIndex()))
     Renderer::detachShader(m_index, m_compShader.getIndex());

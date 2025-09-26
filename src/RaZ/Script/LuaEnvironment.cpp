@@ -26,7 +26,7 @@ bool LuaEnvironment::execute(const std::string& code) const {
   try {
     LuaWrapper::getState().script(code, *m_environment);
   } catch (const sol::error& err) {
-    Logger::error("[LuaEnvironment] Error executing code: '" + std::string(err.what()) + '\'');
+    Logger::error("[LuaEnvironment] Error executing code: '{}'", err.what());
     return false;
   }
 
@@ -42,12 +42,12 @@ bool LuaEnvironment::executeFromFile(const FilePath& filePath) const {
   if (filePath.isEmpty())
     return false;
 
-  Logger::debug("[LuaEnvironment] Executing code from file ('" + filePath + "')...");
+  Logger::debug("[LuaEnvironment] Executing code from file ('{}')...", filePath);
 
   try {
     LuaWrapper::getState().script_file(filePath.toUtf8(), *m_environment);
   } catch (const sol::error& err) {
-    Logger::error("[LuaEnvironment] Error executing code from file: '" + std::string(err.what()) + '\'');
+    Logger::error("[LuaEnvironment] Error executing code from file: '{}'", err.what());
     return false;
   }
 
@@ -69,7 +69,7 @@ void LuaEnvironment::clear() {
 LuaEnvironment::~LuaEnvironment() = default;
 
 void LuaEnvironment::registerEntity(const Entity& entity, const std::string& name) {
-  Logger::debug("[LuaEnvironment] Registering entity (ID: " + std::to_string(entity.getId()) + ") as '" + name + "'...");
+  Logger::debug("[LuaEnvironment] Registering entity (ID: {}) as '{}'...", entity.getId(), name);
   m_environment->operator[](name) = &entity;
   Logger::debug("[LuaEnvironment] Registered entity");
 }

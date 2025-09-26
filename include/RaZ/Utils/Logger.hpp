@@ -3,6 +3,7 @@
 #ifndef RAZ_LOGGER_HPP
 #define RAZ_LOGGER_HPP
 
+#include <format>
 #include <functional>
 #include <string>
 
@@ -29,28 +30,49 @@ public:
   /// \note Requires a logging level of "error" or above.
   /// \param message Message to be printed.
   static void error(const std::string& message);
+  /// Prints an error message.
+  /// \note Requires a logging level of "error" or above.
+  /// \param message Message to be printed.
+  /// \param args Arguments to be formatted to the message.
+  template <typename... Args>
+  static void error(std::format_string<Args...> message, Args&&... args) { error(std::format(message, std::forward<Args>(args)...)); }
   /// Prints a warning message.
   /// \note Requires a logging level of "warning" or above.
   /// \param message Message to be printed.
   static void warn(const std::string& message);
+  /// Prints a warning message.
+  /// \note Requires a logging level of "warning" or above.
+  /// \param message Message to be printed.
+  /// \param args Arguments to be formatted to the message.
+  template <typename... Args>
+  static void warn(std::format_string<Args...> message, Args&&... args) { warn(std::format(message, std::forward<Args>(args)...)); }
   /// Prints an information message.
   /// \note Requires a logging level of "info" or above.
   /// \param message Message to be printed.
   static void info(const std::string& message);
+  /// Prints an information message.
+  /// \note Requires a logging level of "info" or above.
+  /// \param message Message to be printed.
+  /// \param args Arguments to be formatted to the message.
+  template <typename... Args>
+  static void info(std::format_string<Args...> message, Args&&... args) { info(std::format(message, std::forward<Args>(args)...)); }
 #if !defined(NDEBUG) || defined(RAZ_FORCE_DEBUG_LOG)
   /// Prints a debug message.
   /// \note Does nothing in a configuration other than Debug, unless RAZ_FORCE_DEBUG_LOG is defined.
   /// \note Requires a logging level of "debug" or above.
   /// \param message Message to be printed.
-  static void debug(const char* message) { debug(std::string(message)); }
+  static void debug(const std::string& message);
   /// Prints a debug message.
   /// \note Does nothing in a configuration other than Debug, unless RAZ_FORCE_DEBUG_LOG is defined.
   /// \note Requires a logging level of "debug" or above.
   /// \param message Message to be printed.
-  static void debug(const std::string& message);
+  /// \param args Arguments to be formatted to the message.
+  template <typename... Args>
+  static void debug(std::format_string<Args...> message, Args&&... args) { debug(std::format(message, std::forward<Args>(args)...)); }
 #else
-  static void debug(const char*) {}
   static void debug(const std::string&) {}
+  template <typename... Args>
+  static void debug(std::format_string<Args...>, Args&&...) {}
 #endif
 
   ~Logger() = delete;

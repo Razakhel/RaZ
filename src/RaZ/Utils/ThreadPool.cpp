@@ -11,7 +11,7 @@ ThreadPool::ThreadPool(const std::string& threadNamePrefix) : ThreadPool(Threadi
 ThreadPool::ThreadPool(unsigned int threadCount, const std::string& threadNamePrefix) {
   ZoneScopedN("ThreadPool::ThreadPool");
 
-  Logger::debug("[ThreadPool] Initializing (with " + std::to_string(threadCount) + " thread(s))...");
+  Logger::debug("[ThreadPool] Initializing (with {} thread(s))...", threadCount);
 
   m_threads.reserve(threadCount);
 

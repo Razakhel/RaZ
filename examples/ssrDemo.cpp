@@ -2,8 +2,6 @@
 
 #include "DemoUtils.hpp"
 
-using namespace std::literals;
-
 int main() {
   try {
     ////////////////////
@@ -185,7 +183,7 @@ int main() {
       blueBallTrans.setPosition(2.f - sinTime, 1.f, 0.f);
     });
   } catch (const std::exception& exception) {
-    Raz::Logger::error("Exception occurred: "s + exception.what());
+    Raz::Logger::error("Exception occurred: {}", exception.what());
   }
 
   return EXIT_SUCCESS;

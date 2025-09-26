@@ -34,7 +34,7 @@ std::pair<Mesh, MeshRenderer> load(const FilePath& filePath) {
 #endif
   }
 
-  throw std::invalid_argument("[MeshFormat] Unsupported mesh file extension '" + fileExt + "' for loading.");
+  throw std::invalid_argument(std::format("[MeshFormat] Unsupported mesh file extension '{}' for loading", fileExt));
 }
 
 void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRenderer) {
@@ -46,7 +46,7 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
   if (fileExt == "obj")
     ObjFormat::save(filePath, mesh, meshRenderer);
   else
-    throw std::invalid_argument("[MeshFormat] Unsupported mesh file extension '" + fileExt + "' for saving.");
+    throw std::invalid_argument(std::format("[MeshFormat] Unsupported mesh file extension '{}' for saving", fileExt));
 }
 
 } // namespace Raz::MeshFormat

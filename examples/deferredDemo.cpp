@@ -2,8 +2,6 @@
 
 #include "DemoUtils.hpp"
 
-using namespace std::literals;
-
 constexpr unsigned int sceneWidth  = 1280;
 constexpr unsigned int sceneHeight = 720;
 
@@ -201,7 +199,7 @@ int main() {
 
     app.run();
   } catch (const std::exception& exception) {
-    Raz::Logger::error("Exception occurred: "s + exception.what());
+    Raz::Logger::error("Exception occurred: {}", exception.what());
   }
 
   return EXIT_SUCCESS;

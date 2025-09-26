@@ -2,8 +2,6 @@
 
 #include "DemoUtils.hpp"
 
-using namespace std::literals;
-
 int main() {
   try {
     ////////////////////
@@ -291,14 +289,14 @@ end)";
 
     overlayScript.addButton("Apply", [&] () {
       try {
-        // Running a dummy script, checking that it's syntactically correct
+        // Running a dummy script, checking that it is syntactically correct
         Raz::LuaScript testScript(scriptTextArea.getText());
         testScript.registerEntity(mesh, "this");
         testScript.update({});
 
         luaScript.loadCode(scriptTextArea.getText());
       } catch (const std::exception& ex) {
-        Raz::Logger::error("Failed to reload the Lua script:\n" + std::string(ex.what()));
+        Raz::Logger::error("Failed to reload the Lua script:\n{}", ex.what());
       }
     });
 
@@ -392,7 +390,7 @@ end)";
     app.run();
 #endif
   } catch (const std::exception& exception) {
-    Raz::Logger::error("Exception occurred: "s + exception.what());
+    Raz::Logger::error("Exception occurred: {}", exception.what());
   }
 
   return EXIT_SUCCESS;

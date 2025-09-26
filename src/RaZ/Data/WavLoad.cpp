@@ -129,17 +129,17 @@ AudioData load(const FilePath& filePath) {
   ZoneScopedN("WavFormat::load");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[WavLoad] Loading WAV file ('" + filePath + "')...");
+  Logger::debug("[WavLoad] Loading WAV file ('{}')...", filePath);
 
   std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("[WavLoad] Could not open the WAV file '" + filePath + "'");
+    throw std::invalid_argument(std::format("[WavLoad] Could not open the WAV file '{}'", filePath));
 
   const std::optional<WavInfo> info = validateWav(file);
 
   if (info == std::nullopt)
-    throw std::runtime_error("[WavLoad] '" + filePath + "' is not a valid WAV audio file");
+    throw std::runtime_error(std::format("[WavLoad] '{}' is not a valid WAV audio file", filePath));
 
   AudioData audioData {};
 
@@ -174,7 +174,7 @@ AudioData load(const FilePath& filePath) {
       break;
 
     default:
-      throw std::runtime_error("[WavLoad] " + std::to_string(info->bitsPerSample) + " bits WAV files are unsupported");
+      throw std::runtime_error(std::format("[WavLoad] {} bits WAV files are unsupported", info->bitsPerSample));
   }
 
   // If the format is still unassigned, it is invalid

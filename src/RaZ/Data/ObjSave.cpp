@@ -97,12 +97,12 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
   ZoneScopedN("ObjFormat::save");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[ObjSave] Saving OBJ file ('" + filePath + "')...");
+  Logger::debug("[ObjSave] Saving OBJ file ('{}')...", filePath);
 
   std::ofstream file(filePath, std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Unable to create an OBJ file as '" + filePath + "'; path to file must exist");
+    throw std::invalid_argument(std::format("Error: Unable to create an OBJ file as '{}'; path to file must exist", filePath));
 
   file << "# OBJ file created with RaZ - https://github.com/Razakhel/RaZ\n\n";
 

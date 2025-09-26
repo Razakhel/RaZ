@@ -30,7 +30,7 @@ inline void checkError(void* device, const std::string& errorMsg) {
   const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
 
   if (errorCode != ALC_NO_ERROR)
-    Logger::error("[OpenAL] " + errorMsg + " (" + recoverAlcErrorStr(errorCode) + ')');
+    Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlcErrorStr(errorCode));
 }
 
 constexpr int recoverFrameSize(AudioFormat format) {
@@ -112,7 +112,7 @@ std::vector<std::string> Microphone::recoverDevices() {
 void Microphone::openDevice(AudioFormat format, unsigned int frequency, float duration, const std::string& deviceName) {
   ZoneScopedN("Microphone::openDevice");
 
-  Logger::debug("[Microphone] Opening capture " + (!deviceName.empty() ? + "device '" + deviceName + '\'' : "default device") + "...");
+  Logger::debug("[Microphone] Opening capture {}...", (!deviceName.empty() ? std::format("device '{}'", deviceName) : "default device"));
 
   destroy();
 
@@ -136,7 +136,7 @@ void Microphone::openDevice(AudioFormat format, unsigned int frequency, float du
   m_format    = format;
   m_frequency = frequency;
 
-  Logger::debug("[Microphone] Opened capture device '" + recoverCurrentDevice() + '\'');
+  Logger::debug("[Microphone] Opened capture device '{}'", recoverCurrentDevice());
 }
 
 std::string Microphone::recoverCurrentDevice() const {

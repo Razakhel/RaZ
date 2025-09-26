@@ -15,12 +15,12 @@ Image load(const FilePath& filePath, bool flipVertically) {
   ZoneScopedN("TgaFormat::load");
   ZoneTextF("Path: %s", filePath.toUtf8().c_str());
 
-  Logger::debug("[TgaFormat] Loading TGA file ('" + filePath + "')...");
+  Logger::debug("[TgaFormat] Loading TGA file ('{}')...", filePath);
 
   std::ifstream file(filePath, std::ios_base::binary);
 
   if (!file)
-    throw std::invalid_argument("Error: Could not open the PNG file '" + filePath + "'");
+    throw std::invalid_argument(std::format("Error: Could not open the PNG file '{}'", filePath));
 
   // Declaring a single array of unsigned char, reused everywhere later
   std::array<unsigned char, 2> bytes {};

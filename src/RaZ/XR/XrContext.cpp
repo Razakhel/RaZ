@@ -30,7 +30,7 @@ const char* getResultStr(XrInstance instance, XrResult result) {
 }
 
 std::string getErrorStr(const std::string& errorMsg, XrResult result, XrInstance instance) {
-  return "[XrContext] " + errorMsg + ": " + getResultStr(instance, result) + " (" + std::to_string(result) + ')';
+  return std::format("[XrContext] {}: {} ({})", errorMsg, getResultStr(instance, result), static_cast<int>(result));
 }
 
 void checkLog(XrResult result, const std::string& errorMsg, XrInstance instance) {
@@ -99,7 +99,7 @@ XrBool32 logCallback(XrDebugUtilsMessageSeverityFlagsEXT severity,
   if (callbackData->functionName)
     logMsg += callbackData->functionName;
 
-  logMsg += '(' + severityStr + '/' + getTypeStr(type) + "): ";
+  logMsg += std::format("({}/{}): ", severityStr, getTypeStr(type));
 
   if (callbackData->messageId)
     logMsg += "ID: " + std::string(callbackData->messageId);
@@ -124,7 +124,7 @@ XrBool32 logCallback(XrDebugUtilsMessageSeverityFlagsEXT severity,
       break;
   }
 
-  // Returning false to indicate that the call should not be aborted
+  // Returning false to indicate that the call shouldn't be aborted
   // See: https://registry.khronos.org/OpenXR/specs/1.1/html/xrspec.html#PFN_xrDebugUtilsMessengerCallbackEXT
   return false;
 }
@@ -144,10 +144,9 @@ XrContext::XrContext(const std::string& appName) {
   instanceProperties.type = XR_TYPE_INSTANCE_PROPERTIES;
   checkLog(xrGetInstanceProperties(m_instance, &instanceProperties), "Failed to get instance properties", m_instance);
 
-  Logger::info("[XrContext] OpenXR runtime: " + std::string(instanceProperties.runtimeName) + " - "
-                                              + std::to_string(XR_VERSION_MAJOR(instanceProperties.runtimeVersion)) + '.'
-                                              + std::to_string(XR_VERSION_MINOR(instanceProperties.runtimeVersion)) + '.'
-                                              + std::to_string(XR_VERSION_PATCH(instanceProperties.runtimeVersion)));
+  Logger::info("[XrContext] OpenXR runtime: {} - {}.{}.{}",
+               instanceProperties.runtimeName, XR_VERSION_MAJOR(instanceProperties.runtimeVersion),
+               XR_VERSION_MINOR(instanceProperties.runtimeVersion), XR_VERSION_PATCH(instanceProperties.runtimeVersion));
 
   createDebugMessenger();
 
@@ -205,20 +204,21 @@ void XrContext::recoverApiLayers() {
 #endif
 
   for (const std::string& requestedLayer : m_apiLayers) {
-    const auto layerPropIter = std::find_if(apiLayerProperties.cbegin(), apiLayerProperties.cend(),
-                                            [&requestedLayer] (const XrApiLayerProperties& layerProp) { return requestedLayer == layerProp.layerName; });
+    const auto layerPropIter = std::ranges::find_if(apiLayerProperties, [&requestedLayer] (const XrApiLayerProperties& layerProp) {
+      return requestedLayer == layerProp.layerName;
+    });
 
     if (layerPropIter != apiLayerProperties.cend())
       m_activeApiLayers.emplace_back(requestedLayer.c_str());
     else
-      Logger::error("[XrContext] Failed to find OpenXR API layer: " + requestedLayer);
+      Logger::error("[XrContext] Failed to find OpenXR API layer: {}", requestedLayer);
   }
 
 #if !defined(NDEBUG) || defined(RAZ_FORCE_DEBUG_LOG)
   if (!m_activeApiLayers.empty()) {
     std::string activeLayersMsg = "[XrContext] Active layers:";
     for (const char* activeLayer : m_activeApiLayers)
-      activeLayersMsg += "\n    " + std::string(activeLayer);
+      activeLayersMsg += std::format("\n    {}", activeLayer);
     Logger::debug(activeLayersMsg);
   }
 #endif
@@ -246,31 +246,31 @@ void XrContext::recoverExtensions() {
   {
     std::string availableExtensionsMsg = "[XrContext] Available extensions:";
     for (const XrExtensionProperties& extProp : extensionProperties) {
-      const std::string extVersionStr = std::to_string(XR_VERSION_MAJOR(extProp.extensionVersion)) + '.'
-                                      + std::to_string(XR_VERSION_MINOR(extProp.extensionVersion)) + '.'
-                                      + std::to_string(XR_VERSION_PATCH(extProp.extensionVersion));
-      availableExtensionsMsg += "\n    " + std::string(extProp.extensionName) + " - " + extVersionStr;
+      const std::string extVersionStr = std::format("{}.{}.{}", XR_VERSION_MAJOR(extProp.extensionVersion),
+                                                                XR_VERSION_MINOR(extProp.extensionVersion),
+                                                                XR_VERSION_PATCH(extProp.extensionVersion));
+      availableExtensionsMsg += std::format("\n    {} - {}", extProp.extensionName, extVersionStr);
     }
     Logger::debug(availableExtensionsMsg);
   }
 #endif
 
   for (const std::string& requestedExtension : m_extensions) {
-    const auto extIter = std::find_if(extensionProperties.cbegin(), extensionProperties.cend(), [&requestedExtension] (const XrExtensionProperties& extProp) {
+    const auto extIter = std::ranges::find_if(extensionProperties, [&requestedExtension] (const XrExtensionProperties& extProp) {
       return requestedExtension == extProp.extensionName;
     });
 
     if (extIter != extensionProperties.cend())
       m_activeExtensions.emplace_back(requestedExtension.c_str());
     else
-      Logger::error("[XrContext] Failed to find OpenXR instance extension: " + requestedExtension);
+      Logger::error("[XrContext] Failed to find OpenXR instance extension: {}", requestedExtension);
   }
 
 #if !defined(NDEBUG) || defined(RAZ_FORCE_DEBUG_LOG)
   if (!m_activeExtensions.empty()) {
     std::string activeExtensionsMsg = "[XrContext] Active extensions:";
     for (const char* activeExt : m_activeExtensions)
-      activeExtensionsMsg += "\n    " + std::string(activeExt);
+      activeExtensionsMsg += std::format("\n    {}", activeExt);
     Logger::debug(activeExtensionsMsg);
   }
 #endif
@@ -314,7 +314,7 @@ void XrContext::destroyInstance() {
 void XrContext::createDebugMessenger() {
   ZoneScopedN("XrContext::createDebugMessenger");
 
-  if (std::find(m_activeExtensions.cbegin(), m_activeExtensions.cend(), std::string_view(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) == m_activeExtensions.cend())
+  if (std::ranges::find(m_activeExtensions, std::string_view(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) == m_activeExtensions.cend())
     return; // Extension not found
 
   Logger::debug("[XrContext] Creating debug messenger...");
@@ -349,7 +349,7 @@ void XrContext::destroyDebugMessenger() {
   if (m_debugMsgr == XR_NULL_HANDLE)
     return;
 
-  if (std::find(m_activeExtensions.cbegin(), m_activeExtensions.cend(), std::string_view(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) == m_activeExtensions.cend())
+  if (std::ranges::find(m_activeExtensions, std::string_view(XR_EXT_DEBUG_UTILS_EXTENSION_NAME)) == m_activeExtensions.cend())
     return; // Extension not found
 
   Logger::debug("[XrContext] Destroying debug messenger...");
