@@ -176,4 +176,8 @@ TEST_CASE("FilePath printing", "[utils]") {
     stream << testPath;
     CHECK(stream.str() == L"tèstPâth");
   }
+
+  // std::format()
+  CHECK(std::format("{}", testPath) == "tèstPâth");
+  CHECK(std::format(L"{}", testPath) == L"tèstPâth");
 }

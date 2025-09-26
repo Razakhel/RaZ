@@ -3,6 +3,7 @@
 #ifndef RAZ_FILEPATH_HPP
 #define RAZ_FILEPATH_HPP
 
+#include <format>
 #include <iosfwd>
 #include <string>
 #include <string_view>
@@ -19,7 +20,7 @@ class FilePath {
 #endif
 
 public:
-  FilePath() = default;
+  constexpr FilePath() = default;
   /// Creates a path in a platform-dependent encoding from a given UTF-8 string.
   /// \note On Windows, the given string will be converted to UTF-16.
   /// \param pathStr UTF-8 encoded path string.
@@ -44,12 +45,12 @@ public:
   /// \note On platforms other than Windows, the given string will be converted to UTF-8. If not using Windows, use the standard string constructors.
   /// \param pathStr Platform-specific encoded wide path string.
   FilePath(const std::wstring_view& pathStr) : FilePath(pathStr.data()) {}
-  FilePath(const FilePath&) = default;
-  FilePath(FilePath&&) noexcept = default;
+  constexpr FilePath(const FilePath&) = default;
+  constexpr FilePath(FilePath&&) noexcept = default;
 
-  const StringType& getPath() const noexcept { return m_path; }
-  const CharType* getPathStr() const noexcept { return m_path.c_str(); }
-  bool isEmpty() const noexcept { return m_path.empty(); }
+  constexpr const StringType& getPath() const noexcept { return m_path; }
+  constexpr const CharType* getPathStr() const noexcept { return m_path.c_str(); }
+  constexpr bool isEmpty() const noexcept { return m_path.empty(); }
 
   static FilePath recoverPathToFile(const std::string& pathStr);
   static FilePath recoverPathToFile(const std::wstring& pathStr);
@@ -75,8 +76,8 @@ public:
   std::wstring toWide() const;
 #endif
 
-  FilePath& operator=(const FilePath&) = default;
-  FilePath& operator=(FilePath&&) noexcept = default;
+  constexpr FilePath& operator=(const FilePath&) = default;
+  constexpr FilePath& operator=(FilePath&&) noexcept = default;
   std::string operator+(char c) const { return toUtf8() + c; }
   std::wstring operator+(wchar_t c) const { return toWide() + c; }
   std::string operator+(const char* pathStr) const { return toUtf8() + pathStr; }
@@ -98,11 +99,11 @@ public:
   bool operator!=(const std::wstring_view& pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const FilePath& filePath) const noexcept { return m_path == filePath.getPath(); }
   bool operator!=(const FilePath& filePath) const noexcept { return !(*this == filePath); }
-  explicit operator const StringType&() const noexcept { return m_path; }
-  operator const CharType*() const noexcept { return m_path.c_str(); }
+  constexpr explicit operator const StringType&() const noexcept { return m_path; }
+  constexpr operator const CharType*() const noexcept { return m_path.c_str(); }
 
 private:
-  StringType m_path {};
+  StringType m_path;
 };
 
 static inline std::string operator+(char c, const FilePath& filePath) {
@@ -138,9 +139,35 @@ extern std::wostream& operator<<(std::wostream& stream, const FilePath& filePath
 template <>
 struct std::hash<Raz::FilePath> {
   /// Computes the hash of the given file path.
-  /// \param filePath FilePath to compute the hash of.
-  /// \return FilePath's hash value.
+  /// \param filePath File path to compute the hash of.
+  /// \return File path's hash value.
   std::size_t operator()(const Raz::FilePath& filePath) const noexcept { return std::hash<std::string>()(filePath.toUtf8()); }
+};
+
+/// Specialization of std::formatter for FilePath.
+template <>
+struct std::formatter<Raz::FilePath, char> : std::formatter<std::string, char> {
+  /// Formats the given file path.
+  /// \tparam ContextT Type of the formatting context.
+  /// \param filePath File path to be formatted.
+  /// \param context Formatting context.
+  template <typename ContextT>
+  constexpr auto format(const Raz::FilePath& filePath, ContextT& context) const {
+    return std::formatter<std::string, char>::format(filePath.toUtf8(), context);
+  }
+};
+
+/// Specialization of std::formatter for FilePath.
+template <>
+struct std::formatter<Raz::FilePath, wchar_t> : std::formatter<std::wstring, wchar_t> {
+  /// Formats the given file path.
+  /// \tparam ContextT Type of the formatting context.
+  /// \param filePath File path to be formatted.
+  /// \param context Formatting context.
+  template <typename ContextT>
+  constexpr auto format(const Raz::FilePath& filePath, ContextT& context) const {
+    return std::formatter<std::wstring, wchar_t>::format(filePath.toWide(), context);
+  }
 };
 
 #endif // RAZ_FILEPATH_HPP

@@ -21,14 +21,14 @@ constexpr std::size_t recoverLastSeparatorPos(std::size_t firstSeparatorPos, std
   return std::max(firstSeparatorPos, secondSeparatorPos);
 }
 
-inline std::size_t recoverLastSeparatorPos(const std::string& pathStr) {
+constexpr std::size_t recoverLastSeparatorPos(const std::string& pathStr) {
   const std::size_t lastSlashPos     = pathStr.find_last_of('/');
   const std::size_t lastBackslashPos = pathStr.find_last_of('\\');
 
   return recoverLastSeparatorPos(lastSlashPos, lastBackslashPos, std::string::npos);
 }
 
-inline std::size_t recoverLastSeparatorPos(const std::wstring& pathStr) {
+constexpr std::size_t recoverLastSeparatorPos(const std::wstring& pathStr) {
   const std::size_t lastSlashPos     = pathStr.find_last_of(L'/');
   const std::size_t lastBackslashPos = pathStr.find_last_of(L'\\');
 
@@ -89,18 +89,18 @@ FilePath FilePath::recoverExtension(const std::string& pathStr) {
   const std::size_t lastPointPos = pathStr.find_last_of('.');
 
   if (lastPointPos == std::string::npos)
-    return FilePath();
+    return {};
 
-  return pathStr.substr(pathStr.find_last_of('.') + 1);
+  return pathStr.substr(lastPointPos + 1);
 }
 
 FilePath FilePath::recoverExtension(const std::wstring& pathStr) {
   const std::size_t lastPointPos = pathStr.find_last_of(L'.');
 
   if (lastPointPos == std::wstring::npos)
-    return FilePath();
+    return {};
 
-  return pathStr.substr(pathStr.find_last_of(L'.') + 1);
+  return pathStr.substr(lastPointPos + 1);
 }
 
 #if defined(RAZ_PLATFORM_WINDOWS) && !defined(RAZ_PLATFORM_CYGWIN)
