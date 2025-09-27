@@ -142,6 +142,7 @@ function (add_compiler_flags)
             -Wno-mismatched-tags
             -Wno-missing-braces
             -Wno-missing-field-initializers
+            -Wno-missing-noreturn
             -Wno-newline-eof
             -Wno-padded
             -Wno-reserved-id-macro
@@ -178,6 +179,16 @@ function (add_compiler_flags)
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
             list(APPEND COMPILER_FLAGS -Wno-unsafe-buffer-usage)
         endif ()
+
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 21)
+            list(
+                APPEND
+                COMPILER_FLAGS
+
+                -Wno-nrvo
+                -Wno-unique-object-duplication # This warning can be interesting when building as a shared library
+            )
+        endif ()
     elseif (COMPILER_MSVC)
         list(
             APPEND
@@ -190,41 +201,25 @@ function (add_compiler_flags)
             /wd4242 # Conversion from T1 to T2, possible loss of data (any type)
             /wd4244 # Conversion from T1 to T2, possible loss of data (specific types)
             /wd4312 # Conversion from T1 to T2 of greater size
-            /wd4571 # SEH exceptions aren't caught since Visual C++ 7.1
-            /wd5045 # Spectre mitigation
-            /wd5246 # Initialization of subobject should be wrapped in braces
-            /wd5264 # const(expr) variable not used
-
-            # Warnings triggered by Sol
-            /wd4371 # Class layout may have changed from a previous compiler version due to better packing
-            /wd4582 # Constructor not implicitly called
-            /wd4583 # Destructor not implicitly called
-            /wd5243 # Using incomplete class can cause ODR violation
-
-            # Warnings triggered by the FBX SDK
-            /wd4266 # No override available (function is hidden)
+            /wd4355 # 'this' used in base member initializing list
             /wd4365 # Signed/unsigned mismatch (implicit conversion)
-            /wd4619 # Unknown warning number
+            /wd4514 # Unreferenced inline function has been removed
+            /wd4571 # SEH exceptions aren't caught since Visual C++ 7.1
+            /wd4623 # Default constructor was implicitly defined as deleted
             /wd4625 # Copy constructor implicitly deleted
             /wd4626 # Copy assignment operator implicitly deleted
-
-            # Warnings triggered by MSVC's standard library
-            /wd4355 # 'this' used in base member initializing list
-            /wd4514 # Unreferenced inline function has been removed
-            /wd4548 # Expression before comma has no effect
-            /wd4623 # Default constructor was implicitly defined as deleted
-            /wd4668 # Preprocessor macro not defined
             /wd4710 # Function not inlined
             /wd4711 # Function inlined
-            /wd4774 # Format string is not a string literal
             /wd4820 # Added padding to members
             /wd5026 # Move constructor implicitly deleted
             /wd5027 # Move assignment operator implicitly deleted
             /wd5039 # Pointer/ref to a potentially throwing function passed to an 'extern "C"' function (with -EHc)
-            /wd5105 # Undefined macro expansion
-            /wd5204 # Class with virtual functions but no virtual destructor
-            /wd5220 # Non-static volatile member doesn't imply non-trivial move/copy ctor/operator=
-            /wd5262 # Implicit fallthrough
+            /wd5045 # Spectre mitigation
+            /wd5246 # Initialization of subobject should be wrapped in braces
+            /wd5264 # const(expr) variable not used
+
+            # Warnings triggered in Sol
+            /wd4371 # Class layout may have changed from a previous compiler version due to better packing
         )
 
         # Automatically export all classes & functions
@@ -497,7 +492,7 @@ function (add_compiler_flags)
 
             ${arg_SCOPE}
                 #-pthread # Enabling pthread
-                "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed
+                "SHELL:-s ALLOW_MEMORY_GROWTH=1" # Automatically reallocate memory if needed (may run non-wasm code slowly if used with pthread)
                 "SHELL:-s DISABLE_EXCEPTION_CATCHING=0" # Force catching exceptions
                 "SHELL:-s OFFSCREEN_FRAMEBUFFER=1" # Enable rendering to offscreen targets
                 "SHELL:-s OFFSCREENCANVAS_SUPPORT=1" # Allow creating multiple GL contexts on separate threads & swapping between them

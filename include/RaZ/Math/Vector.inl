@@ -142,7 +142,7 @@ template <typename T, std::size_t Size>
 constexpr Vector<T, Size> Vector<T, Size>::operator-() const noexcept {
   Vector res;
   for (std::size_t i = 0; i < Size; ++i)
-    res.m_data[i] = -m_data[i];
+    res.m_data[i] = static_cast<T>(-m_data[i]);
   return res;
 }
 
