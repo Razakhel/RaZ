@@ -448,6 +448,29 @@ else ()
     message(STATUS "[RaZ] Lua scripting DISABLED")
 endif ()
 
+if (NOT RAZ_USE_EMSCRIPTEN)
+    # Networking currently isn't available with Emscripten
+    if (RAZ_USE_NETWORKING)
+        file(
+            GLOB
+            RAZ_NETWORK_FILES
+
+            "${PROJECT_SOURCE_DIR}/src/RaZ/Network/*"
+            "${PROJECT_SOURCE_DIR}/include/RaZ/Network/*"
+        )
+        list(APPEND RAZ_FILES ${RAZ_NETWORK_FILES})
+
+        target_link_libraries(RaZ PRIVATE Asio)
+        message(STATUS "[RaZ] Networking ENABLED")
+    else ()
+        message(STATUS "[RaZ] Networking DISABLED")
+    endif ()
+endif ()
+
+if (RAZ_USE_EMSCRIPTEN OR NOT RAZ_USE_NETWORKING)
+    target_compile_definitions(RaZ PUBLIC RAZ_NO_NETWORKING)
+endif ()
+
 if (NOT RAZ_PLATFORM_MAC AND NOT RAZ_USE_EMSCRIPTEN AND RAZ_USE_WINDOW)
     # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
     # TODO: requiring windowing currently makes XR unavailable from the GUI editor, as it handles the windowing part on its own

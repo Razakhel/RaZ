@@ -15,6 +15,12 @@ if (NOT RAZ_USE_EMSCRIPTEN)
         include(GLFW)
     endif ()
 
+    option(RAZ_USE_NETWORKING "Use networking capabilities (with Asio)" ON)
+    if (RAZ_USE_NETWORKING)
+        # Asio requires threading capabilities which aren't yet enabled with Emscripten
+        include(Asio)
+    endif ()
+
     if (NOT RAZ_PLATFORM_MAC AND RAZ_USE_WINDOW)
         # XR currently isn't available with macOS or Emscripten and requires windowing capabilities
         include(OpenXR)
