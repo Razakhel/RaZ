@@ -62,6 +62,10 @@ if (RAZ_USE_WINDOW OR RAZ_USE_EMSCRIPTEN)
         add_example(RaZ_ShowcaseDemo     showcaseDemo.cpp)     # Too many assets to be built (command line too long)
         add_example(RaZ_TessellationDemo tessellationDemo.cpp) # Tessellation shaders are unavailable with WebGL
 
+        if (RAZ_USE_NETWORKING)
+            add_example(RaZ_NetworkDemo networkDemo.cpp) # Networking currently isn't available with Emscripten
+        endif ()
+
         if (NOT RAZ_PLATFORM_MAC)
             add_example(RaZ_XRDemo xrDemo.cpp) # XR currently isn't available with macOS or Emscripten
         endif ()
