@@ -39,6 +39,7 @@ private:
   static void registerMatrixTypes();
   static void registerMeshTypes();
   static void registerMeshRendererTypes();
+  static void registerNetworkTypes();
   static void registerOverlayBaseTypes();
   static void registerOverlayWidgetTypes();
   static void registerPhysicsTypes();

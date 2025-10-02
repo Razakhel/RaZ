@@ -468,6 +468,7 @@ if (NOT RAZ_USE_EMSCRIPTEN)
 endif ()
 
 if (RAZ_USE_EMSCRIPTEN OR NOT RAZ_USE_NETWORKING)
+    list(REMOVE_ITEM RAZ_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Script/LuaNetwork.cpp")
     target_compile_definitions(RaZ PUBLIC RAZ_NO_NETWORKING)
 endif ()
 

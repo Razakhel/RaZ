@@ -29,6 +29,9 @@ void LuaWrapper::registerTypes() {
     registerMatrixTypes();
     registerMeshTypes();
     registerMeshRendererTypes();
+#if !defined(RAZ_NO_NETWORKING)
+    registerNetworkTypes();
+#endif
 #if !defined(RAZ_NO_OVERLAY)
     registerOverlayBaseTypes();
     registerOverlayWidgetTypes();
