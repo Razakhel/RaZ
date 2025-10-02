@@ -15,7 +15,7 @@ void Logger::error(const std::string& message) {
   if (m_logFunc)
     m_logFunc(LoggingLevel::ERROR, message);
   else
-    std::cerr << "[RaZ] [Error] - " << message << '\n';
+    std::cerr << std::format("[RaZ] [Error] - {}\n", message);
 }
 
 void Logger::warn(const std::string& message) {
@@ -27,7 +27,7 @@ void Logger::warn(const std::string& message) {
   if (m_logFunc)
     m_logFunc(LoggingLevel::WARNING, message);
   else
-    std::cerr << "[RaZ] [Warning] - " << message << '\n';
+    std::cerr << std::format("[RaZ] [Warning] - {}\n", message);
 }
 
 void Logger::info(const std::string& message) {
@@ -39,7 +39,7 @@ void Logger::info(const std::string& message) {
   if (m_logFunc)
     m_logFunc(LoggingLevel::INFO, message);
   else
-    std::cout << "[RaZ] [Info] - " << message << '\n';
+    std::cout << std::format("[RaZ] [Info] - {}\n", message);
 }
 
 #if defined(RAZ_CONFIG_DEBUG) || defined(RAZ_FORCE_DEBUG_LOG)
@@ -52,7 +52,7 @@ void Logger::debug(const std::string& message) {
   if (m_logFunc)
     m_logFunc(LoggingLevel::DEBUG, message);
   else
-    std::cout << "[RaZ] [Debug] - " << message << '\n';
+    std::cout << std::format("[RaZ] [Debug] - {}\n", message);
 }
 #endif
 
