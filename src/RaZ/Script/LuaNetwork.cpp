@@ -14,9 +14,11 @@ void LuaWrapper::registerNetworkTypes() {
     sol::usertype<TcpClient> tcpClient = state.new_usertype<TcpClient>("TcpClient",
                                                                        sol::constructors<TcpClient(),
                                                                                          TcpClient(const std::string&, unsigned short)>());
-    tcpClient["connect"] = &TcpClient::connect;
-    tcpClient["send"]    = &TcpClient::send;
-    tcpClient["close"]   = &TcpClient::close;
+    tcpClient["connect"]                   = &TcpClient::connect;
+    tcpClient["send"]                      = &TcpClient::send;
+    tcpClient["recoverAvailableByteCount"] = &TcpClient::recoverAvailableByteCount;
+    tcpClient["receive"]                   = &TcpClient::receive;
+    tcpClient["close"]                     = &TcpClient::close;
   }
 
   {

@@ -29,12 +29,23 @@ void TcpClient::connect(const std::string& host, unsigned short port) {
   Logger::debug("[TcpClient] Connected");
 }
 
-std::string TcpClient::send(const std::string& request) {
-  Logger::debug("[TcpClient] Sending '{}'...", request);
+void TcpClient::send(const std::string& data) {
+  Logger::debug("[TcpClient] Sending '{}'...", data);
 
-  asio::write(m_impl->socket, asio::buffer(request));
+  asio::error_code error;
+  asio::write(m_impl->socket, asio::buffer(data), error);
 
-  // Getting back the response from the server
+  if (error)
+    throw std::runtime_error(std::format("[TcpClient] Failed to send data: {}", error.message()));
+}
+
+std::size_t TcpClient::recoverAvailableByteCount() {
+  asio::detail::io_control::bytes_readable command(true);
+  m_impl->socket.io_control(command);
+  return command.get();
+}
+
+std::string TcpClient::receive() {
   std::array<char, 1024> buffer {};
   const size_t length = m_impl->socket.read_some(asio::buffer(buffer));
   return std::string(buffer.data(), length);

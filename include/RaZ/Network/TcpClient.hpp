@@ -12,6 +12,8 @@ class TcpClient {
 public:
   TcpClient();
   TcpClient(const std::string& host, unsigned short port) : TcpClient() { connect(host, port); }
+  TcpClient(const TcpClient&) = delete;
+  TcpClient(TcpClient&&) noexcept = default;
 
   /// Connects the client to a server.
   /// \param host Host to establish a connection with.
@@ -19,11 +21,18 @@ public:
   void connect(const std::string& host, unsigned short port);
   /// Sends data to the server the client is connected to.
   /// \note This operation is blocking and returns only when all data has been sent or if an error occurred.
-  /// \param request Data to be sent.
-  /// \return Response sent by the server.
-  std::string send(const std::string& request);
+  /// \param data Data to be sent.
+  void send(const std::string& data);
+  /// Recovers the number of currently available bytes to be received.
+  /// \return Number of bytes that can be received.
+  std::size_t recoverAvailableByteCount();
+  /// Receives the data that have been sent to the client.
+  std::string receive();
   /// Closes the client.
   void close();
+
+  TcpClient& operator=(const TcpClient&) = delete;
+  TcpClient& operator=(TcpClient&&) noexcept = default;
 
   ~TcpClient();
 

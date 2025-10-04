@@ -39,7 +39,7 @@ public:
   /// \param windowWidth Width of the window.
   /// \param windowHeight Height of the window.
   /// \param windowTitle Title of the window.
-  /// \param settings Settings to create the window with.
+  /// \param windowSettings Settings to create the window with.
   /// \param antiAliasingSampleCount Number of anti-aliasing samples.
   /// \note The window's width & height are to be considered just hints; the window manager remains responsible for the actual dimensions, which may be lower.
   ///   This can notably happen when the requested window size exceeds what the screens can display. The actual window's size can be queried afterward.

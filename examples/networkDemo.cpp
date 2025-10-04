@@ -22,8 +22,8 @@ int main() {
       if (request == "q")
         break;
 
-      const std::string response = client.send(request);
-      std::cout << "Received back: " << response << '\n';
+      client.send(request);
+      std::cout << std::format("Received back: {}\n", client.receive());
     }
 
     client.close();
