@@ -21,7 +21,7 @@ void LuaWrapper::registerNetworkTypes() {
 
   {
     sol::usertype<TcpServer> tcpServer = state.new_usertype<TcpServer>("TcpServer",
-                                                                       sol::constructors<TcpServer(unsigned short)>());
+                                                                       sol::constructors<TcpServer()>());
     tcpServer["start"] = &TcpServer::start;
     tcpServer["stop"]  = &TcpServer::stop;
   }

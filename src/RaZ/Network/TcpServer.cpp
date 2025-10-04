@@ -39,19 +39,21 @@ void runSession(asio::ip::tcp::socket socket) {
 }
 
 struct TcpServer::Impl {
-  explicit Impl(unsigned short port) : acceptor(context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port)) {}
+  Impl() : acceptor(context) {}
 
   asio::io_context context;
   asio::ip::tcp::acceptor acceptor;
 };
 
-TcpServer::TcpServer(unsigned short port) : m_impl{ std::make_unique<Impl>(port) } {}
+TcpServer::TcpServer() : m_impl{ std::make_unique<Impl>() } {}
 
-void TcpServer::start() {
-  Logger::debug("[TcpServer] Starting...");
+void TcpServer::start(unsigned short port) {
+  Logger::debug("[TcpServer] Starting on port {}...", port);
+
+  setup(port);
 
   while (true) {
-    Logger::debug("[TcpServer] Awaiting connection on port {}...", m_impl->acceptor.local_endpoint().port());
+    Logger::debug("[TcpServer] Awaiting connection on port {}...", port);
 
     std::error_code error;
     asio::ip::tcp::socket socket = m_impl->acceptor.accept(error);
@@ -72,5 +74,13 @@ void TcpServer::stop() {
 }
 
 TcpServer::~TcpServer() = default;
+
+void TcpServer::setup(unsigned short port) {
+  const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
+  m_impl->acceptor.open(endpoint.protocol());
+  m_impl->acceptor.set_option(asio::socket_base::reuse_address(true));
+  m_impl->acceptor.bind(endpoint);
+  m_impl->acceptor.listen();
+}
 
 } // namespace Raz

@@ -9,17 +9,25 @@ namespace Raz {
 
 class TcpServer {
 public:
-  explicit TcpServer(unsigned short port);
+  TcpServer();
+  TcpServer(const TcpServer&) = delete;
+  TcpServer(TcpServer&&) noexcept = default;
 
   /// Starts the server and listens for connections.
   /// \note This operation is blocking; call the function from another thread if needed.
-  void start();
+  /// \param port Port to listen for connections on.
+  void start(unsigned short port);
   /// Stops the server.
   void stop();
+
+  TcpServer& operator=(const TcpServer&) = delete;
+  TcpServer& operator=(TcpServer&&) noexcept = default;
 
   ~TcpServer();
 
 private:
+  void setup(unsigned short port);
+
   struct Impl;
   std::unique_ptr<Impl> m_impl;
 };
