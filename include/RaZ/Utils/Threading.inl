@@ -16,7 +16,7 @@ std::future<ResultT> launchAsync(FuncT&& action, Args&&... args) {
 #endif
 }
 
-template <typename BegIndexT, typename EndIndexT, typename FuncT, typename>
+template <std::integral BegIndexT, std::integral EndIndexT, typename FuncT>
 void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int taskCount) {
   static_assert(std::is_invocable_v<FuncT, IndexRange>, "Error: The given action must take an IndexRange as parameter");
 
@@ -62,7 +62,7 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, 
 #endif
 }
 
-template <typename IterT, typename FuncT, typename>
+template <std::input_iterator IterT, typename FuncT>
 void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskCount) {
   static_assert(std::is_invocable_v<FuncT, IterRange<IterT>>, "Error: The given action must take an IterRange as parameter");
 
@@ -109,7 +109,7 @@ void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskC
 #endif
 }
 
-template <typename BegIndexT, typename EndIndexT, typename ParallelFuncT, typename ReduceFuncT, typename>
+template <std::integral BegIndexT, std::integral EndIndexT, typename ParallelFuncT, typename ReduceFuncT>
 auto parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex, const ParallelFuncT& action, const ReduceFuncT& reduce, unsigned int taskCount) {
   static_assert(std::is_invocable_v<ParallelFuncT, IndexRange>, "Error: The given parallel action must take an IndexRange as parameter");
 
@@ -164,7 +164,7 @@ auto parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex, const ParallelF
 #endif
 }
 
-template <typename IterT, typename ParallelFuncT, typename ReduceFuncT, typename>
+template <std::input_iterator IterT, typename ParallelFuncT, typename ReduceFuncT>
 auto parallelizeReduce(IterT begin, IterT end, const ParallelFuncT& action, const ReduceFuncT& reduce, unsigned int taskCount) {
   static_assert(std::is_invocable_v<ParallelFuncT, IterRange<IterT>>, "Error: The given parallel action must take an IterRange as parameter");
 
