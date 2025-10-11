@@ -15,6 +15,8 @@ public:
   TcpClient(const TcpClient&) = delete;
   TcpClient(TcpClient&&) noexcept = default;
 
+  bool isConnected() const;
+
   /// Connects the client to a server.
   /// \param host Host to establish a connection with.
   /// \param port Port to connect to.
@@ -28,8 +30,8 @@ public:
   std::size_t recoverAvailableByteCount();
   /// Receives the data that have been sent to the client.
   std::string receive();
-  /// Closes the client.
-  void close();
+  /// Disconnects the client from the server.
+  void disconnect();
 
   TcpClient& operator=(const TcpClient&) = delete;
   TcpClient& operator=(TcpClient&&) noexcept = default;

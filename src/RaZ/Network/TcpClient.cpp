@@ -17,6 +17,10 @@ struct TcpClient::Impl {
 
 TcpClient::TcpClient() : m_impl{ std::make_unique<Impl>() } {}
 
+bool TcpClient::isConnected() const {
+  return m_impl->socket.is_open();
+}
+
 void TcpClient::connect(const std::string& host, unsigned short port) {
   Logger::debug("[TcpClient] Connecting to {}:{}...", host, port);
 
@@ -51,7 +55,10 @@ std::string TcpClient::receive() {
   return std::string(buffer.data(), length);
 }
 
-void TcpClient::close() {
+void TcpClient::disconnect() {
+  if (!isConnected())
+    return;
+
   Logger::debug("[TcpClient] Closing...");
   m_impl->socket.shutdown(asio::socket_base::shutdown_both);
   m_impl->socket.close();

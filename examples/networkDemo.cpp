@@ -26,7 +26,7 @@ int main() {
       std::cout << std::format("Received back: {}\n", client.receive());
     }
 
-    client.close();
+    client.disconnect();
     server.stop();
   } catch (const std::exception& exception) {
     Raz::Logger::error("Exception occurred: {}", exception.what());

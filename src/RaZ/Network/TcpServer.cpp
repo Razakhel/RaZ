@@ -18,8 +18,8 @@ void runSession(asio::ip::tcp::socket socket) {
 
       const size_t length = socket.read_some(asio::buffer(data), error);
 
-      if (error == asio::error::eof) {
-        Logger::debug("[TcpServer] Connection closed");
+      if (error == asio::error::eof || error == asio::error::connection_reset) {
+        Logger::debug("[TcpServer] Connection with {} closed", socket.remote_endpoint().address().to_string());
         break;
       }
 
@@ -61,7 +61,7 @@ void TcpServer::start(unsigned short port) {
     if (error == asio::error::interrupted)
       break; // Server closed
 
-    Logger::debug("[TcpServer] Connected");
+    Logger::debug("[TcpServer] Connected to {}", socket.remote_endpoint().address().to_string());
     std::thread(runSession, std::move(socket)).detach();
   }
 }
