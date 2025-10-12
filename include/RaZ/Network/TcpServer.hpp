@@ -27,6 +27,7 @@ public:
 
 private:
   void setup(unsigned short port);
+  void accept();
 
   struct Impl;
   std::unique_ptr<Impl> m_impl;

@@ -10,33 +10,46 @@ namespace Raz {
 
 namespace {
 
-void runSession(asio::ip::tcp::socket socket) {
-  try {
-    while (true) {
-      std::array<char, 1024> data {};
-      std::error_code error;
+class TcpSession : public std::enable_shared_from_this<TcpSession> {
+public:
+  explicit TcpSession(asio::ip::tcp::socket socket) noexcept : m_socket{ std::move(socket) } {}
 
-      const size_t length = socket.read_some(asio::buffer(data), error);
+  void run() {
+    Logger::debug("[TcpSession] Connected to {}", m_socket.remote_endpoint().address().to_string());
+    receive();
+  }
 
+private:
+  void receive() {
+    m_socket.async_read_some(asio::buffer(m_data), [self = shared_from_this()] (const asio::error_code& error, std::size_t length) {
       if (error == asio::error::eof || error == asio::error::connection_reset) {
-        Logger::debug("[TcpServer] Connection with {} closed", socket.remote_endpoint().address().to_string());
-        break;
+        Logger::debug("[TcpSession] Connection with {} closed", self->m_socket.remote_endpoint().address().to_string());
+        return;
       }
 
-      if (error)
-        throw std::system_error(error);
+      if (error) {
+        Logger::error("[TcpSession] Error while receiving data: {}", error.message());
+      } else {
+        Logger::debug("[TcpSession] Received: {}", self->m_data.data());
+        self->echo(length); // Replying with the same received data
+      }
 
-      Logger::debug("[TcpServer] Received: {}", data.data());
-
-      // Answering with the same received data
-      asio::write(socket, asio::buffer(data, length));
-    }
-  } catch (const std::exception& exception) {
-    Logger::error("[TcpServer] Exception occurred: {}", exception.what());
+      self->receive();
+    });
   }
-}
 
-}
+  void echo(std::size_t length) {
+    asio::async_write(m_socket, asio::buffer(m_data, length), [] (const asio::error_code& error, std::size_t) {
+      if (error)
+        Logger::error("[TcpSession] Error while echoing: {}", error.message());
+    });
+  }
+
+  asio::ip::tcp::socket m_socket;
+  std::array<char, 1024> m_data {};
+};
+
+} // namespace
 
 struct TcpServer::Impl {
   Impl() : acceptor(context) {}
@@ -51,19 +64,9 @@ void TcpServer::start(unsigned short port) {
   Logger::debug("[TcpServer] Starting on port {}...", port);
 
   setup(port);
+  accept();
 
-  while (true) {
-    Logger::debug("[TcpServer] Awaiting connection on port {}...", port);
-
-    std::error_code error;
-    asio::ip::tcp::socket socket = m_impl->acceptor.accept(error);
-
-    if (error == asio::error::interrupted)
-      break; // Server closed
-
-    Logger::debug("[TcpServer] Connected to {}", socket.remote_endpoint().address().to_string());
-    std::thread(runSession, std::move(socket)).detach();
-  }
+  m_impl->context.run();
 }
 
 void TcpServer::stop() {
@@ -81,6 +84,22 @@ void TcpServer::setup(unsigned short port) {
   m_impl->acceptor.set_option(asio::socket_base::reuse_address(true));
   m_impl->acceptor.bind(endpoint);
   m_impl->acceptor.listen();
+}
+
+void TcpServer::accept() {
+  Logger::debug("[TcpServer] Awaiting connection...");
+
+  m_impl->acceptor.async_accept([this] (const asio::error_code& error, asio::ip::tcp::socket socket) {
+    if (error == asio::error::interrupted || error == asio::error::operation_aborted)
+      return; // Server closed
+
+    if (error)
+      Logger::error("[TcpServer] Error while accepting connection: {}", error.message());
+    else
+      std::make_shared<TcpSession>(std::move(socket))->run();
+
+    accept();
+  });
 }
 
 } // namespace Raz
