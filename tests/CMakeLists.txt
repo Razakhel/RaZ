@@ -23,16 +23,8 @@ if (RAZ_COMPILER_CLANG)
         RaZ_Tests
 
         PRIVATE
-            -Wno-double-promotion # [long] double/float operations are voluntarily made
-            -Wno-float-conversion # Can occur voluntarily for readability
-            -Wno-implicit-int-float-conversion # Can occur voluntarily for readability
             -Wno-unneeded-member-function # Test structures may contain unnecessary member functions
     )
-
-    # Disabling some other warnings available since Clang 13.X
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13 AND NOT APPLE)
-        target_compile_options(RaZ_Tests PRIVATE -Wno-reserved-identifier) # Each Catch test case macro triggers this
-    endif ()
 elseif (RAZ_COMPILER_MSVC)
     target_compile_options(
         RaZ_Tests
@@ -41,12 +33,7 @@ elseif (RAZ_COMPILER_MSVC)
             /wd4723 # Potential divide by 0
 
             # Warnings triggered by Catch
-            /wd4388 # Signed/unsigned mismatch (equality comparison)
-            /wd4583 # Destructor not implicitly called
-            /wd4623 # Default constructor implicitly deleted
             /wd4868 # Evaluation order not guaranteed in braced initializing list
-            /wd5219 # Implicit conversion, possible loss of data
-            /wd5267 # Assignment operator implicitly deleted
     )
 endif ()
 

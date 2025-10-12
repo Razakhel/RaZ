@@ -273,7 +273,7 @@ TEST_CASE("Vector normalization", "[math]") {
   CHECK(Raz::Vec3b(0).normalize() == Raz::Vec3f(0.f));
   CHECK(Raz::Vec3i(0).normalize() == Raz::Vec3f(0.f));
   CHECK(Raz::Vec3f(0.f).normalize() == Raz::Vec3f(0.f));
-  CHECK(Raz::Vec3d(0.0).normalize() == Raz::Vec3d(0.f));
+  CHECK(Raz::Vec3d(0.0).normalize() == Raz::Vec3d(0.0));
 }
 
 TEST_CASE("Vector interpolation", "[math]") {
