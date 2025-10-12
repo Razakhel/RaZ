@@ -78,12 +78,7 @@ if (RAZ_USE_LUA)
     list(APPEND RAZ_TESTS_SRC src/RaZ/Script/*.cpp)
 endif ()
 
-file(
-    GLOB
-    RAZ_TEST_FILES
-
-    ${RAZ_TESTS_SRC}
-)
+file(GLOB RAZ_TEST_FILES ${RAZ_TESTS_SRC})
 
 ############################
 # RaZ Tests - Audio/OpenAL #
@@ -113,12 +108,16 @@ endif ()
 ###############################
 
 if (NOT RAZ_USE_FBX)
-    list(
-        REMOVE_ITEM
-        RAZ_TEST_FILES
+    list(REMOVE_ITEM RAZ_TEST_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Data/FbxFormat.cpp")
+endif ()
 
-        "${PROJECT_SOURCE_DIR}/src/RaZ/Data/FbxFormat.cpp"
-    )
+##########################
+# RaZ Tests - Networking #
+##########################
+
+if (RAZ_USE_NETWORKING AND NOT RAZ_USE_EMSCRIPTEN)
+    file(GLOB RAZ_NETWORK_TEST_FILES "${PROJECT_SOURCE_DIR}/src/RaZ/Network/*.cpp")
+    list(APPEND RAZ_TEST_FILES ${RAZ_NETWORK_TEST_FILES})
 endif ()
 
 #####################

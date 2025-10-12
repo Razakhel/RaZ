@@ -30,7 +30,7 @@ private:
       if (error) {
         Logger::error("[TcpSession] Error while receiving data: {}", error.message());
       } else {
-        Logger::debug("[TcpSession] Received: {}", self->m_data.data());
+        Logger::debug("[TcpSession] Received: {}", std::string_view(self->m_data.data(), length));
         self->echo(length); // Replying with the same received data
       }
 
@@ -79,6 +79,9 @@ void TcpServer::stop() {
 TcpServer::~TcpServer() = default;
 
 void TcpServer::setup(unsigned short port) {
+  if (m_impl->context.stopped())
+    m_impl->context.restart();
+
   const asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
   m_impl->acceptor.open(endpoint.protocol());
   m_impl->acceptor.set_option(asio::socket_base::reuse_address(true));
