@@ -4,7 +4,7 @@
 
 project(OpenXR)
 
-add_library(OpenXR STATIC)
+add_library(OpenXR OBJECT)
 
 target_compile_features(OpenXR PRIVATE cxx_std_14)
 

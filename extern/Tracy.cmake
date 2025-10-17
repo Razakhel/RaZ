@@ -4,7 +4,7 @@
 
 project(Tracy)
 
-add_library(Tracy STATIC)
+add_library(Tracy OBJECT)
 
 target_compile_features(Tracy PRIVATE cxx_std_17)
 
