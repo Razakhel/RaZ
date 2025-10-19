@@ -12,7 +12,8 @@ jobs:
       ${{ !matrix.use_audio && ', no audio' || '' }}\
       ${{ !matrix.use_lua && ', no Lua' || '' }}\
       ${{ !matrix.use_networking && ', no networking' || '' }}\
-      ${{ !matrix.use_window && ', no window' || '' }})"
+      ${{ !matrix.use_window && ', no window' || '' }}\
+      ${{ matrix.coverage && ', coverage' || '' }})"
     runs-on: ubuntu-24.04
 
     strategy:
@@ -32,11 +33,14 @@ jobs:
           - true
         use_window:
           - true
+        coverage:
+          - false
         include:
-          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: false, use_lua: true, use_networking: true, use_window: true }
-          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: false, use_networking: true, use_window: true }
-          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: true, use_networking: false, use_window: true }
-          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: true, use_networking: true, use_window: false }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: false, use_lua: true, use_networking: true, use_window: true, coverage: false }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: false, use_networking: true, use_window: true, coverage: false }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: true, use_networking: false, use_window: true, coverage: false }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: true, use_networking: true, use_window: false, coverage: false }
+          - { compiler: { c: gcc, cpp: g++ }, build_type: Debug, use_audio: true, use_lua: true, use_networking: true, use_window: true, coverage: true }
 
     steps:
     - uses: actions/checkout@v4
@@ -83,13 +87,14 @@ jobs:
         cmake -GNinja \
               -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
               -DCMAKE_C_COMPILER=${{ matrix.compiler.c }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cpp }} \
-              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON \
               -DRAZ_USE_AUDIO=${{ matrix.use_audio && 'ON' || 'OFF' }} \
               -DRAZ_USE_LUA=${{ matrix.use_lua && 'ON' || 'OFF' }} \
               -DRAZ_USE_NETWORKING=${{ matrix.use_networking && 'ON' || 'OFF' }} \
               -DRAZ_USE_WINDOW=${{ matrix.use_window && 'ON' || 'OFF' }} \
               -DRAZ_USE_IMGUI=${{ matrix.use_window && 'ON' || 'OFF' }} \
-              -DRAZ_USE_FBX=OFF -DRAZ_BUILD_TESTS=ON ${{ matrix.compiler.c == 'gcc' && '-DRAZ_ENABLE_COVERAGE=ON' || '' }} \
+              -DRAZ_USE_FBX=OFF \
+              -DRAZ_BUILD_EXAMPLES=ON -DRAZ_GEN_DOC=ON \
+              -DRAZ_BUILD_TESTS=ON -DRAZ_ENABLE_COVERAGE=${{ matrix.coverage && 'ON' || 'OFF' }} \
               -DSKIP_RENDERER_ERRORS=ON -DENABLE_DEBUG_INFO=ON \
               ${{ github.workspace }} &&
         cmake --build . --target RaZ_PrintDebugInfo --config ${{ matrix.build_type }}
@@ -120,18 +125,18 @@ jobs:
         ALSOFT_DRIVERS=null xvfb-run -a --server-args='-screen 0 1280x720x16' \
         gdb --batch --return-child-result -x '${{ github.workspace }}/tests/assets/debug/gdb_commands.txt' --args ./tests/RaZ_Tests [render]
 
-    # Preparing code coverage; only done with GCC in Debug with all features enabled
+    # Preparing code coverage
     - name: Coverage setup
-      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
+      if: matrix.coverage
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
       run: |
         lcov -d ./CMakeFiles/RaZ.dir/src/ -c -o coverage.info &&
         lcov -r coverage.info '/usr/*' '${{ github.workspace }}/extern/*' -o coverage.info &&
         lcov -l coverage.info
 
-    # Processing code coverage; only done with GCC in Debug with all features enabled
+    # Processing code coverage
     - name: Coverage processing
-      if: matrix.compiler.c == 'gcc' && matrix.build_type == 'Debug' && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
+      if: matrix.coverage
       uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -143,7 +148,7 @@ jobs:
       run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
 
     - name: Upload build
-      if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
+      if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window && !matrix.coverage
       uses: actions/upload-artifact@v4
       with:
         name: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
