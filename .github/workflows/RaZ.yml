@@ -15,6 +15,9 @@ jobs:
       ${{ !matrix.use_window && ', no window' || '' }}\
       ${{ matrix.coverage && ', coverage' || '' }})"
     runs-on: ubuntu-24.04
+    env:
+      ARTIFACT_NAME: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       fail-fast: false
@@ -145,16 +148,20 @@ jobs:
     # Installing RaZ in the build directory; default is /usr/local
     - name: Install
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
+      run: sudo cmake --install . --prefix ./RaZ --config ${{ matrix.build_type }}
 
-    - name: Upload build
+    - name: Upload build artifact
       if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window && !matrix.coverage
       uses: actions/upload-artifact@v4
       with:
-        name: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
-        path: |
-          ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/include
-          ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/lib
+        name: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}
+        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ
+
+    - name: Deploy nightly
+      if: github.ref_name == github.event.repository.default_branch && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window && !matrix.coverage
+      run: |
+        tar -C ${{ runner.workspace }}/build-${{ matrix.compiler.c }} -czvf ${{ env.ARTIFACT_NAME }}.tar.gz RaZ &&
+        gh release upload nightly --clobber ${{ env.ARTIFACT_NAME }}.tar.gz
 
   ###########
   # Windows #
@@ -168,6 +175,8 @@ jobs:
       ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: windows-2022
     env:
+      ARTIFACT_NAME: RaZ-windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       OPENAL_VERSION: 1.23.1
 
     strategy:
@@ -243,15 +252,20 @@ jobs:
 
     - name: Install
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: cmake --install . --prefix C:/RaZ --config ${{ matrix.build_type }}
+      run: cmake --install . --prefix ./RaZ --config ${{ matrix.build_type }}
 
-    - name: Upload build
+    - name: Upload build artifact
       if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
       uses: actions/upload-artifact@v4
       with:
-        name: RaZ-windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
-        path: |
-          C:/RaZ
+        name: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}
+        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ
+
+    - name: Deploy nightly
+      if: github.ref_name == github.event.repository.default_branch && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
+      run: |
+        7z a ${{ env.ARTIFACT_NAME }}.zip ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ &&
+        gh release upload nightly --clobber ${{ env.ARTIFACT_NAME }}.zip
 
   #########
   # macOS #
@@ -264,6 +278,9 @@ jobs:
       ${{ !matrix.use_networking && ', no networking' || '' }}\
       ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: macos-15
+    env:
+      ARTIFACT_NAME: RaZ-macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       fail-fast: false
@@ -330,16 +347,20 @@ jobs:
     # Installing RaZ in the build directory; default is /usr/local
     - name: Install
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: sudo cmake --install . --prefix ./ --config ${{ matrix.build_type }}
+      run: sudo cmake --install . --prefix ./RaZ --config ${{ matrix.build_type }}
 
-    - name: Upload build
+    - name: Upload build artifact
       if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
       uses: actions/upload-artifact@v4
       with:
-        name: RaZ-macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
-        path: |
-          ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/include
-          ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/lib
+        name: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}
+        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ
+
+    - name: Deploy nightly
+      if: github.ref_name == github.event.repository.default_branch && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
+      run: |
+        tar -C ${{ runner.workspace }}/build-${{ matrix.compiler.c }} -czvf ${{ env.ARTIFACT_NAME }}.tar.gz RaZ &&
+        gh release upload nightly --clobber ${{ env.ARTIFACT_NAME }}.tar.gz
 
   ##############
   # Emscripten #
