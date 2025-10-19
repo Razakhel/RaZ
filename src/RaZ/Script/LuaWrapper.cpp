@@ -109,7 +109,7 @@ sol::state& LuaWrapper::getState() {
     Logger::debug("[LuaWrapper] Initializing state...");
 
     sol::state luaState;
-    luaState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+    luaState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::string);
 
     Logger::debug("[LuaWrapper] Initialized state");
 
