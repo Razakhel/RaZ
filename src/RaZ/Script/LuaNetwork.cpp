@@ -1,5 +1,6 @@
 #include "RaZ/Network/TcpClient.hpp"
 #include "RaZ/Network/TcpServer.hpp"
+#include "RaZ/Network/UdpServer.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
@@ -27,6 +28,13 @@ void LuaWrapper::registerNetworkTypes() {
                                                                        sol::constructors<TcpServer()>());
     tcpServer["start"] = &TcpServer::start;
     tcpServer["stop"]  = &TcpServer::stop;
+  }
+
+  {
+    sol::usertype<UdpServer> udpServer = state.new_usertype<UdpServer>("UdpServer",
+                                                                       sol::constructors<UdpServer()>());
+    udpServer["start"] = &UdpServer::start;
+    udpServer["stop"]  = &UdpServer::stop;
   }
 }
 
