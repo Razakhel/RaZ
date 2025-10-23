@@ -1,5 +1,6 @@
 #include "RaZ/Network/TcpClient.hpp"
 #include "RaZ/Network/TcpServer.hpp"
+#include "RaZ/Network/UdpClient.hpp"
 #include "RaZ/Network/UdpServer.hpp"
 #include "RaZ/Script/LuaWrapper.hpp"
 
@@ -28,6 +29,16 @@ void LuaWrapper::registerNetworkTypes() {
                                                                        sol::constructors<TcpServer()>());
     tcpServer["start"] = &TcpServer::start;
     tcpServer["stop"]  = &TcpServer::stop;
+  }
+
+  {
+    sol::usertype<UdpClient> udpClient = state.new_usertype<UdpClient>("UdpClient",
+                                                                       sol::constructors<UdpClient()>());
+    udpClient["setDestination"]            = &UdpClient::setDestination;
+    udpClient["send"]                      = &UdpClient::send;
+    udpClient["recoverAvailableByteCount"] = &UdpClient::recoverAvailableByteCount;
+    udpClient["receive"]                   = &UdpClient::receive;
+    udpClient["close"]                     = &UdpClient::close;
   }
 
   {

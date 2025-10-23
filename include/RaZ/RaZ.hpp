@@ -49,6 +49,7 @@
 #include "Math/Vector.hpp"
 #include "Network/TcpClient.hpp"
 #include "Network/TcpServer.hpp"
+#include "Network/UdpClient.hpp"
 #include "Network/UdpServer.hpp"
 #include "Physics/Collider.hpp"
 #include "Physics/PhysicsSystem.hpp"

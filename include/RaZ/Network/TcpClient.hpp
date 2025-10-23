@@ -18,6 +18,7 @@ public:
   bool isConnected() const;
 
   /// Connects the client to a server.
+  /// \note This operation is blocking and returns only when a connection has been established or if an error occurred.
   /// \param host Host to establish a connection with.
   /// \param port Port to connect to.
   void connect(const std::string& host, unsigned short port);
@@ -28,7 +29,8 @@ public:
   /// Recovers the number of currently available bytes to be received.
   /// \return Number of bytes that can be received.
   std::size_t recoverAvailableByteCount();
-  /// Receives the data that have been sent to the client.
+  /// Receives the data that has been sent to the client.
+  /// \note This operation is blocking and returns only when at least one byte has been received or if an error occurred.
   std::string receive();
   /// Disconnects the client from the server.
   void disconnect();
