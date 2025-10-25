@@ -21,9 +21,6 @@ jobs:
       ${{ !matrix.use_window && ', no window' || '' }}\
       ${{ matrix.coverage && ', coverage' || '' }})"
     runs-on: ubuntu-24.04
-    env:
-      ARTIFACT_NAME: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       fail-fast: false
@@ -154,20 +151,14 @@ jobs:
     # Installing RaZ in the build directory; default is /usr/local
     - name: Install
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: sudo cmake --install . --prefix ./RaZ --config ${{ matrix.build_type }}
+      run: sudo cmake --install . --prefix ./install/RaZ --config ${{ matrix.build_type }}
 
     - name: Upload build artifact
       if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window && !matrix.coverage
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}
-        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ
-
-    - name: Deploy nightly
-      if: github.ref_name == github.event.repository.default_branch && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window && !matrix.coverage
-      run: |
-        tar -C ${{ runner.workspace }}/build-${{ matrix.compiler.c }} -czvf ${{ env.ARTIFACT_NAME }}.tar.gz RaZ &&
-        gh release upload nightly --clobber ${{ env.ARTIFACT_NAME }}.tar.gz
+        name: RaZ-linux-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
+        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/install
 
   ###########
   # Windows #
@@ -181,8 +172,6 @@ jobs:
       ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: windows-2022
     env:
-      ARTIFACT_NAME: RaZ-windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       OPENAL_VERSION: 1.23.1
 
     strategy:
@@ -258,20 +247,14 @@ jobs:
 
     - name: Install
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: cmake --install . --prefix ./RaZ --config ${{ matrix.build_type }}
+      run: cmake --install . --prefix ./install/RaZ --config ${{ matrix.build_type }}
 
     - name: Upload build artifact
       if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}
-        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ
-
-    - name: Deploy nightly
-      if: github.ref_name == github.event.repository.default_branch && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
-      run: |
-        7z a ${{ env.ARTIFACT_NAME }}.zip ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ &&
-        gh release upload nightly --clobber ${{ env.ARTIFACT_NAME }}.zip
+        name: RaZ-windows-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
+        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/install
 
   #########
   # macOS #
@@ -284,9 +267,6 @@ jobs:
       ${{ !matrix.use_networking && ', no networking' || '' }}\
       ${{ !matrix.use_window && ', no window' || '' }})"
     runs-on: macos-15
-    env:
-      ARTIFACT_NAME: RaZ-macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     strategy:
       fail-fast: false
@@ -353,20 +333,14 @@ jobs:
     # Installing RaZ in the build directory; default is /usr/local
     - name: Install
       working-directory: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}
-      run: sudo cmake --install . --prefix ./RaZ --config ${{ matrix.build_type }}
+      run: sudo cmake --install . --prefix ./install/RaZ --config ${{ matrix.build_type }}
 
     - name: Upload build artifact
       if: matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.ARTIFACT_NAME }}-${{ github.sha }}
-        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/RaZ
-
-    - name: Deploy nightly
-      if: github.ref_name == github.event.repository.default_branch && matrix.use_audio && matrix.use_lua && matrix.use_networking && matrix.use_window
-      run: |
-        tar -C ${{ runner.workspace }}/build-${{ matrix.compiler.c }} -czvf ${{ env.ARTIFACT_NAME }}.tar.gz RaZ &&
-        gh release upload nightly --clobber ${{ env.ARTIFACT_NAME }}.tar.gz
+        name: RaZ-macos-${{ matrix.compiler.c }}-${{ matrix.build_type }}-${{ github.sha }}
+        path: ${{ runner.workspace }}/build-${{ matrix.compiler.c }}/install
 
   ##############
   # Emscripten #
@@ -460,3 +434,55 @@ jobs:
         run: |
           cmake --build . --config ${{ matrix.build_type }} &&
           pwd && find .
+
+  ###################
+  # Nightly release #
+  ###################
+
+  nightly:
+    if: github.ref_name == github.event.repository.default_branch
+    name: "Release nightly"
+    runs-on: ubuntu-latest
+    needs: [linux, windows, macos]
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      # Running git commands requires an actual project; getting as few files as possible
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            README.md
+          sparse-checkout-cone-mode: false
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create archives
+        run: |
+          ls -al .
+          for artifactDir in *${{ github.sha }}/; do
+            archiveName="${artifactDir:0:-42}"
+            if [[ $archiveName == *"windows"* ]]; then
+              command="7z a -tzip $archiveName.zip ${artifactDir}RaZ"
+            else
+              command="tar -C $artifactDir -czvf $archiveName.tar.gz RaZ"
+            fi
+            echo "Running '$command'..."
+            eval $command
+          done
+
+      - name: Upload archives
+        run: |
+          ls -al .
+          for archive in *.tar.gz *.zip; do
+            echo "Uploading $archive..."
+            gh release upload nightly --clobber $archive
+          done
+
+      - name: Update tag
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git tag -f nightly
+          git push --force origin nightly
