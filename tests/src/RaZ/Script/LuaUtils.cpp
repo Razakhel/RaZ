@@ -98,6 +98,7 @@ TEST_CASE("LuaUtils Shape", "[script][lua][utils]") {
     assert(aabb:getMinPosition() == Vec3f.new(-1))
     assert(aabb:getMaxPosition() == Vec3f.new(1))
     assert(aabb:computeHalfExtents() == Vec3f.new(1))
+    assert(aabb:computeCorners().minMinMin == aabb:getMinPosition())
 
     local line = Line.new(Vec3f.new(-1), Vec3f.new(1))
     assert(line:getBeginPos() == Vec3f.new(-1))

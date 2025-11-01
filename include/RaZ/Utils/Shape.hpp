@@ -17,6 +17,17 @@ class Quad;
 class AABB;
 class OBB;
 
+struct BoxCorners {
+  Vec3f minMinMin; ///< Point in [Min X; Min Y; Min Z].
+  Vec3f minMinMax; ///< Point in [Min X; Min Y; Max Z].
+  Vec3f minMaxMin; ///< Point in [Min X; Max Y; Min Z].
+  Vec3f minMaxMax; ///< Point in [Min X; Max Y; Max Z].
+  Vec3f maxMinMin; ///< Point in [Max X; Min Y; Min Z].
+  Vec3f maxMinMax; ///< Point in [Max X; Min Y; Max Z].
+  Vec3f maxMaxMin; ///< Point in [Max X; Max Y; Min Z].
+  Vec3f maxMaxMax; ///< Point in [Max X; Max Y; Max Z].
+};
+
 enum class ShapeType {
   LINE,
   PLANE,
@@ -595,6 +606,9 @@ public:
   ///       -----------------------
   /// \return AABB's half-extents.
   constexpr Vec3f computeHalfExtents() const noexcept { return (m_maxPos - m_minPos) * 0.5f; }
+  /// Computes the coordinates of the box's 8 corners.
+  /// \return Corners of the box.
+  BoxCorners computeCorners() const;
 
   /// Checks if the current AABB is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.

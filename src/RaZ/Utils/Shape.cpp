@@ -314,6 +314,19 @@ Vec3f AABB::computeProjection(const Vec3f& point) const {
   return Vec3f(closestX, closestY, closestZ);
 }
 
+BoxCorners AABB::computeCorners() const {
+  return {
+    .minMinMin = m_minPos,
+    .minMinMax = Vec3f(m_minPos.x(), m_minPos.y(), m_maxPos.z()),
+    .minMaxMin = Vec3f(m_minPos.x(), m_maxPos.y(), m_minPos.z()),
+    .minMaxMax = Vec3f(m_minPos.x(), m_maxPos.y(), m_maxPos.z()),
+    .maxMinMin = Vec3f(m_maxPos.x(), m_minPos.y(), m_minPos.z()),
+    .maxMinMax = Vec3f(m_maxPos.x(), m_minPos.y(), m_maxPos.z()),
+    .maxMaxMin = Vec3f(m_maxPos.x(), m_maxPos.y(), m_minPos.z()),
+    .maxMaxMax = m_maxPos
+  };
+}
+
 // OBB functions
 
 bool OBB::contains(const Vec3f& point) const {

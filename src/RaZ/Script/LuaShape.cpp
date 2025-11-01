@@ -19,6 +19,20 @@ void LuaWrapper::registerShapeTypes() {
     aabb["getMinPosition"]     = &AABB::getMinPosition;
     aabb["getMaxPosition"]     = &AABB::getMaxPosition;
     aabb["computeHalfExtents"] = &AABB::computeHalfExtents;
+    aabb["computeCorners"]     = &AABB::computeCorners;
+  }
+
+  {
+    sol::usertype<BoxCorners> boxCorners = state.new_usertype<BoxCorners>("BoxCorners",
+                                                                          sol::constructors<BoxCorners()>());
+    boxCorners["minMinMin"] = &BoxCorners::minMinMin;
+    boxCorners["minMinMax"] = &BoxCorners::minMinMax;
+    boxCorners["minMaxMin"] = &BoxCorners::minMaxMin;
+    boxCorners["minMaxMax"] = &BoxCorners::minMaxMax;
+    boxCorners["maxMinMin"] = &BoxCorners::maxMinMin;
+    boxCorners["maxMinMax"] = &BoxCorners::maxMinMax;
+    boxCorners["maxMaxMin"] = &BoxCorners::maxMaxMin;
+    boxCorners["maxMaxMax"] = &BoxCorners::maxMaxMax;
   }
 
   {

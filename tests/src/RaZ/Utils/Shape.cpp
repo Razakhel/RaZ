@@ -566,6 +566,23 @@ TEST_CASE("AABB bounding box", "[utils]") {
   CHECK(aabb3.computeBoundingBox() == aabb3);
 }
 
+TEST_CASE("AABB corners computation", "[utils]") {
+  for (const Raz::AABB& aabb : { aabb1, aabb2, aabb3 }) {
+    const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax] = aabb.computeCorners();
+    const auto [minX, minY, minZ] = aabb.getMinPosition();
+    const auto [maxX, maxY, maxZ] = aabb.getMaxPosition();
+
+    CHECK(minMinMin.strictlyEquals(aabb.getMinPosition()));
+    CHECK(minMinMax.strictlyEquals(Raz::Vec3f(minX, minY, maxZ)));
+    CHECK(minMaxMin.strictlyEquals(Raz::Vec3f(minX, maxY, minZ)));
+    CHECK(minMaxMax.strictlyEquals(Raz::Vec3f(minX, maxY, maxZ)));
+    CHECK(maxMinMin.strictlyEquals(Raz::Vec3f(maxX, minY, minZ)));
+    CHECK(maxMinMax.strictlyEquals(Raz::Vec3f(maxX, minY, maxZ)));
+    CHECK(maxMaxMin.strictlyEquals(Raz::Vec3f(maxX, maxY, minZ)));
+    CHECK(maxMaxMax.strictlyEquals(aabb.getMaxPosition()));
+  }
+}
+
 TEST_CASE("AABB equality", "[utils]") {
   CHECK(aabb1 == aabb1);
   CHECK(aabb2 == aabb2);
