@@ -669,8 +669,8 @@ public:
   constexpr OBB(const AABB& aabb, const Quaternionf& rotation) noexcept : m_aabb{ aabb } { setRotation(rotation); }
 
   constexpr ShapeType getType() const noexcept override { return ShapeType::OBB; }
-  constexpr const Vec3f& getMinPosition() const { return m_aabb.getMinPosition(); }
-  constexpr const Vec3f& getMaxPosition() const { return m_aabb.getMaxPosition(); }
+  constexpr const Vec3f& getOriginalMinPosition() const { return m_aabb.getMinPosition(); }
+  constexpr const Vec3f& getOriginalMaxPosition() const { return m_aabb.getMaxPosition(); }
   constexpr const Quaternionf& getRotation() const { return m_rotation; }
   constexpr const Quaternionf& getInverseRotation() const { return m_invRotation; }
 
@@ -728,6 +728,18 @@ public:
   /// \return Computed centroid.
   constexpr Vec3f computeCentroid() const override { return m_aabb.computeCentroid(); }
   AABB computeBoundingBox() const override;
+  /// Computes the rotated minimum position of the box.
+  /// \return Rotated minimum position.
+  constexpr Vec3f computeRotatedMinPosition() const {
+    const Vec3f centroid = computeCentroid();
+    return (centroid + m_rotation * (m_aabb.getMinPosition() - centroid));
+  }
+  /// Computes the rotated maximum position of the box.
+  /// \return Rotated maximum position.
+  constexpr Vec3f computeRotatedMaxPosition() const {
+    const Vec3f centroid = computeCentroid();
+    return (centroid + m_rotation * (m_aabb.getMaxPosition() - centroid));
+  }
   /// Computes the half-extents of the box, starting from its centroid.
   ///
   ///          _______________________

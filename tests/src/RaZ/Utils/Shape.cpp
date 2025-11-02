@@ -596,12 +596,6 @@ TEST_CASE("AABB equality", "[utils]") {
 }
 
 TEST_CASE("OBB basic", "[utils]") {
-  // The min & max positions aren't transformed
-  CHECK(obb1.getMinPosition() == Raz::Vec3f(-0.5f));
-  CHECK(obb1.getMaxPosition() == Raz::Vec3f(0.5f));
-  CHECK(obb2.getMinPosition() == Raz::Vec3f(2.f, 3.f, -5.f));
-  CHECK(obb2.getMaxPosition() == Raz::Vec3f(5.f));
-
   CHECK(obb1.getRotation() == Raz::Quaternionf(90_deg, Raz::Axis::X));
   CHECK(obb1.getInverseRotation() == Raz::Quaternionf(-90_deg, Raz::Axis::X));
   CHECK(obb2.getRotation() == Raz::Quaternionf(45_deg, Raz::Axis::Y));
@@ -615,25 +609,45 @@ TEST_CASE("OBB basic", "[utils]") {
   CHECK(obb2.computeHalfExtents() == Raz::Vec3f(1.5f, 1.f, 5.f));
 }
 
+TEST_CASE("OBB extremities", "[utils]") {
+  // The original positions aren't transformed
+  CHECK(obb1.getOriginalMinPosition().strictlyEquals(aabb1.getMinPosition()));
+  CHECK(obb1.getOriginalMaxPosition().strictlyEquals(aabb1.getMaxPosition()));
+  CHECK(obb2.getOriginalMinPosition().strictlyEquals(aabb2.getMinPosition()));
+  CHECK(obb2.getOriginalMaxPosition().strictlyEquals(aabb2.getMaxPosition()));
+
+  // The rotated positions are transformed
+  CHECK_THAT(obb1.computeRotatedMinPosition(), IsNearlyEqualToVector(Raz::Vec3f(-0.5f, 0.5f, -0.5f)));
+  CHECK_THAT(obb1.computeRotatedMaxPosition(), IsNearlyEqualToVector(Raz::Vec3f(0.5f, -0.5f, 0.5f)));
+  CHECK_THAT(obb2.computeRotatedMinPosition(), IsNearlyEqualToVector(Raz::Vec3f(-1.09619427f, 3.f, -2.47487354f)));
+  CHECK_THAT(obb2.computeRotatedMaxPosition(), IsNearlyEqualToVector(Raz::Vec3f(8.09619427f, 5.f, 2.47487354f)));
+}
+
 TEST_CASE("OBB point containment", "[utils]") {
   // See: https://www.geogebra.org/m/bcux726b
 
   CHECK(obb1.contains(obb1.computeCentroid()));
   // This box is a cube rotated by 90°; the original bounds are still considered inside
-  CHECK(obb1.contains(obb1.getMinPosition()));
-  CHECK(obb1.contains(obb1.getMaxPosition()));
+  CHECK(obb1.contains(obb1.getOriginalMinPosition()));
+  CHECK(obb1.contains(obb1.getOriginalMaxPosition()));
+  // So are the rotated bounds
+  CHECK(obb1.contains(obb1.computeRotatedMinPosition()));
+  CHECK(obb1.contains(obb1.computeRotatedMaxPosition()));
 
   // The check includes a slight tolerance to account for floating-point errors
-  CHECK(obb1.contains(obb1.getMinPosition() - 0.00000001f));
-  CHECK(obb1.contains(obb1.getMaxPosition() + 0.00000001f));
+  CHECK(obb1.contains(obb1.getOriginalMinPosition() - 0.00000001f));
+  CHECK(obb1.contains(obb1.getOriginalMaxPosition() + 0.00000001f));
 
   CHECK(obb2.contains(obb2.computeCentroid()));
   // This box is rotated by 45°; the original bounds can't be inside
-  CHECK_FALSE(obb2.contains(obb2.getMinPosition()));
-  CHECK_FALSE(obb2.contains(obb2.getMaxPosition()));
+  CHECK_FALSE(obb2.contains(obb2.getOriginalMinPosition()));
+  CHECK_FALSE(obb2.contains(obb2.getOriginalMaxPosition()));
+  // However, the transformed bounds are contained
+  CHECK(obb2.contains(obb2.computeRotatedMinPosition()));
+  CHECK(obb2.contains(obb2.computeRotatedMaxPosition()));
 
-  // The point must be considered as contained by the box only if it is in its local volume, i.e., the box rotated in its own space
-  // In contrast, the global box is the one rotated in world space, i.e., without taking the box's position into account
+  // The point must be considered as contained only if it lies within the box rotated around its own center (called "local" below)
+  // In contrast, "global" refers to the box rotated around the world origin, which would give incorrect results
 
   constexpr Raz::Vec3f point1(2.5f, 4.f, 0.f);
   constexpr Raz::Vec3f point2(6.5f, 4.f, 0.f);
