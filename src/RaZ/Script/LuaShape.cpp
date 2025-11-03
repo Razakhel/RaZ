@@ -52,14 +52,15 @@ void LuaWrapper::registerShapeTypes() {
                                                                        OBB(const AABB&),
                                                                        OBB(const AABB&, const Quaternionf&)>(),
                                                      sol::base_classes, sol::bases<Shape>());
-    obb["getOriginalMinPosition"]    = &OBB::getOriginalMinPosition;
-    obb["getOriginalMaxPosition"]    = &OBB::getOriginalMaxPosition;
-    obb["getRotation"]               = &OBB::getRotation;
-    obb["getInverseRotation"]        = &OBB::getInverseRotation;
-    obb["setRotation"]               = &OBB::setRotation;
-    obb["computeRotatedMinPosition"] = &OBB::computeRotatedMinPosition;
-    obb["computeRotatedMaxPosition"] = &OBB::computeRotatedMaxPosition;
-    obb["computeHalfExtents"]        = &OBB::computeHalfExtents;
+    obb["getOriginalMinPosition"]     = &OBB::getOriginalMinPosition;
+    obb["getOriginalMaxPosition"]     = &OBB::getOriginalMaxPosition;
+    obb["getRotation"]                = &OBB::getRotation;
+    obb["getInverseRotation"]         = &OBB::getInverseRotation;
+    obb["setRotation"]                = &OBB::setRotation;
+    obb["computeRotatedMinPosition"]  = &OBB::computeRotatedMinPosition;
+    obb["computeRotatedMaxPosition"]  = &OBB::computeRotatedMaxPosition;
+    obb["computeOriginalHalfExtents"] = &OBB::computeOriginalHalfExtents;
+    obb["computeRotatedHalfExtents"]  = &OBB::computeRotatedHalfExtents;
   }
 
   {

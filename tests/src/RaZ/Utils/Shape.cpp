@@ -603,10 +603,6 @@ TEST_CASE("OBB basic", "[utils]") {
 
   CHECK(obb1.computeCentroid() == Raz::Vec3f(0.f));
   CHECK(obb2.computeCentroid() == Raz::Vec3f(3.5f, 4.f, 0.f));
-
-  // The half-extents aren't transformed
-  CHECK(obb1.computeHalfExtents() == Raz::Vec3f(0.5f));
-  CHECK(obb2.computeHalfExtents() == Raz::Vec3f(1.5f, 1.f, 5.f));
 }
 
 TEST_CASE("OBB extremities", "[utils]") {
@@ -656,4 +652,18 @@ TEST_CASE("OBB point containment", "[utils]") {
   CHECK(obb2.contains(point1));       // Inside local, outside global, inside original
   CHECK_FALSE(obb2.contains(point2)); // Outside local, inside global, outside original
   CHECK(obb2.contains(point3));       // Inside local, outside global, outside original
+}
+
+TEST_CASE("OBB half-extents", "[utils]") {
+  // The original half-extents aren't transformed
+  CHECK(obb1.computeOriginalHalfExtents() == Raz::Vec3f(0.5f));
+  CHECK(obb2.computeOriginalHalfExtents() == Raz::Vec3f(1.5f, 1.f, 5.f));
+
+  // The rotated half-extents are transformed
+  CHECK_THAT(obb1.computeRotatedHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(0.5f, -0.5f, 0.5f)));
+  CHECK_THAT(obb2.computeRotatedHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(4.59619427f, 1.f, 2.47487354f)));
+
+  // Checking that moving from the min position in the full extents' direction ends up in the max position
+  CHECK_THAT(obb1.computeRotatedMinPosition() + obb1.computeRotatedHalfExtents() * 2.f, IsNearlyEqualToVector(obb1.computeRotatedMaxPosition()));
+  CHECK_THAT(obb2.computeRotatedMinPosition() + obb2.computeRotatedHalfExtents() * 2.f, IsNearlyEqualToVector(obb2.computeRotatedMaxPosition()));
 }
