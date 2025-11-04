@@ -29,9 +29,9 @@ public:
     }
   }
   explicit TriggerVolume(const OBB& obb) : m_volume{ obb } {
-    if (obb.getOriginalMinPosition().x() >= obb.getOriginalMaxPosition().x()
-     || obb.getOriginalMinPosition().y() >= obb.getOriginalMaxPosition().y()
-     || obb.getOriginalMinPosition().z() >= obb.getOriginalMaxPosition().z()) {
+    if (obb.getOriginalBox().getMinPosition().x() >= obb.getOriginalBox().getMaxPosition().x()
+     || obb.getOriginalBox().getMinPosition().y() >= obb.getOriginalBox().getMaxPosition().y()
+     || obb.getOriginalBox().getMinPosition().z() >= obb.getOriginalBox().getMaxPosition().z()) {
       throw std::invalid_argument("[TriggerVolume] The OBB's max position must be greater than the min on all axes");
     }
   }

@@ -606,13 +606,6 @@ TEST_CASE("OBB basic", "[utils]") {
 }
 
 TEST_CASE("OBB extremities", "[utils]") {
-  // The original positions aren't transformed
-  CHECK(obb1.getOriginalMinPosition().strictlyEquals(aabb1.getMinPosition()));
-  CHECK(obb1.getOriginalMaxPosition().strictlyEquals(aabb1.getMaxPosition()));
-  CHECK(obb2.getOriginalMinPosition().strictlyEquals(aabb2.getMinPosition()));
-  CHECK(obb2.getOriginalMaxPosition().strictlyEquals(aabb2.getMaxPosition()));
-
-  // The rotated positions are transformed
   CHECK_THAT(obb1.computeRotatedMinPosition(), IsNearlyEqualToVector(Raz::Vec3f(-0.5f, 0.5f, -0.5f)));
   CHECK_THAT(obb1.computeRotatedMaxPosition(), IsNearlyEqualToVector(Raz::Vec3f(0.5f, -0.5f, 0.5f)));
   CHECK_THAT(obb2.computeRotatedMinPosition(), IsNearlyEqualToVector(Raz::Vec3f(-1.09619427f, 3.f, -2.47487354f)));
@@ -620,30 +613,29 @@ TEST_CASE("OBB extremities", "[utils]") {
 }
 
 TEST_CASE("OBB point containment", "[utils]") {
-  // See: https://www.geogebra.org/m/bcux726b
-
   CHECK(obb1.contains(obb1.computeCentroid()));
   // This box is a cube rotated by 90°; the original bounds are still considered inside
-  CHECK(obb1.contains(obb1.getOriginalMinPosition()));
-  CHECK(obb1.contains(obb1.getOriginalMaxPosition()));
+  CHECK(obb1.contains(obb1.getOriginalBox().getMinPosition()));
+  CHECK(obb1.contains(obb1.getOriginalBox().getMaxPosition()));
   // So are the rotated bounds
   CHECK(obb1.contains(obb1.computeRotatedMinPosition()));
   CHECK(obb1.contains(obb1.computeRotatedMaxPosition()));
 
   // The check includes a slight tolerance to account for floating-point errors
-  CHECK(obb1.contains(obb1.getOriginalMinPosition() - 0.00000001f));
-  CHECK(obb1.contains(obb1.getOriginalMaxPosition() + 0.00000001f));
+  CHECK(obb1.contains(obb1.computeRotatedMinPosition() - 0.00000001f));
+  CHECK(obb1.contains(obb1.computeRotatedMaxPosition() + 0.00000001f));
 
   CHECK(obb2.contains(obb2.computeCentroid()));
   // This box is rotated by 45°; the original bounds can't be inside
-  CHECK_FALSE(obb2.contains(obb2.getOriginalMinPosition()));
-  CHECK_FALSE(obb2.contains(obb2.getOriginalMaxPosition()));
+  CHECK_FALSE(obb2.contains(obb2.getOriginalBox().getMinPosition()));
+  CHECK_FALSE(obb2.contains(obb2.getOriginalBox().getMaxPosition()));
   // However, the transformed bounds are contained
   CHECK(obb2.contains(obb2.computeRotatedMinPosition()));
   CHECK(obb2.contains(obb2.computeRotatedMaxPosition()));
 
   // The point must be considered as contained only if it lies within the box rotated around its own center (called "local" below)
   // In contrast, "global" refers to the box rotated around the world origin, which would give incorrect results
+  // See: https://www.geogebra.org/m/bcux726b
 
   constexpr Raz::Vec3f point1(2.5f, 4.f, 0.f);
   constexpr Raz::Vec3f point2(6.5f, 4.f, 0.f);
@@ -655,11 +647,6 @@ TEST_CASE("OBB point containment", "[utils]") {
 }
 
 TEST_CASE("OBB half-extents", "[utils]") {
-  // The original half-extents aren't transformed
-  CHECK(obb1.computeOriginalHalfExtents() == Raz::Vec3f(0.5f));
-  CHECK(obb2.computeOriginalHalfExtents() == Raz::Vec3f(1.5f, 1.f, 5.f));
-
-  // The rotated half-extents are transformed
   CHECK_THAT(obb1.computeRotatedHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(0.5f, -0.5f, 0.5f)));
   CHECK_THAT(obb2.computeRotatedHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(4.59619427f, 1.f, 2.47487354f)));
 

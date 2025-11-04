@@ -669,8 +669,7 @@ public:
   constexpr OBB(const AABB& aabb, const Quaternionf& rotation) noexcept : m_aabb{ aabb } { setRotation(rotation); }
 
   constexpr ShapeType getType() const noexcept override { return ShapeType::OBB; }
-  constexpr const Vec3f& getOriginalMinPosition() const { return m_aabb.getMinPosition(); }
-  constexpr const Vec3f& getOriginalMaxPosition() const { return m_aabb.getMaxPosition(); }
+  constexpr const AABB& getOriginalBox() const { return m_aabb; }
   constexpr const Quaternionf& getRotation() const { return m_rotation; }
   constexpr const Quaternionf& getInverseRotation() const { return m_invRotation; }
 
@@ -740,24 +739,9 @@ public:
     const Vec3f centroid = computeCentroid();
     return (centroid + m_rotation * (m_aabb.getMaxPosition() - centroid));
   }
-  /// Computes the original (unrotated) half-extents of the box, starting from its centroid.
-  ///
-  ///          _______________________
-  ///         /|          ^         /|
-  ///        / |          |        / |
-  ///       |---------------------|  |
-  ///       |  |          |       |  |
-  ///       |  |          --------|->|
-  ///       |  |         /        |  |
-  ///       |  |        v         |  |
-  ///       | /-------------------|-/
-  ///       |/                    |/
-  ///       -----------------------
-  /// \return Original half-extents.
-  constexpr Vec3f computeOriginalHalfExtents() const noexcept { return m_aabb.computeHalfExtents(); }
   /// Computes the rotated half-extents of the box, starting from its centroid.
   /// \return Rotated half-extents.
-  constexpr Vec3f computeRotatedHalfExtents() const noexcept { return m_rotation * computeOriginalHalfExtents(); }
+  constexpr Vec3f computeRotatedHalfExtents() const noexcept { return m_rotation * m_aabb.computeHalfExtents(); }
 
   /// Checks if the current OBB is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
