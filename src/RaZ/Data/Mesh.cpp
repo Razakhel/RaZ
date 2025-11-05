@@ -155,40 +155,40 @@ Mesh::Mesh(const AABB& box) {
   const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax] = box.computeCorners();
 
   // Right face
-  vertices.emplace_back(Vertex{ maxMinMax, Vec2f(0.f, 0.f), Axis::Right, Axis::Forward });
-  vertices.emplace_back(Vertex{ maxMinMin, Vec2f(1.f, 0.f), Axis::Right, Axis::Forward });
-  vertices.emplace_back(Vertex{ maxMaxMax, Vec2f(0.f, 1.f), Axis::Right, Axis::Forward });
-  vertices.emplace_back(Vertex{ maxMaxMin, Vec2f(1.f, 1.f), Axis::Right, Axis::Forward });
+  vertices.emplace_back(Vertex{ maxMinMax, Vec2f(0.f, 0.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ maxMinMin, Vec2f(1.f, 0.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ maxMaxMax, Vec2f(0.f, 1.f), Axis::X, -Axis::Z });
+  vertices.emplace_back(Vertex{ maxMaxMin, Vec2f(1.f, 1.f), Axis::X, -Axis::Z });
 
   // Left face
-  vertices.emplace_back(Vertex{ minMinMin, Vec2f(0.f, 0.f), Axis::Left, Axis::Backward });
-  vertices.emplace_back(Vertex{ minMinMax, Vec2f(1.f, 0.f), Axis::Left, Axis::Backward });
-  vertices.emplace_back(Vertex{ minMaxMin, Vec2f(0.f, 1.f), Axis::Left, Axis::Backward });
-  vertices.emplace_back(Vertex{ minMaxMax, Vec2f(1.f, 1.f), Axis::Left, Axis::Backward });
+  vertices.emplace_back(Vertex{ minMinMin, Vec2f(0.f, 0.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ minMinMax, Vec2f(1.f, 0.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ minMaxMin, Vec2f(0.f, 1.f), -Axis::X, Axis::Z });
+  vertices.emplace_back(Vertex{ minMaxMax, Vec2f(1.f, 1.f), -Axis::X, Axis::Z });
 
   // Top face
-  vertices.emplace_back(Vertex{ minMaxMax, Vec2f(0.f, 0.f), Axis::Up, Axis::Right });
-  vertices.emplace_back(Vertex{ maxMaxMax, Vec2f(1.f, 0.f), Axis::Up, Axis::Right });
-  vertices.emplace_back(Vertex{ minMaxMin, Vec2f(0.f, 1.f), Axis::Up, Axis::Right });
-  vertices.emplace_back(Vertex{ maxMaxMin, Vec2f(1.f, 1.f), Axis::Up, Axis::Right });
+  vertices.emplace_back(Vertex{ minMaxMax, Vec2f(0.f, 0.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ maxMaxMax, Vec2f(1.f, 0.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ minMaxMin, Vec2f(0.f, 1.f), Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ maxMaxMin, Vec2f(1.f, 1.f), Axis::Y, Axis::X });
 
   // Bottom face
-  vertices.emplace_back(Vertex{ minMinMin, Vec2f(0.f, 0.f), Axis::Down, Axis::Right });
-  vertices.emplace_back(Vertex{ maxMinMin, Vec2f(1.f, 0.f), Axis::Down, Axis::Right });
-  vertices.emplace_back(Vertex{ minMinMax, Vec2f(0.f, 1.f), Axis::Down, Axis::Right });
-  vertices.emplace_back(Vertex{ maxMinMax, Vec2f(1.f, 1.f), Axis::Down, Axis::Right });
+  vertices.emplace_back(Vertex{ minMinMin, Vec2f(0.f, 0.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ maxMinMin, Vec2f(1.f, 0.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ minMinMax, Vec2f(0.f, 1.f), -Axis::Y, Axis::X });
+  vertices.emplace_back(Vertex{ maxMinMax, Vec2f(1.f, 1.f), -Axis::Y, Axis::X });
 
   // Front face
-  vertices.emplace_back(Vertex{ minMinMax, Vec2f(0.f, 0.f), Axis::Backward, Axis::Right });
-  vertices.emplace_back(Vertex{ maxMinMax, Vec2f(1.f, 0.f), Axis::Backward, Axis::Right });
-  vertices.emplace_back(Vertex{ minMaxMax, Vec2f(0.f, 1.f), Axis::Backward, Axis::Right });
-  vertices.emplace_back(Vertex{ maxMaxMax, Vec2f(1.f, 1.f), Axis::Backward, Axis::Right });
+  vertices.emplace_back(Vertex{ minMinMax, Vec2f(0.f, 0.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ maxMinMax, Vec2f(1.f, 0.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ minMaxMax, Vec2f(0.f, 1.f), Axis::Z, Axis::X });
+  vertices.emplace_back(Vertex{ maxMaxMax, Vec2f(1.f, 1.f), Axis::Z, Axis::X });
 
   // Back face
-  vertices.emplace_back(Vertex{ maxMinMin, Vec2f(0.f, 0.f), Axis::Forward, Axis::Left });
-  vertices.emplace_back(Vertex{ minMinMin, Vec2f(1.f, 0.f), Axis::Forward, Axis::Left });
-  vertices.emplace_back(Vertex{ maxMaxMin, Vec2f(0.f, 1.f), Axis::Forward, Axis::Left });
-  vertices.emplace_back(Vertex{ minMaxMin, Vec2f(1.f, 1.f), Axis::Forward, Axis::Left });
+  vertices.emplace_back(Vertex{ maxMinMin, Vec2f(0.f, 0.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ minMinMin, Vec2f(1.f, 0.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ maxMaxMin, Vec2f(0.f, 1.f), -Axis::Z, -Axis::X });
+  vertices.emplace_back(Vertex{ minMaxMin, Vec2f(1.f, 1.f), -Axis::Z, -Axis::X });
 
   submesh.getTriangleIndices() = {
      0,  1,  2,  1,  3,  2, // Right face

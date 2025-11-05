@@ -654,3 +654,40 @@ TEST_CASE("OBB half-extents", "[utils]") {
   CHECK_THAT(obb1.computeRotatedMinPosition() + obb1.computeRotatedHalfExtents() * 2.f, IsNearlyEqualToVector(obb1.computeRotatedMaxPosition()));
   CHECK_THAT(obb2.computeRotatedMinPosition() + obb2.computeRotatedHalfExtents() * 2.f, IsNearlyEqualToVector(obb2.computeRotatedMaxPosition()));
 }
+
+TEST_CASE("OBB corners computation", "[utils]") {
+  {
+    const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax] = obb1.computeRotatedCorners();
+    CHECK(minMinMin.strictlyEquals(obb1.computeRotatedMinPosition()));
+    CHECK(minMinMax == Raz::Vec3f(-0.5f));
+    CHECK(minMaxMin == Raz::Vec3f(-0.5f, 0.5f, 0.5f));
+    CHECK(minMaxMax == Raz::Vec3f(-0.5f, -0.5f, 0.5f));
+    CHECK(maxMinMin == Raz::Vec3f(0.5f, 0.5f, -0.5f));
+    CHECK(maxMinMax == Raz::Vec3f(0.5f, -0.5f, -0.5f));
+    CHECK(maxMaxMin == Raz::Vec3f(0.5f));
+    CHECK(maxMaxMax.strictlyEquals(obb1.computeRotatedMaxPosition()));
+  }
+
+  {
+    const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax] = obb2.computeRotatedCorners();
+    CHECK(minMinMin.strictlyEquals(obb2.computeRotatedMinPosition()));
+    CHECK_THAT(minMinMax, IsNearlyEqualToVector(Raz::Vec3f(5.97487402f, 3.f, 4.59619427f)));
+    CHECK_THAT(minMaxMin, IsNearlyEqualToVector(Raz::Vec3f(-1.09619427f, 5.f, -2.47487354f)));
+    CHECK_THAT(minMaxMax, IsNearlyEqualToVector(Raz::Vec3f(5.97487402f, 5.f, 4.59619427f)));
+    CHECK_THAT(maxMinMin, IsNearlyEqualToVector(Raz::Vec3f(1.02512598f, 3.f, -4.59619427f)));
+    CHECK_THAT(maxMinMax, IsNearlyEqualToVector(Raz::Vec3f(8.09619427f, 3.f, 2.47487354f)));
+    CHECK_THAT(maxMaxMin, IsNearlyEqualToVector(Raz::Vec3f(1.02512598f, 5.f, -4.59619427f)));
+    CHECK(maxMaxMax.strictlyEquals(obb2.computeRotatedMaxPosition()));
+  }
+}
+
+TEST_CASE("OBB equality", "[utils]") {
+  CHECK(obb1 == obb1);
+  CHECK(obb2 == obb2);
+
+  CHECK(obb1 != obb2);
+
+  Raz::OBB obb1Copy = obb1;
+  obb1Copy.translate(Raz::Vec3f(std::numeric_limits<float>::epsilon()));
+  CHECK(obb1Copy == obb1);
+}

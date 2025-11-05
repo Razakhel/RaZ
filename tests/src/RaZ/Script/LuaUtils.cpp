@@ -115,6 +115,7 @@ TEST_CASE("LuaUtils Shape", "[script][lua][utils]") {
     assert(obb:computeRotatedMinPosition() == obb:getOriginalBox():getMinPosition())
     assert(obb:computeRotatedMaxPosition() == obb:getOriginalBox():getMaxPosition())
     assert(obb:computeRotatedHalfExtents() == obb:getOriginalBox():computeHalfExtents())
+    assert(obb:computeRotatedCorners().maxMaxMax == obb:getOriginalBox():getMaxPosition())
 
     local plane = Plane.new(0)
     plane       = Plane.new(0, Axis.Z)

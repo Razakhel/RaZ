@@ -351,4 +351,20 @@ AABB OBB::computeBoundingBox() const {
   throw std::runtime_error("Error: Not implemented yet.");
 }
 
+BoxCorners OBB::computeRotatedCorners() const {
+  const Vec3f centroid = computeCentroid();
+  const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax ] = m_aabb.computeCorners();
+  return {
+    .minMinMin = centroid + (m_rotation * (minMinMin - centroid)),
+    .minMinMax = centroid + (m_rotation * (minMinMax - centroid)),
+    .minMaxMin = centroid + (m_rotation * (minMaxMin - centroid)),
+    .minMaxMax = centroid + (m_rotation * (minMaxMax - centroid)),
+    .maxMinMin = centroid + (m_rotation * (maxMinMin - centroid)),
+    .maxMinMax = centroid + (m_rotation * (maxMinMax - centroid)),
+    .maxMaxMin = centroid + (m_rotation * (maxMaxMin - centroid)),
+    .maxMaxMax = centroid + (m_rotation * (maxMaxMax - centroid))
+  };
+}
+
+
 } // namespace Raz

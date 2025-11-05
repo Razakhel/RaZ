@@ -59,6 +59,7 @@ void LuaWrapper::registerShapeTypes() {
     obb["computeRotatedMinPosition"] = &OBB::computeRotatedMinPosition;
     obb["computeRotatedMaxPosition"] = &OBB::computeRotatedMaxPosition;
     obb["computeRotatedHalfExtents"] = &OBB::computeRotatedHalfExtents;
+    obb["computeRotatedCorners"]     = &OBB::computeRotatedCorners;
   }
 
   {

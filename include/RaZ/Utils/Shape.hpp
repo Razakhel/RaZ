@@ -742,6 +742,9 @@ public:
   /// Computes the rotated half-extents of the box, starting from its centroid.
   /// \return Rotated half-extents.
   constexpr Vec3f computeRotatedHalfExtents() const noexcept { return m_rotation * m_aabb.computeHalfExtents(); }
+  /// Computes the rotated coordinates of the box's 8 corners.
+  /// \return Rotated corners of the box.
+  BoxCorners computeRotatedCorners() const;
 
   /// Checks if the current OBB is equal to another given one.
   /// Uses a near-equality check to take floating-point errors into account.
