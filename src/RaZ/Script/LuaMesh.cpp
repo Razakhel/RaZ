@@ -19,7 +19,8 @@ void LuaWrapper::registerMeshTypes() {
                                                                           Mesh(const Sphere&, uint32_t, SphereMeshType),
                                                                           Mesh(const Triangle&, const Vec2f&, const Vec2f&, const Vec2f&),
                                                                           Mesh(const Quad&),
-                                                                          Mesh(const AABB&)>(),
+                                                                          Mesh(const AABB&),
+                                                                          Mesh(const OBB&)>(),
                                                         sol::base_classes, sol::bases<Component>());
     mesh["getSubmeshes"]         = PickNonConstOverload<>(&Mesh::getSubmeshes);
     mesh["getBoundingBox"]       = &Mesh::getBoundingBox;

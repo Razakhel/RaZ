@@ -11,10 +11,10 @@
 namespace Raz {
 
 struct Vertex {
-  Vec3f position {};
-  Vec2f texcoords {};
-  Vec3f normal {};
-  Vec3f tangent {};
+  Vec3f position;
+  Vec2f texcoords;
+  Vec3f normal;
+  Vec3f tangent;
 
   constexpr bool strictlyEquals(const Vertex& vert) const noexcept { return position.strictlyEquals(vert.position)
                                                                          && texcoords.strictlyEquals(vert.texcoords)

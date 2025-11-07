@@ -16,18 +16,19 @@ enum class SphereMeshType {
   ICO     ///< [Icosphere/convex icosahedron](https://en.wikipedia.org/wiki/Geodesic_polyhedron).
 };
 
-class Mesh : public Component {
+class Mesh final : public Component {
 public:
   Mesh() = default;
   Mesh(const Plane& plane, float width, float depth);
   /// Creates a mesh from a Sphere.
   /// \param sphere Sphere to create the mesh with.
-  /// \param subdivCount Amount of subdivisions (for a UV sphere, represents both the amount of vertical & horizontal lines to be created).
+  /// \param subdivCount Number of subdivisions (for a UV sphere, represents both the number of vertical & horizontal lines to be created).
   /// \param type Type of the sphere mesh to create.
   Mesh(const Sphere& sphere, uint32_t subdivCount, SphereMeshType type);
   Mesh(const Triangle& triangle, const Vec2f& firstTexcoords, const Vec2f& secondTexcoords, const Vec2f& thirdTexcoords);
   explicit Mesh(const Quad& quad);
   explicit Mesh(const AABB& box);
+  explicit Mesh(const OBB& orientedBox);
   Mesh(const Mesh&) = delete;
   Mesh(Mesh&&) noexcept = default;
 
@@ -48,7 +49,7 @@ public:
   Mesh& operator=(Mesh&&) noexcept = default;
 
 private:
-  /// Creates an UV sphere mesh from a Sphere.
+  /// Creates a UV sphere mesh from a Sphere.
   ///
   ///          /-----------\
   ///        / / / / | / \ / \
@@ -63,15 +64,15 @@ private:
   ///                longitude/width
   ///
   /// \param sphere Sphere to create the mesh with.
-  /// \param widthCount Amount of vertical lines to be created (longitude).
-  /// \param heightCount Amount of horizontal lines to be created (latitude).
+  /// \param widthCount Number of vertical lines to be created (longitude).
+  /// \param heightCount Number of horizontal lines to be created (latitude).
   void createUvSphere(const Sphere& sphere, uint32_t widthCount, uint32_t heightCount);
   /// Creates an icosphere mesh from a Sphere.
   /// \param sphere Sphere to create the mesh with.
-  /// \param subdivCount Amount of subdivisions to apply to the mesh.
+  /// \param subdivCount Number of subdivisions to apply to the mesh.
   void createIcosphere(const Sphere& sphere, uint32_t subdivCount);
 
-  std::vector<Submesh> m_submeshes {};
+  std::vector<Submesh> m_submeshes;
   AABB m_boundingBox = AABB(Vec3f(0.f), Vec3f(0.f));
 };
 

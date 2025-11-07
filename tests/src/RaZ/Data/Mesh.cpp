@@ -19,9 +19,9 @@ TEST_CASE("Mesh basic", "[data]") {
   CHECK(mesh.getSubmeshes().size() == 1);
 
   submesh.getVertices() = {
-    Raz::Vertex{ Raz::Vec3f(-1.f) },
-    Raz::Vertex{ Raz::Vec3f(0.f) },
-    Raz::Vertex{ Raz::Vec3f(1.f) }
+    { .position = Raz::Vec3f(-1.f) },
+    { .position = Raz::Vec3f(0.f) },
+    { .position = Raz::Vec3f(1.f) }
   };
   submesh.getTriangleIndices() = { 0, 1, 2 };
   CHECK(mesh.recoverVertexCount() == 3);
@@ -44,9 +44,9 @@ TEST_CASE("Mesh tangents", "[data]") {
 
   Raz::Submesh& submesh = mesh.addSubmesh();
   submesh.getVertices() = {
-    Raz::Vertex{ Raz::Vec3f(-1.f, -1.f, 0.f) },
-    Raz::Vertex{ Raz::Vec3f(1.f, -1.f, 0.f) },
-    Raz::Vertex{ Raz::Vec3f(0.f, 1.f, 0.f) }
+    { .position = Raz::Vec3f(-1.f, -1.f, 0.f) },
+    { .position = Raz::Vec3f(1.f, -1.f, 0.f) },
+    { .position = Raz::Vec3f(0.f, 1.f, 0.f) }
   };
   submesh.getTriangleIndices() = { 0, 1, 2 }; // Tangent computation needs triangles to iterate over
 
@@ -82,14 +82,14 @@ TEST_CASE("Mesh tangents", "[data]") {
   CHECK(submesh.getVertices()[3].tangent == triangle2Tangent);
 }
 
-TEST_CASE("Mesh plane", "[data]") {
-  const Raz::Plane plane(1.5f, Raz::Axis::Y);
+TEST_CASE("Mesh from plane", "[data]") {
+  constexpr Raz::Plane plane(1.5f, Raz::Axis::Y);
 
   constexpr float width = 1.f;
   constexpr float depth = 1.f;
   Raz::Mesh mesh(plane, width, depth);
 
-  CHECK(mesh.getSubmeshes().size() == 1);
+  REQUIRE(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 4);
   CHECK(mesh.recoverTriangleCount() == 2);
 
@@ -125,24 +125,19 @@ TEST_CASE("Mesh plane", "[data]") {
                       submesh.getVertices()[submesh.getTriangleIndices()[5]].position).isCounterClockwise(plane.getNormal()));
 
   const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-
+  CHECK(boundingBox.getMinPosition() == Raz::Vec3f(-1.f, 1.5f, -1.f));
+  CHECK(boundingBox.getMaxPosition() == Raz::Vec3f(1.f, 1.5f, 1.f));
   CHECK(boundingBox.computeCentroid() == Raz::Vec3f(0.f, 1.5f, 0.f));
-
-  constexpr Raz::Vec3f expectedMinPos(-1.f, 1.5f, -1.f);
-  constexpr Raz::Vec3f expectedMaxPos(1.f, 1.5f, 1.f);
-
-  CHECK(boundingBox.getMinPosition() == expectedMinPos);
-  CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
-TEST_CASE("Mesh triangle", "[data]") {
-  const Raz::Triangle triangle(Raz::Vec3f(-1.f, 0.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 1.f, 0.f));
+TEST_CASE("Mesh from triangle", "[data]") {
+  constexpr Raz::Triangle triangle(Raz::Vec3f(-1.f, 0.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 1.f, 0.f));
   CHECK(triangle.computeNormal() == Raz::Axis::Z);
   CHECK(triangle.isCounterClockwise(Raz::Axis::Z));
 
   Raz::Mesh mesh(triangle, Raz::Vec2f(0.f, 0.f), Raz::Vec2f(1.f, 0.f), Raz::Vec2f(0.5f, 1.f));
 
-  CHECK(mesh.getSubmeshes().size() == 1);
+  REQUIRE(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 3);
   CHECK(mesh.recoverTriangleCount() == 1);
 
@@ -167,22 +162,17 @@ TEST_CASE("Mesh triangle", "[data]") {
                       submesh.getVertices()[submesh.getTriangleIndices()[2]].position).isCounterClockwise(Raz::Axis::Z));
 
   const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-
+  CHECK(boundingBox.getMinPosition() == Raz::Vec3f(-1.f, 0.f, 0.f));
+  CHECK(boundingBox.getMaxPosition() == Raz::Vec3f(1.f, 1.f, 0.f));
   CHECK(boundingBox.computeCentroid() == Raz::Vec3f(0.f, 0.5f, 0.f));
-
-  const Raz::Vec3f expectedMinPos(-1.f, 0.f, 0.f);
-  const Raz::Vec3f expectedMaxPos(1.f, 1.f, 0.f);
-
-  CHECK(boundingBox.getMinPosition() == expectedMinPos);
-  CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
-TEST_CASE("Mesh quad", "[data]") {
-  const Raz::Quad quad(Raz::Vec3f(0.f, 2.f, 0.f), Raz::Vec3f(1.f, 2.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 0.f, 0.f));
+TEST_CASE("Mesh from quad", "[data]") {
+  constexpr Raz::Quad quad(Raz::Vec3f(0.f, 2.f, 0.f), Raz::Vec3f(1.f, 2.f, 0.f), Raz::Vec3f(1.f, 0.f, 0.f), Raz::Vec3f(0.f, 0.f, 0.f));
 
   Raz::Mesh mesh(quad);
 
-  CHECK(mesh.getSubmeshes().size() == 1);
+  REQUIRE(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 4);
   CHECK(mesh.recoverTriangleCount() == 2);
 
@@ -203,18 +193,13 @@ TEST_CASE("Mesh quad", "[data]") {
                       submesh.getVertices()[submesh.getTriangleIndices()[5]].position).isCounterClockwise(Raz::Axis::Z));
 
   const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-
+  CHECK(boundingBox.getMinPosition() == Raz::Vec3f(0.f, 0.f, 0.f));
+  CHECK(boundingBox.getMaxPosition() == Raz::Vec3f(1.f, 2.f, 0.f));
   CHECK(boundingBox.computeCentroid() == Raz::Vec3f(0.5f, 1.f, 0.f));
-
-  const Raz::Vec3f expectedMinPos(0.f, 0.f, 0.f);
-  const Raz::Vec3f expectedMaxPos(1.f, 2.f, 0.f);
-
-  CHECK(boundingBox.getMinPosition() == expectedMinPos);
-  CHECK(boundingBox.getMaxPosition() == expectedMaxPos);
 }
 
-TEST_CASE("Mesh UV sphere", "[data]") {
-  const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
+TEST_CASE("Mesh from sphere (UV sphere)", "[data]") {
+  constexpr Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
   auto checkWindingOrder = [&sphere] (const Raz::Mesh& mesh) {
     const Raz::Submesh& submesh = mesh.getSubmeshes().front();
@@ -247,57 +232,48 @@ TEST_CASE("Mesh UV sphere", "[data]") {
   {
     Raz::Mesh mesh(sphere, 10, Raz::SphereMeshType::UV);
 
-    CHECK(mesh.getSubmeshes().size() == 1);
+    REQUIRE(mesh.getSubmeshes().size() == 1);
     CHECK(mesh.recoverVertexCount() == 121);
     CHECK(mesh.recoverTriangleCount() == 180);
 
     checkWindingOrder(mesh);
 
     const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-
-    CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
-
     // The bounding box's Z coordinate is not exactly radius/-radius, due to the approximation made by the low longitude count
-    const Raz::Vec3f expectedMinPos = Raz::Vec3f(-sphere.getRadius(), -sphere.getRadius(), -2.3776412f) + sphere.getCenter();
-    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius(), sphere.getRadius(), 2.3776417f) + sphere.getCenter();
+    constexpr Raz::Vec3f expectedOffset(sphere.getRadius(), sphere.getRadius(), 2.3776412f);
+    constexpr Raz::Vec3f expectedMinPos = sphere.getCenter() - expectedOffset;
+    constexpr Raz::Vec3f expectedMaxPos = sphere.getCenter() + expectedOffset;
 
     CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
     CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
-
-    const Raz::Vec3f expectedHalfExtents = Raz::Vec3f(Raz::Vec2f(sphere.getRadius()), 2.3776414f);
-    CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(expectedHalfExtents));
+    CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
+    CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(expectedOffset));
   }
 
   // UV sphere mesh with 100 splits in latitude/longitude
   {
     Raz::Mesh mesh(sphere, 100, Raz::SphereMeshType::UV);
 
-    CHECK(mesh.getSubmeshes().size() == 1);
+    REQUIRE(mesh.getSubmeshes().size() == 1);
     CHECK(mesh.recoverVertexCount() == 10201);
     CHECK(mesh.recoverTriangleCount() == 19800);
 
     checkWindingOrder(mesh);
 
     const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-
-    CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
-
     // With 100 splits, the bounding box's Z is now equal to radius/-radius as expected
-    const Raz::Vec3f expectedMinPos = Raz::Vec3f(-sphere.getRadius()) + sphere.getCenter();
-    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius()) + sphere.getCenter();
-
-    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
-    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
-
+    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(sphere.getCenter() - sphere.getRadius()));
+    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(sphere.getCenter() + sphere.getRadius()));
+    CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
     CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(sphere.getRadius())));
   }
 
   CHECK_THROWS(Raz::Mesh(sphere, 0, Raz::SphereMeshType::UV)); // Creating a sphere with no subdivision throws an exception
-  CHECK_NOTHROW(Raz::Mesh(sphere, 1, Raz::SphereMeshType::UV)); // Although it doesn't make much sense, a subdivision as low as one is currently allowed
+  CHECK_NOTHROW(Raz::Mesh(sphere, 1, Raz::SphereMeshType::UV)); // Although it makes little sense, a subdivision as low as one is currently allowed
 }
 
-TEST_CASE("Mesh icosphere", "[data]") {
-  const Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
+TEST_CASE("Mesh from sphere (icosphere)", "[data]") {
+  constexpr Raz::Sphere sphere(Raz::Vec3f(1.f, 2.f, 3.f), 2.5f);
 
   auto checkWindingOrder = [&sphere] (const Raz::Mesh& mesh) {
     const Raz::Submesh& submesh = mesh.getSubmeshes().front();
@@ -323,23 +299,17 @@ TEST_CASE("Mesh icosphere", "[data]") {
   {
     Raz::Mesh mesh(sphere, 1, Raz::SphereMeshType::ICO);
 
-    CHECK(mesh.getSubmeshes().size() == 1);
+    REQUIRE(mesh.getSubmeshes().size() == 1);
     CHECK(mesh.recoverVertexCount() == 12);
     CHECK(mesh.recoverTriangleCount() == 20);
 
     checkWindingOrder(mesh);
 
     const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-
+    // The bounding box's components aren't exactly radius/-radius, due to the approximation made by the low subdivision count
+    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(sphere.getCenter() - 2.1266272f));
+    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(sphere.getCenter() + 2.1266272f));
     CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
-
-    // The bounding box's components are not exactly radius/-radius, due to the approximation made by the low subdivision count
-    const Raz::Vec3f expectedMinPos = Raz::Vec3f(-2.1266272f) + sphere.getCenter();
-    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(2.1266272f) + sphere.getCenter();
-
-    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
-    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
-
     CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(2.1266272f)));
   }
 
@@ -349,35 +319,29 @@ TEST_CASE("Mesh icosphere", "[data]") {
 //  {
 //    Raz::Mesh mesh(sphere, 2, Raz::SphereMeshType::ICO);
 //
-//    CHECK(mesh.getSubmeshes().size() == 1);
+//    REQUIRE(mesh.getSubmeshes().size() == 1);
 //    CHECK(mesh.recoverVertexCount() == 24);
 //    CHECK(mesh.recoverTriangleCount() == 180);
 //
 //    checkWindingOrder(mesh);
 //
 //    const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-//
-//    CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
-//
 //    // With 2 subdivisions, the bounding box's components are now equal to radius/-radius as expected
-//    const Raz::Vec3f expectedMinPos = Raz::Vec3f(-sphere.getRadius()) + sphere.getCenter();
-//    const Raz::Vec3f expectedMaxPos = Raz::Vec3f(sphere.getRadius()) + sphere.getCenter();
-//
-//    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(expectedMinPos));
-//    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(expectedMaxPos));
-//
+//    CHECK_THAT(boundingBox.getMinPosition(), IsNearlyEqualToVector(sphere.getCenter() - sphere.getRadius()));
+//    CHECK_THAT(boundingBox.getMaxPosition(), IsNearlyEqualToVector(sphere.getCenter() + sphere.getRadius()));
+//    CHECK_THAT(boundingBox.computeCentroid(), IsNearlyEqualToVector(sphere.computeCentroid()));
 //    CHECK_THAT(boundingBox.computeHalfExtents(), IsNearlyEqualToVector(Raz::Vec3f(sphere.getRadius())));
 //  }
 
   CHECK_THROWS(Raz::Mesh(sphere, 0, Raz::SphereMeshType::ICO)); // Creating a sphere with no subdivision throws an exception
 }
 
-TEST_CASE("Mesh AABB", "[data]") {
-  const Raz::AABB box(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
+TEST_CASE("Mesh from AABB", "[data]") {
+  constexpr Raz::AABB box(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
 
   Raz::Mesh mesh(box);
 
-  CHECK(mesh.getSubmeshes().size() == 1);
+  REQUIRE(mesh.getSubmeshes().size() == 1);
   CHECK(mesh.recoverVertexCount() == 24);
   CHECK(mesh.recoverTriangleCount() == 12);
 
@@ -396,7 +360,6 @@ TEST_CASE("Mesh AABB", "[data]") {
 
     for (std::size_t i = startIndex; i < startIndex + 6; ++i) {
       const Raz::Vertex& vert = submesh.getVertices()[submesh.getTriangleIndices()[i]];
-
       CHECK(vert.normal.strictlyEquals(normal));
       CHECK(vert.tangent.strictlyEquals(tangent));
     }
@@ -410,8 +373,57 @@ TEST_CASE("Mesh AABB", "[data]") {
   checkData(30, -Raz::Axis::Z, -Raz::Axis::X); // Back face
 
   const Raz::AABB& boundingBox = mesh.computeBoundingBox();
-
-  CHECK(boundingBox.computeCentroid().strictlyEquals(box.computeCentroid()));
   CHECK(boundingBox.getMinPosition().strictlyEquals(box.getMinPosition()));
   CHECK(boundingBox.getMaxPosition().strictlyEquals(box.getMaxPosition()));
+  CHECK(boundingBox.computeCentroid().strictlyEquals(box.computeCentroid()));
+}
+
+TEST_CASE("Mesh from OBB", "[data]") {
+  // See: https://www.geogebra.org/m/vhnrkbhh
+
+  constexpr Raz::Quaternionf rotation(0.92388f, 0.220942f, 0.220942f, 0.220942f); // 45° around [1; 1; 1]
+  constexpr Raz::OBB orientedBox(Raz::Vec3f(-1.f, 0.5f, -1.5f), Raz::Vec3f(1.f, 1.f, 0.f), rotation);
+
+  Raz::Mesh mesh(orientedBox);
+
+  REQUIRE(mesh.getSubmeshes().size() == 1);
+  CHECK(mesh.recoverVertexCount() == 24);
+  CHECK(mesh.recoverTriangleCount() == 12);
+
+  const Raz::Submesh& submesh = mesh.getSubmeshes().front();
+  const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax] = orientedBox.computeRotatedCorners();
+  const std::array<Raz::Vec3f, 36> expectedPositions = {
+    maxMinMax, maxMinMin, maxMaxMax, maxMinMin, maxMaxMin, maxMaxMax, // Right face
+    minMinMin, minMinMax, minMaxMin, minMinMax, minMaxMax, minMaxMin, // Left face
+    minMaxMax, maxMaxMax, minMaxMin, maxMaxMax, maxMaxMin, minMaxMin, // Top face
+    minMinMin, maxMinMin, minMinMax, maxMinMin, maxMinMax, minMinMax, // Bottom face
+    minMinMax, maxMinMax, minMaxMax, maxMinMax, maxMaxMax, minMaxMax, // Front face
+    maxMinMin, minMinMin, maxMaxMin, minMinMin, minMaxMin, maxMaxMin  // Back face
+  };
+
+  auto checkData = [&submesh, &expectedPositions] (std::size_t startIndex, const Raz::Vec3f& normal, const Raz::Vec3f& tangent) {
+    REQUIRE(Raz::FloatUtils::areNearlyEqual(tangent.dot(normal), 0.f));
+
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex    ]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 1]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 2]].position).isCounterClockwise(normal));
+
+    CHECK(Raz::Triangle(submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 3]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 4]].position,
+                        submesh.getVertices()[submesh.getTriangleIndices()[startIndex + 5]].position).isCounterClockwise(normal));
+
+    for (std::size_t i = startIndex; i < startIndex + 6; ++i) {
+      const Raz::Vertex& vert = submesh.getVertices()[submesh.getTriangleIndices()[i]];
+      CHECK(vert.position.strictlyEquals(expectedPositions[i]));
+      CHECK(vert.normal == normal);
+      CHECK(vert.tangent == tangent);
+    }
+  };
+
+  checkData(0, (rotation * Raz::Axis::X).normalize(), (rotation * -Raz::Axis::Z).normalize());   // Rotated right face
+  checkData(6, (rotation * -Raz::Axis::X).normalize(), (rotation * Raz::Axis::Z).normalize());   // Rotated left face
+  checkData(12, (rotation * Raz::Axis::Y).normalize(), (rotation * Raz::Axis::X).normalize());   // Rotated top face
+  checkData(18, (rotation * -Raz::Axis::Y).normalize(), (rotation * Raz::Axis::X).normalize());  // Rotated bottom face
+  checkData(24, (rotation * Raz::Axis::Z).normalize(), (rotation * Raz::Axis::X).normalize());   // Rotated front face
+  checkData(30, (rotation * -Raz::Axis::Z).normalize(), (rotation * -Raz::Axis::X).normalize()); // Rotated back face
 }

@@ -200,6 +200,18 @@ Mesh::Mesh(const AABB& box) {
   };
 }
 
+Mesh::Mesh(const OBB& orientedBox) : Mesh(orientedBox.getOriginalBox()) {
+  ZoneScopedN("Mesh::Mesh(OBB)");
+
+  const Vec3f centroid = orientedBox.computeCentroid();
+
+  for (Vertex& vertex : m_submeshes.front().getVertices()) {
+    vertex.position = centroid + orientedBox.getRotation() * (vertex.position - centroid);
+    vertex.normal   = (orientedBox.getRotation() * vertex.normal).normalize();
+    vertex.tangent  = (orientedBox.getRotation() * vertex.tangent).normalize();
+  }
+}
+
 std::size_t Mesh::recoverVertexCount() const {
   std::size_t vertexCount = 0;
 

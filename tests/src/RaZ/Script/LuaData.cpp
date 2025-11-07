@@ -170,6 +170,7 @@ TEST_CASE("LuaData Mesh", "[script][lua][data]") {
     mesh       = Mesh.new(Triangle.new(Vec3f.new(), Vec3f.new(), Vec3f.new()), Vec2f.new(), Vec2f.new(), Vec2f.new())
     mesh       = Mesh.new(Quad.new(Vec3f.new(), Vec3f.new(), Vec3f.new(), Vec3f.new()))
     mesh       = Mesh.new(AABB.new(Vec3f.new(), Vec3f.new()))
+    mesh       = Mesh.new(OBB.new(Vec3f.new(), Vec3f.new(), Quaternionf.identity()))
 
     assert(mesh:getSubmeshes():size() == 1)
     mesh:addSubmesh()
