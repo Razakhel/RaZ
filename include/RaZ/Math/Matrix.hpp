@@ -197,11 +197,6 @@ public:
   /// \param mat Matrix to be compared with.
   /// \return True if matrices are [nearly] equal, else otherwise.
   constexpr bool operator==(const Matrix& mat) const noexcept;
-  /// Matrix inequality comparison operator.
-  /// Uses a near-equality check on floating types to take floating-point errors into account.
-  /// \param mat Matrix to be compared with.
-  /// \return True if matrices are different, else otherwise.
-  constexpr bool operator!=(const Matrix& mat) const noexcept { return !(*this == mat); }
   /// Output stream operator.
   /// \param stream Stream to output into.
   /// \param mat Matrix to be output.

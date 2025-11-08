@@ -100,6 +100,7 @@ public:
 
   constexpr Shape& operator=(const Shape&) = default;
   constexpr Shape& operator=(Shape&&) noexcept = default;
+  constexpr bool operator==(const Shape&) const noexcept = default;
 
   constexpr virtual ~Shape() = default;
 
@@ -178,12 +179,7 @@ public:
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param line Line to be compared with.
   /// \return True if the lines are nearly equal to each other, false otherwise.
-  constexpr bool operator==(const Line& line) const noexcept { return (m_beginPos == line.m_beginPos && m_endPos == line.m_endPos); }
-  /// Checks if the current line is different from another given one.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param line Line to be compared with.
-  /// \return True if the lines are different from each other, false otherwise.
-  constexpr bool operator!=(const Line& line) const noexcept { return !(*this == line); }
+  constexpr bool operator==(const Line& line) const noexcept = default;
 
 private:
   Vec3f m_beginPos;
@@ -259,11 +255,6 @@ public:
   /// \return True if the planes are nearly equal to each other, false otherwise.
   constexpr bool operator==(const Plane& plane) const noexcept { return (FloatUtils::areNearlyEqual(m_distance, plane.m_distance)
                                                                       && m_normal == plane.m_normal); }
-  /// Checks if the current plane is different from another given one.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param plane Plane to be compared with.
-  /// \return True if the planes are different from each other, false otherwise.
-  constexpr bool operator!=(const Plane& plane) const noexcept { return !(*this == plane); }
 
 private:
   float m_distance {};
@@ -335,11 +326,6 @@ public:
   /// \return True if the spheres are nearly equal to each other, false otherwise.
   constexpr bool operator==(const Sphere& sphere) const noexcept { return (m_centerPos == sphere.m_centerPos
                                                                         && FloatUtils::areNearlyEqual(m_radius, sphere.m_radius)); }
-  /// Checks if the current sphere is different from another given one.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param sphere Sphere to be compared with.
-  /// \return True if the spheres are different from each other, false otherwise.
-  constexpr bool operator!=(const Sphere& sphere) const noexcept { return !(*this == sphere); }
 
 private:
   Vec3f m_centerPos;
@@ -421,14 +407,7 @@ public:
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param triangle Triangle to be compared with.
   /// \return True if the triangles are nearly equal to each other, false otherwise.
-  constexpr bool operator==(const Triangle& triangle) const noexcept { return (m_firstPos == triangle.m_firstPos
-                                                                            && m_secondPos == triangle.m_secondPos
-                                                                            && m_thirdPos == triangle.m_thirdPos); }
-  /// Checks if the current triangle is different from another given one.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param triangle Triangle to be compared with.
-  /// \return True if the triangles are different from each other, false otherwise.
-  constexpr bool operator!=(const Triangle& triangle) const noexcept { return !(*this == triangle); }
+  constexpr bool operator==(const Triangle& triangle) const noexcept = default;
 
 private:
   Vec3f m_firstPos;
@@ -502,15 +481,7 @@ public:
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param quad Quad to be compared with.
   /// \return True if the quads are nearly equal to each other, false otherwise.
-  constexpr bool operator==(const Quad& quad) const noexcept { return (m_leftTopPos == quad.m_leftTopPos
-                                                                    && m_rightTopPos == quad.m_rightTopPos
-                                                                    && m_rightBottomPos == quad.m_rightBottomPos
-                                                                    && m_leftBottomPos == quad.m_leftBottomPos); }
-  /// Checks if the current quad is different from another given one.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param quad Quad to be compared with.
-  /// \return True if the quads are different from each other, false otherwise.
-  constexpr bool operator!=(const Quad& quad) const noexcept { return !(*this == quad); }
+  constexpr bool operator==(const Quad& quad) const noexcept = default;
 
 private:
   Vec3f m_leftTopPos;
@@ -614,12 +585,7 @@ public:
   /// Uses a near-equality check to take floating-point errors into account.
   /// \param aabb AABB to be compared with.
   /// \return True if the AABBs are nearly equal to each other, false otherwise.
-  constexpr bool operator==(const AABB& aabb) const noexcept { return (m_minPos == aabb.m_minPos && m_maxPos == aabb.m_maxPos); }
-  /// Checks if the current AABB is different from another given one.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param aabb AABB to be compared with.
-  /// \return True if the AABBs are different from each other, false otherwise.
-  constexpr bool operator!=(const AABB& aabb) const noexcept { return !(*this == aabb); }
+  constexpr bool operator==(const AABB& aabb) const noexcept = default;
 
 private:
   Vec3f m_minPos;
@@ -751,11 +717,6 @@ public:
   /// \param obb OBB to be compared with.
   /// \return True if the OBBs are nearly equal to each other, false otherwise.
   constexpr bool operator==(const OBB& obb) const noexcept { return (m_aabb == obb.m_aabb && m_rotation == obb.m_rotation); }
-  /// Checks if the current OBB is different from another given one.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param obb OBB to be compared with.
-  /// \return True if the OBBs are different from each other, false otherwise.
-  constexpr bool operator!=(const OBB& obb) const noexcept { return !(*this == obb); }
 
 private:
   AABB m_aabb;

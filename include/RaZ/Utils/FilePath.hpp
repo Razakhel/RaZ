@@ -86,19 +86,12 @@ public:
   std::wstring operator+(const std::wstring& pathStr) const { return toWide() + pathStr; }
   FilePath operator+(const FilePath& filePath) const { return m_path + filePath.getPath(); }
   bool operator==(const char* pathStr) const noexcept { return toUtf8() == pathStr; }
-  bool operator!=(const char* pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const wchar_t* pathStr) const noexcept { return toWide() == pathStr; }
-  bool operator!=(const wchar_t* pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const std::string& pathStr) const noexcept { return toUtf8() == pathStr; }
-  bool operator!=(const std::string& pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const std::wstring& pathStr) const noexcept { return toWide() == pathStr; }
-  bool operator!=(const std::wstring& pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const std::string_view& pathStr) const noexcept { return toUtf8() == pathStr; }
-  bool operator!=(const std::string_view& pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const std::wstring_view& pathStr) const noexcept { return toWide() == pathStr; }
-  bool operator!=(const std::wstring_view& pathStr) const noexcept { return !(*this == pathStr); }
   bool operator==(const FilePath& filePath) const noexcept { return m_path == filePath.getPath(); }
-  bool operator!=(const FilePath& filePath) const noexcept { return !(*this == filePath); }
   constexpr explicit operator const StringType&() const noexcept { return m_path; }
   constexpr operator const CharType*() const noexcept { return m_path.c_str(); }
 

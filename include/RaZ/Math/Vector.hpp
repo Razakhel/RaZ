@@ -218,11 +218,6 @@ public:
   /// \param vec Vector to be compared with.
   /// \return True if vectors are [nearly] equal, else otherwise.
   constexpr bool operator==(const Vector& vec) const noexcept;
-  /// Vector inequality comparison operator.
-  /// Uses a near-equality check on floating types to take floating-point errors into account.
-  /// \param vec Vector to be compared with.
-  /// \return True if vectors are different, else otherwise.
-  constexpr bool operator!=(const Vector& vec) const noexcept { return !(*this == vec); }
   /// Vector's value type conversion operator.
   /// \tparam T2 Type to convert the vector's values to.
   /// \return Vector object of the new type.

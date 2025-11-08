@@ -33,11 +33,10 @@ public:
 
   constexpr operator const Vec3f&() const noexcept { return m_values; }
   constexpr explicit operator Vec3b() const noexcept { return Vec3b(m_values[0] * 255, m_values[1] * 255, m_values[2] * 255); }
-  constexpr bool operator==(const Color& color) const noexcept { return m_values == color.m_values; }
-  constexpr bool operator!=(const Color& color) const noexcept { return !(*this == color); }
+  constexpr bool operator==(const Color& color) const noexcept = default;
 
 private:
-  Vec3f m_values {};
+  Vec3f m_values;
 };
 
 namespace ColorPreset {

@@ -21,11 +21,7 @@ struct Vertex {
                                                                          && normal.strictlyEquals(vert.normal)
                                                                          && tangent.strictlyEquals(vert.tangent); }
 
-  constexpr bool operator==(const Vertex& vert) const noexcept { return (position == vert.position)
-                                                                     && (texcoords == vert.texcoords)
-                                                                     && (normal == vert.normal)
-                                                                     && (tangent == vert.tangent); }
-  constexpr bool operator!=(const Vertex& vert) const noexcept { return !(*this == vert); }
+  constexpr bool operator==(const Vertex& vert) const noexcept = default;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const Vertex& vert) {
@@ -65,9 +61,9 @@ public:
   Submesh& operator=(Submesh&&) noexcept = default;
 
 private:
-  std::vector<Vertex> m_vertices {};
-  std::vector<unsigned int> m_lineIndices {};
-  std::vector<unsigned int> m_triangleIndices {};
+  std::vector<Vertex> m_vertices;
+  std::vector<unsigned int> m_lineIndices;
+  std::vector<unsigned int> m_triangleIndices;
 
   AABB m_boundingBox = AABB(Vec3f(0.f), Vec3f(0.f));
 };

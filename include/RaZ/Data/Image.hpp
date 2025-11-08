@@ -62,11 +62,6 @@ struct ImageData {
   /// \param imgData Image data to be compared with.
   /// \return True if data are equal, false otherwise.
   virtual bool operator==(const ImageData& imgData) const = 0;
-  /// Checks if the current image data is different from another given one.
-  /// Datas' types must be the same.
-  /// \param imgData Image data to be compared with.
-  /// \return True if data are different, false otherwise.
-  bool operator!=(const ImageData& imgData) const { return !(*this == imgData); }
 
   virtual ~ImageData() = default;
 };
@@ -215,11 +210,6 @@ public:
   /// \param img Image to be compared with.
   /// \return True if images are the same, false otherwise.
   bool operator==(const Image& img) const;
-  /// Checks if the current image is different from another given one.
-  /// Their inner data must be of the same type.
-  /// \param img Image to be compared with.
-  /// \return True if images are different, false otherwise.
-  bool operator!=(const Image& img) const { return !(*this == img); }
 
 private:
   constexpr std::size_t computeIndex(std::size_t widthIndex, std::size_t heightIndex) const noexcept {
@@ -251,7 +241,7 @@ private:
   ImageDataType m_dataType {};
   uint8_t m_channelCount {};
 
-  ImageDataPtr m_data {};
+  ImageDataPtr m_data;
 };
 
 } // namespace Raz

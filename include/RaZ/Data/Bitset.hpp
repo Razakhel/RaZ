@@ -12,19 +12,19 @@ namespace Raz {
 
 class Bitset {
 public:
-  Bitset() = default;
-  explicit Bitset(std::size_t bitCount, bool initVal = false) : m_bits(bitCount, initVal) {}
-  Bitset(std::initializer_list<bool> values) : m_bits(values) {}
+  constexpr Bitset() = default;
+  constexpr explicit Bitset(std::size_t bitCount, bool initVal = false) : m_bits(bitCount, initVal) {}
+  constexpr Bitset(std::initializer_list<bool> values) : m_bits(values) {}
 
-  std::size_t getSize() const noexcept { return m_bits.size(); }
+  constexpr std::size_t getSize() const noexcept { return m_bits.size(); }
 
-  bool isEmpty() const noexcept { return (std::find(m_bits.cbegin(), m_bits.cend(), true) == m_bits.cend()); }
-  std::size_t getEnabledBitCount() const noexcept { return static_cast<std::size_t>(std::count(m_bits.cbegin(), m_bits.cend(), true)); }
-  std::size_t getDisabledBitCount() const noexcept { return (m_bits.size() - getEnabledBitCount()); }
+  constexpr bool isEmpty() const noexcept { return (std::ranges::find(m_bits, true) == m_bits.cend()); }
+  constexpr std::size_t getEnabledBitCount() const noexcept { return std::ranges::count(m_bits, true); }
+  constexpr std::size_t getDisabledBitCount() const noexcept { return (m_bits.size() - getEnabledBitCount()); }
   void setBit(std::size_t index, bool value = true);
-  void resize(std::size_t newSize) { m_bits.resize(newSize); }
-  void reset() { std::fill(m_bits.begin(), m_bits.end(), false); }
-  void clear() noexcept { m_bits.clear(); }
+  constexpr void resize(std::size_t newSize) { m_bits.resize(newSize); }
+  constexpr void reset() { std::fill(m_bits.begin(), m_bits.end(), false); }
+  constexpr void clear() noexcept { m_bits.clear(); }
 
   Bitset operator~() const noexcept;
   Bitset operator&(const Bitset& bitset) const noexcept;
@@ -37,13 +37,12 @@ public:
   Bitset& operator^=(const Bitset& bitset) noexcept;
   Bitset& operator<<=(std::size_t shift);
   Bitset& operator>>=(std::size_t shift);
-  bool operator[](std::size_t index) const noexcept { return m_bits[index]; }
-  bool operator==(const Bitset& bitset) const noexcept { return std::equal(m_bits.cbegin(), m_bits.cend(), bitset.m_bits.cbegin()); }
-  bool operator!=(const Bitset& bitset) const noexcept { return !(*this == bitset); }
+  constexpr bool operator[](std::size_t index) const noexcept { return m_bits[index]; }
+  constexpr bool operator==(const Bitset& bitset) const noexcept { return std::equal(m_bits.cbegin(), m_bits.cend(), bitset.m_bits.cbegin()); }
   friend std::ostream& operator<<(std::ostream& stream, const Bitset& bitset);
 
 private:
-  std::vector<bool> m_bits {};
+  std::vector<bool> m_bits;
 };
 
 } // namespace Raz

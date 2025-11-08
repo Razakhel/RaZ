@@ -113,11 +113,6 @@ public:
   /// \param quat Quaternion to be compared with.
   /// \return True if quaternions are nearly equal, else otherwise.
   constexpr bool operator==(const Quaternion& quat) const noexcept;
-  /// Quaternion inequality comparison operator.
-  /// Uses a near-equality check to take floating-point errors into account.
-  /// \param quat Quaternion to be compared with.
-  /// \return True if quaternions are different, else otherwise.
-  constexpr bool operator!=(const Quaternion& quat) const noexcept { return !(*this == quat); }
   /// Matrix conversion operator; computes the rotation matrix represented by the quaternion.
   /// \return Rotation matrix.
   constexpr operator Mat4<T>() const noexcept { return computeMatrix(); }

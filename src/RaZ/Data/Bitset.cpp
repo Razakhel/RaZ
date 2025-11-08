@@ -22,7 +22,7 @@ Bitset Bitset::operator~() const noexcept {
 
 Bitset Bitset::operator&(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.m_bits.begin());
+  std::copy_n(m_bits.cbegin(), res.getSize(), res.m_bits.begin());
 
   res &= bitset;
   return res;
@@ -30,7 +30,7 @@ Bitset Bitset::operator&(const Bitset& bitset) const noexcept {
 
 Bitset Bitset::operator|(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.m_bits.begin());
+  std::copy_n(m_bits.cbegin(), res.getSize(), res.m_bits.begin());
 
   res |= bitset;
   return res;
@@ -38,7 +38,7 @@ Bitset Bitset::operator|(const Bitset& bitset) const noexcept {
 
 Bitset Bitset::operator^(const Bitset& bitset) const noexcept {
   Bitset res(std::min(m_bits.size(), bitset.getSize()));
-  std::copy(m_bits.cbegin(), m_bits.cbegin() + static_cast<std::ptrdiff_t>(res.getSize()), res.m_bits.begin());
+  std::copy_n(m_bits.cbegin(), res.getSize(), res.m_bits.begin());
 
   res ^= bitset;
   return res;
