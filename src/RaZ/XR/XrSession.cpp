@@ -118,8 +118,7 @@ int64_t selectColorSwapchainFormat(const std::vector<int64_t>& formats) {
     GL_RGBA8_SNORM
   };
 
-  const auto formatIter = std::find_first_of(formats.cbegin(), formats.cend(),
-                                             supportedColorSwapchainFormats.cbegin(), supportedColorSwapchainFormats.cend());
+  const auto formatIter = std::ranges::find_first_of(formats, supportedColorSwapchainFormats);
 
   if (formatIter == formats.cend())
     return 0;
@@ -135,8 +134,7 @@ int64_t selectDepthSwapchainFormat(const std::vector<int64_t>& formats) {
     GL_DEPTH_COMPONENT16
   };
 
-  const auto formatIter = std::find_first_of(formats.cbegin(), formats.cend(),
-                                             supportedDepthSwapchainFormats.cbegin(), supportedDepthSwapchainFormats.cend());
+  const auto formatIter = std::ranges::find_first_of(formats, supportedDepthSwapchainFormats);
 
   if (formatIter == formats.cend())
     return 0;

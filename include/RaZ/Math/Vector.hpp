@@ -222,7 +222,7 @@ public:
   /// \tparam T2 Type to convert the vector's values to.
   /// \return Vector object of the new type.
   template <typename T2> constexpr explicit operator Vector<T2, Size>() const noexcept;
-  /// Output stream operator.
+  /// Vector output stream operator.
   /// \param stream Stream to output into.
   /// \param vec Vector to be output.
   friend std::ostream& operator<< <>(std::ostream& stream, const Vector& vec);
@@ -234,16 +234,16 @@ private:
 /// Element-wise value-vector addition operator (of the form val + vec).
 /// \tparam T Type of the vector's data.
 /// \tparam Size Vector's size.
-/// \param val Value to be added to the vectors's element.
-/// \param vec Vector to be additioned.
-/// \return Additioned vector.
+/// \param val Value to be added to the vector's elements.
+/// \param vec Vector to be added.
+/// \return Added vector.
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size> operator+(T val, const Vector<T, Size>& vec) noexcept { return vec + val; }
 
 /// Element-wise value-vector multiplication operator (of the form val * vec).
 /// \tparam T Type of the vector's data.
 /// \tparam Size Vector's size.
-/// \param val Value to be multiplied by the vectors's element.
+/// \param val Value to multiply the vector's elements by.
 /// \param vec Vector to be multiplied.
 /// \return Multiplied vector.
 template <typename T, std::size_t Size>

@@ -45,7 +45,7 @@ public:
   /// Checks if an attribute has been set with the given uniform name.
   /// \param uniformName Uniform name to be checked.
   /// \return True if an attribute exists with the given name, false otherwise.
-  bool hasAttribute(const std::string& uniformName) const noexcept;
+  bool hasAttribute(const std::string& uniformName) const noexcept { return m_attributes.contains(uniformName); }
   /// Checks if an attribute has been set with the given uniform name and type.
   /// \tparam T Type to be checked.
   /// \param uniformName Uniform name to be checked.

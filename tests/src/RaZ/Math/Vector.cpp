@@ -96,7 +96,7 @@ TEST_CASE("Vector dot", "[math]") {
 }
 
 TEST_CASE("Vector cross", "[math]") {
-  // The cross product cannot be computed for unsigned types or sizes other than 3
+  // The cross product can't be computed for unsigned types or sizes other than 3
 
   CHECK(vec3i1.cross(vec3i1) == Raz::Vec3i(0));
   CHECK(vec3i1.cross(vec3i2) == Raz::Vec3i(19829036, 13869944, 50784));
@@ -216,7 +216,7 @@ TEST_CASE("Vector reflection", "[math]") {
   //       \ | /
   // _______v|/_______
 
-  // The reflected vector cannot be computed for unsigned types
+  // The reflected vector can't be computed for unsigned types
 
   CHECK(Raz::Vec3f(1.f, -1.f, 0.f).reflect(Raz::Vec3f(0.f, 1.f, 0.f)) == Raz::Vec3f(1.f, 1.f, 0.f));
   CHECK_THAT(vec3f1.reflect(Raz::Vec3f(0.f, 1.f, 0.f)), IsNearlyEqualToVector(Raz::Vec3f(3.18f, -42.f, 0.874f)));
@@ -517,11 +517,11 @@ TEST_CASE("Vector strict equality", "[math]") {
   constexpr std::array<Raz::Vec3f, 3> vectors = { vec3f1Swizzled, vec3f1Epsilon, vec3f1 };
 
   // When using a simple find(), which uses operator==, vec3f1Epsilon is found instead of vec3f1
-  const auto foundIter = std::find(vectors.cbegin(), vectors.cend(), vec3f1);
+  const auto foundIter = std::ranges::find(vectors, vec3f1);
   CHECK(std::distance(vectors.cbegin(), foundIter) == 1);
 
   // To search for a specific element, find_if() must be used with a strict equality check
-  const auto foundIfIter = std::find_if(vectors.cbegin(), vectors.cend(), [&] (const Raz::Vec3f& compVec) { return vec3f1.strictlyEquals(compVec); });
+  const auto foundIfIter = std::ranges::find_if(vectors, [&] (const Raz::Vec3f& compVec) noexcept { return vec3f1.strictlyEquals(compVec); });
   CHECK(std::distance(vectors.cbegin(), foundIfIter) == 2);
 
   constexpr std::array<Raz::Vec3f, 3> swappedVectors = { vec3f1Swizzled, vec3f1, vec3f1Epsilon };
@@ -542,7 +542,7 @@ TEST_CASE("Vector less-than", "[math]") {
 
   CHECK(std::less<Raz::Vec3f>()(vec3f1, vec3f2));
   CHECK_FALSE(std::less<Raz::Vec3f>()(vec3f2, vec3f1));
-  CHECK_FALSE(std::less<Raz::Vec3f>()(vec3f1, vec3f1)); // Equal vectors are not strictly less than the other
+  CHECK_FALSE(std::less<Raz::Vec3f>()(vec3f1, vec3f1)); // Equal vectors aren't strictly less than the other
   CHECK(std::less<Raz::Vec3f>()(vec3f1, vec3f1 + std::numeric_limits<float>::epsilon()));
   CHECK_FALSE(std::less<Raz::Vec3f>()(vec3f1 + std::numeric_limits<float>::epsilon(), vec3f1)); // Performs a strict check, no tolerance allowed
 

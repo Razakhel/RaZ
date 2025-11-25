@@ -19,14 +19,6 @@ class RenderSystem;
 class Window;
 using WindowPtr = std::unique_ptr<Window>;
 
-using KeyboardCallbacks    = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
-using MouseButtonCallbacks = std::vector<std::tuple<int, std::function<void(float)>, Input::ActionTrigger, std::function<void()>>>;
-using MouseScrollCallback  = std::function<void(double, double)>;
-using MouseMoveCallback    = std::tuple<double, double, std::function<void(double, double)>>;
-using InputActions         = std::unordered_map<int, std::pair<std::function<void(float)>, Input::ActionTrigger>>;
-using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
-using CloseCallback        = std::function<void()>;
-
 enum class WindowSetting : unsigned int {
   FOCUSED        = 1,   ///< Forces the window to take the focus.
   RESIZABLE      = 2,   ///< Makes the window able to be resized, either by dragging the edges & corners or by maximizing it.
@@ -92,7 +84,7 @@ public:
   /// \param width New window width.
   /// \param height New window height.
   /// \note The width & height are to be considered just hints; the window manager remains responsible for the actual dimensions, which may be lower.
-  ///   This can notably happen when the requested window size exceeds what the screens can display. The actual window's size can be queried afterward.
+  ///   This can notably happen when the requested window size exceeds what the screens can display. The actual size can be queried afterward.
   /// \see getWidth(), getHeight()
   void resize(unsigned int width, unsigned int height);
   /// Sets the window in a fullscreen mode, taking the whole main monitor's screen.
@@ -155,7 +147,7 @@ public:
   /// Sets the action to be executed on window close.
   /// \param func Action to be executed when the window is closed.
   void setCloseCallback(std::function<void()> func);
-  /// Associates all of the callbacks, making them active.
+  /// Associates all the callbacks, making them active.
   void updateCallbacks() const;
 #if !defined(RAZ_NO_OVERLAY)
   /// Changes the overlay's enabled state.
@@ -178,6 +170,31 @@ public:
   ~Window() { close(); }
 
 private:
+  struct KeyboardCallback {
+    Keyboard::Key key;
+    std::function<void(float)> actionPress;
+    Input::ActionTrigger frequency;
+    std::function<void()> actionRelease;
+  };
+
+  struct MouseButtonCallback {
+    Mouse::Button button;
+    std::function<void(float)> actionPress;
+    Input::ActionTrigger frequency;
+    std::function<void()> actionRelease;
+  };
+
+  struct MouseMoveCallback {
+    double xPrevPos {};
+    double yPrevPos {};
+    std::function<void(double, double)> action;
+  };
+
+  struct InputAction {
+    std::function<void(float)> action;
+    Input::ActionTrigger frequency;
+  };
+
   /// Processes actions corresponding to keyboard & mouse inputs.
   /// \param deltaTime Amount of time elapsed since the last frame.
   void processInputs(float deltaTime);
@@ -196,8 +213,12 @@ private:
   int m_posX {};
   int m_posY {};
 
-  InputCallbacks m_callbacks {};
-  CloseCallback m_closeCallback {};
+  std::vector<KeyboardCallback> m_keyboardCallbacks;
+  std::vector<MouseButtonCallback> m_mouseButtonCallbacks;
+  std::function<void(double, double)> m_mouseScrollCallback;
+  MouseMoveCallback m_mouseMoveCallback;
+  std::unordered_map<int, InputAction> m_inputActions;
+  std::function<void()> m_closeCallback;
 
 #if !defined(RAZ_NO_OVERLAY)
   Overlay m_overlay {};

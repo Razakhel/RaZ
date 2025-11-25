@@ -43,7 +43,7 @@ TEST_CASE("AudioSystem devices recovery", "[audio]") {
   const Raz::AudioSystem audio;
   const std::string currentDevice = audio.recoverCurrentDevice();
 
-  CHECK(std::find(devices.cbegin(), devices.cend(), currentDevice) != devices.cend());
+  CHECK(std::ranges::find(devices, currentDevice) != devices.cend());
 }
 
 TEST_CASE("AudioSystem attributes update", "[audio]") {

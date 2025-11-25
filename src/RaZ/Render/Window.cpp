@@ -240,24 +240,24 @@ void Window::setCursorState(Cursor::State state) const {
 void Window::addKeyCallback(Keyboard::Key key, std::function<void(float)> actionPress,
                                                Input::ActionTrigger frequency,
                                                std::function<void()> actionRelease) {
-  std::get<0>(m_callbacks).emplace_back(key, std::move(actionPress), frequency, std::move(actionRelease));
+  m_keyboardCallbacks.emplace_back(key, std::move(actionPress), frequency, std::move(actionRelease));
   updateCallbacks();
 }
 
 void Window::addMouseButtonCallback(Mouse::Button button, std::function<void(float)> actionPress,
                                                           Input::ActionTrigger frequency,
                                                           std::function<void()> actionRelease) {
-  std::get<1>(m_callbacks).emplace_back(button, std::move(actionPress), frequency, std::move(actionRelease));
+  m_mouseButtonCallbacks.emplace_back(button, std::move(actionPress), frequency, std::move(actionRelease));
   updateCallbacks();
 }
 
 void Window::setMouseScrollCallback(std::function<void(double, double)> func) {
-  std::get<2>(m_callbacks) = std::move(func);
+  m_mouseScrollCallback = std::move(func);
   updateCallbacks();
 }
 
 void Window::setMouseMoveCallback(std::function<void(double, double)> func) {
-  std::get<3>(m_callbacks) = std::make_tuple(m_width / 2, m_height / 2, std::move(func));
+  m_mouseMoveCallback = { m_width * 0.5, m_height * 0.5, std::move(func) };
   updateCallbacks();
 }
 
@@ -287,38 +287,33 @@ void Window::updateCallbacks() const {
 #endif
 
   // Keyboard inputs
-  if (!std::get<0>(m_callbacks).empty()) {
-    glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int key, int scancode, int action, int mods) {
+  glfwSetKeyCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int key, int scancode, int action, int mods) {
 #if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_KeyCallback(windowHandle, key, scancode, action, mods);
+    ImGui_ImplGlfw_KeyCallback(windowHandle, key, scancode, action, mods);
 
-      // Key callbacks should not be executed if the overlay requested keyboard focus
-      if (ImGui::GetIO().WantCaptureKeyboard)
-        return;
+    // Key callbacks shouldn't be executed if the overlay requested keyboard focus
+    if (ImGui::GetIO().WantCaptureKeyboard)
+      return;
 #endif
 
-      InputCallbacks& callbacks = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks;
-      const auto& keyCallbacks  = std::get<0>(callbacks);
+    Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(windowHandle));
 
-      for (const auto& callback : keyCallbacks) {
-        if (key != std::get<0>(callback))
-          continue;
+    for (const auto& callback : window.m_keyboardCallbacks) {
+      if (key != callback.key)
+        continue;
 
-        auto& actions = std::get<InputActions>(callbacks);
+      auto& actions = window.m_inputActions;
 
-        if (action == GLFW_PRESS) {
-          actions.emplace(key, std::make_pair(std::get<1>(callback), std::get<2>(callback)));
-        } else if (action == GLFW_RELEASE) {
-          actions.erase(key);
+      if (action == GLFW_PRESS) {
+        actions.emplace(key, InputAction{ callback.actionPress, callback.frequency });
+      } else if (action == GLFW_RELEASE) {
+        actions.erase(key);
 
-          const auto& actionRelease = std::get<3>(callback);
-
-          if (actionRelease)
-            actionRelease();
-        }
+        if (const auto& actionRelease = callback.actionRelease)
+          actionRelease();
       }
-    });
-  }
+    }
+  });
 
 #if !defined(RAZ_NO_OVERLAY)
   // Unicode character inputs
@@ -335,69 +330,57 @@ void Window::updateCallbacks() const {
 #endif
 
   // Mouse buttons inputs
-  if (!std::get<1>(m_callbacks).empty()) {
-    glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int button, int action, int mods) {
+  glfwSetMouseButtonCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int button, int action, int mods) {
 #if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_MouseButtonCallback(windowHandle, button, action, mods);
+    ImGui_ImplGlfw_MouseButtonCallback(windowHandle, button, action, mods);
 
-      // Mouse buttons callbacks should not be executed if the overlay requested mouse focus
-      if (ImGui::GetIO().WantCaptureMouse)
-        return;
+    // Mouse buttons callbacks shouldn't be executed if the overlay requested mouse focus
+    if (ImGui::GetIO().WantCaptureMouse)
+      return;
 #endif
 
-      InputCallbacks& callbacks  = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks;
-      const auto& mouseCallbacks = std::get<1>(callbacks);
+    Window& window = *static_cast<Window*>(glfwGetWindowUserPointer(windowHandle));
 
-      for (const auto& callback : mouseCallbacks) {
-        if (button != std::get<0>(callback))
-          continue;
+    for (const auto& callback : window.m_mouseButtonCallbacks) {
+      if (button != callback.button)
+        continue;
 
-        auto& actions = std::get<InputActions>(callbacks);
+      if (action == GLFW_PRESS) {
+        window.m_inputActions.emplace(button, InputAction{ callback.actionPress, callback.frequency });
+      } else if (action == GLFW_RELEASE) {
+        window.m_inputActions.erase(button);
 
-        if (action == GLFW_PRESS) {
-          actions.emplace(button, std::make_pair(std::get<1>(callback), std::get<2>(callback)));
-        } else if (action == GLFW_RELEASE) {
-          actions.erase(button);
-
-          const auto& actionRelease = std::get<3>(callback);
-
-          if (actionRelease)
-            actionRelease();
-        }
+        if (const auto& actionRelease = callback.actionRelease)
+          actionRelease();
       }
-    });
-  }
+    }
+  });
 
   // Mouse scroll input
-  if (std::get<2>(m_callbacks)) {
-    glfwSetScrollCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xOffset, double yOffset) {
+  glfwSetScrollCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xOffset, double yOffset) {
 #if !defined(RAZ_NO_OVERLAY)
-      ImGui_ImplGlfw_ScrollCallback(windowHandle, xOffset, yOffset);
+    ImGui_ImplGlfw_ScrollCallback(windowHandle, xOffset, yOffset);
 
-      // Scroll callback should not be executed if the overlay requested mouse focus
-      if (ImGui::GetIO().WantCaptureMouse)
-        return;
+    // Scroll callback shouldn't be executed if the overlay requested mouse focus
+    if (ImGui::GetIO().WantCaptureMouse)
+      return;
 #endif
 
-      const auto& scrollCallback = std::get<2>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks);
+    if (const auto& scrollCallback = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_mouseScrollCallback)
       scrollCallback(xOffset, yOffset);
-    });
-  }
+  });
 
   // Mouse move input
-  if (std::get<2>(std::get<3>(m_callbacks))) {
-    glfwSetCursorPosCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xPosition, double yPosition) {
-      MouseMoveCallback& moveCallback = std::get<3>(static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_callbacks);
+  glfwSetCursorPosCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xPosition, double yPosition) {
+    auto& [xPrevPos, yPrevPos, action] = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_mouseMoveCallback;
 
-      double& xPrevPos = std::get<0>(moveCallback);
-      double& yPrevPos = std::get<1>(moveCallback);
+    if (action == nullptr)
+      return;
 
-      std::get<2>(moveCallback)(xPosition - xPrevPos, yPosition - yPrevPos);
-
-      xPrevPos = xPosition;
-      yPrevPos = yPosition;
-    });
-  }
+    action(xPosition - xPrevPos, yPosition - yPrevPos);
+    xPrevPos = xPosition;
+    yPrevPos = yPosition;
+  });
 }
 
 bool Window::run(float deltaTime) {
@@ -447,21 +430,16 @@ void Window::processInputs(float deltaTime) {
     glfwPollEvents();
   }
 
-  auto& actions   = std::get<InputActions>(m_callbacks);
-  auto actionIter = actions.cbegin();
+  auto actionIter = m_inputActions.cbegin();
 
-  while (actionIter != actions.cend()) {
-    const auto& action = actionIter->second;
+  while (actionIter != m_inputActions.cend()) {
+    const auto& [action, frequency] = actionIter->second;
 
-    // An action consists of two parts:
-    // - A callback associated with the triggered key or button
-    // - A value indicating if it should be executed only once or every frame
+    action(deltaTime);
 
-    action.first(deltaTime);
-
-    // Removing the current action if ONCE is given, or simply increment the iterator
-    if (action.second == Input::ONCE)
-      actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
+    // Removing the current action if it should be executed only once, or simply increment the iterator
+    if (frequency == Input::ONCE)
+      actionIter = m_inputActions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
     else
       ++actionIter;
   }

@@ -1176,7 +1176,7 @@ void Renderer::recoverUniformInfo(unsigned int programIndex, unsigned int unifor
   type = static_cast<UniformType>(uniformType);
 
   name.resize(static_cast<std::size_t>(nameLength));
-  std::copy(uniformName.cbegin(), uniformName.cbegin() + nameLength, name.begin());
+  std::copy_n(uniformName.cbegin(), nameLength, name.begin());
 
   if (size)
     *size = uniformSize;
@@ -1729,7 +1729,7 @@ std::string Renderer::recoverLabel(RenderObjectType type, unsigned int objectInd
 
   std::string label;
   label.resize(static_cast<std::size_t>(labelLength));
-  std::copy(labelName.cbegin(), labelName.cbegin() + labelLength, label.begin());
+  std::copy_n(labelName.cbegin(), labelLength, label.begin());
 
   printConditionalErrors();
 

@@ -10,6 +10,8 @@
 #include "GL/glew.h" // Needed by TracyOpenGL.hpp
 #include "tracy/TracyOpenGL.hpp"
 
+#include <ranges>
+
 namespace Raz {
 
 namespace {
@@ -96,7 +98,7 @@ void Framebuffer::addColorBuffer(Texture2DPtr texture, unsigned int index) {
   if (texture->getColorspace() == TextureColorspace::DEPTH || texture->getColorspace() == TextureColorspace::INVALID)
     throw std::invalid_argument("Error: Invalid color buffer");
 
-  const auto bufferIt = std::find_if(m_colorBuffers.cbegin(), m_colorBuffers.cend(), [&texture, index] (const auto& colorBuffer) {
+  const auto bufferIt = std::ranges::find_if(m_colorBuffers, [&texture, index] (const auto& colorBuffer) noexcept {
     return (texture == colorBuffer.first && index == colorBuffer.second);
   });
 
@@ -111,10 +113,9 @@ void Framebuffer::removeTextureBuffer(const Texture2DPtr& texture) {
   if (texture == m_depthBuffer) {
     m_depthBuffer.reset();
   } else {
-    const auto bufferIt = std::remove_if(m_colorBuffers.begin(), m_colorBuffers.end(), [&texture] (const auto& buffer) {
+    std::erase_if(m_colorBuffers, [&texture] (const auto& buffer) noexcept {
       return (texture == buffer.first);
     });
-    m_colorBuffers.erase(bufferIt, m_colorBuffers.end());
   }
 
   mapBuffers();
@@ -131,7 +132,7 @@ void Framebuffer::resizeBuffers(unsigned int width, unsigned int height) {
   if (m_depthBuffer)
     m_depthBuffer->resize(width, height);
 
-  for (const auto& [colorBuffer, _] : m_colorBuffers)
+  for (const Texture2DPtr& colorBuffer : m_colorBuffers | std::views::keys)
     colorBuffer->resize(width, height);
 }
 

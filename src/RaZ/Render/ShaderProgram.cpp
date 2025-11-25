@@ -4,6 +4,8 @@
 
 #include "tracy/Tracy.hpp"
 
+#include <ranges>
+
 namespace Raz {
 
 namespace {
@@ -57,24 +59,20 @@ ImageInternalFormat recoverImageTextureFormat(const Texture& texture) {
 ShaderProgram::ShaderProgram()
   : m_index{ Renderer::createProgram() } {}
 
-bool ShaderProgram::hasAttribute(const std::string& uniformName) const noexcept {
-  return (m_attributes.find(uniformName) != m_attributes.cend());
-}
-
 bool ShaderProgram::hasTexture(const Texture& texture) const noexcept {
-  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&texture] (const auto& element) {
+  return std::ranges::any_of(m_textures, [&texture] (const auto& element) {
     return (element.first->getIndex() == texture.getIndex());
   });
 }
 
 bool ShaderProgram::hasTexture(const std::string& uniformName) const noexcept {
-  return std::any_of(m_textures.cbegin(), m_textures.cend(), [&uniformName] (const auto& element) {
+  return std::ranges::any_of(m_textures, [&uniformName] (const auto& element) noexcept {
     return (element.second == uniformName);
   });
 }
 
 const Texture& ShaderProgram::getTexture(const std::string& uniformName) const {
-  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
+  const auto textureIt = std::ranges::find_if(m_textures, [&uniformName] (const auto& element) noexcept {
     return (element.second == uniformName);
   });
 
@@ -86,19 +84,19 @@ const Texture& ShaderProgram::getTexture(const std::string& uniformName) const {
 
 #if !defined(USE_WEBGL)
 bool ShaderProgram::hasImageTexture(const Texture& texture) const noexcept {
-  return std::any_of(m_imageTextures.cbegin(), m_imageTextures.cend(), [&texture] (const auto& element) {
+  return std::ranges::any_of(m_imageTextures, [&texture] (const auto& element) {
     return (element.first->getIndex() == texture.getIndex());
   });
 }
 
 bool ShaderProgram::hasImageTexture(const std::string& uniformName) const noexcept {
-  return std::any_of(m_imageTextures.cbegin(), m_imageTextures.cend(), [&uniformName] (const auto& element) {
+  return std::ranges::any_of(m_imageTextures, [&uniformName] (const auto& element) noexcept {
     return (element.second.uniformName == uniformName);
   });
 }
 
 const Texture& ShaderProgram::getImageTexture(const std::string& uniformName) const {
-  const auto textureIt = std::find_if(m_imageTextures.begin(), m_imageTextures.end(), [&uniformName] (const auto& element) {
+  const auto textureIt = std::ranges::find_if(m_imageTextures, [&uniformName] (const auto& element) noexcept {
     return (element.second.uniformName == uniformName);
   });
 
@@ -110,7 +108,7 @@ const Texture& ShaderProgram::getImageTexture(const std::string& uniformName) co
 #endif
 
 void ShaderProgram::setTexture(TexturePtr texture, const std::string& uniformName) {
-  const auto textureIt = std::find_if(m_textures.begin(), m_textures.end(), [&uniformName] (const auto& element) {
+  const auto textureIt = std::ranges::find_if(m_textures, [&uniformName] (const auto& element) noexcept {
     return (element.second == uniformName);
   });
 
@@ -140,7 +138,7 @@ void ShaderProgram::setImageTexture(TexturePtr texture, const std::string& unifo
     throw std::invalid_argument("[ShaderProgram] Textures with an sRGB(A) colorspace cannot be used as image textures");
   }
 
-  auto imgTextureIt = std::find_if(m_imageTextures.begin(), m_imageTextures.end(), [&uniformName] (const auto& element) {
+  auto imgTextureIt = std::ranges::find_if(m_imageTextures, [&uniformName] (const auto& element) noexcept {
     return (element.second.uniformName == uniformName);
   });
 
@@ -206,7 +204,7 @@ void ShaderProgram::sendAttributes() const {
 
   use();
 
-  for (const auto& [name, attrib] : m_attributes) {
+  for (const Attribute& attrib : m_attributes | std::views::values) {
     if (attrib.location == -1)
       continue;
 
@@ -234,7 +232,7 @@ void ShaderProgram::initTextures() const {
   // TODO: binding indices should be user-definable to allow the same texture to be bound to multiple uniforms
   int bindingIndex = 0;
 
-  for (const auto& [texture, name] : m_textures)
+  for (const std::string& name : m_textures | std::views::values)
     sendUniform(name, bindingIndex++);
 }
 
@@ -245,16 +243,16 @@ void ShaderProgram::bindTextures() const {
 
   unsigned int textureIndex = 0;
 
-  for (const auto& [texture, _] : m_textures) {
+  for (const TexturePtr& texture : m_textures | std::views::keys) {
     Renderer::setActiveTexture(textureIndex++);
     texture->bind();
   }
 }
 
 void ShaderProgram::removeTexture(const Texture& texture) {
-  m_textures.erase(std::remove_if(m_textures.begin(), m_textures.end(), [&texture] (const auto& element) {
+  std::erase_if(m_textures, [&texture] (const auto& element) {
     return (element.first->getIndex() == texture.getIndex());
-  }), m_textures.end());
+  });
 }
 
 void ShaderProgram::removeTexture(const std::string& uniformName) {
@@ -279,7 +277,7 @@ void ShaderProgram::initImageTextures() const {
   // TODO: binding indices should be user-definable to allow the same texture to be bound to multiple uniforms
   int bindingIndex = 0;
 
-  for (const auto& [texture, info] : m_imageTextures)
+  for (const ImageTextureAttachment& info : m_imageTextures | std::views::values)
     sendUniform(info.uniformName, bindingIndex++);
 }
 
@@ -295,9 +293,9 @@ void ShaderProgram::bindImageTextures() const {
 }
 
 void ShaderProgram::removeImageTexture(const Texture& texture) {
-  m_imageTextures.erase(std::remove_if(m_imageTextures.begin(), m_imageTextures.end(), [&texture] (const auto& element) {
+  std::erase_if(m_imageTextures, [&texture] (const auto& element) {
     return (element.first->getIndex() == texture.getIndex());
-  }), m_imageTextures.end());
+  });
 }
 
 void ShaderProgram::removeImageTexture(const std::string& uniformName) {
@@ -449,8 +447,7 @@ void RenderShaderProgram::setTessellationControlShader(TessellationControlShader
 }
 
 void RenderShaderProgram::setTessellationEvaluationShader(TessellationEvaluationShader&& tessEvalShader) {
-  Logger::debug("[RenderShaderProgram] Setting tessellation evaluation shader (ID: "
-                + std::to_string(tessEvalShader.getIndex()) + ", path: '" + tessEvalShader.getPath() + "')");
+  Logger::debug("[RenderShaderProgram] Setting tessellation evaluation shader (ID: {}, path: '{}')", tessEvalShader.getIndex(), tessEvalShader.getPath());
 
   if (m_tessEvalShader && Renderer::isShaderAttached(m_index, m_tessEvalShader->getIndex()))
     Renderer::detachShader(m_index, m_tessEvalShader->getIndex());

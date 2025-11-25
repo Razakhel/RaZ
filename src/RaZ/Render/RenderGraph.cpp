@@ -1,5 +1,4 @@
 #include "RaZ/Math/Transform.hpp"
-#include "RaZ/Render/Camera.hpp"
 #include "RaZ/Render/MeshRenderer.hpp"
 #include "RaZ/Render/RenderGraph.hpp"
 #include "RaZ/Render/RenderSystem.hpp"
@@ -11,7 +10,7 @@
 namespace Raz {
 
 bool RenderGraph::isValid() const {
-  return std::all_of(m_nodes.cbegin(), m_nodes.cend(), [] (const std::unique_ptr<RenderPass>& renderPass) {
+  return std::ranges::all_of(m_nodes, [] (const std::unique_ptr<RenderPass>& renderPass) {
     return renderPass->isValid();
   });
 }

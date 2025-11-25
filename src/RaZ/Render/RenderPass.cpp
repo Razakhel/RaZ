@@ -6,6 +6,8 @@
 #include "GL/glew.h" // Needed by TracyOpenGL.hpp
 #include "tracy/TracyOpenGL.hpp"
 
+#include <ranges>
+
 namespace Raz {
 
 bool RenderPass::isValid() const {
@@ -14,15 +16,15 @@ bool RenderPass::isValid() const {
 
   const std::vector<std::pair<Texture2DPtr, unsigned int>>& writeColorBuffers = m_writeFramebuffer.m_colorBuffers;
 
-  for (const auto& [texture, _] : m_program.getTextures()) {
+  for (const TexturePtr& texture : m_program.getTextures() | std::views::keys) {
     // If the same depth buffer exists both in read & write, the pass is invalid
     if (texture->getColorspace() == TextureColorspace::DEPTH && m_writeFramebuffer.hasDepthBuffer()) {
       if (texture.get() == &m_writeFramebuffer.getDepthBuffer())
         return false;
     }
 
-    const auto bufferIt = std::find_if(writeColorBuffers.cbegin(), writeColorBuffers.cend(), [&readTexture = texture] (const auto& buffer) {
-      return (readTexture == buffer.first);
+    const auto bufferIt = std::ranges::find_if(writeColorBuffers, [&texture] (const auto& buffer) noexcept {
+      return (texture == buffer.first);
     });
 
     // Likewise for the color buffers: if any has been added as both read & write, the pass is invalid

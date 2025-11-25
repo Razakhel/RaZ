@@ -116,7 +116,7 @@ public:
   /// Matrix conversion operator; computes the rotation matrix represented by the quaternion.
   /// \return Rotation matrix.
   constexpr operator Mat4<T>() const noexcept { return computeMatrix(); }
-  /// Output stream operator.
+  /// Quaternion output stream operator.
   /// \param stream Stream to output into.
   /// \param quat Quaternion to be output.
   friend std::ostream& operator<< <>(std::ostream& stream, const Quaternion& quat);

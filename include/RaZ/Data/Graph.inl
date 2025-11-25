@@ -34,10 +34,10 @@ void GraphNode<T>::addParents(GraphNode& node, OtherNodesTs&&... otherNodes) {
   if (&node == this)
     throw std::invalid_argument("Error: A graph node cannot be a parent of itself");
 
-  if (std::find(m_parents.cbegin(), m_parents.cend(), &node) == m_parents.cend())
+  if (std::ranges::find(m_parents, &node) == m_parents.cend())
     m_parents.emplace_back(static_cast<T*>(&node));
 
-  if (std::find(node.m_children.cbegin(), node.m_children.cend(), this) == node.m_children.cend())
+  if (std::ranges::find(node.m_children, this) == node.m_children.cend())
     node.m_children.emplace_back(static_cast<T*>(this));
 
   // Stop the recursive unpacking if no more nodes are to be added as parents
@@ -62,10 +62,10 @@ void GraphNode<T>::addChildren(GraphNode& node, OtherNodesTs&&... otherNodes) {
   if (&node == this)
     throw std::invalid_argument("Error: A graph node cannot be a child of itself");
 
-  if (std::find(m_children.cbegin(), m_children.cend(), &node) == m_children.cend())
+  if (std::ranges::find(m_children, &node) == m_children.cend())
     m_children.emplace_back(static_cast<T*>(&node));
 
-  if (std::find(node.m_parents.cbegin(), node.m_parents.cend(), this) == node.m_parents.cend())
+  if (std::ranges::find(node.m_parents, this) == node.m_parents.cend())
     node.m_parents.emplace_back(static_cast<T*>(this));
 
   // Stop the recursive unpacking if no more nodes are to be added as children
@@ -89,7 +89,7 @@ void GraphNode<T>::unlinkParent(const GraphNode& node) {
   if (&node == this)
     throw std::invalid_argument("Error: A graph node cannot be unlinked from itself");
 
-  const auto parentIt = std::find(m_parents.cbegin(), m_parents.cend(), &node);
+  const auto parentIt = std::ranges::find(m_parents, &node);
   if (parentIt != m_parents.cend())
     m_parents.erase(parentIt);
 }
@@ -99,7 +99,7 @@ void GraphNode<T>::unlinkChild(const GraphNode& node) {
   if (&node == this)
     throw std::invalid_argument("Error: A graph node cannot be unlinked from itself");
 
-  const auto childIt = std::find(m_children.cbegin(), m_children.cend(), &node);
+  const auto childIt = std::ranges::find(m_children, &node);
   if (childIt != m_children.cend())
     m_children.erase(childIt);
 }
@@ -125,7 +125,7 @@ NodeT& Graph<NodeT>::addNode(Args&& ... args) {
 
 template <typename NodeT>
 void Graph<NodeT>::removeNode(NodeT& node) {
-  const auto nodeIt = std::find_if(m_nodes.cbegin(), m_nodes.cend(), [&node] (const NodePtr& nodePtr) { return (nodePtr.get() == &node); });
+  const auto nodeIt = std::ranges::find_if(m_nodes, [&node] (const NodePtr& nodePtr) noexcept { return (nodePtr.get() == &node); });
 
   if (nodeIt == m_nodes.cend())
     throw std::invalid_argument("Error: The graph node to be removed does not exist");

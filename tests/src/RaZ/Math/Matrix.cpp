@@ -447,11 +447,11 @@ TEST_CASE("Matrix strict equality", "[math]") {
   constexpr std::array<Raz::Mat3f, 3> matrices = { mat31Swizzled, mat31Epsilon, mat31 };
 
   // When using a simple find(), which uses operator==, mat31Epsilon is found instead of mat31
-  const auto foundIter = std::find(matrices.cbegin(), matrices.cend(), mat31);
+  const auto foundIter = std::ranges::find(matrices, mat31);
   CHECK_FALSE(std::distance(matrices.cbegin(), foundIter) == 2);
 
   // To search for a specific element, find_if() must be used with a strict equality check
-  const auto foundIfIter = std::find_if(matrices.cbegin(), matrices.cend(), [&] (const Raz::Mat3f& compMat) { return mat31.strictlyEquals(compMat); });
+  const auto foundIfIter = std::ranges::find_if(matrices, [&] (const Raz::Mat3f& compMat) noexcept { return mat31.strictlyEquals(compMat); });
   CHECK(std::distance(matrices.cbegin(), foundIfIter) == 2);
 
   constexpr std::array<Raz::Mat3f, 3> swappedMatrices = { mat31Swizzled, mat31, mat31Epsilon };

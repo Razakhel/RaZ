@@ -211,7 +211,7 @@ inline std::wstring toUppercaseCopy(std::wstring text) {
 /// \param text String to be trimmed.
 /// \return Reference to the trimmed string.
 inline std::string& trimLeft(std::string& text) {
-  text.erase(text.begin(), std::find_if_not(text.begin(), text.end(), [] (unsigned char c) {
+  text.erase(text.begin(), std::ranges::find_if_not(text, [] (unsigned char c) noexcept(noexcept(std::isspace(c))) {
     return std::isspace(c);
   }));
   return text;
@@ -221,7 +221,7 @@ inline std::string& trimLeft(std::string& text) {
 /// \param text Wide string to be trimmed.
 /// \return Reference to the trimmed wide string.
 inline std::wstring& trimLeft(std::wstring& text) {
-  text.erase(text.begin(), std::find_if_not(text.begin(), text.end(), [] (wchar_t c) {
+  text.erase(text.begin(), std::ranges::find_if_not(text, [] (wchar_t c) noexcept(noexcept(std::iswspace(c))) {
     return std::iswspace(c);
   }));
   return text;

@@ -248,7 +248,7 @@ constexpr Vector<T, Size>& Vector<T, Size>::operator*=(ValT val) noexcept {
 template <typename T, std::size_t Size>
 constexpr Vector<T, Size>& Vector<T, Size>::operator/=(const Vector& vec) noexcept {
   if constexpr (std::is_integral_v<T>)
-    assert("Error: Integer vector division by 0 is undefined." && (std::find(vec.m_data.cbegin(), vec.m_data.cend(), 0) == vec.m_data.cend()));
+    assert("Error: Integer vector division by 0 is undefined." && (std::ranges::find(vec.m_data, 0) == vec.m_data.cend()));
 
   for (std::size_t i = 0; i < Size; ++i)
     m_data[i] /= vec[i];
