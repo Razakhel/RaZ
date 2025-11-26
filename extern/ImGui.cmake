@@ -15,15 +15,13 @@ add_library(ImGui OBJECT)
 
 target_compile_features(ImGui PRIVATE cxx_std_17)
 
-# The needed Freetype header ft2build.h seems to be found only when calling aux_source_directory(); this call is thus kept instead of manually finding files
-aux_source_directory(imgui IMGUI_SRC)
-
 file(
-    GLOB_RECURSE
+    GLOB
     IMGUI_FILES
 
-    ${IMGUI_SRC}
     imgui/misc/cpp/*.cpp
+    imgui/misc/cpp/*.h
+    imgui/*.cpp
     imgui/*.h
     implot/*.cpp
     implot/*.h

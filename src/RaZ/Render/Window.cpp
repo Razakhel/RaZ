@@ -372,6 +372,13 @@ void Window::updateCallbacks() const {
 
   // Mouse move input
   glfwSetCursorPosCallback(m_windowHandle, [] (GLFWwindow* windowHandle, double xPosition, double yPosition) {
+#if !defined(RAZ_NO_OVERLAY)
+    ImGui_ImplGlfw_CursorPosCallback(windowHandle, xPosition, yPosition);
+
+    if (ImGui::GetIO().WantCaptureMouse)
+      return;
+#endif
+
     auto& [xPrevPos, yPrevPos, action] = static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->m_mouseMoveCallback;
 
     if (action == nullptr)
