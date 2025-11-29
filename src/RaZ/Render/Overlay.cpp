@@ -75,6 +75,15 @@ void Overlay::initialize(GLFWwindow* windowHandle) {
   Logger::debug("[Overlay] Initialized");
 }
 
+void Overlay::rescale(float scaleFactor) {
+  // TODO: ImGuiStyle::ScaleAllSizes() should only be called once. Allowing to call it multiple times should imply resetting the style to avoid resizing issues,
+  //  but it doesn't seem to work as expected. As ImGui's API on this topic is being reworked, a proper solution may be available later
+
+  ImGuiStyle& style = ImGui::GetStyle();
+  style.ScaleAllSizes(scaleFactor);
+  style.FontScaleDpi = scaleFactor;
+}
+
 void Overlay::destroy() {
   ZoneScopedN("Overlay::destroy");
 

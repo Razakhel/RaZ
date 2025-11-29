@@ -124,7 +124,19 @@ Window::Window(RenderSystem& renderSystem,
 
 #if !defined(RAZ_NO_OVERLAY)
   Overlay::initialize(m_windowHandle);
-#endif
+
+  glfwSetWindowContentScaleCallback(m_windowHandle, [] (GLFWwindow*, float horizScale, float /* vertScale */) {
+    Overlay::rescale(horizScale);
+  });
+
+#if !defined(RAZ_PLATFORM_EMSCRIPTEN) // glfwGetWindowContentScale() isn't available with Emscripten
+  float windowHorizScale {};
+  glfwGetWindowContentScale(m_windowHandle, &windowHorizScale, nullptr);
+
+  if (windowHorizScale != 0.f)
+    Overlay::rescale(windowHorizScale);
+#endif // RAZ_PLATFORM_EMSCRIPTEN
+#endif // RAZ_NO_OVERLAY
 
   ++s_refCounter;
 

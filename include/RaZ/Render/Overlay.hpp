@@ -75,6 +75,9 @@ private:
   /// Initializes ImGui with the containing window.
   /// \param windowHandle Handle to initialize the overlay with.
   static void initialize(GLFWwindow* windowHandle);
+  /// Rescales the overlay by the given factor.
+  /// \param scaleFactor Factor to scale the overlay elements by.
+  static void rescale(float scaleFactor);
   /// Destroys the overlay.
   static void destroy();
 
