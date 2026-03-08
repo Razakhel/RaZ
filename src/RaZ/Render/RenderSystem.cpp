@@ -246,29 +246,30 @@ void RenderSystem::initialize(unsigned int sceneWidth, unsigned int sceneHeight)
 }
 
 void RenderSystem::sendCameraInfo() const {
-  assert("Error: The render system needs a camera to send its info." && (m_cameraEntity != nullptr));
-  assert("Error: The camera must have a transform component to send its info." && m_cameraEntity->hasComponent<Transform>());
-
   ZoneScopedN("RenderSystem::sendCameraInfo");
 
-  auto& camera       = m_cameraEntity->getComponent<Camera>();
-  auto& camTransform = m_cameraEntity->getComponent<Transform>();
+  if (m_cameraEntity == nullptr)
+    throw std::runtime_error("[RenderSystem] A camera must exist within the scene");
+
+  auto& camera = m_cameraEntity->getComponent<Camera>();
 
   m_cameraUbo.bind();
 
-  if (camTransform.hasUpdated()) {
-    if (camera.getCameraType() == CameraType::LOOK_AT)
-      camera.computeLookAt(camTransform.getPosition());
-    else
-      camera.computeViewMatrix(camTransform);
+  if (m_cameraEntity->hasComponent<Transform>()) {
+    if (auto& camTransform = m_cameraEntity->getComponent<Transform>(); camTransform.hasUpdated()) {
+      if (camera.getCameraType() == CameraType::LOOK_AT)
+        camera.computeLookAt(camTransform.getPosition());
+      else
+        camera.computeViewMatrix(camTransform);
 
-    camera.computeInverseViewMatrix();
+      camera.computeInverseViewMatrix();
 
-    sendViewMatrix(camera.getViewMatrix());
-    sendInverseViewMatrix(camera.getInverseViewMatrix());
-    sendCameraPosition(camTransform.getPosition());
+      sendViewMatrix(camera.getViewMatrix());
+      sendInverseViewMatrix(camera.getInverseViewMatrix());
+      sendCameraPosition(camTransform.getPosition());
 
-    camTransform.setUpdated(false);
+      camTransform.setUpdated(false);
+    }
   }
 
   sendProjectionMatrix(camera.getProjectionMatrix());

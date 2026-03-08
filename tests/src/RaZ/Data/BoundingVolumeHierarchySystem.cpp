@@ -8,11 +8,11 @@
 TEST_CASE("BoundingVolumeHierarchySystem accepted components", "[data]") {
   Raz::World world(1);
 
-  auto& bvh = world.addSystem<Raz::BoundingVolumeHierarchySystem>();
+  const auto& bvh = world.addSystem<Raz::BoundingVolumeHierarchySystem>();
 
   const Raz::Entity& mesh = world.addEntityWithComponent<Raz::Mesh>();
 
-  world.update({});
+  CHECK_NOTHROW(world.update({}));
 
   CHECK(bvh.containsEntity(mesh));
 }
@@ -33,7 +33,7 @@ TEST_CASE("BoundingVolumeHierarchySystem auto rebuild", "[data]") {
   }
 
   // The BVH is rebuilt on each world update if entities are linked to/unlinked from it
-  world.update({});
+  CHECK_NOTHROW(world.update({}));
 
   CHECK(rootNode.isLeaf());
   CHECK(rootNode.getBoundingBox() == Raz::AABB(Raz::Vec3f(-1.5f, -1.f, -1.f), Raz::Vec3f(1.f, 1.5f, 1.f)));
@@ -48,7 +48,7 @@ TEST_CASE("BoundingVolumeHierarchySystem auto rebuild", "[data]") {
     submesh.getTriangleIndices() = { 0, 1, 2 };
   }
 
-  world.update({});
+  CHECK_NOTHROW(world.update({}));
 
   REQUIRE_FALSE(rootNode.isLeaf());
   CHECK(rootNode.getBoundingBox() == Raz::AABB(Raz::Vec3f(-1.5f, -1.f, -1.5f), Raz::Vec3f(1.5f, 1.5f, 1.5f)));

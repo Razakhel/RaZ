@@ -23,7 +23,7 @@ Raz::Image renderFrame(Raz::World& world, const Raz::FilePath& renderedImgPath =
   Raz::Window& window = TestUtils::getWindow();
 
   // Rendering a frame of the scene by updating the World's RenderSystem and running the Window to render its overlay
-  world.update({});
+  CHECK_NOTHROW(world.update({}));
   window.run(0.f);
 
   // Recovering the rendered frame into an image
@@ -44,16 +44,25 @@ TEST_CASE("RenderSystem accepted components", "[render]") {
 
   const auto& renderSystem = world.addSystem<Raz::RenderSystem>(0, 0);
 
-  // RenderSystem::update() needs a Camera with a Transform component
-  const Raz::Entity& camera       = world.addEntityWithComponents<Raz::Camera, Raz::Transform>();
+  const Raz::Entity& camera       = world.addEntityWithComponent<Raz::Camera>();
   const Raz::Entity& meshRenderer = world.addEntityWithComponent<Raz::MeshRenderer>();
   const Raz::Entity& light        = world.addEntityWithComponent<Raz::Light>(Raz::LightType::DIRECTIONAL, Raz::Axis::X, 1.f);
 
-  world.update({});
+  CHECK_NOTHROW(world.update({}));
 
   CHECK(renderSystem.containsEntity(camera));
   CHECK(renderSystem.containsEntity(meshRenderer));
   CHECK(renderSystem.containsEntity(light));
+}
+
+TEST_CASE("RenderSystem camera presence", "[render]") {
+  Raz::World world(1);
+
+  world.addSystem<Raz::RenderSystem>(0, 0);
+  CHECK_THROWS(world.update({})); // Missing camera
+
+  world.addEntityWithComponent<Raz::Camera>();
+  CHECK_NOTHROW(world.update({})); // Ok, doesn't need a transform
 }
 
 TEST_CASE("RenderSystem Cook-Torrance ball", "[render]") {

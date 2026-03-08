@@ -15,7 +15,7 @@ namespace Raz {
 struct FrameTimeInfo {
   float deltaTime {};   ///< Time elapsed since the application's last execution, in seconds.
   float globalTime {};  ///< Time elapsed since the application started, in seconds.
-  int substepCount {};  ///< Amount of fixed time steps to process.
+  int substepCount {};  ///< Number of fixed time steps to process.
   float substepTime {}; ///< Time to be used by each fixed time step, in seconds.
 };
 

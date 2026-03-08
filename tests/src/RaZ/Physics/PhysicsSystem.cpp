@@ -27,7 +27,7 @@ TEST_CASE("PhysicsSystem accepted components", "[physics]") {
   const Raz::Entity& rigidBody = world.addEntityWithComponent<Raz::RigidBody>(1.f, 1.f);
   const Raz::Entity& collider  = world.addEntityWithComponent<Raz::Collider>(Raz::Plane(0.f));
 
-  world.update({});
+  CHECK_NOTHROW(world.update({}));
 
   CHECK(physics.containsEntity(rigidBody));
   CHECK(physics.containsEntity(collider));
@@ -38,7 +38,13 @@ TEST_CASE("PhysicsSystem rigid bodies collision", "[physics]") {
 
   float remainingTime {};
   const auto updateWorld = [&world, &remainingTime] (float duration, float substepTime = 0.016666f) {
-    world.update(Raz::FrameTimeInfo{ duration, 0.f, static_cast<int>((duration + remainingTime) / substepTime), substepTime });
+    const Raz::FrameTimeInfo frameTimeInfo{
+      .deltaTime    = duration,
+      .globalTime   = 0.f,
+      .substepCount = static_cast<int>((duration + remainingTime) / substepTime),
+      .substepTime  = substepTime
+    };
+    CHECK_NOTHROW(world.update(frameTimeInfo));
     remainingTime = std::fmod(duration, substepTime);
   };
 
@@ -74,7 +80,7 @@ TEST_CASE("PhysicsSystem rigid bodies collision", "[physics]") {
   // The system should internally update itself in several fixed time steps to guarantee its numerical stability
   updateWorld(0.02f);
 
-  // The particles have started moving downards
+  // The particles have started moving downward
   CHECK(bouncyParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.998638f, 0.f));
   CHECK(bouncyParticleRigidBody.getVelocity() == Raz::Vec3f(0.f, -0.163437635f, 0.f));
   CHECK(solidParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.998638f, 0.f));
@@ -109,7 +115,7 @@ TEST_CASE("PhysicsSystem rigid bodies collision", "[physics]") {
   CHECK(bouncyParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.139680699f, 0.f));
   CHECK(bouncyParticleRigidBody.getVelocity() == Raz::Vec3f(0.f, 3.96358323f, 0.f));
   CHECK(solidParticleTransform.getPosition() == Raz::Vec3f(0.f, 0.00408647349f, 0.f));
-  CHECK(solidParticleRigidBody.getVelocity() == Raz::Vec3f(0.f, -0.100929342f, 0.f)); // The solid particle goes back downards almost instantly
+  CHECK(solidParticleRigidBody.getVelocity() == Raz::Vec3f(0.f, -0.100929342f, 0.f)); // The solid particle goes back downward almost instantly
   CHECK(staticParticleTransform.getPosition().strictlyEquals(initParticlePos));
   CHECK(staticParticleRigidBody.getVelocity().strictlyEquals(Raz::Vec3f(0.f)));
 }
