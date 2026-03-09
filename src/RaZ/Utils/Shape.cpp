@@ -353,7 +353,7 @@ AABB OBB::computeBoundingBox() const {
 
 BoxCorners OBB::computeRotatedCorners() const {
   const Vec3f centroid = computeCentroid();
-  const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax ] = m_aabb.computeCorners();
+  const auto [minMinMin, minMinMax, minMaxMin, minMaxMax, maxMinMin, maxMinMax, maxMaxMin, maxMaxMax] = m_aabb.computeCorners();
   return {
     .minMinMin = centroid + (m_rotation * (minMinMin - centroid)),
     .minMinMax = centroid + (m_rotation * (minMinMax - centroid)),

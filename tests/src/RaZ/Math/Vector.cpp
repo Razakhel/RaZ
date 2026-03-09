@@ -569,7 +569,7 @@ TEST_CASE("Vector conversion", "[math]") {
   CHECK(Raz::Vec3i(vec3d1) == Raz::Vec3i(-18, 4752, -842));
 }
 
-TEST_CASE("Vector printing", "[math]") {
+TEST_CASE("Vector stream output", "[math]") {
   std::stringstream stream;
 
   stream << vec3b1;
@@ -594,4 +594,13 @@ TEST_CASE("Vector printing", "[math]") {
   stream.str(std::string());
   stream << vec3d2;
   CHECK(stream.str() == "[ 13.01, -1e-08, 351.025 ]");
+}
+
+TEST_CASE("Vector formatting", "[math]") {
+  CHECK(std::format("{}", vec3b1) == "[ 31, 8, 12 ]");
+  CHECK(std::format("{}", vec3i2) == "[ 740, -1058, 18 ]");
+  CHECK(std::format("{}", vec3f1) == "[ 3.18, 42, 0.874 ]");
+  CHECK(std::format("{}", vec3f2) == "[ 541.41, 47.25, 6.321 ]");
+  CHECK(std::format("{}", vec4f1) == "[ 84.47, 2, 0.001, 847.12 ]");
+  CHECK(std::format("{}", vec3d2) == "[ 13.01, -1e-08, 351.025465545 ]");
 }

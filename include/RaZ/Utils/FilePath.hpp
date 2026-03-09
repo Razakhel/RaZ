@@ -141,11 +141,9 @@ struct std::hash<Raz::FilePath> {
 template <>
 struct std::formatter<Raz::FilePath, char> : std::formatter<std::string, char> {
   /// Formats the given file path.
-  /// \tparam ContextT Type of the formatting context.
   /// \param filePath File path to be formatted.
   /// \param context Formatting context.
-  template <typename ContextT>
-  constexpr auto format(const Raz::FilePath& filePath, ContextT& context) const {
+  constexpr auto format(const Raz::FilePath& filePath, auto& context) const {
     return std::formatter<std::string, char>::format(filePath.toUtf8(), context);
   }
 };
@@ -154,11 +152,9 @@ struct std::formatter<Raz::FilePath, char> : std::formatter<std::string, char> {
 template <>
 struct std::formatter<Raz::FilePath, wchar_t> : std::formatter<std::wstring, wchar_t> {
   /// Formats the given file path.
-  /// \tparam ContextT Type of the formatting context.
   /// \param filePath File path to be formatted.
   /// \param context Formatting context.
-  template <typename ContextT>
-  constexpr auto format(const Raz::FilePath& filePath, ContextT& context) const {
+  constexpr auto format(const Raz::FilePath& filePath, auto& context) const {
     return std::formatter<std::wstring, wchar_t>::format(filePath.toWide(), context);
   }
 };

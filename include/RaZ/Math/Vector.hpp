@@ -6,7 +6,9 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <format>
 #include <ostream>
+#include <string>
 
 namespace Raz {
 
@@ -365,6 +367,26 @@ struct std::less<Raz::Vector<T, Size>> {
     }
 
     return false;
+  }
+};
+
+/// Specialization of std::formatter for Vector.
+template <typename T, std::size_t Size>
+struct std::formatter<Raz::Vector<T, Size>> : std::formatter<std::string> {
+  /// Formats the given vector.
+  /// \param vec Vector to be formatted.
+  /// \param context Formatting context.
+  constexpr auto format(const Raz::Vector<T, Size>& vec, auto& context) const {
+    std::string result;
+
+    std::format_to(std::back_inserter(result), "[ {}", vec[0]);
+
+    for (std::size_t i = 1; i < Size; ++i)
+      std::format_to(std::back_inserter(result), ", {}", vec[i]);
+
+    result += " ]";
+
+    return std::formatter<std::string, char>::format(result, context);
   }
 };
 
