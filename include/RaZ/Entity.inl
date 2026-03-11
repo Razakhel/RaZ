@@ -43,22 +43,23 @@ template <typename CompT>
 const CompT& Entity::getComponent() const {
   static_assert(std::is_base_of_v<Component, CompT>, "Error: The fetched component must be derived from Component.");
 
-  if (hasComponent<CompT>())
-    return static_cast<const CompT&>(*m_components[Component::getId<CompT>()]);
+  if (!hasComponent<CompT>())
+    throw std::runtime_error("[Entity] No component available of specified type");
 
-  throw std::runtime_error("Error: No component available of specified type");
+  return static_cast<const CompT&>(*m_components[Component::getId<CompT>()]);
+
 }
 
 template <typename CompT>
 void Entity::removeComponent() {
   static_assert(std::is_base_of_v<Component, CompT>, "Error: The removed component must be derived from Component.");
 
-  if (hasComponent<CompT>()) {
-    const std::size_t compId = Component::getId<CompT>();
+  if (!hasComponent<CompT>())
+    return;
 
-    m_components[compId].reset();
-    m_enabledComponents.setBit(compId, false);
-  }
+  const std::size_t compId = Component::getId<CompT>();
+  m_components[compId].reset();
+  m_enabledComponents.setBit(compId, false);
 }
 
 } // namespace Raz

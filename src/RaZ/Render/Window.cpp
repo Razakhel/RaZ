@@ -111,6 +111,10 @@ Window::Window(RenderSystem& renderSystem,
   glfwGetWindowSize(m_windowHandle, &m_width, &m_height);
   glfwGetWindowPos(m_windowHandle, &m_posX, &m_posY);
 
+  glfwSetWindowSizeCallback(m_windowHandle, [] (GLFWwindow* windowHandle, int newWidth, int newHeight) {
+    static_cast<Window*>(glfwGetWindowUserPointer(windowHandle))->resize(static_cast<unsigned int>(newWidth), static_cast<unsigned int>(newHeight));
+  });
+
   if (glfwGetCurrentContext() == nullptr)
     glfwMakeContextCurrent(m_windowHandle);
 
@@ -179,7 +183,8 @@ void Window::resize(unsigned int width, unsigned int height) {
 }
 
 void Window::makeFullscreen() {
-  glfwGetWindowSize(m_windowHandle, &m_width, &m_height);
+  m_windowedWidth  = m_width;
+  m_windowedHeight = m_height;
   glfwGetWindowPos(m_windowHandle, &m_posX, &m_posY);
 
   GLFWmonitor* monitor    = glfwGetPrimaryMonitor();
@@ -189,7 +194,7 @@ void Window::makeFullscreen() {
 }
 
 void Window::makeWindowed() {
-  glfwSetWindowMonitor(m_windowHandle, nullptr, m_posX, m_posY, m_width, m_height, GLFW_DONT_CARE);
+  glfwSetWindowMonitor(m_windowHandle, nullptr, m_posX, m_posY, m_windowedWidth, m_windowedHeight, GLFW_DONT_CARE);
 }
 
 void Window::enableFaceCulling(bool value) const {

@@ -210,6 +210,8 @@ private:
 
   int m_width {};
   int m_height {};
+  int m_windowedWidth {};
+  int m_windowedHeight {};
   int m_posX {};
   int m_posY {};
 
