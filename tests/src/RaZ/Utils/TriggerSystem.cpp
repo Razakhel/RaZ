@@ -65,13 +65,32 @@ TEST_CASE("TriggerSystem trigger actions", "[utils]") {
 
   world.addSystem<Raz::TriggerSystem>();
 
-  Raz::Entity& triggererEntity = world.addEntityWithComponent<Raz::Transform>();
+  // Transforms and volumes are defined so that all objects are tested at the same location:
+  //  - The AABB has its centroid at [0; 0; 0] and its transform to the destination;
+  //  - The OBB has both its centroid and its transform halfway;
+  //  - The sphere has its centroid at the destination and an identity transform.
+
+  constexpr Raz::Vec3f testLocation(0.f, 0.f, -5.f);
+
+  constexpr Raz::Transform triggererInitTransform(testLocation);
+  const Raz::Transform boxInitTransform(Raz::Axis::Right * 5.f, Raz::Quaternionf(90_deg, Raz::Axis::Y));
+  const Raz::Transform orientedBoxInitTransform(Raz::Axis::Up * 2.5f, Raz::Quaternionf(-90_deg, Raz::Axis::X));
+  constexpr Raz::Transform sphereInitTransform;
+
+  constexpr Raz::AABB aabb(Raz::Vec3f(-0.1f), Raz::Vec3f(0.1f));
+  const Raz::OBB obb(Raz::Vec3f(-0.1f, -0.1f, -2.51f), Raz::Vec3f(0.1f, 0.1f, -2.49f), Raz::Quaternionf(45_deg, Raz::Axis::Y));
+  constexpr Raz::Sphere sphere(testLocation, 0.1f);
+
+  CHECK(boxInitTransform.getRotation() * boxInitTransform.getPosition() + aabb.computeCentroid() == testLocation);
+  CHECK(orientedBoxInitTransform.getRotation() * orientedBoxInitTransform.getPosition() + obb.computeCentroid() == testLocation);
+  CHECK(sphereInitTransform.getRotation() * sphereInitTransform.getPosition() + sphere.computeCentroid() == testLocation);
+
+  Raz::Entity& triggererEntity = world.addEntityWithComponent<Raz::Transform>(triggererInitTransform);
   triggererEntity.addComponent<Raz::Triggerer>().registerComponents<Raz::TriggerVolume>(); // Standard case, triggers any TriggerVolume
 
-  constexpr Raz::AABB aabb(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
-  auto& triggerBox         = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::TriggerVolume>(aabb);
-  auto& triggerOrientedBox = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::TriggerVolume>(Raz::OBB(aabb, Raz::Quaternionf(45_deg, Raz::Axis::Y)));
-  auto& triggerSphere      = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::TriggerVolume>(Raz::Sphere(Raz::Vec3f(0.f), 1.f));
+  auto& triggerBox         = world.addEntityWithComponent<Raz::Transform>(boxInitTransform).addComponent<Raz::TriggerVolume>(aabb);
+  auto& triggerOrientedBox = world.addEntityWithComponent<Raz::Transform>(orientedBoxInitTransform).addComponent<Raz::TriggerVolume>(obb);
+  auto& triggerSphere      = world.addEntityWithComponent<Raz::Transform>(sphereInitTransform).addComponent<Raz::TriggerVolume>(sphere);
 
   int boxEnterCount = 0;
   int boxStayCount  = 0;
@@ -127,7 +146,7 @@ TEST_CASE("TriggerSystem trigger actions", "[utils]") {
   CHECK(sphereLeaveCount == 0);
 
   // Moving the triggerer out of the sphere and the oriented box, but still inside the axis-aligned box
-  triggererEntity.getComponent<Raz::Transform>().setPosition(Raz::Vec3f(0.75f));
+  triggererEntity.getComponent<Raz::Transform>().setPosition(testLocation + Raz::Vec3f(0.075f));
 
   world.update({});
 
@@ -144,7 +163,7 @@ TEST_CASE("TriggerSystem trigger actions", "[utils]") {
   CHECK(sphereLeaveCount == 1);
 
   // Moving the triggerer out of all volumes
-  triggererEntity.getComponent<Raz::Transform>().setPosition(Raz::Vec3f(1.5f));
+  triggererEntity.getComponent<Raz::Transform>().setPosition(testLocation + Raz::Vec3f(0.15f));
 
   world.update({});
 
@@ -161,7 +180,7 @@ TEST_CASE("TriggerSystem trigger actions", "[utils]") {
   CHECK(sphereLeaveCount == 1);
 
   // Moving the triggerer back inside all volumes and resetting all actions
-  triggererEntity.getComponent<Raz::Transform>().setPosition(Raz::Vec3f(0.f));
+  triggererEntity.getComponent<Raz::Transform>().setPosition(testLocation);
   triggerBox.resetEnterAction();
   triggerBox.resetStayAction();
   triggerBox.resetLeaveAction();

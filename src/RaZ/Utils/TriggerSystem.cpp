@@ -20,9 +20,10 @@ bool TriggerSystem::update(const FrameTimeInfo&) {
 
     const auto& triggerer          = triggererEntity->getComponent<Triggerer>();
     const auto& triggererTransform = triggererEntity->getComponent<Transform>();
+    const Vec3f triggererPos       = triggererTransform.getRotation() * triggererTransform.getPosition();
 
     for (Entity* triggerVolumeEntity : m_entities) {
-      if (!triggerVolumeEntity->hasComponent<TriggerVolume>())
+      if (!triggerVolumeEntity->hasComponent<TriggerVolume>() || !triggerVolumeEntity->hasComponent<Transform>())
         continue;
 
       if ((triggerer.getTriggerableComponents() & triggerVolumeEntity->getEnabledComponents()).isEmpty())
@@ -33,21 +34,21 @@ bool TriggerSystem::update(const FrameTimeInfo&) {
       if (!triggerVolume.m_enabled)
         continue;
 
-      processTrigger(triggerVolume, triggererTransform);
+      processTrigger(triggerVolume, triggererPos, triggerVolumeEntity->getComponent<Transform>());
     }
   }
 
   return true;
 }
 
-void TriggerSystem::processTrigger(TriggerVolume& triggerVolume, const Transform& triggererTransform) {
+void TriggerSystem::processTrigger(TriggerVolume& triggerVolume, const Vec3f& triggererPos, const Transform& triggerVolumeTransform) {
   ZoneScopedN("TriggerSystem::processTrigger");
 
   const bool wasBeingTriggered = triggerVolume.m_isCurrentlyTriggered;
+  const Vec3f triggerVolumePos = triggerVolumeTransform.getRotation() * triggerVolumeTransform.getPosition();
 
-  triggerVolume.m_isCurrentlyTriggered = std::visit([&triggererTransform] (const auto& volume) {
-    // TODO: handle all transform info for both the triggerer & the volume
-    return volume.contains(triggererTransform.getPosition());
+  triggerVolume.m_isCurrentlyTriggered = std::visit([&triggererPos, &triggerVolumePos] (const auto& volume) {
+    return volume.contains(triggererPos - triggerVolumePos);
   }, triggerVolume.m_volume);
 
   if (!wasBeingTriggered && !triggerVolume.m_isCurrentlyTriggered)

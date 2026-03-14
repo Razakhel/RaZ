@@ -20,13 +20,15 @@ using Radiansf = Radians<float>;
 /// Transform class which handles 3D transformations (translation/rotation/scale).
 class Transform final : public Component {
 public:
-  explicit Transform(const Vec3f& position = Vec3f(0.f), const Quaternionf& rotation = Quaternionf::identity(), const Vec3f& scale = Vec3f(1.f)) noexcept
+  constexpr explicit Transform(const Vec3f& position = Vec3f(0.f),
+                               const Quaternionf& rotation = Quaternionf::identity(),
+                               const Vec3f& scale = Vec3f(1.f)) noexcept
     : m_position{ position }, m_rotation{ rotation }, m_scale{ scale } {}
 
-  const Vec3f& getPosition() const { return m_position; }
-  const Quaternionf& getRotation() const { return m_rotation; }
-  const Vec3f& getScale() const { return m_scale; }
-  bool hasUpdated() const { return m_updated; }
+  constexpr const Vec3f& getPosition() const { return m_position; }
+  constexpr const Quaternionf& getRotation() const { return m_rotation; }
+  constexpr const Vec3f& getScale() const { return m_scale; }
+  constexpr bool hasUpdated() const { return m_updated; }
 
   void setPosition(const Vec3f& position);
   void setPosition(float x, float y, float z) { setPosition(Vec3f(x, y, z)); }
