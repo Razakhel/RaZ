@@ -52,7 +52,7 @@ protected:
 
   /// Adds the given component types as accepted by the current system.
   /// \tparam CompTs Types of the components to accept.
-  template <typename... CompTs> void registerComponents() { (m_acceptedComponents.setBit(Component::getId<CompTs>()), ...); }
+  template <typename... CompTs> void registerComponents() { (m_acceptedComponents.setBit(Component::getId<CompTs>(), true), ...); }
   /// Removes the given component types as accepted by the current system.
   /// \tparam CompTs Types of the components to deny.
   template <typename... CompTs> void unregisterComponents() { (m_acceptedComponents.setBit(Component::getId<CompTs>(), false), ...); }

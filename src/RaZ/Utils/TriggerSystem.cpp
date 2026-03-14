@@ -3,6 +3,8 @@
 #include "RaZ/Utils/TriggerSystem.hpp"
 #include "RaZ/Utils/TriggerVolume.hpp"
 
+#include "tracy/Tracy.hpp"
+
 namespace Raz {
 
 TriggerSystem::TriggerSystem() {
@@ -10,14 +12,20 @@ TriggerSystem::TriggerSystem() {
 }
 
 bool TriggerSystem::update(const FrameTimeInfo&) {
+  ZoneScopedN("TriggerSystem::update");
+
   for (const Entity* triggererEntity : m_entities) {
     if (!triggererEntity->hasComponent<Triggerer>() || !triggererEntity->hasComponent<Transform>())
       continue;
 
+    const auto& triggerer          = triggererEntity->getComponent<Triggerer>();
     const auto& triggererTransform = triggererEntity->getComponent<Transform>();
 
     for (Entity* triggerVolumeEntity : m_entities) {
       if (!triggerVolumeEntity->hasComponent<TriggerVolume>())
+        continue;
+
+      if ((triggerer.getTriggerableComponents() & triggerVolumeEntity->getEnabledComponents()).isEmpty())
         continue;
 
       auto& triggerVolume = triggerVolumeEntity->getComponent<TriggerVolume>();
@@ -33,6 +41,8 @@ bool TriggerSystem::update(const FrameTimeInfo&) {
 }
 
 void TriggerSystem::processTrigger(TriggerVolume& triggerVolume, const Transform& triggererTransform) {
+  ZoneScopedN("TriggerSystem::processTrigger");
+
   const bool wasBeingTriggered = triggerVolume.m_isCurrentlyTriggered;
 
   triggerVolume.m_isCurrentlyTriggered = std::visit([&triggererTransform] (const auto& volume) {

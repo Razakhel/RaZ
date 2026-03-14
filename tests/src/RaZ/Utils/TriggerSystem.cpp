@@ -23,13 +23,50 @@ TEST_CASE("TriggerSystem accepted components", "[utils]") {
   CHECK(triggerSystem.containsEntity(triggerVolume));
 }
 
+TEST_CASE("TriggerSystem triggerer components", "[utils]") {
+  Raz::World world;
+
+  world.addSystem<Raz::TriggerSystem>();
+
+  auto& triggerVolumeEntity = world.addEntityWithComponent<Raz::Transform>();
+  auto& triggerVolume       = triggerVolumeEntity.addComponent<Raz::TriggerVolume>(Raz::Sphere(Raz::Vec3f(0.f), 1.f));
+
+  int triggerCount = 0;
+  triggerVolume.setEnterAction([&triggerCount] () noexcept { ++triggerCount; });
+  triggerVolume.setStayAction([&triggerCount] () noexcept { ++triggerCount; });
+
+  auto& triggerer = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Triggerer>();
+
+  struct TestComponent : Raz::Component {};
+
+  // A triggerer with no triggerable component can trigger nothing
+  world.update({});
+  CHECK(triggerCount == 0);
+
+  // Adding a triggerable component to the triggerer, which the trigger volume entity doesn't have yet
+  triggerer.registerComponents<TestComponent>();
+  world.update({});
+  CHECK(triggerCount == 0);
+
+  // Adding the component to the trigger volume makes it triggerable
+  triggerVolumeEntity.addComponent<TestComponent>();
+  world.update({});
+  world.update({});
+  CHECK(triggerCount == 2);
+
+  // Removing the component makes it untriggerable again
+  triggerVolumeEntity.removeComponent<TestComponent>();
+  world.update({});
+  CHECK(triggerCount == 2);
+}
+
 TEST_CASE("TriggerSystem trigger actions", "[utils]") {
   Raz::World world;
 
   world.addSystem<Raz::TriggerSystem>();
 
   Raz::Entity& triggererEntity = world.addEntityWithComponent<Raz::Transform>();
-  triggererEntity.addComponent<Raz::Triggerer>();
+  triggererEntity.addComponent<Raz::Triggerer>().registerComponents<Raz::TriggerVolume>(); // Standard case, triggers any TriggerVolume
 
   constexpr Raz::AABB aabb(Raz::Vec3f(-1.f), Raz::Vec3f(1.f));
   auto& triggerBox         = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::TriggerVolume>(aabb);

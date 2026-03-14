@@ -4,6 +4,7 @@
 #define RAZ_TRIGGERVOLUME_HPP
 
 #include "RaZ/Component.hpp"
+#include "RaZ/Data/Bitset.hpp"
 #include "RaZ/Utils/Shape.hpp"
 
 #include <functional>
@@ -13,7 +14,25 @@ namespace Raz {
 
 /// Triggerer component, representing an entity that can interact with triggerable entities.
 /// \see TriggerVolume
-class Triggerer final : public Component {};
+class Triggerer final : public Component {
+public:
+  Triggerer() = default;
+
+  const Bitset& getTriggerableComponents() const noexcept { return m_triggerableComponents; }
+
+  /// Registers components that can be triggered by this triggerer.
+  /// Only entities containing at least one of these components (along with a TriggerVolume) will be triggerable.
+  /// \tparam CompTs Types of the components to register.
+  template <typename... CompTs>
+  void registerComponents() { (m_triggerableComponents.setBit(Component::getId<CompTs>(), true), ...); }
+  /// Unregisters components that can be triggered with this triggerer.
+  /// \tparam CompTs Types of the components to unregister.
+  template <typename... CompTs>
+  void unregisterComponents() { (m_triggerableComponents.setBit(Component::getId<CompTs>(), false), ...); }
+
+private:
+  Bitset m_triggerableComponents {};
+};
 
 /// TriggerVolume component, holding a volume that can be triggered and actions that can be executed accordingly.
 /// \see Triggerer, TriggerSystem
