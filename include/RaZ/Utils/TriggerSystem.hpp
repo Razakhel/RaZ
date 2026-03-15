@@ -17,7 +17,10 @@ public:
   bool update(const FrameTimeInfo& timeInfo) override;
 
 private:
-  static void processTrigger(TriggerVolume& triggerVolume, const Vec3f& triggererPos, const Transform& triggerVolumeTransform);
+  static void processTrigger(TriggerVolume& triggerVolume,
+                             Entity& triggererEntity,
+                             const Vec3f& triggererPos,
+                             const Transform& triggerVolumeTransform);
 };
 
 } // namespace Raz

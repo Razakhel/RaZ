@@ -125,9 +125,9 @@ void LuaWrapper::registerUtilsTypes() {
                                                                                    sol::constructors<TriggerVolume(const AABB&),
                                                                                                      TriggerVolume(const OBB&),
                                                                                                      TriggerVolume(const Sphere&)>());
-    triggerVolume["setEnterAction"]   = &TriggerVolume::setEnterAction;
-    triggerVolume["setStayAction"]    = &TriggerVolume::setStayAction;
-    triggerVolume["setLeaveAction"]   = &TriggerVolume::setLeaveAction;
+    triggerVolume["setEnterAction"]   = [] (TriggerVolume& v, std::function<void(Entity*)> ea) { v.setEnterAction([a = std::move(ea)] (Entity& e) { a(&e); }); };
+    triggerVolume["setStayAction"]    = [] (TriggerVolume& v, std::function<void(Entity*)> sa) { v.setStayAction([a = std::move(sa)] (Entity& e) { a(&e); }); };
+    triggerVolume["setLeaveAction"]   = [] (TriggerVolume& v, std::function<void(Entity*)> la) { v.setLeaveAction([a = std::move(la)] (Entity& e) { a(&e); }); };
     triggerVolume["enable"]           = sol::overload([] (TriggerVolume& v) { v.enable(); },
                                                       PickOverload<bool>(&TriggerVolume::enable));
     triggerVolume["disable"]          = &TriggerVolume::disable;

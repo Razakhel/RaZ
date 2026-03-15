@@ -14,7 +14,7 @@ TriggerSystem::TriggerSystem() {
 bool TriggerSystem::update(const FrameTimeInfo&) {
   ZoneScopedN("TriggerSystem::update");
 
-  for (const Entity* triggererEntity : m_entities) {
+  for (Entity* triggererEntity : m_entities) {
     if (!triggererEntity->hasComponent<Triggerer>() || !triggererEntity->hasComponent<Transform>())
       continue;
 
@@ -34,14 +34,17 @@ bool TriggerSystem::update(const FrameTimeInfo&) {
       if (!triggerVolume.m_enabled)
         continue;
 
-      processTrigger(triggerVolume, triggererPos, triggerVolumeEntity->getComponent<Transform>());
+      processTrigger(triggerVolume, *triggererEntity, triggererPos, triggerVolumeEntity->getComponent<Transform>());
     }
   }
 
   return true;
 }
 
-void TriggerSystem::processTrigger(TriggerVolume& triggerVolume, const Vec3f& triggererPos, const Transform& triggerVolumeTransform) {
+void TriggerSystem::processTrigger(TriggerVolume& triggerVolume,
+                                   Entity& triggererEntity,
+                                   const Vec3f& triggererPos,
+                                   const Transform& triggerVolumeTransform) {
   ZoneScopedN("TriggerSystem::processTrigger");
 
   const bool wasBeingTriggered = triggerVolume.m_isCurrentlyTriggered;
@@ -54,12 +57,12 @@ void TriggerSystem::processTrigger(TriggerVolume& triggerVolume, const Vec3f& tr
   if (!wasBeingTriggered && !triggerVolume.m_isCurrentlyTriggered)
     return;
 
-  const std::function<void()>& action = (!wasBeingTriggered && triggerVolume.m_isCurrentlyTriggered ? triggerVolume.m_enterAction
-                                      : (wasBeingTriggered && triggerVolume.m_isCurrentlyTriggered  ? triggerVolume.m_stayAction
-                                                                                                    : triggerVolume.m_leaveAction));
+  const std::function<void(Entity&)>& action = (!wasBeingTriggered && triggerVolume.m_isCurrentlyTriggered ? triggerVolume.m_enterAction
+                                             : (wasBeingTriggered && triggerVolume.m_isCurrentlyTriggered  ? triggerVolume.m_stayAction
+                                                                                                           : triggerVolume.m_leaveAction));
 
   if (action)
-    action();
+    action(triggererEntity);
 }
 
 } // namespace Raz

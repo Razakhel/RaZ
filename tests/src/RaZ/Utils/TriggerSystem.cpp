@@ -32,8 +32,9 @@ TEST_CASE("TriggerSystem triggerer components", "[utils]") {
   auto& triggerVolume       = triggerVolumeEntity.addComponent<Raz::TriggerVolume>(Raz::Sphere(Raz::Vec3f(0.f), 1.f));
 
   int triggerCount = 0;
-  triggerVolume.setEnterAction([&triggerCount] () noexcept { ++triggerCount; });
-  triggerVolume.setStayAction([&triggerCount] () noexcept { ++triggerCount; });
+
+  triggerVolume.setEnterAction([&triggerCount] (const Raz::Entity&) noexcept { ++triggerCount; });
+  triggerVolume.setStayAction([&triggerCount] (const Raz::Entity&) noexcept { ++triggerCount; });
 
   auto& triggerer = world.addEntityWithComponent<Raz::Transform>().addComponent<Raz::Triggerer>();
 
@@ -96,25 +97,25 @@ TEST_CASE("TriggerSystem trigger actions", "[utils]") {
   int boxStayCount  = 0;
   int boxLeaveCount = 0;
 
-  triggerBox.setEnterAction([&boxEnterCount] () noexcept { ++boxEnterCount; });
-  triggerBox.setStayAction([&boxStayCount] () noexcept { ++boxStayCount; });
-  triggerBox.setLeaveAction([&boxLeaveCount] () noexcept { ++boxLeaveCount; });
+  triggerBox.setEnterAction([&boxEnterCount] (const Raz::Entity&) noexcept { ++boxEnterCount; });
+  triggerBox.setStayAction([&boxStayCount] (const Raz::Entity&) noexcept { ++boxStayCount; });
+  triggerBox.setLeaveAction([&boxLeaveCount] (const Raz::Entity&) noexcept { ++boxLeaveCount; });
 
   int orientedBoxEnterCount = 0;
   int orientedBoxStayCount  = 0;
   int orientedBoxLeaveCount = 0;
 
-  triggerOrientedBox.setEnterAction([&orientedBoxEnterCount] () noexcept { ++orientedBoxEnterCount; });
-  triggerOrientedBox.setStayAction([&orientedBoxStayCount] () noexcept { ++orientedBoxStayCount; });
-  triggerOrientedBox.setLeaveAction([&orientedBoxLeaveCount] () noexcept { ++orientedBoxLeaveCount; });
+  triggerOrientedBox.setEnterAction([&orientedBoxEnterCount] (const Raz::Entity&) noexcept { ++orientedBoxEnterCount; });
+  triggerOrientedBox.setStayAction([&orientedBoxStayCount] (const Raz::Entity&) noexcept { ++orientedBoxStayCount; });
+  triggerOrientedBox.setLeaveAction([&orientedBoxLeaveCount] (const Raz::Entity&) noexcept { ++orientedBoxLeaveCount; });
 
   int sphereEnterCount = 0;
   int sphereStayCount  = 0;
   int sphereLeaveCount = 0;
 
-  triggerSphere.setEnterAction([&sphereEnterCount] () noexcept { ++sphereEnterCount; });
-  triggerSphere.setStayAction([&sphereStayCount] () noexcept { ++sphereStayCount; });
-  triggerSphere.setLeaveAction([&sphereLeaveCount] () noexcept { ++sphereLeaveCount; });
+  triggerSphere.setEnterAction([&sphereEnterCount] (const Raz::Entity&) noexcept { ++sphereEnterCount; });
+  triggerSphere.setStayAction([&sphereStayCount] (const Raz::Entity&) noexcept { ++sphereStayCount; });
+  triggerSphere.setLeaveAction([&sphereLeaveCount] (const Raz::Entity&) noexcept { ++sphereLeaveCount; });
 
   world.update({});
 

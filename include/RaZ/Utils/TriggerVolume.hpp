@@ -12,6 +12,8 @@
 
 namespace Raz {
 
+class Entity;
+
 /// Triggerer component, representing an entity that can interact with triggerable entities.
 /// \see TriggerVolume
 class Triggerer final : public Component {
@@ -31,7 +33,7 @@ public:
   void unregisterComponents() { (m_triggerableComponents.setBit(Component::getId<CompTs>(), false), ...); }
 
 private:
-  Bitset m_triggerableComponents {};
+  Bitset m_triggerableComponents;
 };
 
 /// TriggerVolume component, holding a volume that can be triggered and actions that can be executed accordingly.
@@ -59,9 +61,15 @@ public:
       throw std::invalid_argument("[TriggerVolume] The sphere's radius must be greater than 0");
   }
 
-  void setEnterAction(std::function<void()> enterAction) { m_enterAction = std::move(enterAction); }
-  void setStayAction(std::function<void()> stayAction) { m_stayAction = std::move(stayAction); }
-  void setLeaveAction(std::function<void()> leaveAction) { m_leaveAction = std::move(leaveAction); }
+  /// Sets the action to be executed when a triggering entity enters the volume.
+  /// \param enterAction Action to be executed on entering the volume. Takes the triggering entity as argument.
+  void setEnterAction(std::function<void(Entity&)> enterAction) { m_enterAction = std::move(enterAction); }
+  /// Sets the action to be executed when a triggering entity stays in the volume.
+  /// \param stayAction Action to be executed on staying in the volume. Takes the triggering entity as argument.
+  void setStayAction(std::function<void(Entity&)> stayAction) { m_stayAction = std::move(stayAction); }
+  /// Sets the action to be executed when a triggering entity leaves the volume.
+  /// \param leaveAction Action to be executed on leaving the volume. Takes the triggering entity as argument.
+  void setLeaveAction(std::function<void(Entity&)> leaveAction) { m_leaveAction = std::move(leaveAction); }
 
   /// Changes the trigger volume's state.
   /// \param enabled True if the trigger volume should be enabled (triggerable), false otherwise.
@@ -76,9 +84,9 @@ private:
   bool m_enabled = true;
 
   std::variant<AABB, OBB, Sphere> m_volume;
-  std::function<void()> m_enterAction;
-  std::function<void()> m_stayAction;
-  std::function<void()> m_leaveAction;
+  std::function<void(Entity&)> m_enterAction;
+  std::function<void(Entity&)> m_stayAction;
+  std::function<void(Entity&)> m_leaveAction;
 
   bool m_isCurrentlyTriggered = false;
 };
