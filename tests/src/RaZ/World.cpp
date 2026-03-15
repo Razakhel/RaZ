@@ -1,3 +1,4 @@
+#include "RaZ/Application.hpp"
 #include "RaZ/World.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -21,12 +22,21 @@ TEST_CASE("World entities manipulation", "[core]") {
   CHECK(world.getEntities()[1]->getId() == 1);
   CHECK(world.getEntities()[2]->getId() == 2);
 
+  // Removing entities just stores them to be cleaned on the next world update
   world.removeEntity(entity0);
+  CHECK(world.getEntities().size() == 3);
+  CHECK(world.getEntities()[0]->getId() == 0);
+  CHECK(world.getEntities()[1]->getId() == 1);
+  CHECK(world.getEntities()[2]->getId() == 2);
+
+  // Updating the world cleans all entities marked for removal
+  world.update({});
   CHECK(world.getEntities().size() == 2);
   CHECK(world.getEntities()[0]->getId() == 1);
   CHECK(world.getEntities()[1]->getId() == 2);
 
   world.removeEntity(entity2);
+  world.update({});
   CHECK(world.getEntities().size() == 1);
   CHECK(world.getEntities()[0]->getId() == 1);
 
@@ -37,12 +47,13 @@ TEST_CASE("World entities manipulation", "[core]") {
 
   // The entity removal is made by checking the pointers; if it isn't owned by this world, it throws an exception
   const Raz::Entity extEntity(0);
-  CHECK_THROWS(world.removeEntity(extEntity));
+  CHECK_NOTHROW(world.removeEntity(extEntity)); // Marking for removal doesn't check its validity
+  CHECK_THROWS(world.update({})); // The cleaning step does
 }
 
 TEST_CASE("World get entities with components", "[core]") {
-  struct TestComp1 : public Raz::Component {};
-  struct TestComp2 : public Raz::Component {};
+  struct TestComp1 : Raz::Component {};
+  struct TestComp2 : Raz::Component {};
 
   Raz::World world(2);
 
@@ -94,7 +105,7 @@ TEST_CASE("World refresh", "[core]") {
   CHECK(world.getEntities()[1]->getId() == 1);
   CHECK(world.getEntities()[2]->getId() == 2);
 
-  // Disabling the entity 1; refreshing the world should put it at the end of the list
+  // Disabling entity 1; refreshing the world should put it at the end of the list
 
   entity1.disable();
   world.refresh();
@@ -107,7 +118,7 @@ TEST_CASE("World refresh", "[core]") {
   CHECK(world.getEntities()[1]->getId() == 2);
   CHECK(world.getEntities()[2]->getId() == 1);
 
-  // Likewise for the entity 0, it ends swapped with the last enabled entity
+  // Likewise for entity 0, it ends up swapped with the last enabled entity
 
   entity0.disable();
   world.refresh();
@@ -120,7 +131,7 @@ TEST_CASE("World refresh", "[core]") {
   CHECK(world.getEntities()[1]->getId() == 0);
   CHECK(world.getEntities()[2]->getId() == 1);
 
-  // Reenabling the entity 1 should make it advance so that the 0 remains at the end
+  // Reenabling entity 1 should make it advance so that the 0 remains at the end
 
   entity1.enable();
   world.refresh();

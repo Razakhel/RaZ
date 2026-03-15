@@ -11,18 +11,6 @@ Entity& World::addEntity(bool enabled) {
   return *m_entities.back();
 }
 
-void World::removeEntity(const Entity& entity) {
-  const auto iter = std::ranges::find_if(m_entities, [&entity] (const EntityPtr& entityPtr) noexcept { return (&entity == entityPtr.get()); });
-
-  if (iter == m_entities.end())
-    throw std::invalid_argument("[World] The entity to be removed isn't owned by this world");
-
-  for (const SystemPtr& system : m_systems)
-    system->unlinkEntity(*iter);
-
-  m_entities.erase(iter);
-}
-
 bool World::update(const FrameTimeInfo& timeInfo) {
   ZoneScopedN("World::update");
 
@@ -43,6 +31,8 @@ bool World::update(const FrameTimeInfo& timeInfo) {
 
 void World::refresh() {
   ZoneScopedN("World::refresh");
+
+  cleanEntities();
 
   if (m_entities.empty())
     return;
@@ -122,6 +112,24 @@ void World::sortEntities() {
   }
 
   m_activeEntityCount = static_cast<std::size_t>(std::distance(m_entities.begin(), lastEntity) + 1);
+}
+
+void World::cleanEntities() {
+  for (const Entity* entity : m_entitiesToRemove) {
+    const auto entityIter = std::ranges::find_if(m_entities, [entity] (const EntityPtr& entityPtr) noexcept {
+      return (entity == entityPtr.get());
+    });
+
+    if (entityIter == m_entities.end())
+      throw std::invalid_argument("[World] The entity to be removed isn't owned by this world");
+
+    for (const SystemPtr& system : m_systems)
+      system->unlinkEntity(*entityIter);
+
+    m_entities.erase(entityIter);
+  }
+
+  m_entitiesToRemove.clear();
 }
 
 } // namespace Raz

@@ -6,6 +6,8 @@
 #include "RaZ/Entity.hpp"
 #include "RaZ/System.hpp"
 
+#include <unordered_set>
+
 namespace Raz {
 
 struct FrameTimeInfo;
@@ -65,9 +67,9 @@ public:
   /// \tparam CompsTs Types of the components to query.
   /// \return List of entities containing all given components.
   template <typename... CompsTs> std::vector<Entity*> recoverEntitiesWithComponents();
-  /// Removes an entity from the world. It *must* be an entity created by this world.
+  /// Marks an entity to be removed on the next update. It must be an entity created by this world.
   /// \param entity Entity to be removed.
-  void removeEntity(const Entity& entity);
+  void removeEntity(const Entity& entity) { m_entitiesToRemove.emplace(&entity); }
   /// Updates the world, updating all the systems it contains.
   /// \param timeInfo Time-related frame information.
   /// \return True if the world still has active systems, false otherwise.
@@ -85,6 +87,8 @@ public:
 private:
   /// Sorts entities so that the disabled ones are packed to the end of the list.
   void sortEntities();
+  /// Erases entities marked for removal.
+  void cleanEntities();
 
   std::vector<SystemPtr> m_systems {};
   Bitset m_activeSystems {};
@@ -92,6 +96,8 @@ private:
   std::vector<EntityPtr> m_entities {};
   std::size_t m_activeEntityCount = 0;
   std::size_t m_maxEntityIndex = 0;
+
+  std::unordered_set<const Entity*> m_entitiesToRemove;
 };
 
 } // namespace Raz
