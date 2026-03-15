@@ -15,7 +15,7 @@ void World::removeEntity(const Entity& entity) {
   const auto iter = std::ranges::find_if(m_entities, [&entity] (const EntityPtr& entityPtr) noexcept { return (&entity == entityPtr.get()); });
 
   if (iter == m_entities.end())
-    throw std::invalid_argument("Error: The entity isn't owned by this world");
+    throw std::invalid_argument("[World] The entity to be removed isn't owned by this world");
 
   for (const SystemPtr& system : m_systems)
     system->unlinkEntity(*iter);
@@ -98,7 +98,7 @@ void World::destroy() {
 void World::sortEntities() {
   ZoneScopedN("World::sortEntities");
 
-  // Reorganizing the entites, swapping enabled & disabled ones so that the enabled ones are in front
+  // Reorganizing the entities, swapping enabled & disabled ones so that the enabled ones are in front
   auto firstEntity = m_entities.begin();
   auto lastEntity  = m_entities.end() - 1;
 

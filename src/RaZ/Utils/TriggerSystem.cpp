@@ -47,19 +47,25 @@ void TriggerSystem::processTrigger(TriggerVolume& triggerVolume,
                                    const Transform& triggerVolumeTransform) {
   ZoneScopedN("TriggerSystem::processTrigger");
 
-  const bool wasBeingTriggered = triggerVolume.m_isCurrentlyTriggered;
-  const Vec3f triggerVolumePos = triggerVolumeTransform.getRotation() * triggerVolumeTransform.getPosition();
+  const bool wasBeingTriggered = triggerVolume.m_triggeringEntities.contains(&triggererEntity);
 
-  triggerVolume.m_isCurrentlyTriggered = std::visit([&triggererPos, &triggerVolumePos] (const auto& volume) {
-    return volume.contains(triggererPos - triggerVolumePos);
+  const Vec3f triggerVolumeAbsPos = triggerVolumeTransform.getRotation() * triggerVolumeTransform.getPosition();
+  const Vec3f triggererRelPos     = triggererPos - triggerVolumeAbsPos; // Triggerer position in the volume's space
+  const bool isCurrentlyTriggered = std::visit([&triggererRelPos] (const auto& volume) {
+    return volume.contains(triggererRelPos);
   }, triggerVolume.m_volume);
 
-  if (!wasBeingTriggered && !triggerVolume.m_isCurrentlyTriggered)
+  if (isCurrentlyTriggered)
+    triggerVolume.m_triggeringEntities.emplace(&triggererEntity);
+  else
+    triggerVolume.m_triggeringEntities.erase(&triggererEntity);
+
+  if (!wasBeingTriggered && !isCurrentlyTriggered)
     return;
 
-  const std::function<void(Entity&)>& action = (!wasBeingTriggered && triggerVolume.m_isCurrentlyTriggered ? triggerVolume.m_enterAction
-                                             : (wasBeingTriggered && triggerVolume.m_isCurrentlyTriggered  ? triggerVolume.m_stayAction
-                                                                                                           : triggerVolume.m_leaveAction));
+  const std::function<void(Entity&)>& action = (!wasBeingTriggered   ? triggerVolume.m_enterAction
+                                             : (isCurrentlyTriggered ? triggerVolume.m_stayAction
+                                                                     : triggerVolume.m_leaveAction));
 
   if (action)
     action(triggererEntity);

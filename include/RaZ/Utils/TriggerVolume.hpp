@@ -8,6 +8,7 @@
 #include "RaZ/Utils/Shape.hpp"
 
 #include <functional>
+#include <unordered_set>
 #include <variant>
 
 namespace Raz {
@@ -88,7 +89,7 @@ private:
   std::function<void(Entity&)> m_stayAction;
   std::function<void(Entity&)> m_leaveAction;
 
-  bool m_isCurrentlyTriggered = false;
+  std::unordered_set<const Entity*> m_triggeringEntities;
 };
 
 } // namespace Raz

@@ -61,6 +61,92 @@ TEST_CASE("TriggerSystem triggerer components", "[utils]") {
   CHECK(triggerCount == 2);
 }
 
+TEST_CASE("TriggerSystem triggering entities", "[utils]") {
+  Raz::World world;
+
+  world.addSystem<Raz::TriggerSystem>();
+
+  Raz::Entity& triggerVolumeEntity = world.addEntityWithComponent<Raz::Transform>(Raz::Vec3f(1.f));
+  auto& triggerVolume              = triggerVolumeEntity.addComponent<Raz::TriggerVolume>(Raz::Sphere(Raz::Vec3f(0.f), 1.f));
+
+  Raz::Entity& triggerer1Entity = world.addEntityWithComponent<Raz::Transform>();
+  triggerer1Entity.addComponent<Raz::Triggerer>().registerComponents<Raz::TriggerVolume>();
+  Raz::Entity& triggerer2Entity = world.addEntityWithComponent<Raz::Transform>();
+  triggerer2Entity.addComponent<Raz::Triggerer>().registerComponents<Raz::TriggerVolume>();
+
+  const Raz::Entity* lastEnterEntity {};
+  const Raz::Entity* lastStayEntity {};
+  const Raz::Entity* lastLeaveEntity {};
+  int triggerCount = 0;
+
+  triggerVolume.setEnterAction([&lastEnterEntity, &triggerCount] (const Raz::Entity& entity) noexcept {
+    lastEnterEntity = &entity;
+    ++triggerCount;
+  });
+  triggerVolume.setStayAction([&lastStayEntity, &triggerCount] (const Raz::Entity& entity) noexcept {
+    lastStayEntity = &entity;
+    ++triggerCount;
+  });
+  triggerVolume.setLeaveAction([&lastLeaveEntity, &triggerCount] (const Raz::Entity& entity) noexcept {
+    lastLeaveEntity = &entity;
+    ++triggerCount;
+  });
+
+  // Both triggerers are initially outside the volume
+  lastEnterEntity = nullptr;
+  lastStayEntity  = nullptr;
+  lastLeaveEntity = nullptr;
+  world.update({});
+  CHECK(lastEnterEntity == nullptr);
+  CHECK(lastStayEntity == nullptr);
+  CHECK(lastLeaveEntity == nullptr);
+  CHECK(triggerCount == 0);
+
+  // Moving the first triggerer inside the volume
+  triggerer1Entity.getComponent<Raz::Transform>().setPosition(triggerVolumeEntity.getComponent<Raz::Transform>().getPosition());
+  lastEnterEntity = nullptr;
+  lastStayEntity  = nullptr;
+  lastLeaveEntity = nullptr;
+  world.update({});
+  CHECK(lastEnterEntity == &triggerer1Entity);
+  CHECK(lastStayEntity == nullptr);
+  CHECK(lastLeaveEntity == nullptr);
+  CHECK(triggerCount == 1);
+
+  // Moving the second triggerer inside the volume
+  triggerer2Entity.getComponent<Raz::Transform>().setPosition(triggerVolumeEntity.getComponent<Raz::Transform>().getPosition());
+  lastEnterEntity = nullptr;
+  lastStayEntity  = nullptr;
+  lastLeaveEntity = nullptr;
+  world.update({});
+  CHECK(lastEnterEntity == &triggerer2Entity);
+  CHECK(lastStayEntity == &triggerer1Entity);
+  CHECK(lastLeaveEntity == nullptr);
+  CHECK(triggerCount == 3);
+
+  // Moving the first triggerer outside the volume
+  triggerer1Entity.getComponent<Raz::Transform>().setPosition(Raz::Vec3f(0.f));
+  lastEnterEntity = nullptr;
+  lastStayEntity  = nullptr;
+  lastLeaveEntity = nullptr;
+  world.update({});
+  CHECK(lastEnterEntity == nullptr);
+  CHECK(lastStayEntity == &triggerer2Entity);
+  CHECK(lastLeaveEntity == &triggerer1Entity);
+  CHECK(triggerCount == 5);
+
+  // Moving the second triggerer outside the volume
+  triggerer2Entity.getComponent<Raz::Transform>().setPosition(Raz::Vec3f(0.f));
+  lastEnterEntity = nullptr;
+  lastStayEntity  = nullptr;
+  lastLeaveEntity = &triggerer2Entity;
+  world.update({});
+  CHECK(lastEnterEntity == nullptr);
+  CHECK(lastStayEntity == nullptr);
+  CHECK(lastLeaveEntity == &triggerer2Entity);
+  CHECK(triggerCount == 6);
+}
+
 TEST_CASE("TriggerSystem trigger actions", "[utils]") {
   Raz::World world;
 
