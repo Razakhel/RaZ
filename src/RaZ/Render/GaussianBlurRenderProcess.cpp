@@ -58,7 +58,7 @@ GaussianBlurRenderProcess::GaussianBlurRenderProcess(RenderGraph& renderGraph) :
 
   // Validating the render graph
   if (!renderGraph.isValid())
-    throw std::runtime_error("Error: The gaussian blur process is invalid");
+    throw std::runtime_error("[GaussianBlurRenderProcess] The gaussian blur process is invalid");
 }
 
 bool GaussianBlurRenderProcess::isEnabled() const noexcept {
@@ -121,7 +121,7 @@ void GaussianBlurRenderProcess::setInputBuffer(Texture2DPtr inputBuffer) {
 
   // Validating the render graph
   if (!m_renderGraph.isValid())
-    throw std::runtime_error("Error: The gaussian blur process is invalid");
+    throw std::runtime_error("[GaussianBlurRenderProcess] The gaussian blur process is invalid");
 }
 
 void GaussianBlurRenderProcess::setOutputBuffer(Texture2DPtr outputBuffer) {

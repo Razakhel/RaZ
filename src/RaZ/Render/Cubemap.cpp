@@ -14,7 +14,26 @@ namespace Raz {
 namespace {
 
 constexpr std::string_view vertSource = R"(
-  layout(location = 0) in vec3 vertPosition;
+  const vec3 positions[8] = vec3[](
+    vec3( 1.0,  1.0, -1.0), // Right top back
+    vec3( 1.0,  1.0,  1.0), // Right top front
+    vec3( 1.0, -1.0, -1.0), // Right bottom back
+    vec3( 1.0, -1.0,  1.0), // Right bottom front
+    vec3(-1.0,  1.0, -1.0), // Left top back
+    vec3(-1.0,  1.0,  1.0), // Left top front
+    vec3(-1.0, -1.0, -1.0), // Left bottom back
+    vec3(-1.0, -1.0,  1.0)  // Left bottom front
+  );
+
+  // Organizing the triangles to be in a clockwise order, since we will always be inside the cube
+  const int indices[36] = int[](
+    0, 2, 1, 1, 2, 3, // Right
+    4, 5, 7, 4, 7, 6, // Left
+    4, 0, 1, 4, 1, 5, // Top
+    7, 3, 2, 7, 2, 6, // Bottom
+    5, 1, 3, 5, 3, 7, // Front
+    0, 4, 6, 0, 6, 2  // Back
+  );
 
   layout(std140) uniform uboCameraInfo {
     mat4 uniViewMat;
@@ -28,10 +47,12 @@ constexpr std::string_view vertSource = R"(
   out vec3 fragTexcoords;
 
   void main() {
-    fragTexcoords = vertPosition;
+    vec3 worldPos = positions[indices[gl_VertexID]];
 
-    vec4 pos    = uniProjectionMat * (mat4(mat3(uniViewMat)) * vec4(vertPosition, 1.0));
-    gl_Position = pos.xyww;
+    fragTexcoords = worldPos;
+
+    vec4 projPos = uniProjectionMat * (mat4(mat3(uniViewMat)) * vec4(worldPos, 1.0));
+    gl_Position  = projPos.xyww;
   }
 )";
 
@@ -46,57 +67,6 @@ constexpr std::string_view fragSource = R"(
     fragColor = texture(uniSkybox, fragTexcoords);
   }
 )";
-
-inline const MeshRenderer& getDisplayCube() {
-  static const MeshRenderer cube = [] () {
-    Mesh mesh;
-
-    Submesh& submesh = mesh.addSubmesh();
-
-    submesh.getVertices() = {
-      Vertex{ Vec3f( 1.f,  1.f, -1.f) }, // Right top back
-      Vertex{ Vec3f( 1.f,  1.f,  1.f) }, // Right top front
-      Vertex{ Vec3f( 1.f, -1.f, -1.f) }, // Right bottom back
-      Vertex{ Vec3f( 1.f, -1.f,  1.f) }, // Right bottom front
-      Vertex{ Vec3f(-1.f,  1.f, -1.f) }, // Left top back
-      Vertex{ Vec3f(-1.f,  1.f,  1.f) }, // Left top front
-      Vertex{ Vec3f(-1.f, -1.f, -1.f) }, // Left bottom back
-      Vertex{ Vec3f(-1.f, -1.f,  1.f) }  // Left bottom front
-    };
-
-    // Organizing the triangles to be in a clockwise order, since we will always be inside the cube
-    submesh.getTriangleIndices() = {
-      0, 2, 1, 1, 2, 3, // Right
-      4, 5, 7, 4, 7, 6, // Left
-      4, 0, 1, 4, 1, 5, // Top
-      7, 3, 2, 7, 2, 6, // Bottom
-      5, 1, 3, 5, 3, 7, // Front
-      0, 4, 6, 0, 6, 2  // Back
-    };
-
-    MeshRenderer meshRenderer;
-
-    RenderShaderProgram& program = meshRenderer.addMaterial().getProgram();
-    program.setShaders(VertexShader::loadFromSource(vertSource), FragmentShader::loadFromSource(fragSource));
-    program.setAttribute(0, "uniSkybox");
-    program.sendAttributes();
-
-    meshRenderer.load(mesh, RenderMode::TRIANGLE);
-    meshRenderer.getSubmeshRenderers().front().setMaterialIndex(0);
-
-#if !defined(USE_OPENGL_ES)
-    if (Renderer::checkVersion(4, 3)) {
-      Renderer::setLabel(RenderObjectType::PROGRAM, program.getIndex(), "Cubemap shader program");
-      Renderer::setLabel(RenderObjectType::SHADER, program.getVertexShader().getIndex(), "Cubemap vertex shader");
-      Renderer::setLabel(RenderObjectType::SHADER, program.getFragmentShader().getIndex(), "Cubemap fragment shader");
-    }
-#endif
-
-    return meshRenderer;
-  }();
-
-  return cube;
-}
 
 TextureFormat recoverFormat(ImageColorspace colorspace) {
   switch (colorspace) {
@@ -169,7 +139,23 @@ Cubemap::Cubemap() {
 }
 
 const RenderShaderProgram& Cubemap::getProgram() const {
-  return getDisplayCube().getMaterials().front().getProgram();
+  static const RenderShaderProgram cubemapProgram = [] () {
+    RenderShaderProgram program(VertexShader::loadFromSource(vertSource), FragmentShader::loadFromSource(fragSource));
+    program.setAttribute(0, "uniSkybox");
+    program.sendAttributes();
+
+#if !defined(USE_OPENGL_ES)
+    if (Renderer::checkVersion(4, 3)) {
+      Renderer::setLabel(RenderObjectType::PROGRAM, program.getIndex(), "Cubemap shader program");
+      Renderer::setLabel(RenderObjectType::SHADER, program.getVertexShader().getIndex(), "Cubemap vertex shader");
+      Renderer::setLabel(RenderObjectType::SHADER, program.getFragmentShader().getIndex(), "Cubemap fragment shader");
+    }
+#endif
+
+    return program;
+  }();
+
+  return cubemapProgram;
 }
 
 void Cubemap::load(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back) const {
@@ -243,14 +229,15 @@ void Cubemap::draw() const {
   ZoneScopedN("Cubemap::draw");
   TracyGpuZone("Cubemap::draw")
 
-  const MeshRenderer& displayCube = getDisplayCube();
+  static const VertexArray vao;
+  vao.bind();
 
-  displayCube.getMaterials().front().getProgram().use();
+  getProgram().use();
   Renderer::setActiveTexture(0);
   bind();
 
   Renderer::setDepthFunction(DepthStencilFunction::LESS_EQUAL);
-  displayCube.draw();
+  Renderer::drawArrays(PrimitiveType::TRIANGLES, 36);
   Renderer::setDepthFunction(DepthStencilFunction::LESS);
 }
 

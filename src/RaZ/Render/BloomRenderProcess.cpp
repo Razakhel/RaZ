@@ -268,7 +268,7 @@ BloomRenderProcess::BloomRenderProcess(RenderGraph& renderGraph) : RenderProcess
 
   // Validating the render graph
   if (!renderGraph.isValid())
-    throw std::runtime_error("Error: The bloom process is invalid");
+    throw std::runtime_error("[BloomRenderProcess] The bloom process is invalid");
 }
 
 bool BloomRenderProcess::isEnabled() const noexcept {

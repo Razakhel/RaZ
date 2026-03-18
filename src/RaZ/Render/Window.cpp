@@ -42,7 +42,7 @@ Window::Window(RenderSystem& renderSystem,
   });
 
   if (!glfwInit())
-    throw std::runtime_error("Error: Failed to initialize GLFW");
+    throw std::runtime_error("[Window] Failed to initialize GLFW");
 
 #if !defined(USE_OPENGL_ES)
   glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
@@ -101,7 +101,7 @@ Window::Window(RenderSystem& renderSystem,
     }
 
     close();
-    throw std::runtime_error("Error: Failed to create GLFW Window");
+    throw std::runtime_error("[Window] Failed to create GLFW Window");
   }
 #else
   m_windowHandle = glfwCreateWindow(static_cast<int>(width), static_cast<int>(height), title.c_str(), nullptr, glfwGetCurrentContext());

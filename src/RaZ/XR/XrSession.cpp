@@ -262,11 +262,8 @@ void XrSession::initialize(uint64_t systemId) {
   if (graphicsRequirements.minApiVersionSupported > graphicsApiVersion) {
     const uint16_t requiredMajorVersion = XR_VERSION_MAJOR(graphicsRequirements.minApiVersionSupported);
     const uint16_t requiredMinorVersion = XR_VERSION_MINOR(graphicsRequirements.minApiVersionSupported);
-    throw std::runtime_error("[XrSession] The current OpenGL version "
-                             + std::to_string(Renderer::getMajorVersion()) + '.' + std::to_string(Renderer::getMinorVersion())
-                             + " does not meet the minimum required version "
-                             + std::to_string(requiredMajorVersion) + '.' + std::to_string(requiredMinorVersion)
-                             + " for OpenXR");
+    throw std::runtime_error(std::format("[XrSession] The current OpenGL version {}.{} does not meet the minimum required version {}.{} for OpenXR",
+                             Renderer::getMajorVersion(), Renderer::getMinorVersion(), requiredMajorVersion, requiredMinorVersion));
   }
 
   const GraphicsBinding graphicsBinding = getGraphicsBinding();

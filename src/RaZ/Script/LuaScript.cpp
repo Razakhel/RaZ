@@ -77,7 +77,7 @@ void LuaScript::setup() const {
   const sol::unsafe_function setupFunc = setupRef;
 
   if (!setupFunc().valid())
-    throw std::runtime_error("Error: The Lua script failed to be setup");
+    throw std::runtime_error("[LuaScript] The Lua script failed to be setup");
 
   Logger::debug("[LuaScript] Ran script setup");
 }
