@@ -14,7 +14,7 @@ using namespace Raz::Literals;
 TEST_CASE("AudioSystem accepted components", "[audio]") {
   Raz::World world(2);
 
-  auto& audio = world.addSystem<Raz::AudioSystem>();
+  const auto& audio = world.addSystem<Raz::AudioSystem>();
 
   const Raz::Entity& sound    = world.addEntityWithComponent<Raz::Sound>();
   const Raz::Entity& listener = world.addEntityWithComponents<Raz::Listener, Raz::Transform>(); // The Listener entity requires a Transform component
@@ -23,6 +23,26 @@ TEST_CASE("AudioSystem accepted components", "[audio]") {
 
   CHECK(audio.containsEntity(sound));
   CHECK(audio.containsEntity(listener));
+}
+
+TEST_CASE("AudioSystem listener validity", "[audio]") {
+  Raz::World world(2);
+
+  auto& audioSystem = world.addSystem<Raz::AudioSystem>();
+
+  // A listener entity without a transform component is considered invalid when updating the system
+  Raz::Entity& listenerEntity = world.addEntity();
+  listenerEntity.addComponent<Raz::Listener>();
+  CHECK_THROWS(world.update({}));
+  CHECK(audioSystem.containsEntity(listenerEntity)); // The listener has still been linked to the system
+
+  listenerEntity.addComponent<Raz::Transform>();
+  CHECK_NOTHROW(world.update({})); // The listener now has a transform, no error occurs
+
+  // When trying to link a second listener, an exception is thrown as there can be only one
+  Raz::Entity& listenerEntity2 = world.addEntityWithComponents<Raz::Listener, Raz::Transform>();
+  CHECK_THROWS(world.update({}));
+  CHECK_FALSE(audioSystem.containsEntity(listenerEntity2)); // The second listener hasn't been linked
 }
 
 TEST_CASE("AudioSystem initialization", "[audio]") {

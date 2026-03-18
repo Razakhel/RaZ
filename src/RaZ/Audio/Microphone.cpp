@@ -7,14 +7,11 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#include <stdexcept>
-#include <string>
-
 namespace Raz {
 
 namespace {
 
-constexpr const char* recoverAlcErrorStr(int errorCode) {
+constexpr std::string_view recoverAlcErrorStr(int errorCode) {
   switch (errorCode) {
     case ALC_INVALID_DEVICE:  return "Invalid device";
     case ALC_INVALID_CONTEXT: return "Invalid context";
@@ -26,10 +23,8 @@ constexpr const char* recoverAlcErrorStr(int errorCode) {
   }
 }
 
-inline void checkError(void* device, const std::string& errorMsg) {
-  const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
-
-  if (errorCode != ALC_NO_ERROR)
+inline void checkError(void* device, std::string_view errorMsg) {
+  if (const int errorCode = alcGetError(static_cast<ALCdevice*>(device)); errorCode != ALC_NO_ERROR)
     Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlcErrorStr(errorCode));
 }
 

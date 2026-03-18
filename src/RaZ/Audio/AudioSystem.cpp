@@ -11,13 +11,11 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
-#include <string>
-
 namespace Raz {
 
 namespace {
 
-constexpr const char* recoverAlcErrorStr(int errorCode) {
+constexpr std::string_view recoverAlcErrorStr(int errorCode) {
   switch (errorCode) {
     case ALC_INVALID_DEVICE:  return "Invalid device";
     case ALC_INVALID_CONTEXT: return "Invalid context";
@@ -29,10 +27,8 @@ constexpr const char* recoverAlcErrorStr(int errorCode) {
   }
 }
 
-inline void checkError(void* device, const std::string& errorMsg) {
-  const int errorCode = alcGetError(static_cast<ALCdevice*>(device));
-
-  if (errorCode != ALC_NO_ERROR)
+inline void checkError(void* device, std::string_view errorMsg) {
+  if (const int errorCode = alcGetError(static_cast<ALCdevice*>(device)); errorCode != ALC_NO_ERROR)
     Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlcErrorStr(errorCode));
 }
 
@@ -58,7 +54,7 @@ AudioSystem::AudioSystem(const std::string& deviceName) {
 }
 
 std::vector<std::string> AudioSystem::recoverDevices() {
-  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty vector
+  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT"))
     return {};
 
   std::vector<std::string> devices;
@@ -93,7 +89,7 @@ void AudioSystem::openDevice(const std::string& deviceName) {
 
   if (!alcMakeContextCurrent(static_cast<ALCcontext*>(m_context))) {
     Logger::error("[OpenAL] Failed to make the audio context current");
-    alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure, which we already handled
+    alcGetError(static_cast<ALCdevice*>(m_device)); // Flushing errors, since alcMakeContextCurrent() produces one on failure which we already handled
   }
 
   Logger::debug("[AudioSystem] Opened device '{}'", recoverCurrentDevice());
@@ -103,7 +99,7 @@ std::string AudioSystem::recoverCurrentDevice() const {
   if (m_device == nullptr) // The system has failed to initialize; returning an empty device name
     return {};
 
-  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT")) // If the needed extension is unsupported, return an empty string
+  if (!alcIsExtensionPresent(nullptr, "ALC_ENUMERATE_ALL_EXT"))
     return {};
 
   return alcGetString(static_cast<ALCdevice*>(m_device), ALC_ALL_DEVICES_SPECIFIER);
@@ -111,11 +107,6 @@ std::string AudioSystem::recoverCurrentDevice() const {
 
 bool AudioSystem::update(const FrameTimeInfo&) {
   ZoneScopedN("AudioSystem::update");
-
-#if defined(RAZ_CONFIG_DEBUG)
-  // Checking that only one Listener exists
-  bool hasOneListener = false;
-#endif
 
   for (Entity* entity : m_entities) {
     if (entity->hasComponent<Sound>()) {
@@ -138,12 +129,8 @@ bool AudioSystem::update(const FrameTimeInfo&) {
     }
 
     if (entity->hasComponent<Listener>()) {
-#if defined(RAZ_CONFIG_DEBUG)
-      assert("Error: Only one Listener component must exist in an AudioSystem." && !hasOneListener);
-      hasOneListener = true;
-#endif
-
-      assert("Error: A Listener entity must have a Transform component." && entity->hasComponent<Transform>());
+      if (!entity->hasComponent<Transform>())
+        throw std::runtime_error("[AudioSystem] A listener must have a transform component");
 
       auto& listener      = entity->getComponent<Listener>();
       auto& listenerTrans = entity->getComponent<Transform>();
@@ -187,6 +174,17 @@ void AudioSystem::destroy() {
   }
 
   Logger::debug("[AudioSystem] Destroyed");
+}
+
+void AudioSystem::linkEntity(const EntityPtr& entity) {
+  ZoneScopedN("AudioSystem::linkEntity");
+
+  if (entity->hasComponent<Listener>()
+   && std::ranges::find_if(m_entities, [] (const Entity* linkedEntity) { return linkedEntity->hasComponent<Listener>(); }) != m_entities.cend()) {
+    throw std::runtime_error("[AudioSystem] Only one listener can exist in an audio system");
+  }
+
+  System::linkEntity(entity);
 }
 
 } // namespace Raz

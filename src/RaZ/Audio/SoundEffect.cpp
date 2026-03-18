@@ -5,13 +5,13 @@
 #include "tracy/Tracy.hpp"
 
 #include <AL/efx.h>
-#include <AL/efx-presets.h>
+//#include <AL/efx-presets.h> // Premade reverb presets
 
 namespace Raz {
 
 namespace {
 
-constexpr const char* recoverAlErrorStr(int errorCode) {
+constexpr std::string_view recoverAlErrorStr(int errorCode) {
   switch (errorCode) {
     case AL_INVALID_NAME:      return "Invalid name";
     case AL_INVALID_ENUM:      return "Invalid enum";
@@ -23,10 +23,8 @@ constexpr const char* recoverAlErrorStr(int errorCode) {
   }
 }
 
-inline void checkError(const std::string& errorMsg) {
-  const int errorCode = alGetError();
-
-  if (errorCode != AL_NO_ERROR)
+inline void checkError(std::string_view errorMsg) {
+  if (const int errorCode = alGetError(); errorCode != AL_NO_ERROR)
     Logger::error("[OpenAL] {} ({})", errorMsg, recoverAlErrorStr(errorCode));
 }
 

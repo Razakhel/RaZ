@@ -33,6 +33,8 @@ public:
   ~AudioSystem() override { destroy(); }
 
 private:
+  void linkEntity(const EntityPtr& entity) override;
+
   void* m_device {};
   void* m_context {};
 };

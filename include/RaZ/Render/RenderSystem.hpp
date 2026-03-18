@@ -92,10 +92,9 @@ public:
   void removeCubemap() { m_cubemap.reset(); }
   void destroy() override;
 
-protected:
+private:
   void linkEntity(const EntityPtr& entity) override;
 
-private:
   void initialize();
   void initialize(unsigned int sceneWidth, unsigned int sceneHeight);
   void sendCameraInfo() const;
