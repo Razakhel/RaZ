@@ -250,8 +250,8 @@ class OverlayListBox final : public OverlayElement {
 
 public:
   OverlayListBox(std::string label, std::vector<std::string> entries,
-                 std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {
+                 std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initIndex = std::numeric_limits<std::size_t>::max())
+    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentIndex{ initIndex } {
     if (m_actionChanged == nullptr)
       throw std::invalid_argument("[OverlayListBox] The callback function must be valid");
   }
@@ -261,7 +261,7 @@ public:
 private:
   std::vector<std::string> m_entries;
   std::function<void(const std::string&, std::size_t)> m_actionChanged;
-  std::size_t m_currentId {};
+  std::size_t m_currentIndex {};
 };
 
 class OverlayDropdown final : public OverlayElement {
@@ -269,8 +269,8 @@ class OverlayDropdown final : public OverlayElement {
 
 public:
   OverlayDropdown(std::string label, std::vector<std::string> entries,
-                  std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0)
-    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentId{ initId } {
+                  std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initIndex = 0)
+    : OverlayElement(std::move(label)), m_entries{ std::move(entries) }, m_actionChanged{ std::move(actionChanged) }, m_currentIndex{ initIndex } {
     if (m_actionChanged == nullptr)
       throw std::invalid_argument("[OverlayDropdown] The callback function must be valid");
   }
@@ -280,7 +280,7 @@ public:
 private:
   std::vector<std::string> m_entries;
   std::function<void(const std::string&, std::size_t)> m_actionChanged;
-  std::size_t m_currentId {};
+  std::size_t m_currentIndex {};
 };
 
 class OverlayColorPicker final : public OverlayElement {
@@ -496,19 +496,19 @@ public:
   /// Adds a list box on the overlay window.
   /// \param label Text to be displayed beside the list.
   /// \param entries Texts to fill the list with.
-  /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
-  /// \param initId Index of the element to select at initialization. Must be less than the entry count.
-  /// \return Reference to the newly added listbox.
+  /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text and index.
+  /// \param initIndex Index of the element to select at initialization. If higher than or equal to the number of entries, nothing will be selected.
+  /// \return Reference to the newly added list box.
   OverlayListBox& addListBox(std::string label, std::vector<std::string> entries,
-                             std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
+                             std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initIndex = std::numeric_limits<std::size_t>::max());
   /// Adds a dropdown list on the overlay window.
   /// \param label Text to be displayed beside the dropdown.
   /// \param entries Texts to fill the dropdown with.
-  /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text & index.
-  /// \param initId Index of the element to select at initialization. Must be less than the entry count.
+  /// \param actionChanged Action to be executed when a different element is selected. Receives the currently selected text and index.
+  /// \param initIndex Index of the element to select at initialization. Must be less than the entry count.
   /// \return Reference to the newly added dropdown list.
   OverlayDropdown& addDropdown(std::string label, std::vector<std::string> entries,
-                               std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId = 0);
+                               std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initIndex = 0);
   /// Adds a color picker on the overlay window.
   /// \param label Text to be displayed beside the color picker.
   /// \param actionChanged Action to be executed when a color is selected.

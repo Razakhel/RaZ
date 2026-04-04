@@ -206,15 +206,15 @@ OverlayTextArea& OverlayWindow::addTextArea(std::string label, std::function<voi
 }
 
 OverlayListBox& OverlayWindow::addListBox(std::string label, std::vector<std::string> entries,
-                                          std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+                                          std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initIndex) {
   return static_cast<OverlayListBox&>(*m_elements.emplace_back(std::make_unique<OverlayListBox>(std::move(label), std::move(entries),
-                                                                                                std::move(actionChanged), initId)));
+                                                                                                std::move(actionChanged), initIndex)));
 }
 
 OverlayDropdown& OverlayWindow::addDropdown(std::string label, std::vector<std::string> entries,
-                                            std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initId) {
+                                            std::function<void(const std::string&, std::size_t)> actionChanged, std::size_t initIndex) {
   return static_cast<OverlayDropdown&>(*m_elements.emplace_back(std::make_unique<OverlayDropdown>(std::move(label), std::move(entries),
-                                                                                                  std::move(actionChanged), initId)));
+                                                                                                  std::move(actionChanged), initIndex)));
 }
 
 OverlayColorPicker& OverlayWindow::addColorPicker(std::string label, std::function<void(const Color&)> actionChanged, const Color& initColor) {
@@ -363,12 +363,12 @@ void OverlayWindow::render() const {
 
         if (ImGui::BeginListBox(listBox.m_label.c_str(), dimensions)) {
           for (std::size_t entryIndex = 0; entryIndex < listBox.m_entries.size(); ++entryIndex) {
-            const bool isSelected = (listBox.m_currentId == entryIndex);
+            const bool isSelected = (listBox.m_currentIndex == entryIndex);
 
             if (ImGui::Selectable(listBox.m_entries[entryIndex].c_str(), isSelected)) {
               if (!isSelected) { // If the item isn't already selected
                 listBox.m_actionChanged(listBox.m_entries[entryIndex], entryIndex);
-                listBox.m_currentId = entryIndex;
+                listBox.m_currentIndex = entryIndex;
               }
             }
 
@@ -386,15 +386,15 @@ void OverlayWindow::render() const {
       {
         auto& dropdown = static_cast<OverlayDropdown&>(*element);
 
-        const char* preview = (dropdown.m_currentId < dropdown.m_entries.size() ? dropdown.m_entries[dropdown.m_currentId].c_str() : nullptr);
+        const char* preview = (dropdown.m_currentIndex < dropdown.m_entries.size() ? dropdown.m_entries[dropdown.m_currentIndex].c_str() : nullptr);
         if (ImGui::BeginCombo(dropdown.m_label.c_str(), preview)) {
           for (std::size_t entryIndex = 0; entryIndex < dropdown.m_entries.size(); ++entryIndex) {
-            const bool isSelected = (dropdown.m_currentId == entryIndex);
+            const bool isSelected = (dropdown.m_currentIndex == entryIndex);
 
             if (ImGui::Selectable(dropdown.m_entries[entryIndex].c_str(), isSelected)) {
               if (!isSelected) { // If the item isn't already selected
                 dropdown.m_actionChanged(dropdown.m_entries[entryIndex], entryIndex);
-                dropdown.m_currentId = entryIndex;
+                dropdown.m_currentIndex = entryIndex;
               }
             }
 
