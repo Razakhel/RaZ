@@ -5,9 +5,7 @@
 
 #include "RaZ/Component.hpp"
 #include "RaZ/Math/Angle.hpp"
-#include "RaZ/Math/Constants.hpp"
 #include "RaZ/Math/Matrix.hpp"
-#include "RaZ/Math/Vector.hpp"
 
 namespace Raz {
 
@@ -26,19 +24,21 @@ enum class ProjectionType : uint8_t {
 /// Camera simulating a point of view for a scene to be rendered from.
 class Camera final : public Component {
 public:
-  Camera() = default;
+  constexpr Camera() = default;
   Camera(unsigned int frameWidth, unsigned int frameHeight,
          Radiansf fieldOfView = Degreesf(45.f),
          float nearPlane = 0.1f, float farPlane = 1000.f,
          ProjectionType projType = ProjectionType::PERSPECTIVE);
 
-  Radiansf getFieldOfView() const { return m_fieldOfView; }
-  float getOrthographicBound() const { return m_orthoBound; }
-  CameraType getCameraType() const { return m_cameraType; }
-  const Mat4f& getViewMatrix() const { return m_viewMat; }
-  const Mat4f& getInverseViewMatrix() const { return m_invViewMat; }
-  const Mat4f& getProjectionMatrix() const { return m_projMat; }
-  const Mat4f& getInverseProjectionMatrix() const { return m_invProjMat; }
+  constexpr unsigned int getFrameWidth() const noexcept { return m_frameWidth; }
+  constexpr unsigned int getFrameHeight() const noexcept { return m_frameHeight; }
+  constexpr Radiansf getFieldOfView() const noexcept { return m_fieldOfView; }
+  constexpr float getOrthographicBound() const noexcept { return m_orthoBound; }
+  constexpr CameraType getCameraType() const noexcept { return m_cameraType; }
+  constexpr const Mat4f& getViewMatrix() const noexcept { return m_viewMat; }
+  constexpr const Mat4f& getInverseViewMatrix() const noexcept { return m_invViewMat; }
+  constexpr const Mat4f& getProjectionMatrix() const noexcept { return m_projMat; }
+  constexpr const Mat4f& getInverseProjectionMatrix() const noexcept { return m_invProjMat; }
 
   void setFieldOfView(Radiansf fieldOfView);
   void setOrthographicBound(float bound);
@@ -105,7 +105,9 @@ public:
   constexpr Vec3f unproject(const Vec2f& point) const noexcept { return unproject(Vec3f(point, 0.f)); }
 
 private:
-  float m_frameRatio     = 1.f;
+  unsigned int m_frameWidth {};
+  unsigned int m_frameHeight {};
+  float m_frameRatio {};
   Radiansf m_fieldOfView = Degreesf(45.f);
   float m_nearPlane      = 0.1f;
   float m_farPlane       = 1000.f;

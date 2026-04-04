@@ -7,11 +7,11 @@
 
 using namespace Raz::Literals;
 
-TEST_CASE("Camera view", "[render]") {
+TEST_CASE("Camera view matrix", "[render]") {
   Raz::Camera camera;
 
   const Raz::Quaternionf rotation(45_deg, Raz::Axis::Y);
-  Raz::Transform camTransform(Raz::Vec3f(0.f, 1., 0.f), rotation);
+  Raz::Transform camTransform(Raz::Vec3f(0.f, 1.f, 0.f), rotation);
   const Raz::Mat4f& viewMat = camera.computeViewMatrix(camTransform);
 
   CHECK(Raz::Mat3f(viewMat) == Raz::Mat3f(rotation.computeMatrix().inverse()));
@@ -97,6 +97,48 @@ TEST_CASE("Camera orthographic projection", "[render]") {
                                                                             0.f,     0.2f,  0.f,    0.f,
                                                                             0.f,     0.f,  -0.001f, 0.f,
                                                                             0.f,     0.f,   0.f,    1.f)));
+}
+
+TEST_CASE("Camera viewport", "[render]") {
+  Raz::Camera camera;
+  CHECK(camera.getFrameWidth() == 0);
+  CHECK(camera.getFrameHeight() == 0);
+  CHECK(camera.getProjectionMatrix() == Raz::Mat4f::identity());
+  CHECK(camera.getInverseProjectionMatrix() == Raz::Mat4f::identity());
+
+  // Giving 0 as width or height is an error
+  CHECK_THROWS_AS(camera.resizeViewport(0, 0), std::invalid_argument);
+  CHECK_THROWS_AS(camera.resizeViewport(0, 1), std::invalid_argument);
+  CHECK_THROWS_AS(camera.resizeViewport(1, 0), std::invalid_argument);
+
+  constexpr Raz::Mat4f uniformProj(2.41421342f, 0.f,          0.f,      0.f,
+                                   0.f,         2.41421342f,  0.f,      0.f,
+                                   0.f,         0.f,         -1.0002f, -0.20002f,
+                                   0.f,         0.f,         -1.f,      0.f);
+
+  camera.resizeViewport(1, 1);
+  CHECK(camera.getFrameWidth() == 1);
+  CHECK(camera.getFrameHeight() == 1);
+  CHECK_THAT(camera.getProjectionMatrix(), IsNearlyEqualToMatrix(uniformProj));
+  CHECK_THAT(camera.getInverseProjectionMatrix(), IsNearlyEqualToMatrix(uniformProj.inverse()));
+
+  constexpr Raz::Mat4f nonUniformProj(4.82842684f, 0.f,          0.f,      0.f,
+                                      0.f,         2.41421342f,  0.f,      0.f,
+                                      0.f,         0.f,         -1.0002f, -0.20002f,
+                                      0.f,         0.f,         -1.f,      0.f);
+
+  camera.resizeViewport(2, 4);
+  CHECK(camera.getFrameWidth() == 2);
+  CHECK(camera.getFrameHeight() == 4);
+  CHECK_THAT(camera.getProjectionMatrix(), IsNearlyEqualToMatrix(nonUniformProj));
+  CHECK_THAT(camera.getInverseProjectionMatrix(), IsNearlyEqualToMatrix(nonUniformProj.inverse()));
+
+  // Resizing with dimensions yielding the same ratio doesn't recompute the matrices
+  camera.resizeViewport(4, 8);
+  CHECK(camera.getFrameWidth() == 4);
+  CHECK(camera.getFrameHeight() == 8);
+  CHECK_THAT(camera.getProjectionMatrix(), IsNearlyEqualToMatrix(nonUniformProj));
+  CHECK_THAT(camera.getInverseProjectionMatrix(), IsNearlyEqualToMatrix(nonUniformProj.inverse()));
 }
 
 TEST_CASE("Camera point unprojection", "[render]") {

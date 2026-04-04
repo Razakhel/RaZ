@@ -21,6 +21,8 @@ TEST_CASE("LuaRender Camera", "[script][lua][render]") {
     assert(camera.cameraType == CameraType.LOOK_AT)
 
     camera:resizeViewport(1, 1)
+    assert(camera:getFrameWidth() == 1)
+    assert(camera:getFrameHeight() == 1)
 
     camera:setTarget(Vec3f.new(1))
     assert(camera:computeViewMatrix(Transform.new()) == camera:getViewMatrix())

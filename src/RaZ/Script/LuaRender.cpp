@@ -27,6 +27,8 @@ void LuaWrapper::registerRenderTypes() {
                                                                                 Camera(unsigned int, unsigned int, Radiansf, float, float),
                                                                                 Camera(unsigned int, unsigned int, Radiansf, float, float, ProjectionType)>(),
                                                               sol::base_classes, sol::bases<Component>());
+    camera["getFrameWidth"]                  = &Camera::getFrameWidth;
+    camera["getFrameHeight"]                 = &Camera::getFrameHeight;
     camera["fieldOfView"]                    = sol::property(&Camera::getFieldOfView, &Camera::setFieldOfView);
     camera["orthographicBound"]              = sol::property(&Camera::getOrthographicBound, &Camera::setOrthographicBound);
     camera["cameraType"]                     = sol::property(&Camera::getCameraType, &Camera::setCameraType);

@@ -8,14 +8,11 @@ namespace Raz {
 Camera::Camera(unsigned int frameWidth, unsigned int frameHeight,
                Radiansf fieldOfView,
                float nearPlane, float farPlane,
-               ProjectionType projType) : m_frameRatio{ static_cast<float>(frameWidth) / static_cast<float>(frameHeight) },
-                                          m_fieldOfView{ fieldOfView },
+               ProjectionType projType) : m_fieldOfView{ fieldOfView },
                                           m_nearPlane{ nearPlane }, m_farPlane{ farPlane },
                                           m_projType{ projType } {
   ZoneScopedN("Camera::Camera");
-
-  computeProjectionMatrix();
-  computeInverseProjectionMatrix();
+  resizeViewport(frameWidth, frameHeight);
 }
 
 void Camera::setFieldOfView(Radiansf fieldOfView) {
@@ -136,6 +133,12 @@ const Mat4f& Camera::computeInverseProjectionMatrix() {
 
 void Camera::resizeViewport(unsigned int frameWidth, unsigned int frameHeight) {
   ZoneScopedN("Camera::resizeViewport");
+
+  if (frameWidth == 0 || frameHeight == 0)
+    throw std::invalid_argument("[Camera] Cannot resize viewport with a width or height of 0");
+
+  m_frameWidth  = frameWidth;
+  m_frameHeight = frameHeight;
 
   const float newRatio = static_cast<float>(frameWidth) / static_cast<float>(frameHeight);
 
