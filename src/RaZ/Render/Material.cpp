@@ -20,6 +20,10 @@ constexpr std::string_view blinnPhongShaderSource = {
 #include "blinn-phong.frag.embed"
 };
 
+constexpr std::string_view vertexColorShaderSource = {
+#include "vertex_colors.frag.embed"
+};
+
 constexpr std::string_view singleTexture2DShaderSource = {
 #include "single_texture_2d.frag.embed"
 };
@@ -95,6 +99,10 @@ void Material::loadType(MaterialType type) {
       if (!m_program.hasTexture(MaterialTexture::Bump))
         m_program.setTexture(Texture2D::create(ColorPreset::White), MaterialTexture::Bump);
 
+      break;
+
+    case MaterialType::VERTEX_COLORS:
+      m_program.setShaders(VertexShader::loadFromSource(vertShaderSource), FragmentShader::loadFromSource(vertexColorShaderSource));
       break;
 
     case MaterialType::SINGLE_TEXTURE_2D:

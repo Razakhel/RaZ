@@ -15,11 +15,13 @@ struct Vertex {
   Vec2f texcoords;
   Vec3f normal;
   Vec3f tangent;
+  Vec3f color;
 
   constexpr bool strictlyEquals(const Vertex& vert) const noexcept { return position.strictlyEquals(vert.position)
                                                                          && texcoords.strictlyEquals(vert.texcoords)
                                                                          && normal.strictlyEquals(vert.normal)
-                                                                         && tangent.strictlyEquals(vert.tangent); }
+                                                                         && tangent.strictlyEquals(vert.tangent)
+                                                                         && color.strictlyEquals(vert.color); }
 
   constexpr bool operator==(const Vertex& vert) const noexcept = default;
 };
@@ -30,6 +32,7 @@ inline std::ostream& operator<<(std::ostream& stream, const Vertex& vert) {
          << "  " << vert.texcoords << '\n'
          << "  " << vert.normal << '\n'
          << "  " << vert.tangent << '\n'
+         << "  " << vert.color << '\n'
          << '}';
   return stream;
 }
@@ -77,7 +80,7 @@ struct std::hash<Raz::Vertex> {
   /// \param vert Vertex to compute the hash of.
   /// \return Vertex's hash value.
   constexpr std::size_t operator()(const Raz::Vertex& vert) const noexcept {
-    return vert.tangent.hash(vert.normal.hash(vert.texcoords.hash(vert.position.hash(0))));
+    return vert.color.hash(vert.tangent.hash(vert.normal.hash(vert.texcoords.hash(vert.position.hash(0)))));
   }
 };
 

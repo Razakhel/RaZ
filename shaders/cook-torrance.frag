@@ -26,6 +26,7 @@ struct Material {
 in struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
+  vec3 vertColor;
   mat3 vertTBNMatrix;
 } vertMeshInfo;
 

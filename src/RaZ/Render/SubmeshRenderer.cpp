@@ -120,6 +120,13 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
                             stride, tangentOffset);
   Renderer::enableVertexAttribArray(3);
 
+  // Color
+  constexpr std::size_t colorOffset = tangentOffset + sizeof(vertices.front().tangent);
+  Renderer::setVertexAttrib(4,
+                            AttribDataType::FLOAT, 3, // vec3
+                            stride, colorOffset);
+  Renderer::enableVertexAttribArray(4);
+
   m_vbo.unbind();
   m_vao.unbind();
 

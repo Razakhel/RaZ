@@ -2,6 +2,7 @@ layout(location = 0) in vec3 vertPosition;
 layout(location = 1) in vec2 vertTexcoords;
 layout(location = 2) in vec3 vertNormal;
 layout(location = 3) in vec3 vertTangent;
+layout(location = 4) in vec3 vertColor;
 
 layout(std140) uniform uboCameraInfo {
   mat4 uniViewMat;
@@ -19,12 +20,14 @@ layout(std140) uniform uboModelInfo {
 out struct MeshInfo {
   vec3 vertPosition;
   vec2 vertTexcoords;
+  vec3 vertColor;
   mat3 vertTBNMatrix;
 } vertMeshInfo;
 
 void main() {
   vertMeshInfo.vertPosition  = (uniModelMat * vec4(vertPosition, 1.0)).xyz;
   vertMeshInfo.vertTexcoords = vertTexcoords;
+  vertMeshInfo.vertColor     = vertColor;
 
   mat3 modelMat = mat3(uniModelMat);
 

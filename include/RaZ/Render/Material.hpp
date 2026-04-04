@@ -10,6 +10,7 @@ namespace Raz {
 enum class MaterialType {
   COOK_TORRANCE,     ///< Cook-Torrance (PBR) material.
   BLINN_PHONG,       ///< Blinn-Phong material.
+  VERTEX_COLORS,     ///<
   SINGLE_TEXTURE_2D, ///< Single 2D texture material; only displays the given texture as-is.
   SINGLE_TEXTURE_3D  ///< Single 3D texture material; only displays the given texture as-is.
 };

@@ -8,6 +8,7 @@ constexpr std::string_view tessCtrlSource = R"(
   struct MeshInfo {
     vec3 vertPosition;
     vec2 vertTexcoords;
+    vec3 vertColor;
     mat3 vertTBNMatrix;
   };
 
@@ -43,6 +44,7 @@ constexpr std::string_view tessEvalSource = R"(
   struct MeshInfo {
     vec3 vertPosition;
     vec2 vertTexcoords;
+    vec3 vertColor;
     mat3 vertTBNMatrix;
   };
 
