@@ -46,6 +46,7 @@ TEST_CASE("LuaRender Cubemap", "[script][lua][render]") {
     cubemap       = Cubemap.new(Image.new(1, 1, ImageColorspace.GRAY), Image.new(1, 1, ImageColorspace.GRAY_ALPHA),
                                 Image.new(1, 1, ImageColorspace.RGB), Image.new(1, 1, ImageColorspace.RGBA),
                                 Image.new(1, 1, ImageColorspace.SRGB), Image.new(1, 1, ImageColorspace.SRGBA))
+    cubemap       = Cubemap.new(Image.new(4, 2, ImageColorspace.GRAY))
 
     assert(cubemap:getIndex() >= 0)
     assert(cubemap:getProgram() ~= nil)
@@ -53,6 +54,7 @@ TEST_CASE("LuaRender Cubemap", "[script][lua][render]") {
     cubemap:load(Image.new(1, 1, ImageColorspace.GRAY), Image.new(1, 1, ImageColorspace.GRAY_ALPHA),
                  Image.new(1, 1, ImageColorspace.RGB), Image.new(1, 1, ImageColorspace.RGBA),
                  Image.new(1, 1, ImageColorspace.SRGB), Image.new(1, 1, ImageColorspace.SRGBA))
+    cubemap:load(Image.new(4, 2, ImageColorspace.GRAY))
 
     cubemap:bind()
     cubemap:draw()

@@ -14,8 +14,9 @@ class RenderShaderProgram;
 class Cubemap {
 public:
   Cubemap();
-  explicit Cubemap(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back)
+  Cubemap(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back)
     : Cubemap() { load(right, left, top, bottom, front, back); }
+  explicit Cubemap(const Image& equirectangularImg) : Cubemap() { load(equirectangularImg); }
   Cubemap(const Cubemap&) = delete;
   Cubemap(Cubemap&&) noexcept = default;
 
@@ -30,6 +31,9 @@ public:
   /// \param front Image which will be on the front of the cube.
   /// \param back Image which will be on the back of the cube.
   void load(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back) const;
+  /// Applies the given equirectangular image to the cubemap.
+  /// \param equirectangularImg Equirectangular image to apply.
+  void load(const Image& equirectangularImg) const;
   /// Binds the cubemap texture.
   void bind() const;
   /// Unbinds the cubemap texture.

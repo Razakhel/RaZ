@@ -1,8 +1,9 @@
 #include "RaZ/Data/Image.hpp"
-#include "RaZ/Data/Mesh.hpp"
+#include "RaZ/Data/ImageUtils.hpp"
 #include "RaZ/Render/Cubemap.hpp"
-#include "RaZ/Render/MeshRenderer.hpp"
+#include "RaZ/Render/GraphicObjects.hpp"
 #include "RaZ/Render/Renderer.hpp"
+#include "RaZ/Render/ShaderProgram.hpp"
 #include "RaZ/Utils/Logger.hpp"
 
 #include "tracy/Tracy.hpp"
@@ -159,7 +160,7 @@ const RenderShaderProgram& Cubemap::getProgram() const {
 }
 
 void Cubemap::load(const Image& right, const Image& left, const Image& top, const Image& bottom, const Image& front, const Image& back) const {
-  ZoneScopedN("Cubemap::load");
+  ZoneScopedN("Cubemap::load(Image, Image, Image, Image, Image, Image)");
 
   bind();
 
@@ -215,6 +216,12 @@ void Cubemap::load(const Image& right, const Image& left, const Image& top, cons
   if (Renderer::checkVersion(4, 3))
     Renderer::setLabel(RenderObjectType::TEXTURE, m_index, "Cubemap texture");
 #endif
+}
+
+void Cubemap::load(const Image& equirectangularImg) const {
+  ZoneScopedN("Cubemap::load(Image)");
+  const auto [right, left, top, bottom, front, back] = ImageUtils::convertEquirectangularToCubemap(equirectangularImg);
+  load(right, left, top, bottom, front, back);
 }
 
 void Cubemap::bind() const {

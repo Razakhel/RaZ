@@ -67,10 +67,12 @@ void LuaWrapper::registerRenderTypes() {
                                                                  sol::constructors<Cubemap(),
                                                                                    Cubemap(const Image&, const Image&,
                                                                                            const Image&, const Image&,
-                                                                                           const Image&, const Image&)>());
+                                                                                           const Image&, const Image&),
+                                                                                   Cubemap(const Image&)>());
     cubemap["getIndex"]   = &Cubemap::getIndex;
     cubemap["getProgram"] = [] (const Cubemap& c) { return &c.getProgram(); };
-    cubemap["load"]       = &Cubemap::load;
+    cubemap["load"]       = sol::overload(PickOverload<const Image&, const Image&, const Image&, const Image&, const Image&, const Image&>(&Cubemap::load),
+                                          PickOverload<const Image&>(&Cubemap::load));
     cubemap["bind"]       = &Cubemap::bind;
     cubemap["unbind"]     = &Cubemap::unbind;
     cubemap["draw"]       = &Cubemap::draw;

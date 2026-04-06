@@ -121,20 +121,20 @@ void save(const FilePath& filePath, const Mesh& mesh, const MeshRenderer* meshRe
 
   for (const Submesh& submesh : mesh.getSubmeshes()) {
     for (const Vertex& vertex : submesh.getVertices()) {
-      if (posCorrespIndices.find(vertex.position) == posCorrespIndices.cend()) {
+      if (!posCorrespIndices.contains(vertex.position)) {
         file << "v " << vertex.position.x() << ' '
                      << vertex.position.y() << ' '
                      << vertex.position.z() << '\n';
         posCorrespIndices.emplace(vertex.position, posCorrespIndices.size() + 1);
       }
 
-      if (texCorrespIndices.find(vertex.texcoords) == texCorrespIndices.cend()) {
+      if (!texCorrespIndices.contains(vertex.texcoords)) {
         file << "vt " << vertex.texcoords.x() << ' '
                       << vertex.texcoords.y() << '\n';
         texCorrespIndices.emplace(vertex.texcoords, texCorrespIndices.size() + 1);
       }
 
-      if (normCorrespIndices.find(vertex.normal) == normCorrespIndices.cend()) {
+      if (!normCorrespIndices.contains(vertex.normal)) {
         file << "vn " << vertex.normal.x() << ' '
                       << vertex.normal.y() << ' '
                       << vertex.normal.z() << '\n';
