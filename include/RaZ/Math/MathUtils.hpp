@@ -47,6 +47,32 @@ constexpr Vector<T, Size> lerp(const Vector<T, Size>& min, const Vector<T, Size>
   return res;
 }
 
+/// Computes the bilinear interpolation between four values, according to a coefficient for each axis.
+///
+///         minXY ----- maxXminY
+///           |            |
+///           |            |
+///           |            |
+///       minXmaxY ----- maxXY
+/// \tparam T Type to compute the interpolation with.
+/// \tparam CoeffT Type of the coefficients to apply.
+/// \param minXY Minimum value on both X and Y.
+/// \param maxXminY Maximum value on X, minimum value on Y.
+/// \param minXMaxY Minimum value on X, maximum value on Y.
+/// \param maxXY Maximum value on both X and Y.
+/// \param coeffX Coefficient on X between 0 (returns `minX`) and 1 (returns `maxX`).
+/// \param coeffY Coefficient on Y between 0 (returns `minY`) and 1 (returns `maxY`).
+/// \return Computed bilinear interpolation between the min and max values.
+template <typename T, typename CoeffT>
+constexpr float bilerp(T minXY, T maxXminY, T minXMaxY, T maxXY, CoeffT coeffX, CoeffT coeffY) noexcept {
+  static_assert(std::is_floating_point_v<CoeffT>, "Error: The coefficient type must be floating point.");
+
+  return static_cast<T>(static_cast<CoeffT>(minXY)    * (1 - coeffX) * (1 - coeffY)
+                      + static_cast<CoeffT>(maxXminY) * coeffX       * (1 - coeffY)
+                      + static_cast<CoeffT>(minXMaxY) * (1 - coeffX) * coeffY
+                      + static_cast<CoeffT>(maxXY)    * coeffX       * coeffY);
+}
+
 /// Computes the cubic [Hermite interpolation](https://en.wikipedia.org/wiki/Hermite_interpolation) of a value.
 ///
 ///       1.0    |               |___

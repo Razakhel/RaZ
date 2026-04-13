@@ -57,6 +57,24 @@ TEST_CASE("MathUtils lerp vector", "[math]") {
   CHECK(Raz::MathUtils::lerp(Raz::Vec3b(255, 140, 27), Raz::Vec3b(75, 241, 173), 1.f) == Raz::Vec3b(75, 241, 173));
 }
 
+TEST_CASE("MathUtils bilerp", "[math]") {
+  //   0 ------- 0.25
+  //   |          |
+  //   |          |
+  //   |          |
+  // 0.75 ------- 1
+
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 0.0f, 0.f) == 0.f);
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 0.0f, 1.f) == 0.75f);
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 1.f, 0.f) == 0.25f);
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 1.f, 1.f) == 1.f);
+
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 0.25f, 0.25f) == 0.25f);
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 0.25f, 0.75f) == 0.625f);
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 0.75f, 0.25f) == 0.375f);
+  CHECK(Raz::MathUtils::bilerp(0.f, 0.25f, 0.75f, 1.f, 0.75f, 0.75f) == 0.75f);
+}
+
 TEST_CASE("MathUtils smoothstep value", "[math]") {
   CHECK(Raz::MathUtils::smoothstep(0.f) == 0.f);
   CHECK(Raz::MathUtils::smoothstep(0.25f) == 0.15625f);
