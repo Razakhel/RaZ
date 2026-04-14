@@ -21,7 +21,7 @@ void MeshDistanceField::compute(std::size_t sampleCount) {
   if (m_bvh == nullptr)
     throw std::runtime_error("[MeshDistanceField] Computing a mesh distance field requires having given a BVH.");
 
-  std::fill(m_values.begin(), m_values.end(), std::numeric_limits<float>::max());
+  std::ranges::fill(m_values, std::numeric_limits<float>::max());
 
   const Vec3f areaExtents = m_area.getMaxPosition() - m_area.getMinPosition();
   const float widthStep   = areaExtents.x() / static_cast<float>(m_width - 1);
@@ -54,7 +54,7 @@ void MeshDistanceField::compute(std::size_t sampleCount) {
         }
       }
     }
-  }, Threading::getSystemThreadCount() * 2);
+  }, Threading::getDefaultThreadPool(), Threading::getSystemThreadCount() * 2);
 }
 
 std::vector<Image> MeshDistanceField::recoverSlices() const {

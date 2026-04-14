@@ -1,11 +1,9 @@
-#include "RaZ/Utils/ThreadPool.hpp"
-
 #include <vector>
 
-namespace Raz::Threading {
+namespace Raz {
 
 template <typename FuncT, typename... Args, typename ResultT>
-std::future<ResultT> launchAsync(FuncT&& action, Args&&... args) {
+std::future<ResultT> Threading::launchAsync(FuncT&& action, Args&&... args) {
 #if defined(RAZ_THREADS_AVAILABLE)
   return std::async(std::forward<FuncT>(action), std::forward<Args>(args)...);
 #else
@@ -16,7 +14,7 @@ std::future<ResultT> launchAsync(FuncT&& action, Args&&... args) {
 }
 
 template <std::integral BegIndexT, std::integral EndIndexT, typename FuncT>
-void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, unsigned int taskCount) {
+void Threading::parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, ThreadPool& threadPool, unsigned int taskCount) {
   static_assert(std::is_invocable_v<FuncT, IndexRange>, "Error: The given action must take an IndexRange as parameter");
 
   if (taskCount == 0)
@@ -26,8 +24,6 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, 
     throw std::invalid_argument("[Threading] The given index range is invalid.");
 
 #if defined(RAZ_THREADS_AVAILABLE)
-  ThreadPool& threadPool = getDefaultThreadPool();
-
   const auto totalRangeCount     = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
   const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), totalRangeCount);
 
@@ -62,7 +58,7 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, 
 }
 
 template <std::input_iterator IterT, typename FuncT>
-void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskCount) {
+void Threading::parallelize(IterT begin, IterT end, const FuncT& action, ThreadPool& threadPool, unsigned int taskCount) {
   static_assert(std::is_invocable_v<FuncT, IterRange<IterT>>, "Error: The given action must take an IterRange as parameter");
 
   if (taskCount == 0)
@@ -74,8 +70,6 @@ void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskC
     throw std::invalid_argument("[Threading] The given iterator range is invalid.");
 
 #if defined(RAZ_THREADS_AVAILABLE)
-  ThreadPool& threadPool = getDefaultThreadPool();
-
   const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), static_cast<std::size_t>(totalRangeCount));
 
   const std::size_t perTaskRangeCount = static_cast<std::size_t>(totalRangeCount) / maxTaskCount;
@@ -109,7 +103,9 @@ void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskC
 }
 
 template <std::integral BegIndexT, std::integral EndIndexT, typename ParallelFuncT, typename ReduceFuncT>
-auto parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex, const ParallelFuncT& action, const ReduceFuncT& reduce, unsigned int taskCount) {
+auto Threading::parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex,
+                                  const ParallelFuncT& action, const ReduceFuncT& reduce,
+                                  ThreadPool& threadPool, unsigned int taskCount) {
   static_assert(std::is_invocable_v<ParallelFuncT, IndexRange>, "Error: The given parallel action must take an IndexRange as parameter");
 
   using ResultT = std::invoke_result_t<ParallelFuncT, IndexRange>;
@@ -126,8 +122,6 @@ auto parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex, const ParallelF
     throw std::invalid_argument("[Threading] The given index range is invalid.");
 
 #if defined(RAZ_THREADS_AVAILABLE)
-  ThreadPool& threadPool = getDefaultThreadPool();
-
   const auto totalRangeCount     = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
   const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), totalRangeCount);
 
@@ -164,7 +158,7 @@ auto parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex, const ParallelF
 }
 
 template <std::input_iterator IterT, typename ParallelFuncT, typename ReduceFuncT>
-auto parallelizeReduce(IterT begin, IterT end, const ParallelFuncT& action, const ReduceFuncT& reduce, unsigned int taskCount) {
+auto Threading::parallelizeReduce(IterT begin, IterT end, const ParallelFuncT& action, const ReduceFuncT& reduce, ThreadPool& threadPool, unsigned int taskCount) {
   static_assert(std::is_invocable_v<ParallelFuncT, IterRange<IterT>>, "Error: The given parallel action must take an IterRange as parameter");
 
   using ResultT = std::invoke_result_t<ParallelFuncT, IterRange<IterT>>;
@@ -183,8 +177,6 @@ auto parallelizeReduce(IterT begin, IterT end, const ParallelFuncT& action, cons
     throw std::invalid_argument("[Threading] The given iterator range is invalid.");
 
 #if defined(RAZ_THREADS_AVAILABLE)
-  ThreadPool& threadPool = getDefaultThreadPool();
-
   const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), static_cast<std::size_t>(totalRangeCount));
 
   const std::size_t perTaskRangeCount = static_cast<std::size_t>(totalRangeCount) / maxTaskCount;
@@ -219,4 +211,4 @@ auto parallelizeReduce(IterT begin, IterT end, const ParallelFuncT& action, cons
 #endif
 }
 
-} // namespace Raz::Threading
+} // namespace Raz

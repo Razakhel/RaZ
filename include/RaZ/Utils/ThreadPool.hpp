@@ -35,6 +35,14 @@ public:
   /// \param threadNamePrefix Name that will be given to each thread, followed by their respective index.
   explicit ThreadPool(unsigned int threadCount, const std::string& threadNamePrefix = "Pool worker");
 
+  unsigned int getThreadCount() const noexcept {
+#if defined(RAZ_THREADS_AVAILABLE)
+    return static_cast<unsigned int>(m_threads.size());
+#else
+    return 1;
+#endif
+  }
+
   /// Enqueues a task to be executed by an available thread.
   /// \note If threads aren't supported, the task will be executed directly on the calling thread.
   /// \param task Task to be executed.
