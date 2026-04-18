@@ -1,13 +1,12 @@
 #include "RaZ/Utils/ThreadPool.hpp"
 
-#include <cassert>
 #include <vector>
 
 namespace Raz::Threading {
 
 template <typename FuncT, typename... Args, typename ResultT>
 std::future<ResultT> launchAsync(FuncT&& action, Args&&... args) {
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#if defined(RAZ_THREADS_AVAILABLE)
   return std::async(std::forward<FuncT>(action), std::forward<Args>(args)...);
 #else
   std::promise<ResultT> promise;
@@ -26,7 +25,7 @@ void parallelize(BegIndexT beginIndex, EndIndexT endIndex, const FuncT& action, 
   if (static_cast<std::ptrdiff_t>(beginIndex) >= static_cast<std::ptrdiff_t>(endIndex))
     throw std::invalid_argument("[Threading] The given index range is invalid.");
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#if defined(RAZ_THREADS_AVAILABLE)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   const auto totalRangeCount     = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
@@ -74,7 +73,7 @@ void parallelize(IterT begin, IterT end, const FuncT& action, unsigned int taskC
   if (totalRangeCount <= 0)
     throw std::invalid_argument("[Threading] The given iterator range is invalid.");
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#if defined(RAZ_THREADS_AVAILABLE)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), static_cast<std::size_t>(totalRangeCount));
@@ -126,7 +125,7 @@ auto parallelizeReduce(BegIndexT beginIndex, EndIndexT endIndex, const ParallelF
   if (static_cast<std::ptrdiff_t>(beginIndex) >= static_cast<std::ptrdiff_t>(endIndex))
     throw std::invalid_argument("[Threading] The given index range is invalid.");
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#if defined(RAZ_THREADS_AVAILABLE)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   const auto totalRangeCount     = static_cast<std::size_t>(endIndex) - static_cast<std::size_t>(beginIndex);
@@ -183,7 +182,7 @@ auto parallelizeReduce(IterT begin, IterT end, const ParallelFuncT& action, cons
   if (totalRangeCount <= 0)
     throw std::invalid_argument("[Threading] The given iterator range is invalid.");
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#if defined(RAZ_THREADS_AVAILABLE)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   const std::size_t maxTaskCount = std::min(static_cast<std::size_t>(taskCount), static_cast<std::size_t>(totalRangeCount));

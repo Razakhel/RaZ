@@ -3,17 +3,17 @@
 #ifndef RAZ_THREADING_HPP
 #define RAZ_THREADING_HPP
 
-// <thread> must be included first, since it creates the definition checked below
+// <thread> must be included first, since it creates the glib definition checked below
 #include <thread>
 
 // std::thread is not available on MinGW with Win32 threads
 #if defined(__MINGW32__) && !defined(_GLIBCXX_HAS_GTHREADS)
-#pragma message("Warning: Threads are not available with your compiler; check that you're using POSIX threads and not Win32 ones.")
+#pragma message("Warning: Threads are not available with your compiler; check that you're using POSIX threads and not Win32 ones")
+#elif defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+#pragma message("Warning: Threads are not yet available with Emscripten; parallel algorithms will run on the main thread")
 #else
 #define RAZ_THREADS_AVAILABLE
 #endif
-
-#if defined(RAZ_THREADS_AVAILABLE)
 
 #include <functional>
 #include <future>
@@ -174,7 +174,5 @@ auto parallelizeReduce(ContainerT&& collection, const ParallelFuncT& action, con
 } // namespace Raz
 
 #include "Threading.inl"
-
-#endif // RAZ_THREADS_AVAILABLE
 
 #endif // RAZ_THREADING_HPP

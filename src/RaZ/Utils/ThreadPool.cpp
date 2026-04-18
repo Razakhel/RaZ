@@ -11,6 +11,7 @@ ThreadPool::ThreadPool(const std::string& threadNamePrefix) : ThreadPool(Threadi
 ThreadPool::ThreadPool(unsigned int threadCount, const std::string& threadNamePrefix) {
   ZoneScopedN("ThreadPool::ThreadPool");
 
+#if defined(RAZ_THREADS_AVAILABLE)
   Logger::debug("[ThreadPool] Initializing (with {} thread(s))...", threadCount);
 
   m_threads.reserve(threadCount);
@@ -37,22 +38,28 @@ ThreadPool::ThreadPool(unsigned int threadCount, const std::string& threadNamePr
       }
     });
   }
+#endif
 
   Logger::debug("[ThreadPool] Initialized");
 }
 
 void ThreadPool::addTask(std::function<void()> task) {
+#if defined(RAZ_THREADS_AVAILABLE)
   {
     const std::lock_guard<std::mutex> lock(m_tasksMutex);
     m_tasks.push(std::move(task));
   }
 
   m_condVar.notify_one();
+#else
+  task();
+#endif
 }
 
 ThreadPool::~ThreadPool() {
   ZoneScopedN("ThreadPool::~ThreadPool");
 
+#if defined(RAZ_THREADS_AVAILABLE)
   Logger::debug("[ThreadPool] Destroying...");
 
   {
@@ -64,6 +71,7 @@ ThreadPool::~ThreadPool() {
 
   for (std::thread& thread : m_threads)
     thread.join();
+#endif
 
   Logger::debug("[ThreadPool] Destroyed");
 }

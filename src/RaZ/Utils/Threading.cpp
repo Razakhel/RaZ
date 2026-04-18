@@ -1,7 +1,5 @@
 #include "RaZ/Utils/Threading.hpp"
 
-#ifdef RAZ_THREADS_AVAILABLE
-
 #include "common/TracySystem.hpp"
 
 namespace Raz {
@@ -19,7 +17,7 @@ void Threading::parallelize(const std::function<void()>& action, unsigned int ta
   if (taskCount == 0)
     throw std::invalid_argument("[Threading] The number of tasks cannot be 0.");
 
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#if defined(RAZ_THREADS_AVAILABLE)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   std::vector<std::promise<void>> promises;
@@ -42,7 +40,7 @@ void Threading::parallelize(const std::function<void()>& action, unsigned int ta
 }
 
 void Threading::parallelize(std::initializer_list<std::function<void()>> actions) {
-#if !defined(RAZ_PLATFORM_EMSCRIPTEN)
+#if defined(RAZ_THREADS_AVAILABLE)
   ThreadPool& threadPool = getDefaultThreadPool();
 
   std::vector<std::promise<void>> promises;
@@ -66,5 +64,3 @@ void Threading::parallelize(std::initializer_list<std::function<void()>> actions
 }
 
 } // namespace Raz
-
-#endif // RAZ_THREADS_AVAILABLE

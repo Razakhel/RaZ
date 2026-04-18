@@ -3,22 +3,25 @@
 #ifndef RAZ_THREADPOOL_HPP
 #define RAZ_THREADPOOL_HPP
 
-// <thread> must be included first, since it creates the definition checked below
+// <thread> must be included first, since it creates the glib definition checked below
 #include <thread>
 
 // std::thread is not available on MinGW with Win32 threads
 #if defined(__MINGW32__) && !defined(_GLIBCXX_HAS_GTHREADS)
-#pragma message("Warning: Threads are not available with your compiler; check that you're using POSIX threads and not Win32 ones.")
+#pragma message("Warning: Threads are not available with your compiler; check that you're using POSIX threads and not Win32 ones")
+#elif defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+#pragma message("Warning: Threads are not yet available with Emscripten; parallel algorithms will run on the main thread")
 #else
 #define RAZ_THREADS_AVAILABLE
 #endif
 
-#if defined(RAZ_THREADS_AVAILABLE)
-
-#include <condition_variable>
 #include <functional>
+
+#if defined(RAZ_THREADS_AVAILABLE)
+#include <condition_variable>
 #include <mutex>
 #include <queue>
+#endif
 
 namespace Raz {
 
@@ -33,22 +36,23 @@ public:
   explicit ThreadPool(unsigned int threadCount, const std::string& threadNamePrefix = "Pool worker");
 
   /// Enqueues a task to be executed by an available thread.
+  /// \note If threads aren't supported, the task will be executed directly on the calling thread.
   /// \param task Task to be executed.
   void addTask(std::function<void()> task);
 
   ~ThreadPool();
 
 private:
+#if defined(RAZ_THREADS_AVAILABLE)
   std::vector<std::thread> m_threads {};
   bool m_shouldStop = false;
 
   std::mutex m_tasksMutex {};
   std::condition_variable m_condVar {};
   std::queue<std::function<void()>> m_tasks {};
+#endif
 };
 
 } // namespace Raz
-
-#endif // RAZ_THREADS_AVAILABLE
 
 #endif // RAZ_THREADPOOL_HPP
