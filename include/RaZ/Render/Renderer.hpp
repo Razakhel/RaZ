@@ -1038,6 +1038,7 @@ public:
   static void bindVertexArray(unsigned int index);
   static void unbindVertexArray() { bindVertexArray(0); }
   static void enableVertexAttribArray(unsigned int index);
+  static void disableVertexAttribArray(unsigned int index);
   static void setVertexAttrib(unsigned int index, AttribDataType dataType, uint8_t size, unsigned int stride, unsigned int offset, bool normalize = false);
   static void setVertexAttribDivisor(unsigned int index, unsigned int divisor);
   static void deleteVertexArrays(unsigned int count, const unsigned int* indices);

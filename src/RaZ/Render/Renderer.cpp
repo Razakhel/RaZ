@@ -431,6 +431,14 @@ void Renderer::enableVertexAttribArray(unsigned int index) {
   printConditionalErrors();
 }
 
+void Renderer::disableVertexAttribArray(unsigned int index) {
+  assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
+
+  glDisableVertexAttribArray(index);
+
+  printConditionalErrors();
+}
+
 void Renderer::setVertexAttrib(unsigned int index, AttribDataType dataType, uint8_t size, unsigned int stride, unsigned int offset, bool normalize) {
   assert("Error: The Renderer must be initialized before calling its functions." && isInitialized());
 
