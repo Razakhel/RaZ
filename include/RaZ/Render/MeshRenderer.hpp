@@ -14,7 +14,9 @@ class Mesh;
 class MeshRenderer final : public Component {
 public:
   MeshRenderer() = default;
-  explicit MeshRenderer(const Mesh& mesh, RenderMode renderMode = RenderMode::TRIANGLE) { load(mesh, renderMode); }
+  explicit MeshRenderer(const Mesh& mesh,
+                        RenderMode renderMode = RenderMode::TRIANGLE,
+                        VertexAttribute enabledAttribs = VertexAttributeDefault) { load(mesh, renderMode, enabledAttribs); }
   MeshRenderer(const MeshRenderer&) = delete;
   MeshRenderer(MeshRenderer&&) noexcept = default;
 
@@ -62,7 +64,10 @@ public:
   /// Loads a mesh onto the GPU.
   /// \param mesh Mesh to be loaded.
   /// \param renderMode Render mode to apply.
-  void load(const Mesh& mesh, RenderMode renderMode = RenderMode::TRIANGLE);
+  /// \param enabledAttribs Flags selecting which vertex attributes to pack and bind.
+  void load(const Mesh& mesh,
+            RenderMode renderMode = RenderMode::TRIANGLE,
+            VertexAttribute enabledAttribs = VertexAttributeDefault);
   /// Loads the materials.
   void loadMaterials() const;
   /// Renders the mesh.

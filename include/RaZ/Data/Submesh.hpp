@@ -15,7 +15,7 @@ struct Vertex {
   Vec2f texcoords;
   Vec3f normal;
   Vec3f tangent;
-  Vec3f color;
+  Vec4f color = Vec4f(1.f, 1.f, 1.f, 1.f);
 
   constexpr bool strictlyEquals(const Vertex& vert) const noexcept { return position.strictlyEquals(vert.position)
                                                                          && texcoords.strictlyEquals(vert.texcoords)

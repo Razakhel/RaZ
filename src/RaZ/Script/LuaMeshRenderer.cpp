@@ -17,7 +17,8 @@ void LuaWrapper::registerMeshRendererTypes() {
     sol::usertype<MeshRenderer> meshRenderer = state.new_usertype<MeshRenderer>("MeshRenderer",
                                                                                 sol::constructors<MeshRenderer(),
                                                                                                   MeshRenderer(const Mesh&),
-                                                                                                  MeshRenderer(const Mesh&, RenderMode)>(),
+                                                                                                  MeshRenderer(const Mesh&, RenderMode),
+                                                                                                  MeshRenderer(const Mesh&, RenderMode, VertexAttribute)>(),
                                                                                 sol::base_classes, sol::bases<Component>());
     meshRenderer["isEnabled"]           = &MeshRenderer::isEnabled;
     meshRenderer["getSubmeshRenderers"] = PickNonConstOverload<>(&MeshRenderer::getSubmeshRenderers);
@@ -35,7 +36,8 @@ void LuaWrapper::registerMeshRendererTypes() {
                                                         &MeshRenderer::addSubmeshRenderer<const Submesh&, RenderMode>);
     meshRenderer["clone"]               = &MeshRenderer::clone;
     meshRenderer["load"]                = sol::overload([] (MeshRenderer& r, const Mesh& m) { r.load(m); },
-                                                        PickOverload<const Mesh&, RenderMode>(&MeshRenderer::load));
+                                                        [] (MeshRenderer& r, const Mesh& m, RenderMode rm) { r.load(m, rm); },
+                                                        PickOverload<const Mesh&, RenderMode, VertexAttribute>(&MeshRenderer::load));
     meshRenderer["loadMaterials"]       = &MeshRenderer::loadMaterials;
     meshRenderer["draw"]                = &MeshRenderer::draw;
   }
@@ -50,7 +52,8 @@ void LuaWrapper::registerMeshRendererTypes() {
     submeshRenderer["materialIndex"] = sol::property(&SubmeshRenderer::getMaterialIndex, &SubmeshRenderer::setMaterialIndex);
     submeshRenderer["clone"]         = &SubmeshRenderer::clone;
     submeshRenderer["load"]          = sol::overload([] (SubmeshRenderer& r, const Submesh& s) { r.load(s); },
-                                                     PickOverload<const Submesh&, RenderMode>(&SubmeshRenderer::load));
+                                                     [] (SubmeshRenderer& r, const Submesh& s, RenderMode rm) { r.load(s, rm); },
+                                                     PickOverload<const Submesh&, RenderMode, VertexAttribute>(&SubmeshRenderer::load));
     submeshRenderer["draw"]          = &SubmeshRenderer::draw;
 
     state.new_enum<RenderMode>("RenderMode", {

@@ -50,16 +50,18 @@ void SubmeshRenderer::setRenderMode(RenderMode renderMode, const Submesh& submes
 SubmeshRenderer SubmeshRenderer::clone() const {
   SubmeshRenderer submeshRenderer;
 
-  submeshRenderer.m_renderMode    = m_renderMode;
-  submeshRenderer.m_renderFunc    = m_renderFunc;
-  submeshRenderer.m_materialIndex = m_materialIndex;
+  submeshRenderer.m_renderMode     = m_renderMode;
+  submeshRenderer.m_enabledAttribs = m_enabledAttribs;
+  submeshRenderer.m_renderFunc     = m_renderFunc;
+  submeshRenderer.m_materialIndex  = m_materialIndex;
 
   return submeshRenderer;
 }
 
-void SubmeshRenderer::load(const Submesh& submesh, RenderMode renderMode) {
+void SubmeshRenderer::load(const Submesh& submesh, RenderMode renderMode, VertexAttribute enabledAttribs) {
   ZoneScopedN("SubmeshRenderer::load");
 
+  m_enabledAttribs = enabledAttribs;
   loadVertices(submesh);
   setRenderMode(renderMode, submesh);
 }
@@ -84,41 +86,76 @@ void SubmeshRenderer::loadVertices(const Submesh& submesh) {
 
   const std::vector<Vertex>& vertices = submesh.getVertices();
 
+  // Pack only enabled attributes into a dense float buffer
+  const bool hasPosition  = static_cast<bool>(m_enabledAttribs & VertexAttribute::Position);
+  const bool hasTexcoords = static_cast<bool>(m_enabledAttribs & VertexAttribute::Texcoords);
+  const bool hasNormal    = static_cast<bool>(m_enabledAttribs & VertexAttribute::Normal);
+  const bool hasTangent   = static_cast<bool>(m_enabledAttribs & VertexAttribute::Tangent);
+  const bool hasColor     = static_cast<bool>(m_enabledAttribs & VertexAttribute::Color);
+
+  const unsigned int stride = (hasPosition  ? 3 : 0)
+                            + (hasTexcoords ? 2 : 0)
+                            + (hasNormal    ? 3 : 0)
+                            + (hasTangent   ? 3 : 0)
+                            + (hasColor     ? 4 : 0);
+
+  std::vector<float> packedData;
+  packedData.reserve(vertices.size() * stride);
+
+  for (const Vertex& vert : vertices) {
+    if (hasPosition) {
+      packedData.push_back(vert.position[0]);
+      packedData.push_back(vert.position[1]);
+      packedData.push_back(vert.position[2]);
+    }
+    if (hasTexcoords) {
+      packedData.push_back(vert.texcoords[0]);
+      packedData.push_back(vert.texcoords[1]);
+    }
+    if (hasNormal) {
+      packedData.push_back(vert.normal[0]);
+      packedData.push_back(vert.normal[1]);
+      packedData.push_back(vert.normal[2]);
+    }
+    if (hasTangent) {
+      packedData.push_back(vert.tangent[0]);
+      packedData.push_back(vert.tangent[1]);
+      packedData.push_back(vert.tangent[2]);
+    }
+    if (hasColor) {
+      packedData.push_back(vert.color[0]);
+      packedData.push_back(vert.color[1]);
+      packedData.push_back(vert.color[2]);
+      packedData.push_back(vert.color[3]);
+    }
+  }
+
   Renderer::sendBufferData(BufferType::ARRAY_BUFFER,
-                           static_cast<std::ptrdiff_t>(sizeof(vertices.front()) * vertices.size()),
-                           vertices.data(),
+                           static_cast<std::ptrdiff_t>(packedData.size() * sizeof(float)),
+                           packedData.data(),
                            BufferDataUsage::STATIC_DRAW);
 
   m_vbo.vertexCount = static_cast<unsigned int>(vertices.size());
 
-  constexpr uint8_t stride = sizeof(vertices.front());
+  // Bind shader locations
+  const auto byteStride   = stride * static_cast<unsigned int>(sizeof(float));
+  unsigned int byteOffset = 0;
 
-  // Position
-  Renderer::setVertexAttrib(0,
-                            AttribDataType::FLOAT, 3, // vec3
-                            stride, 0);
-  Renderer::enableVertexAttribArray(0);
+  auto bindAttrib = [&byteOffset, byteStride] (unsigned int location, uint8_t compCount, bool enabled) {
+    if (enabled) {
+      Renderer::setVertexAttrib(location, AttribDataType::FLOAT, compCount, byteStride, byteOffset);
+      Renderer::enableVertexAttribArray(location);
+      byteOffset += compCount * static_cast<unsigned int>(sizeof(float));
+    } else {
+      Renderer::disableVertexAttribArray(location);
+    }
+  };
 
-  // Texcoords
-  constexpr std::size_t texcoordsOffset = sizeof(vertices.front().position);
-  Renderer::setVertexAttrib(1,
-                            AttribDataType::FLOAT, 2, // vec2
-                            stride, texcoordsOffset);
-  Renderer::enableVertexAttribArray(1);
-
-  // Normal
-  constexpr std::size_t normalOffset = texcoordsOffset + sizeof(vertices.front().texcoords);
-  Renderer::setVertexAttrib(2,
-                            AttribDataType::FLOAT, 3, // vec3
-                            stride, normalOffset);
-  Renderer::enableVertexAttribArray(2);
-
-  // Tangent
-  constexpr std::size_t tangentOffset = normalOffset + sizeof(vertices.front().normal);
-  Renderer::setVertexAttrib(3,
-                            AttribDataType::FLOAT, 3, // vec3
-                            stride, tangentOffset);
-  Renderer::enableVertexAttribArray(3);
+  bindAttrib(0, 3, hasPosition);  // vec3 position
+  bindAttrib(1, 2, hasTexcoords); // vec2 texcoords
+  bindAttrib(2, 3, hasNormal);    // vec3 normal
+  bindAttrib(3, 3, hasTangent);   // vec3 tangent
+  bindAttrib(4, 4, hasColor);     // vec4 color
 
   // Color
   constexpr std::size_t colorOffset = tangentOffset + sizeof(vertices.front().tangent);

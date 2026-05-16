@@ -5,6 +5,7 @@
 
 #include "RaZ/Data/Submesh.hpp"
 #include "RaZ/Render/GraphicObjects.hpp"
+#include "RaZ/Utils/EnumUtils.hpp"
 
 #include <functional>
 
@@ -19,12 +20,32 @@ enum class RenderMode : unsigned int {
 #endif
 };
 
+/// Flags selecting which vertex attributes are packed into the VBO and bound to shader locations.
+/// \see SubmeshRenderer::load()
+enum class VertexAttribute : uint8_t {
+  Position  = 1,  ///< Vertex position (vec3, location 0).
+  Texcoords = 2,  ///< Texture coordinates (vec2, location 1).
+  Normal    = 4,  ///< Vertex normal (vec3, location 2).
+  Tangent   = 8,  ///< Vertex tangent (vec3, location 3).
+  Color     = 16, ///< Vertex color (vec4, location 4).
+};
+MAKE_ENUM_FLAG(VertexAttribute)
+
+/// Default set of vertex attributes: position, texcoords, normal, and tangent.
+inline constexpr VertexAttribute VertexAttributeDefault = VertexAttribute::Position
+                                                        | VertexAttribute::Texcoords
+                                                        | VertexAttribute::Normal
+                                                        | VertexAttribute::Tangent;
+
 class SubmeshRenderer {
 public:
   SubmeshRenderer() = default;
-  explicit SubmeshRenderer(const Submesh& submesh, RenderMode renderMode = RenderMode::TRIANGLE) { load(submesh, renderMode); }
+  explicit SubmeshRenderer(const Submesh& submesh,
+                           RenderMode renderMode = RenderMode::TRIANGLE,
+                           VertexAttribute enabledAttribs = VertexAttributeDefault) { load(submesh, renderMode, enabledAttribs); }
 
   RenderMode getRenderMode() const { return m_renderMode; }
+  VertexAttribute getEnabledAttributes() const { return m_enabledAttribs; }
   std::size_t getMaterialIndex() const { return m_materialIndex; }
 
   /// Sets a specific mode to render the submesh into.
@@ -40,7 +61,10 @@ public:
   /// Loads the submesh's data (vertices & indices) onto the graphics card.
   /// \param submesh Submesh to load the data from.
   /// \param renderMode Primitive type to render the submesh with.
-  void load(const Submesh& submesh, RenderMode renderMode = RenderMode::TRIANGLE);
+  /// \param enabledAttribs Flags selecting which vertex attributes to pack and bind. Defaults to position, texcoords, normal, and tangent.
+  void load(const Submesh& submesh,
+            RenderMode renderMode = RenderMode::TRIANGLE,
+            VertexAttribute enabledAttribs = VertexAttributeDefault);
   /// Draws the submesh in the scene.
   void draw() const;
 
@@ -53,6 +77,7 @@ private:
   IndexBuffer m_ibo {};
 
   RenderMode m_renderMode = RenderMode::TRIANGLE;
+  VertexAttribute m_enabledAttribs = VertexAttributeDefault;
   std::function<void(const VertexBuffer&, const IndexBuffer&)> m_renderFunc {};
 
   std::size_t m_materialIndex = 0;

@@ -63,7 +63,7 @@ MeshRenderer MeshRenderer::clone() const {
   return meshRenderer;
 }
 
-void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
+void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode, VertexAttribute enabledAttribs) {
   ZoneScopedN("MeshRenderer::load");
 
   if (mesh.getSubmeshes().empty()) {
@@ -76,7 +76,7 @@ void MeshRenderer::load(const Mesh& mesh, RenderMode renderMode) {
   m_submeshRenderers.resize(mesh.getSubmeshes().size());
 
   for (std::size_t submeshIndex = 0; submeshIndex < mesh.getSubmeshes().size(); ++submeshIndex)
-    m_submeshRenderers[submeshIndex].load(mesh.getSubmeshes()[submeshIndex], renderMode);
+    m_submeshRenderers[submeshIndex].load(mesh.getSubmeshes()[submeshIndex], renderMode, enabledAttribs);
 
   // If no material exists, create a default one
   if (m_materials.empty())
