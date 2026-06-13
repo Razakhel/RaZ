@@ -9,6 +9,9 @@ int main() {
     Raz::TcpServer server(1234);
     Raz::TcpClient client("localhost", 1234);
 
+    server.setConnectedCallback([] () { Raz::Logger::info("Client connected"); });
+    server.setDisconnectedCallback([] () { Raz::Logger::info("Client disconnected"); });
+
     while (true) {
       std::cout << "Write text to be sent ('q' to quit):\n";
       std::string request;

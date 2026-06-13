@@ -9,14 +9,27 @@
 
 namespace Raz {
 
-namespace {
+class TcpSession;
+
+struct TcpServer::Impl {
+  Impl() : acceptor(context) {}
+
+  asio::io_context context;
+  asio::ip::tcp::acceptor acceptor;
+  std::thread contextThread;
+
+  std::function<void()> connectedCallback;
+  std::function<void()> disconnectedCallback;
+};
 
 class TcpSession : public std::enable_shared_from_this<TcpSession> {
 public:
-  explicit TcpSession(asio::ip::tcp::socket socket) noexcept : m_socket{ std::move(socket) } {}
+  TcpSession(asio::ip::tcp::socket socket, TcpServer::Impl& server) noexcept : m_socket{ std::move(socket) }, m_server{ server } {}
 
   void run() {
     Logger::debug("[TcpSession] Connected to {}", m_socket.remote_endpoint().address().to_string());
+    if (m_server.connectedCallback)
+      m_server.connectedCallback();
     receive();
   }
 
@@ -25,6 +38,8 @@ private:
     m_socket.async_read_some(asio::buffer(m_data), [self = shared_from_this()] (const asio::error_code& error, std::size_t length) {
       if (error == asio::error::eof || error == asio::error::connection_reset) {
         Logger::debug("[TcpSession] Connection with {} closed", self->m_socket.remote_endpoint().address().to_string());
+        if (self->m_server.disconnectedCallback)
+          self->m_server.disconnectedCallback();
         return;
       }
 
@@ -47,23 +62,23 @@ private:
   }
 
   asio::ip::tcp::socket m_socket;
+  TcpServer::Impl& m_server;
   std::array<char, 1024> m_data {};
-};
-
-} // namespace
-
-struct TcpServer::Impl {
-  Impl() : acceptor(context) {}
-
-  asio::io_context context;
-  asio::ip::tcp::acceptor acceptor;
-  std::thread contextThread;
 };
 
 TcpServer::TcpServer() : m_impl{ std::make_unique<Impl>() } {}
 
 bool TcpServer::isRunning() const {
   return m_impl->acceptor.is_open();
+}
+
+void TcpServer::setConnectedCallback(std::function<void()> connectedCallback) {
+  m_impl->connectedCallback = std::move(connectedCallback);
+}
+
+void TcpServer::setDisconnectedCallback(std::function<void()> disconnectedCallback) {
+  m_impl->disconnectedCallback = std::move(disconnectedCallback);
+
 }
 
 void TcpServer::start(unsigned short port) {
@@ -117,7 +132,7 @@ void TcpServer::accept() {
     if (error)
       Logger::error("[TcpServer] Error while accepting connection: {}", error.message());
     else
-      std::make_shared<TcpSession>(std::move(socket))->run();
+      std::make_shared<TcpSession>(std::move(socket), *m_impl)->run();
 
     accept();
   });

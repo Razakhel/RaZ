@@ -3,11 +3,14 @@
 #ifndef RAZ_TCPSERVER_HPP
 #define RAZ_TCPSERVER_HPP
 
+#include <functional>
 #include <memory>
 
 namespace Raz {
 
 class TcpServer {
+  friend class TcpSession;
+
 public:
   TcpServer();
   explicit TcpServer(unsigned short port) : TcpServer() { start(port); }
@@ -15,6 +18,8 @@ public:
   TcpServer(TcpServer&&) noexcept = default;
 
   bool isRunning() const;
+  void setConnectedCallback(std::function<void()> connectedCallback);
+  void setDisconnectedCallback(std::function<void()> disconnectedCallback);
 
   /// Starts the server and listens for connections.
   /// \param port Port to listen for connections on.

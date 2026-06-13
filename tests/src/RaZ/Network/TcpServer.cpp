@@ -1,8 +1,9 @@
+#include "RaZ/Network/TcpClient.hpp"
 #include "RaZ/Network/TcpServer.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
-#include <thread>
+#include <future>
 
 TEST_CASE("TcpServer basic", "[network]") {
   Raz::TcpServer server;
@@ -20,4 +21,22 @@ TEST_CASE("TcpServer basic", "[network]") {
   CHECK_FALSE(server.isRunning());
   CHECK_NOTHROW(server.stop()); // Stopping an already stopped server does nothing
   CHECK_FALSE(server.isRunning());
+}
+
+TEST_CASE("TcpServer connection callbacks") {
+  Raz::TcpServer server;
+  CHECK_NOTHROW(server.start(1234));
+
+  std::promise<void> connectionPromise;
+  std::promise<void> disconnectionPromise;
+  server.setConnectedCallback([&connectionPromise] () { connectionPromise.set_value(); });
+  server.setDisconnectedCallback([&disconnectionPromise] () { disconnectionPromise.set_value(); });
+
+  Raz::TcpClient client;
+
+  client.connect("localhost", 1234);
+  CHECK_NOTHROW(connectionPromise.get_future().get());
+
+  client.disconnect();
+  CHECK_NOTHROW(disconnectionPromise.get_future().get());
 }
