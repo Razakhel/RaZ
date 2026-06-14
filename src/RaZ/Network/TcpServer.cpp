@@ -20,6 +20,7 @@ struct TcpServer::Impl {
 
   std::function<void()> connectedCallback;
   std::function<void()> disconnectedCallback;
+  std::function<std::vector<std::byte>(std::span<const std::byte>)> receivedCallback;
 };
 
 class TcpSession : public std::enable_shared_from_this<TcpSession> {
@@ -31,6 +32,13 @@ public:
     if (m_server.connectedCallback)
       m_server.connectedCallback();
     receive();
+  }
+
+  void send(std::span<const std::byte> data) {
+    asio::async_write(m_socket, asio::buffer(data), [] (const asio::error_code& error, std::size_t) {
+      if (error)
+        Logger::error("[TcpSession] Error while sending data: {}", error.message());
+    });
   }
 
 private:
@@ -45,19 +53,13 @@ private:
 
       if (error) {
         Logger::error("[TcpSession] Error while receiving data: {}", error.message());
-      } else {
-        Logger::debug("[TcpSession] Received: {}", std::string_view(self->m_data.data(), length));
-        self->echo(length); // Replying with the same received data
+      } else if (self->m_server.receivedCallback) {
+        const std::vector<std::byte> response = self->m_server.receivedCallback(std::span(reinterpret_cast<const std::byte*>(self->m_data.data()), length));
+        if (!response.empty())
+          self->send(response);
       }
 
       self->receive();
-    });
-  }
-
-  void echo(std::size_t length) {
-    asio::async_write(m_socket, asio::buffer(m_data, length), [] (const asio::error_code& error, std::size_t) {
-      if (error)
-        Logger::error("[TcpSession] Error while echoing: {}", error.message());
     });
   }
 
@@ -79,6 +81,10 @@ void TcpServer::setConnectedCallback(std::function<void()> connectedCallback) {
 void TcpServer::setDisconnectedCallback(std::function<void()> disconnectedCallback) {
   m_impl->disconnectedCallback = std::move(disconnectedCallback);
 
+}
+
+void TcpServer::setReceivedCallback(std::function<std::vector<std::byte>(std::span<const std::byte>)> receivedCallback) {
+  m_impl->receivedCallback = std::move(receivedCallback);
 }
 
 void TcpServer::start(unsigned short port) {

@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <memory>
+#include <span>
 
 namespace Raz {
 
@@ -20,6 +21,7 @@ public:
   bool isRunning() const;
   void setConnectedCallback(std::function<void()> connectedCallback);
   void setDisconnectedCallback(std::function<void()> disconnectedCallback);
+  void setReceivedCallback(std::function<std::vector<std::byte>(std::span<const std::byte>)> receivedCallback);
 
   /// Starts the server and listens for connections.
   /// \param port Port to listen for connections on.

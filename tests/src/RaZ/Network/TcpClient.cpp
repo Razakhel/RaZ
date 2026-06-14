@@ -39,6 +39,9 @@ TEST_CASE("TcpClient connection", "[network]") {
 
 TEST_CASE("TcpClient send and receive", "[network]") {
   Raz::TcpServer server(1234);
+  server.setReceivedCallback([] (std::span<const std::byte> data) {
+    return std::vector(data.begin(), data.end()); // Echoing back the received data
+  });
 
   Raz::TcpClient client("localhost", 1234);
   REQUIRE(client.isConnected());
@@ -56,6 +59,9 @@ TEST_CASE("TcpClient send and receive", "[network]") {
 
 TEST_CASE("TcpClient receive at least", "[network]") {
   Raz::TcpServer server(1234);
+  server.setReceivedCallback([] (std::span<const std::byte> data) {
+    return std::vector(data.begin(), data.end()); // Echoing back the received data
+  });
 
   Raz::TcpClient client("localhost", 1234);
   REQUIRE(client.isConnected());
@@ -72,6 +78,9 @@ TEST_CASE("TcpClient receive at least", "[network]") {
 
 TEST_CASE("TcpClient receive exactly", "[network]") {
   Raz::TcpServer server(1234);
+  server.setReceivedCallback([] (std::span<const std::byte> data) {
+    return std::vector(data.begin(), data.end()); // Echoing back the received data
+  });
 
   Raz::TcpClient client("localhost", 1234);
   REQUIRE(client.isConnected());
@@ -85,6 +94,9 @@ TEST_CASE("TcpClient receive exactly", "[network]") {
 
 TEST_CASE("TcpClient receive until delimiter", "[network]") {
   Raz::TcpServer server(1234);
+  server.setReceivedCallback([] (std::span<const std::byte> data) {
+    return std::vector(data.begin(), data.end()); // Echoing back the received data
+  });
 
   Raz::TcpClient client("localhost", 1234);
   REQUIRE(client.isConnected());

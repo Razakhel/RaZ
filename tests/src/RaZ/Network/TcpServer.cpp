@@ -24,8 +24,7 @@ TEST_CASE("TcpServer basic", "[network]") {
 }
 
 TEST_CASE("TcpServer connection callbacks") {
-  Raz::TcpServer server;
-  CHECK_NOTHROW(server.start(1234));
+  Raz::TcpServer server(1234);
 
   std::promise<void> connectionPromise;
   std::promise<void> disconnectionPromise;
@@ -39,4 +38,25 @@ TEST_CASE("TcpServer connection callbacks") {
 
   client.disconnect();
   CHECK_NOTHROW(disconnectionPromise.get_future().get());
+}
+
+TEST_CASE("TcpServer reception callback") {
+  Raz::TcpServer server(1234);
+
+  uint8_t receivedCount = 0;
+  server.setReceivedCallback([&receivedCount] (std::span<const std::byte> data) {
+    std::vector<std::byte> response(data.begin(), data.end());
+    response.emplace_back(static_cast<std::byte>(' '));
+    response.emplace_back(static_cast<std::byte>(receivedCount + 48)); // Actual character representing the count
+    ++receivedCount;
+    return response;
+  });
+
+  Raz::TcpClient client("localhost", 1234);
+
+  client.send("test");
+  CHECK(client.receive() == "test 0");
+
+  client.send("other test");
+  CHECK(client.receive() == "other test 1");
 }

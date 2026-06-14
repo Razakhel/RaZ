@@ -11,6 +11,12 @@ int main() {
 
     server.setConnectedCallback([] () { Raz::Logger::info("Client connected"); });
     server.setDisconnectedCallback([] () { Raz::Logger::info("Client disconnected"); });
+    server.setReceivedCallback([] (std::span<const std::byte> data) {
+      const std::string_view dataStr(reinterpret_cast<const char*>(data.data()), data.size());
+      Raz::Logger::info("Received: {}", dataStr);
+      // Replying "OK" to the client
+      return std::vector<std::byte>({ static_cast<std::byte>('O'), static_cast<std::byte>('K') });
+    });
 
     while (true) {
       std::cout << "Write text to be sent ('q' to quit):\n";
