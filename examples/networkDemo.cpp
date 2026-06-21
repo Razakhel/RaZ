@@ -7,8 +7,6 @@ int main() {
     Raz::Logger::setLoggingLevel(Raz::LoggingLevel::ALL);
 
     Raz::TcpServer server(1234);
-    Raz::TcpClient client("localhost", 1234);
-
     server.setConnectedCallback([] () { Raz::Logger::info("Client connected"); });
     server.setDisconnectedCallback([] () { Raz::Logger::info("Client disconnected"); });
     server.setReceivedCallback([] (std::span<const std::byte> data) {
@@ -17,6 +15,8 @@ int main() {
       // Replying "OK" to the client
       return std::vector<std::byte>({ static_cast<std::byte>('O'), static_cast<std::byte>('K') });
     });
+
+    Raz::TcpClient client("localhost", 1234);
 
     while (true) {
       std::cout << "Write text to be sent ('q' to quit):\n";

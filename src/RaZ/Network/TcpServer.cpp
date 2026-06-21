@@ -17,6 +17,7 @@ struct TcpServer::Impl {
   asio::io_context context;
   asio::ip::tcp::acceptor acceptor;
   std::thread contextThread;
+  std::vector<std::weak_ptr<TcpSession>> sessions;
 
   std::function<void()> connectedCallback;
   std::function<void()> disconnectedCallback;
@@ -101,6 +102,14 @@ void TcpServer::start(unsigned short port) {
   });
 }
 
+void TcpServer::broadcast(std::vector<std::byte> data) {
+  asio::post(m_impl->context, [this, broadcastData = std::move(data)] () {
+    std::erase_if(m_impl->sessions, [] (const auto& session) { return session.expired(); });
+    for (const std::weak_ptr<TcpSession>& session : m_impl->sessions)
+      session.lock()->send(broadcastData);
+  });
+}
+
 void TcpServer::stop() {
   Logger::debug("[TcpServer] Stopping...");
 
@@ -135,10 +144,13 @@ void TcpServer::accept() {
     if (error == asio::error::interrupted || error == asio::error::operation_aborted)
       return; // Server closed
 
-    if (error)
+    if (error) {
       Logger::error("[TcpServer] Error while accepting connection: {}", error.message());
-    else
-      std::make_shared<TcpSession>(std::move(socket), *m_impl)->run();
+    } else {
+      std::shared_ptr<TcpSession> session = std::make_shared<TcpSession>(std::move(socket), *m_impl);
+      m_impl->sessions.emplace_back(session);
+      session->run();
+    }
 
     accept();
   });

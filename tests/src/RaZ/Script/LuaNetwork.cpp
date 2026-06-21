@@ -38,7 +38,11 @@ TEST_CASE("LuaNetwork TcpServer", "[script][lua][network]") {
     tcpServer       = TcpServer.new(1234)
 
     assert(tcpServer:isRunning())
+    tcpServer:setConnectedCallback(function () end)
+    tcpServer:setDisconnectedCallback(function () end)
+    tcpServer:setReceivedCallback(function () end)
     tcpServer:start(1234)
+    tcpServer:broadcast("test")
     tcpServer:stop()
   )"));
 }

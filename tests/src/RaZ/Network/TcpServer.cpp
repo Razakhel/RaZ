@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <future>
+#include <latch>
 
 TEST_CASE("TcpServer basic", "[network]") {
   Raz::TcpServer server;
@@ -59,4 +60,24 @@ TEST_CASE("TcpServer reception callback") {
 
   client.send("other test");
   CHECK(client.receive() == "other test 1");
+}
+
+TEST_CASE("TcpServer broadcast") {
+  Raz::TcpServer server(1234);
+
+  // Due to a potential data race (which occurs under Linux and/or with GCC), connections must be fully done before broadcasting;
+  //  since this test doesn't represent what an actual usage would be, the synchronization is done here
+  // In a real-life situation broadcasting should always happen in response to an event, guaranteeing a prior connection
+  std::latch remainingConnectionCount(2);
+  server.setConnectedCallback([&remainingConnectionCount] () noexcept { remainingConnectionCount.count_down(); });
+
+  Raz::TcpClient client1("localhost", 1234);
+  Raz::TcpClient client2("localhost", 1234);
+
+  remainingConnectionCount.wait();
+
+  constexpr std::string_view message = "test";
+  server.broadcast(message);
+  CHECK(client1.receive() == message);
+  CHECK(client2.receive() == message);
 }

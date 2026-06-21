@@ -48,9 +48,13 @@ void LuaWrapper::registerNetworkTypes() {
     sol::usertype<TcpServer> tcpServer = state.new_usertype<TcpServer>("TcpServer",
                                                                        sol::constructors<TcpServer(),
                                                                                          TcpServer(unsigned short)>());
-    tcpServer["isRunning"] = &TcpServer::isRunning;
-    tcpServer["start"]     = &TcpServer::start;
-    tcpServer["stop"]      = &TcpServer::stop;
+    tcpServer["isRunning"]               = &TcpServer::isRunning;
+    tcpServer["setConnectedCallback"]    = &TcpServer::setConnectedCallback;
+    tcpServer["setDisconnectedCallback"] = &TcpServer::setDisconnectedCallback;
+    tcpServer["setReceivedCallback"]     = &TcpServer::setReceivedCallback;
+    tcpServer["start"]                   = &TcpServer::start;
+    tcpServer["broadcast"]               = PickOverload<std::string_view>(&TcpServer::broadcast);
+    tcpServer["stop"]                    = &TcpServer::stop;
   }
 
   {
