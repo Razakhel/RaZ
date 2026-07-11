@@ -520,12 +520,12 @@ enum class SamplerParameter : unsigned int {
   WRAP_S         = static_cast<unsigned int>(TextureParameter::WRAP_S)         /* GL_TEXTURE_WRAP_S       */, ///<
   WRAP_T         = static_cast<unsigned int>(TextureParameter::WRAP_T)         /* GL_TEXTURE_WRAP_T       */, ///<
   WRAP_R         = static_cast<unsigned int>(TextureParameter::WRAP_R)         /* GL_TEXTURE_WRAP_R       */, ///<
-#if !defined(OPENGL_ES)
+#if !defined(USE_OPENGL_ES)
   BORDER_COLOR   = 4100                                                        /* GL_TEXTURE_BORDER_COLOR */, ///<
 #endif
   MIN_LOD        = 33082                                                       /* GL_TEXTURE_MIN_LOD      */, ///<
   MAX_LOD        = 33083                                                       /* GL_TEXTURE_MAX_LOD      */, ///<
-#if !defined(OPENGL_ES)
+#if !defined(USE_OPENGL_ES)
   LOD_BIAS       = 34049                                                       /* GL_TEXTURE_LOD_BIAS     */, ///<
 #endif
   COMPARE_MODE   = 34892                                                       /* GL_TEXTURE_COMPARE_MODE */, ///<
@@ -974,7 +974,7 @@ public:
   /// \param minor Minor version.
   /// \return True if the given version is higher than or equal to the current one, false otherwise.
   static bool checkVersion(int major, int minor) noexcept { return (s_majorVersion > major || (s_majorVersion == major && s_minorVersion >= minor)); }
-  static bool isExtensionSupported(const std::string& extension) { return (s_extensions.find(extension) != s_extensions.cend()); }
+  static bool isExtensionSupported(const std::string& extension) { return s_extensions.contains(extension); }
   static TextureInternalFormat getDefaultFramebufferColorFormat() { return s_defaultFramebufferColor; }
   static TextureInternalFormat getDefaultFramebufferDepthFormat() { return s_defaultFramebufferDepth; }
   static void enable(Capability capability);

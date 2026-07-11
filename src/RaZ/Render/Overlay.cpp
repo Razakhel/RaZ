@@ -111,7 +111,7 @@ void OverlayTextbox::setText(std::string text) {
   m_callback(m_text);
 }
 
-OverlayTextbox& OverlayTextbox::append(const std::string& text) {
+OverlayTextbox& OverlayTextbox::append(std::string_view text) {
   m_text += text;
   m_callback(m_text);
 
@@ -128,7 +128,7 @@ void OverlayTextArea::setText(std::string text) {
   m_callback(m_text);
 }
 
-OverlayTextArea& OverlayTextArea::append(const std::string& text) {
+OverlayTextArea& OverlayTextArea::append(std::string_view text) {
   m_text += text;
   m_callback(m_text);
 

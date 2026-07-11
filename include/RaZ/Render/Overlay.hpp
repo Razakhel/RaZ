@@ -209,10 +209,10 @@ public:
 
   void setText(std::string text);
 
-  OverlayTextbox& append(const std::string& text);
+  OverlayTextbox& append(std::string_view text);
   void clear();
 
-  OverlayTextbox& operator+=(const std::string& text) { return append(text); }
+  OverlayTextbox& operator+=(std::string_view text) { return append(text); }
 
 private:
   std::string m_text;
@@ -234,10 +234,10 @@ public:
 
   void setText(std::string text);
 
-  OverlayTextArea& append(const std::string& text);
+  OverlayTextArea& append(std::string_view text);
   void clear();
 
-  OverlayTextArea& operator+=(const std::string& text) { return append(text); }
+  OverlayTextArea& operator+=(std::string_view text) { return append(text); }
 
 private:
   std::string m_text;
