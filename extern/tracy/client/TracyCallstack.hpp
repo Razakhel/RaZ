@@ -1,9 +1,24 @@
 #ifndef __TRACYCALLSTACK_HPP__
 #define __TRACYCALLSTACK_HPP__
 
+#include <stdint.h>
+
 #include "../common/TracyApi.h"
 #include "../common/TracyForceInline.hpp"
 #include "TracyCallstack.h"
+
+namespace tracy
+{
+
+struct ImageEntry
+{
+    uint64_t m_startAddress = 0;
+    uint64_t m_endAddress = 0;
+    char* m_name = nullptr;
+    char* m_path = nullptr;
+};
+
+}
 
 #ifndef TRACY_HAS_CALLSTACK
 
@@ -72,6 +87,10 @@ void InitCallstack();
 void InitCallstackCritical();
 void EndCallstack();
 const char* GetKernelModulePath( uint64_t addr );
+
+#ifdef __linux__
+void InitExternalImageCache( pid_t pid );
+#endif
 
 #ifdef TRACY_DEBUGINFOD
 const uint8_t* GetBuildIdForImage( const char* image, size_t& size );

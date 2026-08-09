@@ -1,7 +1,12 @@
 #ifndef __TRACYOPENGL_HPP__
 #define __TRACYOPENGL_HPP__
 
-#if !defined TRACY_ENABLE || defined __APPLE__
+#ifdef __APPLE__
+#define TRACY_OPENGL_DISABLE
+#warning "OpenGL timestamps are unreliable on Apple devices that still run OpenGL."
+#endif
+
+#if !defined TRACY_ENABLE || defined TRACY_OPENGL_DISABLE
 
 #define TracyGpuContext
 #define TracyGpuContextName(x,y)
@@ -34,6 +39,9 @@ public:
 #include <atomic>
 #include <assert.h>
 #include <stdlib.h>
+#ifdef TRACY_OPENGL_AUTO_CALIBRATION
+#  include <chrono>
+#endif
 
 #include "Tracy.hpp"
 #include "../client/TracyProfiler.hpp"
@@ -44,9 +52,24 @@ public:
 #if !defined GL_TIMESTAMP && defined GL_TIMESTAMP_EXT
 #  define GL_TIMESTAMP GL_TIMESTAMP_EXT
 #  define GL_QUERY_COUNTER_BITS GL_QUERY_COUNTER_BITS_EXT
+#  define GL_QUERY_RESULT GL_QUERY_RESULT_EXT
+#  define GL_QUERY_RESULT_AVAILABLE GL_QUERY_RESULT_AVAILABLE_EXT
+#  define glGenQueries glGenQueriesEXT
+#  define glGetQueryiv glGetQueryivEXT
 #  define glGetQueryObjectiv glGetQueryObjectivEXT
 #  define glGetQueryObjectui64v glGetQueryObjectui64vEXT
+#  define glGetInteger64v glGetInteger64vEXT
 #  define glQueryCounter glQueryCounterEXT
+#endif
+
+#ifndef GL_MAJOR_VERSION
+#  define GL_MAJOR_VERSION 0x821B
+#endif
+#ifndef GL_NUM_EXTENSIONS
+#  define GL_NUM_EXTENSIONS 0x821D
+#endif
+#ifndef GL_QUERY_RESULT_NO_WAIT
+#  define GL_QUERY_RESULT_NO_WAIT 0x9194
 #endif
 
 #define TracyGpuContext tracy::GetGpuCtx().ptr = (tracy::GpuCtx*)tracy::tracy_malloc( sizeof( tracy::GpuCtx ) ); new(tracy::GetGpuCtx().ptr) tracy::GpuCtx;
@@ -87,24 +110,57 @@ class GpuCtx
 {
     friend class GpuCtxScope;
 
-    enum { QueryCount = 64 * 1024 };
+    static constexpr size_t QueryCount = 64 * 1024;
 
 public:
     GpuCtx()
         : m_context( GetGpuCtxCounter().fetch_add( 1, std::memory_order_relaxed ) )
         , m_head( 0 )
         , m_tail( 0 )
+        , m_supportsQueryBufferObject( false )
     {
+        ZoneScopedC( Color::Red4 );
+
         assert( m_context != 255 );
 
-        glGenQueries( QueryCount, m_query );
+        if( !CheckFeature( "GL_ARB_timer_query" ) && !CheckFeature( "GL_EXT_disjoint_timer_query" ) )
+        {
+            Profiler::LogString( MessageSourceType::Tracy, MessageSeverity::Warning, Color::Tomato, 0,
+                    "OpenGL context does not support timer queries." );
+        }
+
+        // check for GL_QUERY_RESULT_NO_WAIT support
+        m_supportsQueryBufferObject = CheckFeature( "GL_ARB_query_buffer_object" );
+        if( !m_supportsQueryBufferObject )
+        {
+            Profiler::LogString( MessageSourceType::Tracy, MessageSeverity::Info, 0, 0,
+                    "OpenGL context does not support GL_ARB_query_buffer_object." );
+        }
+
+        GLint bits;
+        glGetQueryiv( GL_TIMESTAMP, GL_QUERY_COUNTER_BITS, &bits );
+        if( bits == 0 )
+        {
+            // all timestamp queries would resolve to 0 (and produce 0ns GPU zones).
+            // (this is the case for many TBDR GPUs, including Apple Silicon)
+            Profiler::LogString( MessageSourceType::Tracy, MessageSeverity::Warning, Color::Tomato, 0,
+                "OpenGL driver does not implement GL_TIMESTAMP precision." );
+        }
+        assert( bits > 0 );
 
         int64_t tgpu;
         glGetInteger64v( GL_TIMESTAMP, &tgpu );
         int64_t tcpu = Profiler::GetTime();
 
-        GLint bits;
-        glGetQueryiv( GL_TIMESTAMP, GL_QUERY_COUNTER_BITS, &bits );
+#ifdef TRACY_OPENGL_AUTO_CALIBRATION
+        // The anchor above is never refreshed; advertise calibration and emit periodic
+        // GpuCalibration events to correct CPU/GPU drift (see Recalibrate). Opt-in,
+        // because Recalibrate() calls glGetInteger64v( GL_TIMESTAMP ), which forces a
+        // CPU/GPU sync.
+        m_prevCalibration = GetHostTimeNs();
+#endif
+
+        glGenQueries( QueryCount, m_query );
 
         const float period = 1.f;
         const auto thread = GetThreadHandle();
@@ -114,7 +170,11 @@ public:
         MemWrite( &item->gpuNewContext.thread, thread );
         MemWrite( &item->gpuNewContext.period, period );
         MemWrite( &item->gpuNewContext.context, m_context );
-        MemWrite( &item->gpuNewContext.flags, uint8_t( 0 ) );
+#ifdef TRACY_OPENGL_AUTO_CALIBRATION
+        MemWrite( &item->gpuNewContext.flags, GpuContextFlags( GpuContextCalibration ) );
+#else
+        MemWrite( &item->gpuNewContext.flags, GpuContextFlags( 0 ) );
+#endif
         MemWrite( &item->gpuNewContext.type, GpuContextType::OpenGl );
 
 #ifdef TRACY_ON_DEMAND
@@ -143,8 +203,6 @@ public:
     {
         ZoneScopedC( Color::Red4 );
 
-        if( m_tail == m_head ) return;
-
 #ifdef TRACY_ON_DEMAND
         if( !GetProfiler().IsConnected() )
         {
@@ -153,14 +211,18 @@ public:
         }
 #endif
 
+#ifdef TRACY_OPENGL_AUTO_CALIBRATION
+        // Before the drain's early-returns, so it runs even on frames with no
+        // completed queries.
+        Recalibrate();
+#endif
+
+        if( m_tail == m_head ) return;
+
         while( m_tail != m_head )
         {
-            GLint available;
-            glGetQueryObjectiv( m_query[m_tail], GL_QUERY_RESULT_AVAILABLE, &available );
-            if( !available ) return;
-
             uint64_t time;
-            glGetQueryObjectui64v( m_query[m_tail], GL_QUERY_RESULT, &time );
+            if( !GetTimestamp(time, m_tail) ) return;
 
             TracyLfqPrepare( QueueType::GpuTime );
             MemWrite( &item->gpuTime.gpuTime, (int64_t)time );
@@ -173,6 +235,87 @@ public:
     }
 
 private:
+    // Returns whether the driver advertises a single extension (full GL_-prefixed token).
+    static bool CheckFeature( const char* feature )
+    {
+        GLint major = 0;
+        glGetIntegerv( GL_MAJOR_VERSION, &major );
+        if( glGetError() != GL_NO_ERROR ) major = 0;   // pre-3.0: enum not supported
+
+#if defined(GL_VERSION_3_0) || defined(GL_ES_VERSION_3_0)
+        // GL 3 onwards: glGetStringi
+        if( major >= 3 )
+        {
+            GLint numExt = 0;
+            glGetIntegerv( GL_NUM_EXTENSIONS, &numExt );
+            for( GLint i = 0; i < numExt; i++ )
+            {
+                auto ext = (const char*)glGetStringi( GL_EXTENSIONS, i );
+                if( ext && strcmp( ext, feature ) == 0 ) return true;
+            }
+            return false;
+        }
+#endif
+
+        // pre GL3 fallback:
+        auto exts = (const char*)glGetString( GL_EXTENSIONS );
+        return exts && strstr( exts, feature ) != nullptr;
+    }
+
+    tracy_force_inline bool GetTimestamp( uint64_t& timestamp, unsigned int queryId )
+    {
+        if( m_supportsQueryBufferObject )
+        {
+            constexpr uint64_t sentinel = ~uint64_t(0);
+            uint64_t time = sentinel;
+            glGetQueryObjectui64v( m_query[queryId], GL_QUERY_RESULT_NO_WAIT, &time );
+            if ( time == sentinel ) return false;
+            timestamp = time;
+        }
+        else
+        {
+            GLint available;
+            glGetQueryObjectiv( m_query[queryId], GL_QUERY_RESULT_AVAILABLE, &available );
+            if( available == GL_FALSE ) return false;
+            uint64_t time;
+            glGetQueryObjectui64v( m_query[queryId], GL_QUERY_RESULT, &time );
+            timestamp = time;
+        }
+        return true;
+    }
+
+#ifdef TRACY_OPENGL_AUTO_CALIBRATION
+    // Monotonic host ns for the inter-calibration interval (cpuDelta), kept
+    // separate from Profiler::GetTime() as in the D3D12/Vulkan backends.
+    static tracy_force_inline int64_t GetHostTimeNs()
+    {
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::steady_clock::now().time_since_epoch() ).count();
+    }
+
+    // OpenGL has no atomic CPU+GPU timestamp query, so sample back-to-back; the
+    // gap is negligible against the recalibration interval below. Note this forces
+    // a CPU/GPU sync, which is why the whole path is opt-in (TRACY_OPENGL_AUTO_CALIBRATION).
+    tracy_force_inline void Recalibrate()
+    {
+        const int64_t hostNow = GetHostTimeNs();
+        const int64_t delta = hostNow - m_prevCalibration;
+        if( delta < 1000ll * 1000 * 1000 ) return; // throttle: ~once per second
+
+        int64_t tgpu;
+        glGetInteger64v( GL_TIMESTAMP, &tgpu );
+        const int64_t refCpu = Profiler::GetTime();
+        m_prevCalibration = hostNow;
+
+        TracyLfqPrepare( QueueType::GpuCalibration );
+        MemWrite( &item->gpuCalibration.gpuTime, tgpu );
+        MemWrite( &item->gpuCalibration.cpuTime, refCpu );
+        MemWrite( &item->gpuCalibration.cpuDelta, delta );
+        MemWrite( &item->gpuCalibration.context, m_context );
+        TracyLfqCommit;
+    }
+#endif
+
     tracy_force_inline unsigned int NextQueryId()
     {
         const auto id = m_head;
@@ -196,6 +339,12 @@ private:
 
     unsigned int m_head;
     unsigned int m_tail;
+
+#ifdef TRACY_OPENGL_AUTO_CALIBRATION
+    int64_t m_prevCalibration; // host-ns timestamp of the last emitted calibration
+#endif
+
+    bool m_supportsQueryBufferObject;
 };
 
 class GpuCtxScope
@@ -204,6 +353,7 @@ public:
     tracy_force_inline GpuCtxScope( const SourceLocationData* srcloc, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -225,6 +375,7 @@ public:
     tracy_force_inline GpuCtxScope( const SourceLocationData* srcloc, int32_t depth, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -252,6 +403,7 @@ public:
     tracy_force_inline GpuCtxScope( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -274,6 +426,7 @@ public:
     tracy_force_inline GpuCtxScope( uint32_t line, const char* source, size_t sourceSz, const char* function, size_t functionSz, const char* name, size_t nameSz, int32_t depth, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -306,6 +459,9 @@ public:
         const auto queryId = GetGpuCtx().ptr->NextQueryId();
         glQueryCounter( GetGpuCtx().ptr->TranslateOpenGlQueryId( queryId ), GL_TIMESTAMP );
 
+#ifdef TRACY_ON_DEMAND
+        if( GetProfiler().ConnectionId() != m_connectionId ) return;
+#endif
         TracyLfqPrepare( QueueType::GpuZoneEnd );
         MemWrite( &item->gpuZoneEnd.cpuTime, Profiler::GetTime() );
         memset( &item->gpuZoneEnd.thread, 0, sizeof( item->gpuZoneEnd.thread ) );
@@ -316,6 +472,10 @@ public:
 
 private:
     const bool m_active;
+
+#ifdef TRACY_ON_DEMAND
+    uint64_t m_connectionId = 0;
+#endif
 };
 
 }

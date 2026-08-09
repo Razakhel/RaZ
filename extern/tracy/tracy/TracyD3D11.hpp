@@ -108,7 +108,7 @@ public:
                 continue;
             }
 
-            if (disjoint.Disjoint)
+            if (disjoint.Disjoint || disjoint.Frequency == 0)
                 continue;
 
             UINT64 timestamp = 0;
@@ -132,7 +132,7 @@ public:
         MemWrite( &item->gpuNewContext.thread, uint32_t(0) );   // #TODO: why not GetThreadHandle()?
         MemWrite( &item->gpuNewContext.period, 1.0f );
         MemWrite( &item->gpuNewContext.context, m_contextId);
-        MemWrite( &item->gpuNewContext.flags, uint8_t(0) );
+        MemWrite( &item->gpuNewContext.flags, GpuContextFlags(0) );
         MemWrite( &item->gpuNewContext.type, GpuContextType::Direct3D11 );
 
 #ifdef TRACY_ON_DEMAND
@@ -214,6 +214,13 @@ public:
         {
             m_previousCheckpoint = m_nextCheckpoint;
             TracyD3D11Panic("disjoint timestamps detected; dropping.");
+            return;
+        }
+
+        if (disjoint.Frequency == 0)
+        {
+            m_previousCheckpoint = m_nextCheckpoint;
+            TracyD3D11Panic("zero GPU timestamp frequency; dropping.");
             return;
         }
 
@@ -365,6 +372,9 @@ public:
         const auto queryId = m_ctx->NextQueryId();
         m_ctx->m_immediateDevCtx->End(m_ctx->GetQueryObjectFromId(queryId));
 
+#ifdef TRACY_ON_DEMAND
+        if( GetProfiler().ConnectionId() != m_connectionId ) return;
+#endif
         auto* item = Profiler::QueueSerial();
         MemWrite( &item->hdr.type, QueueType::GpuZoneEndSerial );
         MemWrite( &item->gpuZoneEnd.cpuTime, Profiler::GetTime() );
@@ -378,6 +388,7 @@ private:
     tracy_force_inline D3D11ZoneScope( D3D11Ctx* ctx, bool active )
 #ifdef TRACY_ON_DEMAND
         : m_active( active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( active )
 #endif
@@ -401,6 +412,10 @@ private:
     }
 
     const bool m_active;
+
+#ifdef TRACY_ON_DEMAND
+    uint64_t m_connectionId = 0;
+#endif
 
     D3D11Ctx* m_ctx;
 };

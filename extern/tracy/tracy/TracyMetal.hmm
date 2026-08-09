@@ -198,7 +198,7 @@ public:
             reallocateBuffer = true;
         }
         TracyMetalDebugMasked(1<<3, ZoneValue(count));
-
+        
         auto buffer_idx = (begin / MaxQueries) % 2;
         auto counterSampleBuffer = m_counterSampleBuffers[buffer_idx];
 
@@ -275,9 +275,9 @@ public:
             resolved += 2;
         }
         TracyMetalDebugMasked(1<<3, ZoneValue(RingCount(begin, m_previousCheckpoint.load())));
-
+        
         m_previousCheckpoint += resolved;
-
+        
         // Check whether the timestamp buffer has been fully resolved/collected:
         // WARN: there's technically a race condition here: NextQuery() may reference the
         // buffer that is being released instead of the new one. In practice, this should
@@ -299,7 +299,7 @@ private:
     {
         TracyMetalDebugMasked(1<<0, TracyMetalPanic(, "MTLCounterErrorValue = 0x%llx", MTLCounterErrorValue));
         TracyMetalDebugMasked(1<<0, TracyMetalPanic(, "MTLCounterDontSample = 0x%llx", MTLCounterDontSample));
-
+        
         if (m_device == nil)
         {
             TracyMetalPanic({assert(false);} return, "device is nil.");
@@ -324,10 +324,10 @@ private:
         {
             TracyMetalDebugMasked(1<<0, fprintf(stderr, "WARNING: timestamp sampling at tile dispatch boundary is not supported.\n"));
         }
-
+        
         m_counterSampleBuffers[0] = NewTimestampSampleBuffer(m_device, MaxQueries);
         m_counterSampleBuffers[1] = NewTimestampSampleBuffer(m_device, MaxQueries);
-
+        
         m_timestampRequestTime.resize(MaxQueries);
 
         MTLTimestamp cpuTimestamp = 0;
@@ -341,9 +341,9 @@ private:
         TracyMetalDebugMasked(1<<0, TracyMetalPanic(, "Calibration: CPU timestamp (Tracy): %llu", cpuTimestamp));
 
         float period = 1.0f;
-
+        
         m_contextId = GetGpuCtxCounter().fetch_add(1);
-
+        
         auto* item = Profiler::QueueSerial();
         MemWrite(&item->hdr.type, QueueType::GpuNewContext);
         MemWrite(&item->gpuNewContext.cpuTime, int64_t(cpuTimestamp));
@@ -425,7 +425,7 @@ private:
     {
         return m_contextId;
     }
-
+    
     static id<MTLCounterSampleBuffer> NewTimestampSampleBuffer(id<MTLDevice> device, size_t count)
     {
         ZoneScopedN("tracy::MetalCtx::NewTimestampSampleBuffer");
@@ -459,7 +459,7 @@ private:
                 "ERROR: unable to create sample buffer for timestamp counters : %s | %s",
                 [error.localizedDescription cString], [error.localizedFailureReason cString]);
         }
-
+        
         return counterSampleBuffer;
     }
 
@@ -474,9 +474,9 @@ private:
 
     atomic_counter m_previousCheckpoint = 0;
     MTLTimestamp m_mostRecentTimestamp = 0;
-
+    
     std::vector<std::chrono::high_resolution_clock::time_point> m_timestampRequestTime;
-
+    
     std::mutex m_collectionMutex;
 };
 
@@ -486,6 +486,7 @@ public:
     tracy_force_inline MetalZoneScope( MetalCtx* ctx, MTLComputePassDescriptor* desc, const SourceLocationData* srcloc, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -506,6 +507,7 @@ public:
     tracy_force_inline MetalZoneScope( MetalCtx* ctx, MTLBlitPassDescriptor* desc, const SourceLocationData* srcloc, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -526,6 +528,7 @@ public:
     tracy_force_inline MetalZoneScope( MetalCtx* ctx, MTLRenderPassDescriptor* desc, const SourceLocationData* srcloc, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -549,6 +552,7 @@ public:
     tracy_force_inline MetalZoneScope( MetalCtx* ctx, id<MTLComputeCommandEncoder> cmdEncoder, const SourceLocationData* srcloc, bool is_active )
 #ifdef TRACY_ON_DEMAND
         : m_active( is_active && GetProfiler().IsConnected() )
+        , m_connectionId( GetProfiler().ConnectionId() )
 #else
         : m_active( is_active )
 #endif
@@ -569,20 +573,27 @@ public:
     {
         if( !m_active ) return;
 
+#ifdef TRACY_ON_DEMAND
+        if( GetProfiler().ConnectionId() != m_connectionId ) return;
+#endif
         SubmitZoneEndGpu(m_ctx, m_query.idx + 1);
     }
-
+    
     TracyMetalDebugZoneScopeWireTap;
 
 private:
     const bool m_active;
+
+#ifdef TRACY_ON_DEMAND
+    uint64_t m_connectionId = 0;
+#endif
 
     MetalCtx* m_ctx;
 
     /* TODO: declare it for "command-level" profiling
     id<MTLComputeCommandEncoder> m_cmdEncoder;
     */
-
+    
     static void SubmitZoneBeginGpu(MetalCtx* ctx, uint32_t queryId, const SourceLocationData* srcloc)
     {
         auto* item = Profiler::QueueSerial();
@@ -593,10 +604,10 @@ private:
         MemWrite( &item->gpuZoneBegin.queryId, uint16_t( queryId ) );
         MemWrite( &item->gpuZoneBegin.context, ctx->GetContextId() );
         Profiler::QueueSerialFinish();
-
+        
         TracyMetalDebugMasked(1<<2, TracyAllocN((void*)(uintptr_t)queryId, 1, "TracyMetalGpuZone"));
     }
-
+    
     static void SubmitZoneEndGpu(MetalCtx* ctx, uint32_t queryId)
     {
         auto* item = Profiler::QueueSerial();
@@ -606,7 +617,7 @@ private:
         MemWrite( &item->gpuZoneEnd.queryId, uint16_t( queryId ) );
         MemWrite( &item->gpuZoneEnd.context, ctx->GetContextId() );
         Profiler::QueueSerialFinish();
-
+        
         TracyMetalDebugMasked(1<<2, TracyAllocN((void*)(uintptr_t)queryId, 1, "TracyMetalGpuZone"));
     }
 

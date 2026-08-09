@@ -9,6 +9,7 @@
 #include "../common/TracySystem.hpp"
 #include "../common/TracyAlign.hpp"
 #include "../common/TracyAlloc.hpp"
+#include "../common/TracyFormat.h"
 #include "TracyProfiler.hpp"
 #include "TracyCallstack.hpp"
 
@@ -99,7 +100,7 @@ public:
         TracyQueueCommit( zoneTextFatThread );
     }
 
-    void TextFmt( const char* fmt, ... )
+    void TextFmt( const char* fmt, ... ) TRACY_ATTRIBUTE_FORMAT_PRINTF(2, 3)
     {
         if( !m_active ) return;
 #ifdef TRACY_ON_DEMAND
@@ -138,7 +139,7 @@ public:
         TracyQueueCommit( zoneTextFatThread );
     }
 
-    void NameFmt( const char* fmt, ... )
+    void NameFmt( const char* fmt, ... ) TRACY_ATTRIBUTE_FORMAT_PRINTF(2, 3)
     {
         if( !m_active ) return;
 #ifdef TRACY_ON_DEMAND
